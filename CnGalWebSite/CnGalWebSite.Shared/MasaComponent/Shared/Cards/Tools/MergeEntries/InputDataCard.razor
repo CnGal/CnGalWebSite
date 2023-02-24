@@ -107,10 +107,10 @@ else
         model = new MergeEntryModel();
     }
 
-    public Task OnDelete(MergeEntryModel model)
+    public void OnDelete(MergeEntryModel model)
     {
         Model.Remove(model);
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnClickFinshInput()

@@ -44,12 +44,12 @@
     CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog masaCatalog;
     List<ArticleCatalogModel> CatalogItems = new List<ArticleCatalogModel>();
 
-    public Task Refresh(string text, string url)
+    public void Refresh(string text, string url)
     {
         Url = url;
         CatalogItems = ArticleCatalogModel.GetCatalog(text);
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

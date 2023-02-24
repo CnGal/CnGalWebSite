@@ -200,11 +200,11 @@
         NavigationManager.NavigateTo("/account/register/" + ReturnUrl);
     }
 
-    private Task OnRedirecting()
+    private void OnRedirecting()
     {
         isOnRedirecting = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

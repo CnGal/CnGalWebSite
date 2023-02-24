@@ -21,10 +21,10 @@
     [Parameter]
     public string Title { get; set; }
 
-    private Task OnAddinfor()
+    private void OnAddinfor()
     {
         Model.Add(new RelevancesModel());
-        return Task.CompletedTask;
+        
     }
 
 }

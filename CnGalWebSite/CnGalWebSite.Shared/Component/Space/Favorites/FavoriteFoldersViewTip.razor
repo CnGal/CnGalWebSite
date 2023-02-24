@@ -86,9 +86,9 @@ else
         NavigationManager.NavigateTo("/space/index/" + UserId);
         StateHasChanged();
     }
-    public Task OnManage()
+    public void OnManage()
     {
         NavigationManager.NavigateTo("/space/EditSpaceFavoriteFolders/" + UserId);
-        return Task.CompletedTask;
+        
     }
 }

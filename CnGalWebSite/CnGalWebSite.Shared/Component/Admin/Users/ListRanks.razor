@@ -35,7 +35,7 @@
         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => LookLink(context.Id))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(async () => LookLink(context.Id))" />
 
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
 
@@ -88,10 +88,10 @@
         }
     }
 
-    private Task LookLink(long id)
+    private void LookLink(long id)
     {
         NavigationManager.NavigateTo(Provider, "/ranks/editmain/" + id, "编辑头衔", "fa fa-tree");
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
@@ -241,11 +241,6 @@
             Title = "添加新头衔",
             Model = model,
             Items = items,
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 return await CreateRank((CreateRankModel)context.Model);

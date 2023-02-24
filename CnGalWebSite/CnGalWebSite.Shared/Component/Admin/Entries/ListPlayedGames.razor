@@ -42,7 +42,7 @@
         <TableColumn @bind-Field="@context.ShowPublicly" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.GameId ))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookClick( context.GameId ))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-link" Text="显示" IsAsync="true" IsShow="context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="私密" IsAsync="true" IsShow="context.ShowPublicly" OnClickWithoutRender="@(() => OnRowEditShowPubliclyClick(new long[] { context.Id }, true, true))" />
@@ -214,10 +214,10 @@
         await TableRows.QueryAsync();
     }
 
-    public Task OnRowLookClick(int id)
+    public void OnRowLookClick(int id)
     {
         NavigationManager.NavigateTo( "/entries/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
 

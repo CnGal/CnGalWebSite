@@ -127,11 +127,11 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    public Task OnTabClick(int index)
+    public void OnTabClick(int index)
     {
 
         TabIndexNum = index;
-        return Task.CompletedTask;
+        
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

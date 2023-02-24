@@ -27,7 +27,7 @@
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 
-    public Task CollectionChanged(bool collected, long id)
+    public void CollectionChanged(bool collected, long id)
     {
         foreach (var item in Model.PeripheryOverviewModels)
         {
@@ -50,6 +50,6 @@
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 }

@@ -57,11 +57,6 @@
             Model = Prizes[i],
             Items = items,
             Size = Size.Medium,
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
             // Trace.Log("保存按钮被点击");
@@ -90,11 +85,6 @@
             Model = model,
             Items = items,
             Size = Size.Medium,
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
             // Trace.Log("保存按钮被点击");
@@ -119,7 +109,7 @@
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImportPrizeTip>(new Dictionary<string, object>
         {
-            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, async (model) => await OnImported(model)),
+            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, (model) => OnImported(model)),
             [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
             [nameof(BatchImportPrizeTip.Title)] = "激活码"
 
@@ -127,7 +117,7 @@
         await DialogService.Show(option);
     }
 
-    public Task OnImported(List<string> model)
+    public void OnImported(List<string> model)
     {
         //检查是否符合要求
         foreach (var item in model)
@@ -138,6 +128,6 @@
             });
         }
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

@@ -54,11 +54,12 @@
     bool isCurrentFirst = true;
 
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await  GenerateList();
+         GenerateList();
     }
-    public Task GenerateList()
+
+    public void GenerateList()
     {
         ContrastItems.Clear();
         CurrentItems.Clear();
@@ -120,7 +121,7 @@
             CurrentItems.Last().Active = true;
             CurrentItem = CurrentItems.Last().Value;
         }
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnContrastChanged(SelectedItem item)
@@ -142,7 +143,7 @@
             }
         }
 
-        await GenerateList();
+        GenerateList();
         StateHasChanged();
         await ContrastChanged.InvokeAsync(item.Value);
     }
@@ -153,7 +154,7 @@
             isCurrentFirst = false;
             return;
         }
-        await GenerateList();
+        GenerateList();
         StateHasChanged();
         await CurrentChanged.InvokeAsync(item.Value);
     }

@@ -62,7 +62,7 @@
 
     private double ImageRatio { get; set; } = 1;
 
-    public Task OnInputFileChange(IBrowserFile file, ImageAspectType type)
+    public void OnInputFileChange(IBrowserFile file, ImageAspectType type)
     {
         PreviewImagePath = null;
 
@@ -92,20 +92,20 @@
 
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnLoad()
+    public void OnLoad()
     {
         isReady = true;
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnReset()
+    private void OnReset()
     {
         ImageRatio =1;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     private async Task DoneCrop()
@@ -176,7 +176,7 @@
 
     }
 
-    public Task DialogChanged(bool value)
+    public void DialogChanged(bool value)
     {
         Dialog=value;
         if(value==false)
@@ -184,6 +184,6 @@
             isReady = false;
         }
 
-        return Task.CompletedTask;
+        
     }
 }

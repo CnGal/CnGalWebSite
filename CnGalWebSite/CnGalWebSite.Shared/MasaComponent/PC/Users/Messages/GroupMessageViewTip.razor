@@ -33,10 +33,10 @@ else
         TotalPages = (Model.Count-1) / MaxCount + 1;
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         CurrentPage = pageIndex;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

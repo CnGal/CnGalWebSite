@@ -45,10 +45,10 @@
             ErrorHandler.ProcessError(ex, "获取广场随机标签列表失败");
         }
     }
-    public Task OnClickMore(string url)
+    public void OnClickMore(string url)
     {
         NavigationManager.NavigateTo(url);
-        return Task.CompletedTask;
+        
     }
 
 }

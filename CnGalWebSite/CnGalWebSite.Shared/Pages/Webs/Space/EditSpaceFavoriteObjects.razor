@@ -122,14 +122,14 @@ else
             ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
         }
     }
-    private Task DataLoaded(EditFavoriteFolderViewModel model)
+    private void DataLoaded(EditFavoriteFolderViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

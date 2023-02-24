@@ -53,7 +53,7 @@
                 _dataCacheService.UserPendingDataCatche.Items =( await Http.GetFromJsonAsync<List<UserPendingDataModel>>(ToolHelper.WebApiPath + "api/space/GetUserPendingData", ToolHelper.options)).OrderByDescending(s => s.DisplayMode).ToList();
             }
 
-            await OnPageClick(1);
+            OnPageClick(1);
 
             StateHasChanged();
         }
@@ -63,13 +63,13 @@
         }
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         _dataCacheService.UserPendingDataCatche.CurrentPage = pageIndex;
         Model = _dataCacheService.UserPendingDataCatche.Items.OrderByDescending(s => s.DisplayMode).Skip((_dataCacheService.UserPendingDataCatche.CurrentPage - 1) * _dataCacheService.UserPendingDataCatche.MaxCount).Take(_dataCacheService.UserPendingDataCatche.MaxCount).ToList();
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

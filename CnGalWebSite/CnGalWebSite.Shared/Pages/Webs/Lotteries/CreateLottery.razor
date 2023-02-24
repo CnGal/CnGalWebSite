@@ -95,14 +95,14 @@
         }
     }
 
-    private Task DataLoaded(EditLotteryModel model)
+    private void DataLoaded(EditLotteryModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

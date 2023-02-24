@@ -69,35 +69,35 @@
         CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar topBar;
         CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu navButton;
 
-        public async Task ChangeTitle(string title)
+        public void ChangeTitle(string title)
         {
             if (homeTitleCard != null)
             {
-                await homeTitleCard.ChangeTitle(title);
+                homeTitleCard.ChangeTitle(title);
             }
             if (topBar != null)
             {
-                await topBar.ChangeTitle(title);
+                topBar.ChangeTitle(title);
             }
         }
-        public Task OnClickSearch()
+        public void OnClickSearch()
         {
             NavigationManager.NavigateTo("/search");
-            return Task.CompletedTask;
+            
         }
 
-        public async Task SetDrawer()
+        public void SetDrawer()
         {
             if (navButton != null)
             {
-                await navButton.SetDrawer(true);
+                navButton.SetDrawer(true);
             }
         }
 
-        public Task OnRefreshLayout()
+        public void OnRefreshLayout()
         {
             NavigationManager.NavigateTo("/");
 
-            return Task.CompletedTask;
+            
         }
     }

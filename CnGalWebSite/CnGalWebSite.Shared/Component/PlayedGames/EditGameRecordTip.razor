@@ -112,15 +112,15 @@
     CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
 
 
-    public Task ValueChanged(StringNumber index)
+    public void ValueChanged(StringNumber index)
     {
         if (index == null)
         {
-            return Task.CompletedTask;
+            
         }
         Model.Type = (PlayedGameType)index.ToInt32();
 
-        return Task.CompletedTask;
+        
     }
 
     protected async Task OnInit()

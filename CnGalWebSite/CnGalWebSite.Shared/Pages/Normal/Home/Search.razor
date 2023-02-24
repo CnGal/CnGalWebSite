@@ -162,43 +162,43 @@
 
 
 
-    public Task OnChanged(int page = 1)
+    public void OnChanged(int page = 1)
     {
         InputModel.CurrentPage = page;
         NavigationManager.NavigateTo("/search" + InputModel.ToQueryParameterString());
 
-        return Task.CompletedTask;
+        
     }
 
 
-    private async Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         if (isReady == false ||  DataModel.pagedResultDto.CurrentPage == pageIndex)
         {
             return;
         }
-        await OnChanged(pageIndex);
+        OnChanged(pageIndex);
     }
 
 
-    private async Task OnSearchString()
+    private void OnSearchString()
     {
-        await OnChanged();
+        OnChanged();
     }
 
 
-    private async Task OnSearchString(string text)
+    private void OnSearchString(string text)
     {
         InputModel.FilterText = text;
 
-        await OnChanged();
+        OnChanged();
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs e)
+    private void OnKeyDown(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            await OnSearchString();
+            OnSearchString();
         }
     }
 

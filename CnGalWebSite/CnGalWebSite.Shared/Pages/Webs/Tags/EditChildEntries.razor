@@ -107,14 +107,14 @@ else
     }
 
 
-    private Task DataLoaded(EditTagChildEntriesViewModel model)
+    private void DataLoaded(EditTagChildEntriesViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

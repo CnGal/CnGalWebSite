@@ -85,10 +85,10 @@ else
         }
     }
 
-    public Task OnClickDetail(CommentViewModel item)
+    public void OnClickDetail(CommentViewModel item)
     {
         _dataCacheService.DetailComment = item;
         NavigationManager.NavigateTo("/comments/index");
-        return Task.CompletedTask;
+        
     }
 }

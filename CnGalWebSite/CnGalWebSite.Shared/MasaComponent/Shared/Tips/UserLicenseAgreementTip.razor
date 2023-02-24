@@ -62,9 +62,9 @@
         dialog = false;
     }
 
-    public Task OnDisagree()
+    public void OnDisagree()
     {
         _mauiService.Quit();
-        return Task.CompletedTask;
+        
     }
 }

@@ -39,9 +39,9 @@
     public EditButtonLineModel Model { get; set; }
 
 
-    public Task OnNav()
+    public void OnNav()
     {
         NavigationManager.NavigateTo(Model.Link);
-        return Task.CompletedTask;
+        
     }
 }

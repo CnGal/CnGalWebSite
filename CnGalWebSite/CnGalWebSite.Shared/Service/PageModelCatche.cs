@@ -125,7 +125,7 @@ namespace CnGalWebSite.Shared.Service
             return temp;
         }
 
-        private Task PersistData()
+        private async Task PersistData()
         {
             try
             {
@@ -135,9 +135,6 @@ namespace CnGalWebSite.Shared.Service
             {
 
             }
-
-
-            return Task.CompletedTask;
         }
 
         void IDisposable.Dispose()

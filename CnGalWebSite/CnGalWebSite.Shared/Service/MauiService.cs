@@ -14,9 +14,9 @@ namespace CnGalWebSite.Shared.Service
             
         }
 
-        public Task OpenNewPage(string url)
+        public async Task OpenNewPage(string url)
         {
-            return Task.CompletedTask;
+            
         }
 
         public void Quit()
@@ -29,9 +29,9 @@ namespace CnGalWebSite.Shared.Service
            
         }
 
-        public Task ShareLink(ShareLinkModel model)
+        public async Task ShareLink(ShareLinkModel model)
         {
-            return Task.CompletedTask;
+            
         }
     }
 }

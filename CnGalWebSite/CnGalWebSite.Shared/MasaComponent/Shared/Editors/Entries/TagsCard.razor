@@ -19,19 +19,19 @@
     InputTagListTip inputTagListTip;
     SearchTagsViewTip searchTagsViewTip;
 
-    public async Task OnInputSearch()
+    public void OnInputSearch()
     {
         if (inputTagListTip != null)
         {
-            await inputTagListTip.Refresh();
+            inputTagListTip.Refresh();
         }
     }
 
-    public async Task OnInputList()
+    public void OnInputList()
     {
         if (searchTagsViewTip != null)
         {
-            await searchTagsViewTip.Refresh();
+            searchTagsViewTip.Refresh();
         }
     }
 }

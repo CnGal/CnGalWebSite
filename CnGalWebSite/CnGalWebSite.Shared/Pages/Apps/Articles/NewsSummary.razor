@@ -53,11 +53,11 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         _dataCacheService.NewsSummaryCache.CurrentPage = pageIndex;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     protected override async Task OnInitializedAsync()

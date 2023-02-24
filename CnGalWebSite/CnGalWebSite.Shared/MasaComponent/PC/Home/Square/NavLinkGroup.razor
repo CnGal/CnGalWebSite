@@ -52,10 +52,10 @@
 </div>
 
 @code {
-    public Task OnClick(string url)
+    public void OnClick(string url)
     {
         NavigationManager.NavigateTo(url);
-        return Task.CompletedTask;
+        
     }
 
 }

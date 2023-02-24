@@ -67,7 +67,7 @@
     string gameName;
     bool isDubbing;
 
-    public Task Refresh(bool dialog, PlayedGameUserScoreModel model, string _gameName = null, int _gameId = 0, bool _isDubbing = true)
+    public void Refresh(bool dialog, PlayedGameUserScoreModel model, string _gameName = null, int _gameId = 0, bool _isDubbing = true)
     {
         gameId = _gameId;
         gameName = _gameName;
@@ -76,7 +76,7 @@
         isDubbing = _isDubbing;
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

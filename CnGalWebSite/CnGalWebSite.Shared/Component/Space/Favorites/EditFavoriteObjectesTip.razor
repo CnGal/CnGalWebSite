@@ -158,7 +158,7 @@
 
         if (moveFavoriteFolderTip!=null)
         {
-            await  moveFavoriteFolderTip.Refresh(ObjectIds,UserFavoriteInfor);
+            moveFavoriteFolderTip.Refresh(ObjectIds,UserFavoriteInfor);
         }
 
     }
@@ -169,7 +169,7 @@
         temp.Add(new KeyValuePair<FavoriteObjectType, long>(type, id));
         if (moveFavoriteFolderTip != null)
         {
-            await moveFavoriteFolderTip.Refresh(temp, UserFavoriteInfor);
+            moveFavoriteFolderTip.Refresh(temp, UserFavoriteInfor);
         }
     }
 

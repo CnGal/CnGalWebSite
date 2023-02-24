@@ -33,11 +33,11 @@
     {
         if (appLayout != null)
         {
-            await appLayout.ChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
+            appLayout.ChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
         }
         if (adminLayout != null)
         {
-            await adminLayout.ChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
+            adminLayout.ChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
         }
 
         if (string.IsNullOrWhiteSpace(StructuredData) == false)

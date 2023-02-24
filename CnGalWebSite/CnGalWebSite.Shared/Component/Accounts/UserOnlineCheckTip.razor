@@ -60,17 +60,17 @@
         }
     }
 
-    private Task OnClickLogin()
+    private void OnClickLogin()
     {
         _dataCacheService.IsOnThirdPartyLogin = false;
         NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnClickRegister()
+    private void OnClickRegister()
     {
         _dataCacheService.IsOnThirdPartyLogin = false;
         NavigationManager.NavigateTo("/account/register/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 }

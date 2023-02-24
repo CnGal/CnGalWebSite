@@ -65,7 +65,7 @@
     /// </summary>
     public DateTime End { get; set; }
 
-    public Task Refresh()
+    public void Refresh()
     {
         //根据当前月份计算出显示范围
         var temp = Month.AddDays(-Month.Day + 1);
@@ -75,12 +75,12 @@
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        await Refresh();
+        Refresh();
     }
 
     public async Task ValueChanged(StringNumber index)
@@ -105,6 +105,6 @@
         }
 
         await MonthChanged.InvokeAsync(Month);
-        await Refresh();
+        Refresh();
     }
 }

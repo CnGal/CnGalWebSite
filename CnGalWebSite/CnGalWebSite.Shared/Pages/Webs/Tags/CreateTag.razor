@@ -108,14 +108,14 @@
     }
 
 
-    private Task DataLoaded(CreateTagViewModel model)
+    private void DataLoaded(CreateTagViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

@@ -42,10 +42,10 @@
             ErrorHandler.ProcessError(ex, "获取广场抽奖列表失败");
         }
     }
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/lotteries/home");
-        return Task.CompletedTask;
+        
     }
 
 }

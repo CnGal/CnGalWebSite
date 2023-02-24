@@ -321,11 +321,11 @@ else
         }
     }
 
-    public Task OnPreEdit(bool value)
+    public void OnPreEdit(bool value)
     {
         Model.IsEdit = value;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

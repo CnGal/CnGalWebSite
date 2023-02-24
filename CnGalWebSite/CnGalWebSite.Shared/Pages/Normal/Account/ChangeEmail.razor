@@ -85,11 +85,11 @@
         public ErrorHandler ErrorHandler { get; set; }
 
 
-        private Task OnPassed()
+        private void OnPassed()
         {
             isReady = true;
             StateHasChanged();
-            return Task.CompletedTask;
+            
         }
 
         private async Task ConfirmEmailBefore()

@@ -43,12 +43,12 @@
     bool Dialog { get; set; }
 
 
-    public Task OnClick(string url)
+    public void OnClick(string url)
     {
         NavigationManager.NavigateTo(url);
         Dialog = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

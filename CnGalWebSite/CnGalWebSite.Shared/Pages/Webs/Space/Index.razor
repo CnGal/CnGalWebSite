@@ -329,10 +329,10 @@ else
 
     }
 
-    public Task TabValueChanged(StringNumber index)
+    public void TabValueChanged(StringNumber index)
     {
         _dataCacheService.SpaceViewCache.TabIndex = index.ToInt32();
         TabIndex = index;
-        return Task.CompletedTask;
+        
     }
 }

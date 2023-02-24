@@ -37,8 +37,8 @@
         <TableColumn @bind-Field="@context.IsPassedVerification" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookUser( context.Id , context.UserName))" />
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditUser(context.Id ))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookUser( context.Id , context.UserName))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="编辑" IsAsync="true" OnClickWithoutRender="@(async () => EditUser(context.Id ))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="解封" IsAsync="true" OnClickWithoutRender="@(() => OnRowBanUsersClick(new string[] { context.Id },false ,true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-pencil-square-o" Text="封禁" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowBanUsersClick(new string[] { context.Id },true ,true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关留言" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new string[] { context.Id }, !context.CanComment, true))" />
@@ -78,15 +78,15 @@
             return new QueryData<ListUserAloneModel>();
         }
     }
-    private Task EditUser(string id)
+    private void EditUser(string id)
     {
         NavigationManager.NavigateTo(Provider, "/admin/edituser/" + id, "编辑用户", "fa fa-user-circle");
-        return Task.CompletedTask;
+        
     }
-    private Task LookUser(string id, string name)
+    private void LookUser(string id, string name)
     {
         NavigationManager.NavigateTo(Provider, "/space/index/" + id, name, "fa fa-star-o");
-        return Task.CompletedTask;
+        
     }
 
     [Inject]
@@ -104,11 +104,6 @@
             Title = "添加新用户",
             Model = model,
             Items = items,
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 var result = await AuthService.Register((RegisterModel)context.Model);

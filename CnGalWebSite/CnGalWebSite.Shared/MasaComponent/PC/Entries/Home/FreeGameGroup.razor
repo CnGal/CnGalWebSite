@@ -42,10 +42,10 @@
             ErrorHandler.ProcessError(ex, "获取词条主页免费游戏列表失败");
         }
     }
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/free");
-        return Task.CompletedTask;
+        
     }
 
 }

@@ -90,10 +90,10 @@
         await OnChanged.InvokeAsync();
     }
 
-    public Task OnAdd()
+    public void OnAdd()
     {
         dialog = true;
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnClean()
@@ -104,11 +104,11 @@
     }
 
 
-    public Task ModalCancel()
+    public void ModalCancel()
     {
         dialog = false;
         _dates = _predates;
-        return Task.CompletedTask;
+        
     }
 
     public async Task ModalOK()

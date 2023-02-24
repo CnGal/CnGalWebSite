@@ -39,8 +39,8 @@
         try
         {
             Model = await Http.GetFromJsonAsync<PerfectionLevelOverviewModel>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelOverview", ToolHelper.options);
-            await OnPieInit();
-            await OnBarInit();
+            OnPieInit();
+            OnBarInit();
             isReady = true;
             StateHasChanged();
         }
@@ -50,7 +50,7 @@
         }
     }
 
-    private Task OnPieInit()
+    private void OnPieInit()
     {
         pie.Title.Text = "全站完善度概览";
         pie.Series.Add(new EChartsPieOptionSery
@@ -63,12 +63,9 @@
                     new EChartsPieOptionSeryData{Name="急需完善",Value=Model.ToBeImprovedCount},
                 }
         });
-
-        return Task.CompletedTask;
-
-
     }
-    private Task OnBarInit()
+
+    private void OnBarInit()
     {
         bar.Title.Text = "统计数值";
         bar.XAxis.Data = new List<string>() { "平均数", "众数", "中位数", "标准差" };
@@ -78,7 +75,7 @@
             Stack = "default",
             Data = new List<double> { Math.Round(Model.AverageValue, 2),Model.Mode, Math.Round(Model.Median, 2), Math.Round(Model.StandardDeviation, 2) }
         });
-        return Task.CompletedTask;
+        
     }
 
 }

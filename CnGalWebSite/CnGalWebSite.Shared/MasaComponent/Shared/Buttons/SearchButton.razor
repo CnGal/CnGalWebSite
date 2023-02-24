@@ -26,10 +26,10 @@ else
     [Parameter]
     public bool Dark { get; set; }
 
-    public Task OnClick()
+    public void OnClick()
     {
         NavigationManager.NavigateTo("/home/search");
-        return Task.CompletedTask;
+        
     }
 
 }

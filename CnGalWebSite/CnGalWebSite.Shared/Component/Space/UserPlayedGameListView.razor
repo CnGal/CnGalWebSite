@@ -87,11 +87,11 @@
         }
     }
 
-    public async Task OnEditSteam()
+    public void OnEditSteam()
     {
         if(editUserSteamInforTip!=null)
         {
-            await editUserSteamInforTip.Refresh(true);
+            editUserSteamInforTip.Refresh(true);
         }
 
     }

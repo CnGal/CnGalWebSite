@@ -94,11 +94,11 @@
 
             }
 
-            await OnClickLeft();
+            OnClickLeft();
         }
     }
 
-    private Task OnClickLeft()
+    private void OnClickLeft()
     {
         //处理回调
         if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
@@ -107,7 +107,7 @@
         }
         //Url = "/account/login/" + ReturnUrl;
         NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
-        return Task.CompletedTask;
+        
     }
     private async Task OnClickRight()
     {

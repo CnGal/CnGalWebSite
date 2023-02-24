@@ -208,11 +208,11 @@ else
 
     }
 
-    private Task OnLogin()
+    private void OnLogin()
     {
         isLogin = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnPassed()

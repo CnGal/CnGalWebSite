@@ -69,11 +69,11 @@
         }
     }
 
-    public Task RefreshComment(KeyValuePair<CommentViewModel, string> item)
+    public void RefreshComment(KeyValuePair<CommentViewModel, string> item)
     {
         Items.Remove(item);
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

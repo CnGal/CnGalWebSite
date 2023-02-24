@@ -18,8 +18,8 @@
 
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-users" Text="查看用户" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookUserClick(context.UserId))" />
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-codepen" Text="查看词条" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookEntryClick(context.EntryId))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-users" Text="查看用户" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookUserClick(context.UserId))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-codepen" Text="查看词条" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookEntryClick(context.EntryId))" />
     </RowButtonTemplate>
 </Table>
 
@@ -57,16 +57,16 @@
     }
 
 
-    public Task OnRowLookUserClick(string id)
+    public void OnRowLookUserClick(string id)
     {
         NavigationManager.NavigateTo("/space/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnRowLookEntryClick(int id)
+    public void OnRowLookEntryClick(int id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
 }

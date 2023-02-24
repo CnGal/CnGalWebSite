@@ -21,7 +21,7 @@
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.UserId , context.UserName))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookLink( context.UserId , context.UserName))" />
 
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" IsShow="context.IsHidden"
                              Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
@@ -74,11 +74,11 @@
         }
     }
 
-    private Task LookLink(string userId, string name)
+    private void LookLink(string userId, string name)
     {
 
         NavigationManager.NavigateTo(Provider, "/space/index/" + userId, name, "fa fa-star-o");
-        return Task.CompletedTask;
+        
     }
 
 
@@ -200,11 +200,6 @@
             Title = "添加头衔用户",
             Model = model,
             Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 return await AddRankUser((AddUserRankModel)context.Model);

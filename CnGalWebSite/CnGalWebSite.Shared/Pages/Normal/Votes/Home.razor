@@ -60,9 +60,9 @@
         }
     }
 
-    private Task OnCreateVote()
+    private void OnCreateVote()
     {
         NavigationManager.NavigateTo(Provider, "/votes/createvote", "创建投票");
-        return Task.CompletedTask;
+        
     }
 }

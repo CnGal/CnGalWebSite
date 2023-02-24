@@ -133,10 +133,10 @@
         await _structuredDataService.SetStructuredData(urls);
     }
 
-    public Task OnLogin()
+    public void OnLogin()
     {
         NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 
 }

@@ -198,11 +198,11 @@ else
 
     }
 
-    public Task ValueChanged(StringNumber index)
+    public void ValueChanged(StringNumber index)
     {
         Model.TabIndex = index.ToInt32();
         TabIndex = index;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

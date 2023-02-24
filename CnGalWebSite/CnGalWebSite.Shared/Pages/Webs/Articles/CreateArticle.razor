@@ -114,14 +114,14 @@
         }
     }
 
-    private Task DataLoaded(CreateArticleViewModel model)
+    private void DataLoaded(CreateArticleViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 
