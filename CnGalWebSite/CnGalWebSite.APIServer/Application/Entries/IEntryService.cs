@@ -40,6 +40,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void UpdateEntryDataAudio(Entry entry, EntryAudioExamineModel examine);
 
+        void UpdateEntryDataWebsite(Entry entry, EntryWebsiteExamineModel examine);
+
         Task<List<int>> GetEntryIdsFromNames(List<string> names);
 
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
@@ -62,7 +64,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         EditEntryTagViewModel GetEditTagsViewModel(Entry entry);
 
-        EditAudioViewModel GetEditAuioViewModel(Entry entry);
+        EditAudioViewModel GetEditAudioViewModel(Entry entry);
+
+        EditEntryWebsiteViewModel GetEditWebsitViewModel(Entry entry);
 
         void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
 
@@ -78,6 +82,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model);
 
+        void SetDataFromEditWebsiteViewModel(Entry newEntry, EditEntryWebsiteViewModel model);
 
         Task UpdateRoleBrithday();
 

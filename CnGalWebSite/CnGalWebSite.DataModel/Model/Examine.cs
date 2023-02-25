@@ -180,5 +180,7 @@ namespace CnGalWebSite.DataModel.Model
         EditVideoRelevanes,
         [Display(Name = "编辑收藏夹")]
         EditFavoriteFolderMain,
+        [Display(Name = "编辑词条官网模板补充信息")]
+        EstablishWebsite,
     }
 }

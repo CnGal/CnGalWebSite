@@ -81,7 +81,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 游戏发布时间 只对游戏词条有效
         /// </summary>
         public DateTime? PubulishTime { get; set; }
-
+        /// <summary>
+        /// 使用的模板
+        /// </summary>
+        public EntryStyleTemplate Template { get; set; }
         /// <summary>
         /// 消歧义页
         /// </summary>
@@ -98,6 +101,17 @@ namespace CnGalWebSite.DataModel.Model
         public int? PerfectionId { get; set; }
         public Perfection Perfection { get; set; }
 
+        /// <summary>
+        /// 官网补充信息
+        /// </summary>
+        public int? EntryWebsiteId { get; set; }
+        public EntryWebsite EntryWebsite { get; set; }
+
+        /// <summary>
+        /// 预约信息 只对游戏生效
+        /// </summary>
+        public long? BookingId { get; set; }
+        public Booking Booking { get; set; }
 
         /// <summary>
         /// 附加信息列表 Staff迁移到 EntryStaffFromEntryNavigation 中
@@ -158,6 +172,9 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<PlayedGame> PlayedGames { get; set; } = new HashSet<PlayedGame>();
 
+        /// <summary>
+        /// 投票
+        /// </summary>
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
         /// <summary>
@@ -192,6 +209,72 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<EntryStaff> EntryStaffToEntryNavigation { get; set; } = new List<EntryStaff>();
 
     }
+
+    /// <summary>
+    /// 词条官方网站补充信息
+    /// </summary>
+    public class EntryWebsite
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 首页轮播图列表
+        /// </summary>
+        public ICollection<EntryWebsiteImage> Carousels { get; set; } = new List<EntryWebsiteImage>();
+
+        /// <summary>
+        /// 背景图列表
+        /// </summary>
+        public ICollection<EntryWebsiteImage> BackgroundImages { get; set; } = new List<EntryWebsiteImage>();
+
+        /// <summary>
+        /// 介绍 纯html
+        /// </summary>
+        public string Introduction { get; set; }
+
+        /// <summary>
+        /// 标题 纯html
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
+        /// 自定义Html 优先级最高
+        /// </summary>
+        public string Html { get; set; }
+
+        public int? EntryId { get; set; }
+        public Entry Entry { get; set; }
+    }
+
+    public enum EntryStyleTemplate
+    {
+        [Display(Name ="默认")]
+        Default,
+        [Display(Name ="官网")]
+        OfficialWebsite
+    }
+
+    public class EntryWebsiteImage
+    {
+        public long Id { get; set; }
+
+        public EntryWebsiteImageType Type { get; set; }
+
+        public string Url { get; set; }
+
+        public int Priority { get; set; }
+
+        public string Note { get; set; }
+    }
+
+    public enum EntryWebsiteImageType
+    {
+        [Display(Name ="PC端")]
+        Large,
+        [Display(Name = "移动端")]
+        Small
+    }
+
     public class Outlink
     {
         public long Id { get; set; }

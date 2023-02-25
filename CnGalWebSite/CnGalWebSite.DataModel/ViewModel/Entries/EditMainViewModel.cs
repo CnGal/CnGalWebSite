@@ -5,6 +5,9 @@ namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EditMainViewModel : BaseEntryEditModel
     {
+        [Display(Name = "样式模板")]
+        public EntryStyleTemplate Template { get; set; }
+
         [Display(Name = "显示名称")]
         [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }

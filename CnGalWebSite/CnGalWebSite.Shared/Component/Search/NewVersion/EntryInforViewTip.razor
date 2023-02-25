@@ -80,13 +80,13 @@ else
                 </a>
 
                 <div class="@(BigCardStyle?"pb-2":"pt-3 ps-3")" style=" width: 100%;">
-                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-1 mb-2" style="display: flex; align-items: center;">
+                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color mb-2" style="display: flex; align-items: center;">
                         @if (ShowType)
                         {
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         }
 
-                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                        <h3 class="h5 mb-0 fw-bold text-truncate-2">@Model.Name</h3>
                     </a>
 
                     <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
@@ -135,7 +135,7 @@ else
                                 <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                             }
 
-                            <h3 class="h5 fw-bold mb-0" style=" display: inline;">@Model.Name</h3>
+                            <h3 class="h5 fw-bold mb-0 text-truncate-2">@Model.Name</h3>
                         </a>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
                     </div>
@@ -194,21 +194,15 @@ else
                         }
                     }
 
-
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
                     <span class="me-4">@(Model.CommentCount)条评论</span>
 
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
                     <span class="me-4">@(Model.ReaderCount)次阅读</span>
                 </span>
-
             </a>
-
         }
-
     </div>
-
-
 }
 
 

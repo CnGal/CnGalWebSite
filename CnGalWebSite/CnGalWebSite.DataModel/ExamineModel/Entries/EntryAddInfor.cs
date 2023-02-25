@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.Model;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ExamineModel.Entries
 {
@@ -6,7 +7,29 @@ namespace CnGalWebSite.DataModel.ExamineModel.Entries
     {
         public List<BasicEntryInformation_> Information { get; set; } = new List<BasicEntryInformation_> { };
         public List<EntryStaffExamineModel> Staffs { get; set; } = new List<EntryStaffExamineModel> { };
+
+        public EditBooking Booking { get; set; }=new EditBooking();
     }
+
+    public class EditBooking
+    {
+        public List<ExamineMainAlone> MainInfor { get; set; } = new List<ExamineMainAlone>();
+
+        public List<EditBookingGoal> Goals { get; set; } = new List<EditBookingGoal> { };
+    }
+
+    public class EditBookingGoal
+    {
+        public bool IsDelete { get; set; }
+
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 当前目标达成的最低人数
+        /// </summary>
+        public int Target { get; set; }
+    }
+
     public class BasicEntryInformation_
     {
         public bool IsDelete { get; set; }

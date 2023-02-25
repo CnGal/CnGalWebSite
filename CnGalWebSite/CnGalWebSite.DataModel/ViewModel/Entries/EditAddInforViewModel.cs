@@ -13,6 +13,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "相关网站")]
         public List<SocialPlatform> SocialPlatforms { get; set; } = new List<SocialPlatform>() { };
 
+        /// <summary>
+        /// 预约
+        /// </summary>
+        public EditBookingModel Booking { get; set; }=new EditBookingModel();
+
         #region 游戏
         [Display(Name = "发行时间")]
         [DataType(DataType.Date)]
@@ -142,10 +147,46 @@ namespace CnGalWebSite.DataModel.ViewModel
                 
             }
 
+            //检查预约数据
+            if(Booking.Goals.Any(s=>string.IsNullOrWhiteSpace(s.Name)))
+            {
+                return new Result { Error = $"请填写预约目标名称" };
+            }
+            foreach(var item in Booking.Goals)
+            {
+                if(Booking.Goals.Count(s=>s.Name==item.Name)>1)
+                {
+                    return new Result { Error = $"重复的预约目标名称：{item.Name}" };
+                }
+            }
+
             return new Result { Successful = true };
         }
 
     }
+
+    public class EditBookingModel
+    {
+        [Display(Name = "上线后通知预约用户")]
+        public bool IsNeedNotification { get; set; }
+
+        [Display(Name = "开启预约")]
+        public bool Open { get; set; }
+
+        [Display(Name = "关联抽奖")]
+        public string LotteryName { get; set; }
+
+        public List<EditBookingGoalModel> Goals=new List<EditBookingGoalModel>();
+    }
+
+    public class EditBookingGoalModel
+    {
+        [Display(Name = "名称")]
+        public string Name { get; set; }
+        [Display(Name = "人数")]
+        public int Target { get; set; }
+    }
+
 
     public class GamePlatformModel
     {

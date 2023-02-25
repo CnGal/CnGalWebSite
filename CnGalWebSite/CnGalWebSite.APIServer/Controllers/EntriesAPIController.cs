@@ -881,7 +881,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _entryService.UpdateEntryDataAsync(entry, examine);
             }
 
-            return _entryService.GetEditAuioViewModel(entry);
+            return _entryService.GetEditAudioViewModel(entry);
         }
 
         [HttpPost]

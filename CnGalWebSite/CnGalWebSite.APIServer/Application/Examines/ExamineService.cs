@@ -813,6 +813,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 DisplayName = "类型",
                 DisplayValue = entry.Type.GetDisplayName(),
             });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "样式模板",
+                DisplayValue = entry.Template.GetDisplayName(),
+            });
 
             model.Texts.Add(new InformationsModel
             {
@@ -932,6 +937,47 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 
             }
 
+            if (entry.Booking != null && (entry.Booking.Open || entry.Booking.Goals.Any() || entry.Booking.IsNeedNotification || entry.Booking.LotteryId != 0))
+            {
+                var texts = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName = "开启预约",
+                        DisplayValue = entry.Booking.Open ? "是" : "否",
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName = "上线后通知用户",
+                        DisplayValue = entry.Booking.Open ? "是" : "否",
+                    }
+                };
+
+                if(entry.Booking.LotteryId>0)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "关联抽奖",
+                        DisplayValue = entry.Booking.LotteryId,
+                    });
+                }
+                foreach (var item in entry.Booking.Goals)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = item.Name,
+                        DisplayValue = item.Target.ToString(),
+                    });
+                }
+
+                information.Add(new InformationsModel
+                {
+                    Modifier = "游戏预约",
+                    Informations = texts
+                });
+
+            }
+          
             model.Texts = information;
 
             return model;
