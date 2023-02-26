@@ -874,11 +874,11 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     continue;
                 }
-                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem" && item.Name != "IsCreatedByCurrentUser")
+                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem" && item.Name != "IsCreatedByCurrentUser" && item.Name != "Open" && item.Name != "IsNeedNotification")
                 {
                     continue;
                 }
-                if (item.PropertyType == typeof(int) && item.Name != "PageCount" && item.Name != "SongCount")
+                if (item.PropertyType == typeof(int) && item.Name != "PageCount" && item.Name != "SongCount" && item.Name != "LotteryId")
                 {
                     continue;
                 }

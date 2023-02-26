@@ -82,6 +82,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EditState InforState { get; set; }
         public EditState TagState { get; set; }
         public EditState AudioState { get; set; }
+        public EditState WebsiteState { get; set; }
 
         public bool CanComment { get; set; }
 
@@ -165,7 +166,7 @@ namespace CnGalWebSite.DataModel.ViewModel
     {
         public long BookingCount { get; set; }
 
-        public List<BookingGoalViewModel> Goals=new List<BookingGoalViewModel>();
+        public List<BookingGoalViewModel> Goals { get; set; } = new List<BookingGoalViewModel>();
     }
 
     public class BookingGoalViewModel

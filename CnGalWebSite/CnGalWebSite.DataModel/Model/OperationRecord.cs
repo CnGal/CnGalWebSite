@@ -36,5 +36,7 @@ namespace CnGalWebSite.DataModel.Model
         Login,
         [Display(Name = "注册")]
         Registe,
+        [Display(Name = "预约")]
+        Booking,
     }
 }

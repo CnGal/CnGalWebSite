@@ -58,7 +58,7 @@ else
         </div>
         <MTabsItems @bind-Value="TabIndex">
             <MTabItem Value="1">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
@@ -86,6 +86,7 @@ else
 
     private bool isReady = false;
     public StringNumber TabIndex { get; set; } = 1;
+    private IEnumerable<string> EntryGameItems { get; set; }
 
 
     [CascadingParameter]
@@ -100,6 +101,8 @@ else
             try
             {
                 Model = await Http.GetFromJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery/" + Id, ToolHelper.options);
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+
                 isReady = true;
                 StateHasChanged();
             }
@@ -141,7 +144,7 @@ else
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 }

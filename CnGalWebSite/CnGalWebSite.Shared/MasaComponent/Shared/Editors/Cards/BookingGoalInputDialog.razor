@@ -13,10 +13,10 @@
         <MCardText>
             <div class="row">
                 <div class="col-12  col-sm-6">
-                    <MTextField @bind-Value="Model.Target" Label="目标人数" />
+                    <MTextField @bind-Value="Model.Target" Label="目标人数" Type="number"/>
                 </div>
                 <div class="col-12  col-sm-6">
-                    <MTextField @bind-Value="Model.Name" Label="名称" />
+                    <MTextField @bind-Value="Model.Name" Label="名称" OnKeyDown="OnKeyDown" />
                 </div>
             </div>
         </MCardText>
@@ -33,6 +33,15 @@
 
     bool Dialog { get; set; }
 
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Dialog = false;
+            await OnChanged.InvokeAsync();
+            StateHasChanged();
+        }
+    }
 
     public void Refresh(EditBookingGoalModel model)
     {

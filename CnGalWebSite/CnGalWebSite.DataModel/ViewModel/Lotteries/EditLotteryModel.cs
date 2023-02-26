@@ -42,6 +42,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         [Display(Name = "抽奖时间")]
         public DateTime LotteryTime { get; set; }
 
+        [Display(Name = "关联游戏")]
+        public string GameName { get; set; }
+
         public List<EditLotteryAwardModel> Awards { get; set; } = new List<EditLotteryAwardModel>();
 
         public override Result Validate()
@@ -50,6 +53,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
             if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(DisplayName))
             {
                 return new Result { Error= "请填写所有必填项目" };
+            }
+
+            if(ConditionType== LotteryConditionType.BookingGame)
+            {
+                if(string.IsNullOrWhiteSpace(GameName))
+                {
+                    return new Result { Error = "筛选条件为“预约游戏”时，关联游戏不能为空" };
+                }
             }
 
             if (BeginTime > EndTime)

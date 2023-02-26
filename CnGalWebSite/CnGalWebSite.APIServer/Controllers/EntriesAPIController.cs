@@ -90,12 +90,14 @@ namespace CnGalWebSite.APIServer.Controllers
             var entry = await _entryRepository.GetAll()
                     .Include(s => s.Outlinks)
                     .Include(s=>s.Audio)
+                    .Include(s => s.WebsiteAddInfor)
+                    .Include(s => s.Booking).ThenInclude(s=>s.Goals)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Audio)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)                  
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
-                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
+                    .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                     .FirstOrDefaultAsync(x => x.Id == id);
@@ -121,7 +123,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.EntryId == entry.Id && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio))
+                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio || s.Operation == Operation.EstablishWebsite))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation,
@@ -167,6 +169,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _entryService.UpdateEntryDataAsync(entry, examine);
                 }
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EstablishWebsite);
+                if (examine != null)
+                {
+                    await _entryService.UpdateEntryDataAsync(entry, examine);
+                }
             }
 
             //建立视图模型
@@ -201,6 +208,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examineQuery.Any(s => s.Operation == Operation.EstablishAudio))
                 {
                     model.AudioState = EditState.Preview;
+                }
+                if (examineQuery.Any(s => s.Operation == Operation.EstablishWebsite))
+                {
+                    model.WebsiteState = EditState.Preview;
                 }
             }
 
@@ -290,6 +301,18 @@ namespace CnGalWebSite.APIServer.Controllers
                     else
                     {
                         model.AudioState = EditState.Normal;
+                    }
+                }
+                if (model.WebsiteState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EstablishAudio))
+                    {
+                        model.WebsiteState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.WebsiteState = EditState.Normal;
                     }
                 }
             }
@@ -395,7 +418,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
             var entry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Booking)
+                .Include(s=>s.Booking).ThenInclude(s=>s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
@@ -443,13 +466,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //查找词条
             var currentEntry = await _entryRepository.GetAll()
-                .Include(s => s.Booking)
+                .Include(s => s.Booking).ThenInclude(s => s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.Booking)
+                .Include(s => s.Booking).ThenInclude(s => s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

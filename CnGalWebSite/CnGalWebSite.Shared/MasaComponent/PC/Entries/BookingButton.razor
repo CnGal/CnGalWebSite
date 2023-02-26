@@ -6,7 +6,7 @@
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClickStar" />
-
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -22,6 +22,7 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -72,7 +73,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false });
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -95,7 +96,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true });
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

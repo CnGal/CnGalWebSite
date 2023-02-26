@@ -1,0 +1,27 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"已有{Model.Booking.BookingCount}人预约")" Icon="@IconType.Booking.ToIconString()" Collapable>
+    <Scroll style="max-height:500px">
+        <MTimeline AlignTop Dense Class="me-2">
+            @foreach (var item in Model.Booking.Goals)
+            {
+                <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"orange":"green")"
+                               Icon="@(item.Target>Model.Booking.BookingCount?IconType.IndeterminateTime.ToIconString():IconType.Check.ToIconString())"
+                               FillDot>
+                    <MCard>
+                        <MCardTitle Class="h6 fw-bold p-3 pb-0">
+                            @item.Name
+                        </MCardTitle>
+                        <MCardText>
+                            @($"达到{item.Target}人解锁")
+                        </MCardText>
+                    </MCard>
+                </MTimelineItem>
+            }
+        </MTimeline>
+    </Scroll>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

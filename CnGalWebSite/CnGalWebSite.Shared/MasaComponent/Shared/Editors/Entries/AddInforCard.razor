@@ -48,14 +48,12 @@
                 <div class="form-group col-12">
                     <CheckboxList TValue="List<string>" Value="@GamePlatformsValue" ValueChanged="GamePlatformsValueChanged" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true"></CheckboxList>
                 </div>
-                <div class="col-12 p-3">
-                    <Divider></Divider>
-                </div>
             </div>
-            <h5 class="fw-bold mb-4">STAFF</h5>
-            <StaffEditorChartListTip Staffs="Model.Staffs"/>
-            <h5 class="fw-bold mb-4">预约</h5>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking"/>
+            <InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems"/>
+            <InputRelevanceListTitle Title="STAFF" Text="参与制作的成员" />
+            <StaffEditorChartListTip Staffs="Model.Staffs" />
+
             break;
         case EntryType.ProductionGroup:
             <div class="row">
@@ -136,8 +134,6 @@
             </div>
             break;
     }
-
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <InputSocialPlatformListTip Model="Model.SocialPlatforms"></InputSocialPlatformListTip>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -151,6 +147,8 @@
     public IEnumerable<string> EntryGroupItems { get; set; }
     [Parameter]
     public IEnumerable<string> EntryStaffItems { get; set; }
+    [Parameter]
+    public IEnumerable<string> LotteryItems { get; set; }
 
     List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem>();
 
@@ -201,7 +199,7 @@
             });
         }
 
-        
+
     }
 
 }

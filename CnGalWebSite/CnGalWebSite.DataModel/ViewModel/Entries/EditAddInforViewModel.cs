@@ -176,7 +176,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "关联抽奖")]
         public string LotteryName { get; set; }
 
-        public List<EditBookingGoalModel> Goals=new List<EditBookingGoalModel>();
+        public List<EditBookingGoalModel> Goals { get; set; } = new List<EditBookingGoalModel>();
     }
 
     public class EditBookingGoalModel

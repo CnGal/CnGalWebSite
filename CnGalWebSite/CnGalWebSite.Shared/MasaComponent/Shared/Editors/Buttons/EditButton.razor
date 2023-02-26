@@ -15,7 +15,7 @@
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
                 <MButton Fab Small @attributes="@attrs" Class="@Class" Dark Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
-                    <MIcon>mdi-pencil</MIcon>
+                    <MIcon>@IconType.Edit.ToIconString()</MIcon>
                 </MButton>
             </ActivatorContent>
             <ChildContent>

@@ -7,10 +7,10 @@
     @if (Model.Open)
     {
         <div class="form-group col-12  col-sm-6">
-            <BootstrapInput @bind-Value="Model.LotteryName" ShowLabel="true" />
+            <Switch @bind-Value="Model.IsNeedNotification" ShowLabel="true" />
         </div>
         <div class="form-group col-12  col-sm-6">
-            <Switch @bind-Value="Model.IsNeedNotification" ShowLabel="true" />
+            <AutoComplete Items="@LotteryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.LotteryName" ShowLabel="true" />
         </div>
     }
 
@@ -22,19 +22,26 @@
         <thead>
             <tr>
                 <th class="text-left">
-                    目标
+                    目标人数
                 </th>
                 <th class="text-left">
                     名称
                 </th>
+                <th class="text-left">
+                    操作
+                </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Goals.OrderByDescending(s => s.Target))
+            @foreach (var item in Model.Goals.OrderBy(s => s.Target))
             {
                 <tr @key="item.Name">
                     <td style="min-width: 50px; ">@item.Target</td>
                     <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.Name</td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                    </td>
                 </tr>
             }
         </tbody>
@@ -47,7 +54,8 @@
     [Parameter]
     public EditBookingModel Model { get; set; }
     [Parameter]
-    public string Class { get; set; }
+    public IEnumerable<string> LotteryItems { get; set; }
+
 
     BookingGoalInputDialog bookingGoalInputDialog;
 
@@ -55,7 +63,9 @@
     {
         if (bookingGoalInputDialog != null)
         {
-            bookingGoalInputDialog.Refresh(new EditBookingGoalModel());
+            var goal = new EditBookingGoalModel();
+            Model.Goals.Add(goal);
+            bookingGoalInputDialog.Refresh(goal);
         }
     }
 

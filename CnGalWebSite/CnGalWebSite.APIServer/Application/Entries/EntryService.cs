@@ -1528,6 +1528,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             }
 
+            //预约信息
+            if (entry.Type == EntryType.Game && entry.Booking != null)
+            {
+                model.Booking = new BookingViewModel
+                {
+                    BookingCount = entry.Booking.BookingCount,
+                    Goals = entry.Booking.Goals.Select(s => new BookingGoalViewModel
+                    {
+                        Name = s.Name,
+                        Target = s.Target
+                    }).ToList()
+                };
+            }
+
             //序列化图片列表
 
             //读取词条信息
@@ -1856,7 +1870,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //预约
             if (newEntry.Booking != null)
             {
-                if (currentEntry.Booking != null)
+                if (currentEntry.Booking == null)
                 {
                     currentEntry.Booking = new Booking();
                 }
@@ -1901,6 +1915,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         entryAddInfor.Booking.Goals.Add(new EditBookingGoal
                         {
                             Target = infor.Target,
+                            Name=infor.Name,
                             IsDelete = false
                         });
                     }
@@ -2315,7 +2330,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var entryWebsite = new EntryWebsiteExamineModel();
             if (newEntry.WebsiteAddInfor != null)
             {
-                if (currentEntry.WebsiteAddInfor != null)
+                if (currentEntry.WebsiteAddInfor == null)
                 {
                     currentEntry.WebsiteAddInfor = new EntryWebsite();
                 }

@@ -125,7 +125,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         UnCollapsed,
         Goal,
         Booking,
-        UnBooking
+        UnBooking,
+        Edit,
+        Delete,
+        Check
     }
 
     public static class IconTypeHelper
@@ -134,6 +137,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Check:
+                    return "mdi-check-bold";
+                case IconType.Delete:
+                    return "mdi-trash-can";
+                case IconType.Edit:
+                    return "mdi-pencil";
                 case IconType.Booking:
                     return "mdi-cart-heart";
                 case IconType.UnBooking:

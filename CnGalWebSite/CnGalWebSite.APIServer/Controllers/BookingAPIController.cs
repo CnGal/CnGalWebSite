@@ -2,6 +2,8 @@
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Lotteries;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
@@ -55,10 +57,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPerfectionService _perfectionService;
         private readonly IEditRecordService _editRecordService;
         private readonly ILogger<BookingAPIController> _logger;
+        private readonly IOperationRecordService _operationRecordService;
+        private readonly ILotteryService _lotteryService;
 
         public BookingAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
         IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<BookingAPIController> logger, IRepository<Booking, long> bookingRepository,
-        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository, IRepository<BookingUser, long> bookingUserRepository)
+        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository, IRepository<BookingUser, long> bookingUserRepository,
+        IOperationRecordService operationRecordService, ILotteryService lotteryService)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -78,6 +83,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryRepository = lotteryRepository;
             _bookingRepository = bookingRepository;
             _bookingUserRepository = bookingUserRepository;
+            _operationRecordService = operationRecordService;
+            _lotteryService = lotteryService;
         }
 
         
@@ -125,6 +132,31 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _bookingUserRepository.DeleteAsync(bookUser);
                 }
 
+            }
+
+            //参加关联抽奖
+            if (booking.LotteryId != 0 && model.IsBooking)
+            {
+                var lottery = await _lotteryRepository.GetAll().AsNoTracking().Include(s => s.Users).FirstOrDefaultAsync(s => s.Id == booking.LotteryId);
+                try
+                {
+                    await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex, "BookingId:{id} User:{id} LotteryId:{id},自动参与抽奖失败", booking.Id, user.Id, lottery.Id);
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+              
+            }
+
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Booking, booking.Id.ToString(), user, model.Identification, HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
 
             //计算总数

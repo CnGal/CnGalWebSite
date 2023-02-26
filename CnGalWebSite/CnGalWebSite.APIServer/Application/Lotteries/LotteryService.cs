@@ -1,11 +1,14 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 
 namespace CnGalWebSite.APIServer.Application.Lotteries
@@ -27,10 +31,15 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Comment, long> _commentRepository;
+        private readonly IRepository<BookingUser, long> _bookingUserRepository;
+        private readonly IOperationRecordService _operationRecordService;
+        private readonly ILogger<LotteryService> _logger;
 
         public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-            IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository,
-              UserManager<ApplicationUser> userManager)
+            IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger,
+        UserManager<ApplicationUser> userManager, IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService)
         {
             _lotteryRepository = lotteryRepository;
             _lotteryUserRepository = lotteryUserRepository;
@@ -40,6 +49,11 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _userService = userService;
             _userRepository = userRepository;
             _userManager = userManager;
+            _bookingUserRepository = bookingUserRepository;
+            _commentRepository = commentRepository;
+            _operationRecordService=operationRecordService;
+            _playedGameRepository = playedGameRepository;
+            _logger = logger;
         }
         public Task<QueryData<ListLotteryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryAloneModel searchModel)
         {
@@ -309,5 +323,90 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
             _ = await _lotteryRepository.UpdateAsync(lottery);
         }
+
+        public async Task<string> CheckCondition(ApplicationUser user,Lottery lottery)
+        {
+            if (lottery.ConditionType == LotteryConditionType.GameRecord)
+            {
+                if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id) == false)
+                {
+                    return "参加该抽奖需要至少有一条游玩记录";
+                }
+            }
+            else if (lottery.ConditionType == LotteryConditionType.CommentLottery)
+            {
+                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery && string.IsNullOrWhiteSpace(s.Text) == false) == false)
+                {
+                    return "参加该抽奖需要评论该抽奖，并通过审核";
+                }
+            }
+            else if (lottery.ConditionType == LotteryConditionType.BookingGame)
+            {
+                if (await _bookingUserRepository.GetAll().Include(s => s.Booking).AsNoTracking().AnyAsync(s => s.Booking.EntryId == lottery.GameId && s.ApplicationUserId == user.Id) == false)
+                {
+                    return "参加该抽奖需要预约游戏";
+                }
+            }
+
+            return null;
+        }
+
+        public async Task AddUserToLottery(Lottery lottery,ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification)
+        {
+            //检查抽奖条件
+           var result=await CheckCondition(user, lottery);
+            if (result != null)
+            {
+                throw new Exception(result);
+            }
+
+            if (lottery.Users.Any(s => s.ApplicationUserId == user.Id))
+            {
+                throw new Exception("你已经参加了这个抽奖");
+            }
+            var time = DateTime.Now.ToCstTime();
+            await _lotteryUserRepository.InsertAsync(new LotteryUser
+            {
+                ApplicationUserId = user.Id,
+                LotteryId = lottery.Id,
+                ParticipationTime = time,
+                Number = lottery.Users.Count + 1,
+                //查找是否有相同的特征值
+                IsHidden = await _operationRecordService.CheckOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, identification, httpContext)
+            });
+
+
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, identification, httpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
+            }
+        }
+
+        public async Task CopyUserFromBookingToLottery(Booking booking,Lottery lottery)
+        {
+            var users = booking.Users.Where(s => lottery.Users.Any(x => x.ApplicationUserId == s.ApplicationUserId) == false).Select(s => s.ApplicationUser);
+
+            var time = DateTime.Now.ToCstTime();
+            foreach (var item in users)
+            {
+                await _lotteryUserRepository.InsertAsync(new LotteryUser
+                {
+                    ApplicationUserId = item.Id,
+                    LotteryId = lottery.Id,
+                    ParticipationTime = time,
+                    Number = lottery.Users.Count + 1,
+                    //查找是否有相同的特征值
+                    IsHidden = await _operationRecordService.CheckOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), item)
+                });
+
+                await _operationRecordService.CopyOperationRecord(OperationRecordType.Booking, booking.Id.ToString(), OperationRecordType.Lottery, lottery.Id.ToString(), item);
+            }
+        }
+
+
     }
 }
