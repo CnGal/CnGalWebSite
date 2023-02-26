@@ -213,9 +213,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
                 case Operation.EstablishAddInfor:
                     entry = await _entryRepository.GetAll()
-                                               .Include(s => s.Information).ThenInclude(s => s.Additional)
-                                               .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                               .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                        .Include(s=>s.Booking)
+                        .Include(s => s.Information).ThenInclude(s => s.Additional)
+                        .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                        .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
                 case Operation.EstablishImages:
                     entry = await _entryRepository.GetAll()
@@ -242,16 +243,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
                 case Operation.EditArticleMain:
-
                     entry = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
-
                     break;
                 case Operation.EditArticleRelevanes:
                     entry = await _articleRepository.GetAll()
-                            .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
-                            .Include(s => s.Entries)
-                            .Include(s => s.Videos)
-                            .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
+                        .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                        .Include(s => s.Entries)
+                        .Include(s => s.Videos)
+                        .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
                     break;
                 case Operation.EditArticleMainPage:
                     entry = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
@@ -327,6 +326,11 @@ namespace CnGalWebSite.APIServer.Controllers
                        .Include(s => s.Pictures)
                        .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
                     break;
+                case Operation.EstablishWebsite:
+                    entry = await _entryRepository.GetAll()
+                       .Include(s => s.WebsiteAddInfor)
+                       .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+                    break;
                 default:
                     return new Result { Successful = false, Error = "未知的操作" };
             }
@@ -372,6 +376,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Operation.EstablishAudio => typeof(EntryAudioExamineModel),
                         Operation.EstablishRelevances => typeof(EntryRelevances),
                         Operation.EstablishTags => typeof(EntryTags),
+                        Operation.EstablishWebsite => typeof(EntryWebsiteExamineModel),
                         Operation.EditArticleMain => typeof(ExamineMain),
                         Operation.EditArticleRelevanes => typeof(ArticleRelevances),
                         Operation.EditTagMain => typeof(ExamineMain),

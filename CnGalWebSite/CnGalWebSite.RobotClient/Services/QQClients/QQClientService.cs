@@ -441,29 +441,15 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             }
             else if (model.Range == RobotReplyRange.Friend)
             {
-                
-                (bool isTimedOut, Newtonsoft.Json.Linq.JObject Return) j = model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
-                if (j.isTimedOut)
-                {
-                    _logger.LogError("向 {group} 发送“{消息}”失败", model.SendTo, model.Text);
-                }
-                else
-                {
-                    _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
-                }
 
+                model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
+
+                _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
             }
             else
             {
-                (bool isTimedOut, Newtonsoft.Json.Linq.JObject Return) j = model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
-                if (j.isTimedOut)
-                {
-                    _logger.LogError("向 {group} 发送“{消息}”失败", model.SendTo, model.Text);
-                }
-                else
-                {
-                    _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
-                }
+                model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
+                _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
             }
 
             return;

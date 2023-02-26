@@ -1,0 +1,53 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<MDialog Value="Dialog" ValueChanged="ValueChanged"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑目标
+        </MCardTitle>
+        <MCardText>
+            达到相应目标会在页面展示
+        </MCardText>
+        <MCardText>
+            <div class="row">
+                <div class="col-12  col-sm-6">
+                    <MTextField @bind-Value="Model.Target" Label="目标人数" />
+                </div>
+                <div class="col-12  col-sm-6">
+                    <MTextField @bind-Value="Model.Name" Label="名称" />
+                </div>
+            </div>
+        </MCardText>
+    </MCard>
+</MDialog>
+@code {
+
+    private EditBookingGoalModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool Dialog { get; set; }
+
+
+    public void Refresh(EditBookingGoalModel model)
+    {
+        Model = model;
+        Dialog = true;
+
+        StateHasChanged();
+
+    }
+
+    public async Task ValueChanged(bool dialog)
+    {
+        Dialog = dialog;
+        StateHasChanged();
+        await OnChanged.InvokeAsync();
+    }
+
+}

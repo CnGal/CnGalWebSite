@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace CnGalWebSite.DataModel.Model
 {
     public class Entry
@@ -104,13 +106,11 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 官网补充信息
         /// </summary>
-        public int? EntryWebsiteId { get; set; }
-        public EntryWebsite EntryWebsite { get; set; }
+        public EntryWebsite WebsiteAddInfor { get; set; }
 
         /// <summary>
         /// 预约信息 只对游戏生效
         /// </summary>
-        public long? BookingId { get; set; }
         public Booking Booking { get; set; }
 
         /// <summary>
@@ -220,11 +220,13 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 首页轮播图列表
         /// </summary>
+        [InverseProperty("CarouselWebsite")]
         public ICollection<EntryWebsiteImage> Carousels { get; set; } = new List<EntryWebsiteImage>();
 
         /// <summary>
         /// 背景图列表
         /// </summary>
+        [InverseProperty("BackgroundImageWebsite")]
         public ICollection<EntryWebsiteImage> BackgroundImages { get; set; } = new List<EntryWebsiteImage>();
 
         /// <summary>
@@ -265,6 +267,12 @@ namespace CnGalWebSite.DataModel.Model
         public int Priority { get; set; }
 
         public string Note { get; set; }
+
+        public long CarouseWebsitelId { get; set; }
+        public EntryWebsite CarouselWebsite { get; set; }
+
+        public long BackgroundImageWebsiteId { get; set; }
+        public EntryWebsite BackgroundImageWebsite { get; set; }
     }
 
     public enum EntryWebsiteImageType

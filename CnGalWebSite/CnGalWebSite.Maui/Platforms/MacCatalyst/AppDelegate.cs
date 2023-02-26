@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.Maui
+﻿using Foundation;
+
+namespace CnGalWebSite.Maui
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

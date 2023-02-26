@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
+﻿using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -1127,6 +1128,42 @@ namespace CnGalWebSite.DataModel.Helper
                 if (informations.Count(s => item.Url == s.Url) > 1)
                 {
                     var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        public static List<EntryWebsiteImage> Purge(this List<EntryWebsiteImage> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Url == s.Url) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        public static List<BookingGoal> Purge(this List<BookingGoal> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Name == s.Name) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Name == s.Name);
                     if (temp != null)
                     {
                         informations.Remove(temp);

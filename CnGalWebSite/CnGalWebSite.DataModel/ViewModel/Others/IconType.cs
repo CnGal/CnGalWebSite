@@ -123,6 +123,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         CloudUpload,
         Collapsed,
         UnCollapsed,
+        Goal,
+        Booking,
+        UnBooking
     }
 
     public static class IconTypeHelper
@@ -131,6 +134,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Booking:
+                    return "mdi-cart-heart";
+                case IconType.UnBooking:
+                    return "mdi-cart-outline";
+                case IconType.Goal:
+                    return "mdi-flag-checkered";
                 case IconType.Collapsed:
                     return "fa fa-chevron-right";
                 case IconType.UnCollapsed:

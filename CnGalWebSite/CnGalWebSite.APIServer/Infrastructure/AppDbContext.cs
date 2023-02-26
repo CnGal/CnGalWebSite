@@ -90,6 +90,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<UserReviewEditRecord> UserReviewEditRecords { get; set; }
         public DbSet<Video> Videos { get; set; }
         public DbSet<RoleBirthday> RoleBirthdays { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<BookingUser> BookingUsers { get; set; }
+        public DbSet<EntryWebsite> EntryWebsites { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

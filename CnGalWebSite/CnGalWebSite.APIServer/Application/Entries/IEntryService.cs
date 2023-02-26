@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         EditMainViewModel GetEditMainViewModel(Entry entry);
 
-        EditAddInforViewModel GetEditAddInforViewModel(Entry entry);
+        Task< EditAddInforViewModel> GetEditAddInforViewModel(Entry entry);
 
         EditImagesViewModel GetEditImagesViewModel(Entry entry);
 
@@ -70,7 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
 
-        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model);
+        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model, int lotteryId);
 
         void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
 

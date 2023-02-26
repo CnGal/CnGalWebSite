@@ -23,6 +23,8 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public int LotteryId { get; set; }
 
+        public int BookingCount { get; set; }
+
         public int? EntryId { get; set; }
         public Entry Entry { get; set; }
 

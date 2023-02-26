@@ -30,14 +30,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
             {
                 if (Carousels.Count(s => s.Image == item.Image) > 1)
                 {
-                    return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
+                    return new Result { Error = "轮播图链接不能重复，重复的链接：" + item.Image, Successful = false };
                 }
             }
             foreach (var item in BackgroundImages)
             {
                 if (BackgroundImages.Count(s => s.Image == item.Image) > 1)
                 {
-                    return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
+                    return new Result { Error = "背景图片链接不能重复，重复的链接：" + item.Image, Successful = false };
                 }
             }
 

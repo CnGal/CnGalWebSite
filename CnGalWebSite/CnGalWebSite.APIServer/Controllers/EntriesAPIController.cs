@@ -43,6 +43,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IAppHelper _appHelper;
         private readonly IEntryService _entryService;
         private readonly IArticleService _articleService;
@@ -52,7 +53,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly ILogger<EntriesAPIController> _logger;
 
-        public EntriesAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService,
+        public EntriesAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
         IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository)
         {
@@ -71,6 +72,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _logger = logger;
             _videoService = videoService;
             _videoRepository = videoRepository;
+            _lotteryRepository = lotteryRepository;
         }
 
         /// <summary>
@@ -393,6 +395,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
             var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Booking)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
@@ -419,7 +422,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _entryService.UpdateEntryDataAsync(entry, examine);
             }
 
-            return _entryService.GetEditAddInforViewModel(entry);
+            return await _entryService.GetEditAddInforViewModel(entry);
         }
 
         [HttpPost]
@@ -440,11 +443,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //查找词条
             var currentEntry = await _entryRepository.GetAll()
+                .Include(s => s.Booking)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Booking)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -453,9 +458,24 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
+            //检查预约关联抽奖是否存在
+            int lotteryId = 0;
+            if(string.IsNullOrWhiteSpace( model.Booking.LotteryName)==false)
+            {
+                var lottery = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden == false && s.Name == model.Booking.LotteryName).FirstOrDefaultAsync();
+                if(lottery==null)
+                {
+                    return new Result { Successful = false, Error = "预约关联抽奖不存在" };
+                }
+                else
+                {
+                    lotteryId =(int) lottery.Id;
+                }
+            }
+
 
             //设置数据
-            await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model);
+            await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model, lotteryId);
 
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
@@ -935,6 +955,94 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EditEntryWebsiteViewModel>> EditWebsiteAsync(int Id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //获取词条
+            var entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            if (entry == null)
+            {
+                return NotFound();
+            }
+            //判断是否为锁定状态
+            if (await _appHelper.IsEntryLockedAsync(Id, user.Id, Operation.EstablishWebsite))
+            {
+                return NotFound();
+            }
+
+            //获取用户的审核信息
+            var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishWebsite);
+            if (examine != null)
+            {
+                await _entryService.UpdateEntryDataAsync(entry, examine);
+            }
+
+            return _entryService.GetEditWebsitViewModel(entry);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditWebsiteAsync(EditEntryWebsiteViewModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //检查是否超过编辑上限
+            if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
+            {
+                return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
+            }
+            //判断是否为锁定状态
+            if (await _appHelper.IsEntryLockedAsync(model.Id, user.Id, Operation.EstablishWebsite))
+            {
+                return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
+            }
+
+            //检查是否重复
+            foreach (var item in model.Carousels)
+            {
+                if (model.Carousels.Count(s => s.Image == item.Image) > 1)
+                {
+                    return new Result { Error = "轮播图链接不能重复，重复的链接：" + item.Image, Successful = false };
+
+                }
+            }
+            foreach (var item in model.BackgroundImages)
+            {
+                if (model.BackgroundImages.Count(s => s.Image == item.Image) > 1)
+                {
+                    return new Result { Error = "背景图片链接不能重复，重复的链接：" + item.Image, Successful = false };
+
+                }
+            }
+            //查找词条
+            var currentEntry = await _entryRepository.GetAll().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (currentEntry == null)
+            {
+                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
+            }
+
+            //设置数据
+            _entryService.SetDataFromEditWebsiteViewModel(newEntry, model);
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishWebsite) == false)
+            {
+                return new Result { Successful = true };
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishWebsite);
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishWebsite, model.Note);
+
+
+
+            return new Result { Successful = true };
+
+        }
+
         [HttpPost]
         public async Task<ActionResult<Result>> EstablishEntryAsync(EstablishEntryViewModel model)
         {
@@ -977,6 +1085,23 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (model.Audio.Audio.Count(s => s.Url == item.Url) > 1)
                     {
                         return new Result { Error = $"{item.Name} 与其他音频重复了，链接：{item.Url}", Successful = false };
+
+                    }
+                }
+                //检查是否重复
+                foreach (var item in model.Website.Carousels)
+                {
+                    if (model.Website.Carousels.Count(s => s.Image == item.Image) > 1)
+                    {
+                        return new Result { Error = "轮播图链接不能重复，重复的链接：" + item.Image, Successful = false };
+
+                    }
+                }
+                foreach (var item in model.Website.BackgroundImages)
+                {
+                    if (model.Website.BackgroundImages.Count(s => s.Image == item.Image) > 1)
+                    {
+                        return new Result { Error = "背景图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
                     }
                 }
@@ -1049,16 +1174,30 @@ namespace CnGalWebSite.APIServer.Controllers
                 var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
                 var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
                 var videos = await _videoRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-
+                //检查预约关联抽奖是否存在
+                int lotteryId = 0;
+                if (string.IsNullOrWhiteSpace(model.AddInfor.Booking.LotteryName) == false)
+                {
+                    var lottery = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden == false && s.Name == model.AddInfor.Booking.LotteryName).FirstOrDefaultAsync();
+                    if (lottery == null)
+                    {
+                        return new Result { Successful = false, Error = "预约关联抽奖不存在" };
+                    }
+                    else
+                    {
+                        lotteryId = (int)lottery.Id;
+                    }
+                }
 
                 var newEntry = new Entry();
-                await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model.AddInfor);
+                await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model.AddInfor,lotteryId);
                 _entryService.SetDataFromEditImagesViewModel(newEntry, model.Images);
                 _entryService.SetDataFromEditMainPageViewModel(newEntry, model.MainPage);
                 _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);
                 _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances, entries, articles, videos);
                 _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags, tags);
                 _entryService.SetDataFromEditAudioViewModel(newEntry, model.Audio);
+                _entryService.SetDataFromEditWebsiteViewModel(newEntry, model.Website);
 
                 var entry = new Entry();
                 //获取审核记录
@@ -1098,6 +1237,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
@@ -1105,8 +1245,6 @@ namespace CnGalWebSite.APIServer.Controllers
             await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHideOutlink, b => model.IsHidden));
             return new Result { Successful = true };
         }
-
-
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]

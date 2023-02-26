@@ -91,6 +91,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EntryType Type { get; set; }
 
         /// <summary>
+        /// 预约
+        /// </summary>
+        public BookingViewModel Booking { get; set; }
+
+        /// <summary>
         /// 附加信息列表
         /// </summary>
         public List<InformationsModel> Information { get; set; } = new List<InformationsModel>();
@@ -155,6 +160,27 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel> { };
     }
+
+    public class BookingViewModel
+    {
+        public long BookingCount { get; set; }
+
+        public List<BookingGoalViewModel> Goals=new List<BookingGoalViewModel>();
+    }
+
+    public class BookingGoalViewModel
+    {
+        /// <summary>
+        /// 唯一名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 当前目标达成的最低人数
+        /// </summary>
+        public int Target { get; set; }
+    }
+
     public class TagsViewModel
     {
         public int Id { get; set; }

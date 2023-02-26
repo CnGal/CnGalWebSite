@@ -1,0 +1,118 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClickStar" />
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    bool isBooking { get; set; }
+    bool isReady = false;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var user = await authenticationStateTask;
+        if (Id != 0 && isReady == false && user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                //获取文章信息
+                var AsyncModel = await Http.GetFromJsonAsync<BookingGameStateModel>(ToolHelper.WebApiPath + "api/booking/GetBookingGameState/" + Id, ToolHelper.options);
+                isBooking = AsyncModel.IsBooking;
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "判断用户是否预约游戏失败");
+            }
+        }
+
+    }
+
+
+    private async Task OnClickStar()
+    {
+        //判断用户是否登录
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            if (isBooking)
+            {
+                await UnThumbsUp();
+            }
+            else
+            {
+                await ThumbsUp();
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("account/login");
+        }
+
+    }
+
+
+    private async Task UnThumbsUp()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("取消预约游戏失败", obj.Error);
+            }
+            else
+            {
+                isBooking = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "取消预约游戏失败");
+        }
+    }
+    private async Task ThumbsUp()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("预约游戏失败", obj.Error);
+            }
+            else
+            {
+                isBooking = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "预约游戏失败");
+        }
+    }
+
+}
