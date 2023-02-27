@@ -1,0 +1,28 @@
+﻿<div class="character-card">
+    @if (string.IsNullOrWhiteSpace(Model.StandingPainting) == false)
+    {
+        <img src="@Model.StandingPainting">
+    }
+    <div class="caption_wrapper">
+        <div class="caption">
+            <div class="name">@Model.Infor.Name</div>
+            @if (string.IsNullOrWhiteSpace(Model.CV) == false)
+            {
+                <div class="cv">CV： @Model.CV</div>
+            }
+            @if (string.IsNullOrWhiteSpace(Model.Infor.BriefIntroduction) == false)
+            {
+                <div class="description">
+                    @Model.Infor.BriefIntroduction
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EntryRoleViewModel Model { get; set; }
+
+
+}

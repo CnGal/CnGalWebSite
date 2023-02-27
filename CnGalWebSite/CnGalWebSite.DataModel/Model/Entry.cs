@@ -218,16 +218,9 @@ namespace CnGalWebSite.DataModel.Model
         public long Id { get; set; }
 
         /// <summary>
-        /// 首页轮播图列表
+        /// 图片
         /// </summary>
-        [InverseProperty("CarouselWebsite")]
-        public ICollection<EntryWebsiteImage> Carousels { get; set; } = new List<EntryWebsiteImage>();
-
-        /// <summary>
-        /// 背景图列表
-        /// </summary>
-        [InverseProperty("BackgroundImageWebsite")]
-        public ICollection<EntryWebsiteImage> BackgroundImages { get; set; } = new List<EntryWebsiteImage>();
+        public virtual ICollection<EntryWebsiteImage> Images { get; set; } = new List<EntryWebsiteImage>();
 
         /// <summary>
         /// 介绍 纯html
@@ -235,14 +228,34 @@ namespace CnGalWebSite.DataModel.Model
         public string Introduction { get; set; }
 
         /// <summary>
-        /// 标题 纯html
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
         /// 自定义Html 优先级最高
         /// </summary>
         public string Html { get; set; }
+
+        /// <summary>
+        /// 标题 纯html
+        /// </summary>
+        public string FirstPage { get; set; }
+
+        /// <summary>
+        /// Logo图片
+        /// </summary>
+        public string Logo { get; set; }
+
+        /// <summary>
+        /// 副标题
+        /// </summary>
+        public string SubTitle { get; set; }
+
+        /// <summary>
+        /// 主题语句
+        /// </summary>
+        public string Impressions { get; set; }
+
+        /// <summary>
+        /// 主题颜色
+        /// </summary>
+        public string Color { get; set; }
 
         public int? EntryId { get; set; }
         public Entry Entry { get; set; }
@@ -262,25 +275,29 @@ namespace CnGalWebSite.DataModel.Model
 
         public EntryWebsiteImageType Type { get; set; }
 
+        public EntryWebsiteImageSize Size { get; set; }
+
         public string Url { get; set; }
 
         public int Priority { get; set; }
 
         public string Note { get; set; }
-
-        public long CarouseWebsitelId { get; set; }
-        public EntryWebsite CarouselWebsite { get; set; }
-
-        public long BackgroundImageWebsiteId { get; set; }
-        public EntryWebsite BackgroundImageWebsite { get; set; }
     }
 
-    public enum EntryWebsiteImageType
+    public enum EntryWebsiteImageSize
     {
         [Display(Name ="PC端")]
         Large,
         [Display(Name = "移动端")]
         Small
+    }
+
+    public enum EntryWebsiteImageType
+    {
+        [Display(Name = "轮播图")]
+        Carousel,
+        [Display(Name = "背景图")]
+        Background
     }
 
     public class Outlink

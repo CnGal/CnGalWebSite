@@ -3,6 +3,7 @@
 @inject ILocalStorageService _localStorage
 @inject IEventService _eventService
 @inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <style>
@@ -107,7 +108,7 @@ else
     [Inject]
     public MasaBlazor MasaBlazor { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
         {
@@ -119,6 +120,24 @@ else
 
         _eventService.SavaTheme -= OnSavaTheme;
         _eventService.SavaTheme += OnSavaTheme;
+
+        _eventService.TempEffectTheme -= OnTempEffectTheme;
+        _eventService.TempEffectTheme += OnTempEffectTheme;
+
+        NavigationManager.LocationChanged -= LocationChanged;
+        NavigationManager.LocationChanged += LocationChanged;
+
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        await LoadTheme();
+        await Refresh();
+    }
+
+    public async void OnTempEffectTheme()
+    {
+        await Refresh();
     }
 
     public async void OnSavaTheme()
@@ -271,10 +290,18 @@ else
                 colorActive = "#616161";
                 break;
             default:
-                _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
-                colorMain = "#F06292";
-                colorHover = "#D81B60";
-                colorActive = "#880E4F";
+                if (_dataCacheService.ThemeSetting.Theme.Contains("#"))
+                {
+                    colorMain = colorHover = colorActive = _dataCacheService.ThemeSetting.Theme;
+                }
+                else
+                {
+                    _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+                    colorMain = "#F06292";
+                    colorHover = "#D81B60";
+                    colorActive = "#880E4F";
+                }
+
                 break;
 
         }
@@ -330,6 +357,8 @@ else
     public void Dispose()
     {
         _eventService.SavaTheme -= OnSavaTheme;
+        _eventService.TempEffectTheme -= OnTempEffectTheme;
+        NavigationManager.LocationChanged -= LocationChanged;
         GC.SuppressFinalize(this);
     }
     #endregion

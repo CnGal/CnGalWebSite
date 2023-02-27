@@ -667,16 +667,12 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry)
         {
-            //预处理图片
-            entry.MainPicture = entry.Type is EntryType.Staff or EntryType.Role
-                ? GetImagePath(entry.Thumbnail, "user.png")
-                : GetImagePath(entry.MainPicture, "app.png");
+          
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
                 Name = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Name : entry.DisplayName,
                 Type = entry.Type,
-                MainImage = entry.MainPicture,
                 BriefIntroduction = entry.BriefIntroduction,
                 LastEditTime = entry.LastEditTime,
                 ReaderCount = entry.ReaderCount,
@@ -684,6 +680,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 PublishTime = entry.PubulishTime,
                 AddInfors = new List<EntryInforTipAddInforModel>()
             };
+            //预处理图片
+            model.MainImage = entry.Type is EntryType.Staff or EntryType.Role
+                ? GetImagePath(entry.Thumbnail, "user.png")
+                : GetImagePath(entry.MainPicture, "app.png");
 
             //处理音频
             if(entry.Audio!=null&&entry.Audio.Any())
@@ -713,11 +713,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
                             Modifier = "配音",
                             Contents = cvs.Select(s => new StaffNameModel
                             {
-                                DisplayName = string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
+                                DisplayName =string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
                                 Id = s.ToEntryNavigation?.Id ?? -1
                             }).ToList()
                         });
-
                     }
 
                     //查找登场游戏

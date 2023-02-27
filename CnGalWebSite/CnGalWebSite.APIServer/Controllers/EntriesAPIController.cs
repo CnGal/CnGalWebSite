@@ -90,11 +90,12 @@ namespace CnGalWebSite.APIServer.Controllers
             var entry = await _entryRepository.GetAll()
                     .Include(s => s.Outlinks)
                     .Include(s=>s.Audio)
-                    .Include(s => s.WebsiteAddInfor)
+                    .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                     .Include(s => s.Booking).ThenInclude(s=>s.Goals)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Audio)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)                  
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
@@ -984,7 +985,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
-            var entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (entry == null)
             {
                 return NotFound();
@@ -1022,25 +1025,22 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //检查是否重复
-            foreach (var item in model.Carousels)
+            foreach (var item in model.Images)
             {
-                if (model.Carousels.Count(s => s.Image == item.Image) > 1)
+                if (model.Images.Count(s => s.Image == item.Image&&s.Type==item.Type) > 1)
                 {
-                    return new Result { Error = "轮播图链接不能重复，重复的链接：" + item.Image, Successful = false };
+                    return new Result { Error = "相同类型的图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
                 }
             }
-            foreach (var item in model.BackgroundImages)
-            {
-                if (model.BackgroundImages.Count(s => s.Image == item.Image) > 1)
-                {
-                    return new Result { Error = "背景图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
-                }
-            }
             //查找词条
-            var currentEntry = await _entryRepository.GetAll().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(x => x.Id == model.Id);
-            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.WebsiteAddInfor).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var currentEntry = await _entryRepository.GetAll()
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (currentEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
@@ -1112,19 +1112,11 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
                 //检查是否重复
-                foreach (var item in model.Website.Carousels)
+                foreach (var item in model.Website.Images)
                 {
-                    if (model.Website.Carousels.Count(s => s.Image == item.Image) > 1)
+                    if (model.Website.Images.Count(s => s.Image == item.Image && s.Type == item.Type) > 1)
                     {
-                        return new Result { Error = "轮播图链接不能重复，重复的链接：" + item.Image, Successful = false };
-
-                    }
-                }
-                foreach (var item in model.Website.BackgroundImages)
-                {
-                    if (model.Website.BackgroundImages.Count(s => s.Image == item.Image) > 1)
-                    {
-                        return new Result { Error = "背景图片链接不能重复，重复的链接：" + item.Image, Successful = false };
+                        return new Result { Error = "相同类型的图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
                     }
                 }
@@ -1381,9 +1373,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取编辑状态
             model.State = await _entryService.GetEntryEditState(user, id);
             //是否监视
-            if(user!=null)
+            if (user != null)
             {
-           model.IsInMonitor=  await _editRecordService.CheckObjectIsInUserMonitor(user, id);
+                model.IsInMonitor = await _editRecordService.CheckObjectIsInUserMonitor(user, id);
 
             }
 

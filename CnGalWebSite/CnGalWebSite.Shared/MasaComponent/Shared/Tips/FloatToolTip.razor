@@ -8,6 +8,10 @@
     <div style=" display: flex; flex-direction: column;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.BrithdayButton Class="mb-4" />
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" />
+        @if (showEntryStyle)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Style.ToIconString()" Tooltip="切换词条样式模板" OnClick="OnSwitchStyle"  Class="mb-4"/>
+        }
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="left" Text="社区交流" Class="mb-4">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" />
@@ -35,7 +39,11 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
 
 @code {
+    public event Action SwitchEntryStyle;
+
+
     private bool fab;
+    private bool showEntryStyle;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
@@ -44,9 +52,13 @@
     public void OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
-        
+
     }
 
+    public void OnSwitchStyle()
+    {
+        SwitchEntryStyle?.Invoke();
+    }
 
     public async Task OnNav(string url)
     {
@@ -131,6 +143,13 @@
             {
                 masaCatalogButton.Refresh(null, null);
             }
+            StateHasChanged();
+        }
+
+        var temp = NavigationManager.Uri.Contains("entries/index");
+        if (temp != showEntryStyle)
+        {
+            showEntryStyle = temp;
             StateHasChanged();
         }
     }

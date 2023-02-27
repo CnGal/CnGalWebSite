@@ -328,7 +328,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
                 case Operation.EstablishWebsite:
                     entry = await _entryRepository.GetAll()
-                       .Include(s => s.WebsiteAddInfor)
+                        .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                        .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
                     break;
                 default:

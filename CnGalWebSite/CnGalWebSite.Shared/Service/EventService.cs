@@ -14,6 +14,7 @@ namespace CnGalWebSite.Shared.Service
     public class EventService : IEventService
     {
         public event Action SavaTheme;
+        public event Action TempEffectTheme;
 
         private readonly IMauiService _mauiService;
         private readonly IJSRuntime JS;
@@ -32,6 +33,14 @@ namespace CnGalWebSite.Shared.Service
         public void OnSavaTheme()
         {
             SavaTheme?.Invoke();
+        }
+
+        /// <summary>
+        /// 临时设置主题
+        /// </summary>
+        public void OnTempEffectTheme()
+        {
+            TempEffectTheme?.Invoke();
         }
 
         public async Task OpenNewPage(string url)

@@ -10,6 +10,8 @@
     [Parameter]
     public string Context { get; set; }
     [Parameter]
+    public EventCallback<string> ContextChanged { get; set; }
+    [Parameter]
     public int MinHeight { get; set; }
     [Parameter]
     public int Height { get; set; }
@@ -17,8 +19,7 @@
     public string Class { get; set; }
     [Parameter]
     public MarkdownEditorMode Mode { get; set; }
-    [Parameter]
-    public EventCallback<string> ContextChanged { get; set; }
+
     private Dictionary<string, object> _options = new Dictionary<string, object>();
 
     MMarkdown mMarkdown;

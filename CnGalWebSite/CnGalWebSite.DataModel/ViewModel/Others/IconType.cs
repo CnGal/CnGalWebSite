@@ -128,7 +128,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         UnBooking,
         Edit,
         Delete,
-        Check
+        Check,
+        Style,
+        Number1, Number2, Number3, Number4, Number5, Number6,
+        Right,
+        Left,
     }
 
     public static class IconTypeHelper
@@ -137,6 +141,24 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Left:
+                    return "mdi-chevron-left";
+                case IconType.Right:
+                    return "mdi-chevron-right";
+                case IconType.Number1:
+                    return "mdi-numeric-1-box-multiple-outline";
+                case IconType.Number2:
+                    return "mdi-numeric-2-box-multiple-outline";
+                case IconType.Number3:
+                    return "mdi-numeric-3-box-multiple-outline";
+                case IconType.Number4:
+                    return "mdi-numeric-4-box-multiple-outline";
+                case IconType.Number5:
+                    return "mdi-numeric-5-box-multiple-outline";
+                case IconType.Number6:
+                    return "mdi-numeric-6-box-multiple-outline";
+                case IconType.Style:
+                    return "mdi-palette";
                 case IconType.Check:
                     return "mdi-check-bold";
                 case IconType.Delete:

@@ -1,0 +1,23 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<div class="official-website">
+    <MainCard Model="Model" />
+    <StoryCard Model="Model" />
+    <CharacterCard Model="Model" />
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _dataCacheService.ThemeSetting.IsFullScreen = true;
+        if(string.IsNullOrWhiteSpace( Model.WebsiteAddInfor?.Color)==false)
+        {
+            _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;
+        }
+        _eventService.OnTempEffectTheme();
+    }
+}

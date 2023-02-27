@@ -8,9 +8,7 @@ namespace CnGalWebSite.DataModel.ExamineModel.Entries
 {
     public class EntryWebsiteExamineModel
     {
-        public List<EditWebsiteImage> Carousels { get; set; } = new List<EditWebsiteImage>();
-
-        public List<EditWebsiteImage> BackgroundImages { get; set; } = new List<EditWebsiteImage>();
+        public List<EditWebsiteImage> Images { get; set; } = new List<EditWebsiteImage>();
 
         public List<ExamineMainAlone> MainInfor { get; set; } = new List<ExamineMainAlone>();
     }
@@ -20,6 +18,8 @@ namespace CnGalWebSite.DataModel.ExamineModel.Entries
         public bool IsDelete { get; set; }
 
         public EntryWebsiteImageType Type { get; set; }
+
+        public EntryWebsiteImageSize Size { get; set; }
 
         public string Url { get; set; }
 

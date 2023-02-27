@@ -97,6 +97,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         public BookingViewModel Booking { get; set; }
 
         /// <summary>
+        /// 官网补充信息
+        /// </summary>
+        public EntryWebsiteViewModel WebsiteAddInfor { get; set; }
+
+        /// <summary>
         /// 附加信息列表
         /// </summary>
         public List<InformationsModel> Information { get; set; } = new List<InformationsModel>();
@@ -113,7 +118,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 游戏的关联角色列表  和相关词条没有重叠
         /// </summary>
-        public List<EntryInforTipViewModel> Roles { get; set; } = new List<EntryInforTipViewModel> { };
+        public List<EntryRoleViewModel> Roles { get; set; } = new List<EntryRoleViewModel> { };
 
         /// <summary>
         /// STAFF的关联游戏列表 和相关词条没有重叠
@@ -162,9 +167,81 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel> { };
     }
 
+    public class EntryRoleViewModel
+    {
+        public EntryInforTipViewModel Infor { get; set; } = new EntryInforTipViewModel();
+
+        public string Age { get; set; }
+        public string Height { get; set; }
+        public string Birthday { get; set; }
+        public string CV { get; set; }
+
+        public string StandingPainting { get; set; }
+    }
+
+    public class EntryWebsiteViewModel
+    {
+        /// <summary>
+        /// 介绍 纯html
+        /// </summary>
+        public string Introduction { get; set; }
+
+        /// <summary>
+        /// 自定义Html 优先级最高
+        /// </summary>
+        public string Html { get; set; }
+
+        /// <summary>
+        /// 标题 纯html
+        /// </summary>
+        public string FirstPage { get; set; }
+
+        /// <summary>
+        /// Logo图片
+        /// </summary>
+        public string Logo { get; set; }
+
+        /// <summary>
+        /// 副标题
+        /// </summary>
+        public string SubTitle { get; set; }
+
+        /// <summary>
+        /// 主题语句
+        /// </summary>
+        public string Impressions { get; set; }
+
+        /// <summary>
+        /// 主题颜色
+        /// </summary>
+        public string Color { get; set; }
+
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public List<EntryWebsiteImageViewModel> Images { get; set; } = new List<EntryWebsiteImageViewModel>();
+
+    }
+
+    public class EntryWebsiteImageViewModel
+    {
+        public EntryWebsiteImageType Type { get; set; }
+
+        public EntryWebsiteImageSize Size { get; set; }
+
+        public string Url { get; set; }
+
+        public int Priority { get; set; }
+
+        public string Note { get; set; }
+
+    }
+
     public class BookingViewModel
     {
         public long BookingCount { get; set; }
+
+        public bool Open { get; set; }
 
         public List<BookingGoalViewModel> Goals { get; set; } = new List<BookingGoalViewModel>();
     }

@@ -1386,16 +1386,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var model = new ExaminePreDataModel();
             if (entry.WebsiteAddInfor != null)
             {
-                foreach (var item in entry.WebsiteAddInfor.Carousels)
-                {
-                    model.Pictures.Add(new PicturesAloneViewModel
-                    {
-                        Url = item.Url,
-                        Note = item.Note,
-                        Priority = item.Priority,
-                    });
-                }
-                foreach (var item in entry.WebsiteAddInfor.BackgroundImages)
+                foreach (var item in entry.WebsiteAddInfor.Images)
                 {
                     model.Pictures.Add(new PicturesAloneViewModel
                     {
@@ -1407,14 +1398,54 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
                 var texts = new List<KeyValueModel>();
 
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Color) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "主题颜色",
+                        DisplayValue = entry.WebsiteAddInfor.Color,
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.SubTitle) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "副标题",
+                        DisplayValue = entry.WebsiteAddInfor.SubTitle,
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Impressions) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "主题语句",
+                        DisplayValue = entry.WebsiteAddInfor.Impressions,
+                    });
+                }
+
+                model.Texts.Add(new InformationsModel
+                {
+                    Modifier = "主要信息",
+                    Informations = texts
+                });
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Logo) == false)
+                {
+                    model.Pictures.Add(new PicturesAloneViewModel
+                    {
+                        Url = entry.WebsiteAddInfor.Logo,
+                        Note = "Logo",
+                    });
+                }
+
                 if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Html) == false)
                 {
                     model.MainPage += $"<h5>自定义html</h5>\n{entry.WebsiteAddInfor.Html}\n";
                 }
 
-                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Title) == false)
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.FirstPage) == false)
                 {
-                    model.MainPage += $"<h5标题</h5>\n{entry.WebsiteAddInfor.Title}\n";
+                    model.MainPage += $"<h5>首页</h5>\n{entry.WebsiteAddInfor.FirstPage}\n";
                 }
 
                 if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Introduction) == false)
@@ -1431,7 +1462,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.GetAll()
-                  .Include(s => s.WebsiteAddInfor)
+                  .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                   .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {

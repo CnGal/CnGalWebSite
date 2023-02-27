@@ -21,6 +21,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public bool IsExtendEntireScreen { get; set; }
 
         /// <summary>
+        /// 是否全屏显示 不留白边 官网使用
+        /// </summary>
+        public bool IsFullScreen { get; set; }
+
+        /// <summary>
         /// 是否隐藏文章目录
         /// </summary>
         public bool IsHiddeArticleCatalog { get; set; }

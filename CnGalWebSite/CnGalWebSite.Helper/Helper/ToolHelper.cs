@@ -1143,9 +1143,9 @@ namespace CnGalWebSite.DataModel.Helper
             var list = informations.ToList();
             foreach (var item in list)
             {
-                if (informations.Count(s => item.Url == s.Url) > 1)
+                if (informations.Count(s => item.Url == s.Url&&item.Size == s.Size) > 1)
                 {
-                    var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    var temp = informations.FirstOrDefault(s => item.Url == s.Url && item.Size == s.Size);
                     if (temp != null)
                     {
                         informations.Remove(temp);

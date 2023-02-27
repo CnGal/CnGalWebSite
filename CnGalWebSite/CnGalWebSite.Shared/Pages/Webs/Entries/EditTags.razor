@@ -47,7 +47,7 @@ else
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")"  Icon="fa fa-fw  fa-codepen" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")"  Icon="@IconType.Entry.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.TagsCard Model="Model"  TagItems="TagItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

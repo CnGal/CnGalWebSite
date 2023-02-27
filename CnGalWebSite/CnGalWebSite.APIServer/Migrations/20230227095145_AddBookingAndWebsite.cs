@@ -7,11 +7,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CnGalWebSite.APIServer.Migrations
 {
     /// <inheritdoc />
-    public partial class AddBookingAndEntryWebsite : Migration
+    public partial class AddBookingAndWebsite : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "GameId",
+                table: "Lotteries",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
             migrationBuilder.AddColumn<int>(
                 name: "Template",
                 table: "Entries",
@@ -51,9 +58,17 @@ namespace CnGalWebSite.APIServer.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Introduction = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Title = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Html = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FirstPage = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Logo = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SubTitle = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Impressions = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Color = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EntryId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -129,27 +144,20 @@ namespace CnGalWebSite.APIServer.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Type = table.Column<int>(type: "int", nullable: false),
+                    Size = table.Column<int>(type: "int", nullable: false),
                     Url = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Priority = table.Column<int>(type: "int", nullable: false),
                     Note = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CarouseWebsitelId = table.Column<long>(type: "bigint", nullable: false),
-                    CarouselWebsiteId = table.Column<long>(type: "bigint", nullable: true),
-                    BackgroundImageWebsiteId = table.Column<long>(type: "bigint", nullable: false)
+                    EntryWebsiteId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EntryWebsiteImage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EntryWebsiteImage_EntryWebsites_BackgroundImageWebsiteId",
-                        column: x => x.BackgroundImageWebsiteId,
-                        principalTable: "EntryWebsites",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EntryWebsiteImage_EntryWebsites_CarouselWebsiteId",
-                        column: x => x.CarouselWebsiteId,
+                        name: "FK_EntryWebsiteImage_EntryWebsites_EntryWebsiteId",
+                        column: x => x.EntryWebsiteId,
                         principalTable: "EntryWebsites",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -161,7 +169,7 @@ namespace CnGalWebSite.APIServer.Migrations
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 columns: new[] { "Birthday", "ConcurrencyStamp", "LastChangePasswordTime", "RegistTime", "UnsealTime" },
-                values: new object[] { null, "1ccc753b-ae39-4568-a808-53cfed276b00", null, new DateTime(2023, 2, 26, 12, 13, 25, 129, DateTimeKind.Utc).AddTicks(3329), null });
+                values: new object[] { null, "e5eca5ab-01bd-49f4-9061-d975f7bc1669", null, new DateTime(2023, 2, 27, 17, 51, 45, 150, DateTimeKind.Utc).AddTicks(3644), null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingGoal_BookingId",
@@ -185,14 +193,9 @@ namespace CnGalWebSite.APIServer.Migrations
                 column: "BookingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EntryWebsiteImage_BackgroundImageWebsiteId",
+                name: "IX_EntryWebsiteImage_EntryWebsiteId",
                 table: "EntryWebsiteImage",
-                column: "BackgroundImageWebsiteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EntryWebsiteImage_CarouselWebsiteId",
-                table: "EntryWebsiteImage",
-                column: "CarouselWebsiteId");
+                column: "EntryWebsiteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntryWebsites_EntryId",
@@ -218,6 +221,10 @@ namespace CnGalWebSite.APIServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "EntryWebsites");
+
+            migrationBuilder.DropColumn(
+                name: "GameId",
+                table: "Lotteries");
 
             migrationBuilder.DropColumn(
                 name: "Template",

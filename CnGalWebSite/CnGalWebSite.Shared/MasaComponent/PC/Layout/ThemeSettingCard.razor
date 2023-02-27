@@ -45,16 +45,16 @@
             显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_show" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")"  Class="m-0"></MSwitch>
+            <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")"  Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             扩展显示范围
         </MCardTitle>
         <MCardText>
-            选中后将把显示范围扩大到整个页面，也就是两边不再留白
+            选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_expand" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")"  Class="m-0"></MSwitch>
+            <MSwitch Value="_dataCacheService.ThemeSetting.IsExtendEntireScreen" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_dataCacheService.ThemeSetting.IsExtendEntireScreen?"扩展显示范围":"限制显示范围")"  Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             字体
@@ -86,8 +86,7 @@
 @code {
 
     StringNumber colorString = "pink lighten-2";
-    bool _show = false;
-    bool _expand = false;
+
     bool Dialog { get; set; }
 
     [CascadingParameter]
@@ -95,8 +94,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _show = _dataCacheService.ThemeSetting.IsTransparent;
-
         if (string.IsNullOrWhiteSpace(_dataCacheService.ThemeSetting.Theme))
         {
             _dataCacheService.ThemeSetting.Theme = colorString.ToString();
@@ -139,7 +136,6 @@
 
     public void BackgroundValueChanged(bool show)
     {
-        _show = show;
         _dataCacheService.ThemeSetting.IsTransparent = show;
 
         _eventService.OnSavaTheme();
@@ -147,7 +143,6 @@
     }
     public void ExpandValueChanged(bool expand)
     {
-        _expand = expand;
         _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
 
         _eventService.OnSavaTheme();

@@ -1,6 +1,10 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
+@if (_dataCacheService.ThemeSetting.IsFullScreen)
+{
+    @ChildContent
+}
+else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
 {
     @if (string.IsNullOrWhiteSpace(Styles) == false || string.IsNullOrWhiteSpace(Class) == false)
     {

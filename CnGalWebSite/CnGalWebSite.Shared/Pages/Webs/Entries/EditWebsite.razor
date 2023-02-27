@@ -14,7 +14,7 @@ else
 
 }
 
-<AutoSaveTip TItem="EditAudioViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+<AutoSaveTip TItem="EditEntryWebsiteViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" />
@@ -42,7 +42,7 @@ else
         }
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Entry.ToIconString()" Outline>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AudioCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.WebsiteCard Model="Model" IsCollapsed="false" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
@@ -51,14 +51,14 @@ else
 
 
 @code {
-        [Parameter]
-        public string Id { get; set; }
-    public EditAudioViewModel Model { get; set; } = new EditAudioViewModel();
+    [Parameter]
+    public string Id { get; set; }
+    public EditEntryWebsiteViewModel Model { get; set; } = new EditEntryWebsiteViewModel();
     bool isReady = false;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    AutoSaveTip<EditAudioViewModel> autoSave { get; set; }
+    AutoSaveTip<EditEntryWebsiteViewModel> autoSave { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -67,14 +67,14 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id, ToolHelper.options);
+                Model = await Http.GetFromJsonAsync<EditEntryWebsiteViewModel>(ToolHelper.WebApiPath + "api/entries/editwebsite/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑词条音频失败");
+                ErrorHandler.ProcessError(ex, "获取编辑词条官网样式模板数据失败");
             }
 
         }
@@ -84,36 +84,36 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio", Model);
+            var result = await Http.PostAsJsonAsync<EditEntryWebsiteViewModel>(ToolHelper.WebApiPath + "api/entries/editwebsite", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存词条音频失败", obj.Error);
+                await ToastService.Error("保存词条官网样式模板数据失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存词条音频成功，等待审核通过");
-                NavigationManager.NavigateTo( "/entries/index/" + Model.Id);
+                await ToastService.Success("保存成功", "保存词条官网样式模板数据成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存词条音频失败");
+            ErrorHandler.ProcessError(ex, "保存词条官网样式模板数据失败");
         }
     }
 
-    private void DataLoaded(EditAudioViewModel model)
+    private void DataLoaded(EditEntryWebsiteViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 }

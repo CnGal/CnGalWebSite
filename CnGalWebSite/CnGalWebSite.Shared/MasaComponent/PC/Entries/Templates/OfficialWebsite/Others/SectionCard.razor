@@ -1,0 +1,18 @@
+﻿
+<section class="content" id="@Title">
+    <h2>
+        <MIcon Large Color="primary" Class="me-4">@Icon.ToIconString()</MIcon><span class="font-color"> @Title</span>
+    </h2>
+    @ChildContent
+</section>
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public IconType Icon { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+}

@@ -891,20 +891,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         }
 
-        public void UpdateEntryDataWebsiteCarousels(Entry entry, EntryWebsiteExamineModel examine)
+        public void UpdateEntryDataWebsiteImages(Entry entry, EntryWebsiteExamineModel examine)
         {
             if (entry.WebsiteAddInfor == null)
             {
                 entry.WebsiteAddInfor = new EntryWebsite();
             }
-            var pictures = entry.WebsiteAddInfor.Carousels;
+            var pictures = entry.WebsiteAddInfor.Images;
 
-            foreach (var item in examine.Carousels)
+            foreach (var item in examine.Images)
             {
                 var isAdd = false;
                 foreach (var pic in pictures)
                 {
-                    if (pic.Url == item.Url)
+                    if (pic.Url == item.Url&&pic.Type== item.Type)
                     {
                         if (item.IsDelete == true)
                         {
@@ -913,7 +913,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         }
                         else
                         {
-                            pic.Type = item.Type;
+                            pic.Size = item.Size;
                             pic.Priority = item.Priority;
                             pic.Note = item.Note;
                         }
@@ -927,55 +927,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         Url = item.Url,
                         Type = item.Type,
+                        Size = item.Size,
                         Note = item.Note,
-                        Priority = item.Priority
-                    });
-                }
-            }
-
-            //更新最后编辑时间
-            entry.LastEditTime = DateTime.Now.ToCstTime();
-
-        }
-
-        public void UpdateEntryDataWebsiteBackgroundImages(Entry entry, EntryWebsiteExamineModel examine)
-        {
-            if (entry.WebsiteAddInfor == null)
-            {
-                entry.WebsiteAddInfor = new EntryWebsite();
-            }
-            var pictures = entry.WebsiteAddInfor.BackgroundImages;
-
-            foreach (var item in examine.BackgroundImages)
-            {
-                var isAdd = false;
-                foreach (var pic in pictures)
-                {
-                    if (pic.Url == item.Url)
-                    {
-                        if (item.IsDelete == true)
-                        {
-                            pictures.Remove(pic);
-
-                        }
-                        else
-                        {
-                            pic.Type = item.Type;
-                            pic.Priority = item.Priority;
-                            pic.Note = item.Note;
-                        }
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false && item.IsDelete == false)
-                {
-                    pictures.Add(new EntryWebsiteImage
-                    {
-                        Url = item.Url,
-                        Type = item.Type,
-                        Note = item.Note,
-                        Priority = item.Priority
+                        Priority = item.Priority,
                     });
                 }
             }
@@ -987,8 +941,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public void UpdateEntryDataWebsite(Entry entry, EntryWebsiteExamineModel examine)
         {
-            UpdateEntryDataWebsiteCarousels(entry, examine);
-            UpdateEntryDataWebsiteBackgroundImages(entry, examine);
+            UpdateEntryDataWebsiteImages(entry, examine);
             ToolHelper.ModifyDataAccordingToEditingRecord(entry.WebsiteAddInfor, examine.MainInfor);
         }
 
@@ -1093,7 +1046,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.EntryId == entryId && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio))
+                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio || s.Operation == Operation.EstablishWebsite))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation,
@@ -1133,6 +1086,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 if (examineQuery.Any(s => s.Operation == Operation.EstablishAudio))
                 {
                     model.AudioState = EditState.Preview;
+                }
+                if (examineQuery.Any(s => s.Operation == Operation.EstablishWebsite))
+                {
+                    model.WebsiteState = EditState.Preview;
                 }
             }
             //获取各部分状态
@@ -1222,6 +1179,18 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     else
                     {
                         model.AudioState = EditState.Normal;
+                    }
+                }
+                if (model.WebsiteState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EstablishAudio))
+                    {
+                        model.WebsiteState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.WebsiteState = EditState.Normal;
                     }
                 }
             }
@@ -1534,6 +1503,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.Booking = new BookingViewModel
                 {
                     BookingCount = entry.Booking.BookingCount,
+                    Open= entry.Booking.Open,
                     Goals = entry.Booking.Goals.Select(s => new BookingGoalViewModel
                     {
                         Name = s.Name,
@@ -1629,7 +1599,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //序列化相关性列表
             //加载附加信息 关联词条获取
-            var roleInforModel = new List<EntryInforTipViewModel>();
+            var roleInforModel = new List<EntryRoleViewModel>();
             var newsModel = new List<NewsModel>();
             var staffGames = new List<EntryInforTipViewModel>();
             var relevancesEntry = new List<EntryInforTipViewModel>();
@@ -1674,12 +1644,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                     else
                     {
-
                         //获取角色词条
-                        var role = _appHelper.GetEntryInforTipViewModel(item);
-                        role.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
-
-                        roleInforModel.Add(role);
+                        roleInforModel.Add(GetRoleInfor(item));
                     }
 
                 }
@@ -1734,6 +1700,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     DisplayValue = item.BriefIntroduction,
                     Link = item.Link,
                 });
+            }
+
+            //官网补充信息
+            if(entry.WebsiteAddInfor!=null)
+            {
+                model.WebsiteAddInfor = new EntryWebsiteViewModel
+                {
+                    Images = entry.WebsiteAddInfor.Images.Select(s => new EntryWebsiteImageViewModel
+                    {
+                        Note = s.Note,
+                        Priority = s.Priority,
+                        Type = s.Type,
+                        Url = s.Url,
+                        Size=s.Size
+                    }).ToList(),
+                    Html = entry.WebsiteAddInfor.Html,
+                    Introduction = entry.WebsiteAddInfor.Introduction,
+                    SubTitle = entry.WebsiteAddInfor.SubTitle,
+                    Color = entry.WebsiteAddInfor.Color,
+                    FirstPage = entry.WebsiteAddInfor.FirstPage,
+                    Impressions = entry.WebsiteAddInfor.Impressions,
+                    Logo = entry.WebsiteAddInfor.Logo,
+                };
             }
 
             //赋值
@@ -2335,85 +2324,37 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     currentEntry.WebsiteAddInfor = new EntryWebsite();
                 }
 
-                //轮播图
-                foreach (var item in currentEntry.WebsiteAddInfor.Carousels)
-                {
-                    entryWebsite.Carousels.Add(new EditWebsiteImage
-                    {
-                        Type = item.Type,
-                        Url = item.Url,
-                        Note = item.Note,
-                        Priority = item.Priority,
-                        IsDelete = true
-                    });
-                }
-                //再对比当前
-                foreach (var infor in newEntry.WebsiteAddInfor.Carousels.ToList().Purge())
-                {
-                    var isSame = false;
-                    foreach (var item in entryWebsite.Carousels)
-                    {
-                        if (item.Url == infor.Url)
-                        {
-                            if ( item.Type != infor.Type || item.Priority != infor.Priority || item.Note != infor.Note)
-                            {
-                                item.Type = infor.Type;
-                                item.Priority = infor.Priority;
-                                item.Note = infor.Note;
-                                item.IsDelete = false;
-                            }
-                            else
-                            {
-                                entryWebsite.Carousels.Remove(item);
-                            }
-                            isSame = true;
-                            break;
-
-                        }
-                    }
-                    if (isSame == false)
-                    {
-                        entryWebsite.Carousels.Add(new EditWebsiteImage
-                        {
-                            Priority = infor.Priority,
-                            Type = infor.Type,
-                            Url = infor.Url,
-                            Note = infor.Note,
-                            IsDelete = false
-                        });
-                    }
-                }
-
                 //背景图
-                foreach (var item in currentEntry.WebsiteAddInfor.BackgroundImages)
+                foreach (var item in currentEntry.WebsiteAddInfor.Images)
                 {
-                    entryWebsite.BackgroundImages.Add(new EditWebsiteImage
+                    entryWebsite.Images.Add(new EditWebsiteImage
                     {
                         Type = item.Type,
                         Note = item.Note,
                         Url = item.Url,
+                        Size = item.Size,
                         Priority = item.Priority,
                         IsDelete = true
                     });
                 }
                 //再对比当前
-                foreach (var infor in newEntry.WebsiteAddInfor.BackgroundImages.ToList().Purge())
+                foreach (var infor in newEntry.WebsiteAddInfor.Images.ToList().Purge())
                 {
                     var isSame = false;
-                    foreach (var item in entryWebsite.BackgroundImages)
+                    foreach (var item in entryWebsite.Images)
                     {
-                        if (item.Url == infor.Url)
+                        if (item.Url == infor.Url&&item.Type==infor.Type)
                         {
-                            if (item.Type != infor.Type || item.Priority != infor.Priority || item.Note != infor.Note)
+                            if (item.Size != infor.Size || item.Priority != infor.Priority || item.Note != infor.Note)
                             {
-                                item.Type = infor.Type;
+                                item.Size = infor.Size;
                                 item.Note = infor.Note;
                                 item.Priority = infor.Priority;
                                 item.IsDelete = false;
                             }
                             else
                             {
-                                entryWebsite.BackgroundImages.Remove(item);
+                                entryWebsite.Images.Remove(item);
                             }
                             isSame = true;
                             break;
@@ -2422,12 +2363,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                     if (isSame == false)
                     {
-                        entryWebsite.BackgroundImages.Add(new EditWebsiteImage
+                        entryWebsite.Images.Add(new EditWebsiteImage
                         {
                             Priority = infor.Priority,
                             Note = infor.Note,
                             Type = infor.Type,
                             Url = infor.Url,
+                            Size=infor.Size,
                             IsDelete = false
                         });
                     }
@@ -2436,7 +2378,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 //主要信息
                 entryWebsite.MainInfor = ToolHelper.GetEditingRecordFromContrastData(currentEntry.WebsiteAddInfor, newEntry.WebsiteAddInfor);
             }
-            if (entryWebsite.Carousels.Any() || entryWebsite.BackgroundImages.Any() || entryWebsite.MainInfor.Any() )
+            if (entryWebsite.Images.Any() || entryWebsite.MainInfor.Any() )
             {
                 examines.Add(new KeyValuePair<object, Operation>(entryWebsite, Operation.EstablishWebsite));
             }
@@ -3121,26 +3063,21 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             model.Html = entry.WebsiteAddInfor.Html;
             model.Introduction = entry.WebsiteAddInfor.Introduction;
-            model.Title = entry.WebsiteAddInfor.Title;
+            model.SubTitle = entry.WebsiteAddInfor.SubTitle;
+            model.FirstPage = entry.WebsiteAddInfor.FirstPage;
+            model.Logo = entry.WebsiteAddInfor.Logo;
+            model.Color = entry.WebsiteAddInfor.Color;
+            model.Impressions = entry.WebsiteAddInfor.Impressions;
 
-            foreach (var item in entry.WebsiteAddInfor.Carousels)
+            foreach (var item in entry.WebsiteAddInfor.Images)
             {
-                model.Carousels.Add(new EditWebsiteImageModel
+                model.Images.Add(new EditWebsiteImageModel
                 {
                     Image = item.Url,
                     Note = item.Note,
                     Priority = item.Priority,
                     Type = item.Type,
-                });
-            }
-            foreach (var item in entry.WebsiteAddInfor.BackgroundImages)
-            {
-                model.BackgroundImages.Add(new EditWebsiteImageModel
-                {
-                    Image = item.Url,
-                    Note = item.Note,
-                    Priority = item.Priority,
-                    Type = item.Type,
+                    Size=item.Size
                 });
             }
 
@@ -3510,35 +3447,25 @@ namespace CnGalWebSite.APIServer.Application.Entries
         {
             newEntry.WebsiteAddInfor ??= new EntryWebsite();
             newEntry.WebsiteAddInfor.Introduction = model.Introduction;
-            newEntry.WebsiteAddInfor.Title = model.Title;
+            newEntry.WebsiteAddInfor.FirstPage = model.FirstPage;
             newEntry.WebsiteAddInfor.Html = model.Html;
+            newEntry.WebsiteAddInfor.Logo = model.Logo;
+            newEntry.WebsiteAddInfor.Impressions = model.Impressions;
+            newEntry.WebsiteAddInfor.Color = model.Color;
+            newEntry.WebsiteAddInfor.SubTitle = model.SubTitle;
             //再遍历视图模型中的图片 对应修改
-            newEntry.WebsiteAddInfor.Carousels.Clear();
+            newEntry.WebsiteAddInfor.Images.Clear();
 
-            foreach (var item in model.Carousels)
+            foreach (var item in model.Images)
             {
-                newEntry.WebsiteAddInfor.Carousels.Add(new EntryWebsiteImage
+                newEntry.WebsiteAddInfor.Images.Add(new EntryWebsiteImage
                 {
                     Priority = item.Priority,
                     Url = item.Image,
                     Note = item.Note,
                     Type = item.Type,
+                    Size=item.Size
                 });
-
-            }
-
-            newEntry.WebsiteAddInfor.BackgroundImages.Clear();
-
-            foreach (var item in model.BackgroundImages)
-            {
-                newEntry.WebsiteAddInfor.BackgroundImages.Add(new EntryWebsiteImage
-                {
-                    Priority = item.Priority,
-                    Url = item.Image,
-                    Note = item.Note,
-                    Type = item.Type,
-                });
-
             }
         }
 
@@ -3661,7 +3588,28 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return model;
         }
 
+        public EntryRoleViewModel GetRoleInfor(Entry entry)
+        {
+            EntryRoleViewModel roleModel = new EntryRoleViewModel
+            {
+                Infor = _appHelper.GetEntryInforTipViewModel(entry)
+            };
+            roleModel.Infor.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
+            if (roleModel.Infor.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
+            {
+                roleModel.CV = string.Join("、", roleModel.Infor.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents.Select(s => s.DisplayName).ToArray());
+            }
 
+            //查找基础信息
+            roleModel.StandingPainting =_appHelper.GetImagePath(entry.MainPicture, "");
+            if (entry.Information != null && entry.Information.Any())
+            {
+                roleModel.Age = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "年龄")?.DisplayValue;
+                roleModel.Birthday = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "生日")?.DisplayValue;
+                roleModel.Height = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "身高")?.DisplayValue;
+            }
 
+            return roleModel;
+        }
     }
 }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230226065622_AddLotteryRelatedGame")]
-    partial class AddLotteryRelatedGame
+    [Migration("20230227095145_AddBookingAndWebsite")]
+    partial class AddBookingAndWebsite
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -258,7 +258,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "9ee30b83-102c-4b43-bb3e-cbfa62c1e550",
+                            ConcurrencyStamp = "e5eca5ab-01bd-49f4-9061-d975f7bc1669",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -278,7 +278,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2023, 2, 26, 14, 56, 22, 8, DateTimeKind.Utc).AddTicks(3161),
+                            RegistTime = new DateTime(2023, 2, 27, 17, 51, 45, 150, DateTimeKind.Utc).AddTicks(3644),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -999,16 +999,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Color")
+                        .HasColumnType("longtext");
+
                     b.Property<int?>("EntryId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FirstPage")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Html")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Impressions")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Introduction")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Logo")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SubTitle")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -1025,19 +1037,16 @@ namespace CnGalWebSite.APIServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long>("BackgroundImageWebsiteId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("CarouseWebsitelId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CarouselWebsiteId")
+                    b.Property<long?>("EntryWebsiteId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
 
                     b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size")
                         .HasColumnType("int");
 
                     b.Property<int>("Type")
@@ -1048,9 +1057,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BackgroundImageWebsiteId");
-
-                    b.HasIndex("CarouselWebsiteId");
+                    b.HasIndex("EntryWebsiteId");
 
                     b.ToTable("EntryWebsiteImage");
                 });
@@ -4060,20 +4067,10 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryWebsiteImage", b =>
                 {
-                    b.HasOne("CnGalWebSite.DataModel.Model.EntryWebsite", "BackgroundImageWebsite")
-                        .WithMany("BackgroundImages")
-                        .HasForeignKey("BackgroundImageWebsiteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CnGalWebSite.DataModel.Model.EntryWebsite", "CarouselWebsite")
-                        .WithMany("Carousels")
-                        .HasForeignKey("CarouselWebsiteId")
+                    b.HasOne("CnGalWebSite.DataModel.Model.EntryWebsite", null)
+                        .WithMany("Images")
+                        .HasForeignKey("EntryWebsiteId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("BackgroundImageWebsite");
-
-                    b.Navigation("CarouselWebsite");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
@@ -4974,9 +4971,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryWebsite", b =>
                 {
-                    b.Navigation("BackgroundImages");
-
-                    b.Navigation("Carousels");
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
