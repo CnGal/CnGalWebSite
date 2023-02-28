@@ -1,0 +1,34 @@
+﻿@if (Model.Booking?.Goals!=null&&Model.Booking.Goals.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard Icon="IconType.Booking" Title="BOOKING">
+        <div class="container">
+            <div class="booking-card">
+                <MTimeline AlignTop>
+                    @foreach (var item in Model.Booking.Goals)
+                    {
+                        <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"orange":"green")"
+                                       Icon="@(item.Target>Model.Booking.BookingCount?IconType.IndeterminateTime.ToIconString():IconType.Check.ToIconString())"
+                                       FillDot>
+                            <MCard>
+                                <MCardTitle Class="h6 fw-bold p-3 pb-0">
+                                    @item.Name
+                                </MCardTitle>
+                                <MCardText>
+                                    @($"达到{item.Target}人解锁")
+                                </MCardText>
+                            </MCard>
+                        </MTimelineItem>
+                    }
+                </MTimeline>
+            </div>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}
+
+

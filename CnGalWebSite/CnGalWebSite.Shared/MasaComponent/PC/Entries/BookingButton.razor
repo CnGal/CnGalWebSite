@@ -4,8 +4,23 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
+@if (IsHidden==false)
+{
+    @if (Template == EntryStyleTemplate.Default)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
+    }
+    else
+    {
+        <MButton Rounded Color="primary" Block XLarge OnClick="OnClick">
+            <MIcon Left Class="me-4">
+                @(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())
+            </MIcon>
+            @(isBooking?"已预约":"预约")
+        </MButton>
+    }
+}
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClickStar" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
@@ -14,8 +29,13 @@
 
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public EntryStyleTemplate Template { get; set; }
+    [Parameter]
+    public bool IsHidden { get; set; }
 
-    bool isBooking { get; set; }
+    bool isBooking ;
+    public bool IsBooking{ get { return isBooking; } }
     bool isReady = false;
 
     [CascadingParameter]
@@ -46,7 +66,7 @@
     }
 
 
-    private async Task OnClickStar()
+    public async Task OnClick()
     {
         //判断用户是否登录
         var user = await authenticationStateTask;

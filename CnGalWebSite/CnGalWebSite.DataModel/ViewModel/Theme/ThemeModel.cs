@@ -16,9 +16,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public bool IsTransparent { get; set; } = true;
 
         /// <summary>
-        /// 是否扩展到整个屏幕显示
+        /// 是否扩展到整个屏幕显示 不保存
         /// </summary>
-        public bool IsExtendEntireScreen { get; set; }
+        public bool IsExtendEntireScreen;
 
         /// <summary>
         /// 是否全屏显示 不留白边 官网使用

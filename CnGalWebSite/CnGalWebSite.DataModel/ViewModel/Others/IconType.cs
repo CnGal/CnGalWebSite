@@ -130,7 +130,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Delete,
         Check,
         Style,
-        Number1, Number2, Number3, Number4, Number5, Number6,
+        Number1, Number2, Number3, Number4, Number5, Number6, Number7,
         Right,
         Left,
     }
@@ -157,6 +157,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                     return "mdi-numeric-5-box-multiple-outline";
                 case IconType.Number6:
                     return "mdi-numeric-6-box-multiple-outline";
+                case IconType.Number7:
+                    return "mdi-numeric-7-box-multiple-outline";
                 case IconType.Style:
                     return "mdi-palette";
                 case IconType.Check:

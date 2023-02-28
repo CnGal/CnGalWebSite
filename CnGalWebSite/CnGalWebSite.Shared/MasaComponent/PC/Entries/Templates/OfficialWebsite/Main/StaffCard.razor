@@ -1,0 +1,44 @@
+﻿@if (Model.Staffs.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard Icon="IconType.Staff" Title="STAFF">
+        <div class="container">
+            <div class="staff-card">
+                @foreach (var item in Model.Staffs)
+                {
+                    <div class="@(string.IsNullOrWhiteSpace(item.Modifier)?"group-no":"group")">
+                        <div class="name">
+                            @item.Modifier
+                        </div>
+                        <div class="items">
+                            @foreach (var infor in item.StaffList)
+                            {
+                                <div class="posts">
+                                    <div class="name">
+                                        @infor.Modifier：
+                                    </div>
+                                    <div class="items">
+                                        @foreach (var temp in infor.Names)
+                                        {
+                                            <div class="staff-name">@temp.DisplayName</div>
+                                        }
+                                    </div>
+                                </div>
+                             
+                            }
+                        </div>
+                    </div>
+                   
+                }
+            </div>
+          
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}
+
+

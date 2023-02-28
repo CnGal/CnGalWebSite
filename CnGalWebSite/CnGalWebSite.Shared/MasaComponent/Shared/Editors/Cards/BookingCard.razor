@@ -47,7 +47,7 @@
         </tbody>
     </MSimpleTable>
 
-    <BookingGoalInputDialog @ref="bookingGoalInputDialog" OnChanged="OnChanged" />
+    <BookingGoalInputDialog @ref="bookingGoalInputDialog" OnChanged="OnChanged" Items="Model.Goals"/>
 }
 
 @code {
@@ -84,7 +84,7 @@
 
     public void OnChanged()
     {
-        StateHasChanged();
         Model.Goals.RemoveAll(s => string.IsNullOrWhiteSpace(s.Name));
+        StateHasChanged();
     }
 }

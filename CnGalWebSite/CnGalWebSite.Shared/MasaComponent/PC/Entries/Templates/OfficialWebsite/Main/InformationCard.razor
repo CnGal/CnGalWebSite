@@ -1,0 +1,52 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard Icon="IconType.Infor" Title="INFORMATION">
+    <div class="container">
+        <div class="information">
+            <img class="jacket" src="@Model.MainPicture">
+            <div class="description">
+                <dl class="detail">
+                    <div class="title">
+                        <dt>游戏名</dt>
+                        <dd>@Model.Name</dd>
+                    </div>
+                    @if (string.IsNullOrWhiteSpace(group) == false)
+                    {
+                        <div>
+                            <dt>制作组</dt>
+                            <dd>@group</dd>
+                        </div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(publisher) == false)
+                    {
+                        <div>
+                            <dt>发行商</dt>
+                            <dd>@publisher</dd>
+                        </div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(publishTime) == false)
+                    {
+                        <div>
+                            <dt>发售日期</dt>
+                            <dd>@publishTime</dd>
+                        </div>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    string publishTime { get; set; }
+    string group { get; set; }
+    string publisher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        publishTime = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息")?.Informations?.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
+        group = string.Join("、", Model.ProductionGroups.Select(s => s.DisplayName));
+        publisher = string.Join("、", Model.Publishers.Select(s => s.DisplayName));
+    }
+}

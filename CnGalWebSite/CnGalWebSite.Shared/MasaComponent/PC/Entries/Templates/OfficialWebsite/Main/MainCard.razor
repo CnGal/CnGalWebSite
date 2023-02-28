@@ -1,31 +1,66 @@
-﻿
+﻿@inject IEventService _eventService
 
-<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model"/>
-<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" Background/>
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" />
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" Background />
 
 <section id="top">
-    <div class="logo_area">
-        <h1>
-            @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Logo))
+    @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.FirstPage))
+    {
+        <div class="logo-area">
+            <h1>
+                @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Logo))
+                {
+                    <span>@Model.Name</span>
+                }
+                else
+                {
+                    <img width="100%" src="@Model.WebsiteAddInfor.Logo" />
+                }
+            </h1>
+            @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.SubTitle) == false)
             {
-                <span>@Model.Name</span>
+                <div class="lead">
+                    @((MarkupString)Model.WebsiteAddInfor.SubTitle)
+                </div>
             }
             else
             {
-                <img width="100%" src="@Model.WebsiteAddInfor.Logo" />
+                <div class="lead">@publishTime</div>
             }
-        </h1>
-        <div class="lead">@publishTime</div>
-    </div>
-    @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Impressions) == false)
-    {
-        <div class="copy aos-init aos-animate"
-             data-aos="fade-up-custom"
-             data-aos-delay="300">
-            @((MarkupString)Model.WebsiteAddInfor.Impressions)
-        </div>
-    }
 
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Impressions) == false)
+        {
+            <div class="copy">
+                @((MarkupString)Model.WebsiteAddInfor.Impressions)
+            </div>
+        }
+    }
+    else
+    {
+        @((MarkupString)Model.WebsiteAddInfor.FirstPage)
+    }
+    <div class="button-area">
+        @if (Model.Booking != null && Model.Booking.Open)
+        {
+            <div>
+                <BookingButton Template="EntryStyleTemplate.OfficialWebsite" Id="Model.Id" />
+            </div>
+        }
+        @if (Model.SteamId > 0)
+        {
+            <div>
+                <MButton Rounded Color="primary" Block XLarge OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                    <MIcon Left Class="me-4">
+                        @IconType.Steam.ToIconString()
+                    </MIcon>
+                    S T E A M
+                </MButton>
+            </div>
+       
+
+        }
+    </div>
 
 </section>
 
