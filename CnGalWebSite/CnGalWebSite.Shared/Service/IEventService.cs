@@ -9,12 +9,12 @@ namespace CnGalWebSite.Shared.Service
     public interface IEventService
     {
         event Action SavaTheme;
-        event Action LoadTheme;
+        event Action CleanTempEffectTheme;
         event Action TempEffectTheme;
 
         void OnSavaTheme();
 
-        void OnLoadTheme();
+        void OnCleanTempEffectTheme();
 
         Task OpenNewPage(string url);
 

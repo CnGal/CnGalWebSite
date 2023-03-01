@@ -155,7 +155,6 @@ else
         try
         {
             style = GetStyleTemplate();
-            isNotFound = false;
             //获取词条信息
             EntryView = await _dataCatcheService.EntryIndexPageCatche.GetCache(Id);
             //判断如果名称为空则返回主页
@@ -306,7 +305,7 @@ else
         //是否需要清空临时样式
         if (NavigationManager.Uri.Contains("entries/index") == false || (style == EntryStyleTemplate.OfficialWebsite && tempStyle != EntryStyleTemplate.OfficialWebsite))
         {
-            _eventService.OnLoadTheme();
+            _eventService.OnCleanTempEffectTheme();
         }
 
         //是否导航到其他词条

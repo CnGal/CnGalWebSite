@@ -148,8 +148,8 @@ else
         _eventService.SavaTheme -= OnSavaTheme;
         _eventService.SavaTheme += OnSavaTheme;
 
-        _eventService.LoadTheme -= OnLoadTheme;
-        _eventService.LoadTheme += OnLoadTheme;
+        _eventService.CleanTempEffectTheme -= OnCleanTempEffectTheme;
+        _eventService.CleanTempEffectTheme += OnCleanTempEffectTheme;
 
         _eventService.TempEffectTheme -= OnTempEffectTheme;
         _eventService.TempEffectTheme += OnTempEffectTheme;
@@ -165,8 +165,9 @@ else
         await SaveTheme();
         await Refresh();
     }
-    public async void OnLoadTheme()
+    public async void OnCleanTempEffectTheme()
     {
+        _dataCacheService.ThemeSetting.IsFullScreen = false;
         await LoadTheme();
         await Refresh();
     }
@@ -188,7 +189,9 @@ else
     /// <returns></returns>
     public async Task LoadTheme()
     {
+        var isFullScreen = _dataCacheService.ThemeSetting.IsFullScreen;
         _dataCacheService.ThemeSetting = await _localStorage.GetItemAsync<ThemeModel>("theme");
+        _dataCacheService.ThemeSetting.IsFullScreen = isFullScreen;
 
         if (_dataCacheService.ThemeSetting == null)
         {
@@ -383,7 +386,7 @@ else
     {
         _eventService.SavaTheme -= OnSavaTheme;
         _eventService.TempEffectTheme -= OnTempEffectTheme;
-        _eventService.LoadTheme -= OnLoadTheme;
+        _eventService.CleanTempEffectTheme -= OnCleanTempEffectTheme;
         GC.SuppressFinalize(this);
     }
     #endregion
