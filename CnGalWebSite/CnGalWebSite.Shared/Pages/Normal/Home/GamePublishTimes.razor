@@ -72,7 +72,7 @@
 
                     </div>
                     <div style="max-width:100px;">
-                        <MButton Text Block  OnClick="OnClickRight">
+                        <MButton Text Block  OnClick="OnClickRight" Color="primary">
                             下个月
                             <MIcon Right>mdi-arrow-right-thick</MIcon>
                         </MButton>
@@ -80,12 +80,12 @@
                 }
                 else
                 {
-                    <div style="max-width: 180px">
+                    <div style="max-width: 180px" class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="After" ValueChanged="AfterChanged" />
 
                     </div>
                     <span class="ms-4 me-4">  ~  </span>
-                    <div style="max-width: 180px">
+                    <div style="max-width: 180px" class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="Before" ValueChanged="BeforeChanged" />
 
                     </div>

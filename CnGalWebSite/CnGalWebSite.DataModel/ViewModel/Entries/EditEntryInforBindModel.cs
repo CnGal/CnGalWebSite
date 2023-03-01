@@ -32,5 +32,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         public EditState InforState { get; set; }
         public EditState TagState { get; set; }
         public EditState AudioState { get; set; }
+        public EditState WebsiteState { get; set; }
     }
 }

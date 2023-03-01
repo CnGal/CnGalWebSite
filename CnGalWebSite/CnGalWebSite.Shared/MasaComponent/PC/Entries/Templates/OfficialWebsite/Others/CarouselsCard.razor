@@ -1,0 +1,136 @@
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+@if (Images.Any())
+{
+
+    @if (Background)
+    {
+        <style>
+            #web_bg {
+                transition: all .6s ease;
+            }
+        </style>
+        <div id="web_bg" style="background-image: url(@Images[Index])" class=" d-none d-sm-block bgimage-ison"></div>
+    }
+    else
+    {
+        <style>
+            #top {
+                    background-image: url(@Images[Index]);
+                }
+        </style>
+    }
+
+}
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    [Parameter]
+    public bool Background { get; set; }
+
+    List<string> Images = new List<string>();
+
+    int Index { get; set; }
+
+    private System.Threading.Timer mytimer;
+
+    protected override void OnInitialized()
+    {
+        if (Images.Any())
+        {
+            Images.Clear();
+        }
+
+        var firstImages = Model.WebsiteAddInfor?.Images.Where(s => s.Type == (Background ? EntryWebsiteImageType.Background : EntryWebsiteImageType.Carousel));
+        var secondImages = Model.WebsiteAddInfor?.Images.Where(s => s.Type == (Background ? EntryWebsiteImageType.Carousel : EntryWebsiteImageType.Background));
+
+        if (Model.WebsiteAddInfor == null || (firstImages.Any() == false && secondImages.Any() == false))
+        {
+            if (Model.Pictures.Any())
+            {
+                if (Background)
+                {
+                    Images.AddRange(Model.Pictures.Select(s => s.Pictures).SelectMany(s => s).OrderByDescending(s => s.Priority).Select(s => s.Url));
+                }
+                else
+                {
+                    Images.Add(Model.Pictures.Select(s => s.Pictures).SelectMany(s => s).OrderByDescending(s => s.Priority).FirstOrDefault()?.Url);
+                }
+            }
+            else if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+            {
+                Images.Add(Model.BackgroundPicture);
+            }
+            else if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+            {
+                Images.Add(Model.SmallBackgroundPicture);
+            }
+            else if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+            {
+                Images.Add(Model.MainPicture);
+            }
+        }
+        else
+        {
+            if (firstImages.Any(s => s.Size == (_dataCacheService.IsApp ? EntryWebsiteImageSize.Small : EntryWebsiteImageSize.Large)))
+            {
+                Images.AddRange(firstImages.OrderByDescending(s => s.Priority).Where(s => s.Size == (_dataCacheService.IsApp ? EntryWebsiteImageSize.Small : EntryWebsiteImageSize.Large)).Select(s => s.Url));
+            }
+            else if (firstImages.Any())
+            {
+                Images.AddRange(firstImages.OrderByDescending(s => s.Priority).Select(s => s.Url));
+            }
+            else if (secondImages.Any(s => s.Size == (_dataCacheService.IsApp ? EntryWebsiteImageSize.Small : EntryWebsiteImageSize.Large)))
+            {
+                Images.AddRange(secondImages.OrderByDescending(s => s.Priority).Where(s => s.Size == (_dataCacheService.IsApp ? EntryWebsiteImageSize.Small : EntryWebsiteImageSize.Large)).Select(s => s.Url));
+            }
+            else if (secondImages.Any())
+            {
+                Images.AddRange(secondImages.OrderByDescending(s => s.Priority).Select(s => s.Url));
+            }
+        }
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 6);
+
+        }
+    }
+    public async void Send(object o)
+    {
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                Index = ++Index % Images.Count();
+
+                StateHasChanged();
+            });
+        }
+        catch
+        {
+
+        }
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer?.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

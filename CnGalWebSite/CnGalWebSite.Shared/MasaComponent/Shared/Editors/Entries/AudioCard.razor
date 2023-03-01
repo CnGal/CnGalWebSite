@@ -36,8 +36,8 @@
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url" Class="w-100" />
                     </td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="mdi-pencil" Color="success" />
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.EditRecord.ToIconString()" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
                     </td>
 
                 </tr>

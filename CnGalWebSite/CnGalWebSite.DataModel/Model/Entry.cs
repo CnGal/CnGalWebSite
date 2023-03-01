@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace CnGalWebSite.DataModel.Model
 {
     public class Entry
@@ -81,7 +83,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 游戏发布时间 只对游戏词条有效
         /// </summary>
         public DateTime? PubulishTime { get; set; }
-
+        /// <summary>
+        /// 使用的模板
+        /// </summary>
+        public EntryStyleTemplate Template { get; set; }
         /// <summary>
         /// 消歧义页
         /// </summary>
@@ -98,6 +103,15 @@ namespace CnGalWebSite.DataModel.Model
         public int? PerfectionId { get; set; }
         public Perfection Perfection { get; set; }
 
+        /// <summary>
+        /// 官网补充信息
+        /// </summary>
+        public EntryWebsite WebsiteAddInfor { get; set; }
+
+        /// <summary>
+        /// 预约信息 只对游戏生效
+        /// </summary>
+        public Booking Booking { get; set; }
 
         /// <summary>
         /// 附加信息列表 Staff迁移到 EntryStaffFromEntryNavigation 中
@@ -158,6 +172,9 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<PlayedGame> PlayedGames { get; set; } = new HashSet<PlayedGame>();
 
+        /// <summary>
+        /// 投票
+        /// </summary>
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
         /// <summary>
@@ -192,6 +209,99 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<EntryStaff> EntryStaffToEntryNavigation { get; set; } = new List<EntryStaff>();
 
     }
+
+    /// <summary>
+    /// 词条官方网站补充信息
+    /// </summary>
+    public class EntryWebsite
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public virtual ICollection<EntryWebsiteImage> Images { get; set; } = new List<EntryWebsiteImage>();
+
+        /// <summary>
+        /// 介绍 纯html
+        /// </summary>
+        public string Introduction { get; set; }
+
+        /// <summary>
+        /// 自定义Html 优先级最高
+        /// </summary>
+        public string Html { get; set; }
+
+        /// <summary>
+        /// 标题 纯html
+        /// </summary>
+        public string FirstPage { get; set; }
+
+        /// <summary>
+        /// Logo图片
+        /// </summary>
+        public string Logo { get; set; }
+
+        /// <summary>
+        /// 副标题
+        /// </summary>
+        public string SubTitle { get; set; }
+
+        /// <summary>
+        /// 主题语句
+        /// </summary>
+        public string Impressions { get; set; }
+
+        /// <summary>
+        /// 主题颜色
+        /// </summary>
+        public string Color { get; set; }
+
+        public int? EntryId { get; set; }
+        public Entry Entry { get; set; }
+    }
+
+    public enum EntryStyleTemplate
+    {
+        [Display(Name = "缺省")]
+        None,
+        [Display(Name = "大卡片")]
+        Default,
+        [Display(Name ="专题页")]
+        OfficialWebsite
+    }
+
+    public class EntryWebsiteImage
+    {
+        public long Id { get; set; }
+
+        public EntryWebsiteImageType Type { get; set; }
+
+        public EntryWebsiteImageSize Size { get; set; }
+
+        public string Url { get; set; }
+
+        public int Priority { get; set; }
+
+        public string Note { get; set; }
+    }
+
+    public enum EntryWebsiteImageSize
+    {
+        [Display(Name ="PC端")]
+        Large,
+        [Display(Name = "移动端")]
+        Small
+    }
+
+    public enum EntryWebsiteImageType
+    {
+        [Display(Name = "轮播图")]
+        Carousel,
+        [Display(Name = "背景图")]
+        Background
+    }
+
     public class Outlink
     {
         public long Id { get; set; }

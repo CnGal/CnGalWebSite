@@ -32,6 +32,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 音频
         /// </summary>
         public EditAudioViewModel Audio { get; set; } = new EditAudioViewModel();
+        /// <summary>
+        /// 音频
+        /// </summary>
+        public EditEntryWebsiteViewModel Website { get; set; } = new EditEntryWebsiteViewModel();
 
         public override Result Validate()
         {
@@ -66,6 +70,11 @@ namespace CnGalWebSite.DataModel.ViewModel
                 return result;
             }
             result = Audio.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Website.Validate();
             if (!result.Successful)
             {
                 return result;

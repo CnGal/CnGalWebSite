@@ -1,5 +1,4 @@
 ﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@Class" Collapable>
-    <ValidateForm Model="@Model">
         <div class="row">
             <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
@@ -19,30 +18,36 @@
             <div class="row">
 
                 <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type" />
+                    <Select @bind-Value="Model.Type" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.ConditionType" />
+                    <Select @bind-Value="Model.ConditionType" ShowLabel="true" />
                 </div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+                @if (Model.ConditionType == LotteryConditionType.BookingGame)
+                {
+                    <div class="form-group col-12  col-sm-6">
+                        <AutoComplete Items="@EntryGameItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.GameName" ShowLabel="true" />
+                    </div>
+                }
                 <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
+                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12 col-sm-6">
-                    <DateTimePicker @bind-Value="@Model.BeginTime" ViewMode="DatePickerViewMode .DateTime" />
+                    <DateTimePicker @bind-Value="@Model.BeginTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12 col-sm-6">
-                    <DateTimePicker @bind-Value="@Model.EndTime" ViewMode="DatePickerViewMode .DateTime" />
+                    <DateTimePicker @bind-Value="@Model.EndTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
                 </div>
                 @if (Model.Type == LotteryType.Automatic)
                 {
                     <div class="form-group col-12 col-sm-6">
-                        <DateTimePicker @bind-Value="@Model.LotteryTime" ViewMode="DatePickerViewMode .DateTime" />
+                        <DateTimePicker @bind-Value="@Model.LotteryTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
                     </div>
                 }
+
             </div>
         </div>
-    </ValidateForm>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -50,4 +55,7 @@
     public EditLotteryModel Model { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public IEnumerable<string> EntryGameItems { get; set; }
+
 }

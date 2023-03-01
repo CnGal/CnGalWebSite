@@ -6,8 +6,8 @@
     <ButtonContent>
         @if (string.IsNullOrWhiteSpace(Url) == false)
         {
-            <MButton XSmall Text Block  OnClick="@(()=>NavigationManager.NavigateTo(Url))">
-                <MIcon Left>mdi-share-all-outline  </MIcon>
+            <MButton Color="primary" XSmall Text Block  OnClick="@(()=>NavigationManager.NavigateTo(Url))">
+                <MIcon Left>@IconType.SeeDetails.ToIconString() </MIcon>
                 查看更多
             </MButton>
         }

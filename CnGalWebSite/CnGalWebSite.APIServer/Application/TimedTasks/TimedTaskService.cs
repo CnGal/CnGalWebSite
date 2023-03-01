@@ -227,6 +227,13 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     case TimedTaskType.UpdateRoleBrithdays:
                         await _entryService.UpdateRoleBrithday();
                         break;
+                    case TimedTaskType.PostAllBookingNotice:
+                        if (int.TryParse(item.Parameter, out maxNum) == false)
+                        {
+                            maxNum = 2;
+                        }
+                        await _entryService.PostAllBookingNotice(maxNum);
+                        break;
                 }
                 //记录执行时间
                 _timedTaskRepository.Clear();

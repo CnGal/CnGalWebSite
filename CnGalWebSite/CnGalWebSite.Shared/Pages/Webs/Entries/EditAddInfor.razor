@@ -48,8 +48,8 @@ else
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-codepen" Outline>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" Class="mb-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Entry.ToIconString()" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" LotteryItems="LotteryItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
@@ -62,6 +62,7 @@ else
     public EditAddInforViewModel Model { get; set; } = new EditAddInforViewModel();
     private IEnumerable<string> EntryGroupItems { get; set; }
     private IEnumerable<string> EntryStaffItems { get; set; }
+    private IEnumerable<string> LotteryItems { get; set; }
 
     List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem>();
 
@@ -87,6 +88,8 @@ else
                 //获取所有词条
                 EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
                 EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
+                //获取所有抽奖 
+                LotteryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/lotteries/GetNames", ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();
@@ -133,7 +136,7 @@ else
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 

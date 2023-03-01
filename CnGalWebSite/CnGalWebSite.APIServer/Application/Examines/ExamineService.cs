@@ -366,6 +366,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditVideoMainPage => await GetEditVideoMainPageExamineView(model, examine),
                 Operation.EditVideoImages => await GetEditVideoImagesExamineView(model, examine),
                 Operation.EditFavoriteFolderMain => await GetEditFavoriteFolderMainExamineView(model, examine),
+                Operation.EstablishWebsite => await GetEstablishWebsiteExamineView(model, examine),
                 _ => false,
             };
         }
@@ -813,6 +814,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 DisplayName = "类型",
                 DisplayValue = entry.Type.GetDisplayName(),
             });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "样式模板",
+                DisplayValue = entry.Template.GetDisplayName(),
+            });
 
             model.Texts.Add(new InformationsModel
             {
@@ -932,6 +938,47 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 
             }
 
+            if (entry.Booking != null && (entry.Booking.Open || entry.Booking.Goals.Any() || entry.Booking.IsNeedNotification || entry.Booking.LotteryId != 0))
+            {
+                var texts = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName = "开启预约",
+                        DisplayValue = entry.Booking.Open ? "是" : "否",
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName = "上线后通知用户",
+                        DisplayValue = entry.Booking.Open ? "是" : "否",
+                    }
+                };
+
+                if(entry.Booking.LotteryId>0)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "关联抽奖",
+                        DisplayValue = entry.Booking.LotteryId.ToString(),
+                    });
+                }
+                foreach (var item in entry.Booking.Goals)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = item.Name,
+                        DisplayValue = item.Target.ToString(),
+                    });
+                }
+
+                information.Add(new InformationsModel
+                {
+                    Modifier = "游戏预约",
+                    Informations = texts
+                });
+
+            }
+          
             model.Texts = information;
 
             return model;
@@ -943,6 +990,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             var entry = await _entryRepository.GetAll()
                    .Include(s => s.Information).ThenInclude(s => s.Additional)
+                   .Include(s=>s.Booking).ThenInclude(s => s.Goals)
                    .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                    .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
@@ -1329,6 +1377,129 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.BeforeModel = audio;
                 model.AfterModel = audio_examine;
+            }
+            return true;
+        }
+
+        private static ExaminePreDataModel InitExamineViewEntryWebsite(Entry entry)
+        {
+            var model = new ExaminePreDataModel();
+            if (entry.WebsiteAddInfor != null)
+            {
+                foreach (var item in entry.WebsiteAddInfor.Images)
+                {
+                    model.Pictures.Add(new PicturesAloneViewModel
+                    {
+                        Url = item.Url,
+                        Note = item.Note,
+                        Priority = item.Priority,
+                    });
+                }
+
+                var texts = new List<KeyValueModel>();
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Color) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "主题颜色",
+                        DisplayValue = entry.WebsiteAddInfor.Color,
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.SubTitle) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "副标题",
+                        DisplayValue = entry.WebsiteAddInfor.SubTitle,
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Impressions) == false)
+                {
+                    texts.Add(new KeyValueModel
+                    {
+                        DisplayName = "主题语句",
+                        DisplayValue = entry.WebsiteAddInfor.Impressions,
+                    });
+                }
+
+                model.Texts.Add(new InformationsModel
+                {
+                    Modifier = "主要信息",
+                    Informations = texts
+                });
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Logo) == false)
+                {
+                    model.Pictures.Add(new PicturesAloneViewModel
+                    {
+                        Url = entry.WebsiteAddInfor.Logo,
+                        Note = "Logo",
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Html) == false)
+                {
+                    model.MainPage += $"<h5>自定义html</h5>\n{entry.WebsiteAddInfor.Html}\n";
+                }
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.FirstPage) == false)
+                {
+                    model.MainPage += $"<h5>首页</h5>\n{entry.WebsiteAddInfor.FirstPage}\n";
+                }
+
+                if (string.IsNullOrWhiteSpace(entry.WebsiteAddInfor.Introduction) == false)
+                {
+                    model.MainPage += $"<h5>介绍</h5>\n{entry.WebsiteAddInfor.Introduction}\n";
+                }
+            }
+
+
+            return model;
+        }
+
+        public async Task<bool> GetEstablishWebsiteExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Entry;
+            var entry = await _entryRepository.GetAll()
+                  .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                  .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+            if (entry == null)
+            {
+                return false;
+            }
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
+            var website = InitExamineViewEntryWebsite(entry);
+
+            //添加修改记录 
+            await _entryService.UpdateEntryDataAsync(entry, examine);
+
+            var website_examine = InitExamineViewEntryWebsite(entry);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = website_examine;
+                model.AfterModel = website;
+            }
+            else
+            {
+                model.BeforeModel = website;
+                model.AfterModel = website_examine;
             }
             return true;
         }
@@ -3191,6 +3362,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 case Operation.EditVideoImages:
                     await ExamineEditVideoImagesAsync(entry as Video, examine as VideoImages);
                     break;
+                case Operation.EstablishWebsite:
+                    await ExamineEstablishWebsiteAsync(entry as Entry, examine as EntryWebsiteExamineModel);
+                    break;
             }
         }
 
@@ -3418,6 +3592,16 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
+
+        public async Task ExamineEstablishWebsiteAsync(Entry entry, EntryWebsiteExamineModel examine)
+        {
+            //更新数据
+            _entryService.UpdateEntryDataWebsite(entry, examine);
+            //保存
+            _ = await _entryRepository.UpdateAsync(entry);
+
+        }
+
 
         #endregion
 
@@ -5013,6 +5197,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         case Operation.EstablishAudio:
                             await ExamineEstablishAudioAsync(entry, item.Key as EntryAudioExamineModel);
                             break;
+                        case Operation.EstablishWebsite:
+                            await ExamineEstablishWebsiteAsync(entry, item.Key as EntryWebsiteExamineModel);
+                            break;
                         default:
                             throw new Exception("不支持的类型");
                     }
@@ -5585,6 +5772,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 var entry = await _entryRepository.GetAll().AsNoTracking()
                  .Include(s => s.Outlinks)
                  .Include(s => s.Audio)
+                 .Include(s => s.WebsiteAddInfor)
+                 .Include(s => s.Booking)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.Maui
+﻿using UIKit;
+
+namespace CnGalWebSite.Maui
 {
     public class Program
     {

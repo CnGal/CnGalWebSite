@@ -4,7 +4,8 @@
     "inputFiles": [
       "wwwroot/css/app.css",
       "wwwroot/css/calendar-heatMap.css",
-      "wwwroot/css/site.css"
+      "wwwroot/css/site.css",
+      "wwwroot/css/official-website.css"
     ]
   },
   {

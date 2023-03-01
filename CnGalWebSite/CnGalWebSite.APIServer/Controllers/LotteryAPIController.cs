@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.Tables;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
         private readonly ILotteryService _lotteryService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
         private readonly IRepository<Vote, long> _voteRepository;
@@ -45,16 +47,16 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
-        private readonly IRepository<PlayedGame, long> _playedGameRepository;
-        private readonly IRepository<Comment, long> _commentRepository;
+        private readonly IRepository<Booking, long> _bookingRepository;
+
         private readonly ILogger<LotteryAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
 
         public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService,
             IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
-        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository,
+        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository, IRepository<Booking, long> bookingRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-             IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository)
+             IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, int> entryRepository, IRepository<BookingUser, long> bookingUserRepository)
         {
             _userManager = userManager;
             _appHelper = appHelper;
@@ -71,10 +73,10 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryPrizeRepository = lotteryPrizeRepository;
             _lotteryService = lotteryService;
             _userRepository = userRepository;
-            _playedGameRepository = playedGameRepository;
             _logger = logger;
             _operationRecordService = operationRecordService;
-            _commentRepository= commentRepository;
+            _entryRepository = entryRepository;
+            _bookingRepository = bookingRepository;
         }
 
 
@@ -268,22 +270,15 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     else
                     {
-                        if (lottery.ConditionType == LotteryConditionType.GameRecord)
+                        if (await _lotteryService.CheckCondition(user, lottery) == null)
                         {
-                            if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id))
-                            {
-                                model.State = UserLotteryState.NotInvolved;
-                            }
-                            else
-                            {
-                                model.State = UserLotteryState.NoCondition;
-                            }
+                            model.State = UserLotteryState.NotInvolved;
                         }
                         else
                         {
-                            model.State = UserLotteryState.NotInvolved;
-
+                            model.State = UserLotteryState.NoCondition;
                         }
+
                     }
                 }
                 else
@@ -453,6 +448,27 @@ namespace CnGalWebSite.APIServer.Controllers
 
             lottery = await _lotteryRepository.InsertAsync(lottery);
 
+            int gameId = 0;
+            if (string.IsNullOrWhiteSpace(model.GameName) == false)
+            {
+                var temp = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == model.GameName && s.IsHidden == false).Select(s => new { BookingId = s.Booking.Id, s.Id }).FirstOrDefaultAsync();
+                if (temp == null)
+                {
+                    return new Result { Successful = false, Error = "关联的游戏不存在" };
+                }
+                gameId = temp.Id;
+
+                if (lottery.GameId != gameId)
+                {
+                    var booking = await _bookingRepository.GetAll().AsNoTracking().Include(s => s.Users).ThenInclude(s=>s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == temp.BookingId);
+                    var tempLottery = await _lotteryRepository.GetAll().AsNoTracking().Include(s => s.Users).FirstOrDefaultAsync(s => s.Id == lottery.Id);
+                    //第一次添加游戏 复制预约用户到抽奖
+                    await _lotteryService.CopyUserFromBookingToLottery(booking, tempLottery);
+
+                    lottery = await _lotteryRepository.UpdateAsync(lottery);
+                }
+            }
+
             return new Result { Successful = true, Error = lottery.Id.ToString() };
 
         }
@@ -487,8 +503,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 Thumbnail = lottery.Thumbnail,
                 Type = lottery.Type,
                 ConditionType = lottery.ConditionType,
-                
             };
+
+            if(lottery.GameId!=0)
+            {
+                model.GameName = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Id == lottery.GameId && s.IsHidden == false).Select(s => s.Name).FirstOrDefaultAsync();
+            }
 
             foreach (var item in lottery.Awards)
             {
@@ -552,7 +572,24 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "激活码数量应和奖项中填写的数量对应" };
                 }
             }
+            int gameId = 0;
+            if (string.IsNullOrWhiteSpace(model.GameName) == false)
+            {
+                var temp = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == model.GameName && s.IsHidden == false).Select(s =>new {BookingId= s.Booking.Id, s.Id }).FirstOrDefaultAsync();
+                if(temp==null)
+                {
+                    return new Result { Successful = false, Error = "关联的游戏不存在" };
+                }
+                gameId = temp.Id;
 
+                if(lottery.GameId!=gameId)
+                {
+                    var booking = await _bookingRepository.GetAll().AsNoTracking().Include(s => s.Users).ThenInclude(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == temp.BookingId);
+                    var tempLottery=await _lotteryRepository.GetAll().AsNoTracking().Include(s => s.Users).FirstOrDefaultAsync(s => s.Id == lottery.Id);
+                    //第一次添加游戏 复制预约用户到抽奖
+                    await _lotteryService.CopyUserFromBookingToLottery(booking, tempLottery);
+                }
+            }
 
             lottery.Name = model.Name;
             lottery.EndTime = model.EndTime;
@@ -568,6 +605,7 @@ namespace CnGalWebSite.APIServer.Controllers
             lottery.MainPicture = model.MainPicture;
             lottery.Thumbnail = model.Thumbnail;
             lottery.ConditionType = model.ConditionType;
+            lottery.GameId = gameId;
 
             //记录现有的Ids
             var awardIds = model.Awards.Select(s => s.Id).ToList();
@@ -666,49 +704,15 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            //检查抽奖条件
-            if (lottery.ConditionType == LotteryConditionType.GameRecord)
-            {
-                if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id) == false)
-                {
-                    return new Result { Successful = false, Error = "参加该抽奖需要至少有一条游玩记录" };
-                }
-            }
-            else if(lottery.ConditionType == LotteryConditionType.CommentLottery)
-            {
-                if(await _commentRepository.GetAll().AnyAsync(s=>s.ApplicationUserId==user.Id&&s.LotteryId==model.Id&&s.Type== CommentType.CommentLottery&&string.IsNullOrWhiteSpace(s.Text)==false)==false)
-                {
-                    return new Result { Successful = false, Error = "参加该抽奖需要评论该抽奖，并通过审核" };
-                }
-            }
-
-            if (lottery.Users.Any(s => s.ApplicationUserId == user.Id))
-            {
-                return new Result { Successful = false, Error = "你已经参加了这个抽奖" };
-            }
-
-           
-
-            await _lotteryUserRepository.InsertAsync(new LotteryUser
-            {
-                ApplicationUserId = user.Id,
-                LotteryId = model.Id,
-                ParticipationTime = time,
-                Number = lottery.Users.Count + 1,
-                //查找是否有相同的特征值
-                IsHidden = await _operationRecordService.CheckOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, model.Identification, HttpContext)
-            });
-
-
             try
             {
-                await _operationRecordService.AddOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, model.Identification, HttpContext);
+                await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
+                return new Result { Successful = false, Error = ex.Message };
             }
-
+       
             return new Result { Successful = true };
         }
 
@@ -896,6 +900,16 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 获取输入提示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<string>>> GetNamesAsync()
+        {
+            return await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Name).ToArrayAsync();
+        }
 
     }
 }

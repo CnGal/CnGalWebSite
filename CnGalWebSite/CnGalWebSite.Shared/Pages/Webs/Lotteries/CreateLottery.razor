@@ -36,7 +36,7 @@
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建抽奖" Icon="fa fa-fw  fa-dropbox" Outline>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
@@ -48,6 +48,7 @@
     private EditLotteryModel Model { get; set; } = new EditLotteryModel();
 
     private bool isReady = false;
+    private IEnumerable<string> EntryGameItems { get; set; }
 
 
     [CascadingParameter]
@@ -61,6 +62,8 @@
         {
             try
             {
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+
                 isReady = true;
                 StateHasChanged();
             }
@@ -102,7 +105,7 @@
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 }

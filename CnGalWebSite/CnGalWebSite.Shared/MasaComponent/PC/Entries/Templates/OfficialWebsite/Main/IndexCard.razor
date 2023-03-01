@@ -1,0 +1,113 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+@inject IJSRuntime JS
+@implements IDisposable
+
+@if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Html))
+{
+    @if (Check() == false)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
+            此样式目前仅适配游戏类型的词条，其他类型适配持续推进中，尽情期待
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    }
+    else
+    {
+        <div class="official-website">
+            <MainCard Model="Model" />
+            <BookingCard Model="Model" />
+            <StoryCard Model="Model" />
+            <CharacterCard Model="Model" />
+            <GalleryCard Model="Model" />
+            <StaffCard Model="Model" />
+            <InformationCard Model="Model" />
+        </div>
+    }
+}
+else
+{
+    @((MarkupString)Model.WebsiteAddInfor.Html)
+}
+
+@if (Model.Booking != null && Model.Booking.Open)
+{
+    <BookingButton Id="Model.Id" IsHidden="true" @ref="bookingButton" />
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    private DotNetObjectReference<IndexCard> objRef;
+
+    BookingButton bookingButton;
+
+    protected override void OnInitialized()
+    {
+        if (Check())
+        {
+            _dataCacheService.ThemeSetting.IsFullScreen = true;
+            _dataCacheService.ThemeSetting.IsTransparent = true;
+            if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Color) == false)
+            {
+                _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;
+            }
+            _eventService.OnTempEffectTheme();
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await TriggerDotNetInstanceMethod();
+        }
+    }
+
+    public bool Check()
+    {
+        return Model.Type == EntryType.Game;
+    }
+
+    public async Task TriggerDotNetInstanceMethod()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("onWebsiteTemplateInit", objRef);
+        }
+        catch
+        {
+
+        }
+    }
+
+    [JSInvokable]
+    public string CheckBooking()
+    {
+        if (bookingButton == null)
+        {
+            return "未开启预约";
+        }
+
+        return bookingButton?.IsBooking ?? false ? "已预约" : "未预约";
+    }
+
+    [JSInvokable]
+    public async Task ClickBookingButton()
+    {
+        await bookingButton?.OnClick();
+    }
+    [JSInvokable]
+    public EntryIndexViewModel GetEntryModel()
+    {
+        return Model;
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

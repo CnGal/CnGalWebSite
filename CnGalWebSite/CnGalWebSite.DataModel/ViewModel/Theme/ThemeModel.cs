@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Anniversaries;
+﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using System;
 
 namespace CnGalWebSite.DataModel.ViewModel.Theme
@@ -16,9 +17,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public bool IsTransparent { get; set; } = true;
 
         /// <summary>
-        /// 是否扩展到整个屏幕显示
+        /// 是否扩展到整个屏幕显示 不保存
         /// </summary>
-        public bool IsExtendEntireScreen { get; set; }
+        public bool IsExtendEntireScreen;
+
+        /// <summary>
+        /// 是否全屏显示 不留白边 官网使用
+        /// </summary>
+        public bool IsFullScreen { get; set; }
 
         /// <summary>
         /// 是否隐藏文章目录
@@ -33,6 +39,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public int PlayedGameInforCount { get; set; } = 3;
 
         public DisplayMode ListDisplayMode { get; set; }
+
+        /// <summary>
+        /// 词条样式模板
+        /// </summary>
+        public EntryStyleTemplate EntryTemplate { get; set; }
 
         public AnniversariesSetting AnniversariesSetting { get; set; } = new AnniversariesSetting();
 

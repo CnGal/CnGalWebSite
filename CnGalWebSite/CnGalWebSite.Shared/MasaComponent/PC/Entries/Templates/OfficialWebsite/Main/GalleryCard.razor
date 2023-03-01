@@ -1,0 +1,26 @@
+﻿@if (Model.Pictures.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard Icon="IconType.PhotoAlbum" Title="GALLERY">
+        <div class="container">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="imagesList" />
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
+
+    protected override void OnInitialized()
+    {
+        imagesList = Model.Pictures.Select(s => s.Pictures).SelectMany(s => s).Select(s => new EditImageAloneModel
+        {
+            Note = s.Note,
+            Image = s.Url
+        }).ToList();
+    }
+
+}
+
+

@@ -1,0 +1,90 @@
+﻿@inject IPopupService PopupService
+
+<div class="row">
+    <div class="form-group col-12  col-sm-6">
+        <Switch @bind-Value="Model.Open" ShowLabel="true" />
+    </div>
+    @if (Model.Open)
+    {
+        <div class="form-group col-12  col-sm-6">
+            <Switch @bind-Value="Model.IsNeedNotification" ShowLabel="true" />
+        </div>
+        <div class="form-group col-12  col-sm-6">
+            <AutoComplete Items="@LotteryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.LotteryName" ShowLabel="true" />
+        </div>
+    }
+
+</div>
+@if (Model.Open)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加目标" OnClick="OnClickInput" Icon="@IconType.Goal.ToIconString()" Class="mb-4" />
+    <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                    目标人数
+                </th>
+                <th class="text-left">
+                    名称
+                </th>
+                <th class="text-left">
+                    操作
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Goals.OrderBy(s => s.Target))
+            {
+                <tr @key="item.Name">
+                    <td style="min-width: 50px; ">@item.Target</td>
+                    <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.Name</td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
+
+    <BookingGoalInputDialog @ref="bookingGoalInputDialog" OnChanged="OnChanged" Items="Model.Goals"/>
+}
+
+@code {
+    [Parameter]
+    public EditBookingModel Model { get; set; }
+    [Parameter]
+    public IEnumerable<string> LotteryItems { get; set; }
+
+
+    BookingGoalInputDialog bookingGoalInputDialog;
+
+    public void OnClickInput()
+    {
+        if (bookingGoalInputDialog != null)
+        {
+            var goal = new EditBookingGoalModel();
+            Model.Goals.Add(goal);
+            bookingGoalInputDialog.Refresh(goal);
+        }
+    }
+
+    public void OnDelete(EditBookingGoalModel model)
+    {
+        Model.Goals.Remove(model);
+    }
+
+    public void OnEdit(EditBookingGoalModel model)
+    {
+        if (bookingGoalInputDialog != null)
+        {
+            bookingGoalInputDialog.Refresh(model);
+        }
+    }
+
+    public void OnChanged()
+    {
+        Model.Goals.RemoveAll(s => string.IsNullOrWhiteSpace(s.Name));
+        StateHasChanged();
+    }
+}

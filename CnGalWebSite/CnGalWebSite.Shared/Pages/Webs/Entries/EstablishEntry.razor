@@ -11,7 +11,7 @@
 
 <AutoSaveTip TItem="EstablishEntryViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" Creating/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" Creating />
     @if (isReady == false)
     {
         <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
@@ -41,15 +41,16 @@
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建词条" Icon="fa fa-fw  fa-codepen" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建词条" Icon="@IconType.Entry.ToIconString()" Outline>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainCard Model="Model.Main" Class="mb-4" TypeChanged="TypeChanged"  />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model.AddInfor" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems"  Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.ImagesCard Model="Model.Images" Class="mb-4"  />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AudioCard Model="Model.Audio" Class="mb-4"/>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.TagsCard Model="Model.Tags" TagItems="TagItems"  Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.RelevancesCard Model="Model.Relevances" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems"  Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainPageCard Model="Model.MainPage"  Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainCard Model="Model.Main" Class="mb-4" TypeChanged="TypeChanged" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model.AddInfor" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" LotteryItems="LotteryItems" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.ImagesCard Model="Model.Images" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AudioCard Model="Model.Audio" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.TagsCard Model="Model.Tags" TagItems="TagItems" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.RelevancesCard Model="Model.Relevances" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainPageCard Model="Model.MainPage" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.WebsiteCard Model="Model.Website" Class="mb-4" />
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -65,7 +66,7 @@
         AddInfor = new EditAddInforViewModel
         {
             GamePlatforms = new List<GamePlatformModel>
-        {
+    {
                 new GamePlatformModel{GamePlatformType= GamePlatformType.Android},
                 new GamePlatformModel{GamePlatformType= GamePlatformType.DOS},
                 new GamePlatformModel{GamePlatformType= GamePlatformType.IOS},
@@ -91,6 +92,7 @@
     private List<string> ArticleItems { get; set; } = new List<string>();
     private List<string> TagItems { get; set; } = new List<string>();
     private List<string> VideoItems { get; set; } = new List<string>();
+    private List<string> LotteryItems { get; set; } = new List<string>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -113,8 +115,10 @@
                 ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
                 //获取所有标签
                 TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags", ToolHelper.options);
-                //获取所有视频 
+                //获取所有视频
                 VideoItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/videos/GetNames", ToolHelper.options);
+                //获取所有抽奖
+                LotteryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/lotteries/GetNames", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }
@@ -155,7 +159,7 @@
     {
         Model.AddInfor.Type = Model.Relevances.Type = type;
         StateHasChanged();
-        
+
     }
 
     private void DataLoaded(EstablishEntryViewModel model)
@@ -165,7 +169,7 @@
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 }

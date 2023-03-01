@@ -4,11 +4,14 @@
 @inject IDataCacheService _dataCacheService
 
 
-    <CnGalWebSite.Shared.Pages.Webs.Entries.Index Id="@Id" />
+    <CnGalWebSite.Shared.Pages.Webs.Entries.Index Id="@Id" Style="Style"/>
 
 @code{
     [Parameter]
     public string Id { get; set; }
     [Parameter]
     public string DefaultIndex { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int Style { get; set; }
 }

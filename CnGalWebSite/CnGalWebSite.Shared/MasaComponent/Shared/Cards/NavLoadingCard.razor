@@ -1,0 +1,14 @@
+﻿<MSnackbar Timeout="-1" @bind-Value="IsLoading" Text
+           Style="min-width:180px;" Color="primary"
+           Elevation="24">
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="primary">
+        </MProgressCircular>
+        正在跳转......
+    </div>
+</MSnackbar>
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+}

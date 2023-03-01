@@ -250,15 +250,14 @@
             {
                 // Trace.Log("保存按钮被点击");
                 var editModel = (ListTimedTaskAloneModel)context.Model;
-                await EditData(editModel);
-                return true;
+                return await EditData(editModel);
             }
         };
 
         await DialogService.ShowEditDialog(option);
     }
 
-    public async Task EditData(ListTimedTaskAloneModel model)
+    public async Task<bool> EditData(ListTimedTaskAloneModel model)
     {
         try
         {
@@ -269,17 +268,20 @@
             if (obj.Successful == false)
             {
                 await ToastService.Error("保存数据失败", obj.Error);
+                return false;
             }
             else
             {
 
                 await ToastService.Success("保存数据成功", "保存数据成功，不会留下审核记录和编辑记录");
                 await TableRows.QueryAsync();
+                return true;
             }
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存数据失败");
+            return false;
         }
     }
 }

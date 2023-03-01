@@ -140,9 +140,49 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             model.Ip = GetIp(context, model.Ip);
 
             return await _operationRecordRepository.GetAll().AnyAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == model.Cookie || s.Ip == model.Ip));
-
         }
 
+        public async Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user)
+        {
+            var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
+            if(item==null)
+            {
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(item.Cookie) || string.IsNullOrWhiteSpace(item.Ip))
+            {
+                throw new Exception("身份验证参数不能为空");
+            }
+
+
+            return await _operationRecordRepository.GetAll().CountAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == item.Cookie || s.Ip == item.Ip)) > 1;
+        }
+
+        public async Task CopyOperationRecord(OperationRecordType fromType, string fromObjectId, OperationRecordType toType, string toObjectId,ApplicationUser user)
+        {
+            var fromItem = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == fromType && (s.ObjectId == fromObjectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
+            var toItem = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == toType && (s.ObjectId == toObjectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
+
+            if (fromItem != null)
+            {
+                if (toItem == null)
+                {
+                    toItem = await _operationRecordRepository.InsertAsync(new OperationRecord
+                    {
+                        Type = toType,
+                        ObjectId = toObjectId,
+                        ApplicationUserId = user.Id
+                    });
+                }
+
+                toItem.Ip = fromItem.Ip;
+                toItem.Cookie = fromItem.Cookie;
+                toItem.OperationTime = DateTime.Now.ToCstTime();
+
+                await _operationRecordRepository.UpdateAsync(toItem);
+            }
+        }
 
         public string GetIp(HttpContext context, string userIp)
         {

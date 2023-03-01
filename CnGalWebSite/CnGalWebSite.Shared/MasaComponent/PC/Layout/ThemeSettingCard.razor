@@ -45,22 +45,31 @@
             显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_show" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")"  Class="m-0"></MSwitch>
+            <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")" Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             扩展显示范围
         </MCardTitle>
         <MCardText>
-            选中后将把显示范围扩大到整个页面，也就是两边不再留白
+            选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_expand" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")"  Class="m-0"></MSwitch>
+            <MSwitch Value="_dataCacheService.ThemeSetting.IsExtendEntireScreen" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_dataCacheService.ThemeSetting.IsExtendEntireScreen?"扩展显示范围":"限制显示范围")" Class="m-0"></MSwitch>
+        </MCardText>
+        <MCardTitle Class="text-h6">
+            词条样式模板
+        </MCardTitle>
+        <MCardText>
+            选择词条页面的布局排版样式
+        </MCardText>
+        <MCardText Class="pb-0">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="@_dataCacheService.ThemeSetting.EntryTemplate"  ValueChanged="EntryTemplateValueChanged" TValue="EntryStyleTemplate" Lable="词条样式模板" />
         </MCardText>
         <MCardTitle Class="text-h6">
             字体
         </MCardTitle>
         <MCardText Class="pb-0">
-            <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string" ></MTextField>
+            <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string"></MTextField>
         </MCardText>
         <MCardTitle Class="text-h6">
             自动保存编辑
@@ -69,7 +78,7 @@
             在编辑页面时间隔10秒自动保存一次数据
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")"  Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             显示错误详情
@@ -78,7 +87,7 @@
             展示网站发生错误时的详细信息
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")"  Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Class="m-0"></MSwitch>
         </MCardText>
     </MCard>
 </MDialog>
@@ -86,8 +95,7 @@
 @code {
 
     StringNumber colorString = "pink lighten-2";
-    bool _show = false;
-    bool _expand = false;
+
     bool Dialog { get; set; }
 
     [CascadingParameter]
@@ -95,8 +103,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _show = _dataCacheService.ThemeSetting.IsTransparent;
-
         if (string.IsNullOrWhiteSpace(_dataCacheService.ThemeSetting.Theme))
         {
             _dataCacheService.ThemeSetting.Theme = colorString.ToString();
@@ -111,7 +117,7 @@
     {
         Dialog = dialog;
         StateHasChanged();
-        
+
     }
 
     public void ColorValueChanged(StringNumber value)
@@ -133,25 +139,23 @@
         }
 
         _eventService.OnSavaTheme();
-        
+
 
     }
 
     public void BackgroundValueChanged(bool show)
     {
-        _show = show;
         _dataCacheService.ThemeSetting.IsTransparent = show;
 
         _eventService.OnSavaTheme();
-        
+
     }
     public void ExpandValueChanged(bool expand)
     {
-        _expand = expand;
         _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
 
         _eventService.OnSavaTheme();
-        
+
     }
 
     public void FontFamilyValueChanged(string value)
@@ -159,7 +163,7 @@
         _dataCacheService.ThemeSetting.FontFamily = value;
 
         _eventService.OnSavaTheme();
-        
+
     }
 
     public void AllowAutoSaveValueChanged(bool value)
@@ -167,15 +171,19 @@
         _dataCacheService.ThemeSetting.AllowAutoSave = value;
 
         _eventService.OnSavaTheme();
-        
+
     }
 
     public void ShowDetailedErrorInforValueChanged(bool value)
     {
         _dataCacheService.ThemeSetting.ShowDetailedErrorInfor = value;
-
         _eventService.OnSavaTheme();
-        
+    }
+
+    public void EntryTemplateValueChanged(EntryStyleTemplate temp)
+    {
+        _dataCacheService.ThemeSetting.EntryTemplate = temp;
+        _eventService.OnSavaTheme();
     }
 }
 

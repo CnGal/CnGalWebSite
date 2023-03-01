@@ -72,8 +72,10 @@ namespace CnGalWebSite.DataModel.Model
         DrawLottery,
         [Display(Name = "转存主图到第三方图床")]
         TransferAllMainImages,
-              [Display(Name = "更新角色生日缓存")]
-        UpdateRoleBrithdays
+        [Display(Name = "更新角色生日缓存")]
+        UpdateRoleBrithdays,
+        [Display(Name = "发送游戏发布通知")]
+        PostAllBookingNotice
     }
     public enum TimedTaskExecuteType
     {

@@ -30,8 +30,12 @@
                 <div class="form-group col-12  col-sm-6">
                     <BootstrapInput @bind-Value="Model.AnotherName" />
                 </div>
+                <div class="form-group col-12  col-sm-6">
+                    <Select TValue="EntryStyleTemplate" @bind-Value="Model.Template" ShowLabel="true" DisplayText="样式模板"></Select>
+                </div>
+
                 <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3"/>
+                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
                 </div>
             </div>
     </ValidateForm>

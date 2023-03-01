@@ -5,7 +5,7 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
-
+using CnGalWebSite.APIServer.Models;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
@@ -17,6 +17,7 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using NETCore.MailKit.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -42,14 +43,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IAppHelper _appHelper;
         private readonly IArticleService _articleService;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<RoleBirthday, long> _roleBirthdayRepository;
+        private readonly IRepository<BookingUser, long> _bookingUserRepository;
         private readonly ILogger<EntryService> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IViewRenderService _viewRenderService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
         public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger)
+        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository,
+         IEmailService emailService, IRepository<BookingUser, long> bookingUserRepository, IViewRenderService viewRenderService)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -59,8 +65,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _articleService = articleService;
             _playedGameRepository = playedGameRepository;
             _videoRepository = videoRepository;
-            _roleBirthdayRepository=roleBirthdayRepository;
+            _roleBirthdayRepository = roleBirthdayRepository;
             _logger = logger;
+            _lotteryRepository = lotteryRepository;
+            _emailService = emailService;
+            _bookingUserRepository = bookingUserRepository;
+            _viewRenderService = viewRenderService;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -234,7 +244,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             if (count != 0)
             {
                 models = await query.AsNoTracking()
-                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .ToListAsync();
             }
@@ -246,7 +256,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var dtos = new List<EntryInforTipViewModel>();
             foreach (var item in models)
             {
-                dtos.Add( _appHelper.GetEntryInforTipViewModel(item));
+                dtos.Add(_appHelper.GetEntryInforTipViewModel(item));
             }
 
             var dtos_ = new PagedResultDto<EntryInforTipViewModel>
@@ -313,7 +323,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public async Task UpdateEntryDataAddInforAsync(Entry entry, EntryAddInfor examine)
         {
-
+            //附加信息
             foreach (var item in examine.Information)
             {
                 //预处理
@@ -491,6 +501,57 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
 
+            //预约
+            if (examine.Booking.Goals.Any() || examine.Booking.MainInfor.Any())
+            {
+                if (entry.Booking == null)
+                {
+                    entry.Booking = new Booking();
+                }
+
+                var goals = entry.Booking.Goals;
+
+                //更新主要信息
+                ToolHelper.ModifyDataAccordingToEditingRecord(entry.Booking, examine.Booking.MainInfor);
+                //更新目标
+                foreach (var item in examine.Booking.Goals)
+                {
+                    var isAdd = false;
+
+                    //遍历信息列表寻找关键词
+                    foreach (var infor in goals)
+                    {
+
+                        if (infor.Name == item.Name)
+                        {
+                            //查看是否为删除操作
+                            if (item.IsDelete == true)
+                            {
+                                goals.Remove(infor);
+                                isAdd = true;
+                                break;
+                            }
+                            else
+                            {
+                                infor.Target = item.Target;
+                                isAdd = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isAdd == false && item.IsDelete == false)
+                    {
+                        //没有找到关键词 则新建关键词
+                        var temp = new BookingGoal
+                        {
+                            Name = item.Name,
+                            Target = item.Target,
+                        };
+                        goals.Add(temp);
+                    }
+                }
+
+            }
 
             //更新最后编辑时间
             entry.LastEditTime = DateTime.Now.ToCstTime();
@@ -575,11 +636,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     entry.Audio.Add(new EntryAudio
                     {
                         Url = item.Url,
-                        BriefIntroduction=item.BriefIntroduction,
-                        Name=item.Name,
-                        Priority=item.Priority,
-                        Duration=item.Duration,
-                        Thumbnail=item.Thumbnail
+                        BriefIntroduction = item.BriefIntroduction,
+                        Name = item.Name,
+                        Priority = item.Priority,
+                        Duration = item.Duration,
+                        Thumbnail = item.Thumbnail
                     });
                 }
             }
@@ -838,6 +899,61 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         }
 
+        public void UpdateEntryDataWebsiteImages(Entry entry, EntryWebsiteExamineModel examine)
+        {
+            if (entry.WebsiteAddInfor == null)
+            {
+                entry.WebsiteAddInfor = new EntryWebsite();
+            }
+            var pictures = entry.WebsiteAddInfor.Images;
+
+            foreach (var item in examine.Images)
+            {
+                var isAdd = false;
+                foreach (var pic in pictures)
+                {
+                    if (pic.Url == item.Url&&pic.Type== item.Type)
+                    {
+                        if (item.IsDelete == true)
+                        {
+                            pictures.Remove(pic);
+
+                        }
+                        else
+                        {
+                            pic.Size = item.Size;
+                            pic.Priority = item.Priority;
+                            pic.Note = item.Note;
+                        }
+                        isAdd = true;
+                        break;
+                    }
+                }
+                if (isAdd == false && item.IsDelete == false)
+                {
+                    pictures.Add(new EntryWebsiteImage
+                    {
+                        Url = item.Url,
+                        Type = item.Type,
+                        Size = item.Size,
+                        Note = item.Note,
+                        Priority = item.Priority,
+                    });
+                }
+            }
+
+            //更新最后编辑时间
+            entry.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+
+        public void UpdateEntryDataWebsite(Entry entry, EntryWebsiteExamineModel examine)
+        {
+            UpdateEntryDataWebsiteImages(entry, examine);
+            ToolHelper.ModifyDataAccordingToEditingRecord(entry.WebsiteAddInfor, examine.MainInfor);
+        }
+
+
         public async Task UpdateEntryDataAsync(Entry entry, Examine examine)
         {
             switch (examine.Operation)
@@ -906,11 +1022,27 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     UpdateEntryDataAudio(entry, entryAudioExamineModel);
                     break;
+                case Operation.EstablishWebsite:
+                    EntryWebsiteExamineModel entryWebsiteExamineModel = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        entryWebsiteExamineModel = (EntryWebsiteExamineModel)serializer.Deserialize(str, typeof(EntryWebsiteExamineModel));
+                    }
+
+                    UpdateEntryDataWebsite(entry, entryWebsiteExamineModel);
+                    break;
                 default:
                     throw new InvalidOperationException("不支持的操作");
             }
         }
 
+        /// <summary>
+        /// 获取编辑状态
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="entryId"></param>
+        /// <returns></returns>
         public async Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId)
         {
             var model = new EntryEditState();
@@ -922,7 +1054,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.EntryId == entryId && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio))
+                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio || s.Operation == Operation.EstablishWebsite))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation,
@@ -962,6 +1094,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 if (examineQuery.Any(s => s.Operation == Operation.EstablishAudio))
                 {
                     model.AudioState = EditState.Preview;
+                }
+                if (examineQuery.Any(s => s.Operation == Operation.EstablishWebsite))
+                {
+                    model.WebsiteState = EditState.Preview;
                 }
             }
             //获取各部分状态
@@ -1053,11 +1189,28 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         model.AudioState = EditState.Normal;
                     }
                 }
+                if (model.WebsiteState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EstablishAudio))
+                    {
+                        model.WebsiteState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.WebsiteState = EditState.Normal;
+                    }
+                }
             }
 
             return model;
         }
 
+        /// <summary>
+        /// 获取视图模型数据
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry)
         {
             //建立视图模型
@@ -1071,6 +1224,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
                 IsHideOutlink = entry.IsHideOutlink,
+                Template=entry.Template
             };
 
             //查看是否有配音
@@ -1250,7 +1404,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         StaffList = new List<StaffValue>()
                     }
                 };
-                foreach (var item in entry.EntryStaffFromEntryNavigation.OrderBy(s=>s.PositionGeneral).ThenBy(s=>s.PositionOfficial))
+                foreach (var item in entry.EntryStaffFromEntryNavigation.OrderBy(s => s.PositionGeneral).ThenBy(s => s.PositionOfficial))
                 {
 
                     var isAdd = false;
@@ -1352,11 +1506,26 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             }
 
+            //预约信息
+            if (entry.Type == EntryType.Game && entry.Booking != null && (entry.PubulishTime == null || entry.PubulishTime.Value.Date > DateTime.Now.ToCstTime()))
+            {
+                model.Booking = new BookingViewModel
+                {
+                    BookingCount = entry.Booking.BookingCount,
+                    Open = entry.Booking.Open,
+                    Goals = entry.Booking.Goals.Select(s => new BookingGoalViewModel
+                    {
+                        Name = s.Name,
+                        Target = s.Target
+                    }).ToList()
+                };
+            }
+
             //序列化图片列表
 
             //读取词条信息
             var pictures = new List<EntryPicture>();
-            foreach (var item in entry.Pictures.OrderByDescending(s=>s.Priority))
+            foreach (var item in entry.Pictures.OrderByDescending(s => s.Priority))
             {
                 pictures.Add(new EntryPicture
                 {
@@ -1417,7 +1586,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //读取音频信息
             var audioImage = entry.Audio.OrderByDescending(s => s.Priority).FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false)?.Thumbnail;
-            model.Audio.AddRange(entry.Audio.OrderByDescending(s=>s.Priority).Select(s => new AudioViewModel
+            model.Audio.AddRange(entry.Audio.OrderByDescending(s => s.Priority).Select(s => new AudioViewModel
             {
                 BriefIntroduction = s.BriefIntroduction,
                 Name = s.Name,
@@ -1439,7 +1608,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //序列化相关性列表
             //加载附加信息 关联词条获取
-            var roleInforModel = new List<EntryInforTipViewModel>();
+            var roleInforModel = new List<EntryRoleViewModel>();
             var newsModel = new List<NewsModel>();
             var staffGames = new List<EntryInforTipViewModel>();
             var relevancesEntry = new List<EntryInforTipViewModel>();
@@ -1462,10 +1631,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //视频
             foreach (var item in entry.Videos.Where(s => s.IsHidden == false))
             {
-              
-                    model.VideoRelevances.Add(_appHelper.GetVideoInforTipViewModel(item));
 
-                
+                model.VideoRelevances.Add(_appHelper.GetVideoInforTipViewModel(item));
+
+
             }
             //词条
             foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
@@ -1484,18 +1653,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                     else
                     {
-
                         //获取角色词条
-                        var role = _appHelper.GetEntryInforTipViewModel(item);
-                        role.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
-
-                        roleInforModel.Add(role);
+                        roleInforModel.Add(GetRoleInfor(item));
                     }
 
                 }
                 else if (item.Type == EntryType.Game)
                 {
-                    if (entry.Type == EntryType.Staff||entry.Type == EntryType.ProductionGroup)
+                    if (entry.Type == EntryType.Staff || entry.Type == EntryType.ProductionGroup)
                     {
                         var staffGame = _appHelper.GetEntryInforTipViewModel(item);
                         staffGame.AddInfors.Clear();
@@ -1546,6 +1711,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 });
             }
 
+            //官网补充信息
+            if(entry.WebsiteAddInfor!=null)
+            {
+                model.WebsiteAddInfor = new EntryWebsiteViewModel
+                {
+                    Images = entry.WebsiteAddInfor.Images.Select(s => new EntryWebsiteImageViewModel
+                    {
+                        Note = s.Note,
+                        Priority = s.Priority,
+                        Type = s.Type,
+                        Url = s.Url,
+                        Size=s.Size
+                    }).ToList(),
+                    Html = entry.WebsiteAddInfor.Html,
+                    Introduction = entry.WebsiteAddInfor.Introduction,
+                    SubTitle = entry.WebsiteAddInfor.SubTitle,
+                    Color = entry.WebsiteAddInfor.Color,
+                    FirstPage = entry.WebsiteAddInfor.FirstPage,
+                    Impressions = entry.WebsiteAddInfor.Impressions,
+                    Logo = entry.WebsiteAddInfor.Logo,
+                };
+            }
+
             //赋值
             model.Information = information;
             model.Pictures = picturesViewModels;
@@ -1567,6 +1755,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return model;
         }
 
+        /// <summary>
+        /// 对比新旧词条生成编辑记录
+        /// </summary>
+        /// <param name="currentEntry"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
         public List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry)
         {
             var examines = new List<KeyValuePair<object, Operation>>();
@@ -1671,6 +1865,61 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
 
+            //预约
+            if (newEntry.Booking != null)
+            {
+                if (currentEntry.Booking == null)
+                {
+                    currentEntry.Booking = new Booking();
+                }
+
+                //主要信息
+                entryAddInfor.Booking.MainInfor = ToolHelper.GetEditingRecordFromContrastData(currentEntry.Booking, newEntry.Booking);
+                //目标
+                //先把 当前预约中的目标 都 打上删除标签
+                foreach (var item in currentEntry.Booking.Goals)
+                {
+                    entryAddInfor.Booking.Goals.Add(new EditBookingGoal
+                    {
+                        Name = item.Name,
+                        Target = item.Target,
+                        IsDelete = true
+                    });
+                }
+                //再对比当前
+                foreach (var infor in newEntry.Booking.Goals.ToList().Purge())
+                {
+                    var isSame = false;
+                    foreach (var item in entryAddInfor.Booking.Goals)
+                    {
+                        if (item.Name == infor.Name)
+                        {
+                            if (item.Target != infor.Target)
+                            {
+                                item.Target = infor.Target;
+                                item.IsDelete = false;
+                            }
+                            else
+                            {
+                                entryAddInfor.Booking.Goals.Remove(item);
+                            }
+                            isSame = true;
+                            break;
+
+                        }
+                    }
+                    if (isSame == false)
+                    {
+                        entryAddInfor.Booking.Goals.Add(new EditBookingGoal
+                        {
+                            Target = infor.Target,
+                            Name=infor.Name,
+                            IsDelete = false
+                        });
+                    }
+                }
+            }
+
 
 
             //Staff
@@ -1679,13 +1928,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 entryAddInfor.Staffs.Add(new EntryStaffExamineModel
                 {
-                    Modifier=item.Modifier,
-                    StaffId=item.ToEntry,
-                    SubordinateOrganization=item.SubordinateOrganization,
-                    CustomName=item.CustomName,
-                    Name=item.Name,
-                    PositionGeneral=item.PositionGeneral,
-                    PositionOfficial=item.PositionOfficial,
+                    Modifier = item.Modifier,
+                    StaffId = item.ToEntry,
+                    SubordinateOrganization = item.SubordinateOrganization,
+                    CustomName = item.CustomName,
+                    Name = item.Name,
+                    PositionGeneral = item.PositionGeneral,
+                    PositionOfficial = item.PositionOfficial,
                     IsDelete = true,
                 });
             }
@@ -1698,7 +1947,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var isSame = false;
                 foreach (var item in entryAddInfor.Staffs)
                 {
-                    if (item.StaffId == infor.ToEntry&&item.Name==infor.Name && item.PositionOfficial == infor.PositionOfficial && item.Modifier == infor.Modifier)
+                    if (item.StaffId == infor.ToEntry && item.Name == infor.Name && item.PositionOfficial == infor.PositionOfficial && item.Modifier == infor.Modifier)
                     {
                         if (item.SubordinateOrganization != infor.SubordinateOrganization || item.CustomName != infor.CustomName || item.PositionGeneral != infor.PositionGeneral)
                         {
@@ -1732,7 +1981,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
             //检测是否有修改
-            if (entryAddInfor.Information.Any()||entryAddInfor.Staffs.Any())
+            if (entryAddInfor.Information.Any() || entryAddInfor.Staffs.Any() || entryAddInfor.Booking.MainInfor.Any() || entryAddInfor.Booking.Goals.Any())
             {
                 examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
 
@@ -2023,7 +2272,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     Url = item.Url,
                     BriefIntroduction = item.BriefIntroduction,
-                    Duration=item.Duration,
+                    Duration = item.Duration,
                     Name = item.Name,
                     Priority = item.Priority,
                     IsDelete = true
@@ -2063,9 +2312,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         BriefIntroduction = infor.BriefIntroduction,
                         Name = infor.Name,
                         Priority = infor.Priority,
-                        Duration=infor.Duration,
+                        Duration = infor.Duration,
                         IsDelete = false,
-                        Thumbnail=infor.Thumbnail
+                        Thumbnail = infor.Thumbnail
                     });
                 }
             }
@@ -2073,8 +2322,76 @@ namespace CnGalWebSite.APIServer.Application.Entries
             if (entryAudio.Audio.Any())
             {
                 examines.Add(new KeyValuePair<object, Operation>(entryAudio, Operation.EstablishAudio));
-
             }
+
+            //第八部分 官网模板补充信息
+            var entryWebsite = new EntryWebsiteExamineModel();
+            if (newEntry.WebsiteAddInfor != null)
+            {
+                if (currentEntry.WebsiteAddInfor == null)
+                {
+                    currentEntry.WebsiteAddInfor = new EntryWebsite();
+                }
+
+                //背景图
+                foreach (var item in currentEntry.WebsiteAddInfor.Images)
+                {
+                    entryWebsite.Images.Add(new EditWebsiteImage
+                    {
+                        Type = item.Type,
+                        Note = item.Note,
+                        Url = item.Url,
+                        Size = item.Size,
+                        Priority = item.Priority,
+                        IsDelete = true
+                    });
+                }
+                //再对比当前
+                foreach (var infor in newEntry.WebsiteAddInfor.Images.ToList().Purge())
+                {
+                    var isSame = false;
+                    foreach (var item in entryWebsite.Images)
+                    {
+                        if (item.Url == infor.Url&&item.Type==infor.Type)
+                        {
+                            if (item.Size != infor.Size || item.Priority != infor.Priority || item.Note != infor.Note)
+                            {
+                                item.Size = infor.Size;
+                                item.Note = infor.Note;
+                                item.Priority = infor.Priority;
+                                item.IsDelete = false;
+                            }
+                            else
+                            {
+                                entryWebsite.Images.Remove(item);
+                            }
+                            isSame = true;
+                            break;
+
+                        }
+                    }
+                    if (isSame == false)
+                    {
+                        entryWebsite.Images.Add(new EditWebsiteImage
+                        {
+                            Priority = infor.Priority,
+                            Note = infor.Note,
+                            Type = infor.Type,
+                            Url = infor.Url,
+                            Size=infor.Size,
+                            IsDelete = false
+                        });
+                    }
+                }
+
+                //主要信息
+                entryWebsite.MainInfor = ToolHelper.GetEditingRecordFromContrastData(currentEntry.WebsiteAddInfor, newEntry.WebsiteAddInfor);
+            }
+            if (entryWebsite.Images.Any() || entryWebsite.MainInfor.Any() )
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryWebsite, Operation.EstablishWebsite));
+            }
+
             return examines;
         }
 
@@ -2105,14 +2422,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 DisplayName = entry.DisplayName,
                 AnotherName = entry.AnotherName,
                 SmallBackgroundPicture = entry.SmallBackgroundPicture,
-
+                Template=entry.Template,
                 Id = entry.Id
             };
 
             return model;
         }
 
-        public EditAddInforViewModel GetEditAddInforViewModel(Entry entry)
+        public async Task<EditAddInforViewModel> GetEditAddInforViewModel(Entry entry)
         {
 
             var model = new EditAddInforViewModel
@@ -2173,9 +2490,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                     break;
                                 case "游戏平台":
                                     var sArray = Regex.Split(item.DisplayValue, "、", RegexOptions.IgnoreCase);
-                                    foreach(var infor in model.GamePlatforms)
+                                    foreach (var infor in model.GamePlatforms)
                                     {
-                                        if(sArray.Contains(infor.GamePlatformType.ToString()))
+                                        if (sArray.Contains(infor.GamePlatformType.ToString()))
                                         {
                                             infor.IsSelected = true;
                                         }
@@ -2212,17 +2529,17 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
 
                     //处理Staff信息
-                    foreach(var item in entry.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral!= PositionGeneralType.Publisher&& s.PositionGeneral != PositionGeneralType.ProductionGroup))
+                    foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral != PositionGeneralType.Publisher && s.PositionGeneral != PositionGeneralType.ProductionGroup))
                     {
                         model.Staffs.Add(new StaffModel
                         {
                             SubordinateOrganization = item.SubordinateOrganization,
                             CustomName = item.CustomName,
                             Modifier = item.Modifier,
-                            Name = item.ToEntryNavigation?.Name?? item.Name,
+                            Name = item.ToEntryNavigation?.Name ?? item.Name,
                             PositionGeneral = item.PositionGeneral,
                             PositionOfficial = item.PositionOfficial,
-                            Id=item.EntryStaffId
+                            Id = item.EntryStaffId
                         });
                     }
                     //处理制作组发行商信息
@@ -2382,7 +2699,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
 
                     //处理声优信息
-                  model.CV=  GetStringFromStaffs(entry,  PositionGeneralType.CV);
+                    model.CV = GetStringFromStaffs(entry, PositionGeneralType.CV);
 
                     break;
                 case EntryType.Staff:
@@ -2462,6 +2779,31 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
                     break;
+            }
+
+            //预约
+            if (entry.Booking != null)
+            {
+                model.Booking.IsNeedNotification = entry.Booking.IsNeedNotification;
+                model.Booking.Open = entry.Booking.Open;
+                if (entry.Booking.LotteryId == 0)
+                {
+                    model.Booking.LotteryName = null;
+                }
+                else
+                {
+                    model.Booking.LotteryName = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.Id == entry.Booking.Id).Select(s => s.Name).FirstOrDefaultAsync();
+                }
+
+                foreach (var item in entry.Booking.Goals)
+                {
+                    model.Booking.Goals.Add(new EditBookingGoalModel
+                    {
+                        Name = item.Name,
+                        Target = item.Target
+                    });
+                }
+
             }
 
             return model;
@@ -2691,7 +3033,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         }
 
-        public EditAudioViewModel GetEditAuioViewModel(Entry entry)
+        public EditAudioViewModel GetEditAudioViewModel(Entry entry)
         {
             var model = new EditAudioViewModel
             {
@@ -2715,6 +3057,42 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return model;
         }
 
+        public EditEntryWebsiteViewModel GetEditWebsitViewModel(Entry entry)
+        {
+            var model = new EditEntryWebsiteViewModel
+            {
+                Name = entry.Name,
+                Id = entry.Id,
+            };
+
+            if(entry.WebsiteAddInfor==null)
+            {
+                return model;
+            }
+
+            model.Html = entry.WebsiteAddInfor.Html;
+            model.Introduction = entry.WebsiteAddInfor.Introduction;
+            model.SubTitle = entry.WebsiteAddInfor.SubTitle;
+            model.FirstPage = entry.WebsiteAddInfor.FirstPage;
+            model.Logo = entry.WebsiteAddInfor.Logo;
+            model.Color = entry.WebsiteAddInfor.Color;
+            model.Impressions = entry.WebsiteAddInfor.Impressions;
+
+            foreach (var item in entry.WebsiteAddInfor.Images)
+            {
+                model.Images.Add(new EditWebsiteImageModel
+                {
+                    Image = item.Url,
+                    Note = item.Note,
+                    Priority = item.Priority,
+                    Type = item.Type,
+                    Size=item.Size
+                });
+            }
+
+            return model;
+        }
+
 
         public void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model)
         {
@@ -2727,9 +3105,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
             newEntry.DisplayName = model.DisplayName;
             newEntry.SmallBackgroundPicture = model.SmallBackgroundPicture;
             newEntry.AnotherName = model.AnotherName;
+            newEntry.Template = model.Template;
         }
 
-        public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model)
+        public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model,int lotteryId)
         {
             newEntry.Information.Clear();
             newEntry.EntryStaffFromEntryNavigation.Clear();
@@ -2906,8 +3285,22 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var tempList = newEntry.Information.ToList();
             tempList.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayValue));
             newEntry.Information = tempList;
-        }
 
+            //预约
+            newEntry.Booking ??= new Booking();
+            newEntry.Booking.Goals.Clear();
+            foreach(var item in model.Booking.Goals)
+            {
+                newEntry.Booking.Goals.Add(new BookingGoal
+                {
+                    Name = item.Name,
+                    Target = item.Target,
+                });
+            }
+            newEntry.Booking.IsNeedNotification = model.Booking.IsNeedNotification;
+            newEntry.Booking.LotteryId = lotteryId;
+            newEntry.Booking.Open = model.Booking.Open;
+        }
 
         public void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model)
         {
@@ -3059,6 +3452,33 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
         }
 
+        public void SetDataFromEditWebsiteViewModel(Entry newEntry, EditEntryWebsiteViewModel model)
+        {
+            newEntry.WebsiteAddInfor ??= new EntryWebsite();
+            newEntry.WebsiteAddInfor.Introduction = model.Introduction;
+            newEntry.WebsiteAddInfor.FirstPage = model.FirstPage;
+            newEntry.WebsiteAddInfor.Html = model.Html;
+            newEntry.WebsiteAddInfor.Logo = model.Logo;
+            newEntry.WebsiteAddInfor.Impressions = model.Impressions;
+            newEntry.WebsiteAddInfor.Color = model.Color;
+            newEntry.WebsiteAddInfor.SubTitle = model.SubTitle;
+            //再遍历视图模型中的图片 对应修改
+            newEntry.WebsiteAddInfor.Images.Clear();
+
+            foreach (var item in model.Images)
+            {
+                newEntry.WebsiteAddInfor.Images.Add(new EntryWebsiteImage
+                {
+                    Priority = item.Priority,
+                    Url = item.Image,
+                    Note = item.Note,
+                    Type = item.Type,
+                    Size=item.Size
+                });
+            }
+        }
+
+
         /// <summary>
         /// 从字符串中设置Staff
         /// </summary>
@@ -3177,7 +3597,80 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return model;
         }
 
+        public EntryRoleViewModel GetRoleInfor(Entry entry)
+        {
+            EntryRoleViewModel roleModel = new EntryRoleViewModel();
+            roleModel.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(entry));
 
+            roleModel.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
+            if (roleModel.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
+            {
+                roleModel.CV = string.Join("、", roleModel.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents.Select(s => s.DisplayName).ToArray());
+            }
 
+            //查找基础信息
+            roleModel.StandingPainting =_appHelper.GetImagePath(entry.MainPicture, "");
+            if (entry.Information != null && entry.Information.Any())
+            {
+                roleModel.Age = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "年龄")?.DisplayValue;
+                roleModel.Birthday = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "生日")?.DisplayValue;
+                roleModel.Height = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "身高")?.DisplayValue;
+            }
+
+            return roleModel;
+        }
+
+        public async Task PostAllBookingNotice(int max)
+        {
+            var now = DateTime.Now.ToCstTime();
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Booking).ThenInclude(s => s.Users).ThenInclude(s => s.ApplicationUser)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.PubulishTime != null && s.PubulishTime.Value.Date <= now.Date)
+                .Where(s => s.Booking != null && s.Booking.Open && s.Booking.Users.Any(s => s.IsNotified == false))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    s.MainPicture,
+                    s.BriefIntroduction,
+                    s.Pictures,
+                    BookingId = s.Booking.Id,
+                    Users = s.Booking.Users.Where(s => s.IsNotified == false).Select(s => new
+                    {
+                        s.ApplicationUser.Id,
+                        s.ApplicationUser.Email
+
+                    }).Take(max).ToList()
+                }).ToListAsync();
+
+            List<string> userIds = new List<string>();
+            foreach(var item in entries)
+            {
+                var htmlContent = _viewRenderService.Render("~/Models/BookingMsgView.cshtml", new BookingMsgViewModel
+                {
+                    DisplayName = item.DisplayName,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Link = $"https://www.cngal.org/entries/index/{item.Id}",
+                    MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Pictures = item.Pictures.OrderByDescending(s => s.Priority).Select(s => s.Url).Take(4).ToList()
+                });
+
+                foreach (var infor in item.Users)
+                {
+                    _emailService.Send(infor.Email, $"《{item.DisplayName}》已发布", htmlContent,true);
+                    userIds.Add(infor.Id);
+                    if(userIds.Count> max)
+                    {
+                        break;
+                    }
+                }
+                if (userIds.Count > max)
+                {
+                    break;
+                }
+            }
+
+            await _bookingUserRepository.GetAll().Where(s => userIds.Contains(s.ApplicationUserId) && s.BookingId != null && entries.Select(s => s.BookingId).Contains(s.BookingId.Value)).ExecuteUpdateAsync(s => s.SetProperty(a => a.IsNotified, b => true));
+        }
     }
 }

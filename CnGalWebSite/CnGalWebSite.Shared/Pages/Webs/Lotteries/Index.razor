@@ -1,12 +1,11 @@
 ﻿@inject HttpClient Http
-
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
-
 @inject DialogService DialogService
+@implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
@@ -127,23 +126,15 @@ else
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Lottery" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
                                                                 ObjectName="@Model.Name" />
+@if (isFirstLoad == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
+}
+
 
 @code {
-    private string id = "";
     [Parameter]
-    public string Id
-    {
-        get { return id; }
-        set
-        {
-            id = value;
-            if (isFrist == false)
-            {
-                OnInitializedAsync();
-
-            }
-        }
-    }
+    public string Id { get; set; }
 
     bool isReady = false;
     bool isNotFound = false;
@@ -155,20 +146,28 @@ else
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
+    bool isLoading = false;
+    bool isFirstLoad = true;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-
         if (firstRender)
         {
-
-            isFrist = false;
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
+            isFirstLoad = false;
         }
     }
+
     protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+    protected async Task Refresh()
     {
         try
         {
@@ -185,7 +184,7 @@ else
             }
 
             isReady = true;
-            StateHasChanged();
+         //   StateHasChanged();
             var user = await authenticationStateTask;
             if (user.User.Identity.IsAuthenticated)
             {
@@ -195,8 +194,6 @@ else
             {
                 _dataCacheService.VoteIndexPageCatche.Clean(Id);
             }
-
-
         }
         catch (Exception exc)
         {
@@ -211,7 +208,37 @@ else
     {
         Model.IsHidden = !Model.IsHidden;
         StateHasChanged();
-        
     }
 
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCacheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+                StateHasChanged();
+            }
+
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

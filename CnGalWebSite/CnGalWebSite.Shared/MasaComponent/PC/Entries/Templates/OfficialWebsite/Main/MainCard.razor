@@ -1,0 +1,82 @@
+﻿@inject IEventService _eventService
+
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" />
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" Background />
+
+<section id="top">
+    @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.FirstPage))
+    {
+        <div class="logo-area">
+            <h1>
+                @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Logo))
+                {
+                    <span>@Model.Name</span>
+                }
+                else
+                {
+                    <img width="100%" src="@Model.WebsiteAddInfor.Logo" />
+                }
+            </h1>
+            @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.SubTitle) == false)
+            {
+                <div class="lead">
+                    @((MarkupString)Model.WebsiteAddInfor.SubTitle)
+                </div>
+            }
+            else
+            {
+                <div class="lead">@publishTime</div>
+            }
+
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Impressions) == false)
+        {
+            <div class="copy">
+                @((MarkupString)Model.WebsiteAddInfor.Impressions)
+            </div>
+        }
+    }
+    else
+    {
+        @((MarkupString)Model.WebsiteAddInfor.FirstPage)
+    }
+    <div class="button-area">
+        @if (Model.Booking != null && Model.Booking.Open)
+        {
+            <div>
+                <BookingButton Template="EntryStyleTemplate.OfficialWebsite" Id="Model.Id" />
+            </div>
+        }
+        @if (Model.SteamId > 0)
+        {
+            <div>
+                <MButton Rounded Color="primary" Block XLarge OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                    <MIcon Left Class="me-4">
+                        @IconType.Steam.ToIconString()
+                    </MIcon>
+                    S T E A M
+                </MButton>
+            </div>
+        }
+    </div>
+    @if (Model.WebsiteAddInfor == null)
+    {
+        <div class="infor">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="p-3" Outline>
+                未适配该词条，当前界面样式可能不美观，我们将会持续推进样式适配，尽情期待
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    string publishTime { get; set; }
+
+    protected override void OnInitialized()
+    {
+        publishTime = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息")?.Informations?.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
+    }
+}

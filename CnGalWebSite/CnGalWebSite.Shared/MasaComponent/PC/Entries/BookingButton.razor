@@ -1,0 +1,139 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@if (IsHidden==false)
+{
+    @if (Template == EntryStyleTemplate.Default)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
+    }
+    else
+    {
+        <MButton Rounded Color="primary" Block XLarge OnClick="OnClick">
+            <MIcon Left Class="me-4">
+                @(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())
+            </MIcon>
+            @(isBooking?"已预约":"预约")
+        </MButton>
+    }
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public EntryStyleTemplate Template { get; set; }
+    [Parameter]
+    public bool IsHidden { get; set; }
+
+    bool isBooking ;
+    public bool IsBooking{ get { return isBooking; } }
+    bool isReady = false;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var user = await authenticationStateTask;
+        if (Id != 0 && isReady == false && user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                //获取文章信息
+                var AsyncModel = await Http.GetFromJsonAsync<BookingGameStateModel>(ToolHelper.WebApiPath + "api/booking/GetBookingGameState/" + Id, ToolHelper.options);
+                isBooking = AsyncModel.IsBooking;
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler.ProcessError(ex, "判断用户是否预约游戏失败");
+            }
+        }
+
+    }
+
+
+    public async Task OnClick()
+    {
+        //判断用户是否登录
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            if (isBooking)
+            {
+                await UnThumbsUp();
+            }
+            else
+            {
+                await ThumbsUp();
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("account/login");
+        }
+
+    }
+
+
+    private async Task UnThumbsUp()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("取消预约游戏失败", obj.Error);
+            }
+            else
+            {
+                isBooking = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "取消预约游戏失败");
+        }
+    }
+    private async Task ThumbsUp()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("预约游戏失败", obj.Error);
+            }
+            else
+            {
+                isBooking = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "预约游戏失败");
+        }
+    }
+
+}

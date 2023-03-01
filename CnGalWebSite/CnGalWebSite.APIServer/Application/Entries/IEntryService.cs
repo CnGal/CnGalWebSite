@@ -40,6 +40,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void UpdateEntryDataAudio(Entry entry, EntryAudioExamineModel examine);
 
+        void UpdateEntryDataWebsite(Entry entry, EntryWebsiteExamineModel examine);
+
         Task<List<int>> GetEntryIdsFromNames(List<string> names);
 
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
@@ -52,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         EditMainViewModel GetEditMainViewModel(Entry entry);
 
-        EditAddInforViewModel GetEditAddInforViewModel(Entry entry);
+        Task< EditAddInforViewModel> GetEditAddInforViewModel(Entry entry);
 
         EditImagesViewModel GetEditImagesViewModel(Entry entry);
 
@@ -62,11 +64,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         EditEntryTagViewModel GetEditTagsViewModel(Entry entry);
 
-        EditAudioViewModel GetEditAuioViewModel(Entry entry);
+        EditAudioViewModel GetEditAudioViewModel(Entry entry);
+
+        EditEntryWebsiteViewModel GetEditWebsitViewModel(Entry entry);
 
         void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
 
-        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model);
+        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model, int lotteryId);
 
         void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
 
@@ -78,10 +82,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model);
 
+        void SetDataFromEditWebsiteViewModel(Entry newEntry, EditEntryWebsiteViewModel model);
 
         Task UpdateRoleBrithday();
 
         Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day = 0);
 
+        Task PostAllBookingNotice(int max);
     }
 }

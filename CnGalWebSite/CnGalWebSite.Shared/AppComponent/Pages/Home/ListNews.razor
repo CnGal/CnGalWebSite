@@ -5,8 +5,8 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-3" Outline Small>
     <ButtonContent>
 
-            <MButton XSmall Text Block  OnClick="@(()=>NavigationManager.NavigateTo("/articles/news"))">
-                <MIcon Left>mdi-share-all-outline  </MIcon>
+            <MButton Color="primary" XSmall Text Block  OnClick="@(()=>NavigationManager.NavigateTo("/articles/news"))">
+                <MIcon Left>@IconType.SeeDetails.ToIconString()  </MIcon>
                 查看更多
             </MButton>
     </ButtonContent>

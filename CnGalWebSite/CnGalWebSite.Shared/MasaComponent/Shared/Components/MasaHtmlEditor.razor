@@ -1,0 +1,29 @@
+﻿@inject IFileUploadService _fileUploadService
+@inject IPopupService PopupService
+
+<MTextarea Label="@Lable" Rows="3" Color="primary" Value="@Context" ValueChanged="ValueChanged" Class="pt-0">
+</MTextarea>
+<MCard>
+    <Scroll style="max-height: 500px " class="p-4">
+        @((MarkupString)Context)
+    </Scroll>
+</MCard>
+
+
+@code {
+
+    [Parameter]
+    public string Lable { get; set; }
+    [Parameter]
+    public string Context { get; set; }
+    [Parameter]
+    public EventCallback<string> ContextChanged { get; set; }
+
+    public async Task ValueChanged(string context)
+    {
+        Context = context;
+        await ContextChanged.InvokeAsync(context);
+        StateHasChanged();
+    }
+
+}

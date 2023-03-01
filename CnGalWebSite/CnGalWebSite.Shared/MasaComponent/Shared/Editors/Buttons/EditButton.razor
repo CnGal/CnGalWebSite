@@ -15,7 +15,7 @@
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
                 <MButton Fab Small @attributes="@attrs" Class="@Class" Dark Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
-                    <MIcon>mdi-pencil</MIcon>
+                    <MIcon>@IconType.Edit.ToIconString()</MIcon>
                 </MButton>
             </ActivatorContent>
             <ChildContent>
@@ -146,7 +146,7 @@
     {
         ShowExamines = true;
         StateHasChanged();
-        
+
     }
 
     public void ProcButtonList()
@@ -194,6 +194,7 @@
                 editStates.Add(Operation.EstablishTags, model.State.TagState);
                 editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
                 editStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
+                editStates.Add(Operation.EstablishWebsite, model.State.WebsiteState);
 
             }
             else if (Type == ExaminedNormalListModelType.Article)
@@ -257,7 +258,7 @@
     private void OnClickLogin()
     {
         NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        
+
     }
 
     int count = 0;
@@ -308,7 +309,7 @@
         //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();
-        
+
     }
 
     protected override async Task OnInitializedAsync()

@@ -1,0 +1,119 @@
+﻿@inject HttpClient Http
+
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+<AutoSaveTip TItem="EditEntryWebsiteViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" />
+
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+        </div>
+    }
+    else
+    {
+        @if (Model.Type == EntryType.Staff)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
+                这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+        }
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Entry.ToIconString()" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.WebsiteCard Model="Model" IsCollapsed="false" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public EditEntryWebsiteViewModel Model { get; set; } = new EditEntryWebsiteViewModel();
+    bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditEntryWebsiteViewModel> autoSave { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditEntryWebsiteViewModel>(ToolHelper.WebApiPath + "api/entries/editwebsite/" + Id, ToolHelper.options);
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条专题页样式模板数据失败");
+            }
+
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditEntryWebsiteViewModel>(ToolHelper.WebApiPath + "api/entries/editwebsite", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存词条专题页样式模板数据失败", obj.Error);
+            }
+            else
+            {
+                await autoSave.Clean();
+
+                await ToastService.Success("保存成功", "保存词条专题页样式模板数据成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + Model.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存词条专题页样式模板数据失败");
+        }
+    }
+
+    private void DataLoaded(EditEntryWebsiteViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+
+    }
+
+}

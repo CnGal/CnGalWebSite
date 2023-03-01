@@ -75,7 +75,7 @@
 
                             @foreach (var temp in Model.ProductionGroups)
                             {
-                                <OutlineButton IsTitile="false" Text="@temp.DisplayName"  IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="author" ItemType="http://schema.org/Organization" />
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="author" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>
@@ -84,11 +84,11 @@
                     <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
                         @if (Model.Publishers.Count > 0)
                         {
-                            <OutlineButton IsTitile="true" Text="发行商"  Color="grey darken-3"/>
+                            <OutlineButton IsTitile="true" Text="发行商" Color="grey darken-3" />
 
                             @foreach (var temp in Model.Publishers)
                             {
-                                <OutlineButton IsTitile="false" Text="@temp.DisplayName"  IsShowExistTag="Model.IsEdit" EntryId="temp.Id"  Color="grey darken-3"   ItemProp="publisher" ItemType="http://schema.org/Organization" />
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="publisher" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>
@@ -122,6 +122,10 @@
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                     <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
+                        @if (Model.Type == EntryType.Game && Model.Booking != null&&Model.Booking.Open)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.BookingButton Id="Model.Id" Class="me-4" Template="EntryStyleTemplate.Default" />
+                        }
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
 
                         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="@Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
@@ -131,7 +135,7 @@
                         }
                     </div>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-              
+
             }
 
             @if (Model.Type == EntryType.ProductionGroup && string.IsNullOrWhiteSpace(Model.Thumbnail) == false && Model.Thumbnail.Contains("user.png") == false)

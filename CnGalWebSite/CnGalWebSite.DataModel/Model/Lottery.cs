@@ -82,6 +82,11 @@ namespace CnGalWebSite.DataModel.Model
         public int CommentCount { get; set; }
 
         /// <summary>
+        /// 关联词条 预约活动
+        /// </summary>
+        public int GameId { get; set; }
+
+        /// <summary>
         /// 是否隐藏
         /// </summary>
         public bool IsHidden { get; set; }
@@ -123,6 +128,8 @@ namespace CnGalWebSite.DataModel.Model
         GameRecord,
         [Display(Name = "评论该抽奖")]
         CommentLottery,
+        [Display(Name = "预约游戏")]
+        BookingGame,
     }
 
     public class LotteryUser
