@@ -1,13 +1,12 @@
 ﻿@inject HttpClient Http
-
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
 @inject IStructuredDataService _structuredDataService
-
 @inject DialogService DialogService
+@implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
@@ -37,7 +36,7 @@ else
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer Styles="max-width: 900px;" Class="w-100">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer Small>
         <div itemscope itemtype="http://schema.org/Article">
             @if (isReady == false)
             {
@@ -87,23 +86,14 @@ else
                                                                 ObjectName="@Model.Name" />
 
 
+@if (isFirstLoad == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
+}
 
 @code {
-    private string id = "";
     [Parameter]
-    public string Id
-    {
-        get { return id; }
-        set
-        {
-            id = value;
-            if (isFrist == false)
-            {
-                OnInitializedAsync();
-
-            }
-        }
-    }
+    public string Id { get; set; }
 
     public string CurrentUserRank { get; set; }
     bool isReady = false;
@@ -118,6 +108,8 @@ else
     string LastLookName = "";
     bool isFrist = true;
     bool CanDeleted;
+    bool isLoading = false;
+    bool isFirstLoad = true;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -127,15 +119,20 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-
         if (firstRender)
         {
-            isFrist = false;
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
+            isFirstLoad = false;
         }
-
     }
 
     protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    protected async Task Refresh()
     {
         try
         {
@@ -172,7 +169,7 @@ else
             await GenerateCarouselStructuredDataJson();
 
             isReady = true;
-            StateHasChanged();
+            //StateHasChanged();
         }
         catch (Exception exc)
         {
@@ -248,7 +245,7 @@ else
                         break;
                 }
 
-                Id = id;
+                await Refresh();
             }
         }
         catch (Exception ex)
@@ -257,5 +254,35 @@ else
         }
     }
 
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCatcheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+                StateHasChanged();
+            }
 
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

@@ -1,49 +1,13 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.ThemeSetting.IsFullScreen)
-{
+<div class="@($"variable {(Small?"container-sm":"container")}")">
     @ChildContent
-}
-else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
-{
-    @if (string.IsNullOrWhiteSpace(Styles) == false || string.IsNullOrWhiteSpace(Class) == false)
-    {
-        @ChildContent
-    }
-    else
-    {
-        <div class="p-4">
-            @ChildContent
-        </div>
-    }
+</div>
 
-}
-else
-{
-    @if (string.IsNullOrWhiteSpace(Styles) == false || string.IsNullOrWhiteSpace(Class) == false)
-    {
-        <div style=" display: flex; flex-direction: column; align-items: center; align-content: center; ">
-
-            <div style="@Styles" class="@Class">
-                @ChildContent
-            </div>
-        </div>
-    }
-    else
-    {
-        <MContainer>
-            @ChildContent
-        </MContainer>
-    }
-
-}
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     [Parameter]
-    public string Styles { get; set; }
-    [Parameter]
-    public string Class { get; set; }
-
+    public bool Small { get; set; }
 }

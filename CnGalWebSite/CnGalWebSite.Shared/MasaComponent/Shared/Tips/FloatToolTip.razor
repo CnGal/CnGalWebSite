@@ -52,7 +52,6 @@
     public void OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
-
     }
 
     public void OnSwitchStyle()
@@ -127,10 +126,11 @@
         StateHasChanged();
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         NavigationManager.LocationChanged -= LocationChanged;
         NavigationManager.LocationChanged += LocationChanged;
+        LocationChanged(null,null);
 
     }
 

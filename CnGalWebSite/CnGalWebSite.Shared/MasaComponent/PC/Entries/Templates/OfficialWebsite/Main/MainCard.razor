@@ -57,11 +57,16 @@
                     S T E A M
                 </MButton>
             </div>
-       
-
         }
     </div>
-
+    @if (Model.WebsiteAddInfor == null)
+    {
+        <div class="infor">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="p-3" Outline>
+                未适配该词条，当前界面样式可能不美观，我们将会持续推进样式适配，尽情期待
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+        </div>
+    }
 </section>
 
 @code {

@@ -1,0 +1,274 @@
+﻿@model CnGalWebSite.APIServer.Models.BookingMsgViewModel
+
+    <div id="contentDiv"
+         style="
+    position: relative;
+    font-size: 14px;
+    height: auto;
+    padding: 15px 15px 10px 15px;
+    z-index: 1;
+    zoom: 1;
+    line-height: 1.7;
+  ">
+        <div id="qm_con_body">
+            <div id="mailContentContainer">
+                <div>
+                    <table align="center"
+                           style="
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+            box-shadow: rgb(153, 153, 153) 0px 0px 5px;
+            border-collapse: collapse;
+            background: #fff;
+          ">
+                        <tbody>
+                            <tr>
+                                <th valign="middle"
+                                    style="
+                  height: 25px;
+                  line-height: 25px;
+                  padding: 15px 35px;
+                  border-bottom-width: 1px;
+                  border-bottom-style: solid;
+                  border-bottom-color: #f06292;
+                  background-color: #f06292;
+                  border-top-left-radius: 5px;
+                  border-top-right-radius: 5px;
+                  border-bottom-right-radius: 0px;
+                  border-bottom-left-radius: 0px;
+                  text-align: center;
+                  font-size: x-large;
+                  color: white;
+                ">
+                                    《@Model.DisplayName》已发布
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="
+                    padding: 2rem;
+                    background-color: #fff;
+                    max-width: 600px;
+                  ">
+                                        <table width="100%"
+                                               border="0"
+                                               cellspacing="0"
+                                               cellpadding="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <table width="100%"
+                                                               border="0"
+                                                               cellspacing="0"
+                                                               cellpadding="0">
+                                                            <tbody></tbody>
+                                                        </table>
+
+                                                        <table width="100%"
+                                                               border="0"
+                                                               cellspacing="0"
+                                                               cellpadding="0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="pb-60 mpb-40"
+                                                                        style="padding-bottom: 2rem">
+                                                                        <table width="100%"
+                                                                               border="0"
+                                                                               cellspacing="0"
+                                                                               cellpadding="0">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td class="fluid-img pb-10"
+                                                                                        style="
+                                            font-size: 0pt;
+                                            line-height: 0pt;
+                                            text-align: left;
+                                            padding-bottom: 2rem;
+                                          ">
+                                                                                        <a href="@Model.Link"
+                                                                                           target="_blank"
+                                                                                           rel="noopener">
+                                                                                            <img src="@Model.MainPicture"
+                                                                                                 title="@Model.DisplayName"
+                                                                                                 style="width: 100%" />
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+
+                                                                                <tr>
+                                                                                    <td class="text-18 lh-140p c-lgrey mfz-16 pr-10 mpr-0"
+                                                                                        style="
+                                            font-size: 18px;
+                                            font-family: 'Motiva Sans', Arial,
+                                              sans-serif;
+                                            text-align: left;
+                                            min-width: auto !important;
+                                            line-height: 140%; /* color:#dedee1; */
+                                            padding-right: 10px;
+                                          ">
+                                                                                        @Model.BriefIntroduction
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        @if (Model.Pictures.Any())
+                                                        {
+                                                            <table width="100%"
+                                                                   border="0"
+                                                                   cellspacing="0"
+                                                                   cellpadding="0">
+                                                                <tbody>
+
+                                                                    <tr>
+                                                                        <td class="pb-5" style="padding-bottom: 5px">
+                                                                            <table width="100%"
+                                                                                   border="0"
+                                                                                   cellspacing="0"
+                                                                                   cellpadding="0">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td class="fluid-img"
+                                                                                            width="300"
+                                                                                            style="
+                                            font-size: 0pt;
+                                            line-height: 0pt;
+                                            text-align: left;
+                                            padding-right: 5px;
+                                          ">
+                                                                                            <a href="@Model.Link"
+                                                                                               target="_blank"
+                                                                                               rel="noopener">
+                                                                                                <img src="@Model.Pictures[0]"
+                                                                                                     width="300"
+                                                                                                     height="169"
+                                                                                                     border="0" />
+                                                                                            </a>
+                                                                                        </td>
+                                                                                        @if (Model.Pictures.Count > 1)
+                                                                                        {
+                                                                                            <td class="fluid-img"
+                                                                                                width="300"
+                                                                                                style="
+                                            font-size: 0pt;
+                                            line-height: 0pt;
+                                            text-align: left;
+                                          ">
+                                                                                                <a href="@Model.Link"
+                                                                                                   target="_blank"
+                                                                                                   rel="noopener">
+                                                                                                    <img src="@Model.Pictures[1]"
+                                                                                                         width="300"
+                                                                                                         height="169"
+                                                                                                         border="0" />
+                                                                                                </a>
+                                                                                            </td>
+                                                                                        }
+
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                    @if (Model.Pictures.Count > 2)
+                                                                    {
+                                                                        <tr>
+                                                                            <td class="pb-45" style="padding-bottom: 45px">
+                                                                                <table width="100%"
+                                                                                       border="0"
+                                                                                       cellspacing="0"
+                                                                                       cellpadding="0">
+                                                                                    <tbody>
+                                                                                        <tr>
+
+                                                                                            <td class="fluid-img"
+                                                                                                width="300"
+                                                                                                style="
+                                            font-size: 0pt;
+                                            line-height: 0pt;
+                                            text-align: left;
+                                          ">
+                                                                                                <a href="@Model.Link"
+                                                                                                   target="_blank"
+                                                                                                   rel="noopener">
+                                                                                                    <img src="@Model.Pictures[2]"
+                                                                                                         width="300"
+                                                                                                         height="169"
+                                                                                                         border="0" />
+                                                                                                </a>
+                                                                                            </td>
+                                                                                            @if (Model.Pictures.Count > 3)
+                                                                                            {
+                                                                                                <td class="fluid-img"
+                                                                                                    width="300"
+                                                                                                    style="
+                                            font-size: 0pt;
+                                            line-height: 0pt;
+                                            text-align: left;
+                                          ">
+                                                                                                    <a href="@Model.Link"
+                                                                                                       target="_blank"
+                                                                                                       rel="noopener">
+                                                                                                        <img src="@Model.Pictures[3]"
+                                                                                                             width="300"
+                                                                                                             height="169"
+                                                                                                             border="0" />
+                                                                                                    </a>
+                                                                                                </td>
+                                                                                            }
+
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+
+                                                                </tbody>
+                                                            </table>
+
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div style="/* width: 550px; */ margin: 0 auto">
+                                            <div style="
+                        padding: 10px 10px 0;
+                        border-top: 1px solid #ccc;
+                        color: #747474;
+                        margin-bottom: 20px;
+                        line-height: 1.3em;
+                        font-size: 12px;
+                      ">
+                                                <p>
+                                                    此为系统邮件，请勿回复<br />
+                                                    请保管好您的邮箱，避免账号被他人盗用
+                                                </p>
+                                                <p>
+                                                    ©CnGal.org<br />
+                                                    <a href="https://www.cngal.org/"
+                                                       rel="noopener"
+                                                       target="_blank">https://www.cngal.org/</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @{
+    }

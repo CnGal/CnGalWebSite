@@ -8,6 +8,7 @@
     background-position: center 70%;
     color: #fff;
     overflow: hidden;
+    transition: all .6s ease;
 }
 #top .copy {
     position: absolute;
@@ -17,6 +18,11 @@
     line-height: 3rem;
     letter-spacing: 0.3rem;
 }
+    #top .infor {
+        position: fixed;
+        z-index: 1;
+        width: 100%;
+    }
 #top .logo-area .lead {
     text-align: center;
     font-size: 1.8rem;
@@ -145,10 +151,15 @@
     letter-spacing: 0.1rem;
     margin-top: 15px;
 }
-
-.character-card .caption .infor {
-    margin-top: 35px;
-}
+    .character-card .caption .audio {
+        margin-top: 15px;
+    }
+        .character-card .caption .audio + .infor {
+            margin-top: 15px;
+        }
+    .character-card .caption .infor {
+        margin-top: 35px;
+    }
 .character-card .caption .infor div {
     font-size: 1rem;
     letter-spacing: 0.1rem;

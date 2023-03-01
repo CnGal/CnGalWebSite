@@ -14,6 +14,7 @@ namespace CnGalWebSite.Shared.Service
     public class EventService : IEventService
     {
         public event Action SavaTheme;
+        public event Action LoadTheme;
         public event Action TempEffectTheme;
 
         private readonly IMauiService _mauiService;
@@ -33,6 +34,14 @@ namespace CnGalWebSite.Shared.Service
         public void OnSavaTheme()
         {
             SavaTheme?.Invoke();
+        }
+
+        /// <summary>
+        /// 读取主题设置
+        /// </summary>
+        public void OnLoadTheme()
+        {
+            LoadTheme?.Invoke();
         }
 
         /// <summary>

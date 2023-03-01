@@ -11,7 +11,7 @@
         <MCardText>
             达到相应目标会在页面展示
         </MCardText>
-        <MCardText>
+        <MCardText Class="pb-0">
             <div class="row">
                 <div class="col-12  col-sm-6">
                     <MTextField @bind-Value="Model.Target" Label="目标人数" Type="number" />
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </MCardText>
-        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+        <MCardActions Class="pb-6 pe-6 ps-6">
             <MSpacer></MSpacer>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="green" TextStyle />
         </MCardActions>

@@ -5,7 +5,7 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
-
+using CnGalWebSite.APIServer.Models;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
@@ -17,6 +17,7 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using NETCore.MailKit.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -45,12 +46,16 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<RoleBirthday, long> _roleBirthdayRepository;
+        private readonly IRepository<BookingUser, long> _bookingUserRepository;
         private readonly ILogger<EntryService> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IViewRenderService _viewRenderService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
         public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository)
+        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository,
+         IEmailService emailService, IRepository<BookingUser, long> bookingUserRepository, IViewRenderService viewRenderService)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -63,6 +68,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _roleBirthdayRepository = roleBirthdayRepository;
             _logger = logger;
             _lotteryRepository = lotteryRepository;
+            _emailService = emailService;
+            _bookingUserRepository = bookingUserRepository;
+            _viewRenderService = viewRenderService;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -1216,6 +1224,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
                 IsHideOutlink = entry.IsHideOutlink,
+                Template=entry.Template
             };
 
             //查看是否有配音
@@ -1498,12 +1507,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //预约信息
-            if (entry.Type == EntryType.Game && entry.Booking != null)
+            if (entry.Type == EntryType.Game && entry.Booking != null && (entry.PubulishTime == null || entry.PubulishTime.Value.Date > DateTime.Now.ToCstTime()))
             {
                 model.Booking = new BookingViewModel
                 {
                     BookingCount = entry.Booking.BookingCount,
-                    Open= entry.Booking.Open,
+                    Open = entry.Booking.Open,
                     Goals = entry.Booking.Goals.Select(s => new BookingGoalViewModel
                     {
                         Name = s.Name,
@@ -3590,14 +3599,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public EntryRoleViewModel GetRoleInfor(Entry entry)
         {
-            EntryRoleViewModel roleModel = new EntryRoleViewModel
+            EntryRoleViewModel roleModel = new EntryRoleViewModel();
+            roleModel.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(entry));
+
+            roleModel.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
+            if (roleModel.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
             {
-                Infor = _appHelper.GetEntryInforTipViewModel(entry)
-            };
-            roleModel.Infor.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
-            if (roleModel.Infor.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
-            {
-                roleModel.CV = string.Join("、", roleModel.Infor.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents.Select(s => s.DisplayName).ToArray());
+                roleModel.CV = string.Join("、", roleModel.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents.Select(s => s.DisplayName).ToArray());
             }
 
             //查找基础信息
@@ -3610,6 +3618,59 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             return roleModel;
+        }
+
+        public async Task PostAllBookingNotice(int max)
+        {
+            var now = DateTime.Now.ToCstTime();
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Booking).ThenInclude(s => s.Users).ThenInclude(s => s.ApplicationUser)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.PubulishTime != null && s.PubulishTime.Value.Date <= now.Date)
+                .Where(s => s.Booking != null && s.Booking.Open && s.Booking.Users.Any(s => s.IsNotified == false))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    s.MainPicture,
+                    s.BriefIntroduction,
+                    s.Pictures,
+                    BookingId = s.Booking.Id,
+                    Users = s.Booking.Users.Where(s => s.IsNotified == false).Select(s => new
+                    {
+                        s.ApplicationUser.Id,
+                        s.ApplicationUser.Email
+
+                    }).Take(max).ToList()
+                }).ToListAsync();
+
+            List<string> userIds = new List<string>();
+            foreach(var item in entries)
+            {
+                var htmlContent = _viewRenderService.Render("~/Models/BookingMsgView.cshtml", new BookingMsgViewModel
+                {
+                    DisplayName = item.DisplayName,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Link = $"https://www.cngal.org/entries/index/{item.Id}",
+                    MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Pictures = item.Pictures.OrderByDescending(s => s.Priority).Select(s => s.Url).Take(4).ToList()
+                });
+
+                foreach (var infor in item.Users)
+                {
+                    _emailService.Send(infor.Email, $"《{item.DisplayName}》已发布", htmlContent,true);
+                    userIds.Add(infor.Id);
+                    if(userIds.Count> max)
+                    {
+                        break;
+                    }
+                }
+                if (userIds.Count > max)
+                {
+                    break;
+                }
+            }
+
+            await _bookingUserRepository.GetAll().Where(s => userIds.Contains(s.ApplicationUserId) && s.BookingId != null && entries.Select(s => s.BookingId).Contains(s.BookingId.Value)).ExecuteUpdateAsync(s => s.SetProperty(a => a.IsNotified, b => true));
         }
     }
 }

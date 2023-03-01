@@ -1,13 +1,11 @@
-﻿
-@inject HttpClient Http
-
+﻿@inject HttpClient Http
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
-
 @inject DialogService DialogService
+@implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
@@ -122,24 +120,16 @@ else
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Periphery" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
                                                                 ObjectName="@Model.Name" />
+@if (isFirstLoad == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
+}
+
 
 
 @code {
-    private string id = "";
     [Parameter]
-    public string Id
-    {
-        get { return id; }
-        set
-        {
-            id = value;
-            if (isFrist == false)
-            {
-                OnInitializedAsync();
-
-            }
-        }
-    }
+    public string Id { get; set; }
     public string steam { get; set; }
     public string MainPageHtml { get; set; }
     public int currentPage { get; set; } = 1;
@@ -148,6 +138,8 @@ else
     bool isReady = false;
     bool isNotFound = false;
     bool isAsyncReady = false;
+    bool isLoading = false;
+    bool isFirstLoad = true;
 
     public PeripheryViewModel Model { get; set; } = new PeripheryViewModel();
 
@@ -171,23 +163,28 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-
         if (firstRender)
         {
-
-            isFrist = false;
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
+            isFirstLoad = false;
         }
-
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
 
     public void OnPreEdit(bool value)
     {
         Model.IsEdit = value;
         StateHasChanged();
-        
+
     }
 
-    protected override async Task OnInitializedAsync()
+    protected async Task Refresh()
     {
         try
         {
@@ -202,7 +199,6 @@ else
             }
 
             isReady = true;
-            StateHasChanged();
 
             var user = await authenticationStateTask;
 
@@ -210,8 +206,6 @@ else
             {
                 IsAdmin = user.User.IsInRole("Editor");
             }
-
-
         }
         catch (Exception exc)
         {
@@ -282,7 +276,7 @@ else
                         Model.RelatedPeripheriesState = EditState.Normal;
                         break;
                 }
-                Id = id;
+                await Refresh();
             }
         }
         catch (Exception ex)
@@ -290,5 +284,35 @@ else
             ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
     }
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCatcheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+                StateHasChanged();
+            }
 
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

@@ -48,6 +48,7 @@ else
         if (Check())
         {
             _dataCacheService.ThemeSetting.IsFullScreen = true;
+            _dataCacheService.ThemeSetting.IsTransparent = true;
             if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Color) == false)
             {
                 _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;

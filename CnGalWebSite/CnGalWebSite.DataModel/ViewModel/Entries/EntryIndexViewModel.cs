@@ -92,6 +92,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EntryType Type { get; set; }
 
         /// <summary>
+        /// 使用的模板
+        /// </summary>
+        public EntryStyleTemplate Template { get; set; }
+
+        /// <summary>
         /// 预约
         /// </summary>
         public BookingViewModel Booking { get; set; }
@@ -167,9 +172,9 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel> { };
     }
 
-    public class EntryRoleViewModel
+    public class EntryRoleViewModel:EntryInforTipViewModel
     {
-        public EntryInforTipViewModel Infor { get; set; } = new EntryInforTipViewModel();
+        public EntryRoleViewModel() { }
 
         public string Age { get; set; }
         public string Height { get; set; }

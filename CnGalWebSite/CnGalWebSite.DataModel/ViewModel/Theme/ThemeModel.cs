@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Anniversaries;
+﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using System;
 
 namespace CnGalWebSite.DataModel.ViewModel.Theme
@@ -38,6 +39,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public int PlayedGameInforCount { get; set; } = 3;
 
         public DisplayMode ListDisplayMode { get; set; }
+
+        /// <summary>
+        /// 词条样式模板
+        /// </summary>
+        public EntryStyleTemplate EntryTemplate { get; set; }
 
         public AnniversariesSetting AnniversariesSetting { get; set; } = new AnniversariesSetting();
 

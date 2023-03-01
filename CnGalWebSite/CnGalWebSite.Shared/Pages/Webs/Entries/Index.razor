@@ -5,7 +5,7 @@
 @inject IDataCacheService _dataCatcheService
 @inject IStructuredDataService _structuredDataService
 @inject DialogService DialogService
-
+@inject IEventService _eventService
 @implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
@@ -83,16 +83,7 @@ else
 }
 @if (isFirstLoad == false)
 {
-    <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
-               Style="min-width:180px;" Color="primary"
-               Elevation="24">
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="primary">
-            </MProgressCircular>
-            正在跳转......
-        </div>
-
-    </MSnackbar>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Entry" EventType="TrackEventType.View" ObjectId="@EntryView.Id.ToString()"
@@ -186,7 +177,7 @@ else
             await GenerateCarouselStructuredDataJson();
 
             isReady = true;
-            StateHasChanged();
+            //StateHasChanged();
 
         }
         catch (Exception exc)
@@ -201,7 +192,7 @@ else
     {
         var urls = new List<string>();
         urls.AddRange(EntryView.EntryRelevances.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
-        urls.AddRange(EntryView.Roles.Select(s => NavigationManager.BaseUri + "entries/" + s.Infor.Id));
+        urls.AddRange(EntryView.Roles.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         urls.AddRange(EntryView.ProductionGroups.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         urls.AddRange(EntryView.StaffGames.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         urls.AddRange(EntryView.ArticleRelevances.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
@@ -265,6 +256,9 @@ else
                     case Operation.EstablishAudio:
                         EntryView.AudioState = EditState.Normal;
                         break;
+                    case Operation.EstablishWebsite:
+                        EntryView.WebsiteState = EditState.Normal;
+                        break;
                 }
                 _dataCatcheService.EntryIndexPageCatche.Clean(Id);
                 await Refresh();
@@ -285,16 +279,37 @@ else
 
     public EntryStyleTemplate GetStyleTemplate()
     {
-        return (EntryStyleTemplate)Style;
+        if ((EntryStyleTemplate)Style != EntryStyleTemplate.None)
+        {
+            return (EntryStyleTemplate)Style;
+        }
+        else if (_dataCatcheService.ThemeSetting.EntryTemplate != EntryStyleTemplate.None)
+        {
+            return _dataCatcheService.ThemeSetting.EntryTemplate;
+        }
+        else
+        {
+            return EntryView.Template == EntryStyleTemplate.None ? EntryStyleTemplate.Default : EntryView.Template;
+        }
     }
 
     public void SwitchEntryStyle()
     {
-        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("style", style == EntryStyleTemplate.Default ? 1 : 0));
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("style", style == EntryStyleTemplate.Default ? 2 : 1));
     }
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
     {
+
+        var tempStyle = GetStyleTemplate();
+
+        //是否需要清空临时样式
+        if (NavigationManager.Uri.Contains("entries/index") == false || (style == EntryStyleTemplate.OfficialWebsite && tempStyle != EntryStyleTemplate.OfficialWebsite))
+        {
+            _eventService.OnLoadTheme();
+        }
+
+        //是否导航到其他词条
         if (Id != EntryView.Id.ToString())
         {
             if (_dataCatcheService.EntryIndexPageCatche.Check(Id) == false)
@@ -308,15 +323,15 @@ else
             else
             {
                 await Refresh();
+                StateHasChanged();
             }
         }
         else
         {
             //尽量减少状态更改次数
-            var tempStyle = GetStyleTemplate();
-
-            if ( style != tempStyle)
+            if (style != tempStyle)
             {
+
                 style = tempStyle;
                 StateHasChanged();
             }

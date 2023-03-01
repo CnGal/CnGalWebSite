@@ -263,9 +263,11 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum EntryStyleTemplate
     {
-        [Display(Name ="默认")]
+        [Display(Name = "缺省")]
+        None,
+        [Display(Name = "大卡片")]
         Default,
-        [Display(Name ="官网")]
+        [Display(Name ="专题页")]
         OfficialWebsite
     }
 

@@ -124,7 +124,7 @@
                     <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
                         @if (Model.Type == EntryType.Game && Model.Booking != null&&Model.Booking.Open)
                         {
-                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.BookingButton Id="Model.Id" Class="me-4" />
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.BookingButton Id="Model.Id" Class="me-4" Template="EntryStyleTemplate.Default" />
                         }
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
 

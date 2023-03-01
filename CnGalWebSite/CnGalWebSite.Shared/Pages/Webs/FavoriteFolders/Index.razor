@@ -115,16 +115,8 @@ else
 }
 @if (isFirstLoad == false)
 {
-    <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
-                Style="min-width:180px;"
-               Elevation="24">
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate >
-            </MProgressCircular>
-            正在跳转......
-        </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
 
-    </MSnackbar>
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.FavoriteFolder" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
@@ -197,7 +189,7 @@ else
             await GenerateCarouselStructuredDataJson();
 
             isReady = true;
-            StateHasChanged();
+            //StateHasChanged();
 
         }
         catch (Exception exc)
@@ -272,7 +264,7 @@ else
     {
         Model.IsEdit = value;
         StateHasChanged();
-        
+
     }
 
 

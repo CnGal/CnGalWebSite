@@ -2,11 +2,11 @@
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
 @inject IFileUploadService _fileUploadService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
 @inject DialogService DialogService
+@implements IDisposable
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -75,35 +75,24 @@ else
 </div>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Tag" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
                                                                 ObjectName="@Model.Name" />
+@if (isFirstLoad == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
+}
 
 @code {
-    private string id = "";
     [Parameter]
-    public string Id
-    {
-        get
-        {
-            return id;
-        }
-        set
-        {
-            id = value;
-            @if (isFirst == false)
-            {
-                OnInitializedAsync();
-            }
-
-
-        }
-    }
+    public string Id { get; set; }
 
     bool isReady = false;
+    bool isLoading = false;
+    bool isFirstLoad = true;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
     public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
     string LastLookName = "";
-    bool isFirst = true;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -112,11 +101,18 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            isFirst = false;
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
+            isFirstLoad = false;
         }
-
     }
+
     protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
     {
         try
         {
@@ -127,11 +123,11 @@ else
             //判断标签名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
-                NavigationManager.NavigateTo(Provider, "/home", "主页", "fa fa-home");
+                NavigationManager.NavigateTo("/");
             }
 
             isReady = true;
-            StateHasChanged();
+            // StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -142,7 +138,7 @@ else
 
     private void OnCreate()
     {
-        NavigationManager.NavigateTo(Provider, "/tags/createtag", "创建标签", "fa fa-pencil");
+        NavigationManager.NavigateTo("/tags/createtag");
     }
 
 
@@ -191,7 +187,7 @@ else
                         Model.ChildEntriesState = EditState.Normal;
                         break;
                 }
-                Id = id;
+                await Refresh();
             }
         }
         catch (Exception ex)
@@ -199,6 +195,36 @@ else
             ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
     }
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCatcheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+                StateHasChanged();
+            }
 
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }
 

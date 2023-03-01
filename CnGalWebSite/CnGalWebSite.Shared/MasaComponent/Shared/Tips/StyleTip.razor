@@ -92,6 +92,33 @@ else
     }
 </style>
 
+@if (_dataCacheService.ThemeSetting.IsFullScreen)
+{
+    <style>
+        .variable.container {
+            max-width: none;
+            padding: 0;
+        }
+    </style>
+}
+else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
+{
+    <style>
+        .variable.container {
+            max-width: none;
+            padding: 1.5rem !important;
+        }
+    </style>
+}
+else
+{
+    <style>
+        .container-sm {
+            max-width: 900px;
+        }
+    </style>
+}
+
 
 @code {
 
@@ -121,18 +148,11 @@ else
         _eventService.SavaTheme -= OnSavaTheme;
         _eventService.SavaTheme += OnSavaTheme;
 
+        _eventService.LoadTheme -= OnLoadTheme;
+        _eventService.LoadTheme += OnLoadTheme;
+
         _eventService.TempEffectTheme -= OnTempEffectTheme;
         _eventService.TempEffectTheme += OnTempEffectTheme;
-
-        NavigationManager.LocationChanged -= LocationChanged;
-        NavigationManager.LocationChanged += LocationChanged;
-
-    }
-
-    public async void LocationChanged(object sender, LocationChangedEventArgs args)
-    {
-        await LoadTheme();
-        await Refresh();
     }
 
     public async void OnTempEffectTheme()
@@ -143,6 +163,11 @@ else
     public async void OnSavaTheme()
     {
         await SaveTheme();
+        await Refresh();
+    }
+    public async void OnLoadTheme()
+    {
+        await LoadTheme();
         await Refresh();
     }
 
@@ -179,7 +204,7 @@ else
         }
 
         //若为默认主题 则设置主题色
-        if (ThemeModel.DefaultTheme==_dataCacheService.ThemeSetting.Theme && _dataCacheService.ThemeSetting.IsDark == false)
+        if (ThemeModel.DefaultTheme == _dataCacheService.ThemeSetting.Theme && _dataCacheService.ThemeSetting.IsDark == false)
         {
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
@@ -340,7 +365,7 @@ else
         }
 
         //通知主题模式切换
-        if(MasaBlazor.Theme.Dark != _dataCacheService.ThemeSetting.IsDark)
+        if (MasaBlazor.Theme.Dark != _dataCacheService.ThemeSetting.IsDark)
         {
             //重新赋值
             var theme = MasaBlazor.Theme;
@@ -358,7 +383,7 @@ else
     {
         _eventService.SavaTheme -= OnSavaTheme;
         _eventService.TempEffectTheme -= OnTempEffectTheme;
-        NavigationManager.LocationChanged -= LocationChanged;
+        _eventService.LoadTheme -= OnLoadTheme;
         GC.SuppressFinalize(this);
     }
     #endregion

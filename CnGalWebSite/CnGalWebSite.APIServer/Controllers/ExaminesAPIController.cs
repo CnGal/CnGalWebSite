@@ -228,6 +228,11 @@ namespace CnGalWebSite.APIServer.Controllers
                        .Include(s => s.Audio)
                        .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
+                case Operation.EstablishWebsite:
+                    entry = await _entryRepository.GetAll()
+                        .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                       .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                    break;
                 case Operation.EstablishRelevances:
                     entry = await _entryRepository.GetAll()
                         .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -324,11 +329,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 case Operation.EditVideoImages:
                     entry = await _videoRepository.GetAll()
                        .Include(s => s.Pictures)
-                       .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
-                    break;
-                case Operation.EstablishWebsite:
-                    entry = await _entryRepository.GetAll()
-                        .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                        .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
                     break;
                 default:

@@ -88,5 +88,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day = 0);
 
+        Task PostAllBookingNotice(int max);
     }
 }

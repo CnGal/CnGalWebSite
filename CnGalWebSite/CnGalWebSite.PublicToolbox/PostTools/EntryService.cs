@@ -160,12 +160,12 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.CompleteTaskCount++;
 
             //获取从词条关联的各个游戏
-            var reEntryIds = subEntry.Roles.Select(x => x.Infor.Id).ToList();
+            var reEntryIds = subEntry.Roles.Select(x => x.Id).ToList();
             reEntryIds.AddRange(subEntry.ProductionGroups.Select(x => x.Id));//这里是显示名称 极少部分词条可能会有问题
             reEntryIds.AddRange(subEntry.EntryRelevances.Select(x => x.Id));
             reEntryIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
             //获取主词条关联的各个游戏
-            reEntryIds.AddRange(hostEntry.Roles.Select(x => x.Infor.Id));
+            reEntryIds.AddRange(hostEntry.Roles.Select(x => x.Id));
             reEntryIds.AddRange(hostEntry.ProductionGroups.Select(x => x.Id));//这里是显示名称 极少部分词条可能会有问题
             reEntryIds.AddRange(hostEntry.EntryRelevances.Select(x => x.Id));
             reEntryIds.AddRange(hostEntry.StaffGames.Select(x => x.Id));
@@ -173,10 +173,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //游戏
             var reGameIds = subEntry.EntryRelevances.Where(s => s.Type == EntryType.Game||s.Type== EntryType.Role).Select(x => x.Id).ToList();
             reGameIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
-            reGameIds.AddRange(subEntry.Roles.Select(x => x.Infor.Id));
+            reGameIds.AddRange(subEntry.Roles.Select(x => x.Id));
             reGameIds.AddRange(hostEntry.EntryRelevances.Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role).Select(x => x.Id));
             reGameIds.AddRange(hostEntry.StaffGames.Select(x => x.Id));
-            reGameIds.AddRange(hostEntry.Roles.Select(x => x.Infor.Id));
+            reGameIds.AddRange(hostEntry.Roles.Select(x => x.Id));
 
             //替换关联信息
             foreach (var item in reEntryIds)

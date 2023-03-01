@@ -5,37 +5,47 @@
     }
     <div class="caption_wrapper">
         <div class="caption">
-            <div class="name">@Model.Infor.Name</div>
+            <div class="name">@Model.Name</div>
             @if (string.IsNullOrWhiteSpace(Model.CV) == false)
             {
                 <div class="cv">CV： @Model.CV</div>
             }
-            @if (string.IsNullOrWhiteSpace(Model.Age) == false || string.IsNullOrWhiteSpace(Model.Height) == false || string.IsNullOrWhiteSpace(Model.Birthday) == false)
+
+            @foreach (var item in Model.Audio)
             {
-                <div class="infor">
-                    @if (string.IsNullOrWhiteSpace(Model.Age) == false)
-                    {
-                        <div class="age">年龄： @Model.Age</div>
-                    }
-                    @if (string.IsNullOrWhiteSpace(Model.Height) == false)
-                    {
-                        <div class="height">身高： @Model.Height</div>
-                    }
-                    @if (string.IsNullOrWhiteSpace(Model.Birthday) == false)
-                    {
-                        <div class="birthday">生日： @Model.Birthday</div>
-                    }
-                </div>
+                <div class="audio">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@item.Url" />
+</div>
             }
 
+     
 
-            @if (string.IsNullOrWhiteSpace(Model.Infor.BriefIntroduction) == false)
-            {
-                <div class="description">
-                    @Model.Infor.BriefIntroduction
-                </div>
-            }
-        </div>
+                @if (string.IsNullOrWhiteSpace(Model.Age) == false || string.IsNullOrWhiteSpace(Model.Height) == false || string.IsNullOrWhiteSpace(Model.Birthday) == false)
+                {
+                    <div class="infor">
+                        @if (string.IsNullOrWhiteSpace(Model.Age) == false)
+                        {
+                            <div class="age">年龄： @Model.Age</div>
+                        }
+                        @if (string.IsNullOrWhiteSpace(Model.Height) == false)
+                        {
+                            <div class="height">身高： @Model.Height</div>
+                        }
+                        @if (string.IsNullOrWhiteSpace(Model.Birthday) == false)
+                        {
+                            <div class="birthday">生日： @Model.Birthday</div>
+                        }
+                    </div>
+                }
+
+
+                @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) == false)
+                {
+                    <div class="description">
+                        @Model.BriefIntroduction
+                    </div>
+                }
+            </div>
     </div>
 </div>
 
