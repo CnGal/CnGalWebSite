@@ -8,9 +8,7 @@
         @foreach (var item in Model)
         {
             <MSlideItem>
-                <MCard  Class="ma-4"
-                       OnClick="@context.Toggle"
-                       RefBack="@context.Ref">
+                <MCard  OnClick="@context.Toggle" RefBack="@context.Ref">
                     <img src="@item.MainImage" class="character-icon"/>
                 </MCard>
             </MSlideItem>

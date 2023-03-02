@@ -111,9 +111,13 @@
         {
             await InvokeAsync(() =>
             {
-                Index = ++Index % Images.Count();
+                if(Images.Any())
+                {
+                    Index = ++Index % Images.Count();
 
-                StateHasChanged();
+                    StateHasChanged();
+                }
+
             });
         }
         catch
