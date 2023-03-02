@@ -28,16 +28,16 @@
             </Authorized>
         </AuthorizeView>
 
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/contentcenter"))">
+        <MButton Text Block   Color="primary" OnClick="@(()=>OnNav("/contentcenter"))">
             <MIcon Left>mdi-database-edit</MIcon>
             内容中心
         </MButton>
 
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/space/index/" + Model.Id))">
+        <MButton Text Block   Color="primary" OnClick="@(()=>OnNav("/space/index/" + Model.Id))">
             <MIcon Left>mdi-star</MIcon>
             个人空间
         </MButton>
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/space/editdata"))">
+        <MButton Text Block   Color="primary" OnClick="@(()=>OnNav("/space/editdata"))">
             <MIcon Left>mdi-pencil</MIcon>
             编辑资料
         </MButton>
@@ -51,20 +51,20 @@
         }
         else
         {
-            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMessage">
+            <MButton Text Block   Color="primary" OnClick="OnClickMessage">
                 <MIcon Left>mdi-comment-text-multiple  </MIcon>
                 消息通知
             </MButton>
 
         }
 
-    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
+    <MButton Text Block   Color="primary" StopPropagation OnClick="OnClickSetting">
         <MIcon Left>mdi-cog</MIcon>
         <span style="background: linear-gradient(to right,var(--main-color),var(--active-color)); -webkit-background-clip: text; color: transparent; ">主题设置</span>
     </MButton>
 
 
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/account/logout"))">
+        <MButton Text Block  Color="primary" OnClick="@(()=>OnNav("/account/logout"))">
             <MIcon Left>mdi-logout</MIcon>
             退出登入
         </MButton>
