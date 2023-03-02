@@ -189,15 +189,15 @@ else
     /// <returns></returns>
     public async Task LoadTheme()
     {
-        var isFullScreen = _dataCacheService.ThemeSetting.IsFullScreen;
+        var isFullScreen = _dataCacheService.ThemeSetting?.IsFullScreen ?? false;
         _dataCacheService.ThemeSetting = await _localStorage.GetItemAsync<ThemeModel>("theme");
-        _dataCacheService.ThemeSetting.IsFullScreen = isFullScreen;
 
         if (_dataCacheService.ThemeSetting == null)
         {
             _dataCacheService.ThemeSetting = new ThemeModel();
             await SaveTheme();
         }
+        _dataCacheService.ThemeSetting.IsFullScreen = isFullScreen;
 
         //将旧版颜色字符串转化为新版
         if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))

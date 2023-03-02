@@ -113,16 +113,14 @@
     -ms-flex-pack: center;
     justify-content: center;
     align-items: center;
-    padding: 0 80px;
+    padding: 30px 80px 0 80px;
     gap: 10px 3%;
 }
-.character-card img {
-    -ms-flex-item-align: end;
-    align-self: flex-end;
-    padding-top: 20px;
-    width: 45%;
-    max-width: 330px;
-}
+    .character-card img {
+        align-self: center;
+        width: 45%;
+        max-width: 330px;
+    }
 .character-card .caption {
     max-width: 460px;
     display: -webkit-box;
