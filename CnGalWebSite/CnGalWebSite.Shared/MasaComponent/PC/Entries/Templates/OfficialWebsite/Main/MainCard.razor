@@ -1,4 +1,5 @@
 ﻿@inject IEventService _eventService
+@inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" />
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.CarouselsCard Model="Model" Background />
@@ -50,7 +51,7 @@
         @if (Model.SteamId > 0)
         {
             <div>
-                <MButton Rounded Color="primary" Block XLarge OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                <MButton Rounded Color="primary" Block XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
                     <MIcon Left Class="me-4">
                         @IconType.Steam.ToIconString()
                     </MIcon>
