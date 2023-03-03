@@ -88,7 +88,7 @@
             {
                 if (mMarkdown != null)
                 {
-                    await mMarkdown.InsertValueAsync($"\n![{item.FileName}]({item.Url})\n");
+                    await mMarkdown.InsertValueAsync($"\n![]({item.Url})\n");
 
                     //向用户文件管理添加信息
                     await _fileUploadService.AddUserLoadedFileInfor(item, UploadFileType.Image);
