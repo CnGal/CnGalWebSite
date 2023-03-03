@@ -1422,3 +1422,11 @@ a .aspect-ratio + p > strong {
         min-width: 100px;
     }
 }
+.official-website .introduce {
+    white-space: pre-line;
+    font-size: 1rem;
+}
+.pre-img {
+    width: 0;
+    height: 0;
+}
