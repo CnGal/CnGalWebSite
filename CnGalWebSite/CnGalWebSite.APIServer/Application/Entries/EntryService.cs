@@ -2275,6 +2275,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Duration = item.Duration,
                     Name = item.Name,
                     Priority = item.Priority,
+                    Thumbnail=item.Thumbnail,
                     IsDelete = true
                 });
             }
