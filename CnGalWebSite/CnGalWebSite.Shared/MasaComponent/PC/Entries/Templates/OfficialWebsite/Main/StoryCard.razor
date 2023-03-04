@@ -1,16 +1,16 @@
 ﻿@if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction) == false || string.IsNullOrWhiteSpace(Model.MainPage) == false)
 {
     <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard Icon="IconType.MainPage" Title="STORY">
-        <div class="container markdown-body">
-            @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction))
-            {
-                @((MarkupString)Model.MainPage)
-            }
-            else
-            {
-                @((MarkupString)Model.WebsiteAddInfor.Introduction)
-            }
-        </div>
+            <div class=" markdown-body">
+                @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction))
+                {
+                    @((MarkupString)Model.MainPage)
+                }
+                else
+                {
+                    @((MarkupString)Model.WebsiteAddInfor.Introduction)
+                }
+            </div>
     </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Others.SectionCard>
 }
 
