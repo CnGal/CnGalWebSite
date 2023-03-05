@@ -53,8 +53,6 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public bool IsMiniMode { get; set; }
 
-        public event EventHandler<EventArgs> RefreshRequsted;
-
         /// <summary>
         /// 身份验证成功后获得的标识 有效期一小时
         /// </summary>
@@ -383,13 +381,6 @@ namespace CnGalWebSite.Shared.Service
             (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
             (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
         }
-
-        public async Task OnRefreshRequsted(EventArgs e)
-        {
-            EventHandler<EventArgs> handler = RefreshRequsted;
-            await Task.Run(() => handler?.Invoke(this, e));
-        }
-
 
         public void RefreshAllCatche()
         {

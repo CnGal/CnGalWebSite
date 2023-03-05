@@ -16,6 +16,7 @@ namespace CnGalWebSite.Shared.Service
         public event Action SavaTheme;
         public event Action CleanTempEffectTheme;
         public event Action TempEffectTheme;
+        public event Action ToggleMiniMode;
 
         private readonly IMauiService _mauiService;
         private readonly IJSRuntime JS;
@@ -70,6 +71,11 @@ namespace CnGalWebSite.Shared.Service
                 }
                
             }
+        }
+
+        public void OnToggleMiniMode()
+        {
+            ToggleMiniMode?.Invoke();
         }
     }
 }

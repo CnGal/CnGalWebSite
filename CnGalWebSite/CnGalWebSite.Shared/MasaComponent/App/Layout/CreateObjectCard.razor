@@ -4,34 +4,34 @@
 <MDialog @bind-Value="Dialog"
          Width="250">
     <MCard Class="w-100 p-4">
-            <MButton Text Block  OnClick="@(()=>OnClick("/entries/establishentry"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/entries/establishentry"))">
                 <MIcon Left>mdi-archive</MIcon>
                 创建词条
             </MButton>
-            <MButton Text Block  OnClick="@(()=>OnClick("/articles/createarticle"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/articles/createarticle"))">
                 <MIcon Left>mdi-script-text</MIcon>
                 发表文章
             </MButton>
-            <MButton Text Block  OnClick="@(()=>OnClick("/videos/create"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/videos/create"))">
                 <MIcon Left>mdi-animation-play </MIcon>
                 发布视频
             </MButton>
-            <MButton Text Block  OnClick="@(()=>OnClick("/tags/createtag"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/tags/createtag"))">
                 <MIcon Left>mdi-tag</MIcon>
                 创建标签
             </MButton>
-            <MButton Text Block  OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
                 <MIcon Left>mdi-basket</MIcon>
                 创建周边
             </MButton>
 
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                    <MButton Text Block  OnClick="@(()=>OnClick("/lotteries/createlottery"))">
+                    <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/lotteries/createlottery"))">
                         <MIcon Left>mdi-wallet-giftcard </MIcon>
                         创建抽奖
                     </MButton>
-                    <MButton Text Block  OnClick="@(()=>OnClick("/votes/createvote"))">
+                    <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/votes/createvote"))">
                         <MIcon Left>mdi-vote</MIcon>
                         发起投票
                     </MButton>

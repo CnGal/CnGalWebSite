@@ -1,4 +1,5 @@
-﻿@inject IDataCacheService _dataCacheService
+﻿@inject IEventService _eventService
+@inject IDataCacheService _dataCacheService
 @implements IDisposable
 
 @if (_dataCacheService.IsMiniMode == false)
@@ -10,23 +11,22 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void  OnInitialized()
     {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
+        _eventService.ToggleMiniMode -= OnToggleMiniMode;
+        _eventService.ToggleMiniMode += OnToggleMiniMode;
     }
 
-    public async void RefreshRequsted(object sender, EventArgs args)
+    public void OnToggleMiniMode()
     {
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
 
     }
     #region 释放实例
 
     public void Dispose()
     {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _eventService.ToggleMiniMode -= OnToggleMiniMode;
 
         GC.SuppressFinalize(this);
     }

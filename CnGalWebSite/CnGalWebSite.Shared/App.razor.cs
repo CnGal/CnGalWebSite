@@ -13,7 +13,7 @@ namespace CnGalWebSite.Shared
     /// <summary>
     /// 
     /// </summary>
-    public partial class App
+    public partial class App : IDisposable
     {
 
         private System.Threading.Timer mytimer;
@@ -77,7 +77,7 @@ namespace CnGalWebSite.Shared
                     if (isApp != _dataCacheService.IsApp)
                     {
                         _dataCacheService.IsApp = isApp;
-                        needRefresh = true;
+                       // needRefresh = true;
 
                     }
                 }
@@ -108,7 +108,8 @@ namespace CnGalWebSite.Shared
 
                 if (needRefresh)
                 {
-                   await _dataCacheService.OnRefreshRequsted(null);
+                    _eventService.OnToggleMiniMode();
+                    //await _dataCacheService.OnRefreshRequsted(null);
                 }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期
@@ -127,7 +128,7 @@ namespace CnGalWebSite.Shared
             {
                 try
                 {
-                    if(await _authService.IsLogin())
+                    if (await _authService.IsLogin())
                     {
                         await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline", ToolHelper.options);
                     }
@@ -160,5 +161,16 @@ namespace CnGalWebSite.Shared
             }
 
         }
+        #region 释放实例
+        public void Dispose()
+        {
+            if (mytimer != null)
+            {
+                mytimer?.Dispose();
+            }
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
+
 }

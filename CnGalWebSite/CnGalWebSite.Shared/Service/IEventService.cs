@@ -11,6 +11,7 @@ namespace CnGalWebSite.Shared.Service
         event Action SavaTheme;
         event Action CleanTempEffectTheme;
         event Action TempEffectTheme;
+        event Action ToggleMiniMode;
 
         void OnSavaTheme();
 
@@ -20,5 +21,6 @@ namespace CnGalWebSite.Shared.Service
 
         void OnTempEffectTheme();
 
+        public void OnToggleMiniMode();
     }
 }
