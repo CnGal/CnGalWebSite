@@ -21,7 +21,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-    <MButton Text Block  Left OnClick="@(()=>OnClickUrl("/"))">
+    <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/"))">
         <MIcon Left>mdi-home</MIcon>
         主页
     </MButton>
@@ -40,28 +40,28 @@
                     </MButton>
                 </Authorized>
             </AuthorizeView>
-            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/contentcenter"))">
+            <MButton Text Block Color="primary" OnClick="@(()=>OnClickUrl("/contentcenter"))">
                 <MIcon Left>mdi-database-edit </MIcon>
                 内容中心
             </MButton>
 
-            <MButton Text Block  Left OnClick="@(()=>OnClickUrl("space/index/" + _dataCacheService.UserInfor.Id))">
+            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("space/index/" + _dataCacheService.UserInfor.Id))">
                 <MIcon Left>mdi-star</MIcon>
                 个人空间
             </MButton>
-            <MButton Text Block  Left OnClick="@(()=>OnClickUrl("/space/editdata"))">
+            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/space/editdata"))">
                 <MIcon Left>mdi-pencil</MIcon>
                 编辑资料
             </MButton>
-            <MButton Text Block  Left OnClick="@(()=>OnClickUrl("/space/messages"))">
+            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/space/messages"))">
                 <MIcon Left>mdi-comment-text-multiple  </MIcon>
                 消息通知
             </MButton>
-            <MButton Text Block  Left OnClick="OnClickCreate">
+            <MButton Text Block  Color="primary"  Left OnClick="OnClickCreate">
                 <MIcon Left>mdi-plus  </MIcon>
                 创建投稿
             </MButton>
-            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/account/logout"))">
+            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClickUrl("/account/logout"))">
                 <MIcon Left>mdi-logout</MIcon>
                 退出登入
             </MButton>
@@ -70,17 +70,17 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 
-        <MButton Text Block  Left OnClick="@(()=>OnClickUrl("/birthday"))">
+        <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/birthday"))">
             <MIcon Left>mdi-cake-variant</MIcon>
             生日日历
         </MButton>
-        <MButton Text Block  Left OnClick="OnClickSetting">
+        <MButton Text Block Color="primary" Left OnClick="OnClickSetting">
             <MIcon Left>mdi-cog</MIcon>
             主题设置
         </MButton>
 
 
-        <MButton Text Block  Left OnClick="@(()=>OnClickUrl("/about"))">
+        <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/about"))">
             <MIcon Left>mdi-information-outline</MIcon>
             关于我们
         </MButton>

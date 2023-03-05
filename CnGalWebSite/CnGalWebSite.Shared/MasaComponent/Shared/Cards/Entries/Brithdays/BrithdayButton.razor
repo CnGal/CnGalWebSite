@@ -2,7 +2,6 @@
 @inject IDataCacheService _dataCacheService
 @inject HttpClient Http
 @inject IEventService _eventService
-@implements IDisposable
 
 @if (Model != null)
 {
@@ -48,14 +47,6 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
@@ -98,18 +89,4 @@
         }
 
     }
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

@@ -112,11 +112,23 @@ else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
 }
 else
 {
-    <style>
-        .container-sm {
-            max-width: 900px;
-        }
-    </style>
+    @if (_dataCacheService.IsApp)
+    {
+        <style>
+            .container-sm {
+                padding:0;
+            }
+        </style>
+    }
+    else
+    {
+        <style>
+            .container-sm {
+                max-width: 900px;
+            }
+        </style>
+    }
+
 }
 
 
@@ -375,7 +387,7 @@ else
             theme.Dark = _dataCacheService.ThemeSetting.IsDark;
             MasaBlazor.Theme = theme;
 
-            await _dataCacheService.OnRefreshRequsted(null);
+            //await _dataCacheService.OnRefreshRequsted(null);
         }
 
         await InvokeAsync(StateHasChanged);

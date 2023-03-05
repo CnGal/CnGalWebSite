@@ -40,8 +40,6 @@ namespace CnGalWebSite.Shared.Service
 
         bool IsMiniMode { get; set; }
 
-        event EventHandler<EventArgs> RefreshRequsted;
-
         string LoginKey { get; set; }
 
         ThirdPartyLoginTempModel ThirdPartyLoginTempModel { get; set; }
@@ -172,7 +170,5 @@ namespace CnGalWebSite.Shared.Service
         StringNumber HomeTabIndex { get; set; }
 
         void RefreshAllCatche();
-
-        Task OnRefreshRequsted(EventArgs e);
     }
 }
