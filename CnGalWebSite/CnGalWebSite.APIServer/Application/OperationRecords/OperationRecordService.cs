@@ -11,6 +11,7 @@ using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -20,12 +21,50 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
     {
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IConfiguration _configuration;
-
+        private readonly IDictionary<string, string> _ips=new Dictionary<string, string>();
+        private DateTime _lastRefreshTime;
 
         public OperationRecordService(IRepository<OperationRecord, long> operationRecordRepository, IConfiguration configuration)
         {
             _operationRecordRepository = operationRecordRepository;
             _configuration = configuration;
+
+            if(string.IsNullOrWhiteSpace( _configuration["IpWhitelist"])==false)
+            {
+               foreach(var item in  _configuration["IpWhitelist"].Split(',').Select(s => new KeyValuePair<string, string>(s.Trim(), null)))
+                {
+                    _ips.Add(item);
+                }
+            }
+
+        }
+
+        private static string GetHostAddresses(string howtogeek)
+        {
+            IPAddress[] addresslist = Dns.GetHostAddresses(howtogeek);
+
+            return addresslist.FirstOrDefault(s=>s.AddressFamily== System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+        }
+
+        private void RefreshIPs()
+        {
+            if((DateTime.Now.ToCstTime()- _lastRefreshTime).TotalMinutes<10)
+            {
+                return;
+            }
+            _lastRefreshTime = DateTime.Now.ToCstTime();
+
+            foreach (var item in _ips)
+            {
+                if(IpRegex().IsMatch(item.Key))
+                {
+                    _ips[item.Key] = item.Key;
+                }
+                else
+                {
+                    _ips[item.Key] = GetHostAddresses(item.Key);
+                }
+            }
         }
 
         public async Task<QueryData<ListOperationRecordAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListOperationRecordAloneModel searchModel)
@@ -191,9 +230,10 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             {
                 ip = context.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             }
-
+            //刷新ip
+            RefreshIPs();
             //判断是否本地调用
-            if (IpRegex().IsMatch(ip)||ip.Contains( "120.78.81.133"))
+            if (IntranetIpRegex().IsMatch(ip) || _ips.Any(s => ip.Contains(s.Value)))
             {
                 ip = userIp ?? "";
             }
@@ -202,6 +242,8 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
         }
 
         [GeneratedRegex("^(127\\.0\\.0\\.1)|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$")]
+        private static partial Regex IntranetIpRegex();
+        [GeneratedRegex("^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$")]
         private static partial Regex IpRegex();
     }
 }
