@@ -26,6 +26,7 @@ services:
       - WeiXinAppSecret=${WeiXinAppSecret}
       - TucangCCAPIToken=${TucangCCAPIToken}
       - BilibiliCookie=${BilibiliCookie}
+      - IpWhitelist=${IpWhitelist}
     hostname: apiserver
     restart: always
     healthcheck:
