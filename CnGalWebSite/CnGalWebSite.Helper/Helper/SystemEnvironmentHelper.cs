@@ -129,25 +129,43 @@ namespace CnGalWebSite.Helper.Helper
         private MemoryMetrics GetUnixMetrics()
         {
             var output = "";
+            var metrics = new MemoryMetrics();
 
-            var info = new ProcessStartInfo("free -m");
-            info.FileName = "/bin/bash";
-            info.Arguments = "-c \"free -m\"";
-            info.RedirectStandardOutput = true;
-
+            //获取已使用内存
+            var info = new ProcessStartInfo("free -m")
+            {
+                FileName = "/bin/bash",
+                Arguments = "-c \"cat /sys/fs/cgroup/memory/memory.usage_in_bytes\"",
+                RedirectStandardOutput = true
+            };
             using (var process = Process.Start(info))
             {
                 output = process.StandardOutput.ReadToEnd();
-                Console.WriteLine(output);
             }
 
+            metrics.Used = long.Parse(output) / 1024.0 / 1024.0;
+
+            //获取容器内存限制
+            info.Arguments = "-c \"cat /sys/fs/cgroup/memory/memory.limit_in_bytes\"";
+            using (var process = Process.Start(info))
+            {
+                output = process.StandardOutput.ReadToEnd();
+            }
+            metrics.Total = long.Parse(output) / 1024.0 / 1024.0;
+
+            //获取当前系统内存上限
+            info.Arguments = "-c \"free -m\"";
+            using (var process = Process.Start(info))
+            {
+                output = process.StandardOutput.ReadToEnd();
+            }
             var lines = output.Split("\n");
             var memory = lines[1].Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            //内存限制超过系统内存 则使用系统内存
+            metrics.Total = metrics.Total > double.Parse(memory[1]) ? double.Parse(memory[1]) : metrics.Total;
 
-            var metrics = new MemoryMetrics();
-            metrics.Total = double.Parse(memory[1]);
-            metrics.Used = double.Parse(memory[2]);
-            metrics.Free = double.Parse(memory[3]);
+            //计算可用内存
+            metrics.Free = metrics.Total - metrics.Used;
 
             return metrics;
         }

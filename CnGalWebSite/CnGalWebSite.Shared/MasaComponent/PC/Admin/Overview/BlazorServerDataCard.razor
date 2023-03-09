@@ -78,7 +78,7 @@
     public void ProcData()
     {
         Items.Clear();
-        if(Model.CPUUtilization!=double.NaN)
+        if(Model.CPUUtilization>=0)
         {
             Items.Add(new HardwareInforCard.HardwareModel
             {

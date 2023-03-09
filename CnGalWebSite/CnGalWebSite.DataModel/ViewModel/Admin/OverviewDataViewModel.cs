@@ -50,7 +50,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public static string ToString(double mem)
         {
-            return mem > 10240 ? $"{mem / 1024:0.00} GB" : $"{mem} MB";
+            return mem > 10240 ? $"{mem / 1024:0.00} GB" : $"{mem:0.} MB";
         }
     }
 }
