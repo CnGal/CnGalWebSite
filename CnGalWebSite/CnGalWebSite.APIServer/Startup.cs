@@ -4,12 +4,15 @@ using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Typesense;
+using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.APIServer.MessageHandlers;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.HealthCheck.Checks;
+using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -198,7 +201,16 @@ namespace CnGalWebSite.APIServer
             });
 
             //添加状态检查
-            services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+            services.AddHealthChecks()
+                .AddDbContextCheck<AppDbContext>("DbContext")
+                .AddCheck<SystemMemoryHealthcheck>("Memory");
+                //.AddCheck("Steamspy", new PingHealthCheck(Configuration["SteamspyUrl"], 500))
+                //.AddCheck("Steam反代", new PingHealthCheck(Configuration["SteamAPIUrl"], 100))
+                //.AddCheck("互联网档案馆", new PingHealthCheck(Configuration["BackUpArchiveUrl"], 100))
+                //.AddCheck("tucang.cc", new PingHealthCheck(Configuration["TucangCCAPIUrl"], 500))
+                //.AddCheck("RSS订阅源", new PingHealthCheck(Configuration["RSSUrl"], 100))
+                //.AddCheck("Typesense", new PingHealthCheck(Configuration["TypesenseHost"], 100));
+
             #region 添加微信配置
 
             //使用本地缓存必须添加
@@ -282,7 +294,7 @@ namespace CnGalWebSite.APIServer
             option.AddRedirect("^$", "swagger");
             app.UseRewriter(option);
             //添加状态检查终结点
-            app.UseHealthChecks("/healthz");
+            app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
             //添加路由中间件
             app.UseRouting();

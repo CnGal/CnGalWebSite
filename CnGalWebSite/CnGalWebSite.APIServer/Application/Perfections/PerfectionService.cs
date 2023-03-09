@@ -1197,7 +1197,6 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             {
                 perfection.StandardDeviation = model.StandardDeviation;
                 perfection.Mode = model.Mode;
-                perfection.LastUpdateTime = nowTime;
                 perfection.ToBeImprovedCount = model.ToBeImprovedCount;
                 perfection.ExcellentCount = model.ExcellentCount;
                 perfection.AverageValue = model.AverageValue;

@@ -2,6 +2,9 @@
 using Blazored.SessionStorage;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.HealthCheck.Checks;
+using CnGalWebSite.HealthCheck.Models;
+using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared.DataRepositories;
@@ -10,13 +13,18 @@ using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 
 namespace CnGalWebSite.Server
 {
@@ -50,6 +58,11 @@ namespace CnGalWebSite.Server
                 {
                     options.MaximumReceiveMessageSize = int.MaxValue;
                 });
+            //覆盖默认api地址
+            if (string.IsNullOrWhiteSpace(Configuration["WebApiPath"]) == false)
+            {
+                ToolHelper.WebApiPath = Configuration["WebApiPath"];
+            }
             //本地化
             services.AddLocalization()
                 .AddBootstrapBlazor()
@@ -69,7 +82,9 @@ namespace CnGalWebSite.Server
                 }));
 
             //添加状态检查
-             _ = services.AddHealthChecks();
+            services.AddHealthChecks()
+                //.AddCheck("API Server", new PingHealthCheck(ToolHelper.WebApiPath, 100))
+                .AddCheck<SystemMemoryHealthcheck>("Memory");
 
             //添加工具箱
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
@@ -98,13 +113,6 @@ namespace CnGalWebSite.Server
 
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IEventService, EventService>();
-
-            //覆盖默认api地址
-            if (string.IsNullOrWhiteSpace(Configuration["WebApiPath"]) == false)
-            {
-                ToolHelper.WebApiPath = Configuration["WebApiPath"];
-            }
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,7 +128,7 @@ namespace CnGalWebSite.Server
             _ = app.UseStaticFiles();
 
             //添加状态检查终结点
-            _ = app.UseHealthChecks("/healthz");
+            _ = app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
             //转发Ip
             _ = app.UseForwardedHeaders(new ForwardedHeadersOptions

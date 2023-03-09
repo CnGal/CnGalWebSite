@@ -10,6 +10,7 @@ using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.ViewModel.Files;
 using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -28,7 +29,7 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public static string WebApiPath = "http://localhost:45160/";
+        //public static string WebApiPath = "http://localhost:5003/";
         //public static string WebApiPath = "http://172.17.0.1:2001/";
         public static string WebApiPath = "https://api.cngal.org/";
 
@@ -1216,36 +1217,7 @@ namespace CnGalWebSite.DataModel.Helper
             }
         }
 
-        /// <summary>
-        /// 获取服务器动态数据概览
-        /// </summary>
-        /// <returns></returns>
-
-        public static async Task<ServerRealTimeOverviewModel> GetServerRealTimeDataOverview()
-        {
-            var begin = DateTime.Now;
-
-            ServerRealTimeOverviewModel model = new ServerRealTimeOverviewModel();
-
-            using var proc = Process.GetCurrentProcess();
-            var mem = proc.WorkingSet64;
-            var privateMemorySize64 = proc.PrivateMemorySize64;
-            var virtualMemorySize64 = proc.VirtualMemorySize64;
-
-            model.CPUUtilization = await GetCpuUsageForProcess();
-            model.MemoryUsedSize = privateMemorySize64;
-            model.MemoryTotalSize = mem;
-            model.CPUCoreNumber = Environment.ProcessorCount;
-            model.TotalProcessorTime = proc.TotalProcessorTime;
-
-            var end = DateTime.Now;
-
-            model.TimeSpanGetData = end - begin;
-
-            return model;
-
-        }
-
+      
         public static async Task<TransformImageResult> TransformImagesAsync(string text, HttpClient _httpClient)
         {
 
@@ -1297,24 +1269,6 @@ namespace CnGalWebSite.DataModel.Helper
             model.Text = sb.ToString();
 
             return model;
-        }
-
-        private static async Task<double> GetCpuUsageForProcess()
-        {
-            var startTime = DateTime.UtcNow;
-            var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-            await Task.Delay(500);
-
-            var endTime = DateTime.UtcNow;
-            var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-            var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-            var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-
-            var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-
-            return cpuUsageTotal * 100;
         }
 
 

@@ -33,6 +33,7 @@ using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.Helper.Helper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -48,6 +49,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Util.Reflection.Expressions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -120,6 +122,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ISteamInforService _steamInforService;
         private readonly IEditRecordService _editRecordService;
         private readonly IVideoService _videoService;
+        private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
@@ -133,7 +136,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -198,7 +201,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryStaffRepository = entryStaffRepository;
             _editRecordService = editRecordService;
             _videoService = videoService;
-            _videoRepository= videoRepository;
+            _videoRepository = videoRepository;
+            _perfectionOverviewRepository= perfectionOverviewRepository;
         }
 
         /// <summary>
@@ -381,8 +385,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
-
-
 
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListCommentAloneModel>>> GetCommentListAsync(CommentsPagesInfor input)
@@ -721,7 +723,15 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                _logger.LogInformation("已删除 {n} 条记录", await _examineRepository.GetAll().Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"] &&( s.Operation == Operation.EstablishAudio|| s.Operation == Operation.EstablishWebsite)).ExecuteDeleteAsync());  
+                var date = new DateTime(2022, 11, 12);
+                var perfection = await _perfectionOverviewRepository.GetAll().FirstOrDefaultAsync(s => s.LastUpdateTime.Date == date.Date);
+                while (date.Date < DateTime.Now.AddDays(-1).Date)
+                {
+                    date = date.AddDays(1);
+                    perfection.Id = 0;
+                    perfection.LastUpdateTime = date;
+                    await _perfectionOverviewRepository.InsertAsync(perfection);           
+                }
 
 
                 return new Result { Successful = true };
@@ -741,26 +751,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<ServerRealTimeOverviewModel>> GetServerRealTimeDataOverview()
         {
-            return await ToolHelper.GetServerRealTimeDataOverview();
+            return SystemEnvironmentHelper.GetServerRealTimeDataOverview();
         }
 
-        private static async Task<double> GetCpuUsageForProcess()
-        {
-            var startTime = DateTime.UtcNow;
-            var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-            await Task.Delay(500);
-
-            var endTime = DateTime.UtcNow;
-            var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-            var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-            var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-
-            var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-
-            return cpuUsageTotal * 100;
-        }
         /// <summary>
         /// 获取服务器静态数据概览
         /// </summary>
@@ -768,15 +761,18 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<ServerStaticOverviewModel>> GetServerStaticDataOverview()
         {
-            var model = new ServerStaticOverviewModel();
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return SystemEnvironmentHelper.GetServerStaticDataOverview();
+        }
+
+        /// <summary>
+        /// 获取用户数据概览
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<UserDataOverviewModel>> GetUserDataOverview()
+        {
+            var model = new UserDataOverviewModel();
             var now = DateTime.Now.ToCstTime().AddDays(-7);
-
-
-            model.LastUpdateTime = System.IO.File.GetLastWriteTime(assembly.Location);
-            model.SystemName = Environment.OSVersion.ToString();
-            model.SDKVersion = RuntimeInformation.FrameworkDescription;
-            model.ServerName = Environment.MachineName;
 
             model.UserTotalNumber = await _userRepository.GetAll().CountAsync();
             model.UserVerifyEmailNumber = await _userRepository.GetAll().CountAsync(s => s.EmailConfirmed);
@@ -786,6 +782,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
 
         }
+
 
 
 

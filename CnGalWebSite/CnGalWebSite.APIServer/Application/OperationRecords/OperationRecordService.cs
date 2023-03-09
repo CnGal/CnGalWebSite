@@ -151,22 +151,16 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
             model.Ip = GetIp(context, model.Ip);
 
-            var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
-            if (item == null)
+            //可以重复添加相同类型的操作记录
+            await _operationRecordRepository.InsertAsync(new OperationRecord
             {
-                item = await _operationRecordRepository.InsertAsync(new OperationRecord
-                {
-                    Type = type,
-                    ObjectId = objectId,
-                    ApplicationUserId = user.Id
-                });
-            }
-
-            item.Ip = model.Ip;
-            item.Cookie = model.Cookie;
-            item.OperationTime = DateTime.Now.ToCstTime();
-
-            await _operationRecordRepository.UpdateAsync(item);
+                Type = type,
+                ObjectId = objectId,
+                ApplicationUserId = user.Id,
+                Ip = model.Ip,
+                Cookie = model.Cookie,
+                OperationTime = DateTime.Now.ToCstTime()
+            });
         }
 
         public async Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context)
