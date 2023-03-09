@@ -1,12 +1,13 @@
-﻿@inject IDataCacheService _dataCacheService
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
 
 @if (Model.UserTotalNumber != 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户" Icon="fa fa-fw fa-users" Class="mb-4">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户" Icon="@IconType.Users.ToIconString()">
         <div class="row">
             @foreach (var item in Items)
             {
-                <div class="col-12 col-md-4 col-xxl-3 d-flex" style=" align-items: center;">
+                <div class="col-12 col-md-4 col-xxl-3 d-flex mt-4" style=" align-items: center;">
 
                     <MProgressCircular Value="@item.Percentage" Size="70" Width="5" Rotate="270" Color="primary">@item.Percentage.ToString("0.0")%</MProgressCircular>
 
@@ -26,10 +27,13 @@
 
 
 @code {
-    [Parameter]
-    public ServerStaticOverviewModel Model { get; set; }
+
+    public UserDataOverviewModel Model { get; set; } = new UserDataOverviewModel();
 
     private List<InforModel> Items { get; set; } = new List<InforModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     class InforModel
     {
@@ -38,7 +42,25 @@
         public double Percentage { get; set; }
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                Model = await Http.GetFromJsonAsync<UserDataOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetUserDataOverview", ToolHelper.options);
+                SetData();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取用户数据概览失败");
+            }
+
+        }
+    }
+
+    private  void SetData()
     {
         Items.Clear();
         Items.Add(new InforModel

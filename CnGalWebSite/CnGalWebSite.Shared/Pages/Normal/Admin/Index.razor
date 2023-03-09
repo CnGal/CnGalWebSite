@@ -2,7 +2,6 @@
 @page "/admin"
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient Http
-@inject ToastService ToastService
 @inject IDataCacheService _dataCacheService
 
 
@@ -10,9 +9,16 @@
 
 <div class="row">
     <div class="col-12">
-        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="APIServerModel" Name="API Server" />
 
     </div>
+    @if (ToolHelper.IsWASM == false)
+    {
+        <div class="col-12">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="BlazorServerModel" Name="Blazor Server" />
+
+        </div>
+    }
     <div class="@(ToolHelper.IsWASM ?"col-12":"col-12 col-lg-6")">
         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.APIServerDataCard />
 
@@ -20,17 +26,18 @@
     @if (ToolHelper.IsWASM == false)
     {
         <div class="col-12 col-lg-6">
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.BlazorServerDataCard/>
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.BlazorServerDataCard />
         </div>
     }
     <div class="col-12">
-        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.UserDataCard Model="Model"/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.UserDataCard />
     </div>
 </div>
 
 @code {
 
-    public ServerStaticOverviewModel Model = new ServerStaticOverviewModel();
+    public ServerStaticOverviewModel APIServerModel = new ServerStaticOverviewModel();
+    public ServerStaticOverviewModel BlazorServerModel = new ServerStaticOverviewModel();
     bool IsReady = false;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -41,7 +48,11 @@
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview", ToolHelper.options);
+                APIServerModel = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview", ToolHelper.options);
+                if (ToolHelper.IsWASM == false)
+                {
+                    BlazorServerModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
+                }
                 IsReady = true;
                 StateHasChanged();
             }

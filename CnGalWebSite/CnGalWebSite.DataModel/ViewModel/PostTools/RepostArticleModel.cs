@@ -43,4 +43,11 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
         XiaoHeiHe,
         Bilibili
     }
+    public enum OutputLevel
+    {
+        Infor,
+        Warning,
+        Dager
+    }
+
 }

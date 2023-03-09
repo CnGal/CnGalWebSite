@@ -12,8 +12,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public TimeSpan TimeSpanGetData { get; set; }
 
-        public long MemoryTotalSize { get; set; }
-        public long MemoryUsedSize { get; set; }
+        public MemoryMetrics Memory { get; set; }=new MemoryMetrics();
 
         public long NetworkBandwidth { get; set; }
     }
@@ -27,10 +26,31 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public DateTime LastUpdateTime  { get; set; }
 
+
+    }
+
+    public class UserDataOverviewModel
+    {
         public long UserTotalNumber { get; set; }
 
         public long UserVerifyEmailNumber { get; set; }
         public long UserSecondaryVerificationNumber { get; set; }
         public long UserActiveNumber { get; set; }
+    }
+
+    public class MemoryMetrics
+    {
+        public double Total { get; set; }
+        public double Used { get; set; }
+        public double Free { get; set; }
+
+        public string TotalString { get { return ToString(Total); } }
+        public string UsedString { get { return ToString(Used); } }
+        public string FreeString { get { return ToString(Free); } }
+
+        public static string ToString(double mem)
+        {
+            return mem > 10240 ? $"{mem / 1024:0.00} GB" : $"{mem} MB";
+        }
     }
 }

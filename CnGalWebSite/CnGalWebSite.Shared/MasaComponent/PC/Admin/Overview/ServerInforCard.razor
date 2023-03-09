@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="服务器基本信息" Icon="fa fa-fw fa-info-circle" Class="mb-4">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"{Name} 基本信息")" Icon="fa fa-fw fa-info-circle" Class="mb-4">
     <div class="row">
         @foreach (var item in Items)
         {
@@ -23,6 +23,8 @@
 @code {
     [Parameter]
     public ServerStaticOverviewModel Model { get; set; }
+    [Parameter]
+    public string Name { get; set; }
 
     private List<InforModel> Items { get; set; } = new List<InforModel>();
 
@@ -33,7 +35,7 @@
         public string Icon { get; set; }
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         Items.Clear();
         Items.Add(new InforModel

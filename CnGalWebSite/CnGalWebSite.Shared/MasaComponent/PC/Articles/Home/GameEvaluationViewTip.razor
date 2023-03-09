@@ -2,7 +2,7 @@
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" 游戏评测")" Icon="@IconType.Article.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
-    <MWindow @bind-Value="Index" Reverse>
+    <MWindow @bind-Value="Index">
         @foreach (var item in Model.Evaluations)
         {
             <MWindowItem Value="@Model.Evaluations.IndexOf(item)">

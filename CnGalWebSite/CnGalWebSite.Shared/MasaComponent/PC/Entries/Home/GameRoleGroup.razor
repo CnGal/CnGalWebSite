@@ -5,7 +5,7 @@
 @if (Items.Count > 0)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Items[Index.ToInt32()].Name+" 角色预览")" Icon="@IconType.Role.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
-        <MWindow @bind-Value="Index" Reverse>
+        <MWindow @bind-Value="Index">
             @foreach (var item in Items)
             {
                 <MWindowItem Value="@Items.IndexOf(item)">
