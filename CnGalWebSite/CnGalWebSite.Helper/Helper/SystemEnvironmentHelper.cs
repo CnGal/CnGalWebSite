@@ -142,8 +142,11 @@ namespace CnGalWebSite.Helper.Helper
             {
                 output = process.StandardOutput.ReadToEnd();
             }
+            if (string.IsNullOrWhiteSpace(output) == false)
+            {
+                metrics.Used = long.Parse(output) / 1024.0 / 1024.0;
+            }
 
-            metrics.Used = long.Parse(output) / 1024.0 / 1024.0;
 
             //获取容器内存限制
             info.Arguments = "-c \"cat /sys/fs/cgroup/memory/memory.limit_in_bytes\"";
@@ -151,7 +154,11 @@ namespace CnGalWebSite.Helper.Helper
             {
                 output = process.StandardOutput.ReadToEnd();
             }
-            metrics.Total = long.Parse(output) / 1024.0 / 1024.0;
+            if (string.IsNullOrWhiteSpace(output) == false)
+            {
+                metrics.Total = long.Parse(output) / 1024.0 / 1024.0;
+            }
+             
 
             //获取当前系统内存上限
             info.Arguments = "-c \"free -m\"";
@@ -161,6 +168,16 @@ namespace CnGalWebSite.Helper.Helper
             }
             var lines = output.Split("\n");
             var memory = lines[1].Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            //判断是否为空
+            if(metrics.Used==0)
+            {
+                metrics.Used = double.Parse(memory[2]);
+            }
+            if (metrics.Total == 0)
+            {
+                metrics.Total = double.Parse(memory[1]);
+            }
             //内存限制超过系统内存 则使用系统内存
             metrics.Total = metrics.Total > double.Parse(memory[1]) ? double.Parse(memory[1]) : metrics.Total;
 

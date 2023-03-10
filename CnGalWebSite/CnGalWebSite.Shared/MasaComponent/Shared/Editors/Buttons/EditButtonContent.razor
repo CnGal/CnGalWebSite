@@ -1,0 +1,266 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+
+
+@if (isReady)
+{
+    @if (PerfectionInfor != null && ShowPerfection)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" />
+        <MDivider Class="w-100"></MDivider>
+    }
+    <MButton Text Block Color="warning" OnClick="OnClickHistory">
+        <MIcon Left>mdi-history </MIcon>
+        历史编辑记录
+    </MButton>
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <EditHiddenButton IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" Id="Id" Type="Type" />
+        </Authorized>
+    </AuthorizeView>
+    @if (Type == ExaminedNormalListModelType.Entry)
+    {
+        <AuthorizeView>
+            <Authorized>
+                @if (isInMonitor)
+                {
+                    <MButton Text Block Color="success" OnClick="@(()=>SetMonitor(false))">
+                        <MIcon Left>mdi-monitor</MIcon>
+                        已关注
+                    </MButton>
+                }
+                else
+                {
+                    <MButton Text Block Color="warning" OnClick="@(()=>SetMonitor(true))">
+                        <MIcon Left>mdi-monitor</MIcon>
+                        关注词条
+                    </MButton>
+                }
+            </Authorized>
+        </AuthorizeView>
+    }
+
+
+    <AuthorizeView>
+        <Authorized>
+            @foreach (var item in Items)
+            {
+                <PartNavButton Model="item" />
+            }
+        </Authorized>
+        <NotAuthorized>
+            <MButton Text Block Color="success" OnClick="OnClickLogin">
+                <MIcon Left>mdi-login </MIcon>
+                登入后编辑
+            </MButton>
+        </NotAuthorized>
+    </AuthorizeView>
+
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+}
+@if (ShowExamines)
+{
+    <EditRecordListViewTip Id="Id" Model="Examines" Type="Type" OnClickClose="@(()=> { ShowExamines = false;StateHasChanged(); })" />
+}
+
+@code {
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool ShowPerfection { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
+    public bool IsHidden { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsHiddenChanged { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsEditChanged { get; set; }
+
+    bool isReady { get; set; }
+    bool ShowExamines { get; set; }
+    bool isInMonitor { get; set; }
+
+    public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
+
+    public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
+
+    public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel>();
+
+    public PerfectionInforTipViewModel PerfectionInfor { get; set; } = new PerfectionInforTipViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetExamineInfor();
+        if (Examines.Count != 0)
+        {
+            ProcButtonList();
+            isReady = true;
+        }
+        StateHasChanged();
+    }
+
+    public void OnClickHistory()
+    {
+        ShowExamines = true;
+        StateHasChanged();
+
+    }
+
+    public void ProcButtonList()
+    {
+        Items.Clear();
+        foreach (var item in EditStates)
+        {
+            Items.Add(new EditButtonLineModel
+            {
+                State = item.Value == EditState.Normal ? (Examines.Any(s => s.Operation == item.Key) ? EditState.Normal : EditState.None) : item.Value,
+                EditCount = Examines.Count(s => s.Operation == item.Key),
+                Id = long.Parse(Examines.FirstOrDefault()?.RelatedId),
+                LastEditTime = Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
+                Operation = item.Key,
+
+            });
+        }
+
+    }
+
+    public async Task GetExamineInfor()
+    {
+        var editStates = new Dictionary<Operation, EditState>();
+        try
+        {
+            if (Type == ExaminedNormalListModelType.Entry)
+            {
+
+                var model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                if (ShowPerfection)
+                {
+                    PerfectionInfor = model.PerfectionInfor;
+                }
+
+                isInMonitor = model.IsInMonitor;
+
+                editStates.Add(Operation.EstablishMain, model.State.MainState);
+                editStates.Add(Operation.EstablishAddInfor, model.State.InforState);
+
+                editStates.Add(Operation.EstablishImages, model.State.ImagesState);
+                editStates.Add(Operation.EstablishAudio, model.State.AudioState);
+                editStates.Add(Operation.EstablishTags, model.State.TagState);
+                editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
+                editStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
+                editStates.Add(Operation.EstablishWebsite, model.State.WebsiteState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Article)
+            {
+                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                editStates.Add(Operation.EditArticleMain, model.State.MainState);
+                editStates.Add(Operation.EditArticleMainPage, model.State.MainPageState);
+                editStates.Add(Operation.EditArticleRelevanes, model.State.RelevancesState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Periphery)
+            {
+                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/Peripheries/GetPeripheryEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                editStates.Add(Operation.EditPeripheryMain, model.State.MainState);
+                editStates.Add(Operation.EditPeripheryImages, model.State.ImagesState);
+                editStates.Add(Operation.EditPeripheryRelatedEntries, model.State.RelatedEntriesState);
+                editStates.Add(Operation.EditPeripheryRelatedPeripheries, model.State.RelatedPeripheriesState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Tag)
+            {
+                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                editStates.Add(Operation.EditTagMain, model.State.MainState);
+                editStates.Add(Operation.EditTagChildEntries, model.State.ChildEntriesState);
+                editStates.Add(Operation.EditTagChildTags, model.State.ChildTagsState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Video)
+            {
+                var model = await Http.GetFromJsonAsync<EditVideoInforBindModel>(ToolHelper.WebApiPath + "api/videos/GetEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                editStates.Add(Operation.EditVideoMain, model.State.MainState);
+                editStates.Add(Operation.EditVideoImages, model.State.ImagesState);
+                editStates.Add(Operation.EditVideoRelevanes, model.State.RelevancesState);
+                editStates.Add(Operation.EditVideoMainPage, model.State.MainPageState);
+
+
+            }
+
+            EditStates = editStates;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取" + Type.GetDisplayName() + "编辑信息失败");
+            return;
+        }
+
+    }
+
+    private void OnClickLogin()
+    {
+        NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+
+    }
+
+    public async Task SetMonitor(bool open)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserMonitorsModel>(ToolHelper.WebApiPath + "api/examines/EditUserMonitors", new EditUserMonitorsModel
+            {
+                InMonitor = open,
+                Ids = new int[] { (int)Id }
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("修改监视状态失败", obj.Error);
+            }
+            else
+            {
+                isInMonitor = open;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "修改监视状态失败");
+        }
+    }
+
+
+}
