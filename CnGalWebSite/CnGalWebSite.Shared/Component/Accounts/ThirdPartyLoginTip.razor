@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject SwalService SwalService
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -97,9 +97,7 @@ else
                 var user = authState.User;
                 //检查三方登入是否通过 检查是否已经绑定到某个用户
 
-                var result = await Http.PostAsJsonAsync<ThirdPartyLoginModel>(ToolHelper.WebApiPath + "api/account/ThirdPartyLogin", new ThirdPartyLoginModel { Code = Code, Type = Type, ReturnUrl = ToolHelper.GetThirdPartyCallbackUrl(Type), IsSSR = ToolHelper.IsSSR });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                ThirdPartyLoginResult obj = JsonSerializer.Deserialize<ThirdPartyLoginResult>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<ThirdPartyLoginModel, ThirdPartyLoginResult>("api/account/ThirdPartyLogin", new ThirdPartyLoginModel { Code = Code, Type = Type, ReturnUrl = ToolHelper.GetThirdPartyCallbackUrl(Type), IsSSR = ToolHelper.IsSSR });
                 //判断结果
                 switch (obj.Code)
                 {
@@ -227,9 +225,7 @@ else
         try
         {
 
-            var result = await Http.PostAsJsonAsync<AddThirdPartyLoginInforModel>(ToolHelper.WebApiPath + "api/account/AddThirdPartyLoginInfor", new AddThirdPartyLoginInforModel { ThirdPartyKey = _dataCacheService.ThirdPartyLoginTempModel.ThirdLoginKey, LoginKey = _dataCacheService.LoginKey, Type = _dataCacheService.ThirdPartyLoginTempModel.Type });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<AddThirdPartyLoginInforModel, Result>("api/account/AddThirdPartyLoginInfor", new AddThirdPartyLoginInforModel { ThirdPartyKey = _dataCacheService.ThirdPartyLoginTempModel.ThirdLoginKey, LoginKey = _dataCacheService.LoginKey, Type = _dataCacheService.ThirdPartyLoginTempModel.Type });
             //判断结果
             if (obj.Successful == false)
             {

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -28,11 +28,11 @@
             {
                 if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<SteamInforTipViewModel>>("api/steam/GetAllDiscountSteamGame"));
 
                     try
                     {
-                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await Http.GetFromJsonAsync<List<int>>(ToolHelper.WebApiPath + "api/playedgame/GetUserInSteamGameIds", ToolHelper.options);
+                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await _httpService.GetAsync<List<int>>("api/playedgame/GetUserInSteamGameIds");
                     }
                     catch
                     {

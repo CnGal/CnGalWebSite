@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService ToastService
 
 
@@ -52,7 +52,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/perfections/GetRecentlyEditList", ToolHelper.options);
+            Model = await _httpService.GetAsync<List<ExaminedNormalListModel>>("api/perfections/GetRecentlyEditList");
 
         }
         catch (Exception ex)

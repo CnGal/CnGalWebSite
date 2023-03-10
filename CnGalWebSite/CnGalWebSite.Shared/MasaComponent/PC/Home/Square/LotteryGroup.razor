@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -32,7 +32,7 @@
         {
             if (_dataCacheService.LotteryCardsCatche.Count == 0)
             {
-                _dataCacheService.LotteryCardsCatche = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards", ToolHelper.options);
+                _dataCacheService.LotteryCardsCatche = await _httpService.GetAsync<List<LotteryCardViewModel>>("api/lotteries/GetLotteryCards");
                 _dataCacheService.LotteryCardsCatche = _dataCacheService.LotteryCardsCatche.OrderByDescending(s => s.EndTime).Take(12).ToList();
             }
 

@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -72,13 +72,11 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<UserMonitorsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserMonitorList", new UserMonitorsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var data = JsonSerializer.Deserialize<QueryData<ListUserMonitorAloneModel>>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<UserMonitorsPagesInfor, QueryData<ListUserMonitorAloneModel>>("api/examines/GetUserMonitorList", new UserMonitorsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
 
             if (isFirst)
             {
-                if (data.TotalCount == 0)
+                if (obj.TotalCount == 0)
                 {
                     noData = true;
                 }
@@ -88,7 +86,7 @@ else
 
             StateHasChanged();
 
-            return data;
+            return obj;
         }
         catch (Exception ex)
         {
@@ -113,9 +111,7 @@ else
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserMonitorsModel>(ToolHelper.WebApiPath + "api/examines/EditUserMonitors", new EditUserMonitorsModel { Ids = ids, InMonitor = inMonitor });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserMonitorsModel, Result>("api/examines/EditUserMonitors", new EditUserMonitorsModel { Ids = ids, InMonitor = inMonitor });
 
 
 

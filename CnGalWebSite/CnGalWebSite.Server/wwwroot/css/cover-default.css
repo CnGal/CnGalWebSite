@@ -300,3 +300,6 @@ input.te-image-file-input {
 .m-main {
     padding-bottom: 186px !important;
 }
+.img-fluid {
+    width: 100%;
+}

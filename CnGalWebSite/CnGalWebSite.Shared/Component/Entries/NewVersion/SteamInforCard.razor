@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Steam信息" Icon="@IconType.Steam.ToIconString()" >
@@ -101,7 +101,7 @@
             {
                 return;
             }
-            SteamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + Model.SteamId + "/" + Model.Id, ToolHelper.options);
+            SteamInfor = await _httpService.GetAsync<SteamInfor>("api/steam/Getsteaminfor/" + Model.SteamId + "/" + Model.Id);
             IsReady = true;
             StateHasChanged();
         }

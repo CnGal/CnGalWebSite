@@ -1,7 +1,7 @@
 ﻿@page "/admin/managehome"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -113,7 +113,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<ManageHomeViewModel>(ToolHelper.WebApiPath + "api/admin/managehome", ToolHelper.options);
+            Model = await _httpService.GetAsync<ManageHomeViewModel>("api/admin/managehome");
         }
         catch (Exception ex)
         {

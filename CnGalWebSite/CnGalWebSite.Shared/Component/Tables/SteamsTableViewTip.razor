@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
@@ -76,7 +76,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelSteam = await Http.GetFromJsonAsync<SteamInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetSteamInforList", ToolHelper.options);
+            ModelSteam = await _httpService.GetAsync<SteamInforListViewModel>("api/tables/GetSteamInforList");
             isReady = true;
         }
         catch (Exception ex)

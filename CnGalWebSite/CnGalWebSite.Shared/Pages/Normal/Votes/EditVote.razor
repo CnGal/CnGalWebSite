@@ -1,7 +1,7 @@
 ﻿@page "/votes/editvote/{Id}"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -213,16 +213,16 @@ else
                 //清空当前缓存
                 _dataCacheService.VoteIndexPageCatche.Clean(Id);
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditVoteModel>(ToolHelper.WebApiPath + "api/votes/EditVote/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditVoteModel>("api/votes/EditVote/" + Id);
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
-                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1", ToolHelper.options);
-                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
-                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+                EntryRoleItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/1");
+                EntryGroupItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/2");
+                EntryStaffItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/3");
                 //获取所有文章
-                ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
+                ArticleItems = await _httpService.GetAsync<List<string>>("api/articles/GetAllArticles");
 
-                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries", ToolHelper.options);
+                PeripheryItems = await _httpService.GetAsync<List<string>>("api/peripheries/GetAllPeripheries");
 
                 isReady = true;
                 StateHasChanged();
@@ -276,9 +276,7 @@ else
             }
 
 
-            var result = await Http.PostAsJsonAsync<EditVoteModel>(ToolHelper.WebApiPath + "api/votes/EditVote", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditVoteModel, Result>("api/votes/EditVote", Model);
             //判断结果
             if (obj.Successful == false)
             {

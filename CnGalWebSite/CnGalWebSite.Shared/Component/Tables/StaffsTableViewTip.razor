@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 
 @if (!isReady)
@@ -59,7 +59,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelStaff = await Http.GetFromJsonAsync<StaffInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetStaffInforList", ToolHelper.options);
+            ModelStaff = await _httpService.GetAsync<StaffInforListViewModel>("api/tables/GetStaffInforList");
             isReady = true;
         }
         catch (Exception ex)

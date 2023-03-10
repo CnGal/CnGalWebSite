@@ -1,6 +1,6 @@
 ﻿@page "/account/historyuserlogin/{*ReturnUrl}"
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject SwalService SwalService
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -76,9 +76,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<CheckVerificationCodeModel>(ToolHelper.WebApiPath + "api/account/CheckVerificationCode", new CheckVerificationCodeModel { Num = Model.NumToken });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<CheckVerificationCodeModel, Result>("api/account/CheckVerificationCode", new CheckVerificationCodeModel { Num = Model.NumToken });
             //判断结果
             if (obj.Successful == false)
             {
@@ -104,9 +102,7 @@
             //填充其他字段以通过验证
             Model.UserName = _dataCacheService.UserName;
 
-            var result = await Http.PostAsJsonAsync<HistorUserChangePasswordModel>(ToolHelper.WebApiPath + "api/account/HistorUserChangePassword", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HistorUserChangePasswordModel, Result>("api/account/HistorUserChangePassword", Model);
             //判断结果
             if (obj.Successful == false)
             {

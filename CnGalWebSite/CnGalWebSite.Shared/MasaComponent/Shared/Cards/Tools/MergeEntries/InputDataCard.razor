@@ -1,5 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject IPopupService PopupService
 @if (isReady)
@@ -77,7 +77,7 @@ else
         try
         {
             //获取所有词条
-            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList", ToolHelper.options);
+            EntryItems = await _httpService.GetAsync<List<string>>("api/home/GetSearchTipList");
             isReady = true;
         }
         catch (Exception ex)

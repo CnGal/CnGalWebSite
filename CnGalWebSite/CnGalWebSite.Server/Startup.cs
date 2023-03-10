@@ -72,6 +72,7 @@ namespace CnGalWebSite.Server
                 .AddAuthorizationCore()
                 .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
                 .AddScoped<IAuthService, AuthService>()
+                .AddScoped<IHttpService, HttpService>()
                 .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
                 .AddScoped<IDataCacheService, DataCatcheService>()
                 .AddScoped(x => new ImagesLargeViewService())

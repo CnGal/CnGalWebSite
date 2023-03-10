@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject SwalService SwalService
 @inject ToastService? ToastService
@@ -95,7 +95,7 @@
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata/", ToolHelper.options);
+                Model = await _httpService.GetAsync<EditUserDataViewModel>("api/space/edituserdata/");
                 isReady = true;
                 StateHasChanged();
             }
@@ -118,9 +118,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/edituserdata", Model);
             //判断结果
             if (obj.Successful == false)
             {

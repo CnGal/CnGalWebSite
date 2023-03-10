@@ -1,7 +1,7 @@
 ﻿@page "/admin/listbackuparchives"
 @attribute [Authorize(Roles = "Admin")]
 @inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -57,9 +57,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<BackUpArchivesPagesInfor>(ToolHelper.WebApiPath + "api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListBackUpArchiveAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<BackUpArchivesPagesInfor, QueryData<ListBackUpArchiveAloneModel>>("api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -73,9 +71,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<RunBackUpArchiveModel>(ToolHelper.WebApiPath + "api/BackUpArchives/RunBackUpArchive", new RunBackUpArchiveModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<RunBackUpArchiveModel, Result>("api/BackUpArchives/RunBackUpArchive", new RunBackUpArchiveModel { Ids = ids });
 
             if (obj.Successful == false)
             {

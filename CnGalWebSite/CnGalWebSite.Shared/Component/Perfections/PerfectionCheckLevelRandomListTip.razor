@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -45,7 +45,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<PerfectionCheckViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionCheckLevelRadomList/" + (int)Level, ToolHelper.options);
+            Model = await _httpService.GetAsync<List<PerfectionCheckViewModel>>("api/perfections/GetPerfectionCheckLevelRadomList/" + (int)Level);
         }
         catch (Exception ex)
         {

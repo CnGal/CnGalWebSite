@@ -1,6 +1,6 @@
 ﻿@attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -45,9 +45,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<UserCertificationsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetUserCertificationList", new UserCertificationsPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListUserCertificationAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<UserCertificationsPagesInfor, QueryData<ListUserCertificationAloneModel>>("api/admin/GetUserCertificationList", new UserCertificationsPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -60,13 +58,13 @@
     public void OnRowLookUserClick(string id)
     {
         NavigationManager.NavigateTo("/space/index/" + id);
-        
+
     }
 
     public void OnRowLookEntryClick(int id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        
+
     }
 
 }

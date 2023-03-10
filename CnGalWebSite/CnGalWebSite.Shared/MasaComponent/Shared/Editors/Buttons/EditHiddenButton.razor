@@ -1,5 +1,5 @@
 ﻿@inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 <MButton Text Block Color="warning" OnClick="OnHidden">
     <MIcon Left>@(IsHidden? "mdi-eye " : "mdi-eye-off")</MIcon>
@@ -35,9 +35,7 @@
             };
 
 
-            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + url, new HiddenArticleModel { Ids = new long[] { Id }, IsHidden = !IsHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenArticleModel, Result>( url, new HiddenArticleModel { Ids = new long[] { Id }, IsHidden = !IsHidden });
             //判断结果
             if (obj.Successful == false)
             {

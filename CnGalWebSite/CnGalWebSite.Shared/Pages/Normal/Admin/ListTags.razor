@@ -1,7 +1,7 @@
 ﻿@page "/admin/listtags"
 @attribute [Authorize(Roles = "Admin")]
 @inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -73,7 +73,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListTagsInforViewModel>(ToolHelper.WebApiPath + "api/tags/listtags", ToolHelper.options);
+            InforModel = await _httpService.GetAsync<ListTagsInforViewModel>("api/tags/listtags");
         }
         catch(Exception ex)
         {
@@ -86,9 +86,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<TagsPagesInfor>(ToolHelper.WebApiPath + "api/tags/GettagList", new TagsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListTagAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<TagsPagesInfor, QueryData<ListTagAloneModel>>("api/tags/GettagList", new TagsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -107,9 +105,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenTagModel>(ToolHelper.WebApiPath + "api/Tags/HiddenTag", new HiddenTagModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenTagModel, Result>("api/Tags/HiddenTag", new HiddenTagModel { Ids = ids, IsHidden = isHidden });
 
 
 

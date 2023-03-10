@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -32,7 +32,7 @@
         {
             if (_dataCacheService.RandomArticlesCatche.Count == 0)
             {
-                _dataCacheService.RandomArticlesCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/articles/GetRandomArticles", ToolHelper.options);
+                _dataCacheService.RandomArticlesCatche = await _httpService.GetAsync<List<ArticleInforTipViewModel>>("api/articles/GetRandomArticles");
             }
             _dataCacheService.RandomArticlesCatche.Random();
         }

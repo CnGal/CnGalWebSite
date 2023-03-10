@@ -1,5 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @if (Model.Any())
 {
@@ -67,7 +67,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<FavoriteFolderAloneModel>>($"{ToolHelper.WebApiPath}api/favorites/GetRelateFavoriteFolders?type={(int)Type}&id={Id}", ToolHelper.options);
+            Model = await _httpService.GetAsync<List<FavoriteFolderAloneModel>>("{ToolHelper.WebApiPath}api/favorites/GetRelateFavoriteFolders?type={(int)Type}&id={Id}");
 
             StateHasChanged();
         }

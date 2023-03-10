@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -50,7 +50,7 @@
         {
             if (_dataCacheService.UserPendingDataCatche.Items.Any() == false)
             {
-                _dataCacheService.UserPendingDataCatche.Items =( await Http.GetFromJsonAsync<List<UserPendingDataModel>>(ToolHelper.WebApiPath + "api/space/GetUserPendingData", ToolHelper.options)).OrderByDescending(s => s.DisplayMode).ToList();
+                _dataCacheService.UserPendingDataCatche.Items =( await _httpService.GetAsync<List<UserPendingDataModel>>("api/space/GetUserPendingData")).OrderByDescending(s => s.DisplayMode).ToList();
             }
 
             OnPageClick(1);

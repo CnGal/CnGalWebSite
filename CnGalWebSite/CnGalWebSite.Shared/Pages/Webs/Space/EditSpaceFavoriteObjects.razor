@@ -1,5 +1,5 @@
 ﻿
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -65,7 +65,7 @@ else
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + FolderId, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditFavoriteFolderViewModel>("api/favorites/EditFavoriteFolder/" + FolderId);
                 isReady = true;
                 StateHasChanged();
             }
@@ -90,9 +90,7 @@ else
             }
 
 
-            var result = await Http.PostAsJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditFavoriteFolderViewModel, Result>("api/favorites/EditFavoriteFolder", Model);
             //判断结果
             if (obj.Successful == false)
             {

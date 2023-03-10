@@ -1,6 +1,6 @@
 ﻿@page "/weeklynews"
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 @if (isReady)
@@ -29,7 +29,7 @@
         {
             if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
             {
-                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview", ToolHelper.options);
+                _dataCacheService.WeeklyNewsOverviewCatche = await _httpService.GetAsync<List<ArticleInforTipViewModel>>("api/news/GetWeeklyNewsOverview");
             }
 
             isReady = true;

@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService ToastService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
@@ -112,10 +112,10 @@
         try
         {
             //获取所有词条
-            //GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game, ToolHelper.options);
-            StaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff, ToolHelper.options);
-            GroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup, ToolHelper.options);
-            //RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role, ToolHelper.options);
+            //GameItems = await _httpService.GetAsync<List<string>>("api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game);
+            StaffItems = await _httpService.GetAsync<List<string>>("api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff);
+            GroupItems = await _httpService.GetAsync<List<string>>("api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup);
+            //RoleItems = await _httpService.GetAsync<List<string>>("api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role);
 
             isReady = true;
             StateHasChanged();
@@ -178,11 +178,7 @@
         {
             Model.UserCertificationModel.Verification = model;
 
-            var result = await Http.PostAsJsonAsync<EditUserCertificationModel>(ToolHelper.WebApiPath + "api/space/EditUserCertification", Model.UserCertificationModel);
-
-
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserCertificationModel, Result>("api/space/EditUserCertification", Model.UserCertificationModel);
             //判断结果
             if (obj.Successful == false)
             {

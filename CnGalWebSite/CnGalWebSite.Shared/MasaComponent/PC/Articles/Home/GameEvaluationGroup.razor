@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -24,7 +24,7 @@
         {
             if (_dataCacheService.GameEvaluationsCatche.Count == 0)
             {
-                _dataCacheService.GameEvaluationsCatche = await Http.GetFromJsonAsync<List<GameEvaluationsModel>>(ToolHelper.WebApiPath + "api/articles/GetGameEvaluations", ToolHelper.options);
+                _dataCacheService.GameEvaluationsCatche = await _httpService.GetAsync<List<GameEvaluationsModel>>("api/articles/GetGameEvaluations");
             }
 
             _dataCacheService.GameEvaluationsCatche.Random();

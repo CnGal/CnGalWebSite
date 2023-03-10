@@ -1,7 +1,7 @@
 ﻿@page "/admin/edituser/{id}"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -177,7 +177,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditUserViewModel>(ToolHelper.WebApiPath + "api/admin/edituser/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditUserViewModel>("api/admin/edituser/" + Id);
 
             //设置用户角色
             foreach (var item in Model.Roles)
@@ -245,9 +245,7 @@
                     IsSelected = isSelected
                 });
             }
-            var result = await Http.PostAsJsonAsync<EditUserViewModel>(ToolHelper.WebApiPath + "api/admin/edituser", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserViewModel, Result>("api/admin/edituser", Model);
             //判断结果
             if (obj.Successful == false)
             {

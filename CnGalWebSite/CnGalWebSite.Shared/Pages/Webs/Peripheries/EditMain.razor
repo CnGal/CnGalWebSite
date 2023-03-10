@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -65,8 +65,8 @@
             try
             {
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
-                Model = await Http.GetFromJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/editmain/" + Id, ToolHelper.options);
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+                Model = await _httpService.GetAsync<EditPeripheryMainViewModel>("api/peripheries/editmain/" + Id);
                 isReady = true;
                 StateHasChanged();
             }
@@ -80,9 +80,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/EditMain", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditPeripheryMainViewModel, Result>("api/peripheries/EditMain", Model);
             //判断结果
             if (obj.Successful == false)
             {

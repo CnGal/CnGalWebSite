@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -63,9 +63,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<RankUsersPagesInfor>(ToolHelper.WebApiPath + "api/ranks/GetRankUserList", new RankUsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options, RankId = Id });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListRankUserAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<RankUsersPagesInfor, QueryData<ListRankUserAloneModel>>("api/ranks/GetRankUserList", new RankUsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options, RankId = Id });
         }
         catch (Exception ex)
         {
@@ -78,7 +76,7 @@
     {
 
         NavigationManager.NavigateTo(Provider, "/space/index/" + userId, name, "fa fa-star-o");
-        
+
     }
 
 
@@ -87,9 +85,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<RemoveUserRankModel>(ToolHelper.WebApiPath + "api/ranks/RemoveUserRank", new RemoveUserRankModel { UserIds = ids, RankIds = new long[] { Id } });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<RemoveUserRankModel, Result>("api/ranks/RemoveUserRank", new RemoveUserRankModel { UserIds = ids, RankIds = new long[] { Id } });
 
             if (obj.Successful == false)
             {
@@ -130,9 +126,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenUserRankModel>(ToolHelper.WebApiPath + "api/ranks/HiddenUserRank", new HiddenUserRankModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenUserRankModel, Result>("api/ranks/HiddenUserRank", new HiddenUserRankModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -213,9 +207,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<AddUserRankModel>(ToolHelper.WebApiPath + "api/ranks/AddUserRank", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<AddUserRankModel, Result>("api/ranks/AddUserRank", model);
             if (obj.Successful == false)
             {
                 await ToastService.Error("添加头衔用户失败", obj.Error);

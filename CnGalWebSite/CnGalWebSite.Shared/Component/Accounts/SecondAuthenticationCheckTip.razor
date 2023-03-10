@@ -6,7 +6,7 @@
 
 @inject IAuthService AuthService
 @inject SwalService SwalService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 @inject IDataCacheService _dataCacheService
 
@@ -48,14 +48,12 @@
                     }
                 }
 
-                var result = await Http.PostAsJsonAsync<CheckSecondAuthenticationModel>(ToolHelper.WebApiPath + "api/account/CheckSecondAuthentication", new CheckSecondAuthenticationModel { UserId = userId, LoginKey = _dataCacheService.LoginKey });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<CheckSecondAuthenticationModel, Result>("api/account/CheckSecondAuthentication", new CheckSecondAuthenticationModel { UserId = userId, LoginKey = _dataCacheService.LoginKey });
                 //判断结果
                 if (obj.Successful == false)
                 {
                     //验证失败 获取该用户的验证类型
-                    var model = await Http.GetFromJsonAsync<UserAuthenticationTypeModel>(ToolHelper.WebApiPath + "api/account/GetUserAuthenticationType", ToolHelper.options);
+                    var model = await _httpService.GetAsync<UserAuthenticationTypeModel>("api/account/GetUserAuthenticationType");
                     _dataCacheService.UserAuthenticationTypeModel = model;
                     //判断是否开启手机验证
                     if (IsOnPhone == false)

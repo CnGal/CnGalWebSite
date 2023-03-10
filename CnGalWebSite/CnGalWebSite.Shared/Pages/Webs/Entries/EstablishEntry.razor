@@ -1,5 +1,5 @@
 ﻿
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -107,18 +107,18 @@
             {
                 Model.Main.Name = Model.Main.DisplayName = Name;
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
-                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1", ToolHelper.options);
-                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
-                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+                EntryRoleItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/1");
+                EntryGroupItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/2");
+                EntryStaffItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/3");
                 //获取所有文章
-                ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
+                ArticleItems = await _httpService.GetAsync<List<string>>("api/articles/GetAllArticles");
                 //获取所有标签
-                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags", ToolHelper.options);
+                TagItems = await _httpService.GetAsync<List<string>>("api/tags/GetAllTags");
                 //获取所有视频
-                VideoItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/videos/GetNames", ToolHelper.options);
+                VideoItems = await _httpService.GetAsync<List<string>>("api/videos/GetNames");
                 //获取所有抽奖
-                LotteryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/lotteries/GetNames", ToolHelper.options);
+                LotteryItems = await _httpService.GetAsync<List<string>>("api/lotteries/GetNames");
                 isReady = true;
                 StateHasChanged();
             }
@@ -133,9 +133,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EstablishEntryViewModel>(ToolHelper.WebApiPath + "api/entries/EstablishEntry", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EstablishEntryViewModel, Result>("api/entries/EstablishEntry", Model);
             //判断结果
             if (obj.Successful == false)
             {

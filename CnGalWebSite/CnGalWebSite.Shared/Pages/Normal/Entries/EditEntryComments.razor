@@ -2,7 +2,7 @@
 @attribute [Authorize(Roles = "Admin")]
 
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 
 @if(string.IsNullOrWhiteSpace(Model.Name)==false)
@@ -57,7 +57,7 @@
         try
         {
             //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditMainPageViewModel>("api/entries/editmainpage/" + Id);
             isReady = true;
             StateHasChanged();
         }

@@ -1,5 +1,5 @@
 ﻿@inject IJSRuntime JS
-@inject HttpClient Http
+@inject IHttpService _httpService
 @implements IDisposable
 
 @code {
@@ -22,7 +22,7 @@
         {
             isChecked = false;
 
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode", ToolHelper.options);
+            var geetestCodeModel = await _httpService.GetAsync<GeetestCodeModel>("api/account/GetGeetestCode");
 
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);

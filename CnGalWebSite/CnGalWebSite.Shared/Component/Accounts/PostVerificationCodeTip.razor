@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject ToastService ToastService
 @inject IJSRuntime JS
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 
@@ -85,7 +85,7 @@ else
     {
         try
         {
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode", ToolHelper.options);
+            var geetestCodeModel = await _httpService.GetAsync<GeetestCodeModel>("api/account/GetGeetestCode");
 
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
@@ -117,9 +117,7 @@ else
         //尝试获取验证码
         try
         {
-            var result = await Http.PostAsJsonAsync<PostVerificationCodeModel>(ToolHelper.WebApiPath + "api/account/PostVerificationCode", new PostVerificationCodeModel { Mail = Email, Challenge = challenge, Validate = validate, Seccode = seccode, UserName = UserName, LoginKey = LoginKey, SMSType = SmsType, SendType = SendType });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<PostVerificationCodeModel, Result>("api/account/PostVerificationCode", new PostVerificationCodeModel { Mail = Email, Challenge = challenge, Validate = validate, Seccode = seccode, UserName = UserName, LoginKey = LoginKey, SMSType = SmsType, SendType = SendType });
             //判断结果
             if (obj.Successful == true)
             {

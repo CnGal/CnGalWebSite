@@ -1,7 +1,7 @@
 ﻿@page "/admin/listperipheries"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -77,9 +77,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<PeripheriesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetPeripheryList", new PeripheriesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListPeripheryAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<PeripheriesPagesInfor, QueryData<ListPeripheryAloneModel>>("api/admin/GetPeripheryList", new PeripheriesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -92,9 +90,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditPeripheryPriorityViewModel>(ToolHelper.WebApiPath + "api/peripheries/EditPeripheryPriority", new EditPeripheryPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditPeripheryPriorityViewModel, Result>("api/peripheries/EditPeripheryPriority", new EditPeripheryPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             if (obj.Successful == false)
             {
                 await ToastService.Error("修改周边权重失败", obj.Error);
@@ -150,9 +146,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenPeripheryModel>(ToolHelper.WebApiPath + "api/peripheries/HiddenPeriphery", new HiddenPeripheryModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenPeripheryModel, Result>("api/peripheries/HiddenPeriphery", new HiddenPeripheryModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -205,7 +199,7 @@
     public void OnRowLookClick(long id, string name)
     {
         NavigationManager.NavigateTo(Provider, "/peripheries/index/" + id, name, "fa fa-newspaper-o");
-        
+
     }
 
 
@@ -215,9 +209,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditPeripheryCanCommentModel>(ToolHelper.WebApiPath + "api/comments/EditPeripheryCanComment", new EditPeripheryCanCommentModel { Ids = ids, CanComment = canComment });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditPeripheryCanCommentModel, Result>("api/comments/EditPeripheryCanComment", new EditPeripheryCanCommentModel { Ids = ids, CanComment = canComment });
 
 
 

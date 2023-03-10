@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -67,12 +67,12 @@
             try
             {
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
-                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1", ToolHelper.options);
-                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
-                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+                EntryRoleItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/1");
+                EntryGroupItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/2");
+                EntryStaffItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/3");
 
-                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries", ToolHelper.options);
+                PeripheryItems = await _httpService.GetAsync<List<string>>("api/peripheries/GetAllPeripheries");
 
                 isReady = true;
                 StateHasChanged();
@@ -88,9 +88,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<CreatePeripheryViewModel>(ToolHelper.WebApiPath + "api/peripheries/CreatePeriphery", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<CreatePeripheryViewModel, Result>("api/peripheries/CreatePeriphery", Model);
             //判断结果
             if (obj.Successful == false)
             {

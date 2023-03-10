@@ -1,5 +1,5 @@
 ﻿@inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -114,9 +114,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/HiddenGameRecord", new HiddenGameRecordModel { IsHidden = !Model.IsHidden, Ids = new int?[] { Model.GameId } });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenGameRecordModel, Result>("api/playedgame/HiddenGameRecord", new HiddenGameRecordModel { IsHidden = !Model.IsHidden, Ids = new int?[] { Model.GameId } });
             //判断结果
             if (obj.Successful == false)
             {

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService ToastService
 @inject NavigationManager NavigationManager
 
@@ -43,7 +43,7 @@ else
     {
         try
         {
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/space/ReadedAllMessages/");
             //判断结果
             if (obj.Successful == false)
             {

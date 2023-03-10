@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @if (is404 == true)
 {
@@ -32,9 +32,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/articles/GetArticleHomeList", Input);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<PagedResultDto<ArticleInforTipViewModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<PagedSortedAndFilterInput, PagedResultDto<ArticleInforTipViewModel>>("api/articles/GetArticleHomeList", Input);
         }
         catch(Exception ex)
         {

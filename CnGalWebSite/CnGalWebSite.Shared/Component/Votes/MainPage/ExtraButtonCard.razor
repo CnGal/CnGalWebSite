@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
@@ -33,9 +33,7 @@
 
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenVoteModel>(ToolHelper.WebApiPath + "api/votes/HiddenVote", new HiddenVoteModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenVoteModel, Result>("api/votes/HiddenVote", new HiddenVoteModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
             //判断结果
             if (obj.Successful == false)
             {

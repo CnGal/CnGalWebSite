@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -64,9 +64,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<WeeklyNewsPagesInfor>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewList", new WeeklyNewsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListWeeklyNewAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<WeeklyNewsPagesInfor, QueryData<ListWeeklyNewAloneModel>>("api/news/GetWeeklyNewList", new WeeklyNewsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -81,7 +79,7 @@
     private void EditArticle(long id)
     {
         NavigationManager.NavigateTo( "/articles/index/" + id);
-        
+
     }
 
     private async Task EditWeeklyNews(long id)

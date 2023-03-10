@@ -2,7 +2,7 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -51,9 +51,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<FavoriteFoldersPagesInfor>(ToolHelper.WebApiPath + "api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListFavoriteFolderAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<FavoriteFoldersPagesInfor, QueryData<ListFavoriteFolderAloneModel>>("api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel });
         }
         catch (Exception ex)
         {

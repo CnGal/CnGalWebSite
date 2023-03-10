@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="授权" Icon="fa fa-fw  fa-key" Class="h-100">
@@ -67,7 +67,7 @@
         //请求数据
         try
         {
-            oneTimeCodeModel = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode", ToolHelper.options);
+            oneTimeCodeModel = await _httpService.GetAsync<OneTimeCodeModel>("api/account/GetOneTimeCode");
             if (string.IsNullOrWhiteSpace(oneTimeCodeModel.Code))
             {
                 ErrorHandler.ProcessError(new Exception(), "获取一次性授权码失败");

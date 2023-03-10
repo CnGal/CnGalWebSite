@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
     <TitleTip Title="消息中心"></TitleTip>
@@ -132,7 +132,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<List<CnGalWebSite.DataModel.Model.Message>>(ToolHelper.WebApiPath + "api/space/GetUserMessages", ToolHelper.options);
+                Model = await _httpService.GetAsync<List<CnGalWebSite.DataModel.Model.Message>>("api/space/GetUserMessages");
 
                 Model = Model.OrderByDescending(s => s.PostTime).ToList();
 
@@ -167,7 +167,7 @@
         {
             try
             {
-                var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/", ToolHelper.options);
+                var obj = await _httpService.GetAsync<Result>("api/space/ReadedAllMessages/");
                 //判断结果
                 if (obj.Successful == false)
                 {

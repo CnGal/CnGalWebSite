@@ -1,7 +1,7 @@
 ﻿@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject SwalService SwalService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 
 
@@ -59,7 +59,7 @@
 
                 try
                 {
-                    var Model = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode", ToolHelper.options);
+                    var Model = await _httpService.GetAsync<OneTimeCodeModel>("api/account/GetOneTimeCode");
                     code = Model.Code;
 
                 }

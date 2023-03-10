@@ -1,6 +1,6 @@
 ﻿@attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -46,9 +46,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<OperationRecordsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetOperationRecordList", new OperationRecordsPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListOperationRecordAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<OperationRecordsPagesInfor, QueryData<ListOperationRecordAloneModel>>("api/admin/GetOperationRecordList", new OperationRecordsPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -75,7 +73,7 @@
             NavigationManager.NavigateTo("/entries/index/" + id);
         }
 
-        
+
     }
 
 

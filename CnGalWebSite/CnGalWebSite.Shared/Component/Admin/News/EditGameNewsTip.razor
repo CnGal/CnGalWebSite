@@ -1,6 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject DialogService DialogService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IServiceProvider Provider
 
@@ -74,7 +74,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditGameNewsModel>("api/news/EditGameNews/" + Id);
 
             isReady = true;
             StateHasChanged();
@@ -106,9 +106,7 @@
             }
 
 
-            var result = await Http.PostAsJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditGameNewsModel, Result>("api/news/EditGameNews", Model);
             //判断结果
             if (obj.Successful == false)
             {
@@ -135,7 +133,7 @@
         await OnSave();
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishGameNews/" + Id, ToolHelper.options);
+            var result = await _httpService.GetAsync<Result>("api/news/PublishGameNews/" + Id);
             if (result.Successful)
             {
                 await OnRefreshTable.InvokeAsync();
@@ -163,7 +161,7 @@
 
         try
         {
-            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetGameNewsPreview/" + Id, ToolHelper.options);
+            ArticleViewModel model = await _httpService.GetAsync<ArticleViewModel>("api/news/GetGameNewsPreview/" + Id);
 
             if (previewArticleTip != null)
             {

@@ -1,7 +1,7 @@
 ﻿@page "/disambigs/editdisambig/{id}"
 @attribute [Authorize]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -189,7 +189,7 @@
         try
         {
             //获取文章信息
-            Model = await Http.GetFromJsonAsync<EditDisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/editdisambig/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditDisambigViewModel>("api/disambigs/editdisambig/" + Id);
             isReady = true;
         }
         catch(Exception ex)
@@ -209,9 +209,7 @@
                 return;
             }
 
-            var result = await Http.PostAsJsonAsync<CnGalWebSite.DataModel.ViewModel.Disambig.EditDisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/editdisambig", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<CnGalWebSite.DataModel.ViewModel.Disambig.EditDisambigViewModel, Result>("api/disambigs/editdisambig", Model);
             //判断结果
             if (obj.Successful == false)
             {

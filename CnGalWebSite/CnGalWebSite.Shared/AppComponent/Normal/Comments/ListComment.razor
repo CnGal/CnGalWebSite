@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -74,7 +74,7 @@ else
         {
             isReady = false;
             StateHasChanged();
-            var model = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + (UserId??ObjectId.ToString()) + "/1/100", ToolHelper.options);
+            var model = await _httpService.GetAsync<PagedResultDto<CommentViewModel>>("api/comments/GetComments/" + (int)Type + "/" + (UserId??ObjectId.ToString()) + "/1/100");
             Model = model.Data;
             isReady = true;
             StateHasChanged();

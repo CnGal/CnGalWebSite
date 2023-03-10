@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 
 <div>
@@ -37,7 +37,7 @@
         }
         try
         {
-            Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetRelatedVotes/" + (int)Type + "/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<List<VoteCardViewModel>>("api/votes/GetRelatedVotes/" + (int)Type + "/" + Id);
 
         }
         catch (Exception ex)

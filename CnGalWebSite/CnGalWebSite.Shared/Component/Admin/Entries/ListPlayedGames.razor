@@ -1,6 +1,6 @@
 ﻿@attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -75,9 +75,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<PlayedGamesPagesInfor>(ToolHelper.WebApiPath + "api/playedgame/GetEntryList", new PlayedGamesPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListPlayedGameAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<PlayedGamesPagesInfor, QueryData<ListPlayedGameAloneModel>>("api/playedgame/GetEntryList", new PlayedGamesPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -104,9 +102,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/playedgame/HiddenGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenArticleModel, Result>("api/playedgame/HiddenGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -162,9 +158,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/playedgame/ShowPubliclyGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = !isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenArticleModel, Result>("api/playedgame/ShowPubliclyGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = !isHidden });
 
 
 
@@ -217,7 +211,7 @@
     public void OnRowLookClick(int id)
     {
         NavigationManager.NavigateTo( "/entries/index/" + id);
-        
+
     }
 
 

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
@@ -127,7 +127,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/EditGameRecord/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditGameRecordModel>("api/playedgame/EditGameRecord/" + Id);
             isReady = true;
         }
         catch (Exception ex)
@@ -187,9 +187,7 @@
             }
 
 
-            var result = await Http.PostAsJsonAsync<EditGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/EditGameRecord", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditGameRecordModel, Result>("api/playedgame/EditGameRecord", Model);
             //判断结果
             if (obj.Successful == false)
             {

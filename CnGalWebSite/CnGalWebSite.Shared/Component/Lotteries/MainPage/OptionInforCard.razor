@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
@@ -153,7 +153,7 @@
         {
             try
             {
-                StateModel = await Http.GetFromJsonAsync<UserLotteryStateModel>(ToolHelper.WebApiPath + "api/lotteries/GetUserLotteryState/" + ViewModel.Id, ToolHelper.options);
+                StateModel = await _httpService.GetAsync<UserLotteryStateModel>("api/lotteries/GetUserLotteryState/" + ViewModel.Id);
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -168,14 +168,11 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ParticipateInLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+            var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
             {
                 Id = ViewModel.Id,
                 Identification = await deviceIdentification.GetDeviceIdentificationModel()
             });
-
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             if (obj.Successful)
             {
                 await ToastService.Success("参与抽奖成功", "参与抽奖成功");
@@ -217,7 +214,7 @@
         var model = new EditUserAddressModel();
         try
         {
-            model = await Http.GetFromJsonAsync<EditUserAddressModel>(ToolHelper.WebApiPath + "api/space/EditUserAddress", ToolHelper.options);
+            model = await _httpService.GetAsync<EditUserAddressModel>("api/space/EditUserAddress");
         }
         catch (Exception ex)
         {
@@ -241,9 +238,7 @@
 
                 try
                 {
-                    var result = await Http.PostAsJsonAsync<EditUserAddressModel>(ToolHelper.WebApiPath + "api/space/EditUserAddress", item);
-                    string jsonContent = result.Content.ReadAsStringAsync().Result;
-                    Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                    var obj = await _httpService.PostAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", item);
                 //判断结果
                     if (obj.Successful == false)
                     {

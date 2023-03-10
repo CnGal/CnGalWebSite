@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@TitleIcon" Class="mb-4">
@@ -43,7 +43,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<PerfectionInforTipViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelRadomList/" + (int)Level, ToolHelper.options);
+            Model = await _httpService.GetAsync<List<PerfectionInforTipViewModel>>("api/perfections/GetPerfectionLevelRadomList/" + (int)Level);
         }
         catch (Exception ex)
         {

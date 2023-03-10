@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 @if (Model.UserTotalNumber != 0)
@@ -48,7 +48,7 @@
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<UserDataOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetUserDataOverview", ToolHelper.options);
+                Model = await _httpService.GetAsync<UserDataOverviewModel>("api/admin/GetUserDataOverview");
                 SetData();
                 StateHasChanged();
             }

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IFileUploadService _fileUploadService
 
 <div class="@Class">
@@ -18,7 +18,7 @@
 
     public async Task OnClick()
     {
-        var model =await ToolHelper.TransformImagesAsync(Text, Http);
+        var model =await ToolHelper.TransformImagesAsync(Text, _httpService.GetClient());
         Text = model.Text;
         foreach(var item in model.UploadResults)
         {

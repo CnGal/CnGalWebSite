@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -64,9 +64,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<FavoriteObjectsPagesInfor>(ToolHelper.WebApiPath + "api/favorites/GetFavoriteObjectList", new FavoriteObjectsPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, FavoriteFolderId = Id });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListFavoriteObjectAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<FavoriteObjectsPagesInfor, QueryData<ListFavoriteObjectAloneModel>>("api/favorites/GetFavoriteObjectList", new FavoriteObjectsPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, FavoriteFolderId = Id });
         }
         catch (Exception ex)
         {
@@ -106,9 +104,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<DeleteFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/UserDeleteFavoriteObject", new DeleteFavoriteObjectsModel { FavorieFolderId = Id, Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<DeleteFavoriteObjectsModel, Result>("api/favorites/UserDeleteFavoriteObject", new DeleteFavoriteObjectsModel { FavorieFolderId = Id, Ids = ids });
 
             if (obj.Successful == false)
             {
@@ -177,7 +173,7 @@
     {
         try
         {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteInforFromFolderId/" + id, ToolHelper.options);
+            UserFavoriteInfor = await _httpService.GetAsync<FavoriteFoldersViewModel>("api/favorites/GetUserFavoriteInforFromFolderId/" + id);
         }
         catch (Exception ex)
         {

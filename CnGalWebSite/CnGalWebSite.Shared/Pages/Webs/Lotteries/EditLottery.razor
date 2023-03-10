@@ -1,5 +1,5 @@
 ﻿
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -100,8 +100,8 @@ else
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery/" + Id, ToolHelper.options);
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+                Model = await _httpService.GetAsync<EditLotteryModel>("api/lotteries/EditLottery/" + Id);
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
 
                 isReady = true;
                 StateHasChanged();
@@ -116,9 +116,7 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditLotteryModel, Result>("api/lotteries/EditLottery", Model);
             //判断结果
             if (obj.Successful == false)
             {

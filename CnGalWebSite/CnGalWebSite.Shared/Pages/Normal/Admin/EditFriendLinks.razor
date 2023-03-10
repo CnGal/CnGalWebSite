@@ -1,7 +1,7 @@
 ﻿@page "/admin/editfriendlinks"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -55,7 +55,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks", ToolHelper.options);
+            Model = await _httpService.GetAsync<EditFriendLinksViewModel>("api/admin/editfriendlinks");
 
             StateHasChanged();
             isReady = true;
@@ -96,9 +96,7 @@
                     return;
                 }
             }
-            var result = await Http.PostAsJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditFriendLinksViewModel, Result>("api/admin/editfriendlinks", Model);
             //判断结果
             if (obj.Successful == false)
             {

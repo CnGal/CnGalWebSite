@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -52,7 +52,7 @@
             try
             {
                 //获取文章信息
-                var AsyncModel = await Http.GetFromJsonAsync<BookingGameStateModel>(ToolHelper.WebApiPath + "api/booking/GetBookingGameState/" + Id, ToolHelper.options);
+                var AsyncModel = await _httpService.GetAsync<BookingGameStateModel>("api/booking/GetBookingGameState/" + Id);
                 isBooking = AsyncModel.IsBooking;
                 isReady = true;
                 StateHasChanged();
@@ -93,9 +93,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<BookingGameModel, Result>("api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
             //判断结果
             if (obj.Successful == false)
             {
@@ -116,9 +114,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<BookingGameModel>(ToolHelper.WebApiPath + "api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<BookingGameModel, Result>("api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = true, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
             //判断结果
             if (obj.Successful == false)
             {

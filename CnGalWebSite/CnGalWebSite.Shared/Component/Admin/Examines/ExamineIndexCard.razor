@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 <TitleTip NoIndex Title="@(Model.Type.GetDisplayName() +" "+(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName)+(Model.IsPassed==null?" 审核":" 编辑") )"></TitleTip>
 
@@ -116,7 +116,7 @@
             {
 
                 //获取审核信息
-                Model = await Http.GetFromJsonAsync<ExamineViewModel>(ToolHelper.WebApiPath + "api/examines/GetExamineView/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<ExamineViewModel>("api/examines/GetExamineView/" + Id);
 
                 isReady = true;
                 StateHasChanged();

@@ -1,6 +1,6 @@
 ﻿@page "/account/addphonenumber/{*returnURL}"
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -83,9 +83,7 @@
             {
                 Model.LoginToken = _dataCacheService.LoginKey;
 
-                var result = await Http.PostAsJsonAsync<AddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/AddPhoneNumber", Model);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<AddPhoneNumberModel, Result>("api/account/AddPhoneNumber", Model);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -113,9 +111,7 @@
                 AfterModel.LoginToken = Model.LoginToken;
                 AfterModel.Phone = Model.Phone;
 
-                var result = await Http.PostAsJsonAsync<ConfirmAddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/ConfirmAddPhoneNumber", AfterModel);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<ConfirmAddPhoneNumberModel, Result>("api/account/ConfirmAddPhoneNumber", AfterModel);
                 //判断结果
                 if (obj.Successful == false)
                 {

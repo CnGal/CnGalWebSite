@@ -1,7 +1,7 @@
 ﻿@page "/disambigs/createdisambig"
 @attribute [Authorize]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -148,9 +148,7 @@
                 return;
             }
 
-            var result = await Http.PostAsJsonAsync<CnGalWebSite.DataModel.ViewModel.Disambig.CreateDisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/createdisambig", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<CnGalWebSite.DataModel.ViewModel.Disambig.CreateDisambigViewModel, Result>("api/disambigs/createdisambig", Model);
             //判断结果
             if (obj.Successful == false)
             {

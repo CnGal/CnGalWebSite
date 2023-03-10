@@ -1,5 +1,5 @@
 ﻿
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -63,7 +63,7 @@
             try
             {
                 //获取所有词条
-                Model = await Http.GetFromJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditPeripheryImagesViewModel>("api/peripheries/editimages/" + Id);
                 isReady = true;
                 StateHasChanged();
             }
@@ -78,9 +78,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditPeripheryImagesViewModel, Result>("api/peripheries/editimages", Model);
             //判断结果
             if (obj.Successful == false)
             {

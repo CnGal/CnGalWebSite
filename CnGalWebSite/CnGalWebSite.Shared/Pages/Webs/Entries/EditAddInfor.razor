@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -84,12 +84,12 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditAddInforViewModel>("api/entries/EditAddInfor/" + Id);
                 //获取所有词条
-                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
-                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
+                EntryGroupItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/2");
+                EntryStaffItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/3");
                 //获取所有抽奖 
-                LotteryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/lotteries/GetNames", ToolHelper.options);
+                LotteryItems = await _httpService.GetAsync<List<string>>("api/lotteries/GetNames");
 
                 isReady = true;
                 StateHasChanged();
@@ -107,9 +107,7 @@ else
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/editaddinfor", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditAddInforViewModel, Result>("api/entries/editaddinfor", Model);
             //判断结果
             if (obj.Successful == false)
             {

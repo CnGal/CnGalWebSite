@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -79,9 +79,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/news/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListGameNewAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<GameNewsPagesInfor, QueryData<ListGameNewAloneModel>>("api/news/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -98,7 +96,7 @@
     private void EditArticle(long id)
     {
         NavigationManager.NavigateTo( "/articles/index/" + id);
-        
+
     }
 
     private async Task EditGameNews(long id)
@@ -129,9 +127,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<IgnoreGameNewsModel>(ToolHelper.WebApiPath + "api/news/IgnoreGameNews", new IgnoreGameNewsModel { Ids = ids, IsIgnore = isIgnore });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<IgnoreGameNewsModel, Result>("api/news/IgnoreGameNews", new IgnoreGameNewsModel { Ids = ids, IsIgnore = isIgnore });
 
 
 

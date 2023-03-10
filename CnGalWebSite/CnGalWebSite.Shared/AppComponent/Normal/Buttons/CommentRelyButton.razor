@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject SwalService SwalService
 @inject NavigationManager NavigationManager
@@ -54,9 +54,7 @@
                 await ToastService.Error("发表评论失败", "你还什么都没说呢，我们不能发表空的评论哦");
                 return;
             }
-            var result = await Http.PostAsJsonAsync<PublishCommentModel>(ToolHelper.WebApiPath + "api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<PublishCommentModel, Result>("api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type });
             //判断结果
             if (obj.Successful == false)
             {

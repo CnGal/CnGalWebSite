@@ -1,7 +1,7 @@
 ﻿@page "/admin/listfiles"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -60,7 +60,7 @@
     {
         //try
         //{
-        //    InforModel = await Http.GetFromJsonAsync<ListFilesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listfiles", ToolHelper.options);
+        //    InforModel = await _httpService.GetAsync<ListFilesInforViewModel>("api/admin/listfiles");
         //}
         //catch (Exception ex)
         //{
