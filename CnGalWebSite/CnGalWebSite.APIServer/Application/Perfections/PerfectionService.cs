@@ -18,16 +18,18 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         private readonly IRepository<PerfectionCheck, long> _perfectionCheckRepository;
         private readonly IRepository<Perfection, long> _perfectionRepository;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
+        private readonly ILogger<PerfectionService> _logger;
 
 
-        public PerfectionService(IRepository<Entry, int> entryRepository, IRepository<PerfectionCheck, long> perfectionCheckRepository,
-            IRepository<Perfection, long> perfectionRepository, IRepository<Article, long> articleRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository)
+        public PerfectionService(IRepository<Entry, int> entryRepository, IRepository<PerfectionCheck, long> perfectionCheckRepository, ILogger<PerfectionService> logger,
+        IRepository<Perfection, long> perfectionRepository, IRepository<Article, long> articleRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository)
         {
             _entryRepository = entryRepository;
             _perfectionCheckRepository = perfectionCheckRepository;
             _perfectionRepository = perfectionRepository;
             _articleRepository = articleRepository;
             _perfectionOverviewRepository = perfectionOverviewRepository;
+            _logger = logger;
         }
 
         public async Task<QueryData<ListPerfectionAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionAloneModel searchModel)
@@ -430,21 +432,20 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             try
             {
                 //查找词条
-                var entry = await _entryRepository.GetAll().AsNoTracking().AsSplitQuery()
+                var entry = await _entryRepository.GetAll().AsNoTracking()
                     .Include(s => s.Information).ThenInclude(s => s.Additional)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)
-                    .Include(s => s.Perfection).ThenInclude(s => s.Checks)
                     .FirstOrDefaultAsync(s => s.Id == entryId);
                 if (entry == null)
                 {
                     return;
                 }
                 //找到词条当前完善度对象
-                var perfection = entry.Perfection;
+                var perfection = await _perfectionRepository.GetAll().Include(s => s.Checks).FirstOrDefaultAsync(s => s.EntryId == entryId);
                 if (perfection == null)
                 {
                     perfection = new Perfection
@@ -465,7 +466,6 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //运行新的检查
                 var results = new List<PerfectionCheck>
                 {
-
                     //检查简介
                     CheckEntryBriefIntroduction(entry),
                     //检查主图
@@ -476,9 +476,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //检查steamId
                 results.Add(CheckEntrySteamId(entry));
                 //检查制作组
-                results.AddRange(await CheckEntryProductionGroup(entry));
+                results.AddRange( CheckEntryProductionGroup(entry, PerfectionCheckType.ProductionGroup,5));
                 //检查发行商
-                results.AddRange(await CheckEntryPublisher(entry));
+                results.AddRange(CheckEntryProductionGroup(entry, PerfectionCheckType.Publisher,2));
                 //检查发行时间
                 results.Add(CheckEntryIssueTime(entry));
                 //检查游戏平台
@@ -547,12 +547,15 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     grade = results.Select(s => s.Grade).ToArray().Sum();
 
                 }
+
+                _perfectionRepository.Clear();
                 await _perfectionRepository.GetAll().Where(s => s.Id == perfection.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Grade, b => grade));
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "计算词条(Id:{id})完善度失败", entryId);
                 return;
             }
 
@@ -777,160 +780,52 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             }
         }
 
-        public async Task<List<PerfectionCheck>> CheckEntryPublisher(Entry entry)
-        {
-            try
-            {
-                var results = new List<PerfectionCheck>();
-
-                var publisher = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "发行商");
-                if (publisher == null || string.IsNullOrWhiteSpace(publisher.DisplayValue))
-                {
-                    return new List<PerfectionCheck>{
-                        new PerfectionCheck
-                        {
-                            CheckType = PerfectionCheckType.Publisher,
-                            DefectType = PerfectionDefectType.NotFilledIn,
-                            Grade = 0,
-                        }
-                    };
-                }
-                var publishers = publisher.DisplayValue.Replace("，", ",").Replace("、", ",").Split(",").ToList();
-                publishers.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-
-                if (publishers.Count == 0)
-                {
-                    return new List<PerfectionCheck>{
-                        new PerfectionCheck
-                        {
-                            CheckType = PerfectionCheckType.Publisher,
-                            DefectType = PerfectionDefectType.NotFilledIn,
-                            Grade = 0,
-                        }
-                    };
-                }
-
-
-                ToolHelper.Purge(ref publishers);
-
-                //拿到存在和不存在的名单
-                var existentialStaffs = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).Select(s => new { s.Name, s.Type }).ToListAsync();
-
-                var existentialCount = 0;
-
-                var score = (double)2 / publishers.Count;
-                foreach (var item in publishers)
-                {
-                    var temp = existentialStaffs.FirstOrDefault(s => s.Name.ToLower() == item.ToLower());
-                    if (temp == null)
-                    {
-                        results.Add(new PerfectionCheck
-                        {
-                            CheckType = PerfectionCheckType.Publisher,
-                            DefectType = PerfectionDefectType.NonExistent,
-                            Infor = item,
-                            Grade = score / 2,
-                        });
-
-                    }
-                    else if (temp.Type != EntryType.Staff && temp.Type != EntryType.ProductionGroup)
-                    {
-                        results.Add(new PerfectionCheck
-                        {
-                            CheckType = PerfectionCheckType.Publisher,
-                            DefectType = PerfectionDefectType.TypeError,
-                            Infor = item,
-                            Grade = score / 2,
-                        });
-                    }
-                    else
-                    {
-                        existentialCount++;
-                    }
-                }
-                if (existentialCount > 0)
-                {
-                    results.Add(new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.Publisher,
-                        DefectType = PerfectionDefectType.None,
-                        Grade = score * existentialCount,
-                    });
-                }
-
-                return results;
-
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-        }
-
-        public async Task<List<PerfectionCheck>> CheckEntryProductionGroup(Entry entry)
+        public List<PerfectionCheck> CheckEntryProductionGroup(Entry entry, PerfectionCheckType type,double totalScore)
         {
             var results = new List<PerfectionCheck>();
 
-            var publisher = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "制作组");
+            var publishers = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == (type == PerfectionCheckType.ProductionGroup ? PositionGeneralType.ProductionGroup : PositionGeneralType.Publisher));
 
-            if (publisher == null || string.IsNullOrWhiteSpace(publisher.DisplayValue))
+            if (publishers.Any()==false)
             {
                 return new List<PerfectionCheck>{
                         new PerfectionCheck
                         {
-                            CheckType = PerfectionCheckType.ProductionGroup,
+                            CheckType = type,
                             DefectType = PerfectionDefectType.NotFilledIn,
                             Grade = 0,
                         }
                     };
             }
 
-            var publishers = publisher.DisplayValue.Replace("，", ",").Replace("、", ",").Split(",").ToList();
-            publishers.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-
-            if (publishers.Count == 0)
-            {
-                return new List<PerfectionCheck>{
-                    new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.ProductionGroup,
-                        DefectType = PerfectionDefectType.NotFilledIn,
-                        Grade = 0,
-                    }
-                };
-            }
-
-
-            ToolHelper.Purge(ref publishers);
-
             //拿到存在和不存在的名单
-            var existentialStaffs = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).Select(s => new { s.Name, s.Type }).ToListAsync();
+            var existentialStaffs = publishers.Where(s => s.ToEntryNavigation != null);
 
             var existentialCount = 0;
 
-            var score = (double)5 / publishers.Count;
+            var score = totalScore / publishers.Count();
             foreach (var item in publishers)
             {
-                var temp = existentialStaffs.FirstOrDefault(s => s.Name.ToLower() == item.ToLower());
-                if (temp == null)
+                var displayName = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.DisplayName ?? item.Name) : item.CustomName;
+
+                if (item.ToEntryNavigation == null)
                 {
                     results.Add(new PerfectionCheck
                     {
-                        CheckType = PerfectionCheckType.ProductionGroup,
+                        CheckType = type,
                         DefectType = PerfectionDefectType.NonExistent,
-                        Infor = item,
+                        Infor = displayName,
                         Grade = score / 2,
                     });
 
                 }
-                else if (temp.Type != EntryType.Staff && temp.Type != EntryType.ProductionGroup)
+                else if (item.ToEntryNavigation.Type != EntryType.Staff && item.ToEntryNavigation.Type != EntryType.ProductionGroup)
                 {
                     results.Add(new PerfectionCheck
                     {
-                        CheckType = PerfectionCheckType.ProductionGroup,
+                        CheckType = type,
                         DefectType = PerfectionDefectType.TypeError,
-                        Infor = item,
+                        Infor = displayName,
                         Grade = score / 2,
                     });
                 }
@@ -943,7 +838,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             {
                 results.Add(new PerfectionCheck
                 {
-                    CheckType = PerfectionCheckType.ProductionGroup,
+                    CheckType = type,
                     DefectType = PerfectionDefectType.None,
                     Grade = score * existentialCount,
                 });
@@ -979,10 +874,10 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         {
             var results = new List<PerfectionCheck>();
             //获取所有staff
-            var staffs = entry.EntryStaffFromEntryNavigation;
+            var staffs = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral != PositionGeneralType.Publisher && s.PositionGeneral != PositionGeneralType.ProductionGroup);
 
 
-            if (staffs.Count == 0)
+            if (staffs.Any()==false)
             {
                 return new List<PerfectionCheck>{
                     new PerfectionCheck
@@ -996,7 +891,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
             var existentialCount = 0;
 
-            var score = (double)20 / staffs.Count;
+            var score = (double)20 / staffs.Count();
             foreach (var item in staffs)
             {
                 if (item.ToEntryNavigation == null)

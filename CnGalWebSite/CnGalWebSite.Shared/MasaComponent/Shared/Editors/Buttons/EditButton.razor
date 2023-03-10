@@ -28,12 +28,16 @@
             <div class="w-100">
                 @if (Menu)
                 {
-                    <EditButtonContent Id="Id" IsEdit="IsEdit" IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" IsEditChanged="IsEditChanged" Type="Type" ShowPerfection="ShowPerfection" />
+                    <EditButtonContent Id="Id" IsEdit="IsEdit" IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" IsEditChanged="IsEditChanged" Type="Type" ShowPerfection="ShowPerfection" OnClickExamines="OnClickExamines" OnClickPerfectionInfor="OnClickPerfectionInfor" />
                 }
             </div>
         </div>
     </ChildContent>
 </MMenu>
+
+<EditRecordListViewTip @ref="editRecordListViewTip" />
+<EntryPerfectionCheckListTip @ref="entryPerfectionCheckListTip" />
+
 @code {
     [Parameter]
     public ExaminedNormalListModelType Type { get; set; }
@@ -52,19 +56,11 @@
     [Parameter]
     public EventCallback<bool> IsEditChanged { get; set; }
 
-    bool isReady { get; set; }
-    bool ShowExamines { get; set; }
-    bool isInMonitor { get; set; }
-    long _id;
     bool Menu;
 
-    public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
 
-    public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
-
-    public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel>();
-
-    public PerfectionInforTipViewModel PerfectionInfor { get; set; } = new PerfectionInforTipViewModel();
+    EditRecordListViewTip editRecordListViewTip;
+    EntryPerfectionCheckListTip entryPerfectionCheckListTip;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -81,5 +77,21 @@
             await IsEditChanged.InvokeAsync(count % 2 == 1);
         }
         StateHasChanged();
+    }
+
+    public void OnClickExamines(List<ExaminedNormalListModel> model)
+    {
+        if (editRecordListViewTip != null)
+        {
+            editRecordListViewTip.Refresh(model);
+        }
+    }
+
+    public async Task OnClickPerfectionInfor(long id)
+    {
+        if (entryPerfectionCheckListTip != null)
+        {
+            await entryPerfectionCheckListTip.Refresh(true, id);
+        }
     }
 }

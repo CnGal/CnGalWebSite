@@ -2,7 +2,6 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<div class="pointer" @onclick="OnDetails">
     <div class="a-font-color" style="display: flex; align-items: center; flex-direction: column;">
         <div style="display: flex;align-items: center;">
             <div class="swal2-icon m-0 me-1 @("border-"+color)" style="height: 4em; width: 4em; display: flex;align-items: center;">
@@ -30,8 +29,6 @@
             </div>
         </div>
     </div>
-</div>
-<EntryPerfectionCheckListTip @ref="entryPerfectionCheckListTip" />
 
 @code {
     [Parameter]
@@ -40,23 +37,14 @@
     public EventCallback OnClosed { get; set; }
 
     string color = "success";
-    EntryPerfectionCheckListTip entryPerfectionCheckListTip;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
         color = ToolHelper.GetEntryPerfectionLevelColor(Model.Level);
         if (Model.Grade == 0)
         {
             Model.Grade = Model.EditCount;
             color = "success";
-        }
-    }
-
-    public async Task OnDetails()
-    {
-        if (entryPerfectionCheckListTip != null)
-        {
-            await entryPerfectionCheckListTip.Refresh(true, Model.Id);
         }
     }
 }

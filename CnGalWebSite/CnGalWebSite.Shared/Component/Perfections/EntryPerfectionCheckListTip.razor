@@ -17,7 +17,7 @@
                 <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2" Multiple>
                     @if (Model.Any(s => s.Level == PerfectionCheckLevel.High))
                     {
-                        <MExpansionPanel @key="1">
+                        <MExpansionPanel>
                             <MExpansionPanelHeader>
                                 急需完善
                             </MExpansionPanelHeader>
@@ -29,7 +29,7 @@
                             </MExpansionPanelContent>
                         </MExpansionPanel>
                     }
-                    <MExpansionPanel @key="2">
+                    <MExpansionPanel>
                         <MExpansionPanelHeader>
                             待完善
                         </MExpansionPanelHeader>
@@ -40,7 +40,7 @@
                             }
                         </MExpansionPanelContent>
                     </MExpansionPanel>
-                    <MExpansionPanel @key="3">
+                    <MExpansionPanel>
                         <MExpansionPanelHeader>
                             已完善
                         </MExpansionPanelHeader>
@@ -93,12 +93,12 @@
             panel.Clear();
             if(Model.Any(s => s.Level == PerfectionCheckLevel.High))
             {
-                panel.Add(1);
+                panel.Add(0);
             }
             else
             {
-                panel.Add(2);
-                panel.Add(3);
+                panel.Add(0);
+                panel.Add(1);
             }
 
 

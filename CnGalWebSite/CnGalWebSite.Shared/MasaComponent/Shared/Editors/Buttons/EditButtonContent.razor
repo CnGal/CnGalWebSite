@@ -9,7 +9,9 @@
 {
     @if (PerfectionInfor != null && ShowPerfection)
     {
-        <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" />
+        <div class="pointer" @onclick="OnClickPerfection">
+            <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" />
+        </div>
         <MDivider Class="w-100"></MDivider>
     }
     <MButton Text Block Color="warning" OnClick="OnClickHistory">
@@ -64,10 +66,6 @@ else
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
 }
-@if (ShowExamines)
-{
-    <EditRecordListViewTip Id="Id" Model="Examines" Type="Type" OnClickClose="@(()=> { ShowExamines = false;StateHasChanged(); })" />
-}
 
 @code {
     [Parameter]
@@ -86,9 +84,12 @@ else
     public EventCallback<bool> IsHiddenChanged { get; set; }
     [Parameter]
     public EventCallback<bool> IsEditChanged { get; set; }
+    [Parameter]
+    public EventCallback<List<ExaminedNormalListModel>> OnClickExamines { get; set; }
+    [Parameter]
+    public EventCallback<long> OnClickPerfectionInfor { get; set; }
 
     bool isReady { get; set; }
-    bool ShowExamines { get; set; }
     bool isInMonitor { get; set; }
 
     public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
@@ -113,12 +114,16 @@ else
         StateHasChanged();
     }
 
-    public void OnClickHistory()
+    public async Task OnClickHistory()
     {
-        ShowExamines = true;
-        StateHasChanged();
-
+        await OnClickExamines.InvokeAsync(Examines);
     }
+
+    public async Task OnClickPerfection()
+    {
+        await OnClickPerfectionInfor.InvokeAsync(PerfectionInfor.Id);
+    }
+
 
     public void ProcButtonList()
     {
