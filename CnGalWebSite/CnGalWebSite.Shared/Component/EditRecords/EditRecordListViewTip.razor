@@ -1,7 +1,7 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
 
-<MDialog Value="Dialog" ValueChanged="ValueChanged"
+<MDialog @bind-Value="Dialog"
          Width="800">
     <MCard>
         <MCardTitle Class="text-h5">
@@ -13,103 +13,26 @@
 
         <Scroll style="max-height:500px" class="ps-4 pe-4">
             <div>
-                @if (isReady)
-                {
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="Model" OnNavClick="OnNavClick" />
-                }
-                else
-                {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard  Style="min-height:200px;"/>
-       
-                }
+              
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="Model" />
+             
             </div>
         </Scroll>
-        <MCardActions>
-            <MSpacer></MSpacer>
-            <MButton Color="green darken-1"
-                     Text
-                     OnClick="async ()=> { Dialog = false;await OnClickClose.InvokeAsync(); }">
-                关闭
-            </MButton>
-        </MCardActions>
     </MCard>
 </MDialog>
 
 @code {
-    [Parameter]
-    public long Id { get; set; }
-
-    [Parameter]
-    public ExaminedNormalListModelType Type { get; set; }
-
-    [Parameter]
-    public EventCallback OnClickClose { get; set; }
 
     [Parameter]
     public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
 
-    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+    bool Dialog;
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    public string Text { get; set; }
-    private IEnumerable<long> Value1 { get; set; }
-    bool isReady = false;
-    bool Dialog { get; set; } = true;
-
-    protected override async Task OnInitializedAsync()
+    public void Refresh(List<ExaminedNormalListModel>  model)
     {
-        @if (Model.Count == 0)
-        {
-            try
-            {
-                if (Type == ExaminedNormalListModelType.Article)
-                {
-                    var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id, ToolHelper.options);
-                    Model = model.Examines;
-                }
-                else if (Type == ExaminedNormalListModelType.Periphery)
-                {
-                    var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id, ToolHelper.options);
-                    Model = model.Examines;
-                }
-                else if (Type == ExaminedNormalListModelType.Tag)
-                {
-                    var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id, ToolHelper.options);
-                    Model = model.Examines;
-                }
+        Model = model;
+        Dialog = true;
 
-
-
-                isReady = true;
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取历史编辑记录列表失败");
-            }
-        }
-        else
-        {
-            isReady = true;
-            StateHasChanged();
-        }
-
-    }
-
-    public async Task ValueChanged(bool value)
-    {
-        if (value == false)
-        {
-            await OnClickClose.InvokeAsync();
-        }
-    }
-
-    public async Task OnNavClick()
-    {
-        Dialog = false;
-        await Task.Delay(1);
-       await OnClickClose.InvokeAsync();
+        StateHasChanged();
     }
 }
