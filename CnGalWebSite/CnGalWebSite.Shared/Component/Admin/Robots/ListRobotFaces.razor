@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -60,9 +60,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<RobotFacesPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotFaceList", new RobotFacesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListRobotFaceAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<RobotFacesPagesInfor, QueryData<ListRobotFaceAloneModel>>("api/robot/GetRobotFaceList", new RobotFacesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -78,9 +76,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotFace", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenRobotModel, Result>("api/robot/HiddenRobotFace", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -161,9 +157,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ListRobotFaceAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotFaceData", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ListRobotFaceAloneModel, Result>("api/robot/UpdateRobotFaceData", model);
 
             if (obj.Successful == false)
             {
@@ -212,9 +206,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ImportRobotsModel>(ToolHelper.WebApiPath + "api/robot/ImportRobotFaces", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ImportRobotsModel, Result>("api/robot/ImportRobotFaces", model);
 
             if (obj.Successful == false)
             {

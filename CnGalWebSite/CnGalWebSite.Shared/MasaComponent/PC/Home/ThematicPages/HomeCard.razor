@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 
 <div>
@@ -82,7 +82,7 @@
         {
             if (_dataCacheService.CVThematicPageCache == null)
             {
-                _dataCacheService.CVThematicPageCache = await Http.GetFromJsonAsync<CVThematicPageViewModel>(ToolHelper.WebApiPath + "api/tags/GetCVThematicPageViewModel", ToolHelper.options);
+                _dataCacheService.CVThematicPageCache = await _httpService.GetAsync<CVThematicPageViewModel>("api/tags/GetCVThematicPageViewModel");
             }
 
             OnChanged(true);

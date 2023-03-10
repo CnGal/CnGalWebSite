@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject ToastService? ToastService
@@ -96,7 +96,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            Model = await Http.GetFromJsonAsync<List<WinnerDataModel>>(ToolHelper.WebApiPath + "api/lotteries/GetWinnerDatas/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<List<WinnerDataModel>>("api/lotteries/GetWinnerDatas/" + Id);
             isReady = true;
         }
         catch (Exception ex)
@@ -124,15 +124,13 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserPrizeModel>(ToolHelper.WebApiPath + "api/lotteries/EditUserPrize", new EditUserPrizeModel
+            var obj = await _httpService.PostAsync<EditUserPrizeModel, Result>("api/lotteries/EditUserPrize", new EditUserPrizeModel
             {
                 Context = tempStr,
                 LotteryAwardId = currentWinner.AwardId,
                 UserId = currentWinner.UserId
             });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var res = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            if (res.Successful)
+            if (obj.Successful)
             {
                 if (currentWinner.AwardType == LotteryAwardType.ActivationCode)
                 {
@@ -148,7 +146,7 @@ else
             }
             else
             {
-                await ToastService.Success("编辑奖品失败", res.Error);
+                await ToastService.Success("编辑奖品失败", obj.Error);
             }
         }
         catch (Exception ex)

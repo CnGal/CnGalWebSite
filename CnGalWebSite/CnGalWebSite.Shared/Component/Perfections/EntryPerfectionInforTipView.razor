@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject IServiceProvider Provider
@@ -47,7 +47,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<PerfectionInforTipViewModel>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfection/" + EntryId, ToolHelper.options);
+            Model = await _httpService.GetAsync<PerfectionInforTipViewModel>("api/perfections/GetEntryPerfection/" + EntryId);
             color = ToolHelper.GetEntryPerfectionLevelColor(Model.Level);
             isReady = true;
             StateHasChanged();

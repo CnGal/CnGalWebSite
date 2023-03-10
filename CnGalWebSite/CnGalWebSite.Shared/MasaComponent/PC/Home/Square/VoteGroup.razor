@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -32,7 +32,7 @@
         {
             if (_dataCacheService.VoteCardsCatche.Count == 0)
             {
-                _dataCacheService.VoteCardsCatche = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards", ToolHelper.options);
+                _dataCacheService.VoteCardsCatche = await _httpService.GetAsync<List<VoteCardViewModel>>("api/votes/GetVoteCards");
                 _dataCacheService.VoteCardsCatche = _dataCacheService.VoteCardsCatche.OrderByDescending(s => s.EndTime).Take(12).ToList();
 
             }

@@ -1,7 +1,7 @@
 ﻿
 @attribute [Authorize(Roles = "Admin")]
 @inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -68,9 +68,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<UsersPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetUserList", new UsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListUserAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<UsersPagesInfor, QueryData<ListUserAloneModel>>("api/admin/GetUserList", new UsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -81,12 +79,12 @@
     private void EditUser(string id)
     {
         NavigationManager.NavigateTo(Provider, "/admin/edituser/" + id, "编辑用户", "fa fa-user-circle");
-        
+
     }
     private void LookUser(string id, string name)
     {
         NavigationManager.NavigateTo(Provider, "/space/index/" + id, name, "fa fa-star-o");
-        
+
     }
 
     [Inject]
@@ -134,9 +132,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<BanUserModel>(ToolHelper.WebApiPath + "api/account/BanUser", new BanUserModel { Ids = ids, UnsealTime = isBan ? DateTime.Now.ToCstTime().AddYears(10) : null });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<BanUserModel, Result>("api/account/BanUser", new BanUserModel { Ids = ids, UnsealTime = isBan ? DateTime.Now.ToCstTime().AddYears(10) : null });
             if (obj.Successful == false)
             {
                 await ToastService.Error(tempString + "用户失败", obj.Error);
@@ -189,9 +185,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditSpaceCanComment>(ToolHelper.WebApiPath + "api/comments/EditSpaceCanComment", new EditSpaceCanComment { Ids = ids, CanComment = canComment });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditSpaceCanComment, Result>("api/comments/EditSpaceCanComment", new EditSpaceCanComment { Ids = ids, CanComment = canComment });
 
 
 

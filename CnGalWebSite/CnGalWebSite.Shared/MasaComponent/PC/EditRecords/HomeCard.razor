@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 @if (isReady)
@@ -51,7 +51,7 @@ else
             {
                 if (_dataCacheService.UserContentCenterCatche == null)
                 {
-                    _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView", ToolHelper.options);
+                    _dataCacheService.UserContentCenterCatche = await _httpService.GetAsync<UserContentCenterViewModel>("api/examines/GetUserContentCenterView");
                 }
 
                 isReady = true;

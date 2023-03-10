@@ -1,7 +1,7 @@
 ﻿@page "/disambigs/index/{Id}"
 
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
@@ -90,7 +90,7 @@
         {
             isReady = false;
             //获取文章信息
-            Model = await Http.GetFromJsonAsync<DisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigView/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<DisambigViewModel>("api/disambigs/GetDisambigView/" + Id);
             isReady = true;
             StateHasChanged();
         }

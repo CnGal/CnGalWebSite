@@ -12,7 +12,7 @@
 
 @inject IAuthService AuthService
 @inject SwalService SwalService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 <TitleTip NoIndex Title="二次身份验证"></TitleTip>
 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
@@ -162,7 +162,7 @@
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/SecondAuthentication", ToolHelper.options);
+            var result = await _httpService.GetAsync<Result>("api/account/SecondAuthentication");
             if (result.Successful == true)
             {
                 return true;
@@ -188,9 +188,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<SecondAuthenticationModel>(ToolHelper.WebApiPath + "api/account/SecondAuthentication", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<SecondAuthenticationModel, Result>("api/account/SecondAuthentication", Model);
             //判断结果
             if (obj.Successful == false)
             {

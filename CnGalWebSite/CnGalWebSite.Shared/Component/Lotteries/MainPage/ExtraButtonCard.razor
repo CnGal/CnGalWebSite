@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -36,9 +36,7 @@
 
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenLotteryModel, Result>("api/lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
             //判断结果
             if (obj.Successful == false)
             {

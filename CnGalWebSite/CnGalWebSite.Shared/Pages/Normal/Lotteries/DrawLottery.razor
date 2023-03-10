@@ -1,7 +1,7 @@
 ﻿@page "/lotteries/drawlottery/{Id}"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -119,7 +119,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<DrawLotteryDataModel>("api/lotteries/GetLotteryData/" + Id);
             await GetAward();
             isReady = true;
         }
@@ -167,9 +167,7 @@
         {
             try
             {
-                var result = await Http.PostAsJsonAsync<ManualLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/DrawLottery", model);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<ManualLotteryModel, Result>("api/lotteries/DrawLottery", model);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -240,9 +238,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EndLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EndLottery", new EndLotteryModel { Ids = new long[] { Model.Id }, IsEnd = true });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EndLotteryModel, Result>("api/lotteries/EndLottery", new EndLotteryModel { Ids = new long[] { Model.Id }, IsEnd = true });
             //判断结果
             if (obj.Successful == false)
             {

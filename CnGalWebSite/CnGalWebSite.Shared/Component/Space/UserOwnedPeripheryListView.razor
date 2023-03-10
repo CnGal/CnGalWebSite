@@ -1,5 +1,5 @@
 ﻿
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 
 <div>
@@ -35,7 +35,7 @@
 
         try
         {
-            Model = await Http.GetFromJsonAsync<List<GameOverviewPeripheriesModel>>(ToolHelper.WebApiPath + "api/peripheries/GetUserOverviewPeripheries/" + UserId, ToolHelper.options);
+            Model = await _httpService.GetAsync<List<GameOverviewPeripheriesModel>>("api/peripheries/GetUserOverviewPeripheries/" + UserId);
             isReady = true;
         }
         catch(Exception ex)

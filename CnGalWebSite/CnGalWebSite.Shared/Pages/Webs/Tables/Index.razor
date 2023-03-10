@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -103,7 +103,7 @@
         try
         {
             //获取服务器基本信息
-            Model = await Http.GetFromJsonAsync<TableViewModel>(ToolHelper.WebApiPath + "api/tables/Gettableview", ToolHelper.options);
+            Model = await _httpService.GetAsync<TableViewModel>("api/tables/Gettableview");
             StateHasChanged();
         }
         catch (Exception ex)

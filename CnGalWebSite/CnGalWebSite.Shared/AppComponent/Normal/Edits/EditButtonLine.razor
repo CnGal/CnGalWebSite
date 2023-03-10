@@ -1,5 +1,5 @@
 ﻿@inject SwalService SwalService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService ToastService
 @inject NavigationManager NavigationManager
 
@@ -60,9 +60,7 @@
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/entries/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = Model.Operation });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<RevokeExamineModel, Result>("api/entries/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = Model.Operation });
             //判断结果
             if (obj.Successful == false)
             {

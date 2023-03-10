@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -33,7 +33,7 @@
         {
             if (_dataCacheService.DocumentsCatche.Count == 0)
             {
-                _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments", ToolHelper.options);
+                _dataCacheService.DocumentsCatche = await _httpService.GetAsync<List<DocumentViewModel>>("api/home/GetDocuments");
             }
             foreach (var item in _dataCacheService.DocumentsCatche)
             {

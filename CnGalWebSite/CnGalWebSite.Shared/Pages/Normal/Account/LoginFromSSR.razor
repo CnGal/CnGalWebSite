@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @inject ToastService ToastService
 @inject IJSRuntime JS
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 @inject IIPLocatorProvider? IPLocator
@@ -71,9 +71,7 @@
             {
                 try
                 {
-                    var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
-                    string jsonContent = result.Content.ReadAsStringAsync().Result;
-                    LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                    var obj = await _httpService.PostAsync<OneTimeCodeModel, LoginResult>("api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
                     //判断结果
                     if (obj.Code == LoginResultCode.OK)
                     {

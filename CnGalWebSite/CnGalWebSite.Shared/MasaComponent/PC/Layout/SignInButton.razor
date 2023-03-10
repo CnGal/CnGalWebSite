@@ -1,5 +1,5 @@
 ﻿@inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -33,7 +33,7 @@ else
 
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn", ToolHelper.options);
+            var result = await _httpService.GetAsync<Result>("api/space/signIn");
             if (result.Successful == true)
             {
                 Model.IsSignIn = true;

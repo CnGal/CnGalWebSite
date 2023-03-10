@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService ToastService
 
 <div>
@@ -81,9 +81,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<LotteryUsersPagesInfor>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryUserList", new LotteryUsersPagesInfor { LotteryId = Id, SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListLotteryUserAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<LotteryUsersPagesInfor, QueryData<ListLotteryUserAloneModel>>("api/lotteries/GetLotteryUserList", new LotteryUsersPagesInfor { LotteryId = Id, SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -98,9 +96,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLotteryUser", new HiddenLotteryModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenLotteryModel, Result>("api/lotteries/HiddenLotteryUser", new HiddenLotteryModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -155,7 +151,7 @@
         try
         {
 
-            var data = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id, ToolHelper.options);
+            var data = await _httpService.GetAsync<DrawLotteryDataModel>("api/lotteries/GetLotteryData/" + Id);
             var model = new ExportLotteryDataModel();
             var prizeId = 1;
             foreach (var item in data.Awards)

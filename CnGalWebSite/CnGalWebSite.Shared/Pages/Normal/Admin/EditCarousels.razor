@@ -1,7 +1,7 @@
 ﻿@page "/admin/editcarousels"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -57,7 +57,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels", ToolHelper.options);
+            Model = await _httpService.GetAsync<EditCarouselsViewModel>("api/admin/editcarousels");
 
             StateHasChanged();
             isReady = true;
@@ -83,9 +83,7 @@
                 }
 
             }
-            var result = await Http.PostAsJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditCarouselsViewModel, Result>("api/admin/editcarousels", Model);
             //判断结果
             if (obj.Successful == false)
             {

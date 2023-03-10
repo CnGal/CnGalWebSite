@@ -50,6 +50,7 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IHttpService, HttpService>();
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 

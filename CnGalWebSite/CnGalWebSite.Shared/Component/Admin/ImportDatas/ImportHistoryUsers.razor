@@ -1,5 +1,5 @@
 ﻿@inject ToastService? ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 <div class="card h-100  rounded shadow-sm  bg-opacity p-4" style="border:0px">
     <div style="height:100%">
@@ -150,9 +150,7 @@
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<ImportUserModel>(ToolHelper.WebApiPath + "api/batch/ImportHistoryUserData", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ImportUserModel, Result>("api/batch/ImportHistoryUserData", model);
             //判断结果
             if (obj.Successful == false)
             {

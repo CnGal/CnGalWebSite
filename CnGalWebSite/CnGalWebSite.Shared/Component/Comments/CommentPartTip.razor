@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -166,9 +166,7 @@
                 return;
             }
 
-            var result = await Http.PostAsJsonAsync<HiddenCommentModel>(ToolHelper.WebApiPath + "api/comments/UserHiddenComment", new HiddenCommentModel { Ids = new long[] { Model.Id },IsHidden=true });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/UserHiddenComment", new HiddenCommentModel { Ids = new long[] { Model.Id },IsHidden=true });
 
             if (obj.Successful == false)
             {

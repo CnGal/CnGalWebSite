@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -35,7 +35,7 @@
         {
             if (_dataCacheService.RandomTagsCatche.Count == 0)
             {
-                _dataCacheService.RandomTagsCatche = await Http.GetFromJsonAsync<List<RandomTagModel>>(ToolHelper.WebApiPath + "api/tags/GetRandomTags", ToolHelper.options);
+                _dataCacheService.RandomTagsCatche = await _httpService.GetAsync<List<RandomTagModel>>("api/tags/GetRandomTags");
             }
 
             _dataCacheService.RandomTagsCatche.Random();

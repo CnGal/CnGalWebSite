@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -50,7 +50,7 @@
         {
             if (_dataCacheService.GameRolesCatche.Count == 0)
             {
-                _dataCacheService.GameRolesCatche = await Http.GetFromJsonAsync<List<GameRoleModel>>(ToolHelper.WebApiPath + "api/entries/GetGameRoles", ToolHelper.options);
+                _dataCacheService.GameRolesCatche = await _httpService.GetAsync<List<GameRoleModel>>("api/entries/GetGameRoles");
             }
 
             Items = _dataCacheService.GameRolesCatche.Random().Take(12).ToList();

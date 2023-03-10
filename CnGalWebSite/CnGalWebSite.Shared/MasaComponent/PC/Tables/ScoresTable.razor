@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 
 @if (!isReady)
@@ -68,7 +68,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelScores = await Http.GetFromJsonAsync<GameScoreListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGameScoreList", ToolHelper.options);
+            ModelScores = await _httpService.GetAsync<GameScoreListViewModel>("api/tables/GetGameScoreList");
             isReady = true;
         }
         catch (Exception ex)

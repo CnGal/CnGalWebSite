@@ -1,6 +1,6 @@
 ﻿@attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -58,7 +58,7 @@
     public ErrorHandler ErrorHandler { get; set; }
 
 
-   
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,9 +70,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EntriesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetEntryList", new EntriesPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListEntryAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<EntriesPagesInfor, QueryData<ListEntryAloneModel>>("api/admin/GetEntryList", new EntriesPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -85,9 +83,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditEntryPriorityViewModel>(ToolHelper.WebApiPath + "api/entries/EditEntryPriority", new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditEntryPriorityViewModel, Result>("api/entries/EditEntryPriority", new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             if (obj.Successful == false)
             {
                 await ToastService.Error("修改词条权重失败", obj.Error);
@@ -143,9 +139,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenEntryModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenEntryModel, Result>("api/entries/HiddenEntry", new HiddenEntryModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -201,9 +195,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HideEntryOutlink", new HiddenEntryModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenEntryModel, Result>("api/entries/HideEntryOutlink", new HiddenEntryModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -255,7 +247,7 @@
 
     public void OnRowLookClick(int id)
     {
-        NavigationManager.NavigateTo( "/entries/index/" + id);     
+        NavigationManager.NavigateTo( "/entries/index/" + id);
     }
 
     private async Task OnRowEditCanCommentClick(int[] ids, bool canComment, bool showMessage)
@@ -264,9 +256,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditEntryCanCommentModel>(ToolHelper.WebApiPath + "api/comments/EditEntryCanComment", new EditEntryCanCommentModel { Ids = ids, CanComment = canComment });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditEntryCanCommentModel, Result>("api/comments/EditEntryCanComment", new EditEntryCanCommentModel { Ids = ids, CanComment = canComment });
 
 
 
@@ -345,7 +335,7 @@
             Items = model,
             OnEditAsync = async context =>
             {
-            // Trace.Log("保存按钮被点击");
+                // Trace.Log("保存按钮被点击");
                 var editModel = (ListEntryAloneModel)context.Model;
                 await EditData(editModel);
                 return true;
@@ -359,9 +349,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ListEntryAloneModel>(ToolHelper.WebApiPath + "api/batch/UpdateEntryData", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ListEntryAloneModel, Result>("api/batch/UpdateEntryData", model);
 
             if (obj.Successful == false)
             {

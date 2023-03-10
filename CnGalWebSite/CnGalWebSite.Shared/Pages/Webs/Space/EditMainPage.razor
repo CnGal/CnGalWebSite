@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -59,7 +59,7 @@
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage", ToolHelper.options);
+                Model = await _httpService.GetAsync<EditUserMainPageViewModel>("api/space/editmainpage");
                 isReady = true;
                 StateHasChanged();
             }
@@ -75,9 +75,7 @@
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserMainPageViewModel, Result>("api/space/editmainpage", Model);
 
             //判断结果
             if (obj.Successful == false)

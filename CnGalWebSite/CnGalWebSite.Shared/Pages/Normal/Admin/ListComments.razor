@@ -1,7 +1,7 @@
 ﻿@page "/admin/listcomments"
 @attribute [Authorize(Roles = "Admin")]
 @inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -67,9 +67,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListCommentAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<CommentsPagesInfor, QueryData<ListCommentAloneModel>>("api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -89,7 +87,7 @@
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + entryId, "查看评论", "fa fa-comments-o");
                 break;
         }
-        
+
     }
 
     /// <summary>
@@ -102,9 +100,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenCommentModel>(ToolHelper.WebApiPath + "api/comments/HiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/HiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -159,9 +155,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditCommentPriorityViewModel>(ToolHelper.WebApiPath + "api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditCommentPriorityViewModel, Result>("api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             if (obj.Successful == false)
             {
                 await ToastService.Error("修改评论权重失败", obj.Error);

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
@@ -151,7 +151,7 @@ else
             if (Type == ExaminedNormalListModelType.Entry)
             {
 
-                var model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id, ToolHelper.options);
+                var model = await _httpService.GetAsync<EditEntryInforBindModel>("api/entries/GetEntryEditInforBindModel/" + Id);
 
                 Examines = model.Examines;
 
@@ -175,7 +175,7 @@ else
             }
             else if (Type == ExaminedNormalListModelType.Article)
             {
-                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id, ToolHelper.options);
+                var model = await _httpService.GetAsync<EditArticleInforBindModel>("api/articles/GetArticleEditInforBindModel/" + Id);
 
                 Examines = model.Examines;
 
@@ -186,7 +186,7 @@ else
             }
             else if (Type == ExaminedNormalListModelType.Periphery)
             {
-                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/Peripheries/GetPeripheryEditInforBindModel/" + Id, ToolHelper.options);
+                var model = await _httpService.GetAsync<EditPeripheryInforBindModel>("api/Peripheries/GetPeripheryEditInforBindModel/" + Id);
 
                 Examines = model.Examines;
 
@@ -198,7 +198,7 @@ else
             }
             else if (Type == ExaminedNormalListModelType.Tag)
             {
-                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id, ToolHelper.options);
+                var model = await _httpService.GetAsync<EditTagInforBindModel>("api/tags/GetTagEditInforBindModel/" + Id);
 
                 Examines = model.Examines;
 
@@ -209,7 +209,7 @@ else
             }
             else if (Type == ExaminedNormalListModelType.Video)
             {
-                var model = await Http.GetFromJsonAsync<EditVideoInforBindModel>(ToolHelper.WebApiPath + "api/videos/GetEditInforBindModel/" + Id, ToolHelper.options);
+                var model = await _httpService.GetAsync<EditVideoInforBindModel>("api/videos/GetEditInforBindModel/" + Id);
 
                 Examines = model.Examines;
 
@@ -241,14 +241,11 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserMonitorsModel>(ToolHelper.WebApiPath + "api/examines/EditUserMonitors", new EditUserMonitorsModel
+            var obj = await _httpService.PostAsync<EditUserMonitorsModel, Result>("api/examines/EditUserMonitors", new EditUserMonitorsModel
             {
                 InMonitor = open,
                 Ids = new int[] { (int)Id }
             });
-
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

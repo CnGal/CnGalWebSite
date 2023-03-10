@@ -1,5 +1,5 @@
 ﻿@inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -53,15 +53,13 @@
 
                 //提醒敏感词
             }
-            var result = await Http.PostAsJsonAsync<ExamineProcModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExamineProcModel
+            var obj = await _httpService.PostAsync<ExamineProcModel, Result>("api/examines/proc", new ExamineProcModel
             {
                 Id = Model.Id,
                 IsPassed = isPassed,
                 Comments = Model.Comments,
                 ContributionValue = Model.ContributionValue
             });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

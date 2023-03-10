@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -62,9 +62,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<RobotEventsPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotEventList", new RobotEventsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListRobotEventAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<RobotEventsPagesInfor, QueryData<ListRobotEventAloneModel>>("api/robot/GetRobotEventList", new RobotEventsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -80,9 +78,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotEvent", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenRobotModel, Result>("api/robot/HiddenRobotEvent", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -168,9 +164,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ListRobotEventAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotEventData", model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ListRobotEventAloneModel, Result>("api/robot/UpdateRobotEventData", model);
 
             if (obj.Successful == false)
             {

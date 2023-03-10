@@ -1,7 +1,7 @@
 ﻿@page "/admin/index"
 @page "/admin"
 @attribute [Authorize(Roles = "Admin")]
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -48,7 +48,7 @@
         {
             try
             {
-                APIServerModel = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview", ToolHelper.options);
+                APIServerModel = await _httpService.GetAsync<ServerStaticOverviewModel>("api/admin/GetServerStaticDataOverview");
                 if (ToolHelper.IsWASM == false)
                 {
                     BlazorServerModel = SystemEnvironmentHelper.GetServerStaticDataOverview();

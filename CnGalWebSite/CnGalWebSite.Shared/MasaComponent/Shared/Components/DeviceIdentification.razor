@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 @inject IJSRuntime JS
 
@@ -33,7 +33,7 @@
             }
             else
             {
-                Model.Ip = await Http.GetStringAsync(ToolHelper.WebApiPath + "api/account/GetIp");
+                Model.Ip = await _httpService.GetAsync<string>("api/account/GetIp");
 
             }
 

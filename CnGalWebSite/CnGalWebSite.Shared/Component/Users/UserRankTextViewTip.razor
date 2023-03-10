@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IDataCacheService _dataCatcheService
 
@@ -91,7 +91,7 @@
             {
                 return;
             }
-            var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + UserId, ToolHelper.options);
+            var model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + UserId);
             Ranks = model.Ranks;
             StateHasChanged();
         }

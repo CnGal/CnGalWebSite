@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -108,13 +108,10 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<UnBindGroupQQModel>(ToolHelper.WebApiPath + "api/space/UnBindGroupQQ", new UnBindGroupQQModel
+            var obj = await _httpService.PostAsync<UnBindGroupQQModel, Result>("api/space/UnBindGroupQQ", new UnBindGroupQQModel
             {
                 Verification = model
             });
-
-                    string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -138,14 +135,10 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<UnBindGroupQQModel>(ToolHelper.WebApiPath + "api/space/GetBindGroupQQCode", new UnBindGroupQQModel
+            var obj = await _httpService.PostAsync<UnBindGroupQQModel, Result>("api/space/GetBindGroupQQCode", new UnBindGroupQQModel
             {
                 Verification = model
             });
-
-
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

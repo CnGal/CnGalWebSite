@@ -130,7 +130,7 @@ namespace CnGalWebSite.Shared
                 {
                     if (await _authService.IsLogin())
                     {
-                        await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline", ToolHelper.options);
+                        await _httpService.GetAsync<Result>("api/account/MakeUserOnline");
                     }
                 }
                 catch

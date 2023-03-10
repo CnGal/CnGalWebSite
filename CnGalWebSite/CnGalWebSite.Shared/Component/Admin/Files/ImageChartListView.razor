@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -40,9 +40,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<FilesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetFileList", new FilesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListFileAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<FilesPagesInfor, QueryData<ListFileAloneModel>>("api/admin/GetFileList", new FilesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception exc)
         {
@@ -98,7 +96,7 @@
 
     private async Task LookFile(string url)
     {
-       await _eventService.OpenNewPage(url);
+        await _eventService.OpenNewPage(url);
     }
 
 }

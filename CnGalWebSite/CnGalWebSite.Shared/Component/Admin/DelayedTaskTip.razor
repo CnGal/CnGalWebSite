@@ -1,5 +1,5 @@
 ﻿@inject ILocalStorageService _localStorage
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
 
@@ -17,7 +17,7 @@
                 _dataCacheService.DelayedTaskList = taskList;
             }
             //确保网络连通
-            if (await Http.GetFromJsonAsync<List<HomeNewsAloneViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeNewsView", ToolHelper.options) == null)
+            if (await _httpService.GetAsync<List<HomeNewsAloneViewModel>>("api/home/GetHomeNewsView") == null)
             {
                 return;
             }
@@ -30,9 +30,7 @@
                     if (item.Type == DelayedTaskType.DrawLottery)
                     {
                         var model = JsonSerializer.Deserialize<ManualLotteryModel>(item.Context, ToolHelper.options);
-                        var result = await Http.PostAsJsonAsync<ManualLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/DrawLottery", model);
-                        string jsonContent = result.Content.ReadAsStringAsync().Result;
-                        Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                        var obj = await _httpService.PostAsync<ManualLotteryModel, Result>("api/lotteries/DrawLottery", model);
                         //判断结果
                         if (obj.Successful == false)
                         {

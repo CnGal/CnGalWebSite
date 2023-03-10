@@ -1,5 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 
 
@@ -82,7 +82,7 @@
                 {
                     _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
                 }
-                var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId, ToolHelper.options);
+                var model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + userId);
 
                 StateHasChanged();
                 _dataCacheService.UserInfor = model;

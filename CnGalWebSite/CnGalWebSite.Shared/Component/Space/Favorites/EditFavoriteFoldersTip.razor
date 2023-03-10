@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -63,9 +63,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<FavoriteFoldersPagesInfor>(ToolHelper.WebApiPath + "api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, UserId = Id });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListFavoriteFolderAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<FavoriteFoldersPagesInfor, QueryData<ListFavoriteFolderAloneModel>>("api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, UserId = Id });
         }
         catch (Exception ex)
         {
@@ -77,13 +75,13 @@
     private void OnRowManageClick(long id)
     {
         NavigationManager.NavigateTo($"/space/EditSpaceFavoriteObjects?UserId={Id}&FolderId={id}");
-        
+
     }
 
     private void OnRowLookClick(long id, string name)
     {
         NavigationManager.NavigateTo($"/favoritefolders/index/{id}");
-        
+
     }
 
 

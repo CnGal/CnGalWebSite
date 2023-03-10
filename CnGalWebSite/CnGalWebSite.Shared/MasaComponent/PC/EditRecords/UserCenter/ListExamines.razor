@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -81,15 +81,11 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-
-
-            var data = JsonSerializer.Deserialize<QueryData<ListExamineAloneModel>>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ExaminesPagesInfor, QueryData<ListExamineAloneModel>>("api/examines/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
 
             if (isFirst)
             {
-                if (data.TotalCount == 0)
+                if (obj.TotalCount == 0)
                 {
                     noData = true;
                 }
@@ -99,7 +95,7 @@ else
 
             StateHasChanged();
 
-            return data;
+            return obj;
         }
         catch (Exception exc)
         {
@@ -119,9 +115,7 @@ else
         try
         {
 
-            var result = await Http.PostAsJsonAsync<ExamineProcModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExamineProcModel { Id = examineId, IsPassed = isPassed, Comments = "" });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ExamineProcModel, Result>("api/examines/proc", new ExamineProcModel { Id = examineId, IsPassed = isPassed, Comments = "" });
             //判断结果
             if (obj.Successful == false)
             {

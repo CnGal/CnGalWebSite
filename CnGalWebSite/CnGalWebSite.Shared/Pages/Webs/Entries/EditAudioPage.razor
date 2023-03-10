@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
@@ -67,7 +67,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditAudioViewModel>("api/entries/editaudio/" + Id);
 
                 isReady = true;
                 StateHasChanged();
@@ -84,9 +84,7 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditAudioViewModel, Result>("api/entries/editaudio", Model);
             //判断结果
             if (obj.Successful == false)
             {

@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -56,7 +56,7 @@
     {
         try
         {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/UnCollectPeriphery/" + Id, ToolHelper.options);
+            Result obj = await _httpService.GetAsync<Result>("api/peripheries/UnCollectPeriphery/" + Id);
             //判断结果
             if (obj.Successful == false)
             {
@@ -78,7 +78,7 @@
     {
         try
         {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/CollectPeriphery/" + Id, ToolHelper.options);
+            Result obj = await _httpService.GetAsync<Result>("api/peripheries/CollectPeriphery/" + Id);
 
             //判断结果
             if (obj.Successful == false)

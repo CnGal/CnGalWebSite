@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 
 <div style="color: black;">
@@ -74,7 +74,7 @@
     {
         try
         {
-            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList", ToolHelper.options);
+            Items = await _httpService.GetAsync<List<string>>("api/home/GetSearchTipList");
             StateHasChanged();
         }
         catch (Exception ex)

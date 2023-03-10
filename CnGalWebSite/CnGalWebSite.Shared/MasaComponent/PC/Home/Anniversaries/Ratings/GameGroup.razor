@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
@@ -71,7 +71,7 @@
         {
             if (_dataCacheService.JudgableGamesCatche.Count == 0)
             {
-                _dataCacheService.JudgableGamesCatche = await Http.GetFromJsonAsync<List<JudgableGameViewModel>>(ToolHelper.WebApiPath + "api/anniversaries/GetAllJudgableGames", ToolHelper.options);
+                _dataCacheService.JudgableGamesCatche = await _httpService.GetAsync<List<JudgableGameViewModel>>("api/anniversaries/GetAllJudgableGames");
             }
 
             var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString;

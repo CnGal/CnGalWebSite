@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -31,9 +31,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<ErrorCountsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetErrorCountList", new ErrorCountsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListErrorCountAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<ErrorCountsPagesInfor, QueryData<ListErrorCountAloneModel>>("api/admin/GetErrorCountList", new ErrorCountsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception exc)
         {

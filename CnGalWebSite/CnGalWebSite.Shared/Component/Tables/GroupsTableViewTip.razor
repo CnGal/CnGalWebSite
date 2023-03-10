@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -75,7 +75,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelGroup = await Http.GetFromJsonAsync<GroupInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGroupInforList", ToolHelper.options);
+            ModelGroup = await _httpService.GetAsync<GroupInforListViewModel>("api/tables/GetGroupInforList");
             isReady = true;
         }
         catch (Exception ex)

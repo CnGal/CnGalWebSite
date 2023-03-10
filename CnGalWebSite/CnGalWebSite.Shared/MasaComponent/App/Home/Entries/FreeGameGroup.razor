@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -29,7 +29,7 @@
         {
             if (_dataCacheService.FreeGamesCatche.Count == 0)
             {
-                _dataCacheService.FreeGamesCatche = await Http.GetFromJsonAsync<List<EntryInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetFreeGames", ToolHelper.options);
+                _dataCacheService.FreeGamesCatche = await _httpService.GetAsync<List<EntryInforTipViewModel>>("api/steam/GetFreeGames");
             }
 
             _dataCacheService.FreeGamesCatche.Random();

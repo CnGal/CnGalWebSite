@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -36,7 +36,7 @@
             {
                 if (_dataCacheService.DiscountGamesCatche.Any()==false)
                 {
-                    _dataCacheService.DiscountGamesCatche=await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options);
+                    _dataCacheService.DiscountGamesCatche=await _httpService.GetAsync<List<SteamInforTipViewModel>>("api/steam/GetAllDiscountSteamGame");
                 }
 
                 _dataCacheService.DiscountGamesCatche.Random();

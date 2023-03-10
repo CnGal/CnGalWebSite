@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -68,9 +68,9 @@ else
             try
             {
                 //获取所有词条
-                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags", ToolHelper.options);
+                TagItems = await _httpService.GetAsync<List<string>>("api/tags/GetAllTags");
 
-                Model = await Http.GetFromJsonAsync<EditTagChildTagsViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildTags/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditTagChildTagsViewModel>("api/tags/EditChildTags/" + Id);
                 isReady = true;
                 StateHasChanged();
             }
@@ -85,9 +85,7 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditTagChildTagsViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildTags", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditTagChildTagsViewModel, Result>("api/tags/EditChildTags", Model);
             //判断结果
             if (obj.Successful == false)
             {

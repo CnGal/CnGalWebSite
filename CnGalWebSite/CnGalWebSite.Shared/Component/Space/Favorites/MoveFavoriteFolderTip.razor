@@ -1,6 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 
 <MDialog @bind-Value="Dialog"
@@ -67,9 +67,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<MoveFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/MoveFavoriteObjects", new MoveFavoriteObjectsModel { CurrentFolderId = Id, FolderIds = folderIds.ToArray(), ObjectIds = objectIds });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<MoveFavoriteObjectsModel, Result>("api/favorites/MoveFavoriteObjects", new MoveFavoriteObjectsModel { CurrentFolderId = Id, FolderIds = folderIds.ToArray(), ObjectIds = objectIds });
 
             if (obj.Successful == false)
             {

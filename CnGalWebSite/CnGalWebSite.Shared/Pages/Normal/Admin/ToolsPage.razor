@@ -1,7 +1,7 @@
 ﻿@page "/admin/tools"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -55,7 +55,7 @@
         try
         {
             await ToastService.Success("正在置顶最新发行的游戏", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/MakeNewestGamesTop", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/admin/MakeNewestGamesTop");
             //判断结果
             if (obj.Successful == false)
             {
@@ -76,9 +76,7 @@
         try
         {
             await ToastService.Success("正在清空所有游戏权重", "任务执行需要一定时间，请稍安勿躁");
-            var result = await Http.PostAsJsonAsync<EditEntryPriorityViewModel>(ToolHelper.WebApiPath + "api/entries/EditEntryPriority", new EditEntryPriorityViewModel { Operation = EditEntryPriorityOperation.ClearAllGame });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditEntryPriorityViewModel, Result>("api/entries/EditEntryPriority", new EditEntryPriorityViewModel { Operation = EditEntryPriorityOperation.ClearAllGame });
             //判断结果
             if (obj.Successful == false)
             {
@@ -99,7 +97,7 @@
         try
         {
             await ToastService.Success("正在获取所有游戏的SteamId", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/GetAllEntriesSteam", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/steam/GetAllEntriesSteam");
             //判断结果
             if (obj.Successful == false)
             {
@@ -120,7 +118,7 @@
         try
         {
             await ToastService.Success("正在更新所有游戏Steam信息", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/UpdateAllSteamInfor", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/steam/UpdateAllSteamInfor");
             //判断结果
             if (obj.Successful == false)
             {
@@ -141,7 +139,7 @@
         try
         {
             await ToastService.Success("正在刷新搜索缓存", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/RefreshSearchData", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/admin/RefreshSearchData");
             //判断结果
             if (obj.Successful == false)
             {
@@ -162,7 +160,7 @@
         try
         {
             await ToastService.Success("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/TempFunction", ToolHelper.options);
+            var obj = await _httpService.GetAsync<Result>("api/admin/TempFunction");
             //判断结果
             if (obj.Successful == false)
             {

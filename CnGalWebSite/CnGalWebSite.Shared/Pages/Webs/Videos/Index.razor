@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -274,9 +274,7 @@ else
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/videos/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<RevokeExamineModel, Result>("api/videos/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
             //判断结果
             if (obj.Successful == false)
             {

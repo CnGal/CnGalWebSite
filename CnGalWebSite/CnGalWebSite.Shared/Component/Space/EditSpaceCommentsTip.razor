@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -70,9 +70,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/comments/GetCommentListNormal", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options, Type = Type, ObjectId = Id });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListCommentAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<CommentsPagesInfor, QueryData<ListCommentAloneModel>>("api/comments/GetCommentListNormal", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options, Type = Type, ObjectId = Id });
         }
         catch (Exception ex)
         {
@@ -93,7 +91,7 @@
                 break;
 
         }
-        
+
     }
 
     /// <summary>
@@ -106,9 +104,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenCommentModel>(ToolHelper.WebApiPath + "api/comments/UserHiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/UserHiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -167,9 +163,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<DeleteCommentModel>(ToolHelper.WebApiPath + "api/comments/UserDeleteComment", new DeleteCommentModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<DeleteCommentModel, Result>("api/comments/UserDeleteComment", new DeleteCommentModel { Ids = ids });
 
             if (obj.Successful == false)
             {
@@ -209,9 +203,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditCommentPriorityViewModel>(ToolHelper.WebApiPath + "api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditCommentPriorityViewModel, Result>("api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             if (obj.Successful == false)
             {
                 await ToastService.Error("修改评论权重失败", obj.Error);

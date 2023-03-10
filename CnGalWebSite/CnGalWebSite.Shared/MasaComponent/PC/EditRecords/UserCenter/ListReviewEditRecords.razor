@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -71,14 +71,11 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<UserReviewEditRecordsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserReviewEditRecordList", new UserReviewEditRecordsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-
-            var data= JsonSerializer.Deserialize<QueryData<ListUserReviewEditRecordAloneModel>>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<UserReviewEditRecordsPagesInfor, QueryData<ListUserReviewEditRecordAloneModel>>("api/examines/GetUserReviewEditRecordList", new UserReviewEditRecordsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
 
             if (isFirst)
             {
-                if (data.TotalCount == 0)
+                if (obj.TotalCount == 0)
                 {
                     noData = true;
                 }
@@ -88,7 +85,7 @@ else
 
             StateHasChanged();
 
-            return data;
+            return obj;
         }
         catch (Exception ex)
         {
@@ -113,9 +110,7 @@ else
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserReviewEditRecordStateModel>(ToolHelper.WebApiPath + "api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel { ExamineIds = ids, State = state });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel { ExamineIds = ids, State = state });
 
 
 

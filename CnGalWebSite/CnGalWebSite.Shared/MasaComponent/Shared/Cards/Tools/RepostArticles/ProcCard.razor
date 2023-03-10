@@ -1,7 +1,7 @@
 ﻿@inject IArticleService _articleService
 @implements IDisposable
 @inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 
 <div>
     <div>@($"{item.Url} ({index}/{Model.Count})")</div>
@@ -71,8 +71,8 @@
         try
         {
             //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
-            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
+            EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+            ArticleItems = await _httpService.GetAsync<List<string>>("api/articles/GetAllArticles");
 
             mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
 

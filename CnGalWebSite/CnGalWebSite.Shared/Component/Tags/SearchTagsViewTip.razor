@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="fa fa-fw fa-search" Collapable Class="@Class">
@@ -54,7 +54,7 @@
         try
         {
             //获取所有标签
-            Items = await Http.GetFromJsonAsync<List<TagTreeModel>>(ToolHelper.WebApiPath + "api/tags/GetTagsTreeView", ToolHelper.options);
+            Items = await _httpService.GetAsync<List<TagTreeModel>>("api/tags/GetTagsTreeView");
 
             //遍历寻找最后一级的标签
             foreach (var item in Items)

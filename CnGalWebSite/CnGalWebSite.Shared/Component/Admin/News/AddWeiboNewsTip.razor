@@ -1,5 +1,5 @@
 ﻿@inject ToastService ToastService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -53,9 +53,7 @@
             }
 
 
-            var result = await Http.PostAsJsonAsync<AddWeiboNewsModel>(ToolHelper.WebApiPath + "api/news/AddWeiboNews", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<AddWeiboNewsModel, Result>("api/news/AddWeiboNews", Model);
             //判断结果
             if (obj.Successful == false)
             {

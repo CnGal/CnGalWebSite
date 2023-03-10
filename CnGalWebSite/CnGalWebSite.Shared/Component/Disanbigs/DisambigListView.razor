@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -53,9 +53,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<DisambigsPagesInfor>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigListNormal", new DisambigsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListDisambigAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<DisambigsPagesInfor, QueryData<ListDisambigAloneModel>>("api/disambigs/GetDisambigListNormal", new DisambigsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {

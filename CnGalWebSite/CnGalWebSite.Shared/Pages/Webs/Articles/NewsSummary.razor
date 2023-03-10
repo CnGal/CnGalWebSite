@@ -1,5 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -96,7 +96,7 @@
         StateHasChanged();
         try
         {
-            _dataCacheService.NewsSummaryCache.Items = await Http.GetFromJsonAsync<List<NewsSummaryAloneViewModel>>(ToolHelper.WebApiPath + "api/articles/GetNewSummary/" + name, ToolHelper.options);
+            _dataCacheService.NewsSummaryCache.Items = await _httpService.GetAsync<List<NewsSummaryAloneViewModel>>("api/articles/GetNewSummary/" + name);
             _dataCacheService.NewsSummaryCache.CurrentPage = 1;
             isReady = true;
             StateHasChanged();

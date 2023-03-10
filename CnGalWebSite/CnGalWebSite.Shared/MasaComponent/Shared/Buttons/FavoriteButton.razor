@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -83,7 +83,7 @@
     {
         try
         {
-            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + Id + "/" + Type, ToolHelper.options);
+            var userFavoriteInfor = await _httpService.GetAsync<IsObjectInUserFavoriteFolderResult>("api/favorites/IsObjectInUserFavoriteFolder/" + Id + "/" + Type);
 
             if (userFavoriteInfor != null)
             {
@@ -102,7 +102,7 @@
     {
         try
         {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id, ToolHelper.options);
+            UserFavoriteInfor = await _httpService.GetAsync<FavoriteFoldersViewModel>("api/favorites/GetUserFavoriteFolders/" + id);
         }
         catch (Exception ex)
         {
@@ -131,9 +131,7 @@
             //直接添加到默认收藏夹
             try
             {
-                var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = Id, Type = Type });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<AddFavoriteObjectViewModel, Result>("api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = Id, Type = Type });
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -156,9 +154,7 @@
 
         try
         {
-            var result = await Http.PostAsJsonAsync<UnFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = Id, Type = Type });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<UnFavoriteObjectsModel, Result>("api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = Id, Type = Type });
             //判断结果
             if (obj.Successful == false)
             {

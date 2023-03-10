@@ -1,5 +1,5 @@
 ﻿@inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -73,9 +73,7 @@
         {
             SearchModelUser.ApplicationUserId = Id;
 
-            var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListMessageAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<MessagesPagesInfor, QueryData<ListMessageAloneModel>>("api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -91,7 +89,7 @@
             NavigationManager.NavigateTo(Provider,link, name, "fa fa-star-o");
         }
 
-        
+
     }
 
     private async Task OnRowEditIsReadedClick(long[] ids, bool isReaded, bool showMessage)
@@ -100,9 +98,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditMessageIsReadedModel>(ToolHelper.WebApiPath + "api/space/UserEditMessageIsReaded", new EditMessageIsReadedModel { Ids = ids, IsReaded = isReaded });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditMessageIsReadedModel, Result>("api/space/UserEditMessageIsReaded", new EditMessageIsReadedModel { Ids = ids, IsReaded = isReaded });
 
 
 
@@ -161,9 +157,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<DeleteMessagesModel>(ToolHelper.WebApiPath + "api/space/UserDeleteMessages", new DeleteMessagesModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<DeleteMessagesModel, Result>("api/space/UserDeleteMessages", new DeleteMessagesModel { Ids = ids });
 
             if (obj.Successful == false)
             {
@@ -219,9 +213,7 @@
             OnEditAsync = async context =>
             {
 
-                var result = await Http.PostAsJsonAsync<ListMessageAloneModel>(ToolHelper.WebApiPath + "api/space/PostMessages", (ListMessageAloneModel)context.Model);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = await _httpService.PostAsync<ListMessageAloneModel, Result>("api/space/PostMessages", (ListMessageAloneModel)context.Model);
 
 
 

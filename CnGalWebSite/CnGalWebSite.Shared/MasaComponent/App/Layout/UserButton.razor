@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
 
@@ -144,7 +144,7 @@
 
                 if (string.IsNullOrWhiteSpace(userId) == false)
                 {
-                    Model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId, ToolHelper.options);
+                    Model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + userId);
 
 
                     _dataCacheService.UserInfor = Model;

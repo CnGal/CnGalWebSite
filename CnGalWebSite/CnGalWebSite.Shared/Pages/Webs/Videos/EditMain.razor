@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -61,7 +61,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditVideoMainViewModel>(ToolHelper.WebApiPath + "api/videos/editmain/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditVideoMainViewModel>("api/videos/editmain/" + Id);
 
                 isReady = true;
                 StateHasChanged();
@@ -77,9 +77,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditVideoMainViewModel>(ToolHelper.WebApiPath + "api/videos/editmain", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditVideoMainViewModel, Result>("api/videos/editmain", Model);
             //判断结果
             if (obj.Successful == false)
             {

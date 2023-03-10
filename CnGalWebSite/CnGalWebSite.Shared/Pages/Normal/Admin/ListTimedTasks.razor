@@ -1,7 +1,7 @@
 ﻿@page "/admin/listtimedtasks"
 @attribute [Authorize(Roles = "Admin")]
 @inject IAuthService AuthService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -71,9 +71,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<TimedTasksPagesInfor>(ToolHelper.WebApiPath + "api/timedtasks/GetTimedTaskList", new TimedTasksPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListTimedTaskAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<TimedTasksPagesInfor, QueryData<ListTimedTaskAloneModel>>("api/timedtasks/GetTimedTaskList", new TimedTasksPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -89,9 +87,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<PauseTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/PauseTimedTask", new PauseTimedTaskModel { Ids = ids, IsPause = isPause });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<PauseTimedTaskModel, Result>("api/timedtasks/PauseTimedTask", new PauseTimedTaskModel { Ids = ids, IsPause = isPause });
 
 
 
@@ -146,9 +142,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<DeleteTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/DeleteTimedTask", new DeleteTimedTaskModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<DeleteTimedTaskModel, Result>("api/timedtasks/DeleteTimedTask", new DeleteTimedTaskModel { Ids = ids });
 
             if (obj.Successful == false)
             {
@@ -189,9 +183,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<RunTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/RunTimedTask", new RunTimedTaskModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<RunTimedTaskModel, Result>("api/timedtasks/RunTimedTask", new RunTimedTaskModel { Ids = ids });
 
             if (obj.Successful == false)
             {
@@ -261,9 +253,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ListTimedTaskAloneModel>(ToolHelper.WebApiPath + (model.Id == 0 ? "api/timedtasks/AddTimedTask" : "api/timedtasks/UpdateTimedTaskData"), model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ListTimedTaskAloneModel, Result>(model.Id == 0 ? "api/timedtasks/AddTimedTask" : "api/timedtasks/UpdateTimedTaskData", model);
 
             if (obj.Successful == false)
             {

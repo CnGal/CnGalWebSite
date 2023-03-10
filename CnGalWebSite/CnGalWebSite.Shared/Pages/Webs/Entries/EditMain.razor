@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -75,7 +75,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id, ToolHelper.options);
+                Model = await _httpService.GetAsync<EditMainViewModel>("api/entries/editmain/" + Id);
                 isReady = true;
                 StateHasChanged();
             }
@@ -91,9 +91,7 @@ else
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditMainViewModel, Result>("api/entries/editmain", Model);
             //判断结果
             if (obj.Successful == false)
             {

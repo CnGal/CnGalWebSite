@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -71,7 +71,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelMaker = await Http.GetFromJsonAsync<MakerInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetMakerInforList", ToolHelper.options);
+            ModelMaker = await _httpService.GetAsync<MakerInforListViewModel>("api/tables/GetMakerInforList");
             isReady = true;
         }
         catch (Exception ex)

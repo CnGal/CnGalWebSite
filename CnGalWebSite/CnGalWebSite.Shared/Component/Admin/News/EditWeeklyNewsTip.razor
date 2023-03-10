@@ -1,6 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject DialogService DialogService
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -121,7 +121,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditWeeklyNewsModel>("api/news/EditWeeklyNews/" + Id);
 
 
             isReady = true;
@@ -154,9 +154,7 @@
                 return;
             }
 
-            var result = await Http.PostAsJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditWeeklyNewsModel, Result>("api/news/EditWeeklyNews", Model);
             //判断结果
             if (obj.Successful == false)
             {
@@ -181,7 +179,7 @@
         await OnSave();
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishWeelyNews/" + Id, ToolHelper.options);
+            var result = await _httpService.GetAsync<Result>("api/news/PublishWeelyNews/" + Id);
             if (result.Successful)
             {
                 await ToastService.Success("发布周报成功", "发布周报成功");
@@ -206,7 +204,7 @@
 
         try
         {
-            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetWeelyNewsPreview/" + Id, ToolHelper.options);
+            ArticleViewModel model = await _httpService.GetAsync<ArticleViewModel>("api/news/GetWeelyNewsPreview/" + Id);
 
 
             if (previewArticleTip != null)
@@ -232,7 +230,7 @@
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id, ToolHelper.options);
+            var result = await _httpService.GetAsync<Result>("api/news/ResetWeelyNews/" + Id);
             if (result.Successful)
             {
                 await DataChanged();

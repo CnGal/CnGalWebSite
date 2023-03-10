@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -31,7 +31,7 @@
             try
             {
                 //获取文章信息
-                var AsyncModel = await Http.GetFromJsonAsync<ArticleAsyncInforViewModel>(ToolHelper.WebApiPath + "api/articles/GetArticleAsyncInfor/" + Id, ToolHelper.options);
+                var AsyncModel = await _httpService.GetAsync<ArticleAsyncInforViewModel>("api/articles/GetArticleAsyncInfor/" + Id);
                 IsThumbsUp = AsyncModel.IsThumbsUp;
                 isReady = true;
                 StateHasChanged();
@@ -74,9 +74,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<ThumbsUpArticleModel>(ToolHelper.WebApiPath + "api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = false });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = false });
             //判断结果
             if (obj.Successful == false)
             {
@@ -98,9 +96,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ThumbsUpArticleModel>(ToolHelper.WebApiPath + "api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = true });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = true });
             //判断结果
             if (obj.Successful == false)
             {

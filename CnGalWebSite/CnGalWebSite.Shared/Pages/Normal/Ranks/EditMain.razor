@@ -1,7 +1,7 @@
 ﻿@page "/ranks/editmain/{Id}"
 @attribute [Authorize]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
@@ -78,7 +78,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditRankViewModel>(ToolHelper.WebApiPath + "api/ranks/EditRank/" + Id, ToolHelper.options);
+            Model = await _httpService.GetAsync<EditRankViewModel>("api/ranks/EditRank/" + Id);
             isReady = true;
         }
         catch (Exception ex)
@@ -93,9 +93,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<EditRankViewModel>(ToolHelper.WebApiPath + "api/ranks/EditRank", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditRankViewModel, Result>("api/ranks/EditRank", Model);
             //判断结果
             if (obj.Successful == false)
             {

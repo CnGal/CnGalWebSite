@@ -1,7 +1,7 @@
 ﻿@typeparam TValue where TValue : BaseImageEditModel , new()
 
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Multiple Text="上传图片到图床" Icon="IconType.CloudUpload" OnImageUploaded="AddImage" ShowPreview="false"/>

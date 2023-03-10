@@ -1,7 +1,7 @@
 ﻿@page "/admin/listvotes"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
+@inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -78,9 +78,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<VotesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetVoteList", new VotesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListVoteAloneModel>>(jsonContent, ToolHelper.options);
+            return await _httpService.PostAsync<VotesPagesInfor, QueryData<ListVoteAloneModel>>("api/admin/GetVoteList", new VotesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
         }
         catch (Exception ex)
         {
@@ -93,9 +91,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditVotePriorityViewModel>(ToolHelper.WebApiPath + "api/votes/EditVotePriority", new EditVotePriorityViewModel { Ids = ids, PlusPriority = plusPriority });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditVotePriorityViewModel, Result>("api/votes/EditVotePriority", new EditVotePriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             if (obj.Successful == false)
             {
                 await ToastService.Error("修改投票权重失败", obj.Error);
@@ -151,9 +147,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenVoteModel>(ToolHelper.WebApiPath + "api/votes/HiddenVote", new HiddenVoteModel { Ids = ids, IsHidden = isHidden });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<HiddenVoteModel, Result>("api/votes/HiddenVote", new HiddenVoteModel { Ids = ids, IsHidden = isHidden });
 
 
 
@@ -206,7 +200,7 @@
     public void OnRowLookClick(long id, string name)
     {
         NavigationManager.NavigateTo(Provider, "/votes/index/" + id, name, "fa fa-dropbox");
-        
+
     }
 
 
@@ -216,9 +210,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditVoteCanCommentModel>(ToolHelper.WebApiPath + "api/comments/EditVoteCanComment", new EditVoteCanCommentModel { Ids = ids, CanComment = canComment });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var obj = await _httpService.PostAsync<EditVoteCanCommentModel, Result>("api/comments/EditVoteCanComment", new EditVoteCanCommentModel { Ids = ids, CanComment = canComment });
 
 
 

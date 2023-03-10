@@ -1,4 +1,4 @@
-﻿@inject HttpClient Http
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
@@ -38,14 +38,11 @@
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<EditUserReviewEditRecordStateModel>(ToolHelper.WebApiPath + "api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
+            var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
             {
                 State = state,
                 ExamineIds = new long[] { Model.Id }
             });
-
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 
             //判断结果
             if (obj.Successful == false)
