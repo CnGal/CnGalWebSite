@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.RobotClient", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PublicToolbox", "CnGalWebSite\CnGalWebSite.PublicToolbox\CnGalWebSite.PublicToolbox.csproj", "{5DA487BA-909F-4962-9898-9D05BDC52945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.HealthCheck", "CnGalWebSite\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj", "{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.HealthCheck", "CnGalWebSite\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj", "{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
