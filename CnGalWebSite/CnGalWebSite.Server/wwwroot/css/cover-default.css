@@ -208,9 +208,6 @@ input.te-image-file-input {
     padding-bottom: 0;
     padding-top: 0;
 }
-.m-application ul, .m-application ol {
-    padding-left: 0;
-}
 .theme--light.m-application code {
      background-color: transparent;
 }

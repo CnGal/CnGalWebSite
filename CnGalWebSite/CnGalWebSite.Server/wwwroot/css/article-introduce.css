@@ -43,9 +43,10 @@
     .article-introduce dt {
         font-weight:inherit;
     }
-.article-introduce dl div {
-    display: flex;
-}
+    .article-introduce dl div {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
 .article-introduce dt::after {
     content: "：";
