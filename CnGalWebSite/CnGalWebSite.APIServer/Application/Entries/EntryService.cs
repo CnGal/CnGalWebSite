@@ -1315,7 +1315,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
 
                 }
-                else if(item.DisplayName == "闲踏梧桐")
+                else if(item.DisplayName == "昵称（官方称呼）")
                 {
                     continue;
                 }
