@@ -1,11 +1,11 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService ToastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
 @inject IStructuredDataService _structuredDataService
 @inject DialogService DialogService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 @implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
@@ -35,6 +35,9 @@ else
                 break;
             case EntryStyleTemplate.OfficialWebsite:
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.OfficialWebsite.Main.IndexCard Model="EntryView" />
+                break;
+            case EntryStyleTemplate.ArticleIntroduce:
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.IndexCard Model="EntryView" />
                 break;
             default:
                 break;
@@ -224,11 +227,11 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("撤销审核请求失败", obj.Error);
+                await PopupService.ToastAsync("撤销审核请求失败", AlertTypes.Error);
             }
             else
             {
-                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                await PopupService.ToastAsync("撤销审核请求成功", AlertTypes.Success);
                 //修改各部分编辑状态
                 switch (operation)
                 {
@@ -290,9 +293,15 @@ else
         }
     }
 
-    public void SwitchEntryStyle()
+    public async void SwitchEntryStyle()
     {
-        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("style", style == EntryStyleTemplate.Default ? 2 : 1));
+        var index = ((int)style + 1) % 4;
+        if (index == 0)
+        {
+            index = 1;
+        }
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("style", index));
+        await PopupService.ToastAsync($"应用“{((EntryStyleTemplate)index).GetDisplayName()}”样式", AlertTypes.Success);
     }
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)

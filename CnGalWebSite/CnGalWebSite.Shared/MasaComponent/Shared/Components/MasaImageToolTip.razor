@@ -3,7 +3,7 @@
 <MTooltip Left>
     <ActivatorContent>
 
-        <MButton Dark XSmall Fab @attributes="@context.Attrs" Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
+        <MButton Dark="_dataCacheService.ThemeSetting.IsDark" XSmall Fab @attributes="@context.Attrs" Color="primary">
             <MIcon>
                 @Icon
             </MIcon>

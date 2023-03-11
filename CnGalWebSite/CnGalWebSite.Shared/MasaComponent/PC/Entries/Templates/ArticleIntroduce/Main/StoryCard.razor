@@ -1,0 +1,15 @@
+﻿
+@if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+{
+    <section id="story">
+        <h2>介绍</h2>
+        <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+    </section>
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

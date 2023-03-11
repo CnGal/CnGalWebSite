@@ -1,0 +1,94 @@
+﻿@if (Model.Roles.Any())
+{
+    <section id="character">
+        <h2>角色介绍</h2>
+        @foreach (var item in Model.Roles)
+        {
+            <div>
+
+                @if (string.IsNullOrWhiteSpace(item.StandingPainting))
+                {
+                    if (string.IsNullOrWhiteSpace(item.MainImage))
+                    {
+                        <img src="@item.MainImage" alt="@item.Name" />
+                    }
+                }
+                else
+                {
+                    <img src="@item.StandingPainting" alt="@item.Name" />
+                }
+                <div class="name">
+                    <a href="@(item.Id>0?$"/entries/index/{item.Id}":null)">
+                        @item.Name
+                    </a>
+                    @if(string.IsNullOrWhiteSpace(item.RoleIdentity)==false)
+                    {
+                        <span> - @item.RoleIdentity</span>
+                    }
+                </div>
+                @if (item.Audio.Any())
+                {
+                    <div class="audio">
+                        @foreach (var temp in item.Audio)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@temp.Url" />
+                        }
+                    </div>
+                }
+                <dl>
+                    @if (item.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
+                    {
+                        <div>
+                            <dt>配音</dt>
+                            @foreach (var temp in item.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents)
+                            {
+                                <dd>
+                                    <a href="@(temp.Id>0?$"/entries/index/{temp.Id}":null)">
+                                        @temp.DisplayName
+                                    </a>
+                                </dd>
+                            }
+                        </div>
+
+                    }
+
+                    @if (string.IsNullOrWhiteSpace(item.Age) == false)
+                    {
+                        <div>
+                            <dt>年龄</dt>
+                            <dd>@item.Age</dd>
+                        </div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(item.Height) == false)
+                    {
+                        <div>
+                            <dt>身高</dt>
+                            <dd>@item.Height</dd>
+                        </div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(item.Birthday) == false)
+                    {
+                        <div>
+                            <dt>生日</dt>
+                            <dd>@item.Birthday</dd>
+                        </div>
+                    }
+                </dl>
+
+                @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) == false)
+                {
+                    <div class="description">
+                        @item.BriefIntroduction
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

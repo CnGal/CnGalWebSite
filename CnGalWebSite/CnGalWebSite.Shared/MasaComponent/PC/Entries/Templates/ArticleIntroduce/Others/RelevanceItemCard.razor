@@ -1,0 +1,21 @@
+﻿@if(Items.Any())
+            {
+<li>
+    <h3>@(Title+(Items.Count()>4?$" ({Items.Count()})":""))</h3>
+    <ul>
+        @foreach (var item in Items)
+        {
+            <li><a href="@item.DisplayValue" target="@(Outlink?"_blank":null)">@item.DisplayName</a></li>
+        }
+    </ul>
+</li>
+            }
+
+@code {
+    [Parameter]
+    public IEnumerable<KeyValueModel> Items { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public bool Outlink { get; set; }
+}

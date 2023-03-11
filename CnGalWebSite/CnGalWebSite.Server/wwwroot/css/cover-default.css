@@ -303,3 +303,6 @@ input.te-image-file-input {
 .img-fluid {
     width: 100%;
 }
+.m-application a {
+    color: var(--main-color);
+}

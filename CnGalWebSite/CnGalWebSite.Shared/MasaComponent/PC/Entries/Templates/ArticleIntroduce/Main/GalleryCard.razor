@@ -1,0 +1,52 @@
+﻿@inject IEventService _eventService
+@inject ImagesLargeViewService ImagesLargeViewService
+@inject IDataCacheService _dataCatcheService
+
+@if (Model.Pictures.Any())
+{
+    <section id="gallery">
+        <h2>相册</h2>
+        <div class="row">
+            @foreach (var item in imagesList.OrderByDescending(s => s.Priority))
+            {
+                <div class="col-12 col-md-6 col-lg-4 col-xxl-3">
+                    <img src="@item.Image" alt="@item.Note" @onclick="@(()=>OnClickImage(item))" />
+                </div>
+            }
+        </div>
+
+    </section>
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
+
+    protected override void OnParametersSet()
+    {
+        imagesList = Model.Pictures.Select(s => s.Pictures).SelectMany(s => s).Select(s => new EditImageAloneModel
+        {
+            Note = s.Note,
+            Image = s.Url
+        }).ToList();
+    }
+
+    public async Task OnClickImage(EditImageAloneModel model)
+    {
+        if (_dataCatcheService.IsApp)
+        {
+            await _eventService.OpenNewPage(model.Image);
+        }
+        else
+        {
+            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            {
+                Index = imagesList.IndexOf(model),
+                Pictures = imagesList
+            });
+        }
+
+    }
+}

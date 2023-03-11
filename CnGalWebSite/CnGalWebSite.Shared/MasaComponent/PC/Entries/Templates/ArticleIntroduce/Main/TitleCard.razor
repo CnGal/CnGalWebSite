@@ -1,0 +1,31 @@
+﻿
+<section id="title">
+
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    {
+        <img class="main-img @(Model.Type== EntryType.Role||Model.Type== EntryType.Staff?"no-limit":"")" src="@Model.MainPicture" alt="@Model.Name" />
+    }
+    else
+    {
+        @if (string.IsNullOrWhiteSpace(Model.Thumbnail) == false)
+        {
+            <img class="thum-img" src="@Model.Thumbnail" alt="@Model.Name" />
+        }
+    }
+
+
+    <h1>@Model.Name</h1>
+    @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) == false)
+    {
+        <div class="description">
+            @Model.BriefIntroduction
+        </div>
+    }
+
+</section>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

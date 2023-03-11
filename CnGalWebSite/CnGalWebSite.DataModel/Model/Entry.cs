@@ -267,8 +267,11 @@ namespace CnGalWebSite.DataModel.Model
         None,
         [Display(Name = "大卡片")]
         Default,
+        [Display(Name = "文章介绍")]
+        ArticleIntroduce,
         [Display(Name ="专题页")]
         OfficialWebsite
+      
     }
 
     public class EntryWebsiteImage

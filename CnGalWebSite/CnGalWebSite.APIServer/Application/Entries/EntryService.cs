@@ -1315,6 +1315,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
 
                 }
+                else if(item.DisplayName == "闲踏梧桐")
+                {
+                    continue;
+                }
 
                 var isAdd = false;
                 //如果信息值为空 则不显示
@@ -3616,6 +3620,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 roleModel.Age = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "年龄")?.DisplayValue;
                 roleModel.Birthday = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "生日")?.DisplayValue;
                 roleModel.Height = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "身高")?.DisplayValue;
+                roleModel.RoleIdentity = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "角色身份")?.DisplayValue;
             }
 
             return roleModel;

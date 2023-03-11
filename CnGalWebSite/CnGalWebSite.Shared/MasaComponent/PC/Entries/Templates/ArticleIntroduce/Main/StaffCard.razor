@@ -1,0 +1,44 @@
+﻿@if (Model.Staffs.Any())
+{
+    <section id="staff">
+        <h2>STAFF</h2>
+        @foreach (var item in Model.Staffs)
+        {
+            <div class="@(string.IsNullOrWhiteSpace(item.Modifier)?"group-no":"group")">
+                @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
+                {
+                    <h3 class="name">
+                        @item.Modifier
+                    </h3>
+                }
+
+                <dl class="items">
+                    @foreach (var infor in item.StaffList)
+                    {
+                        <div class="posts">
+                            <dt class="name">
+                                @infor.Modifier
+                            </dt>
+                            @foreach (var temp in infor.Names)
+                            {
+                                <dd class="staff-name">
+                                    <a href="@(temp.Id>0?$"/entries/index/{temp.Id}":null)">
+                                        @temp.DisplayName
+                                    </a>
+                                </dd>
+                            }
+                        </div>
+                    }
+                </dl>
+            </div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}
+
+

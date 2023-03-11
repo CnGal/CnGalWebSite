@@ -110,14 +110,9 @@
         }
 
         .official-website section h2 {
-            display: -webkit-box;
-            display: -ms-flexbox;
             display: flex;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
             align-items: center;
             padding: 0 0 6rem;
-            font-family: "Lato", sans-serif;
             letter-spacing: 0.5rem;
             font-weight: bold;
             color: var(--main-color);

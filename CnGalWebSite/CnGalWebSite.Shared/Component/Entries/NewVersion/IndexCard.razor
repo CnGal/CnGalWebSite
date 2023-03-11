@@ -99,7 +99,7 @@
                             @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
                             {
                                 <div class="mb-4">
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense/>
                                 </div>
                             }
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -210,7 +210,7 @@
                 @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
                 {
                     <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" />
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense/>
                     </div>
                 }
                 @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)

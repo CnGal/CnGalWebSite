@@ -1,0 +1,96 @@
+﻿@if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")) || Model.ProductionGroups.Any() || Model.Publishers.Any())
+{
+    <section id="information">
+
+        <h2>基本信息</h2>
+        <dl class="detail">
+            @if (Model.ProductionGroups.Any())
+            {
+                <div>
+                    <dt>制作组</dt>
+                    @foreach (var item in Model.ProductionGroups)
+                    {
+                        <dd>
+                            <a href="@(item.Id>0?$"/entries/index/{item.Id}":null)">
+                                @item.DisplayName
+                            </a>
+                        </dd>
+                    }
+                </div>
+            }
+            @if (Model.Publishers.Any())
+            {
+                <div>
+                    <dt>发行商</dt>
+                    @foreach (var item in Model.Publishers)
+                    {
+                        <dd>
+                            <a href="@(item.Id>0?$"/entries/index/{item.Id}":null)">
+                                @item.DisplayName
+                            </a>
+                        </dd>
+                    }
+                </div>
+            }
+            @if (Model.IsHideOutlink == false)
+            {
+                @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Where(s => s.DisplayName != "官网"))
+                {
+                    <div>
+                        <dt>@item.DisplayName</dt>
+                        <dd>@item.DisplayValue</dd>
+                    </div>
+                }
+            }
+
+        </dl>
+    </section>
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (Model.IsHideOutlink == false && (Model.Information.Any(s => s.Modifier == "相关网站") || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))))
+    {
+        <section id="websites">
+            <h2>相关网站</h2>
+            <dl class="links">
+                @if (Model.Information.Any(s => s.Modifier == "相关网站"))
+                {
+                    @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "相关网站").Informations)
+                    {
+                        <div>
+                            <dt>@item.DisplayName</dt>
+                            <dd>
+                                <a href="@item.DisplayValue" target="_blank">
+                                    @item.DisplayValue
+                                </a>
+                            </dd>
+                        </div>
+                    }
+                }
+
+                @if (Model.Information.Any(s => s.Modifier == "基本信息"))
+                {
+                    @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
+                    {
+                        var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
+                        <div>
+                            <dt>@item.DisplayName</dt>
+                            <dd>
+                                <a href="@item.DisplayValue" target="_blank">
+                                    @item.DisplayValue
+                                </a>
+                            </dd>
+                        </div>
+                    }
+                }
+            </dl>
+        </section>
+    }
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

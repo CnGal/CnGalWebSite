@@ -13,7 +13,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
+                <MButton Color="primary" Dark="_dataCacheService.ThemeSetting.IsDark" Small Fab @attributes="@attrs" OnClick="OnClick">
                     <MIcon>
                         @Icon
                     </MIcon>
