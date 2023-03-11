@@ -1,8 +1,8 @@
 ﻿@if (Model.Staffs != null && Model.Staffs.Count != 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" TextColor="red--text text--darken-2" ButtonColor="red darken-2" Icon="@IconType.Staff.ToIconString()" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" TextColor="error--text" ButtonColor="error" Icon="@IconType.Staff.ToIconString()" Collapable>
         <ButtonContent>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Color="red darken-2" XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Color="error" XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
         </ButtonContent>
         <ChildContent>
             <div>

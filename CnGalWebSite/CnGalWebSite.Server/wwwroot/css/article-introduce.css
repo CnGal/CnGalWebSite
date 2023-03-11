@@ -60,6 +60,7 @@
 }
     .article-introduce #gallery img {
         max-width: 100%;
+        cursor:pointer;
     }
     .article-introduce #gallery .row {
         row-gap: 24px;
