@@ -160,5 +160,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task<Video> AddNewVideoExaminesAsync(Video model, ApplicationUser user, string note);
 
         Task<Examine> GetUserVideoActiveExamineAsync(long videoId, string userId, Operation operation);
+
+        Task<object> GenerateModelFromExamines(object model);
     }
 }

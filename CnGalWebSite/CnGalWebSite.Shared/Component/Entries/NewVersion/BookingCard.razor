@@ -1,7 +1,7 @@
 ﻿
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"已有{Model.Booking.BookingCount}人预约")" Icon="@IconType.Booking.ToIconString()" Collapable>
     <Scroll style="max-height:500px">
-        <MTimeline AlignTop Dense Class="me-2">
+        <MTimeline AlignTop Dense="Dense" Class="me-2">
             @foreach (var item in Model.Booking.Goals)
             {
                 <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"orange":"green")"
@@ -24,4 +24,6 @@
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool Dense { get; set; }
 }

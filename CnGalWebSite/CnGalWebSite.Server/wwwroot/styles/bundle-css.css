@@ -1077,14 +1077,9 @@ a .aspect-ratio + p > strong {
         }
 
         .official-website section h2 {
-            display: -webkit-box;
-            display: -ms-flexbox;
             display: flex;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
             align-items: center;
             padding: 0 0 6rem;
-            font-family: "Lato", sans-serif;
             letter-spacing: 0.5rem;
             font-weight: bold;
             color: var(--main-color);
@@ -1430,3 +1425,111 @@ a .aspect-ratio + p > strong {
     width: 0;
     height: 0;
 }
+
+.article-introduce {
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    letter-spacing: 0.05rem;
+}
+    .article-introduce #title .main-img {
+        width: 500px;
+    }
+    .article-introduce #title .no-limit {
+        height: 500px;
+        width: fit-content;
+    }
+    .article-introduce #title .thum-img {
+        height: 200px;
+        border-radius: 50%;
+        width: fit-content;
+    }
+.article-introduce> section{
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+.article-introduce #title h1 {
+    font-weight: bold;
+}
+.article-introduce #title .description {
+    white-space: pre-line;
+}
+    .article-introduce section> h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+.article-introduce dl {
+    margin: 0;
+}
+.article-introduce  dd {
+    margin: 0;
+}
+    .article-introduce dt {
+        font-weight:inherit;
+    }
+.article-introduce dl div {
+    display: flex;
+}
+
+.article-introduce dt::after {
+    content: "：";
+}
+    .article-introduce dd + dd::before {
+        content: "、";
+    }
+
+.article-introduce a:hover {
+    text-decoration: underline;
+}
+    .article-introduce #gallery img {
+        max-width: 100%;
+    }
+    .article-introduce #gallery .row {
+        row-gap: 24px;
+    }
+    .article-introduce #character img {
+        height: 500px;
+        width: fit-content;
+    }
+    .article-introduce #character > div {
+        gap: .5rem;
+        display: flex;
+        cursor: pointer;
+        flex-direction: column;
+    }
+    .article-introduce #character .name {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    .article-introduce #character .description {
+        white-space: pre-line;
+    }
+    .article-introduce #staff .group > .name {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .article-introduce #relevance h3 {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .article-introduce ol, .article-introduce ul {
+       padding-left: 24px; 
+    }
+    .article-introduce ol, .article-introduce ul {
+        margin:0;
+    }
+    .article-introduce #relevance > ul {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
+    .article-introduce #operation {
+        flex-direction: row;
+        gap: 2rem;
+
+    }
+    

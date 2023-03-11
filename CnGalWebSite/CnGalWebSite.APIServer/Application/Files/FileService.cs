@@ -312,7 +312,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// <returns></returns>
         public async Task TransferMainImagesToPublic(int maxCount)
         {
-            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && (s.Type == EntryType.Game || s.Type == EntryType.ProductionGroup) && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
@@ -401,6 +401,10 @@ namespace CnGalWebSite.APIServer.Application.Files
                         if (string.IsNullOrWhiteSpace(temp) == false)
                         {
                             infor.Url = temp;
+                        }
+                        else
+                        {
+                            throw new Exception("转存图片失败");
                         }
                     }
 

@@ -8,10 +8,10 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     <div class="@(Outline?"":" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-4")">
         <div>
-            <MTextarea Label="备注" Rows="3" Color="green"
+            <MTextarea Label="备注" Rows="3" Color="success"
                        @bind-Value="Model.Note">
             </MTextarea>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnClickSubmit" Icon="mdi-check" Color="green" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnClickSubmit" Icon="mdi-check" Color="success" />
         </div>
     </div>
 </div>

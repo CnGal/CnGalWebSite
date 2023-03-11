@@ -180,6 +180,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string Height { get; set; }
         public string Birthday { get; set; }
         public string CV { get; set; }
+        public string RoleIdentity { get; set; }
 
         public string StandingPainting { get; set; }
     }

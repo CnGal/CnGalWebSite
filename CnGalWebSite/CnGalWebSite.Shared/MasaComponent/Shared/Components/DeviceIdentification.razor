@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 @inject IJSRuntime JS
+@inject HttpClient Http
 
 @code {
     [CascadingParameter]
@@ -27,14 +28,13 @@
 
         try
         {
-            if(connectionInfo!=null&&string.IsNullOrWhiteSpace( connectionInfo.RemoteIpAddress)==false)
+            if (connectionInfo != null && string.IsNullOrWhiteSpace(connectionInfo.RemoteIpAddress) == false)
             {
                 Model.Ip = connectionInfo.RemoteIpAddress;
             }
             else
             {
-                Model.Ip = await _httpService.GetAsync<string>("api/account/GetIp");
-
+                Model.Ip = await Http.GetStringAsync(ToolHelper.WebApiPath + "api/account/GetIp");
             }
 
         }
@@ -42,8 +42,6 @@
         {
             ErrorHandler.ProcessError(ex, "网络异常");
         }
-
-
     }
 
     public async Task Load()

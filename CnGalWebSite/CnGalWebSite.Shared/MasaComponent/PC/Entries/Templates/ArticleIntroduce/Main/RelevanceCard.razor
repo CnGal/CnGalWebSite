@@ -1,0 +1,42 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (Model.StaffGames.Any() || Model.EntryRelevances.Any()|| Model.ArticleRelevances.Any()|| Model.OtherRelevances.Any())
+{
+    <section id="relevance">
+        <h2>相关链接</h2>
+       
+        <ul>
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="动态"
+                                                                                                              Items="@( Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime).Select(s=>new KeyValueModel { DisplayName=$"{s.HappenedTime:yyyy年M月d日} - {s.Title}",DisplayValue=$"/articles/index/{s.ArticleId}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="文章"
+                                                                                                              Items="@( Model.ArticleRelevances.Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/articles/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="配音作品"
+                                                                                                              Items="@(Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.CV))).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="制作作品"
+                                                                                                              Items="@(Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup))).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="发行作品"
+                                                                                                              Items="@(Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher) && s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup) == false)).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="参与作品"
+                                                                                                              Items="@( Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.CV && ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.SpecialThanks) && s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup || ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher) == false)).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="特别感谢"
+                                                                                                              Items="@( Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.SpecialThanks))).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="游戏"
+                                                                                                              Items="@(Model.EntryRelevances.Where(s => s.Type == EntryType.Game).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="组织"
+                                                                                                              Items="@(Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="STAFF"
+                                                                                                              Items="@(Model.EntryRelevances.Where(s => s.Type == EntryType.Staff).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="角色"
+                                                                                                              Items="@(Model.EntryRelevances.Where(s => s.Type == EntryType.Role).Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/entries/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="视频"
+                                                                                                              Items="@( Model.VideoRelevances.Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/videos/index/{s.Id}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="外部" Outlink
+                                                                                                              Items="@(Model.OtherRelevances.Select(s=>new KeyValueModel { DisplayName=s.DisplayName,DisplayValue=s.Link}))" />
+        </ul> 
+    </section>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

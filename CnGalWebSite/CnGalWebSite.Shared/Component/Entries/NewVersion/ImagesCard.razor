@@ -20,7 +20,7 @@
 
     public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         imagesList.Clear();
         foreach (var item in Model.Pictures)

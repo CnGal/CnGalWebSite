@@ -1,0 +1,18 @@
+﻿<section id="operation">
+    @if (Model.Type == EntryType.Game && Model.Booking != null && Model.Booking.Open)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.BookingButton Id="Model.Id" Template="EntryStyleTemplate.Default" />
+    }
+    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" />
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="@Model.IsHidden" IsEdit="Model.IsEdit"/>
+    @if (ToolHelper.IsMaui)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

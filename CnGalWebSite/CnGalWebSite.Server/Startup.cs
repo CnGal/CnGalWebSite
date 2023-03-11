@@ -79,7 +79,7 @@ namespace CnGalWebSite.Server
                 .AddMasaBlazor(s => s.ConfigureTheme(s =>
                 {
                     s.Themes.Light.Primary = "#f06292";
-                    s.Themes.Dark.Primary = "#c9d1d9";
+                    s.Themes.Dark.Primary = "#2196F3";
                 }));
 
             //添加状态检查

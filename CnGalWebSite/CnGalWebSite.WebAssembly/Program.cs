@@ -56,7 +56,11 @@ namespace CnGalWebSite.WebAssembly
 
             builder.Services.AddScoped(x => new ImagesLargeViewService());
 
-            builder.Services.AddMasaBlazor();
+            builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
+            {
+                s.Themes.Light.Primary = "#f06292";
+                s.Themes.Dark.Primary = "#2196F3";
+            }));
 
             //添加工具箱
             _ = builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
