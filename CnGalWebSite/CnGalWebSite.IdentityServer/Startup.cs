@@ -12,6 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Net.Http;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -28,7 +31,8 @@ namespace CnGalWebSite.IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]),
@@ -73,6 +77,14 @@ namespace CnGalWebSite.IdentityServer
                 });
 
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            //添加Masa组件
+            services.AddLocalization()
+                .AddMasaBlazor(s => s.ConfigureTheme(s =>
+                {
+                    s.Themes.Light.Primary = "#f06292";
+                    s.Themes.Dark.Primary = "#2196F3";
+                }));
         }
 
         public void Configure(IApplicationBuilder app)
@@ -83,14 +95,23 @@ namespace CnGalWebSite.IdentityServer
                 app.UseMigrationsEndPoint();
             }
 
+            //转发Ip
+            _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();
+
             app.UseIdentityServer();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
+
+            _ = app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                _ = endpoints.MapBlazorHub();
+                _ = endpoints.MapFallbackToPage("/_Host");
             });
         }
     }

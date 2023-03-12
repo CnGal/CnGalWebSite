@@ -22,7 +22,6 @@
 
     <!--masa blazor css style-->
     <link rel="stylesheet" href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
-    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
 
     <!--icon file,import need to use-->
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
@@ -30,7 +29,9 @@
 
     <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <link rel="stylesheet" href="css/site.css">
+
+    <component type="typeof(HeadOutlet)" render-mode="Server" />
 
     <style>
         .d-ssr {

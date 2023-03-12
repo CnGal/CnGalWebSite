@@ -1,7 +1,6 @@
 ﻿@page "/"
-@using CnGalWebSite.Shared
-@using CnGalWebSite.Shared.Component.Home
-@using CnGalWebSite.DataModel.ViewModel.OperationRecords
+@using CnGalWebSite.IdentityServer
+@using CnGalWebSite.IdentityServer.Models
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
@@ -17,4 +16,4 @@
     };
 }
 
-<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo"/>
+<component type="typeof(App)" render-mode="Server" param-ConnectionInfo="connectionInfo"/>

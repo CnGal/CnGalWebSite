@@ -123,19 +123,18 @@ namespace CnGalWebSite.Server
             //app.UseHttpsRedirection();
             //app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
-            //添加真实IP中间件
-            _ = app.UseForwardedHeaders();
+            //转发Ip
+            _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             _ = app.UseStaticFiles();
 
             //添加状态检查终结点
             _ = app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
-            //转发Ip
-            _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+
 
             _ = app.UseRouting();
 

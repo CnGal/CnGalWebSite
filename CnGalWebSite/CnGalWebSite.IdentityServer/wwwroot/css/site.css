@@ -1,24 +1,77 @@
-﻿.body-container {
-  margin-top: 60px;
-  padding-bottom: 40px; }
+﻿/*覆盖全局样式*/
+.theme--light.m-app-bar.m-toolbar.m-sheet {
+     background-color: transparent; 
+}
 
-.welcome-page li {
-  list-style: none;
-  padding: 4px; }
+/*Layout*/
+footer .infor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.logo-area img{
+    height:2.5rem;
+    border-radius:50%;
+}
+.logo-area {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
 
-.logged-out-page iframe {
-  display: none;
-  width: 0;
-  height: 0; }
+.logo-area .name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 1rem;
+    text-decoration: none;
+}
+footer {
+    font-size: small;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+footer a{
+    color:gray!important;
+}
+.container {
+    max-width: 500px;
+    margin-top: 100px;
+}
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 500px;
+        margin-top: 0;
+    }
+}
 
-.grants-page .card {
-  margin-top: 20px;
-  border-bottom: 1px solid lightgray; }
-  .grants-page .card .card-title {
-    font-size: 120%;
-    font-weight: bold; }
-    .grants-page .card .card-title img {
-      width: 100px;
-      height: 100px; }
-  .grants-page .card label {
-    font-weight: bold; }
+/*主页*/
+.home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home-card img {
+    height: 15rem;
+    width: fit-content;
+    margin-top: 2rem;
+}
+
+/*scrollbar*/
+::-webkit-scrollbar-track {
+    border-radius: 15px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    margin: 5px 0;
+    border-radius: 15px;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
+}
