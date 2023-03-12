@@ -373,7 +373,7 @@ namespace CnGalWebSite.Shared.Service
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(nameof(UserFavoriteObjectsDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
             (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(nameof(PublishGameTimesDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
             (PublishGamesTimelineDataCatche = publishGamesTimelineDataCatche).Init(nameof(PublishGamesTimelineDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesTimeline");
-            (RoleBrithdaysDataCatche = roleBrithdaysDataCatche).Init(nameof(RoleBrithdaysDataCatche), ToolHelper.WebApiPath + "api/entries/GetRoleBrithdaysByTime");
+            (RoleBrithdaysDataCatche = roleBrithdaysDataCatche).Init(nameof(RoleBrithdaysDataCatche), ToolHelper.WebApiPath + "api/entries/GetRoleBirthdaysByTime");
             (HomeListCardsCache = homeListCardsCache).Init(nameof(HomeListCardsCache), ToolHelper.WebApiPath);
 
             (LineChartDataCatche = lineChartDataCatche).Init(nameof(LineChartDataCatche), "");
