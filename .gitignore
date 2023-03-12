@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # 配置文件
 .NewCngalWebSite/NewCngalWebSite.APIServer/appsettings.json
 /CnGalWebSite/CnGalWebSite.APIServer/App_Data/WeChat_OfficialAccount
+/CnGalWebSite/CnGalWebSite.IdentityServer/tempkey.jwk
