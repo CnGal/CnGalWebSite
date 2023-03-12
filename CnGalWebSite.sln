@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PublicToolbox"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.HealthCheck", "CnGalWebSite\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj", "{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.IdentityServer", "CnGalWebSite\CnGalWebSite.IdentityServer\CnGalWebSite.IdentityServer.csproj", "{37188F5A-8A3B-4DF4-A792-3D98C23BF633}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +239,26 @@ Global
 		{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}.Release|x64.Build.0 = Release|Any CPU
 		{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC4DD6EB-7DD8-41BC-8CEC-4218D6CBB8DC}.Release|x86.Build.0 = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|ARM.Build.0 = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|x64.Build.0 = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Debug|x86.Build.0 = Debug|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|ARM.ActiveCfg = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|ARM.Build.0 = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|ARM64.Build.0 = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|x64.ActiveCfg = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|x64.Build.0 = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|x86.ActiveCfg = Release|Any CPU
+		{37188F5A-8A3B-4DF4-A792-3D98C23BF633}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,62 @@
+﻿@namespace CnGalWebSite.Server.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Components.Web
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="galgame,国产galgame,中文galgame,gal,二次元,国产gal,中文gal">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon-512.png">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <base href="~/" />
+
+    <!--masa blazor css style-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
+
+    <!--icon file,import need to use-->
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons" />
+
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+    <style>
+        .d-ssr {
+            display: none;
+        }
+
+        #blazor-error-ui {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        发生了一个错误，请尝试刷新页面，或按下F12查看控制台输出。
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/gt.js"></script>
+
+    @*<script src="_framework/blazor.server.js"></script>*@
+    <script src="https://app.cngal.org/_framework/blazor.server.7.0.js"></script>
+    <script src="https://app.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+
+    <persist-component-state />
+</body>
+</html>
