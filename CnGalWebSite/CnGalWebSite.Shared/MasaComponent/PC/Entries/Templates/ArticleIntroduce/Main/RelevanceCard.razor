@@ -6,8 +6,8 @@
         <h2>相关链接</h2>
        
         <ul>
-            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="动态"
-                                                                                                              Items="@( Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime).Select(s=>new KeyValueModel { DisplayName=$"{s.HappenedTime:yyyy年M月d日} - {s.Title}",DisplayValue=$"/articles/index/{s.ArticleId}"}))" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="动态" Outlink
+                                                                                                              Items="@( Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime).Select(s=>new KeyValueModel { DisplayName=$"{s.HappenedTime:yyyy年M月d日} - {s.Title}",DisplayValue=s.Link}))" />
             <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="文章"
                                                                                                               Items="@( Model.ArticleRelevances.Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/articles/index/{s.Id}"}))" />
             <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="配音作品"

@@ -26,15 +26,18 @@
                         <span> - @item.RoleIdentity</span>
                     }
                 </div>
-                @if (item.Audio.Any())
-                {
-                    <div class="audio">
-                        @foreach (var temp in item.Audio)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@temp.Url" />
-                        }
-                    </div>
-                }
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    @if (item.Audio.Any())
+                    {
+                        <div class="audio">
+                            @foreach (var temp in item.Audio)
+                            {
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@temp.Url" />
+                            }
+                        </div>
+                    }
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+              
                 <dl>
                     @if (item.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
                     {

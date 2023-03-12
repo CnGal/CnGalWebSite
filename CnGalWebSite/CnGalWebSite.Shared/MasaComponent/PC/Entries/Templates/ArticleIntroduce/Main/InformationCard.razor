@@ -1,4 +1,4 @@
-﻿@if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")) || Model.ProductionGroups.Any() || Model.Publishers.Any())
+﻿@if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")) || Model.ProductionGroups.Any() || Model.Publishers.Any()||Model.Tags.Any())
 {
     <section id="information">
 
@@ -32,7 +32,7 @@
                     }
                 </div>
             }
-            @if (Model.IsHideOutlink == false)
+            @if (Model.Information.Any(s => s.Modifier == "基本信息"))
             {
                 @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Where(s => s.DisplayName != "官网"))
                 {
@@ -42,7 +42,20 @@
                     </div>
                 }
             }
-
+            @if (Model.Tags.Any())
+            {
+                <div>
+                    <dt>标签</dt>
+                    @foreach (var item in Model.Tags)
+                    {
+                        <dd>
+                            <a href="@($"/tags/index/{item.Id}")">
+                                @item.Name
+                            </a>
+                        </dd>
+                    }
+                </div>
+            }
         </dl>
     </section>
 }
