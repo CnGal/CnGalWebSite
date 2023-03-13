@@ -1,6 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
-
-namespace CnGalWebSite.Helper.Extensions
+﻿
+namespace CnGalWebSite.Extensions
 {
     public static class DateTimeExtension
     {

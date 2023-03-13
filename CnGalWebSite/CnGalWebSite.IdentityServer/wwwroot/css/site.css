@@ -2,7 +2,29 @@
 .theme--light.m-app-bar.m-toolbar.m-sheet {
      background-color: transparent; 
 }
-
+/*自定义样式*/
+.text-center {
+    text-align: center;
+}
+/*默认卡片*/
+.mdl-card {
+    width: 512px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/*按钮文字始终白色*/
+.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
+    color: white;
+}
+.mdl-button--fab.mdl-button--colored {
+    color: white;
+}
+.mdl-button--fab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 /*Layout*/
 footer .infor {
     display: flex;
@@ -39,25 +61,59 @@ footer a{
     max-width: 500px;
     margin-top: 100px;
 }
+#layout-user{
+    color:white;
+}
+.page-content {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
 @media screen and (max-width: 768px) {
-    .container {
-        max-width: 500px;
-        margin-top: 0;
+    .page-content {
+        padding: 1rem;
     }
 }
 
 /*主页*/
-.home-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+
 .home-card img {
     height: 15rem;
     width: fit-content;
     margin-top: 2rem;
 }
+.home-card .date {
+    padding: 0;
+}
 
+/*登入*/
+.login-card img {
+    height: 10rem;
+    width: fit-content;
+    margin: 2rem;
+}
+.login-card .mdl-textfield{
+    width:100%;
+}
+.login-card .action {
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 2rem;
+}
+.login-card .external {
+    display: flex;
+    justify-content: space-around;
+}
+.login-card .external-text {
+    display: flex;
+    justify-content: center;
+}
+.login-card .external-text hr {
+    width:100%;
+}
+.login-card .external-text p {
+    width: -webkit-fill-available;
+}
 /*scrollbar*/
 ::-webkit-scrollbar-track {
     border-radius: 15px;

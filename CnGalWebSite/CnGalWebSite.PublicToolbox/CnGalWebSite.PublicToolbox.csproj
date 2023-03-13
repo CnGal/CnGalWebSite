@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="CnGalWebSite.Extensions" />
     <Using Include="CnGalWebSite.PublicToolbox.Extentions" />
   </ItemGroup>
 

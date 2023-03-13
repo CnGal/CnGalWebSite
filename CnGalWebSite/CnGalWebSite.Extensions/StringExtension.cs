@@ -1,12 +1,15 @@
-﻿using CnGalWebSite.Helper.ViewModel.Articles;
-using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace CnGalWebSite.Helper.Extensions
+namespace CnGalWebSite.Extensions
 {
     public static class StringExtension
     {
+        /// <summary>
+        /// 截断字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static string Abbreviate(this string str, int length)
         {
             if (str == null)
@@ -23,6 +26,13 @@ namespace CnGalWebSite.Helper.Extensions
             }
         }
 
+        /// <summary>
+        /// 取中间字符串
+        /// </summary>
+        /// <param name="sourse"></param>
+        /// <param name="startstr"></param>
+        /// <param name="endstr"></param>
+        /// <returns></returns>
         public static string MidStrEx(this string sourse, string startstr, string endstr)
         {
             string result = null;
@@ -51,6 +61,11 @@ namespace CnGalWebSite.Helper.Extensions
             return result;
         }
 
+        /// <summary>
+        /// 删除 HTML 中的链接
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string DeleteHtmlLinks(this string value)
         {
             value = value.Replace("</a>", "");
@@ -119,7 +134,23 @@ namespace CnGalWebSite.Helper.Extensions
         {
             return  new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(str));
         }
-      
+
+        public static bool IsLocalUrl(this string url)
+        {
+            if (url == null)
+            {
+                return false;
+            }
+
+            if (url.StartsWith('/'))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
     }
 
    

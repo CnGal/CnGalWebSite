@@ -31,9 +31,10 @@ namespace CnGalWebSite.IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
+            //MVC
+            services.AddControllersWithViews();
 
+            //添加数据库
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]),
                     o =>
@@ -77,14 +78,6 @@ namespace CnGalWebSite.IdentityServer
                 });
 
             services.AddDatabaseDeveloperPageExceptionFilter();
-
-            //添加Masa组件
-            services.AddLocalization()
-                .AddMasaBlazor(s => s.ConfigureTheme(s =>
-                {
-                    s.Themes.Light.Primary = "#f06292";
-                    s.Themes.Dark.Primary = "#2196F3";
-                }));
         }
 
         public void Configure(IApplicationBuilder app)
@@ -108,10 +101,9 @@ namespace CnGalWebSite.IdentityServer
             app.UseIdentityServer();
             app.UseAuthorization();
 
-            _ = app.UseEndpoints(endpoints =>
+            app.UseEndpoints(endpoints =>
             {
-                _ = endpoints.MapBlazorHub();
-                _ = endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }

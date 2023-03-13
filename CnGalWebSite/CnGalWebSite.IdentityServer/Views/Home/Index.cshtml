@@ -1,23 +1,26 @@
-﻿@page "/"
+﻿@using System.Diagnostics
 
-<MCard Class="home-card">
-        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png">
-    <MCardTitle>
-        这里是 CnGal资料站 鉴权中心
-    </MCardTitle>
-    <MCardSubtitle>
+<div class="home-card mdl-card mdl-shadow--2dp">
+    <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">这里是 CnGal资料站 鉴权中心</h2>
+    </div>
+    <div class="mdl-card__supporting-text date text-center">
         @{
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var date = File.GetLastWriteTime(assembly.Location);
+            var date = System.IO.File.GetLastWriteTime(assembly.Location);
         }
         最后更新日期：@date.ToString("yyyy年M月d日")
-    </MCardSubtitle>
-    <MCardText>
+    </div>
+    <div class="mdl-card__supporting-text">
         <ul>
             <li>
                 IdentityServer publishes a
                 <a href="~/.well-known/openid-configuration">discovery document</a>
                 where you can find metadata and links to all the endpoints, key material, etc.
+            </li>
+            <li>
+                点击 <a href="~/account/login">这里</a> 登入
             </li>
             <li>
                 Click <a href="~/diagnostics">here</a> to see the claims for your current session.
@@ -31,9 +34,5 @@
                 and <a href="https://github.com/IdentityServer/IdentityServer4/tree/main/samples">ready to use samples</a>.
             </li>
         </ul>
-    </MCardText>
-</MCard>
-
-@code {
-
-}
+    </div>
+</div>

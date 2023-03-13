@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace CnGalWebSite.Helper.Extensions
+namespace CnGalWebSite.Extensions
 {
     public static class DisplayNameExtension
     {
