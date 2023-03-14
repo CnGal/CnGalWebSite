@@ -1,17 +1,12 @@
 ﻿@model LoginViewModel
 
-
-
-
-
-<div class="login-page">
+<div class="account-page">
     <div class="login-card mdl-card mdl-shadow--2dp">
-        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
         <div class="mdl-card__title">
             <h2 class="mdl-card__title-text">欢迎来到CnGal资料站</h2>
         </div>
         <partial name="_ValidationSummary" />
-
         @if (Model.EnableLocalLogin)
         {
             <div class="mdl-card__supporting-text">
@@ -43,6 +38,10 @@
                 </form>
             </div>
         }
+        <div class="mdl-card__supporting-text">
+            <div class="text-center register-link"> 还没有账号？<a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">立即注册</a></div>
+        </div>
+
         @if (Model.VisibleExternalProviders.Any())
         {
             <div class="mdl-card__supporting-text">
@@ -60,10 +59,10 @@
                             _ => "mdi mdi-link"
                         };
                         <a class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored"
-                                asp-controller="External"
-                                asp-action="Challenge"
-                                asp-route-scheme="@provider.AuthenticationScheme"
-                                asp-route-returnUrl="@Model.ReturnUrl">
+                           asp-controller="External"
+                           asp-action="Challenge"
+                           asp-route-scheme="@provider.AuthenticationScheme"
+                           asp-route-returnUrl="@Model.ReturnUrl">
                             <i class="@icon"></i>
                         </a>
                     }
@@ -73,17 +72,17 @@
 
     </div>
 
- 
 
-    <div class="row">
 
-       
-        @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
-        {
-            <div class="alert alert-warning">
-                <strong>Invalid login request</strong>
-                There are no login schemes configured for this request.
-            </div>
-        }
+        <div class="row">
+
+
+            @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
+            {
+                <div class="alert alert-warning">
+                    <strong>Invalid login request</strong>
+                    There are no login schemes configured for this request.
+                </div>
+            }
+        </div>
     </div>
-</div>

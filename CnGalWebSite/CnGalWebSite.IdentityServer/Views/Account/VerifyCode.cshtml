@@ -1,0 +1,55 @@
+﻿@model VerifyCodeViewModel
+
+<div class="account-page">
+    <div class="verify-code-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">@(Model.IsPhoneNumber? "验证手机号" : "验证电子邮箱" ) </h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            我们已经向 <strong>@(Model.IsPhoneNumber ? Model.PhoneNumber : Model.Email)</strong> 发送了@(Model.IsPhoneNumber ? "一条验证短信" : "一封验证邮件" )，请在下方填写其中的验证码。@(Model.IsPhoneNumber ? "" : "如果没有在收件箱找到邮件，请检查垃圾箱" )
+        </div>
+        <partial name="_ValidationSummary" />
+        <div class="mdl-card__supporting-text">
+            <form asp-route="Register">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="Type" />
+
+                <div class="code-input">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" asp-for="Code" autofocus>
+                        <label class="mdl-textfield__label" asp-for="Code">验证码</label>
+                    </div>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost">重新发送</button>
+                </div>
+
+                <div class="action">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="verify">验证</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@if (Model.IsDisableRepost)
+{
+    <script>
+        window.onload = function () {
+            var GetMoblie = document.getElementById('repost');
+            GetMoblie.disabled = true;//禁用按钮
+            //GetMoblie.removeEventListener('click', funGetMoblie,false);//解除绑定事件
+            var count = 0;
+            var time = setInterval(function () {//定时器循环
+                count++;
+                GetMoblie.innerText = "重新发送（" + (61 - count) + "秒）";
+                GetMoblie.style = "width: 25rem;";
+                if (count >= 60) {
+                    window.clearInterval(time);//清除定时器
+                    GetMoblie.disabled = false;//启用按钮
+                    //GetMoblie.addEventListener('click', funGetMoblie, false);
+                    GetMoblie.innerText = "重新发送";
+                }
+            }, 1000);//一秒执行一次
+        }
+    </script>
+}

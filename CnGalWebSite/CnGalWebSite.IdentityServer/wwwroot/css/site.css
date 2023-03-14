@@ -8,11 +8,13 @@
 }
 /*默认卡片*/
 .mdl-card {
-    width: 512px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 1rem;
 }
+
 /*按钮文字始终白色*/
 .mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
     color: white;
@@ -76,7 +78,10 @@ footer a{
 }
 
 /*主页*/
-
+.home-card {
+    max-width: 512px;
+    width: 100%;
+}
 .home-card img {
     height: 15rem;
     width: fit-content;
@@ -86,20 +91,32 @@ footer a{
     padding: 0;
 }
 
-/*登入*/
-.login-card img {
+/*账户相关页面*/
+.account-page {
+    max-width: 512px;
+    width: 100%;
+}
+.account-page .head-logo {
     height: 10rem;
     width: fit-content;
     margin: 2rem;
 }
-.login-card .mdl-textfield{
-    width:100%;
+.account-page .mdl-textfield {
+    width: 100%;
 }
-.login-card .action {
+.account-page .action {
     display: flex;
     justify-content: space-evenly;
     padding-top: 2rem;
 }
+.account-page h2 {
+    font-weight: bold;
+}
+.account-page button {
+    width: 10rem;
+}
+/*登入*/
+
 .login-card .external {
     display: flex;
     justify-content: space-around;
@@ -113,6 +130,50 @@ footer a{
 }
 .login-card .external-text p {
     width: -webkit-fill-available;
+}
+
+/*注册*/
+.register-card .login-link {
+    padding-top: 2rem;
+}
+/*验证码*/
+.verify-code-card .code-input {
+    display: flex;
+}
+.verify-code-card .code-input button {
+    margin-left: 2rem;
+}
+
+/*Alert*/
+.alert .border {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: inherit;
+    border-bottom-left-radius: inherit;
+    left: 0;
+    border-style: solid;
+    border-width: 2px;
+    content: "";
+    position: absolute;
+    height: 100%;
+}
+.alert-danger .border{
+    background-color: red;
+    border-color: red;
+}
+.alert-danger strong{
+    color: red;
+}
+.alert {
+    position: relative;
+    display: flex;
+}
+.alert .content {
+    padding: .5rem 0 0 1.5rem;
+}
+.alert ul {
+    padding: 0 1.5rem;
+    margin: 0;
 }
 /*scrollbar*/
 ::-webkit-scrollbar-track {

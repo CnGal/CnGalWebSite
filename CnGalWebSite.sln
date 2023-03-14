@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.HealthCheck", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.IdentityServer", "CnGalWebSite\CnGalWebSite.IdentityServer\CnGalWebSite.IdentityServer.csproj", "{37188F5A-8A3B-4DF4-A792-3D98C23BF633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Extensions", "CnGalWebSite\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj", "{095C9FDA-372E-4E31-A4B3-7758EC5B67E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Extensions", "CnGalWebSite\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj", "{095C9FDA-372E-4E31-A4B3-7758EC5B67E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

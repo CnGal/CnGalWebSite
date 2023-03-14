@@ -1,7 +1,12 @@
 ﻿@if (ViewContext.ModelState.IsValid == false)
 {
-    <div class="alert alert-danger">
-        <strong>Error</strong>
-        <div asp-validation-summary="All" class="danger"></div>
+    <div class="mdl-card__supporting-text">
+        <div class="alert alert-danger">
+            <div class="content">
+                <strong> <i class="mdi mdi-alert-circle-outline"></i> 操作失败</strong>
+                <div asp-validation-summary="All" class="danger"></div>
+            </div>
+            <div class="border"></div>
+        </div>
     </div>
 }

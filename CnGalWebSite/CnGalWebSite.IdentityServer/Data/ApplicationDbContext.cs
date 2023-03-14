@@ -1,18 +1,25 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection.Emit;
 using System;
+using CnGalWebSite.IdentityServer.Models.Account;
+using CnGalWebSite.IdentityServer.Models.Messages;
 
 namespace CnGalWebSite.IdentityServer.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public DbSet<VerificationCode> VerificationCodes { get; set; }
+        public DbSet<SendRecord> SendRecords { get; set; }
+
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

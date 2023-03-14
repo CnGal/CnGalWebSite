@@ -8,7 +8,6 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
-using CnGalWebSite.IdentityServer.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +16,16 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.IdentityServer.Models.Account;
+using CnGalWebSite.IdentityServer.Services.Account;
+using CnGalWebSite.IdentityServer.Services.Messages;
+using CnGalWebSite.IdentityServer.Models.Messages;
+using CnGalWebSite.Extensions;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Numerics;
+using static IdentityServer4.Models.IdentityResources;
+using CnGalWebSite.APIServer.DataReositories;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -30,14 +39,17 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
+        private readonly IVerificationCodeService _verificationCodeService;
+        private readonly IMessageService _messageService;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
-            IAuthenticationSchemeProvider schemeProvider,
-            IEventService events)
+            IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository,
+        IEventService events, IVerificationCodeService verificationCodeService, IMessageService messageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -45,16 +57,20 @@ namespace IdentityServerHost.Quickstart.UI
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _verificationCodeService = verificationCodeService;
+            _messageService = messageService;
+            _userRepository= userRepository;
         }
 
         /// <summary>
         /// Entry point into the login workflow
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Login(string returnUrl)
+        public async Task<IActionResult> Login(string returnUrl,bool showCpltRegistToast)
         {
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
+            vm.ShowCpltRegistToast = showCpltRegistToast;
 
             if (vm.IsExternalLoginOnly)
             {
@@ -102,53 +118,88 @@ namespace IdentityServerHost.Quickstart.UI
                 }
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
-                if (result.Succeeded)
-                {
-                    var user = await _userManager.FindByNameAsync(model.Username);
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
-
-                    if (context != null)
-                    {
-                        if (context.IsNativeClient())
-                        {
-                            // The client is native, so this change in how to
-                            // return the response is for better UX for the end user.
-                            return this.LoadingPage("Redirect", model.ReturnUrl);
-                        }
-
-                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                        return Redirect(model.ReturnUrl);
-                    }
-
-                    // request for a local page
-                    if (Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else if (string.IsNullOrEmpty(model.ReturnUrl))
-                    {
-                        return Redirect("~/");
-                    }
-                    else
-                    {
-                        // user might have clicked on a malicious link - should be logged
-                        throw new Exception("invalid return URL");
-                    }
-                }
-
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.Client.ClientId));
-                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                return View(await BuildLoginViewModelAsync(model));
             }
 
-            // something went wrong, show form with error
-            var vm = await BuildLoginViewModelAsync(model);
-            return View(vm);
+            //查找用户
+            var user = await _userManager.FindByEmailAsync(model.Username) ?? await _userManager.FindByNameAsync(model.Username) ?? await _userManager.Users.FirstOrDefaultAsync(s => s.PhoneNumber == model.Username);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                return View(await BuildLoginViewModelAsync(model));
+            }
+
+            //先行验证密码
+            if(!await _userManager.CheckPasswordAsync(user,model.Password))
+            {
+                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                return View(await BuildLoginViewModelAsync(model));
+            }
+
+            //验证电子邮箱
+            if (!user.EmailConfirmed)
+            {
+                return await RedirectToVerifyEmail(user, model.ReturnUrl);
+            }
+
+            //绑定手机号
+            if (string.IsNullOrWhiteSpace( user.PhoneNumber))
+            {
+                return RedirectToAction("AddPhoneNumber", new { user.Email, model.ReturnUrl });
+            }
+
+            //验证手机号
+            if (!user.PhoneNumberConfirmed)
+            {
+                return await RedirectToVerifyPhoneNumber(user, model.ReturnUrl);
+            }
+
+            //登入
+            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+            if (!result.Succeeded)
+            {
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
+                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                return View(await BuildLoginViewModelAsync(model));
+            }
+
+            //记录事件
+            user = await _userManager.FindByNameAsync(model.Username);
+            await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
+
+            //跳转
+            if (context != null)
+            {
+                if (context.IsNativeClient())
+                {
+                    // The client is native, so this change in how to
+                    // return the response is for better UX for the end user.
+                    return this.LoadingPage("Redirect", model.ReturnUrl);
+                }
+
+                // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                return Redirect(model.ReturnUrl);
+            }
+
+            // request for a local page
+            if (Url.IsLocalUrl(model.ReturnUrl))
+            {
+                return Redirect(model.ReturnUrl);
+            }
+            else if (string.IsNullOrEmpty(model.ReturnUrl))
+            {
+                return Redirect("~/");
+            }
+            else
+            {
+                // user might have clicked on a malicious link - should be logged
+                throw new Exception("invalid return URL");
+            }
         }
 
-        
+
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -208,10 +259,213 @@ namespace IdentityServerHost.Quickstart.UI
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Register(string returnUrl)
+        {
+            return await Task.FromResult(View(new RegisterViewModel
+            {
+                ReturnUrl = returnUrl,
+            }));
+        }
 
-        /*****************************************/
-        /* helper APIs for the AccountController */
-        /*****************************************/
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterInputModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //判断用户名是否重复
+            if (await _userRepository.AnyAsync(s => s.UserName == model.Name))
+            {
+                ModelState.AddModelError(string.Empty, "此用户名已经被注册");
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //判断邮箱是否重复
+            if (await _userRepository.AnyAsync(s => s.Email == model.Email))
+            {
+                ModelState.AddModelError(string.Empty, "此电子邮箱已经被注册");
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //添加用户
+            var user = new ApplicationUser
+            {
+                UserName = model.Name,
+                Email = model.Email,
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                AddError(result.Errors);
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //添加角色
+            result = await _userManager.AddToRoleAsync(user, "User");
+            if (!result.Succeeded)
+            {
+                AddError(result.Errors);
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //跳转验证邮箱
+            return await RedirectToVerifyEmail(user, model.ReturnUrl);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerifyCode(string returnUrl, string email, VerificationCodeType type)
+        {
+            return await Task.FromResult(View(new VerifyCodeViewModel
+            {
+                IsDisableRepost = true,
+                ReturnUrl = returnUrl,
+                Email = email,
+                Type = type
+            }));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyCode(VerifyCodeInputModel model, string button)
+        {
+
+
+            //查找用户
+            var user = await _userManager.Users.FirstOrDefaultAsync(s => s.Email == model.Email);
+            if (user == null)
+            {
+                //伪装正确
+                ModelState.AddModelError(string.Empty, "验证码错误");
+                return View(BuildVerifyCodeViewModel(model, true));
+            }
+
+            if (button == "repost")
+            {
+                //重新获取验证码并发送
+                if (model.Type.IsPhoneNumber())
+                {
+                    var code = await _verificationCodeService.GetCodeAsync(null, user.PhoneNumber, model.Type);
+                    if (!await _messageService.SendVerificationSMSAsync(code, user, model.Type))
+                    {
+                        ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                    }
+                }
+                else
+                {
+                    var code = await _verificationCodeService.GetCodeAsync(null, user.Email, model.Type);
+                    if (!await _messageService.SendVerificationEmailAsync(code, user.Email, user, model.Type))
+                    {
+                        ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                    }
+                }
+
+                //返回并禁用发送按钮
+                return View(BuildVerifyCodeViewModel(model, true));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(BuildVerifyCodeViewModel(model));
+            }
+            //获取验证码
+
+            var token = await _verificationCodeService.GetTokenAsync(model.Code, model.Type.IsPhoneNumber() ? model.PhoneNumber : model.Email, model.Type);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                ModelState.AddModelError(string.Empty, "验证码错误");
+                return View(BuildVerifyCodeViewModel(model));
+            }
+
+
+            //根据操作类型跳转
+            if (model.Type == VerificationCodeType.Register)
+            {
+                //验证邮箱
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+                if (!result.Succeeded)
+                {
+                    AddError(result.Errors);
+                    return View(BuildVerifyCodeViewModel(model));
+                }
+                //跳转绑定手机
+                return RedirectToAction("AddPhoneNumber", new { user.Email, model.ReturnUrl });
+            }
+            else if (model.Type == VerificationCodeType.AddPhoneNumber)
+            {
+                //验证手机号
+                if (user.UserName!=token)
+                {
+                    ModelState.AddModelError(string.Empty, "验证码错误");
+                    return View(BuildVerifyCodeViewModel(model));
+                }
+                //设置手机号已验证
+                user.PhoneNumberConfirmed = true;
+                await _userRepository.UpdateAsync(user);
+
+                //完成所有流程 跳转登入
+                return RedirectToAction("Login", new { ShowCpltRegistToast = true, model.ReturnUrl });
+            }
+            else
+            {
+                throw new Exception("未知操作");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddPhoneNumber(string returnUrl, string email, VerificationCodeType type)
+        {
+            return await Task.FromResult(View(new AddPhoneNumberViewModel
+            {
+                ReturnUrl = returnUrl,
+                Email = email,
+            }));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPhoneNumber(AddPhoneNumberInputModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(BuildAddPhoneNumberViewModel(model));
+            }
+
+            //查找用户
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Email == model.Email);
+            if (user == null)
+            {
+                //伪装正确
+                ModelState.AddModelError(string.Empty, "此手机号已经被绑定");
+                return View(BuildAddPhoneNumberViewModel(model));
+            }
+
+            //判断是否已经添加手机号
+            if (user.PhoneNumberConfirmed)
+            {
+                ModelState.AddModelError(string.Empty, "已经绑定了手机号");
+                return View(BuildAddPhoneNumberViewModel(model));
+            }
+
+            //检查是否被绑定
+            if (await _userRepository.AnyAsync(s => s.PhoneNumber == model.PhoneNumber))
+            {
+                ModelState.AddModelError(string.Empty, "此手机号已经被绑定");
+                return View(BuildAddPhoneNumberViewModel(model));
+            }
+
+            //设置手机号
+            user.PhoneNumber = model.PhoneNumber;
+            await _userRepository.UpdateAsync(user);
+
+            //跳转验证手机号
+            return await RedirectToVerifyPhoneNumber(user, model.ReturnUrl);
+        }
+
+
+        #region helper APIs for the AccountController
+
         private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
@@ -338,6 +592,63 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             return vm;
+        }
+
+        private static RegisterViewModel BuildRegisterViewModel(RegisterInputModel model)
+        {
+            var vm = new RegisterViewModel();
+            vm.SynchronizationProperties(model);
+            return vm;
+        }
+
+        private static VerifyCodeViewModel BuildVerifyCodeViewModel(VerifyCodeInputModel model, bool isDisable = false)
+        {
+            var vm = new VerifyCodeViewModel();
+            vm.IsDisableRepost = isDisable;
+            vm.SynchronizationProperties(model);
+            return vm;
+        }
+
+        private static AddPhoneNumberViewModel BuildAddPhoneNumberViewModel(AddPhoneNumberInputModel model)
+        {
+            var vm = new AddPhoneNumberViewModel();
+            vm.SynchronizationProperties(model);
+            return vm;
+        }
+
+        #endregion
+
+        private void AddError(IEnumerable<IdentityError> errors)
+        {
+            foreach (var error in errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+        private async Task<IActionResult> RedirectToVerifyEmail(ApplicationUser user, string returnUrl)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var code = await _verificationCodeService.GetCodeAsync(token, user.Email, VerificationCodeType.Register);
+            if (!await _messageService.SendVerificationEmailAsync(code, user.Email, user, VerificationCodeType.Register))
+            {
+                ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+            }
+
+            return RedirectToAction("VerifyCode", new { user.Email, Type = VerificationCodeType.Register, ReturnUrl = returnUrl });
+
+        }
+
+        private async Task<IActionResult> RedirectToVerifyPhoneNumber(ApplicationUser user, string returnUrl)
+        {
+            var code = await _verificationCodeService.GetCodeAsync(user.UserName, user.PhoneNumber, VerificationCodeType.AddPhoneNumber);
+            if (!await _messageService.SendVerificationSMSAsync(code, user, VerificationCodeType.AddPhoneNumber))
+            {
+                ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+            }
+
+            return RedirectToAction("VerifyCode", new { user.Email, user.PhoneNumber, Type = VerificationCodeType.AddPhoneNumber, ReturnUrl = returnUrl });
+
         }
     }
 }

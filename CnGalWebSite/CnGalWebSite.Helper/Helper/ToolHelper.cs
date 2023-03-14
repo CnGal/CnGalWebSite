@@ -556,6 +556,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static string GetThirdPartyLoginUrl(string returnUrl, ThirdPartyLoginType type)
         {
+            type.GetDisplayName();
             var callbackUrl = GetThirdPartyCallbackUrl(type);
 
             if (string.IsNullOrWhiteSpace(returnUrl))

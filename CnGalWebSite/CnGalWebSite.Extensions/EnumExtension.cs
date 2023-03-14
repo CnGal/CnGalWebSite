@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CnGalWebSite.Extensions
 {
-    public static class DisplayNameExtension
+    public static class EnumExtension
     {
         /// <summary>
         /// 获得枚举的displayName

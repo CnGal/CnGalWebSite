@@ -4,7 +4,6 @@
 
 using IdentityServer4;
 using CnGalWebSite.IdentityServer.Data;
-using CnGalWebSite.IdentityServer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +14,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
+using CnGalWebSite.IdentityServer.Models.Account;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
+using NetCore.AutoRegisterDi;
+using NewCngal.CustomMiddlewares;
+using CnGalWebSite.APIServer.DataReositories;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -43,8 +48,51 @@ namespace CnGalWebSite.IdentityServer
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     }));
 
+            //依赖注入仓储
+            services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
+
+            //添加 MailKit 发送邮件
+            services.AddMailKit(optionBuilder =>
+            {
+                optionBuilder.UseMailKit(new MailKitOptions()
+                {
+                    //get options from sercets.json
+                    Server = Configuration["Server"],
+                    Port = int.Parse(Configuration["Port"]),
+                    SenderName = Configuration["SenderName"],
+                    SenderEmail = Configuration["SenderEmail"],
+
+                    // can be optional with no authentication 
+                    Account = Configuration["Account"],
+                    Password = Configuration["Password"],
+                    // enable ssl or tls
+                    Security = true
+                });
+            });
+
+            //自动注入服务到依赖注入容器
+            services.RegisterAssemblyPublicNonGenericClasses()
+               .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
+               .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+
+            //设置密码格式要求
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.User.AllowedUserNameCharacters = null;
+                options.User.RequireUniqueEmail = true;
+            });
+
+            //添加HTTP客户端
+            services.AddHttpClient();
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>()
                 .AddDefaultTokenProviders();
 
             var builder = services.AddIdentityServer(options =>

@@ -1,0 +1,39 @@
+﻿@model RegisterViewModel
+
+<div class="account-page">
+    <div class="register-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">欢迎来到CnGal资料站</h2>
+        </div>
+        <partial name="_ValidationSummary" />
+        <div class="mdl-card__supporting-text">
+            <form asp-route="Register">
+                <input type="hidden" asp-for="ReturnUrl" />
+
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="email" asp-for="Email" autofocus>
+                    <label class="mdl-textfield__label" asp-for="Email">电子邮箱</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" asp-for="Name" autofocus>
+                    <label class="mdl-textfield__label" asp-for="Name">用户名</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="password" asp-for="Password" autocomplete="off">
+                    <label class="mdl-textfield__label" asp-for="Password">密码</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="password" asp-for="ConfirmPassword" autocomplete="off">
+                    <label class="mdl-textfield__label" asp-for="ConfirmPassword">确认密码</label>
+                </div>
+
+                <div class="action">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">注册</button>
+                </div>
+                <div class="text-center login-link"> 已经有账号了？<a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">立即登入</a></div>
+            </form>
+        </div>
+    </div>
+</div>
