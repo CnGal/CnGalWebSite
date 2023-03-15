@@ -2,6 +2,10 @@
 .theme--light.m-app-bar.m-toolbar.m-sheet {
      background-color: transparent; 
 }
+.mdl-button {
+    text-transform: none;
+    letter-spacing: 0.05rem;
+}
 /*自定义样式*/
 .text-center {
     text-align: center;
@@ -13,6 +17,9 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+}
+.mdl-card h2 {
+    font-weight: bold;
 }
 
 /*按钮文字始终白色*/
@@ -109,9 +116,7 @@ footer a{
     justify-content: space-evenly;
     padding-top: 2rem;
 }
-.account-page h2 {
-    font-weight: bold;
-}
+
 .account-page button {
     width: 10rem;
 }
@@ -143,7 +148,16 @@ footer a{
 .verify-code-card .code-input button {
     margin-left: 2rem;
 }
-
+/*选择账号*/
+.choose-realname-card .action, .choose-account-card .action {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0;
+}
+/*按钮图标+文字*/
+.mdl-button--raised > i {
+    margin-right: .5rem;
+}
 /*Alert*/
 .alert .border {
     border-top-right-radius: 0 !important;
@@ -161,8 +175,23 @@ footer a{
     background-color: red;
     border-color: red;
 }
-.alert-danger strong{
+.alert-danger strong {
     color: red;
+}
+.alert-info strong {
+    color: blue;
+}
+.alert-info .border {
+    background-color: blue;
+    border-color: blue;
+}
+.alert-success strong {
+    color: green;
+}
+
+.alert-success .border {
+    background-color: green;
+    border-color: green;
 }
 .alert {
     position: relative;

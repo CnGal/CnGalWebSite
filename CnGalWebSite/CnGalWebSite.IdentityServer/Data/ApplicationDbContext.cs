@@ -52,7 +52,8 @@ namespace CnGalWebSite.IdentityServer.Data
                 NormalizedEmail = "123456789@qq.com",
                 EmailConfirmed = true,
                 PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",//hasher.HashPassword(null, "CngalAdmin123.."),
-                SecurityStamp = string.Empty
+                SecurityStamp = string.Empty,
+                LockoutEnabled = true
             });
 
             //添加管理员角色

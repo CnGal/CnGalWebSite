@@ -7,6 +7,20 @@ namespace IdentityServerHost.Quickstart.UI
     public class ExternalProvider
     {
         public string DisplayName { get; set; }
+        public string Icon
+        {
+            get
+            {
+                return DisplayName switch
+                {
+                    "Google" => "mdi mdi-google",
+                    "GitHub" => "mdi mdi-github",
+                    "Gitee" => "mdi mdi-alpha-g-circle",
+                    "QQ" => "mdi mdi-qqchat",
+                    _ => "mdi mdi-link"
+                };
+            }
+        }
         public string AuthenticationScheme { get; set; }
     }
 }

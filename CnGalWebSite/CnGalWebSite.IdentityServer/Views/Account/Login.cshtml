@@ -6,7 +6,22 @@
         <div class="mdl-card__title">
             <h2 class="mdl-card__title-text">欢迎来到CnGal资料站</h2>
         </div>
+        @if (Model.ShowCpltRegistToast)
+        {
+            <div class="mdl-card__supporting-text">
+                <div class="alert alert-success">
+                    <div class="content">
+                        <strong> <i class="mdi mdi-alert-circle-outline"></i> 成功注册账号</strong>
+                        <ul>
+                            <li>现在可以使用刚刚创建的账号登入了哦~</li>
+                        </ul>
+                    </div>
+                    <div class="border"></div>
+                </div>
+            </div>
+        }
         <partial name="_ValidationSummary" />
+
         @if (Model.EnableLocalLogin)
         {
             <div class="mdl-card__supporting-text">
@@ -51,20 +66,18 @@
                     <hr />
                 </div>
                 <div class="external">
-                    @foreach (var provider in Model.VisibleExternalProviders)
+                    @foreach (var item in Model.VisibleExternalProviders)
                     {
-                        var icon = provider.DisplayName switch
-                        {
-                            "Google" => "mdi mdi-google",
-                            _ => "mdi mdi-link"
-                        };
-                        <a class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored"
+                        <a class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id="link-@item.DisplayName.ToLower()"
                            asp-controller="External"
                            asp-action="Challenge"
-                           asp-route-scheme="@provider.AuthenticationScheme"
+                           asp-route-scheme="@item.AuthenticationScheme"
                            asp-route-returnUrl="@Model.ReturnUrl">
-                            <i class="@icon"></i>
+                            <i class="@item.Icon"></i>
                         </a>
+                        <div class="mdl-tooltip" data-mdl-for="link-@item.DisplayName.ToLower()">
+                            @item.DisplayName
+                        </div>
                     }
                 </div>
             </div>

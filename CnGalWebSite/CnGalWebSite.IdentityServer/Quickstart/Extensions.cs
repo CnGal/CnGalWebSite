@@ -1,5 +1,8 @@
-using System;
+﻿using System;
+using BlazorComponent;
+using System.Collections.Generic;
 using IdentityServer4.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityServerHost.Quickstart.UI
@@ -22,6 +25,14 @@ namespace IdentityServerHost.Quickstart.UI
             controller.HttpContext.Response.Headers["Location"] = "";
             
             return controller.View(viewName, new RedirectViewModel { RedirectUrl = redirectUri });
+        }
+
+        public static void AddModelStateErrors(this Controller controller, IEnumerable<IdentityError> errors)
+        {
+            foreach (var error in errors)
+            {
+                controller.ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
     }
 }

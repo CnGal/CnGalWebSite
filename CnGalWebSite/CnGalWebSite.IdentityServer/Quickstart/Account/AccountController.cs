@@ -26,6 +26,10 @@ using System.Collections.Generic;
 using System.Numerics;
 using static IdentityServer4.Models.IdentityResources;
 using CnGalWebSite.APIServer.DataReositories;
+using IdentityServer4;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -41,14 +45,16 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IEventService _events;
         private readonly IVerificationCodeService _verificationCodeService;
         private readonly IMessageService _messageService;
+        private readonly IAccountService _accountService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IConfiguration _configuration;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
-            IClientStore clientStore,
-            IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository,
+            IClientStore clientStore, IAccountService accountService, IConfiguration configuration,
+        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository,
         IEventService events, IVerificationCodeService verificationCodeService, IMessageService messageService)
         {
             _userManager = userManager;
@@ -60,6 +66,8 @@ namespace IdentityServerHost.Quickstart.UI
             _verificationCodeService = verificationCodeService;
             _messageService = messageService;
             _userRepository= userRepository;
+            _accountService=accountService;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -68,6 +76,18 @@ namespace IdentityServerHost.Quickstart.UI
         [HttpGet]
         public async Task<IActionResult> Login(string returnUrl,bool showCpltRegistToast)
         {
+            //判断是否外部登入跳转
+            var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            if (result?.Succeeded == true)
+            {
+                // lookup our user and external provider info
+                var (user, provider, providerUserId, claims) = await _accountService.FindUserFromExternalProviderAsync(result);
+                if (user != null)
+                {
+                    return await LoginFromExternalProvider(result, user, provider, providerUserId, returnUrl);
+                }
+            }
+
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
             vm.ShowCpltRegistToast = showCpltRegistToast;
@@ -131,43 +151,35 @@ namespace IdentityServerHost.Quickstart.UI
                 return View(await BuildLoginViewModelAsync(model));
             }
 
-            //先行验证密码
-            if(!await _userManager.CheckPasswordAsync(user,model.Password))
-            {
-                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
-                return View(await BuildLoginViewModelAsync(model));
-            }
-
-            //验证电子邮箱
-            if (!user.EmailConfirmed)
-            {
-                return await RedirectToVerifyEmail(user, model.ReturnUrl);
-            }
-
-            //绑定手机号
-            if (string.IsNullOrWhiteSpace( user.PhoneNumber))
-            {
-                return RedirectToAction("AddPhoneNumber", new { user.Email, model.ReturnUrl });
-            }
-
-            //验证手机号
-            if (!user.PhoneNumberConfirmed)
-            {
-                return await RedirectToVerifyPhoneNumber(user, model.ReturnUrl);
-            }
-
             //登入
             var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
             if (!result.Succeeded)
             {
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
+                if (!result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "错误次数过多，账户被锁定，请稍后重试");
+                    return View(await BuildLoginViewModelAsync(model));
+                }
                 ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
                 return View(await BuildLoginViewModelAsync(model));
             }
 
-            //记录事件
-            user = await _userManager.FindByNameAsync(model.Username);
-            await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
+            //检查并添加外部登入
+            var idsResult = await CheckAndBindExternalToCurrent(user);
+            if (!result.Succeeded)
+            {
+                this.AddModelStateErrors(idsResult.Errors);
+                return View(BuildLoginViewModelAsync(model));
+            }
+
+            //检查实名验证
+            var check = await CheckRealNameAuthentication(user, model.ReturnUrl);
+            if (check != null)
+            {
+                //实名验证不通过则退出登录
+                await _signInManager.SignOutAsync();
+                return check;
+            }
 
             //跳转
             if (context != null)
@@ -262,10 +274,27 @@ namespace IdentityServerHost.Quickstart.UI
         [HttpGet]
         public async Task<IActionResult> Register(string returnUrl)
         {
-            return await Task.FromResult(View(new RegisterViewModel
+            var model = new RegisterViewModel
             {
                 ReturnUrl = returnUrl,
-            }));
+            };
+
+            //判断是否外部登入跳转
+            var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            if (result?.Succeeded == true)
+            {
+                // lookup our user and external provider info
+                var (user, provider, providerUserId, claims) = await _accountService.FindUserFromExternalProviderAsync(result);
+                if (user == null)
+                {
+                    //自动填充字段
+                    var (email, name) = GetExternalUserInforAsync(claims);
+                    model.Email = email;
+                    model.Name=name;
+                }
+            }
+
+            return await Task.FromResult(View(model));
         }
 
         [HttpPost]
@@ -299,7 +328,7 @@ namespace IdentityServerHost.Quickstart.UI
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
-                AddError(result.Errors);
+                this.AddModelStateErrors(result.Errors);
                 return View(BuildRegisterViewModel(model));
             }
 
@@ -307,9 +336,18 @@ namespace IdentityServerHost.Quickstart.UI
             result = await _userManager.AddToRoleAsync(user, "User");
             if (!result.Succeeded)
             {
-                AddError(result.Errors);
+                this.AddModelStateErrors(result.Errors);
                 return View(BuildRegisterViewModel(model));
             }
+
+            //检查并添加外部登入
+            result =await CheckAndBindExternalToCurrent(user);
+            if (!result.Succeeded)
+            {
+                this.AddModelStateErrors(result.Errors);
+                return View(BuildRegisterViewModel(model));
+            }
+
 
             //跳转验证邮箱
             return await RedirectToVerifyEmail(user, model.ReturnUrl);
@@ -387,16 +425,16 @@ namespace IdentityServerHost.Quickstart.UI
                 var result = await _userManager.ConfirmEmailAsync(user, token);
                 if (!result.Succeeded)
                 {
-                    AddError(result.Errors);
+                    this.AddModelStateErrors(result.Errors);
                     return View(BuildVerifyCodeViewModel(model));
                 }
                 //跳转绑定手机
-                return RedirectToAction("AddPhoneNumber", new { user.Email, model.ReturnUrl });
+                return RedirectToAction("ChooseRealNameMethod", new { user.Email, model.ReturnUrl });
             }
             else if (model.Type == VerificationCodeType.AddPhoneNumber)
             {
                 //验证手机号
-                if (user.UserName!=token)
+                if (user.UserName.Sha256()!=token)
                 {
                     ModelState.AddModelError(string.Empty, "验证码错误");
                     return View(BuildVerifyCodeViewModel(model));
@@ -415,7 +453,7 @@ namespace IdentityServerHost.Quickstart.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddPhoneNumber(string returnUrl, string email, VerificationCodeType type)
+        public async Task<IActionResult> AddPhoneNumber(string returnUrl, string email)
         {
             return await Task.FromResult(View(new AddPhoneNumberViewModel
             {
@@ -463,6 +501,21 @@ namespace IdentityServerHost.Quickstart.UI
             return await RedirectToVerifyPhoneNumber(user, model.ReturnUrl);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ChooseRealNameMethod(string returnUrl, string email)
+        {
+
+            //检查支持的外部身份验证提供商
+            var vm =await BuildLoginViewModelAsync(returnUrl);
+            var providers = _configuration["TrustedExternalAuthProviders"].Split(',').Select(s => s.Trim());
+
+            return await Task.FromResult(View(new ChooseRealNameMethodViewModel
+            {
+                ReturnUrl = returnUrl,
+                Email = email,
+                ExternalProviders = vm.ExternalProviders.Where(s => providers.Contains(s.DisplayName))
+            }));
+        }
 
         #region helper APIs for the AccountController
 
@@ -618,14 +671,6 @@ namespace IdentityServerHost.Quickstart.UI
 
         #endregion
 
-        private void AddError(IEnumerable<IdentityError> errors)
-        {
-            foreach (var error in errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
-
         private async Task<IActionResult> RedirectToVerifyEmail(ApplicationUser user, string returnUrl)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -641,7 +686,7 @@ namespace IdentityServerHost.Quickstart.UI
 
         private async Task<IActionResult> RedirectToVerifyPhoneNumber(ApplicationUser user, string returnUrl)
         {
-            var code = await _verificationCodeService.GetCodeAsync(user.UserName, user.PhoneNumber, VerificationCodeType.AddPhoneNumber);
+            var code = await _verificationCodeService.GetCodeAsync(user.UserName.Sha256(), user.PhoneNumber, VerificationCodeType.AddPhoneNumber);
             if (!await _messageService.SendVerificationSMSAsync(code, user, VerificationCodeType.AddPhoneNumber))
             {
                 ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
@@ -650,5 +695,193 @@ namespace IdentityServerHost.Quickstart.UI
             return RedirectToAction("VerifyCode", new { user.Email, user.PhoneNumber, Type = VerificationCodeType.AddPhoneNumber, ReturnUrl = returnUrl });
 
         }
+
+        /// <summary>
+        /// 检查用户实名验证
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns>通过返回null</returns>
+        private async Task<IActionResult> CheckRealNameAuthentication(ApplicationUser user, string returnUrl)
+        {
+            //绑定电子邮箱
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                throw new Exception("电子邮箱不存在，请重新注册账号，或者联系管理员");
+            }
+            //验证电子邮箱
+            if (!user.EmailConfirmed)
+            {
+                return await RedirectToVerifyEmail(user, returnUrl);
+            }
+
+            //需要实名认证 绑定手机 或 绑定信任的第三方身份验证提供商
+            if (!string.IsNullOrWhiteSpace(_configuration["TrustedExternalAuthProviders"]))
+            {
+                var providers = _configuration["TrustedExternalAuthProviders"].Split(',').Select(s => s.Trim());
+                if ((await _userManager.GetLoginsAsync(user)).Any(s => providers.Contains(s.ProviderDisplayName)))
+                {
+                    //通过
+                    return null;
+                }
+            }
+
+            //检查手机号是否存在 或 未验证
+            if (string.IsNullOrWhiteSpace(user.PhoneNumber) || !user.PhoneNumberConfirmed)
+            {
+                //跳转选择验证身份方式
+                return RedirectToAction("ChooseRealNameMethod", new { user.Email, ReturnUrl = returnUrl });
+            }
+
+            //通过
+            return null;
+        }
+
+        /// <summary>
+        /// 用户登入
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="user"></param>
+        /// <param name="provider"></param>
+        /// <param name="providerUserId"></param>
+        /// <returns></returns>
+        private async Task<IActionResult> LoginFromExternalProvider(AuthenticateResult result, ApplicationUser user, string provider, string providerUserId,string returnUrl)
+        {
+            //检查实名验证
+            var check = await CheckRealNameAuthentication(user, returnUrl);
+            if(check != null)
+            {
+                return check;
+            }
+
+            // this allows us to collect any additional claims or properties
+            // for the specific protocols used and store them in the local auth cookie.
+            // this is typically used to store data needed for signout from those protocols.
+            var additionalLocalClaims = new List<Claim>();
+            var localSignInProps = new AuthenticationProperties();
+            ProcessLoginCallback(result, additionalLocalClaims, localSignInProps);
+
+            // issue authentication cookie for user
+            // we must issue the cookie maually, and can't use the SignInManager because
+            // it doesn't expose an API to issue additional claims from the login workflow
+            var principal = await _signInManager.CreateUserPrincipalAsync(user);
+            additionalLocalClaims.AddRange(principal.Claims);
+            var name = principal.FindFirst(JwtClaimTypes.Name)?.Value ?? user.Id;
+
+            var isuser = new IdentityServerUser(user.Id)
+            {
+                DisplayName = name,
+                IdentityProvider = provider,
+                AdditionalClaims = additionalLocalClaims
+            };
+
+            await HttpContext.SignInAsync(isuser, localSignInProps);
+
+            // delete temporary cookie used during external authentication
+            await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+
+
+            // check if external login is in the context of an OIDC request
+            var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+            await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Id, name, true, context?.Client.ClientId));
+
+            if (context != null)
+            {
+                if (context.IsNativeClient())
+                {
+                    // The client is native, so this change in how to
+                    // return the response is for better UX for the end user.
+                    return this.LoadingPage("Redirect", returnUrl);
+                }
+            }
+
+            return Redirect(returnUrl);
+        }
+
+        // if the external login is OIDC-based, there are certain things we need to preserve to make logout work
+        // this will be different for WS-Fed, SAML2p or other protocols
+        private void ProcessLoginCallback(AuthenticateResult externalResult, List<Claim> localClaims, AuthenticationProperties localSignInProps)
+        {
+            // if the external system sent a session id claim, copy it over
+            // so we can use it for single sign-out
+            var sid = externalResult.Principal.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.SessionId);
+            if (sid != null)
+            {
+                localClaims.Add(new Claim(JwtClaimTypes.SessionId, sid.Value));
+            }
+
+            // if the external provider issued an id_token, we'll keep it for signout
+            var idToken = externalResult.Properties.GetTokenValue("id_token");
+            if (idToken != null)
+            {
+                localSignInProps.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = idToken } });
+            }
+        }
+
+        /// <summary>
+        /// 获取外部身份验证提供的用户信息
+        /// </summary>
+        /// <param name="claims"></param>
+        /// <returns></returns>
+        private  (string email, string name) GetExternalUserInforAsync( IEnumerable<Claim> claims)
+        {
+            // create a list of claims that we want to transfer into our store
+            var filtered = new List<Claim>();
+
+            // user's display name
+            var name = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Name)?.Value ??
+                claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+            if (name == null)
+            {
+                var first = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.GivenName)?.Value ??
+                    claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
+                var last = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.FamilyName)?.Value ??
+                    claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
+                if (first != null && last != null)
+                {
+                    name = first + " " + last;
+                }
+                else if (first != null)
+                {
+                    name = first;
+                }
+                else if (last != null)
+                {
+                    name = last;
+                }
+            }
+
+            // email
+            var email = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Email)?.Value ??
+               claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+
+
+            return (email, name);
+        }
+
+        /// <summary>
+        /// 检查并绑定外部用户到当前账号
+        /// </summary>
+        /// <returns></returns>
+        private async Task<IdentityResult> CheckAndBindExternalToCurrent(ApplicationUser user)
+        {
+            var idsResult = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            if (idsResult?.Succeeded == true)
+            {
+                // lookup our user and external provider info
+                var (idsUser, provider, providerUserId, claims) = await _accountService.FindUserFromExternalProviderAsync(idsResult);
+                if (idsUser == null)
+                {
+                    // delete temporary cookie used during external authentication
+                    await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+                    return await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerUserId, provider));
+                }
+            }
+
+            return IdentityResult.Success;
+        }
+
     }
 }

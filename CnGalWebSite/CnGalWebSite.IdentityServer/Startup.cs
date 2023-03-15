@@ -20,6 +20,8 @@ using NETCore.MailKit.Infrastructure.Internal;
 using NetCore.AutoRegisterDi;
 using NewCngal.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
+using System;
+using Microsoft.AspNetCore.Authentication.QQ;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -75,16 +77,22 @@ namespace CnGalWebSite.IdentityServer
                .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
                .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
-            //设置密码格式要求
+            //账户设置
             services.Configure<IdentityOptions>(options =>
             {
+                //密码格式要求
                 options.Password.RequiredLength = 8;
                 options.Password.RequiredUniqueChars = 6;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
+                //用户名
                 options.User.AllowedUserNameCharacters = null;
+                //唯一电子邮箱
                 options.User.RequireUniqueEmail = true;
+                //账户锁定
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             });
 
             //添加HTTP客户端
@@ -117,13 +125,28 @@ namespace CnGalWebSite.IdentityServer
                 .AddGoogle(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    
-                    // register your IdentityServer with Google at https://console.developers.google.com
-                    // enable the Google+ API
-                    // set the redirect URI to https://localhost:5001/signin-google
                     options.ClientId = Configuration["GoogleClientId"];
                     options.ClientSecret = Configuration["GoogleClientSecret"];
+                })
+                .AddGitHub(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.ClientId = Configuration["GitHubClientId"];
+                    options.ClientSecret = Configuration["GitHubClientSecret"];
+                })
+                .AddGitee(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.ClientId = Configuration["GiteeClientId"];
+                    options.ClientSecret = Configuration["GiteeClientSecret"];
+                })
+                .AddQQ(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.ClientId = Configuration["QQClientId"];
+                    options.ClientSecret = Configuration["QQClientSecret"];
                 });
+
 
             services.AddDatabaseDeveloperPageExceptionFilter();
         }

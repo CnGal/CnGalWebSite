@@ -1,0 +1,30 @@
+﻿@model ChooseRealNameMethodViewModel
+
+<div class="account-page">
+    <div class="choose-realname-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">请选择一种方式验证身份</h2>
+        </div>
+        <div class="mdl-card__supporting-text text-center">
+            根据国家法律法规，在完成注册之前我们必须验证你的真实身份，你可以选择下方任一一种方式进行验证
+        </div>
+        <div class="mdl-card__supporting-text">
+            <div class="action">
+                @foreach (var item in Model.ExternalProviders)
+                {
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                       asp-controller="External"
+                       asp-action="Challenge"
+                       asp-route-scheme="@item.AuthenticationScheme"
+                       asp-route-returnUrl="@Model.ReturnUrl">
+                        <i class="@item.Icon"></i>@item.DisplayName
+                    </a>
+                }
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" asp-controller="Account" asp-action="AddPhoneNumber" asp-route-returnUrl="@Model.ReturnUrl" asp-route-email="@Model.Email">
+                    <i class="mdi mdi-cellphone"></i> 手机号
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
