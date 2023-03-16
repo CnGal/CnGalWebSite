@@ -1,0 +1,108 @@
+﻿@model SelectModifyFieldViewModel
+
+<div class="account-page">
+    <div class="select-bind-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">编辑账号信息</h2>
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(Model.SecondCode))
+        {
+
+            <div class="mdl-card__supporting-text text-center">
+                为了确保你的账号安全，需要进行二次身份验证
+            </div>
+            <partial name="_ValidationSummary" />
+
+            <div class="mdl-card__supporting-text">
+                <form asp-route="SelectModifyField">
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <!--极验-->
+                    <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
+                    <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
+                    <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+
+                    <div class="d-none" id="geetestCode-challenge">@Model.GeetestCode.Challenge</div>
+                    <div class="d-none" id="geetestCode-success">@Model.GeetestCode.Success</div>
+                    <div class="d-none" id="geetestCode-gt">@Model.GeetestCode.Gt</div>
+
+                    <div id="captcha-box"></div>
+                    <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
+                    <!--极验-->
+
+
+                    <div class="action">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="callGeetest()" type="button">验证</button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            @if (Model.ShowCpltToast)
+            {
+                <div class="mdl-card__supporting-text">
+                    <div class="alert alert-success">
+                        <div class="content">
+                            <strong> <i class="mdi mdi-alert-circle-outline"></i> 操作成功</strong>
+                            <ul>
+                                <li>成功编辑账号信息</li>
+                            </ul>
+                        </div>
+                        <div class="border"></div>
+                    </div>
+                </div>
+            }
+            <div class="mdl-card__supporting-text">
+                <ul>
+                    @foreach (var item in Model.AccountFields)
+                    {
+                        <li>
+                            <div>
+                                <span>  @item.Type.GetDisplayName()</span>
+                                <div>
+                                    @foreach (var infor in item.Actions)
+                                    {
+                                        <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-type="@item.Type" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
+                                    }
+                                </div>
+                            </div>
+
+                        </li>
+                    }
+
+                    @foreach (var item in Model.ExternalFields)
+                    {
+                        <li>
+                            <div>
+                                <span>@item.DisplayName</span>
+                                <div>
+                                    @foreach (var infor in item.Actions)
+                                    {
+                                        @if (string.IsNullOrWhiteSpace(infor.Value))
+                                        {
+                                            <a asp-controller="External"
+                                               asp-action="Challenge"
+                                               asp-route-scheme="@item.AuthenticationScheme"
+                                               asp-route-returnUrl="@Model.ReturnUrl">
+                                                @infor.Key.GetDisplayName()
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-provider="@item.DisplayName" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>

@@ -16,7 +16,9 @@ namespace CnGalWebSite.IdentityServer.Models.Account
         /// </summary>
         public int Code { get; set; }
 
-        public string UserName { get; set; }
+        public int FailedCount { get; set; }
+
+        public string UserId { get; set; }
 
         public DateTime Time { get; set; }
 
@@ -32,10 +34,14 @@ namespace CnGalWebSite.IdentityServer.Models.Account
         ResetPassword,
         [Display(Name = "绑定手机")]
         AddPhoneNumber,
+        [Display(Name = "二次身份验证")]
+        SecondVerify,
         [Display(Name = "换绑手机")]
         ChangePhoneNumber,
-        [Display(Name = "换绑邮箱")]
-        ChangeEmail
+        [Display(Name = "换绑电子邮箱")]
+        ChangeEmail,
+        [Display(Name = "密码验证通过")]
+        VerifyPassword,
     }
 
     public static class VerificationCodeTypeHelper
@@ -47,6 +53,7 @@ namespace CnGalWebSite.IdentityServer.Models.Account
                 VerificationCodeType.Register => SendRecordPurpose.Register,
                 VerificationCodeType.ResetPassword => SendRecordPurpose.ResetPassword,
                 VerificationCodeType.AddPhoneNumber => SendRecordPurpose.AddPhoneNumber,
+                VerificationCodeType.SecondVerify => SendRecordPurpose.SecondVerify,
                 VerificationCodeType.ChangePhoneNumber => SendRecordPurpose.ChangePhoneNumber,
                 VerificationCodeType.ChangeEmail => SendRecordPurpose.ChangeEmail,
                 _ => throw new NotImplementedException()

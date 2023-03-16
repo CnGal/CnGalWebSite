@@ -1,15 +1,10 @@
-﻿using CnGalWebSite.IdentityServer.Models.Geetest;
+﻿using IdentityServer4.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.IdentityServer.Models.Account
 {
-    public class RegisterInputModel
+    public class SetNewPasswordInputModel
     {
-        [Required(ErrorMessage = "请输入电子邮箱")]
-        [EmailAddress(ErrorMessage = "电子邮箱的格式不正确")]
-        [Display(Name = "电子邮箱")]
-        public string Email { get; set; }
-
         [Required(ErrorMessage = "请输入密码")]
         [DataType(DataType.Password)]
         [Display(Name = "密码")]
@@ -21,14 +16,9 @@ namespace CnGalWebSite.IdentityServer.Models.Account
         [Compare("Password", ErrorMessage = "两次输入的密码不一致，请重新输入")]
         public string ConfirmPassword { get; set; }
 
-        [Display(Name = "用户名")]
-        [Required(ErrorMessage = "请输入用户名")]
-        [MaxLength(20)]
-        public string Name { get; set; }
+        public string UserId { get; set; }
+        public string Token { get; set; }
 
         public string ReturnUrl { get; set; }
-
-        public HumanMachineVerificationResult VerifyResult { get; set; } = new HumanMachineVerificationResult();
-
     }
 }

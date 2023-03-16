@@ -67,10 +67,10 @@ namespace CnGalWebSite.IdentityServer.Services.Messages
             return count >= limit;
         }
 
-        public async Task<bool> SendVerificationSMSAsync(int code, ApplicationUser user, VerificationCodeType type)
+        public async Task<bool> SendVerificationSMSAsync(int code,string phoneNumber, ApplicationUser user, VerificationCodeType type)
         {
             //检查是否超过上限
-            if (await CheckSendCount(user.PhoneNumber, 10, 10))
+            if (await CheckSendCount(phoneNumber, 10, 10))
             {
                 return false;
             }
@@ -78,7 +78,7 @@ namespace CnGalWebSite.IdentityServer.Services.Messages
             var client = CreateClient(_configuration["AliyunAccessKeyId"], _configuration["AliyunAccessKeySecret"]);
             var sendSmsRequest = new AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest
             {
-                PhoneNumbers = user.PhoneNumber,
+                PhoneNumbers = phoneNumber,
                 SignName = "cngal",
                 TemplateCode = _configuration["SMS_" + type.ToString()] ?? throw new Exception("未找到匹配的SMS模板"),
                 TemplateParam = "{ 'code':'" + code + "'}",
@@ -94,7 +94,7 @@ namespace CnGalWebSite.IdentityServer.Services.Messages
             //记录发送
             await _sendRecordRepository.InsertAsync(new SendRecord
             {
-                Address = user.PhoneNumber,
+                Address = phoneNumber,
                 ApplicationUserId = user.Id,
                 Purpose = type.ToPurpose(),
                 Time = DateTime.UtcNow,

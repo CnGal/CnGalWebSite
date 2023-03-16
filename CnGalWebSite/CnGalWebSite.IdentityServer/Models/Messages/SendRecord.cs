@@ -37,9 +37,12 @@ namespace CnGalWebSite.IdentityServer.Models.Messages
         ResetPassword,
         [Display(Name = "绑定手机")]
         AddPhoneNumber,
+        [Display(Name = "二次身份验证")]
+        SecondVerify,
         [Display(Name = "换绑手机")]
         ChangePhoneNumber,
-        [Display(Name = "换绑邮箱")]
-        ChangeEmail
+        [Display(Name = "换绑电子邮箱")]
+        ChangeEmail,
+
     }
 }

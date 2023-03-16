@@ -24,8 +24,7 @@
         <a class="mdl-navigation__link" href="/">主页</a>
         @if (!string.IsNullOrWhiteSpace(name))
         {
-
-            <a class="mdl-navigation__link" href="">控制台</a>
+            <a class="mdl-navigation__link" asp-action="SelectModifyField" asp-controller="Account">编辑账号信息</a>
             <a class="mdl-navigation__link" asp-action="Logout" asp-controller="Account">退出登入</a>
 
         }

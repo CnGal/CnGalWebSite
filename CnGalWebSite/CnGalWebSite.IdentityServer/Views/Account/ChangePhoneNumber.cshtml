@@ -1,17 +1,15 @@
-﻿@model AddPhoneNumberViewModel
+﻿@model ChangePhoneNumberViewModel
 
 <div class="account-page">
     <div class="add-phone-card mdl-card mdl-shadow--2dp">
         <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
         <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">绑定手机号</h2>
+            <h2 class="mdl-card__title-text">修改手机号</h2>
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
             <form asp-route="AddPhoneNumber">
                 <input type="hidden" asp-for="ReturnUrl" />
-                <input type="hidden" asp-for="UserId" />
-                <input type="hidden" asp-for="Code" />
                 <input type="hidden" asp-for="SecondCode" />
 
                 <!--极验-->

@@ -12,6 +12,20 @@
                 <input type="hidden" asp-for="ReturnUrl" />
 
 
+                <!--极验-->
+                <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
+                <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
+                <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+
+                <div class="d-none" id="geetestCode-challenge">@Model.GeetestCode.Challenge</div>
+                <div class="d-none" id="geetestCode-success">@Model.GeetestCode.Success</div>
+                <div class="d-none" id="geetestCode-gt">@Model.GeetestCode.Gt</div>
+
+                <div id="captcha-box"></div>
+                <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
+                <!--极验-->
+
+
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                     <input class="mdl-textfield__input" type="email" asp-for="Email" autofocus>
                     <label class="mdl-textfield__label" asp-for="Email">电子邮箱</label>
@@ -30,7 +44,7 @@
                 </div>
 
                 <div class="action">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">注册</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="callGeetest()" type="button">注册</button>
                 </div>
                 <div class="text-center login-link"> 已经有账号了？<a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">立即登入</a></div>
             </form>

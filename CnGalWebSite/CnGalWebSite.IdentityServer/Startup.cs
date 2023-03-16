@@ -98,6 +98,9 @@ namespace CnGalWebSite.IdentityServer
             //添加HTTP客户端
             services.AddHttpClient();
 
+            //为本地 API 启用令牌验证
+            services.AddLocalApiAuthentication();
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>()
@@ -115,6 +118,7 @@ namespace CnGalWebSite.IdentityServer
             })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
+                .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryClients(Config.Clients)
                 .AddAspNetIdentity<ApplicationUser>();
 
@@ -134,17 +138,18 @@ namespace CnGalWebSite.IdentityServer
                     options.ClientId = Configuration["GitHubClientId"];
                     options.ClientSecret = Configuration["GitHubClientSecret"];
                 })
-                .AddGitee(options =>
-                {
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    options.ClientId = Configuration["GiteeClientId"];
-                    options.ClientSecret = Configuration["GiteeClientSecret"];
-                })
+                
                 .AddQQ(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     options.ClientId = Configuration["QQClientId"];
                     options.ClientSecret = Configuration["QQClientSecret"];
+                })
+                .AddGitee(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.ClientId = Configuration["GiteeClientId"];
+                    options.ClientSecret = Configuration["GiteeClientSecret"];
                 });
 
 

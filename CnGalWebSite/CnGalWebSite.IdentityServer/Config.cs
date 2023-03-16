@@ -23,6 +23,12 @@ namespace CnGalWebSite.IdentityServer
                 new ApiScope("api1", "My API")
             };
 
+        public static IEnumerable<ApiResource> ApiResources = new List<ApiResource>
+        {
+            // 本地API
+            new ApiResource(IdentityServerConstants.LocalApi.ScopeName),
+        };
+
         public static IEnumerable<Client> Clients =>
             new Client[]
             {
@@ -56,6 +62,7 @@ namespace CnGalWebSite.IdentityServer
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.LocalApi.ScopeName,
                         "api1"
                     }
                 }

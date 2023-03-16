@@ -6,9 +6,15 @@
     text-transform: none;
     letter-spacing: 0.05rem;
 }
+.mdl-button--fab{
+    margin:0;
+}
 /*自定义样式*/
 .text-center {
     text-align: center;
+}
+.d-none{
+    display:none;
 }
 /*默认卡片*/
 .mdl-card {
@@ -124,7 +130,7 @@ footer a{
 
 .login-card .external {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
 }
 .login-card .external-text {
     display: flex;
@@ -136,7 +142,13 @@ footer a{
 .login-card .external-text p {
     width: -webkit-fill-available;
 }
-
+.login-card .ex-action {
+    display: flex;
+    justify-content: space-between;
+}
+.login-card .ex-action a{
+    word-break: keep-all;
+}
 /*注册*/
 .register-card .login-link {
     padding-top: 2rem;
@@ -149,10 +161,22 @@ footer a{
     margin-left: 2rem;
 }
 /*选择账号*/
+
 .choose-realname-card .action, .choose-account-card .action {
     flex-direction: column;
     gap: 1.5rem;
     padding: 0;
+}
+/*选择修改绑定信息*/
+.select-bind-card li > div {
+    display: flex;
+}
+.select-bind-card li > div > span {
+    width: 7rem;
+}
+.select-bind-card li > div > div {
+    display: flex;
+    gap: 2rem;
 }
 /*按钮图标+文字*/
 .mdl-button--raised > i {

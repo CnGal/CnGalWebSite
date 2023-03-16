@@ -1,17 +1,15 @@
-﻿@model AddPhoneNumberViewModel
+﻿@model ChangeEmailViewModel
 
 <div class="account-page">
     <div class="add-phone-card mdl-card mdl-shadow--2dp">
         <img class="head-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
         <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">绑定手机号</h2>
+            <h2 class="mdl-card__title-text">修改电子邮箱</h2>
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
             <form asp-route="AddPhoneNumber">
                 <input type="hidden" asp-for="ReturnUrl" />
-                <input type="hidden" asp-for="UserId" />
-                <input type="hidden" asp-for="Code" />
                 <input type="hidden" asp-for="SecondCode" />
 
                 <!--极验-->
@@ -28,8 +26,8 @@
                 <!--极验-->
 
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" asp-for="PhoneNumber" autofocus>
-                    <label class="mdl-textfield__label" asp-for="PhoneNumber">手机号</label>
+                    <input class="mdl-textfield__input" type="email" asp-for="Email" autofocus>
+                    <label class="mdl-textfield__label" asp-for="Email">电子邮箱</label>
                 </div>
 
                 <div class="action">

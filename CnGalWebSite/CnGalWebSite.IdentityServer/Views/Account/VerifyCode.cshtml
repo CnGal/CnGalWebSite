@@ -13,15 +13,33 @@
         <div class="mdl-card__supporting-text">
             <form asp-route="VerifyCode">
                 <input type="hidden" asp-for="ReturnUrl" />
-                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="UserId" />
                 <input type="hidden" asp-for="Type" />
+                <input type="hidden" asp-for="NewPhoneNumber" />
+                <input type="hidden" asp-for="NewEmail" />
+                <input type="hidden" asp-for="PhoneNumber" />
+                <input type="hidden" asp-for="Email" />
+
+                <!--极验-->
+                <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
+                <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
+                <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+
+                <div class="d-none" id="geetestCode-challenge">@Model.GeetestCode.Challenge</div>
+                <div class="d-none" id="geetestCode-success">@Model.GeetestCode.Success</div>
+                <div class="d-none" id="geetestCode-gt">@Model.GeetestCode.Gt</div>
+
+                <div id="captcha-box"></div>
+                <button class="d-none" id="geetestCode-submit-button"  name="button" value="repost" type="submit"></button>
+                <!--极验-->
+
 
                 <div class="code-input">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                         <input class="mdl-textfield__input" asp-for="Code" autofocus autocomplete="off">
                         <label class="mdl-textfield__label" asp-for="Code">验证码</label>
                     </div>
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost">重新发送</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" onclick="callGeetest()" type="button">重新发送</button>
                 </div>
 
                 <div class="action">

@@ -8,6 +8,6 @@ namespace CnGalWebSite.IdentityServer.Services.Messages
     {
         Task<bool> SendVerificationEmailAsync(int code, string email, ApplicationUser user, VerificationCodeType type);
 
-        Task<bool> SendVerificationSMSAsync(int code, ApplicationUser user, VerificationCodeType type);
+        Task<bool> SendVerificationSMSAsync(int code, string phoneNumber, ApplicationUser user, VerificationCodeType type);
     }
 }

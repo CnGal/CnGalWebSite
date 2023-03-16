@@ -1,4 +1,4 @@
-﻿@model ChooseRealNameMethodViewModel
+﻿@model SelectRealNameMethodViewModel
 
 <div class="account-page">
     <div class="choose-realname-card mdl-card mdl-shadow--2dp">
@@ -9,6 +9,20 @@
         <div class="mdl-card__supporting-text text-center">
             根据国家法律法规，在完成注册之前我们必须验证你的真实身份，你可以选择下方任一一种方式进行验证
         </div>
+        @if (Model.ShowCpltToast)
+        {
+            <div class="mdl-card__supporting-text">
+                <div class="alert alert-success">
+                    <div class="content">
+                        <strong> <i class="mdi mdi-alert-circle-outline"></i> 操作成功</strong>
+                        <ul>
+                            <li>你可能修改了账号身份验证信息，需要重新进行身份验证</li>
+                        </ul>
+                    </div>
+                    <div class="border"></div>
+                </div>
+            </div>
+        }
         <div class="mdl-card__supporting-text">
             <div class="action">
                 @foreach (var item in Model.ExternalProviders)
@@ -21,7 +35,7 @@
                         <i class="@item.Icon"></i>@item.DisplayName
                     </a>
                 }
-                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" asp-controller="Account" asp-action="AddPhoneNumber" asp-route-returnUrl="@Model.ReturnUrl" asp-route-email="@Model.Email">
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" asp-controller="Account" asp-action="AddPhoneNumber" asp-route-returnUrl="@Model.ReturnUrl" asp-route-userId="@Model.UserId" asp-route-code="@Model.Code" >
                     <i class="mdi mdi-cellphone"></i> 手机号
                 </a>
             </div>

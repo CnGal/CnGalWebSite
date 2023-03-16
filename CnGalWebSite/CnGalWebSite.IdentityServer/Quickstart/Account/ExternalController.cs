@@ -97,22 +97,23 @@ namespace IdentityServerHost.Quickstart.UI
             }
             var returnUrl = result.Properties.Items["returnUrl"] ?? "~/";
 
+            //先退出当前账号的登入状态
+            await _signInManager.SignOutAsync();
             // lookup our user and external provider info
             var (user, provider, providerUserId, claims) = await _accountService.FindUserFromExternalProviderAsync(result);
             if (user == null)
             {
-
                 //跳转选择绑定现有账号 或 创建新账号
-                return RedirectToAction("ChooseAccount", "External", new { ReturnUrl = returnUrl });
+                return RedirectToAction("SelectAccount", "External", new { ReturnUrl = returnUrl });
             }
 
             return RedirectToAction("Login", "Account", new { ReturnUrl = returnUrl });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ChooseAccount(string returnUrl)
+        public async Task<IActionResult> SelectAccount(string returnUrl)
         {
-            return await Task.FromResult(View(new ChooseAccountViewModel
+            return await Task.FromResult(View(new SelectAccountViewModel
             {
                 ReturnUrl = returnUrl,
             }));

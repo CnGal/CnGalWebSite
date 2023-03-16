@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.IdentityServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230314102531_AddVerifyCode")]
-    partial class AddVerifyCode
+    [Migration("20230316131703_InitData")]
+    partial class InitData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,10 +90,10 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9cd22e82-c645-4767-ac8b-36642c948998",
+                            ConcurrencyStamp = "be8ade65-9702-4a74-a1b7-0cc08d4b89ee",
                             Email = "123456789@qq.com",
                             EmailConfirmed = true,
-                            LockoutEnabled = false,
+                            LockoutEnabled = true,
                             NormalizedEmail = "123456789@qq.com",
                             NormalizedUserName = "ADMIN",
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
@@ -113,6 +113,9 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Property<int>("Code")
                         .HasColumnType("int");
 
+                    b.Property<int>("FailedCount")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime(6)");
 
@@ -122,7 +125,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
+                    b.Property<string>("UserId")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
