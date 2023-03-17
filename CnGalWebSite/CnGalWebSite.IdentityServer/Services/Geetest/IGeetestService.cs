@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.IdentityServer.Models.Geetest;
+﻿using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 

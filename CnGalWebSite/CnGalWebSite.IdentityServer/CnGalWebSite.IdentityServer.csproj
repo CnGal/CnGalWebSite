@@ -4,6 +4,15 @@
     <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>910ee546-046c-409b-821f-8461ca60a574</UserSecretsId>
     <Nullable>disable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +27,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
     <PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="2.0.23" />
-
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
@@ -32,6 +42,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.IdentityServer.Models\CnGalWebSite.IdentityServer.Models.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,24 @@
 ﻿@model LogoutViewModel
 
-<div class="logout-page">
-    <div class="lead">
-        <h1>Logout</h1>
-        <p>Would you like to logut of IdentityServer?</p>
-    </div>
-
-    <form asp-action="Logout">
-        <input type="hidden" name="logoutId" value="@Model.LogoutId"  />
-        <div class="form-group">
-            <button class="btn btn-primary">Yes</button>
+<div class="account-page">
+    <div class="select-bind-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">退出登入</h2>
         </div>
-    </form>
+        <div class="mdl-card__supporting-text text-center">
+            你想要退出登入 CnGal资料站 吗？
+        </div>
+        <partial name="_ValidationSummary" />
+
+        <div class="mdl-card__supporting-text">
+            <form asp-route="Logout">
+                <input type="hidden" name="logoutId" asp-for="@Model.LogoutId" />
+
+                <div class="action">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" type="submit">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

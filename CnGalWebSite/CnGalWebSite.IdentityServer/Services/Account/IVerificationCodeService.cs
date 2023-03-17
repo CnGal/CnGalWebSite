@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.IdentityServer.Models.Account;
+﻿using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.IdentityServer.Services.Account

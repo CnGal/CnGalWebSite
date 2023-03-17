@@ -1,0 +1,138 @@
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<div class="userinfor-card">
+    <AuthorizeView>
+        <MCard Class="w-100 mb-4 main">
+            <MCardText>
+                <div>
+                    <div class="name">@context.User.Identity.Name</div>
+                    <div class="id">@context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value</div>
+                </div>
+                <MButton Fab Icon OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsApiUrl+"Account/SelectModifyField"))">
+                    <MIcon>mdi-pencil</MIcon>
+                </MButton>
+            </MCardText>
+
+        </MCard>
+    </AuthorizeView>
+    <div class="bind mb-4">
+        @if (Model == null)
+        {
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Shared.ProgressingCard />
+        }
+        else
+        {
+
+            <MRow>
+                @foreach (var item in Model.AccountFields)
+                {
+                    <MCol Cols="12" Sm="4" Md="3">
+                        <MCard>
+                            <MCardText>
+                                <div class="key">
+                                    <i class="@item.Icon"></i>
+                                    @item.Type.GetDisplayName()
+
+
+                                </div>
+                                @if (item.Actions.Count > 1 || item.Type == Models.ViewModels.Account.SelectModifyFieldType.Email)
+                                {
+                                    <div class="value success--text">
+                                        <i class="mdi mdi-check-circle"></i>
+                                        已绑定
+                                    </div>
+                                }
+                                else if (item.Type != Models.ViewModels.Account.SelectModifyFieldType.Password)
+                                {
+                                    <div class="value warning--text">
+                                        <i class="mdi mdi-clock-outline"></i>
+                                        未绑定
+                                    </div>
+                                }
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+                }
+            </MRow>
+            <MRow>
+                @foreach (var item in Model.ExternalFields)
+                {
+                    <MCol Cols="12" Sm="4" Md="3">
+                        <MCard>
+                            <MCardText>
+                                <div class="key">
+                                    <i class="@item.Icon"></i>
+                                    @item.DisplayName
+                                </div>
+                                @if (item.Actions.Count > 1)
+                                {
+                                    <div class="value success--text">
+                                        <i class="mdi mdi-check-circle"></i>
+                                        已绑定
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="value warning--text">
+                                        <i class="mdi mdi-clock-outline"></i>
+                                        未绑定
+                                    </div>
+                                }
+                            </MCardText>
+
+
+                        </MCard>
+                    </MCol>
+                }
+            </MRow>
+
+        }
+    </div>
+    <AuthorizeView Context="userContext">
+        <MExpansionPanels Focusable>
+            <MExpansionPanel>
+                <MExpansionPanelHeader>
+                    其他信息
+                </MExpansionPanelHeader>
+                <MExpansionPanelContent>
+                    <dl class="pt-4">
+                        @foreach (var prop in userContext.User.Claims)
+                        {
+                            <div>
+                                <dt>@prop.Type</dt>
+                                <dd>@prop.Value</dd>
+                            </div>
+                        }
+                    </dl>
+                </MExpansionPanelContent>
+            </MExpansionPanel>
+        </MExpansionPanels>
+    </AuthorizeView>
+
+</div>
+
+
+
+@code {
+    AccountBindInfor Model;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<AccountBindInfor>(StaticOptions.IdsApiUrl + "api/account/GetBindInfor");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户信息失败");
+        }
+    }
+
+}

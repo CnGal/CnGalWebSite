@@ -83,9 +83,7 @@ namespace CnGalWebSite.Server
                 }));
 
             //添加状态检查
-            services.AddHealthChecks()
-                //.AddCheck("API Server", new PingHealthCheck(ToolHelper.WebApiPath, 100))
-                .AddCheck<SystemMemoryHealthcheck>("Memory");
+            services.AddHealthChecks().AddCheck<SystemMemoryHealthcheck>("Memory");
 
             //添加工具箱
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))

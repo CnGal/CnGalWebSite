@@ -1,0 +1,51 @@
+﻿@inject NavigationManager Navigation
+
+
+<AuthorizeView Context="userContext">
+    <Authorized>
+        <MButton Icon OnClick="BeginSignOut">
+            <MIcon>mdi-logout</MIcon>
+        </MButton>
+    </Authorized>
+    <NotAuthorized>
+        <MButton Icon OnClick="OnLogin">
+            <MIcon>mdi-login</MIcon>
+        </MButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    readonly List<string> items = new()
+{
+        "Click Me",
+        "Click Me",
+        "Click Me",
+        "Click Me 2",
+    };
+
+    protected void OnLogin()
+    {
+        if (StaticOptions.IsSSR)
+        {
+            Navigation.NavigateTo($"Account/Login?returnUrl={Navigation.Uri.Replace(Navigation.BaseUri, "")}", true);
+        }
+        else
+        {
+            Navigation.NavigateToLogin("authentication/login");
+        }
+
+    }
+
+    private void BeginSignOut()
+    {
+        @if (StaticOptions.IsSSR)
+        {
+            Navigation.NavigateTo("Account/Logout", true);
+        }
+        else
+        {
+            Navigation.NavigateToLogout("authentication/logout");
+        }
+
+    }
+}

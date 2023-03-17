@@ -14,7 +14,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
-using CnGalWebSite.IdentityServer.Models.Account;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
 using NetCore.AutoRegisterDi;
@@ -22,6 +21,11 @@ using NewCngal.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using System;
 using Microsoft.AspNetCore.Authentication.QQ;
+using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+using System.IO;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -115,6 +119,9 @@ namespace CnGalWebSite.IdentityServer
 
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
+
+                //添加本地API到发现文档
+                options.Discovery.CustomEntries.Add("local_api", "~/api");
             })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
@@ -154,6 +161,35 @@ namespace CnGalWebSite.IdentityServer
 
 
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            //API终结点
+            builder.Services.AddEndpointsApiExplorer();
+            //注册Swagger生成器，定义一个或多个Swagger文件
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "CnGal API",
+                    Description = "我们欢迎开发者使用这些API开发各个平台应用，如有困难请咨询网站管理人员",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "CnGal",
+                        Email = "help@cngal.org"
+                    },
+                    Version = "v1"
+                });
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -171,9 +207,20 @@ namespace CnGalWebSite.IdentityServer
             });
 
             app.UseStaticFiles();
-
+            //启用中间件Swagger
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");
+            });
             app.UseRouting();
-
+            //跨域策略
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
             app.UseIdentityServer();
             app.UseAuthorization();
 

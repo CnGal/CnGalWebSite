@@ -1,30 +1,32 @@
 ﻿@model LoggedOutViewModel
 
-@{ 
+@{
     // set this so the layout rendering sees an anonymous user
     ViewData["signed-out"] = true;
 }
 
-<div class="logged-out-page">
-    <h1>
-        Logout
-        <small>You are now logged out</small>
-    </h1>
-
-    @if (Model.PostLogoutRedirectUri != null)
-    {
-        <div>
-            Click <a class="PostLogoutRedirectUri" href="@Model.PostLogoutRedirectUri">here</a> to return to the
-            <span>@Model.ClientName</span> application.
+<div class="account-page">
+    <div class="select-bind-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">成功退出登入</h2>
         </div>
-    }
-
-    @if (Model.SignOutIframeUrl != null)
-    {
-        <iframe width="0" height="0" class="signout" src="@Model.SignOutIframeUrl"></iframe>
-    }
+        <div class="mdl-card__supporting-text text-center">
+            你的账号已经退出登入
+        </div>
+        <partial name="_ValidationSummary" />
+        @if (Model.PostLogoutRedirectUri != null)
+        {
+            <div class="action">
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" href="@Model.PostLogoutRedirectUri">返回</a>
+            </div>
+        }
+        @if (Model.SignOutIframeUrl != null)
+        {
+            <iframe width="0" height="0" class="signout" src="@Model.SignOutIframeUrl"></iframe>
+        }
+    </div>
 </div>
-
 @section scripts
 {
     @if (Model.AutomaticRedirectAfterSignOut)

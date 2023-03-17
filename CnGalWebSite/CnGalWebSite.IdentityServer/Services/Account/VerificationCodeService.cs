@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using System;
-using CnGalWebSite.IdentityServer.Models.Account;
 using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.DataReositories;
 using System.Linq;
+using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 
 namespace CnGalWebSite.IdentityServer.Services.Account
 {
@@ -84,7 +84,7 @@ namespace CnGalWebSite.IdentityServer.Services.Account
             }
 
             var temp = token.Token;
-            await _verificationCodeRepository.DeleteAsync(token);
+            //await _verificationCodeRepository.DeleteAsync(token);
             return temp;
         }
 

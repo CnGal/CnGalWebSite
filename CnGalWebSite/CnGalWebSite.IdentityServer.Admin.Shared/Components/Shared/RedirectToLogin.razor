@@ -1,0 +1,27 @@
+﻿@inject NavigationManager Navigation
+
+<div class="redirect-login-card">
+
+        <MAlert Border="Borders.Left"
+                ColoredBorder
+                Type="AlertTypes.Error"
+                Elevation="2">
+            权限不足！<br/>请尝试 <a @onclick="@OnLogin" class="error--text font-weight-black">登入账号</a> ，或者联系管理员获取权限
+        </MAlert>
+</div>
+
+
+@code {
+    protected void OnLogin()
+    {
+        if (StaticOptions.IsSSR)
+        {
+            Navigation.NavigateTo($"Account/Login?returnUrl={Navigation.Uri.Replace(Navigation.BaseUri, "")}", true);
+        }
+        else
+        {
+            Navigation.NavigateToLogin("authentication/login");
+        }
+
+    }
+}

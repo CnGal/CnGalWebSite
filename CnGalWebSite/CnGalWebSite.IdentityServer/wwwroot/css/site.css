@@ -9,6 +9,7 @@
 .mdl-button--fab{
     margin:0;
 }
+
 /*自定义样式*/
 .text-center {
     text-align: center;
@@ -26,6 +27,7 @@
 }
 .mdl-card h2 {
     font-weight: bold;
+    text-align: center;
 }
 
 /*按钮文字始终白色*/
@@ -41,33 +43,16 @@
     align-items: center;
 }
 /*Layout*/
-footer .infor {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}
-.logo-area img{
-    height:2.5rem;
-    border-radius:50%;
-}
-.logo-area {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logo-area .name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-left: 1rem;
-    text-decoration: none;
+body {
+    background-color: #f5f6f7;
 }
 footer {
     font-size: small;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    background-color: white;
+    padding: .5rem;
 }
 footer a{
     color:gray!important;
@@ -178,6 +163,7 @@ footer a{
     display: flex;
     gap: 2rem;
 }
+/*确认页面*/
 /*按钮图标+文字*/
 .mdl-button--raised > i {
     margin-right: .5rem;

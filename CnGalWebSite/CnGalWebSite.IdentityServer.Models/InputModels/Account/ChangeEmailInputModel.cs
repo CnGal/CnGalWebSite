@@ -1,0 +1,20 @@
+﻿using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
+using System.ComponentModel.DataAnnotations;
+
+namespace CnGalWebSite.IdentityServer.Models.InputModels.Account
+{
+    public class ChangeEmailInputModel
+    {
+        [Required(ErrorMessage = "请输入电子邮箱")]
+        [EmailAddress(ErrorMessage = "电子邮箱的格式不正确")]
+        [Display(Name = "电子邮箱")]
+        public string Email { get; set; }
+
+        public string SecondCode { get; set; }
+        public string ReturnUrl { get; set; }
+
+        public HumanMachineVerificationResult VerifyResult { get; set; } = new HumanMachineVerificationResult();
+
+
+    }
+}

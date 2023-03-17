@@ -1,0 +1,70 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+    <PageTitle>CnGal资料站 - 开放平台</PageTitle>
+    <MApp>
+        <MMain Class="main-content">
+            <div Class="overflow-hidden">
+                <MAppBar Absolute Color="primary" Class="app-bar"
+                         Dark
+                         ShrinkOnScroll
+                         Prominent
+                         Src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/game_head.png"
+                         FadeImgOnScroll
+                         ScrollTarget="#scrolling-sheet-3">
+                    <ImgContent>
+                        <MImage Gradient="to top right, rgb(240 98 146 / 50%), rgb(240 98 146 / 50%)" @attributes="@context"></MImage>
+                    </ImgContent>
+
+                    <ChildContent>
+                        <MAppBarNavIcon></MAppBarNavIcon>
+                        <MAppBarTitle>CnGal资料站 - 开放平台</MAppBarTitle>
+                        <MSpacer></MSpacer>
+                        <CnGalWebSite.IdentityServer.Admin.Shared.Components.Layout.UserButton />
+                    </ChildContent>
+                    <ExtensionContent>
+                        <MTabs AlignWithTitle>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">个人信息</MTab>
+                        </MTabs>
+                    </ExtensionContent>
+                </MAppBar>
+                <MSheet Class="overflow-y-auto main-sheet">
+                    <MContainer Style=" margin-top: 250px;">
+                        <ErrorHandler>
+                            @Body
+                        </ErrorHandler>
+                    </MContainer>
+                </MSheet>
+            </div>
+        </MMain>
+        <MFooter App Absolute>
+            &copy; 2023 - CnGal资料站
+            &nbsp;&nbsp;&nbsp;<a target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备15055899号</a>
+            &nbsp;&nbsp;&nbsp;<a href="https://icp.gov.moe/?keyword=20225899" target="_blank" one-link-mark="yes">萌ICP备20225899号</a>
+            &nbsp;&nbsp;&nbsp;不良信息举报邮箱：help@cngal.org
+        </MFooter>
+    </MApp>
+
+    @code {
+        readonly List<string> items = new()
+    {
+        "Click Me",
+        "Click Me",
+        "Click Me",
+        "Click Me 2",
+    };
+        bool _drawer;
+        List<(string Icon, string Text)> _links = new()
+    {
+        ("mdi-inbox-arrow-down","Inbox"),
+        ("mdi-send","Send"),
+        ("mdi-delete","Trash"),
+        ("mdi-alert-octagon","Spam")
+    };
+        List<string> _cards = new()
+    {
+        "Today",
+        "Yesterday"
+    };
+    }

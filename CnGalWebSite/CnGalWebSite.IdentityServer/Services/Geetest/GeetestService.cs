@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.IdentityServer.Models.Geetest;
+﻿using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
 using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

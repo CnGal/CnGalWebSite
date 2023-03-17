@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using System;
-using CnGalWebSite.IdentityServer.Models.Account;
-using CnGalWebSite.IdentityServer.Models.Messages;
 using Microsoft.EntityFrameworkCore;
 using NETCore.MailKit.Core;
 using CnGalWebSite.APIServer.DataReositories;
@@ -9,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using CnGalWebSite.Extensions;
 using static IdentityServer4.Models.IdentityResources;
+using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Models.DataModels.Messages;
+using CnGalWebSite.IdentityServer.Models.ViewModels.Messages;
 
 namespace CnGalWebSite.IdentityServer.Services.Messages
 {
