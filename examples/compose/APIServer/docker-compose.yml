@@ -28,6 +28,8 @@ services:
       - BilibiliCookie=${BilibiliCookie}
       # Ids 地址
       - Authority=${Authority}
+      # IP 白名单
+      - IpWhitelist=${IpWhitelist}
     hostname: apiserver
     restart: always
     healthcheck:
