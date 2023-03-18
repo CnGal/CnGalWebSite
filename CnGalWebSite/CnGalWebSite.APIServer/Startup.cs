@@ -134,6 +134,7 @@ namespace CnGalWebSite.APIServer
                 .AddJwtBearer("Bearer", options =>
                 {
                     options.Authority = Configuration["Authority"];
+                    options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = false

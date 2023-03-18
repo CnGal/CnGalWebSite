@@ -122,6 +122,7 @@ namespace CnGalWebSite.IdentityServer
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
 
+
                 //添加本地API到发现文档
                 options.Discovery.CustomEntries.Add("local_api", "~/api");
             })
@@ -200,6 +201,14 @@ namespace CnGalWebSite.IdentityServer
 
             //添加状态检查
             services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("DbContext");
+
+            //添加真实IP
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
         }
 
         public void Configure(IApplicationBuilder app)

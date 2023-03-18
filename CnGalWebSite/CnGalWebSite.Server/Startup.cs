@@ -133,6 +133,8 @@ namespace CnGalWebSite.Server
                     //id4配置的ClientId以及ClientSecrets
                     options.ClientId = Configuration["ClientId"];
                     options.ClientSecret = Configuration["ClientSecret"];
+                    //不检查Https
+                    options.RequireHttpsMetadata = false;
 
                     //认证模式
                     options.ResponseType = "code";

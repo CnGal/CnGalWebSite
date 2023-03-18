@@ -22,6 +22,7 @@ services:
       - QQClientSecret=${QQClientSecret}
       # 发送验证邮件的电子邮箱
       - Server=${Server}
+      - Port=${Port}
       - SenderName=${SenderName}
       - SenderEmail=${SenderEmail}
       - Account=${Account}
