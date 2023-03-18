@@ -794,9 +794,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-
-
-
         /// <summary>
         /// 获取图表 管理员限定
         /// </summary>

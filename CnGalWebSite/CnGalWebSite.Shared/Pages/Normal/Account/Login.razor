@@ -42,8 +42,6 @@
                                    Label="记住我" Class="m-0"
                                    HideDetails="true"
                                    ></MCheckbox>
-                        <a href="/account/forgetpassword">忘记密码？</a>
-
                     </div>
                     <div>
                         <div id="captcha-box"></div>
@@ -52,14 +50,6 @@
                     <div class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入" IsAsync="true" OnClick="OnClickLogin" Class="w-100" Rounded Depressed />
                     </div>
-
-                    <span class="mb-4 d-flex" style="justify-content: center; ">
-                        还没有账号？ <a style="float:right" href="/account/register">立即注册</a>
-                    </span>
-                    @if (_dataCacheService.IsOnThirdPartyLogin && ToolHelper.IsMaui == false)
-                    {
-                        <ThirdPartyLoginButtonListView ReturnUrl="@ReturnUrl" OnRedirecting="OnRedirecting"></ThirdPartyLoginButtonListView>
-                    }
                 </div>
             </div>
         }

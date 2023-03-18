@@ -39,24 +39,13 @@
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="账户安全" Icon="fa fa-fw fa-briefcase" Outline Collapable Class="mb-4">
                 <div class="row">
-                    <div class=" col-12 col-md-6  col-lg-4 mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.PasswordCard Model="Model" />
-                    </div>
-                    <div class=" col-12 col-md-6  col-lg-4  mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.EmailCard Model="Model" />
-                    </div>
-                    <div class=" col-12 col-md-6  col-lg-4 mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.PhoneCard Model="Model" />
-                    </div>
-                    <div class=" col-12 col-md-6  col-lg-4 mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.QQLoginCard Model="Model" />
-                    </div>
-
-                    <div class=" col-12 col-md-6  col-lg-4 mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.QQGroupCard Model="Model" OnChanged="OnChanged" />
-                    </div>
-                    <div class=" col-12 col-md-6  col-lg-4  mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.LoginCodeCard Model="Model" />
+                    <div class=" col-12 mb-4">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+                            因迁移重构鉴权系统，我们将于 <strong>2023年3月18日</strong> 开始升级维护。<br />
+                            期间用户相关功能仅支持 <strong>密码登入，个人资料编辑</strong> ，网站其他功能（词条编辑，折扣页面等）不受影响。<br />
+                            具体结束时间请等待最新公告，或者加群 <a href="https://jq.qq.com/?_wv=1027&k=mG6qNvyg" target="_blank" class="error--text fw-bold" rel="noreferrer">128446539</a> 咨询。<br />
+                            不便之处，敬请谅解。
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     </div>
                     <div class=" col-12 col-md-6  col-lg-4  mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.UserCertificationCard Model="Model" />

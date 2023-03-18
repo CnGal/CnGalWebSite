@@ -1,0 +1,29 @@
+﻿@model SelectAccountViewModel
+
+<div class="account-page">
+    <div class="choose-account-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">绑定账号</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            <div class="alert alert-info">
+                <div class="content">
+                    <strong> <i class="mdi mdi-alert-circle-outline"></i> 提示</strong>
+                    <ul>
+                        <li>添加第三方登入方式之前，需要先绑定一个账号哦~</li>
+                        <li>如果在进行身份认证，请选择 <strong>现有账号</strong> ，并使用刚刚创建的账号登入</li>
+                    </ul>
+                </div>
+                <div class="border"></div>
+            </div>
+        </div>
+        <div class="mdl-card__supporting-text">
+
+            <div class="action">
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl"> <i class="mdi mdi-link-variant"></i> 现有账号</a>
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl"> <i class="mdi mdi-link-variant-plus"></i> 创建新账号</a>
+            </div>
+        </div>
+    </div>
+</div>

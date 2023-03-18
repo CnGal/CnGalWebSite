@@ -1,0 +1,64 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<div class="home-page">
+    <MCard>
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png">
+        <MCardTitle>
+            CnGal资料站 - 开放平台
+        </MCardTitle>
+        <MCardSubtitle>
+            @{
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var date = File.GetLastWriteTime(assembly.Location);
+            }
+            最后更新日期：@date.ToString("yyyy年M月d日")
+        </MCardSubtitle>
+        <MCardText>
+            <ul>
+                <AuthorizeView>
+                    <Authorized>
+                        <li>
+                            欢迎，@context.User.Identity.Name
+                        </li>
+                    </Authorized>
+                    <NotAuthorized>
+                        <li>
+                            点击 <a @onclick="OnLogin">这里</a> 登入
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+             
+                <li>
+                    我们提供
+                    <a href="@(StaticOptions.IdsApiUrl+".well-known/openid-configuration")">发现文档</a>，里面包含：<strong>元数据，终结点链接，关键材料......</strong>
+                </li>
+
+                <li>
+                    同时我们也创建了对外API的 <a href="@(StaticOptions.IdsApiUrl+"swagger/index.html")">Swagger文档</a>
+                </li>
+                <li>
+                    这是
+                    <a href="https://github.com/identityserver/IdentityServer4">源代码仓库</a> 的链接，
+                    包含 <a href="https://github.com/IdentityServer/IdentityServer4/tree/main/samples">可使用的样例</a>
+                </li>
+            </ul>
+        </MCardText>
+    </MCard>
+
+</div>
+
+@code {
+    protected void OnLogin()
+    {
+        if (StaticOptions.IsSSR)
+        {
+            Navigation.NavigateTo($"Account/Login?returnUrl={Navigation.Uri.Replace(Navigation.BaseUri, "")}", true);
+        }
+        else
+        {
+            Navigation.NavigateToLogin("authentication/login");
+        }
+
+    }
+}

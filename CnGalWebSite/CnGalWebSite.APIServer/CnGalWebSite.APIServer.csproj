@@ -77,6 +77,7 @@
   <ItemGroup>
     <Using Include="CnGalWebSite.APIServer.Extentions" />
     <Using Include="CnGalWebSite.DataModel.ViewModel.Dtos" />
+    <Using Include="CnGalWebSite.Extensions" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

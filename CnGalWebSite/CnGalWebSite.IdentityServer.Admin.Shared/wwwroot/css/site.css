@@ -1,0 +1,107 @@
+﻿
+    /*全局样式*/
+.main-content .m-sheet.m-card {
+    border-radius: 0;
+}
+
+html {
+    overflow: hidden;
+}
+/*Layout*/
+.app-bar .m-responsive__sizer {
+    padding-bottom: 28.1% !important;
+}
+
+@media screen and (max-width: 768px) {
+    .app-bar .m-responsive__sizer {
+        padding-bottom: 58.1% !important;
+    }
+
+}
+.main-sheet {
+    height: calc(100vh - 30px);
+    background-color: #f5f6f7!important;
+}
+/*scrollbar*/
+::-webkit-scrollbar-track {
+    border-radius: 15px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    margin: 5px 0;
+    border-radius: 15px;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
+}
+/*主页*/
+.home-page {
+    display: flex;
+    justify-content: center;
+}
+.home-page .m-card {
+    max-width: 500px;
+}
+.home-page .m-card img {
+    width: 100%;
+}
+/*跳转登入*/
+.redirect-login-card {
+    display: flex;
+    justify-content: center;
+}
+    .redirect-login-card .m-alert {
+        max-width: 500px;
+    }
+/*用户信息*/
+.userinfor-card .main .name {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+.userinfor-card .m-card__text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+/*加载卡片*/
+.progressing-card {
+    display: flex;
+    flex-direction: column;
+}
+/*dl*/
+dt {
+    font-weight: bold;
+}
+
+dl div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+dt::after {
+    content: "：";
+}
+
+dd + dd::before {
+    content: "、";
+}
+/*页脚*/
+footer {
+    font-size: small;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: white!important;
+    padding: .5rem;
+}
+
+footer a {
+    color: gray !important;
+}

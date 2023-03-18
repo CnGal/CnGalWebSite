@@ -44,8 +44,8 @@
                     <MCheckbox Class="mt-0" Value="_dataCacheService.DiscountPageCatcheHelper.ShowNoDiscountGames" TValue="bool" ValueChanged="ShowNoDiscountGamesChanged" Label="显示无折扣的游戏" />
                 </div>
                 <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-                    <MSlider Max="DiscountPageHelper.MaxOriginalPriceLimit" Min="0" Step="5" Value="_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice" TValue="double" ValueChanged="MaxOriginalPriceChanged"
-                             Label="@(_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice>=DiscountPageHelper.MaxOriginalPriceLimit?"任意价格":_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice==0?"免费发布的游戏":$"原价低于 {_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice:00} ￥")" />
+                    <MSlider Max="DiscountPageHelper.MaxOriginalPriceLimit" Min="5" Step="5" Value="_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice" TValue="double" ValueChanged="MaxOriginalPriceChanged"
+                             Label="@(_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice>=DiscountPageHelper.MaxOriginalPriceLimit?"任意价格":_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice<10?"免费发布的游戏":$"原价低于 {_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice:00} ￥")" />
                 </div>
             }
         </div>

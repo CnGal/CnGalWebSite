@@ -1,0 +1,42 @@
+﻿@using System.Diagnostics
+
+<div class="home-card mdl-card mdl-shadow--2dp">
+    <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">CnGal资料站 - 开放平台</h2>
+    </div>
+    <div class="mdl-card__supporting-text date text-center">
+        @{
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var date = System.IO.File.GetLastWriteTime(assembly.Location);
+        }
+        最后更新日期：@date.ToString("yyyy年M月d日")
+    </div>
+    <div class="mdl-card__supporting-text">
+        <ul>
+
+            <li>
+                点击 <a href="~/account/login">这里</a> 登入
+            </li>
+            <li>
+                点击 <a href="~/diagnostics">这里</a> 查看当前会话的声明
+            </li>
+            <li>
+                点击 <a href="~/grants">这里</a> 管理你的授权
+            </li>
+            <li>
+                我们提供
+                <a href="~/.well-known/openid-configuration">发现文档</a>，里面包含：<strong>元数据，终结点链接，关键材料......</strong>
+            </li>
+
+            <li>
+                同时我们也创建了对外API的 <a href="~/swagger/index.html">Swagger文档</a>
+            </li>
+            <li>
+                这是
+                <a href="https://github.com/identityserver/IdentityServer4">源代码仓库</a> 的链接，
+                包含 <a href="https://github.com/IdentityServer/IdentityServer4/tree/main/samples">可使用的样例</a>
+            </li>
+        </ul>
+    </div>
+</div>

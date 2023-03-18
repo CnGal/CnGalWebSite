@@ -1,0 +1,117 @@
+﻿@model LoginViewModel
+
+<div class="account-page">
+    <div class="login-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">欢迎来到CnGal资料站</h2>
+        </div>
+        @if (Model.ShowCpltToast)
+        {
+            <div class="mdl-card__supporting-text">
+                <div class="alert alert-success">
+                    <div class="content">
+                        <strong> <i class="mdi mdi-alert-circle-outline"></i> 操作成功</strong>
+                        <ul>
+                            <li>现在可以使用刚刚的账号登入了哦~</li>
+                        </ul>
+                    </div>
+                    <div class="border"></div>
+                </div>
+            </div>
+        }
+        <partial name="_ValidationSummary" />
+        @if (Model.EnableLocalLogin)
+        {
+            <div class="mdl-card__supporting-text">
+                <form asp-route="Login">
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <!--极验-->
+                    <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
+                    <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
+                    <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+
+                    <div class="d-none" id="geetestCode-challenge">@Model.GeetestCode.Challenge</div>
+                    <div class="d-none" id="geetestCode-success">@Model.GeetestCode.Success</div>
+                    <div class="d-none" id="geetestCode-gt">@Model.GeetestCode.Gt</div>
+
+                    <div id="captcha-box"></div>
+                    <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
+                    <!--极验-->
+
+
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" asp-for="Username" autofocus>
+                        <label class="mdl-textfield__label" asp-for="Username">用户名或邮箱</label>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="password" asp-for="Password" autocomplete="off">
+                        <label class="mdl-textfield__label" asp-for="Password">密码</label>
+                    </div>
+                    <div class="ex-action">
+                        @if (Model.AllowRememberLogin)
+                        {
+                            <div class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="RememberLogin">
+                                <input id="RememberLogin" class="mdl-checkbox__input" asp-for="RememberLogin">
+                                <label class="mdl-checkbox__label" asp-for="RememberLogin">
+                                    记住我
+                                </label>
+                            </div>
+                        }
+                        <a asp-controller="Account" asp-action="ResetPassword" asp-route-returnUrl="@Model.ReturnUrl">忘记密码？</a>
+                    </div>
+
+                    <div class="action">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="login" onclick="callGeetest()" type="button">登入</button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
+                    </div>
+                </form>
+            </div>
+        }
+        <div class="mdl-card__supporting-text">
+            <div class="text-center register-link"> 还没有账号？<a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">立即注册</a></div>
+        </div>
+
+        @if (Model.VisibleExternalProviders.Any())
+        {
+            <div class="mdl-card__supporting-text">
+                <div class="external-text">
+                    <hr />
+                    <p class="text-center">其他登入方式</p>
+                    <hr />
+                </div>
+                <div class="external">
+                    @foreach (var item in Model.VisibleExternalProviders)
+                    {
+                        <a class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id="link-@item.DisplayName.ToLower()"
+                           asp-controller="External"
+                           asp-action="Challenge"
+                           asp-route-scheme="@item.AuthenticationScheme"
+                           asp-route-returnUrl="@Model.ReturnUrl">
+                            <i class="@item.Icon"></i>
+                        </a>
+                        <div class="mdl-tooltip" data-mdl-for="link-@item.DisplayName.ToLower()">
+                            @item.DisplayName
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+
+
+
+    <div class="row">
+
+
+        @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
+        {
+            <div class="alert alert-warning">
+                <strong>Invalid login request</strong>
+                There are no login schemes configured for this request.
+            </div>
+        }
+    </div>
+</div>

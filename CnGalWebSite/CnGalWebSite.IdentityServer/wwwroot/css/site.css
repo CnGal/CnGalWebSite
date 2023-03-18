@@ -1,0 +1,233 @@
+﻿/*覆盖全局样式*/
+.theme--light.m-app-bar.m-toolbar.m-sheet {
+     background-color: transparent; 
+}
+.mdl-button {
+    text-transform: none;
+    letter-spacing: 0.05rem;
+}
+.mdl-button--fab{
+    margin:0;
+}
+
+/*自定义样式*/
+.text-center {
+    text-align: center;
+}
+.d-none{
+    display:none;
+}
+/*默认卡片*/
+.mdl-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+.mdl-card h2 {
+    font-weight: bold;
+    text-align: center;
+}
+
+/*按钮文字始终白色*/
+.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
+    color: white;
+}
+.mdl-button--fab.mdl-button--colored {
+    color: white;
+}
+.mdl-button--fab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/*Layout*/
+body {
+    background-color: #f5f6f7;
+}
+footer {
+    font-size: small;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: white;
+    padding: .5rem;
+}
+footer a{
+    color:gray!important;
+}
+.container {
+    max-width: 500px;
+    margin-top: 100px;
+}
+#layout-user{
+    color:white;
+}
+.page-content {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+@media screen and (max-width: 768px) {
+    .page-content {
+        padding: 1rem;
+    }
+}
+
+/*主页*/
+.home-card {
+    max-width: 512px;
+    width: 100%;
+}
+.home-card img {
+    height: 15rem;
+    width: fit-content;
+    margin-top: 2rem;
+}
+.home-card .date {
+    padding: 0;
+}
+
+/*账户相关页面*/
+.account-page {
+    max-width: 512px;
+    width: 100%;
+}
+.account-page .head-logo {
+    height: 10rem;
+    width: fit-content;
+    margin: 2rem;
+}
+.account-page .mdl-textfield {
+    width: 100%;
+}
+.account-page .action {
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 2rem;
+}
+
+.account-page button {
+    width: 10rem;
+}
+/*登入*/
+
+.login-card .external {
+    display: flex;
+    justify-content: space-evenly;
+}
+.login-card .external-text {
+    display: flex;
+    justify-content: center;
+}
+.login-card .external-text hr {
+    width:100%;
+}
+.login-card .external-text p {
+    width: -webkit-fill-available;
+}
+.login-card .ex-action {
+    display: flex;
+    justify-content: space-between;
+}
+.login-card .ex-action a{
+    word-break: keep-all;
+}
+/*注册*/
+.register-card .login-link {
+    padding-top: 2rem;
+}
+/*验证码*/
+.verify-code-card .code-input {
+    display: flex;
+}
+.verify-code-card .code-input button {
+    margin-left: 2rem;
+}
+/*选择账号*/
+
+.choose-realname-card .action, .choose-account-card .action {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0;
+}
+/*选择修改绑定信息*/
+.select-bind-card li > div {
+    display: flex;
+}
+.select-bind-card li > div > span {
+    width: 7rem;
+}
+.select-bind-card li > div > div {
+    display: flex;
+    gap: 2rem;
+}
+/*确认页面*/
+/*按钮图标+文字*/
+.mdl-button--raised > i {
+    margin-right: .5rem;
+}
+/*Alert*/
+.alert .border {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: inherit;
+    border-bottom-left-radius: inherit;
+    left: 0;
+    border-style: solid;
+    border-width: 2px;
+    content: "";
+    position: absolute;
+    height: 100%;
+}
+.alert-danger .border{
+    background-color: red;
+    border-color: red;
+}
+.alert-danger strong {
+    color: red;
+}
+.alert-info strong {
+    color: blue;
+}
+.alert-info .border {
+    background-color: blue;
+    border-color: blue;
+}
+.alert-success strong {
+    color: green;
+}
+
+.alert-success .border {
+    background-color: green;
+    border-color: green;
+}
+.alert {
+    position: relative;
+    display: flex;
+}
+.alert .content {
+    padding: .5rem 0 0 1.5rem;
+}
+.alert ul {
+    padding: 0 1.5rem;
+    margin: 0;
+}
+/*scrollbar*/
+::-webkit-scrollbar-track {
+    border-radius: 15px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    margin: 5px 0;
+    border-radius: 15px;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
+}

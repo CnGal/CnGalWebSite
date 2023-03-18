@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build and push all image
  
 on: workflow_dispatch # 手动触发
  
@@ -22,6 +22,7 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
             
+        # Server
         - name: build Blazor Server and push to Dockerhub
           uses: docker/build-push-action@v3
           with:
@@ -32,6 +33,7 @@ jobs:
             tags: |
               littlefishtentears/cngalwebsiteserver
               
+         # API Server
         - name: build API Server and push to Dockerhub
           uses: docker/build-push-action@v3
           with:
@@ -41,4 +43,26 @@ jobs:
             push: true
             tags: |
               littlefishtentears/cngalwebsiteapiserver
+
+        # IdentityServer
+        - name: build IdentityServer and push to Dockerhub
+          uses: docker/build-push-action@v3
+          with:
+            context: .
+            file: ./CnGalWebSite/CnGalWebSite.IdentityServer/Dockerfile # Dockerfile 位置
+            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+            push: true
+            tags: |
+              littlefishtentears/cngalwebsiteidentityserver
+
+        # IdentityServer.Admin
+        - name: build IdentityServer.Admin and push to Dockerhub
+          uses: docker/build-push-action@v3
+          with:
+            context: .
+            file: ./CnGalWebSite/CnGalWebSite.IdentityServer.Admin.SSR/Dockerfile # Dockerfile 位置
+            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+            push: true
+            tags: |
+              littlefishtentears/cngalwebsiteidentityserveradmin
         

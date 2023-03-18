@@ -1,0 +1,32 @@
+﻿@using IdentityServer4.Extensions
+
+@{
+    string name = null;
+    if (!true.Equals(ViewData["signed-out"]))
+    {
+        name = Context.User?.GetDisplayName();
+    }
+}
+
+<header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+        <!-- Title -->
+        <span class="mdl-layout-title">CnGal资料站 - 开放平台</span>
+        <!-- Add spacer, to align navigation to the right -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Navigation. We hide it in small screens. -->
+    </div>
+
+</header>
+<div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">@(string.IsNullOrWhiteSpace(name)? "CnGal资料站 - 开放平台" : name)</span>
+    <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" href="/">主页</a>
+        @if (!string.IsNullOrWhiteSpace(name))
+        {
+            <a class="mdl-navigation__link" asp-action="SelectModifyField" asp-controller="Account">编辑账号信息</a>
+            <a class="mdl-navigation__link" asp-action="Logout" asp-controller="Account">退出登入</a>
+
+        }
+    </nav>
+</div>

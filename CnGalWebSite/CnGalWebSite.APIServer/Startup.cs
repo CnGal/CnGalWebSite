@@ -111,8 +111,8 @@ namespace CnGalWebSite.APIServer
                     Description = "我们欢迎开发者使用这些API开发各个平台应用，如有困难请咨询网站管理人员",
                     Contact = new OpenApiContact
                     {
-                        Name = "沙雕の方块",
-                        Email = "1278490989@qq.com"
+                        Name = "CnGal",
+                        Email = "help@cngal.org"
                     },
                     Version = "v1"
                 });
@@ -201,15 +201,7 @@ namespace CnGalWebSite.APIServer
             });
 
             //添加状态检查
-            services.AddHealthChecks()
-                .AddDbContextCheck<AppDbContext>("DbContext")
-                .AddCheck<SystemMemoryHealthcheck>("Memory");
-                //.AddCheck("Steamspy", new PingHealthCheck(Configuration["SteamspyUrl"], 500))
-                //.AddCheck("Steam反代", new PingHealthCheck(Configuration["SteamAPIUrl"], 100))
-                //.AddCheck("互联网档案馆", new PingHealthCheck(Configuration["BackUpArchiveUrl"], 100))
-                //.AddCheck("tucang.cc", new PingHealthCheck(Configuration["TucangCCAPIUrl"], 500))
-                //.AddCheck("RSS订阅源", new PingHealthCheck(Configuration["RSSUrl"], 100))
-                //.AddCheck("Typesense", new PingHealthCheck(Configuration["TypesenseHost"], 100));
+            services.AddHealthChecks().AddDbContextCheck<AppDbContext>("DbContext");
 
             #region 添加微信配置
 

@@ -26,4 +26,8 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="CnGalWebSite.Extensions" />
+  </ItemGroup>
+
 </Project>

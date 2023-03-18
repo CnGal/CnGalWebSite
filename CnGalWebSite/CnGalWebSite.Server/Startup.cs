@@ -83,9 +83,7 @@ namespace CnGalWebSite.Server
                 }));
 
             //添加状态检查
-            services.AddHealthChecks()
-                //.AddCheck("API Server", new PingHealthCheck(ToolHelper.WebApiPath, 100))
-                .AddCheck<SystemMemoryHealthcheck>("Memory");
+            services.AddHealthChecks();
 
             //添加工具箱
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
@@ -123,19 +121,18 @@ namespace CnGalWebSite.Server
             //app.UseHttpsRedirection();
             //app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
-            //添加真实IP中间件
-            _ = app.UseForwardedHeaders();
+            //转发Ip
+            _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             _ = app.UseStaticFiles();
 
             //添加状态检查终结点
             _ = app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
-            //转发Ip
-            _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+
 
             _ = app.UseRouting();
 
