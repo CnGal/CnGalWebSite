@@ -3,6 +3,7 @@ using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.SSR.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 //判断是否 SSR
@@ -47,7 +48,8 @@ builder.Services.AddAuthentication(options =>
 
         //保存token到本地
         options.SaveTokens = true;
-
+        //不检查Https
+        options.RequireHttpsMetadata = false;
         //很重要，指定从Identity Server的UserInfo地址来取Claim
         options.GetClaimsFromUserInfoEndpoint = true;
         //指定要取哪些资料（除Profile之外，Profile是默认包含的）
@@ -102,6 +104,12 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 //添加状态检查
 builder.Services.AddHealthChecks();
+//添加真实IP
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 var app = builder.Build();
 
@@ -110,6 +118,11 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
+//转发Ip
+_ = app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 //设置Cookies
 app.UseCookiePolicy();
 
