@@ -10,7 +10,7 @@
             裁剪图片
         </MCardTitle>
         <MCardText>
-            @(ToolHelper.IsWASM?"暂不支持gif格式":"直接上传可以更加快捷地裁剪图片")
+            直接上传可以更加快捷地裁剪图片
         </MCardText>
 
         <MCardText Class="pb-0">
@@ -18,7 +18,7 @@
             {
                 <Cropper @bind-Ratio="@ImageRatio" CropperHeight="500" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
                          @ref="cropper"
-                         PureCSharpProcessing="!ToolHelper.IsWASM"
+                         PureCSharpProcessing="ToolHelper.IsSSR"
                          AspectRatio="AspectRatio"
                          RequireAspectRatio="@IsAspectRatioEnabled"
                          ImageFile="File"

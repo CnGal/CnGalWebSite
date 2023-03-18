@@ -17,6 +17,16 @@
 .d-none{
     display:none;
 }
+/*颜色*/
+.success--text {
+    color: #4CAF50 !important;
+}
+.warning--text {
+    color: #FB8C00 !important
+}
+.info--text {
+    color: #2196F3 !important;
+}
 /*默认卡片*/
 .mdl-card {
     width: 100%;
@@ -29,7 +39,18 @@
     font-weight: bold;
     text-align: center;
 }
+.mdl-card {
+    min-height: 0;
+}
 
+.mdl-layout-title .nav-drawer {
+    line-height: initial !important;
+    display: flex;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    padding-left: 2rem !important;
+    font-weight: bold;
+}
 /*按钮文字始终白色*/
 .mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
     color: white;
@@ -163,6 +184,24 @@ footer a{
     display: flex;
     gap: 2rem;
 }
+.select-field-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.bind-card {
+    padding: 0;
+}
+.bind-card .name-bind {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem;
+}
+    .bind-card .action-bind {
+        padding-top: 1rem;
+        display: flex;
+        gap: 2rem;
+    }
 /*确认页面*/
 /*按钮图标+文字*/
 .mdl-button--raised > i {
@@ -181,27 +220,26 @@ footer a{
     position: absolute;
     height: 100%;
 }
-.alert-danger .border{
-    background-color: red;
-    border-color: red;
+.alert-danger .border {
+    background-color: #FF5252 !important;
+    border-color: #FF5252 !important;
 }
 .alert-danger strong {
-    color: red;
+    color: #FF5252 !important;
 }
 .alert-info strong {
-    color: blue;
+    color: #2196F3 !important;
 }
 .alert-info .border {
-    background-color: blue;
-    border-color: blue;
+    background-color: #2196F3 !important;
+    border-color: #2196F3 !important;
 }
 .alert-success strong {
-    color: green;
+    color: #4CAF50;
 }
-
 .alert-success .border {
-    background-color: green;
-    border-color: green;
+    background-color: #4CAF50;
+    border-color: #4CAF50;
 }
 .alert {
     position: relative;

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
@@ -34,11 +35,13 @@ namespace CnGalWebSite.WebAssembly
         /// <returns></returns>
         public static async Task Main(string[] args)
         {
+            //判断是否 SSR
+            ToolHelper.IsSSR = ToolHelper.PreSetIsSSR == null ? false : ToolHelper.PreSetIsSSR.Value;
+
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             // 增加 BootstrapBlazor 组件
             builder.Services.AddBootstrapBlazor();
             //动态修改标题
@@ -47,9 +50,6 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddBlazoredLocalStorage()
                  .AddBlazoredSessionStorage();
 
-            builder.Services.AddAuthorizationCore();
-            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IHttpService, HttpService>();
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
@@ -88,6 +88,23 @@ namespace CnGalWebSite.WebAssembly
 
             builder.Services.AddScoped<IFileUploadService, FileUploadService>();
             builder.Services.AddScoped<IEventService, EventService>();
+
+            //添加OpenId
+            builder.Services.AddOidcAuthentication(options =>
+            {
+                builder.Configuration.Bind("Local", options.ProviderOptions);
+                options.UserOptions.RoleClaim = "role";
+                options.UserOptions.NameClaim = "name";
+            }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
+
+            //自定义消息
+            //builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
+            //builder.Services.AddHttpClient("CnGalAPI")
+            //    //声明使用以上自定义的处理程序
+            //    .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+            //builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
+            //    .CreateClient("CnGalAPI"));
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             var host = builder.Build();
 

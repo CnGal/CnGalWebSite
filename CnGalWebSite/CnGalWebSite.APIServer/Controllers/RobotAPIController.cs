@@ -44,13 +44,13 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/robot/[action]")]
     public class RobotAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -105,21 +105,21 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<RobotFace, long> robotFaceRepository,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
+         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
+        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRobotService robotService,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotGroup, long> robotGroupRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, ISearchHelper searchHelper, IRepository<RobotReply, long> robotReplyRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _examineService = examineService;
-            _roleManager = roleManager;
+            
             _userService = userService;
             _entryService = entryService;
             _articleService = articleService;
@@ -219,7 +219,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotEventDataAsync(ListRobotEventAloneModel model)
         {
@@ -276,7 +276,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotGroupDataAsync(ListRobotGroupAloneModel model)
         {
@@ -322,7 +322,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotReplyDataAsync(ListRobotReplyAloneModel model)
         {
@@ -385,7 +385,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotFaceDataAsync(ListRobotFaceAloneModel model)
         {
@@ -442,7 +442,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> ImportRobotRepliesAsync(ImportRobotsModel model)
         {
@@ -553,7 +553,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> ImportRobotFacesAsync(ImportRobotsModel model)
         {
@@ -607,7 +607,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotEventAsync(HiddenRobotModel model)
         {
@@ -616,7 +616,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotGroupAsync(HiddenRobotModel model)
         {
@@ -625,7 +625,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotReplyAsync(HiddenRobotModel model)
         {
@@ -634,7 +634,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotFaceAsync(HiddenRobotModel model)
         {
@@ -674,15 +674,17 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             if (model.Name == "auth")
             {
-                var user = await _userRepository.GetAll().AsNoTracking()
-                    .FirstOrDefaultAsync(s => s.GroupQQ == model.SenderId);
+                //var user = await _userRepository.GetAll().AsNoTracking()
+                //    .FirstOrDefaultAsync(s => s.GroupQQ == model.SenderId);
 
-                if (user == null)
-                {
-                    return new Result { Successful = false, Error = "你还没有绑定账号哦~ \nPS：私聊“绑定账号”试试吧ヾ(•ω•`)o" };
-                }
+                //if (user == null)
+                //{
+                //    return new Result { Successful = false, Error = "你还没有绑定账号哦~ \nPS：私聊“绑定账号”试试吧ヾ(•ω•`)o" };
+                //}
 
-                return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
+                //return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
+
+                return new Result { Successful = false, Error = "看板娘好像忘记了什么，到底是什么呢？" };
             }
             else if (model.Name == "bindqq")
             {

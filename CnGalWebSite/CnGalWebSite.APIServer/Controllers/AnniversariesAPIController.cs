@@ -46,13 +46,13 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [AllowAnonymous]
     [ApiController]
     [Route("api/anniversaries/[action]")]
     public class AnniversariesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -111,8 +111,8 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
+         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
+        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<PlayedGame, long> playedGameRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
@@ -120,14 +120,14 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _examineService = examineService;
-            _roleManager = roleManager;
+            
             _userService = userService;
             _entryService = entryService;
             _articleService = articleService;
@@ -180,7 +180,6 @@ namespace CnGalWebSite.APIServer.Controllers
         static readonly DateTime before = new DateTime(2022, 5, 31);
         static readonly DateTime after = new DateTime(2021, 5, 31);
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<JudgableGameViewModel>>> GetAllJudgableGamesAsync()
         {
@@ -221,7 +220,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<PlayedGameUserScoreRandomModel>>> GetRandomUserScoresAsync()
         {

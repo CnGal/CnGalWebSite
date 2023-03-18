@@ -1,6 +1,6 @@
 ﻿@page "/admin/listmessages"
 @attribute [Authorize(Roles = "Admin")]
-@inject IAuthService AuthService
+
 @inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider

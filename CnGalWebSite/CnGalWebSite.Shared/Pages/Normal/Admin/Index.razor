@@ -12,18 +12,18 @@
         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="APIServerModel" Name="API Server" />
 
     </div>
-    @if (ToolHelper.IsWASM == false)
+    @if (ToolHelper.IsSSR)
     {
         <div class="col-12">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="BlazorServerModel" Name="Blazor Server" />
 
         </div>
     }
-    <div class="@(ToolHelper.IsWASM ?"col-12":"col-12 col-lg-6")">
+    <div class="@(ToolHelper.IsSSR ?"col-12 col-lg-6":"col-12")">
         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.APIServerDataCard />
 
     </div>
-    @if (ToolHelper.IsWASM == false)
+    @if (ToolHelper.IsSSR)
     {
         <div class="col-12 col-lg-6">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.BlazorServerDataCard />
@@ -49,7 +49,7 @@
             try
             {
                 APIServerModel = await _httpService.GetAsync<ServerStaticOverviewModel>("api/admin/GetServerStaticDataOverview");
-                if (ToolHelper.IsWASM == false)
+                if (ToolHelper.IsSSR)
                 {
                     BlazorServerModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
                 }

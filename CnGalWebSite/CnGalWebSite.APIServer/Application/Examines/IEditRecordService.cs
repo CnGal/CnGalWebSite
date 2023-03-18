@@ -42,7 +42,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         /// <param name="allowEditor"></param>
         /// <returns></returns>
         Task<bool> CheckUserExaminePermission(object entry, ApplicationUser user, bool allowEditor = true);
-        Task<bool> CheckUserExaminePermission(Examine examine, ApplicationUser user, bool allowEditor = true);
+        Task<bool> CheckUserExaminePermission( Examine examine, ApplicationUser user, bool allowEditor = true);
 
         /// <summary>
         /// 检测目标是否在指定用户监视下

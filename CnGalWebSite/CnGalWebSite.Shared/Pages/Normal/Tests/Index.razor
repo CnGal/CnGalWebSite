@@ -67,19 +67,5 @@
 </div>
 
 @code{
-    protected override async Task OnInitializedAsync()
-    {
-        int a = 0;
-        try
-        {
-            a = int.Parse(_dataCacheService.LoginKey);
-        }
-        catch
-        {
 
-        }
-        a++;
-        _dataCacheService.LoginKey = a.ToString();
-
-    }
 }

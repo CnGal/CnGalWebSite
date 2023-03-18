@@ -28,12 +28,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/comments/[action]")]
     public class CommentsAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Comment, long> _commentRepository;
@@ -48,7 +48,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IEditRecordService _editRecordService;
 
-        public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository,
+        public CommentsAPIController( IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository,
         IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
@@ -58,7 +58,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _commentRepository = commentRepository;
             _commentService = commentService;
-            _userManager = userManager;
+            
             _userRepository = userRepository;
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
@@ -95,7 +95,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (commentType == CommentType.CommentUser)
             {
-                var userSpace = await _userManager.FindByIdAsync(id);
+                var userSpace = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
                 if (userSpace != null)
                 {
                     ascriptionUserId = id;
@@ -337,7 +337,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditArticleCanCommentAsync(EditArticleCanCommentModel model)
         {
             await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -345,7 +345,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPeripheryCanCommentAsync(EditPeripheryCanCommentModel model)
         {
             await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -353,7 +353,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVoteCanCommentAsync(EditVoteCanCommentModel model)
         {
             await _voteRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -361,7 +361,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditLotteryCanCommentAsync(EditLotteryCanCommentModel model)
         {
             await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -369,7 +369,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVideoCanCommentAsync(EditLotteryCanCommentModel model)
         {
             await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -377,7 +377,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryCanCommentAsync(EditEntryCanCommentModel model)
         {
             await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -386,7 +386,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditSpaceCanCommentAsync(EditSpaceCanComment model)
         {
             await _userRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
@@ -396,7 +396,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenCommentAsync(HiddenCommentModel model)
         {
 
@@ -413,7 +413,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var item in model.Ids)
             {
-                if (await _appHelper.IsUserHavePermissionForCommmentAsync(item, user))
+                if (await _commentService.IsUserHavePermissionForCommmentAsync(item, user))
                 {
                     await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => true));
                 }
@@ -434,7 +434,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditCommentPriorityAsync(EditCommentPriorityViewModel model)
         {
             await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));

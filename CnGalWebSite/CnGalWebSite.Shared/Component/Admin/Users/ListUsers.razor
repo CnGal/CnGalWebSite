@@ -1,6 +1,6 @@
 ﻿
 @attribute [Authorize(Roles = "Admin")]
-@inject IAuthService AuthService
+
 @inject IHttpService _httpService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
@@ -13,7 +13,6 @@
        ShowExtendButtons="true" ExtendButtonColumnWidth="300" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
         ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
     <TableToolbarTemplate>
-        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加新用户" OnClickCallback="@((IEnumerable<ListUserAloneModel> items)=> { return CreateUser(); })" IsAsync="true" />
         <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Success" Icon="fa fa-database" Text="解封" OnClickCallback="OnUnBanUsersClick" IsAsync="true" />
         <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Info" Icon="fa fa-pencil-square-o" Text="封禁" OnClickCallback="OnBanUsersClick" IsAsync="true" />
         <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Primary" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
@@ -85,41 +84,6 @@
     {
         NavigationManager.NavigateTo(Provider, "/space/index/" + id, name, "fa fa-star-o");
 
-    }
-
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
-    public async Task CreateUser()
-    {
-        RegisterModel model = new RegisterModel();
-        var items = Utility.GenerateEditorItems<RegisterModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<RegisterModel>()
-        {
-            Title = "添加新用户",
-            Model = model,
-            Items = items,
-            OnEditAsync = async context =>
-            {
-                var result = await AuthService.Register((RegisterModel)context.Model);
-
-                if (result.Successful)
-                {
-                    await ToastService.Success("注册成功", "成功注册新用户：" + ((RegisterModel)context.Model).Name);
-                    await TableRows.QueryAsync();
-                }
-                else
-                {
-                    await ToastService.Error("注册失败", result.Error);
-                }
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
     }
 
     /// <summary>

@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/files/[action]")]
     public class FilesAPIController : ControllerBase
@@ -28,18 +28,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IFileService _fileService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
 
         private readonly IAppHelper _appHelper;
 
-        public FilesAPIController(IRepository<UserFile, int> userFileRepository, IRepository<FileManager, int> fileManagerRepository, IAppHelper appHelper, UserManager<ApplicationUser> userManager,
+        public FilesAPIController(IRepository<UserFile, int> userFileRepository, IRepository<FileManager, int> fileManagerRepository, IAppHelper appHelper, 
         IFileService fileService)
         {
             _appHelper = appHelper;
             _fileManagerRepository = fileManagerRepository;
             _userFileRepository = userFileRepository;
             _fileService = fileService;
-            _userManager = userManager;
+            
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<PagedResultDto<ImageInforTipViewModel>> GetImageListAsync(PagedSortedAndFilterInput input)
         {
@@ -124,7 +124,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<PagedResultDto<ListFileAloneModel>> GetAudioListAsync(PagedSortedAndFilterInput input)
         {

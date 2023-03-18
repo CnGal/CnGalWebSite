@@ -30,7 +30,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<BookingUser, long> _bookingUserRepository;
@@ -39,7 +39,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
         public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
             IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger,
-        UserManager<ApplicationUser> userManager, IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService)
+         IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService)
         {
             _lotteryRepository = lotteryRepository;
             _lotteryUserRepository = lotteryUserRepository;
@@ -48,7 +48,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _appHelper = appHelper;
             _userService = userService;
             _userRepository = userRepository;
-            _userManager = userManager;
+            
             _bookingUserRepository = bookingUserRepository;
             _commentRepository = commentRepository;
             _operationRecordService=operationRecordService;
@@ -283,7 +283,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 foreach (var temp in lottery.Users)
                 {
                     var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.ApplicationUserId);
-                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (_userService.CheckCurrentUserRole( "Admin"))
                     {
                         temp.IsHidden = true;
                     }

@@ -21,12 +21,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/videos/[action]")]
     public class VideoAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -46,10 +46,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public VideoAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, ILogger<VideoAPIController> logger,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
-        UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository, IVideoService videoService,
+         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository, IVideoService videoService,
         IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
@@ -93,7 +93,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (video.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Admin") != true)
                 {
                     return NotFound();
                 }
@@ -199,7 +199,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否有权限编辑
-            if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)
+            if (user != null && _userService.CheckCurrentUserRole( "Editor") == true)
             {
                 model.Authority = true;
             }
@@ -761,7 +761,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HideAsync(HiddenArticleModel model)
         {
             //获取当前用户ID
@@ -779,7 +779,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPriorityAsync(EditArticlePriorityViewModel model)
         {
             //获取当前用户ID

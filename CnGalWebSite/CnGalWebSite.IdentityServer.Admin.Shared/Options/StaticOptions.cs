@@ -12,6 +12,7 @@ namespace CnGalWebSite.IdentityServer.Admin.Shared.Options
         public static string IdsApiUrl { get; set; } = "https://localhost:5001/";
         public static string CnGalApiUrl { get; set; } = "https://api.cngal.org/";
 
-        public static bool IsSSR = true;
+        public static bool? PreSetIsSSR = null;
+        public static bool IsSSR = false;
     }
 }

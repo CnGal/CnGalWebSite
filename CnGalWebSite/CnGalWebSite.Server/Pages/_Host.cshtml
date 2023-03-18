@@ -2,6 +2,7 @@
 @using CnGalWebSite.Shared
 @using CnGalWebSite.Shared.Component.Home
 @using CnGalWebSite.DataModel.ViewModel.OperationRecords
+@using Microsoft.AspNetCore.Authentication
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
@@ -15,6 +16,8 @@
     {
         RemoteIpAddress = ip
     };
+
+    var token = await HttpContext.GetTokenAsync("access_token").ConfigureAwait(false);
 }
 
-<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo"/>
+<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo" param-Token="token" />

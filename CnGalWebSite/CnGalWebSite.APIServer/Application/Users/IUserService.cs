@@ -17,14 +17,6 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel);
 
-        Task<bool> AddUserThirdPartyLogin(string id_token, ApplicationUser user, ThirdPartyLoginType type);
-
-        Task<ApplicationUser> GetThirdPartyLoginUser(string id_token, ThirdPartyLoginType type);
-
-        Task<string> GetThirdPartyLoginIdToken(string code, string returnUrl, bool isSSR, ThirdPartyLoginType type);
-
-
-
         Task UpdateUserDataMain(ApplicationUser user, UserMain examine);
 
         Task UpdateUserDataMainPage(ApplicationUser user, string examine);
@@ -51,6 +43,8 @@ namespace CnGalWebSite.APIServer.Application.Users
         Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null);
 
         Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel);
+
+        bool CheckCurrentUserRole( string role);
 
     }
 }

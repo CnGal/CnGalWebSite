@@ -24,12 +24,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/Favorites/[action]")]
     public class FavoriteFolderAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
@@ -48,10 +48,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public FavoriteFolderAPIController(IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Video, long> videoRepository, IRepository<Tag, long> tagRepository,
         IRepository<ApplicationUser, string> userRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<Examine, long> examineRepository,
-        UserManager<ApplicationUser> userManager, IFavoriteObjectService favoriteObjectService, IEditRecordService editRecordService, IUserService userService,
+         IFavoriteObjectService favoriteObjectService, IEditRecordService editRecordService, IUserService userService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
@@ -94,7 +94,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if ((folder.ShowPublicly == false) && user?.Id != folder.ApplicationUserId)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Admin") != true)
                 {
                     return NotFound();
                 }
@@ -152,7 +152,7 @@ namespace CnGalWebSite.APIServer.Controllers
           
 
             //判断是否有权限编辑
-            if (user != null && await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (user != null && _userService.CheckCurrentUserRole( "Admin") == true)
             {
                 model.Authority = true;
             }
@@ -468,7 +468,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private async Task<FavoriteFoldersViewModel> GetUserFavoriteFolders(string userId)
+        [HttpGet("{userId}")]
+        [AllowAnonymous]
+        private async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteFolders(string userId)
         {
             var model = new FavoriteFoldersViewModel
             {
@@ -476,11 +478,15 @@ namespace CnGalWebSite.APIServer.Controllers
             };
             //获取当前用户ID
             var currentUser = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if(currentUser==null)
+            {
+                return NotFound();
+            }
             //判断是否为管理员
             var isAdmin = false;
             if (currentUser != null)
             {
-                isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+                isAdmin = _userService.CheckCurrentUserRole( "Admin");
             }
 
             var user = await _userRepository.GetAll().Include(s => s.FavoriteFolders).FirstOrDefaultAsync(s => s.Id == userId);
@@ -566,7 +572,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //判断是否为当前用户
             if (isAdmin == false && await _favoriteFolderRepository.GetAll().AnyAsync(s => s.Id == model.FavorieFolderId && s.ApplicationUserId == user.Id) == false)
             {
@@ -592,7 +598,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             await _favoriteFolderRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
@@ -610,7 +616,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //判断是否为当前用户
             if (isAdmin == false && await _favoriteFolderRepository.GetAll().CountAsync(s => model.Ids.Contains(s.Id) && s.ApplicationUserId == user.Id) == model.Ids.Length)
             {
@@ -635,7 +641,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //判断是否为当前用户
             if (isAdmin == false && input.UserId != user.Id)
             {
@@ -658,7 +664,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //判断是否为当前用户
             if (isAdmin == false && await _favoriteFolderRepository.GetAll().AnyAsync(s => s.Id == input.FavoriteFolderId && s.ApplicationUserId == user.Id) == false)
             {
@@ -694,7 +700,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var isAdmin = false;
             if (currentUser != null)
             {
-                isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+                isAdmin = _userService.CheckCurrentUserRole("Admin");
             }
 
             //判断是否有权限访问
@@ -778,7 +784,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //获取收藏夹
             var folder = await _favoriteFolderRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == id);
             if (folder == null)
@@ -824,7 +830,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //获取收藏夹
             var folder = await _favoriteFolderRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == model.Id);
             if (folder == null)
@@ -883,7 +889,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //获取关联用户Id
             var currentUserId = (await _favoriteFolderRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.CurrentFolderId))?.ApplicationUserId;
             //判断是否有权限编辑

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+//判断是否 SSR
+StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.PreSetIsSSR.Value;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,12 +41,6 @@ builder.Services.AddAuthentication(options =>
         //id4配置的ClientId以及ClientSecrets
         options.ClientId = builder.Configuration["ClientId"];
         options.ClientSecret = builder.Configuration["ClientSecret"];
-
-        //开发模式下关闭http
-        if (builder.Configuration["Authority"].Contains("https") == false)
-        {
-            options.RequireHttpsMetadata = false;
-        }
 
         //认证模式
         options.ResponseType = "code";

@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Tags;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
@@ -29,12 +30,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/tags/[action]")]
     public class TagsAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -46,11 +47,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IArticleService _articleService;
         private readonly IRepository<Carousel, int> _carouselRepository;
+        private readonly IUserService _userService;
 
-        public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository,
+        public TagsAPIController( IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository, IUserService userService,
         IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService, IRepository<Carousel, int> carouselRepository, IArticleService articleService)
         {
-            _userManager = userManager;
+            
             _tagRepository = tagRepository;
             _appHelper = appHelper;
             _tagService = tagService;
@@ -62,6 +64,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _carouselRepository = carouselRepository;
             _articleRepository = articleRepository;
             _articleService = articleService;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -84,7 +87,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (tag.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Admin") != true)
                 {
                     return NotFound();
                 }
@@ -727,7 +730,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenTagAsync(HiddenTagModel model)
         {
             await _tagRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));

@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 
 using CnGalWebSite.DataModel.ExamineModel.Comments;
@@ -37,10 +38,12 @@ namespace CnGalWebSite.APIServer.Application.Comments
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IUserService _userService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Comment>, string, SortOrder, IEnumerable<Comment>>> SortLambdaCache = new();
 
         public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository, IRepository<Article, long> articleRepository, IRepository<Video, long> videoRepository,
+            IUserService userService,
         IRankService rankService, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Vote, long> voteRepository, IRepository<Lottery, long> lotteryRepository)
         {
             _commentRepository = commentRepository;
@@ -54,6 +57,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
             _videoRepository = videoRepository;
+            _userService= userService;
         }
 
         public async Task<List<CommentViewModel>> GetComments( CommentType type, string Id, string rankName, string ascriptionUserId,IEnumerable<Comment> examineComments)
@@ -499,6 +503,42 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
             }
         }
+
+        public async Task<bool> IsUserHavePermissionForCommmentAsync(long commentId, ApplicationUser user)
+        {
+            var comment = await _commentRepository.GetAll().Include(s => s.Article).Include(s => s.Entry).Include(s => s.UserSpaceCommentManager).Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == commentId);
+            if (comment != null)
+            {
+                //判断评论是否归属该用户
+                if (comment.ApplicationUserId == user.Id)
+                {
+
+                }
+                else if (comment.Article != null && comment.Article.CreateUserId == user.Id)
+                {
+
+                }
+                else if (_userService.CheckCurrentUserRole("Admin"))
+                {
+
+                }
+                else if (comment.UserSpaceCommentManager != null && comment.UserSpaceCommentManager.ApplicationUserId == user.Id)
+                {
+
+                }
+                else
+                {
+                    //不符合上述条件 返回
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
 
     }
 

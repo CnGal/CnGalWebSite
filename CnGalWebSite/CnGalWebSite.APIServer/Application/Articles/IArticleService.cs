@@ -48,5 +48,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         void SetDataFromEditArticleMainPageViewModel(Article newArticle, EditArticleMainPageViewModel model);
 
         void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos);
+
+        Task<bool> CanUserEditArticleAsync(ApplicationUser user, long articleId);
     }
 }

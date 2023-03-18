@@ -109,6 +109,7 @@ namespace CnGalWebSite.IdentityServer
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>()
                 .AddDefaultTokenProviders();
 
             var builder = services.AddIdentityServer(options =>
@@ -175,7 +176,7 @@ namespace CnGalWebSite.IdentityServer
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "CnGal API",
+                    Title = "CnGal资料站 - 开放平台 API",
                     Description = "我们欢迎开发者使用这些API开发各个平台应用，如有困难请咨询网站管理人员",
                     Contact = new OpenApiContact
                     {
@@ -203,6 +204,8 @@ namespace CnGalWebSite.IdentityServer
 
         public void Configure(IApplicationBuilder app)
         {
+            _ = Environment.IsDevelopment() ? app.UseDeveloperExceptionPage() : app.UseExceptionHandler("/Error");
+
             //转发Ip
             _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

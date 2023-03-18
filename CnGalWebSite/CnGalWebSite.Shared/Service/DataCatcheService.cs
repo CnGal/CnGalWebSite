@@ -52,31 +52,7 @@ namespace CnGalWebSite.Shared.Service
         /// 是否为精简模式
         /// </summary>
         public bool IsMiniMode { get; set; }
-
-        /// <summary>
-        /// 身份验证成功后获得的标识 有效期一小时
-        /// </summary>
-        public string LoginKey { get; set; } = string.Empty;
-        /// <summary>
-        /// 第三方登入成功 服务端也验证成功后 返回唯一标识 有效期一小时
-        /// </summary>
-        public ThirdPartyLoginTempModel ThirdPartyLoginTempModel { get; set; } = null;
-        /// <summary>
-        /// 历史用户临时储存用户名
-        /// </summary>
-        public string UserName { get; set; } = string.Empty;
-        /// <summary>
-                                                             /// 历史用户临时储存电子邮箱
-                                                             /// </summary>
-        public string UserEmail { get; set; } = string.Empty;
-        /// <summary>
-        /// 是否正在使用第三方登入
-        /// </summary>
-        public bool IsOnThirdPartyLogin { get; set; } = true;
-        /// <summary>
-        /// 用户二次身份验证方式
-        /// </summary>
-        public UserAuthenticationTypeModel UserAuthenticationTypeModel { get; set; } = new UserAuthenticationTypeModel();
+    
         /// <summary>
         /// 主页数据缓存
         /// </summary>
@@ -392,8 +368,6 @@ namespace CnGalWebSite.Shared.Service
             PlayedGameOverviewDataCatche.Clean();
 
             UserContentCenterCatche = null;
-            LoginKey = null;
-            ThirdPartyLoginTempModel = null;
             UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
         }
     }

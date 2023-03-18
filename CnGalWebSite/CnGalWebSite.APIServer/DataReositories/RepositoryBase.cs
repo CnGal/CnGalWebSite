@@ -144,6 +144,10 @@ namespace CnGalWebSite.APIServer.DataReositories
         {
             return await GetAll().CountAsync();
         }
+        public async Task<bool> AnyAsync(Expression<Func<Tentity, bool>> predicate)
+        {
+            return await GetAll().AnyAsync(predicate);
+        }
 
         public int Count(Expression<Func<Tentity, bool>> predicate)
         {

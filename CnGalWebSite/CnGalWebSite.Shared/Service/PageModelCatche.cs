@@ -35,7 +35,7 @@ namespace CnGalWebSite.Shared.Service
             _serviceProvider = serviceProvider;
 
 
-            if (!ToolHelper.IsWASM)
+            if (ToolHelper.IsSSR)
             {
                 ApplicationState = (PersistentComponentState)_serviceProvider.GetService(typeof(PersistentComponentState));
                 persistingSubscription = ApplicationState.RegisterOnPersisting(PersistData);

@@ -4,6 +4,8 @@ using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.WASM;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+//判断是否 SSR
+StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? false : StaticOptions.PreSetIsSSR.Value;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

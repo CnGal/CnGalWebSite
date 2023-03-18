@@ -8,7 +8,7 @@
             <MCardText>
                 <div>
                     <div class="name">@context.User.Identity.Name</div>
-                    <div class="id">@context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value</div>
+                    <div class="id">@context.User.Claims.GetUserId()</div>
                 </div>
                 <MButton Fab Dark Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsApiUrl+"Account/SelectModifyField"))">
                     <MIcon>mdi-pencil</MIcon>
@@ -26,16 +26,14 @@
         {
 
             <MRow>
-                @foreach (var item in Model.AccountFields)
+                @foreach (var item in Model.AccountFields.Where(s=>s.Type!= Models.ViewModels.Account.SelectModifyFieldType.Password))
                 {
                     <MCol Cols="12" Sm="4" Md="3">
                         <MCard>
                             <MCardText>
                                 <div class="key">
-                                    <i class="@item.Icon"></i>
+                                    <i class="@item.Icon primary--text"></i>
                                     @item.Type.GetDisplayName()
-
-
                                 </div>
                                 @if (item.Actions.Count > 1 || item.Type == Models.ViewModels.Account.SelectModifyFieldType.Email)
                                 {
@@ -63,7 +61,7 @@
                         <MCard>
                             <MCardText>
                                 <div class="key">
-                                    <i class="@item.Icon"></i>
+                                    <i class="@item.Icon primary--text"></i>
                                     @item.DisplayName
                                 </div>
                                 @if (item.Actions.Count > 1)

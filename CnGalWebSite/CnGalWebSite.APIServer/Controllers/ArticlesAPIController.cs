@@ -32,12 +32,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/articles/[action]")]
     public class ArticlesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -56,10 +56,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, IVideoService videoService, IRepository<Video, long> videoRepository,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
-        UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
+         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
@@ -101,7 +101,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (article.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Admin") != true)
                 {
                     return NotFound();
                 }
@@ -177,7 +177,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.UserInfor = await _userService.GetUserInforViewModel(createUser);
 
             //判断是否有权限编辑
-            if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)
+            if (user != null && _userService.CheckCurrentUserRole( "Editor") == true)
             {
                 model.Authority = true;
             }
@@ -279,13 +279,13 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (article.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Editor") != true)
                 {
                     return NotFound();
                 }
             }
             //判断是否有权限编辑
-            if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)
+            if (user != null && _userService.CheckCurrentUserRole( "Editor") == true)
             {
                 model.Authority = true;
             }
@@ -333,7 +333,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "该文章的名称与其他文章重复", Successful = false };
                 }
 
-                if (model.Main.Type == ArticleType.Notice && await _userManager.IsInRoleAsync(user, "Admin") == false)
+                if (model.Main.Type == ArticleType.Notice && _userService.CheckCurrentUserRole( "Admin") == false)
                 {
                     return new Result { Error = "只有管理员才有权限发布公告", Successful = false };
                 }
@@ -478,7 +478,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
                 }
-                if (await _appHelper.CanUserEditArticleAsync(user, model.Id) == false)
+                if (await _articleService.CanUserEditArticleAsync(user, model.Id) == false)
                 {
                     return new Result { Error = "权限不足，文章有其发布者和管理员才能编辑", Successful = false };
                 }
@@ -487,7 +487,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Error = "当前文章已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
                 }
-                if (model.Type == ArticleType.Notice && await _userManager.IsInRoleAsync(user, "Admin") == false)
+                if (model.Type == ArticleType.Notice && _userService.CheckCurrentUserRole( "Admin") == false)
                 {
                     return new Result { Error = "只有管理员才有权限发布公告", Successful = false };
                 }
@@ -595,7 +595,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
                 }
 
-                if (await _appHelper.CanUserEditArticleAsync(user, model.Id) == false)
+                if (await _articleService.CanUserEditArticleAsync(user, model.Id) == false)
                 {
                     return new Result { Error = "权限不足，文章有其发布者和管理员才能编辑", Successful = false };
                 }
@@ -781,7 +781,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
                 }
-                if (await _appHelper.CanUserEditArticleAsync(user, model.Id) == false)
+                if (await _articleService.CanUserEditArticleAsync(user, model.Id) == false)
                 {
                     return new Result { Error = "权限不足，文章有其发布者和管理员才能编辑", Successful = false };
                 }
@@ -883,7 +883,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HideAsync(HiddenArticleModel model)
         {
             await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
@@ -943,7 +943,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPriorityAsync(EditArticlePriorityViewModel model)
         {
             await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
@@ -1268,7 +1268,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
-
 
         [AllowAnonymous]
         [HttpGet]

@@ -36,12 +36,12 @@ using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [Route("api/examines/[action]")]
     [ApiController]
     public class ExaminesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -66,10 +66,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
-        UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository,
+         IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
@@ -154,7 +154,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //获取敏感词列表
-            //if (string.IsNullOrWhiteSpace(examine.Context) == false && user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+            //if (string.IsNullOrWhiteSpace(examine.Context) == false && user != null && _userService.CheckCurrentUserRole( "Admin"))
             //{
             //    model.SensitiveWords = await _appHelper.GetSensitiveWordsInText(examine.Context);
             //}
@@ -166,7 +166,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Result>> ProcAsync(Models.ExaminedViewModel model)
         {
@@ -422,7 +422,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine.PassedTime = DateTime.Now.ToCstTime();
                 examine.IsPassed = true;
 
-                if (await _userManager.IsInRoleAsync(currentUser, "Admin"))
+                if ( _userService.CheckCurrentUserRole("Admin"))
                 {
                     examine.ContributionValue = model.ContributionValue;
                 }
@@ -641,7 +641,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Result>> EditUserMonitors(EditUserMonitorsModel model)
         {
@@ -681,7 +681,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Result>> EditUserReviewEditRecordState(EditUserReviewEditRecordStateModel model)
         {
@@ -725,7 +725,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 获取用户未读的监视词条编辑记录
         /// </summary>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserContentCenterViewModel>> GetUserContentCenterView()
         {
@@ -761,7 +761,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取待审核记录
             var allExamines = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
             //若不是管理员 则检查认证词条
-            if (await _userManager.IsInRoleAsync(user, "Admin") == false)
+            if (_userService.CheckCurrentUserRole( "Admin") == false)
             {
                 var userCertification = await _userCertificationRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null);
                 if (userCertification == null)
@@ -787,7 +787,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserMonitorAloneModel>>> GetUserMonitorListAsync(UserMonitorsPagesInfor input)
         {
@@ -808,7 +808,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserReviewEditRecordAloneModel>>> GetUserReviewEditRecordListAsync(UserReviewEditRecordsPagesInfor input)
         {
@@ -829,7 +829,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListExamineAloneModel>>> GetExamineListAsync(ExaminesPagesInfor input)
         {

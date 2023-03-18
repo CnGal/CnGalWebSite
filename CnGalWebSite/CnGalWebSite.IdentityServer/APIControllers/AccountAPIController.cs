@@ -8,17 +8,19 @@ using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using static IdentityServer4.IdentityServerConstants;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
-    [Authorize(LocalApi.PolicyName)]
+    [Authorize(LocalApi.PolicyName,Roles ="User")]
     [ApiController]
     [Route("api/account/[action]")]
     public class AccountAPIController : ControllerBase
@@ -67,10 +69,9 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             return await _accountService.GetAccountBindInforAsync(context, user);
         }
 
-
         private async Task<ApplicationUser> FindLoginUser()
         {
-            var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject)?.Value;
+            var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject||s.Type == ClaimTypes.NameIdentifier)?.Value;
             return await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
         }
     }

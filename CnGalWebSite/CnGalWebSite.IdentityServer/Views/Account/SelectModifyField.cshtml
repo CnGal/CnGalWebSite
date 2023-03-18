@@ -1,6 +1,6 @@
 ﻿@model SelectModifyFieldViewModel
 
-<div class="account-page">
+<div class="select-field-page account-page">
     <div class="select-bind-card mdl-card mdl-shadow--2dp">
         <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
         <div class="mdl-card__title">
@@ -11,7 +11,7 @@
         {
 
             <div class="mdl-card__supporting-text text-center">
-                为了确保你的账号安全，需要进行二次身份验证
+                为了确保你的账号安全，在编辑之前需要进行二次身份验证
             </div>
             <partial name="_ValidationSummary" />
 
@@ -32,7 +32,6 @@
                     <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
                     <!--极验-->
 
-
                     <div class="action">
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="callGeetest()" type="button">验证</button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
@@ -42,67 +41,95 @@
         }
         else
         {
-            @if (Model.ShowCpltToast)
-            {
-                <div class="mdl-card__supporting-text">
-                    <div class="alert alert-success">
-                        <div class="content">
-                            <strong> <i class="mdi mdi-alert-circle-outline"></i> 操作成功</strong>
-                            <ul>
-                                <li>成功编辑账号信息</li>
-                            </ul>
-                        </div>
-                        <div class="border"></div>
-                    </div>
-                </div>
-            }
-            <div class="mdl-card__supporting-text">
-                <ul>
-                    @foreach (var item in Model.BindInfor.AccountFields)
-                    {
-                        <li>
-                            <div>
-                                <span>  @item.Type.GetDisplayName()</span>
-                                <div>
-                                    @foreach (var infor in item.Actions)
-                                    {
-                                        <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-type="@item.Type" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
-                                    }
-                                </div>
-                            </div>
-
-                        </li>
-                    }
-
-                    @foreach (var item in Model.BindInfor.ExternalFields)
-                    {
-                        <li>
-                            <div>
-                                <span>@item.DisplayName</span>
-                                <div>
-                                    @foreach (var infor in item.Actions)
-                                    {
-                                        @if (string.IsNullOrWhiteSpace(infor.Value))
-                                        {
-                                            <a asp-controller="External"
-                                               asp-action="Challenge"
-                                               asp-route-scheme="@item.AuthenticationScheme"
-                                               asp-route-returnUrl="@Model.ReturnUrl">
-                                                @infor.Key.GetDisplayName()
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-provider="@item.DisplayName" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
-                                        }
-                                    }
-                                </div>
-                            </div>
-
-                        </li>
-                    }
-                </ul>
+            <div class="mdl-card__supporting-text text-center">
+                修改账号绑定的某些信息后，可能需要重新进行身份验证
             </div>
         }
     </div>
+    @foreach (var item in Model.BindInfor.AccountFields)
+    {
+        <div class="mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__supporting-text bind-card">
+                <div class="name-bind">
+                    <div class="key">
+                        <i class="@item.Icon info--text"></i>
+                        @item.Type.GetDisplayName()
+                    </div>
+                    @if (item.Actions.Count > 1 || item.Type == SelectModifyFieldType.Email)
+                    {
+                        <div class="value success--text">
+                            <i class="mdi mdi-check-circle"></i>
+                            已绑定
+                        </div>
+                    }
+                    else if (item.Type != SelectModifyFieldType.Password)
+                    {
+                        <div class="value warning--text">
+                            <i class="mdi mdi-clock-outline"></i>
+                            未绑定
+                        </div>
+                    }
+                </div>
+                @if (string.IsNullOrWhiteSpace(Model.SecondCode) == false)
+                {
+                    <div class="action-bind">
+                        @foreach (var infor in item.Actions)
+                        {
+                            <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-type="@item.Type" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
+                        }
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+    @foreach (var item in Model.BindInfor.ExternalFields)
+    {
+        <div class="mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__supporting-text bind-card">
+                <div class="name-bind">
+                    <div class="key">
+                        <i class="@item.Icon  info--text"></i>
+                        @item.DisplayName
+                    </div>
+                    @if (item.Actions.Count > 1)
+                    {
+                        <div class="value success--text">
+                            <i class="mdi mdi-check-circle"></i>
+                            已绑定
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="value warning--text">
+                            <i class="mdi mdi-clock-outline"></i>
+                            未绑定
+                        </div>
+                    }
+                </div>
+                @if (string.IsNullOrWhiteSpace(Model.SecondCode) == false)
+                {
+                    <div class="action-bind">
+                        @foreach (var infor in item.Actions)
+                        {
+                            @if (string.IsNullOrWhiteSpace(infor.Value))
+                            {
+                                <a asp-controller="External"
+                                   asp-action="Challenge"
+                                   asp-route-scheme="@item.AuthenticationScheme"
+                                   asp-route-returnUrl="@Model.ReturnUrl">
+                                    @infor.Key.GetDisplayName()
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="@infor.Value" asp-route-returnUrl="@Model.ReturnUrl" asp-route-provider="@item.DisplayName" asp-route-secondCode="@Model.SecondCode">@infor.Key.GetDisplayName()</a>
+                            }
+                        }
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
 </div>

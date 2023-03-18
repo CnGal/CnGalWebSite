@@ -17,19 +17,9 @@
                 NavigationManager.NavigateTo("/account/login" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
                 return;
             }
-            var UserId = "";
-            foreach (var item in user.User.Claims)
-            {
-                if (item.Type == "userid")
-                {
-                    UserId = item.Value;
-                }
-            }
+            var UserId  = user.User.Claims.GetUserId();
 
             NavigationManager.NavigateTo("/space/editdata/" + UserId);
-
-
-
         }
     }
 }

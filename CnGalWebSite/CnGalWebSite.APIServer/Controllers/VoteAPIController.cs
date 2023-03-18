@@ -24,7 +24,7 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 namespace CnGalWebSite.APIServer.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/votes/[action]")]
     public class VoteAPIController : ControllerBase
@@ -267,7 +267,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> CreateVoteAsync(CreateVoteModel model)
         {
@@ -428,7 +428,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true, Error = vote.Id.ToString() };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<EditVoteModel>> EditVoteAsync(long id)
         {
@@ -543,7 +543,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditVoteAsync(EditVoteModel model)
         {
@@ -792,7 +792,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Result>> UserVoteAsync(UserVoteModel model)
         {
@@ -868,7 +868,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenVoteAsync(HiddenVoteModel model)
         {
@@ -876,7 +876,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditVotePriorityAsync(EditVotePriorityViewModel model)
         {

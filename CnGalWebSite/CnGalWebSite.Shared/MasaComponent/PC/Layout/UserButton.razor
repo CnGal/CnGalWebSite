@@ -36,10 +36,10 @@
 }
 @code {
 
-    [Parameter]
-    public string Class { get; set; }
-    [Parameter]
-    public EventCallback OnClickSetting { get; set; }
+        [Parameter]
+        public string Class { get; set; }
+        [Parameter]
+        public EventCallback OnClickSetting { get; set; }
 
     private bool menu { get; set; }
     private long messageCount { get; set; }
@@ -49,17 +49,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            //清除登入令牌
-            _dataCacheService.LoginKey = "";
-            _dataCacheService.IsOnThirdPartyLogin = true;
-            _dataCacheService.ThirdPartyLoginTempModel = null;
-
-            await RefreshUserInfor();
-        }
+        await RefreshUserInfor();
     }
 
     public async Task RefreshUserInfor()
@@ -69,14 +61,8 @@
         {
             try
             {
-                string userId = "";
-                foreach (var item in user.User.Claims)
-                {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
+                string userId = userId = user.User.Claims.GetUserId();
+
 
                 if (string.IsNullOrWhiteSpace(userId) == false)
                 {
@@ -86,7 +72,6 @@
                     _dataCacheService.UserInfor = model;
                     StateHasChanged();
                 }
-
             }
             catch
             {
@@ -113,13 +98,13 @@
     {
         messageCount = count;
         StateHasChanged();
-        
+
     }
 
     public void OnClosed()
     {
         menu = false;
         StateHasChanged();
-        
+
     }
 }
