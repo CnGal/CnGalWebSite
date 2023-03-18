@@ -79,7 +79,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly ICommentService _commentService;
         private readonly IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly ILogger<ExamineService> _logger;
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Vote, long> _voteRepository;
@@ -96,7 +96,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
-        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
+        IConfiguration configuration,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -116,7 +116,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
             _configuration = configuration;
-            _userManager = userManager;
+            
             _logger = logger;
             _playedGameService = playedGameService;
             _playedGameRepository = playedGameRepository;
@@ -229,7 +229,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
              var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
 
             //若不是管理员 则检查认证词条
-            if(await _userManager.IsInRoleAsync(user,"Admin")==false)
+            if(_userService.CheckCurrentUserRole("Admin")==false)
             {
                 var userCertification = await _userCertificationRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null);
                 if(userCertification==null)
@@ -5172,7 +5172,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     resulte = text.ToString();
                 }
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                if (_userService.CheckCurrentUserRole( "Editor") == true)
                 {
                     switch (item.Value)
                     {
@@ -5249,7 +5249,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     resulte = text.ToString();
                 }
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                if (_userService.CheckCurrentUserRole( "Editor") == true)
                 {
                     switch (item.Value)
                     {
@@ -5305,7 +5305,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
 
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                if (_userService.CheckCurrentUserRole( "Editor") == true)
                 {
                     switch (item.Value)
                     {
@@ -5364,7 +5364,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
 
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                if (_userService.CheckCurrentUserRole( "Editor") == true)
                 {
                     switch (item.Value)
                     {
@@ -5426,7 +5426,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     resulte = text.ToString();
                 }
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                if (_userService.CheckCurrentUserRole( "Editor") == true)
                 {
                     switch (item.Value)
                     {
@@ -6132,7 +6132,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 .Include(s=>s.Information).ThenInclude(s=>s.Additional)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            var admin = await _userManager.FindByIdAsync(_configuration["ExamineAdminId"]);
+            var admin = await _userRepository.FirstOrDefaultAsync(s=>s.Id==_configuration["ExamineAdminId"]);
             if (entry == null)
             {
                 return;

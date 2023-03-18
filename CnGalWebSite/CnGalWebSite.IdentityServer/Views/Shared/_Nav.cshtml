@@ -21,7 +21,7 @@
 <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">@(string.IsNullOrWhiteSpace(name)? "CnGal资料站 - 开放平台" : name)</span>
     <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="/">主页</a>
+        <a class="mdl-navigation__link nav-drawer" href="/">主页</a>
         @if (!string.IsNullOrWhiteSpace(name))
         {
             <a class="mdl-navigation__link" asp-action="SelectModifyField" asp-controller="Account">编辑账号信息</a>

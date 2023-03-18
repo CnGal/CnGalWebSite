@@ -34,12 +34,12 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/booking/[action]")]
     public class BookingAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -60,12 +60,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IOperationRecordService _operationRecordService;
         private readonly ILotteryService _lotteryService;
 
-        public BookingAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
+        public BookingAPIController( IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
         IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<BookingAPIController> logger, IRepository<Booking, long> bookingRepository,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository, IRepository<BookingUser, long> bookingUserRepository,
         IOperationRecordService operationRecordService, ILotteryService lotteryService)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;

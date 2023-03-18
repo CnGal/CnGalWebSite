@@ -69,14 +69,9 @@
         {
             try
             {
-              
-                foreach (var item in user.User.Claims)
-                {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
+
+                userId = user.User.Claims.GetUserId();
+
 
                 if (string.IsNullOrWhiteSpace(userId))
                 {

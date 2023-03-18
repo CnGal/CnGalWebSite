@@ -22,13 +22,13 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [AllowAnonymous]
     [Route("api/account/[action]")]
     [ApiController]
     public class AccountAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        
+        
         private readonly IAppHelper _appHelper;
         private readonly IRepository<UserOnlineInfor, long> _userOnlineInforRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
@@ -39,11 +39,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ILogger<AccountAPIController> _logger;
 
 
-        public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<ApplicationUser, int> userRepository,
-        SignInManager<ApplicationUser> signInManager, IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService)
+        public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository,  IAppHelper appHelper, IRepository<ApplicationUser, int> userRepository,
+            IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _appHelper = appHelper;
             _userOnlineInforRepository = userOnlineInforRepository;
             _historyUserRepository = historyUserRepository;
@@ -55,272 +53,9 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 登入
-        /// </summary>
-        /// <remarks>
-        /// 需要使用极验人机验证并获取token 登入及二次验证 以下同理
-        /// 每个用户名10分钟只能错误10次 其他验证同理
-        /// </remarks>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult<LoginResult>> Login(LoginModel model)
-        {
-            //提前判断是否通过人机验证
-            if (_appHelper.CheckRecaptcha(model.Verification) == false)
-            {
-                return BadRequest(new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation, ErrorDescribe = "没有通过人机验证" });
-            }
-
-            //首先判断是否错误次数超过上限
-            if (await _appHelper.IsExceedMaxErrorCount(model.UserName, 10, 10))
-            {
-                return new LoginResult { Code = LoginResultCode.FailedTooMany, ErrorDescribe = "登入失败次数过多，将在一段时间后解除锁定，请尝试找回密码，或联系管理员" };
-            }
-
-            var user = await _userManager.FindByEmailAsync(model.UserName);
-            if (user == null)
-            {
-                user = await _userManager.FindByNameAsync(model.UserName);
-            }
-            if (user == null)
-            {
-                user = await _userRepository.FirstOrDefaultAsync(s => s.PhoneNumber == model.UserName);
-            }
-            if (user == null)
-            {
-                //失败后尝试从历史账户中登入
-                var history = await _appHelper.LoginHistoryUser(model.UserName);
-                if (history != null)
-                {
-                    return new LoginResult { Code = LoginResultCode.HistoricalUser, ErrorDescribe = "历史用户", ErrorInfor = history };
-                }
-                else
-                {
-                    await _appHelper.AddErrorCount(model.UserName);
-                    return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "用户名或密码错误" };
-                }
-
-            }
-            if (!user.EmailConfirmed)
-            {
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                //获取短验证码
-                await _appHelper.GetShortTokenAsync(token, user.UserName);
-                //因为此处已经通过人机验证 直接获取验证码
-                await _appHelper.SendVerificationEmailAsync(null, user.Email, user.UserName);
-
-                return new LoginResult { Code = LoginResultCode.FailedEmailValidation, ErrorInfor = user.UserName, ErrorDescribe = "你的电子邮件还没有进行验证" };
-            }
-            //判断用户是否被封禁
-            if (user.UnsealTime != null)
-            {
-                if (user.UnsealTime < DateTime.Now.ToCstTime())
-                {
-                    user.UnsealTime = null;
-                    await _userManager.UpdateAsync(user);
-                }
-                else
-                {
-                    return new LoginResult { Code = LoginResultCode.UserBanded, ErrorDescribe = "该用户已经被封禁，将在" + (user.UnsealTime?.ToString("D") ?? "") + "后解封" };
-                }
-            }
-            //正常登入用户
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
-            {
-                //判断用户是否需要验证
-                if (model.isNeedVerification && user.IsPassedVerification == false && user.RegistTime >new DateTime(2021,9,11))
-                {
-                    return new LoginResult { Code = LoginResultCode.FailedRealNameValidation, ErrorDescribe = "没有通过身份验证", Token = await _appHelper.GetUserJWTokenAsync(user) };
-                }
-                else
-                {
-                    //成功登入 记录ip
-                    try
-                    {
-                       await _operationRecordService.AddOperationRecord(OperationRecordType.Login, null, user, model.Identification, HttpContext);
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.LogError(ex, "身份识别失败");
-                        return new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation,ErrorDescribe="身份识别失败",ErrorInfor=ex.Message };
-                    }
-
-                    return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
-                }
-            }
-            else
-            {
-                //失败后尝试从历史账户中登入
-                var history = await _appHelper.LoginHistoryUser(model.UserName);
-                if (history != null)
-                {
-                    return new LoginResult { Code = LoginResultCode.HistoricalUser, ErrorDescribe = "历史用户", ErrorInfor = history };
-                }
-                else
-                {
-                    await _appHelper.AddErrorCount(model.UserName);
-                    return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "用户名或密码错误" };
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// 刷新JWT令牌
-        /// </summary>
-        /// <remarks>
-        /// JWT令牌有效时长为15天
-        /// 建议每次进入应用刷新一次
-        /// </remarks>
-        /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet]
-        public async Task<ActionResult<LoginResult>> RefreshJWToken()
-        {
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            if (user != null)
-            {
-                //判断用户是否被封禁
-                if (user.UnsealTime != null)
-                {
-                    if (user.UnsealTime < DateTime.Now.ToCstTime())
-                    {
-                        user.UnsealTime = null;
-                        await _userManager.UpdateAsync(user);
-                    }
-                    else
-                    {
-                        return new LoginResult { Code = LoginResultCode.UserBanded, ErrorDescribe = "该用户已经被封禁，将在" + (user.UnsealTime?.ToString("D") ?? "") + "后解封" };
-                    }
-                }
-
-                return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
-            }
-            else
-            {
-                return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "无效的JWT令牌" };
-            }
-
-        }
-        /// <summary>
-        /// 刷新JWT令牌
-        /// </summary>
-        /// <remarks>
-        /// JWT令牌有效时长为15天
-        /// 建议每次进入应用刷新一次
-        /// </remarks>
-        /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost]
-        public async Task<ActionResult<LoginResult>> RefreshJWToken(LoginModel model)
-        {
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            if (user != null)
-            {
-                //判断用户是否被封禁
-                if (user.UnsealTime != null)
-                {
-                    if (user.UnsealTime < DateTime.Now.ToCstTime())
-                    {
-                        user.UnsealTime = null;
-                        await _userManager.UpdateAsync(user);
-                    }
-                    else
-                    {
-                        return new LoginResult { Code = LoginResultCode.UserBanded, ErrorDescribe = "该用户已经被封禁，将在" + (user.UnsealTime?.ToString("D") ?? "") + "后解封" };
-                    }
-                }
-
-                return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
-            }
-            else
-            {
-                return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "无效的JWT令牌" };
-            }
-
-        }
-      
-        /// <summary>
-        /// 获取一次性代码用户跨网站维持登录状态
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<OneTimeCodeModel>> GetOneTimeCodeAsync()
-        {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            return new OneTimeCodeModel { Code = await _appHelper.SetUserLoginKeyAsync(user.Id, true) };
-        }
-
-        /// <summary>
-        /// 通过一次性代码登入
-        /// </summary>
-        /// <remarks>
-        /// 一小时内有效
-        /// </remarks>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<ActionResult<LoginResult>> LoginByOneTimeCode(OneTimeCodeModel model)
-        {
-            var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(ip))
-            {
-                ip = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            }
-
-            //首先判断是否错误次数超过上限
-            if (await _appHelper.IsExceedMaxErrorCount(ip, 60, 1))
-            {
-                await _appHelper.AddErrorCount(ip);
-                return new LoginResult { Code = LoginResultCode.FailedTooMany, ErrorDescribe = "登入失败次数过多，将在一段时间后解除锁定，请尝试找回密码，或联系管理员" };
-            }
-
-
-
-            var userId = await _appHelper.GetUserFromLoginKeyAsync(model.Code);
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                await _appHelper.AddErrorCount(ip);
-                return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "无效的代码" };
-            }
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                //判断用户是否被封禁
-                if (user.UnsealTime != null)
-                {
-                    if (user.UnsealTime < DateTime.Now.ToCstTime())
-                    {
-                        user.UnsealTime = null;
-                        await _userManager.UpdateAsync(user);
-                    }
-                    else
-                    {
-                        await _appHelper.AddErrorCount(ip);
-                        return new LoginResult { Code = LoginResultCode.UserBanded, ErrorDescribe = "该用户已经被封禁，将在" + (user.UnsealTime?.ToString("D") ?? "") + "后解封" };
-                    }
-                }
-
-                return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
-            }
-            else
-            {
-                await _appHelper.AddErrorCount(ip);
-                return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "无效的代码" };
-            }
-
-        }
-
-        /// <summary>
         /// 极验初始化验证接口
         /// </summary>
         /// <returns></returns>
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<GeetestCodeModel>> GetGeetestCode()
         {
@@ -365,7 +100,6 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 获取Ip地址
         /// </summary>
         /// <returns></returns>
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<string>> GetIp()
         {

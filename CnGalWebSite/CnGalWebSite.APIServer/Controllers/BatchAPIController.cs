@@ -17,29 +17,30 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/batch/[action]")]
     public class BatchAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<FriendLink, int> _friendLinkRepository;
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
 
 
-        public BatchAPIController(IRepository<HistoryUser, int> historyUserRepository, IExamineService examineService, IRepository<Periphery, long> peripheryRepository,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IUserService userService,
+        public BatchAPIController(IRepository<HistoryUser, int> historyUserRepository, IExamineService examineService, IRepository<Periphery, long> peripheryRepository, IRepository<ApplicationUser, string> userRepository,
+        IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IUserService userService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
@@ -50,6 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _peripheryRepository = peripheryRepository;
             _userService = userService;
             _videoRepository = videoRepository;
+            _userRepository = userRepository;
         }
 
         [HttpPost]
@@ -105,7 +107,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateAuthorAsync(UpdateAuthorModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
             if (user == null)
             {
                 return new Result { Successful = false, Error = "用户『Id：" + model.UserId + "』不存在" };
@@ -235,12 +237,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (historyUser != null)
                     {
                         //一定会用用户名进行关联
-                        user = await _userManager.FindByNameAsync(historyUser.UserName);
+                        user = await _userRepository.FirstOrDefaultAsync(s => s.UserName == historyUser.UserName);
                     }
                 }
                 else
                 {
-                    user = await _userManager.FindByIdAsync(model.CreateUserId);
+                    user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.CreateUserId);
                 }
 
             }
@@ -270,79 +272,6 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return new Result { Successful = true };
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Result>> ImportHistoryUserDataAsync(ImportUserModel model)
-        {
-            //无法进行数据检查 管理员负责确保数据无误 不建议批量导入数据
-            if (await _userManager.FindByNameAsync(model.UserName) != null)
-            {
-                return new Result { Successful = false, Error = "该用户名" + model.UserName + "已存在，请更换名称后，尝试通知用户" };
-            }
-            if (await _userManager.FindByEmailAsync(model.Email) != null)
-            {
-                return new Result { Successful = false, Error = "该电子邮箱" + model.Email + "已存在，请更换电子邮箱后，尝试通知用户" };
-            }
-            if (string.IsNullOrWhiteSpace(model.UserName))
-            {
-                return new Result { Successful = false, Error = "用户名为必填项目" };
-            }
-            if (string.IsNullOrWhiteSpace(model.Email))
-            {
-                return new Result { Successful = false, Error = "电子邮箱为必填项目" };
-            }
-            if (string.IsNullOrWhiteSpace(model.Password))
-            {
-                return new Result { Successful = false, Error = "密码为必填项目" };
-            }
-            if (string.IsNullOrWhiteSpace(model.PasswordSalt))
-            {
-                return new Result { Successful = false, Error = "加密字符串为必填项目" };
-            }
-
-            //创建用户历史数据
-            var historyUser = new HistoryUser
-            {
-                UserName = model.UserName,
-                Email = model.Email,
-                LoginName = model.LoginName,
-                Password = model.Password,
-                PasswordSalt = model.PasswordSalt,
-                UserIdentity = model.UserIdentity
-            };
-            //导入数据
-            await _historyUserRepository.InsertAsync(historyUser);
-
-            //创建当前用户数据
-            var applicationUser = new ApplicationUser
-            {
-                UserName = model.UserName,
-                Email = model.Email,
-                MainPageContext = model.MainPageContext,
-                PersonalSignature = model.PersonalSignature,
-                Birthday = model.Birthday,
-                RegistTime = model.RegistTime,
-                PhotoPath = model.PhotoPath,
-                BackgroundImage = model.BackgroundImage,
-                Integral = model.Integral,
-                ContributionValue = model.ContributionValue,
-                OnlineTime = model.OnlineTime,
-                LastOnlineTime = model.LastOnlineTime,
-                UnsealTime = model.UnsealTime,
-                CanComment = model.CanComment,
-                EmailConfirmed = true
-            };
-            var result = await _userManager.CreateAsync(applicationUser, new Random().Next() + "A.A" + new Random().Next());
-            if (result.Succeeded == false)
-            {
-                return new Result { Successful = false, Error = result.Errors.First().Description };
-            }
-
-            await _userManager.AddToRoleAsync(applicationUser, "User");
-
-            return new Result { Successful = true };
-
         }
 
         [HttpPost]

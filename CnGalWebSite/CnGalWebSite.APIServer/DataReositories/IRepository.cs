@@ -154,6 +154,7 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// </summary>
         /// <returns>实体的总数</returns>
         Task<int> CountAsync();
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// 支持条件筛选 计算仓储中的实体总和

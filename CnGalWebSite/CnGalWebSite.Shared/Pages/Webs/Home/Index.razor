@@ -27,7 +27,21 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
+<AuthorizeView>
+    <Authorized>
+        <dl>
+            @foreach (var item in context.User.Claims)
+            {
+                <div>
+                    <dt>@item.Type</dt>
+                    <dd>@item.Value</dd>
+                </div>
 
+            }
+            </dl>
+     
+    </Authorized>
+</AuthorizeView>
 
 
 

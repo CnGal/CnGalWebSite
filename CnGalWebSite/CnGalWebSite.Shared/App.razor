@@ -3,20 +3,26 @@
 @inject NavigationManager NavigationManager
 @inject IHttpService _httpService
 @inject IJSRuntime JS
-@inject IAuthService _authService
 @inject I18n I18n
 @inject ILocalStorageService _localStorage
 @inject IEventService _eventService
+@inject HttpClient _httpClient
+@inject IAccessTokenProvider TokenProvider
 @using BlazorComponent.I18n
 
 <MApp>
     <BootstrapBlazorRoot>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip @ref="cngalRootTip">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
             <CascadingValue Value="connectionInfo" IsFixed="true">
                 <CascadingAuthenticationState>
                     <Router AppAssembly="@typeof(AdminLayout).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
-                            <RouteView RouteData="@routeData" DefaultLayout="LayoutType"/>
+                            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
+                                <NotAuthorized>
+                                    <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                </NotAuthorized>
+                            </AuthorizeRouteView>
+                            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
                         </Found>
                         <NotFound>
                             <LayoutView Layout="LayoutType">
@@ -34,6 +40,8 @@
 @code{
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
+    [Parameter]
+    public string Token { get; set; }
 
     public Type LayoutType
     {
@@ -43,5 +51,143 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (ToolHelper.IsSSR && !string.IsNullOrWhiteSpace(Token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
+        }
+        else
+        {
+            var accessTokenResult = await TokenProvider.RequestAccessToken();
+
+            var AccessToken = string.Empty;
+
+            if (accessTokenResult.TryGetToken(out var token))
+            {
+                AccessToken = token.Value;
+            }
+            if (string.IsNullOrWhiteSpace(AccessToken) == false)
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
+            }
+        }
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
+
+        //判断移动端
+        if (NavigationManager.Uri.Contains("m.cngal.org"))
+        {
+            _dataCacheService.IsApp = true;
+        }
+
+        if (ToolHelper.IsMaui)
+        {
+            _dataCacheService.IsApp = ToolHelper.IsApp;
+        }
+
+        //判断来源
+        if (NavigationManager.Uri.Contains("ref=gov"))
+        {
+            _dataCacheService.IsMiniMode = true;
+        }
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        //已经结束预渲染
+        _applicationStateService.InPreRendered = false;
+
+        if (firstRender && (OperatingSystem.IsBrowser() || ToolHelper.IsMaui))
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("$.loading");
+            }
+            catch
+            {
+
+            }
+        }
+
+        if (firstRender)
+        {
+            var needRefresh = false;
+            //检查是否为移动设备
+            if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost") && ToolHelper.IsMaui == false)
+            {
+                var isApp = await IsMobile();
+                if (isApp != _dataCacheService.IsApp)
+                {
+                    _dataCacheService.IsApp = isApp;
+                    // needRefresh = true;
+
+                }
+            }
+            //检查迷你模式
+            try
+            {
+                if (await _localStorage.GetItemAsync<bool>("IsMiniMode"))
+                {
+                    if (_dataCacheService.IsMiniMode == false)
+                    {
+                        _dataCacheService.IsMiniMode = true;
+                        needRefresh = true;
+                    }
+                }
+                else
+                {
+                    if (_dataCacheService.IsMiniMode)
+                    {
+                        await _localStorage.SetItemAsync<bool>("IsMiniMode", true);
+                    }
+                }
+
+            }
+            catch
+            {
+
+            }
+
+            if (needRefresh)
+            {
+                _eventService.OnToggleMiniMode();
+                //await _dataCacheService.OnRefreshRequsted(null);
+            }
+        }
+    }
+
+
+
+    public async Task<bool> IsMobile()
+    {
+        try
+        {
+            var re = await JS.InvokeAsync<string>("isMobile");
+            if (re == "true")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+    }
 }
 

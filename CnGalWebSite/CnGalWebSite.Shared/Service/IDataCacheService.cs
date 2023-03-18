@@ -40,18 +40,6 @@ namespace CnGalWebSite.Shared.Service
 
         bool IsMiniMode { get; set; }
 
-        string LoginKey { get; set; }
-
-        ThirdPartyLoginTempModel ThirdPartyLoginTempModel { get; set; }
-
-        string UserName { get; set; }
-
-        string UserEmail { get; set; }
-
-        bool IsOnThirdPartyLogin { get; set; }
-
-        UserAuthenticationTypeModel UserAuthenticationTypeModel { get; set; }
-
         HomeViewModel HomeViewModel { get; set; }
 
         int RenderTimes { get; set; }

@@ -6,7 +6,7 @@
         <UserButton Class="me-4" OnClickSetting="OnOpenSetting" />
     </Authorized>
     <NotAuthorized>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-login" Class="mr-6" Tooltip="登入" OnClick="OnClickLogin" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-login" Class="mr-6" Tooltip="登入" OnClick="OnLogin" />
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-cog" Class="me-4" Tooltip="设置" OnClick="OnOpenSetting" StopPropagation />
     </NotAuthorized>
 </AuthorizeView>
@@ -18,9 +18,16 @@
     ThemeSettingCard themeSettingCard;
     bool isOpen;
 
-    private void OnClickLogin()
+    protected void OnLogin()
     {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri.Replace(NavigationManager.BaseUri, "")}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login");
+        }
     }
 
     public void OnOpenSetting()

@@ -33,12 +33,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/space/[action]")]
     public class SpaceAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<ApplicationUser, long> _userRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
@@ -57,14 +57,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
-        UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
+         IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
         ISteamInforService steamInforService)
         {
             _examineRepository = examineRepository;
             _examineService = examineService;
             _appHelper = appHelper;
-            _userManager = userManager;
+            
             _messageService = messageService;
             _messageRepository = messageRepository;
             _userRepository = userRepository;
@@ -233,13 +233,13 @@ namespace CnGalWebSite.APIServer.Controllers
             model.EditEntryNum = examines.Count(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage));
             model.CreateArticleNum = _articleRepository.Count(s => s.CreateUserId == user.Id);
 
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            if (_userService.CheckCurrentUserRole( "Admin"))
             {
                 model.Role = "Admin";
             }
             else
             {
-                if (await _userManager.IsInRoleAsync(user, "Editor"))
+                if (_userService.CheckCurrentUserRole( "Editor"))
                 {
                     model.Role = "Editor";
                 }
@@ -341,9 +341,6 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            user = await _userManager.Users
-                         .SingleAsync(x => x.Id == user.Id);
-
 
             //判断用户是否有待审核的主页编辑记录
             var examine = await _examineService.GetUserInforActiveExamineAsync(user.Id, Operation.UserMainPage);
@@ -484,7 +481,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //更新头衔是否显示
             await _rankService.UpdateUserRanksIsHidden(user, model.Ranks);
 
-            var result = await _userManager.UpdateAsync(user);
+            await _userRepository.UpdateAsync(user);
 
 
             //敏感数据 判断是否修改
@@ -508,15 +505,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _editRecordService.SaveAndApplyEditRecord(user, user, userMain, Operation.EditUserMain, model.Note);
             }
 
-            if (result.Succeeded)
-            {
-                return new Result { Successful = true };
-            }
-            else
-            {
-                return new Result { Successful = false, Error = result.Errors.ToList()[0].Description };
-
-            }
+            return new Result { Successful = true };
         }
 
         [HttpGet]
@@ -531,7 +520,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditMessageIsReadedAsync(EditMessageIsReadedModel model)
         {
             await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
@@ -540,7 +529,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> DeleteMessagesAsync(DeleteMessagesModel model)
         {
             await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
@@ -554,7 +543,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             await _messageRepository.GetAll().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
@@ -566,7 +555,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {  //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //检查是否为当前用户Id
-            if (input.SearchModel.ApplicationUserId != user.Id && await _userManager.IsInRoleAsync(user, "Admin") == false)
+            if (input.SearchModel.ApplicationUserId != user.Id && _userService.CheckCurrentUserRole( "Admin") == false)
             {
                 return BadRequest("你没有权限查看此用户的消息列表");
             }
@@ -581,14 +570,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             await _messageRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> PostMessagesAsync(ListMessageAloneModel model)
         {
             await _messageRepository.InsertAsync(new Message
@@ -703,7 +692,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> AddUserIntegralAsync(AddUserIntegralModel model)
         {
             if (await _userRepository.GetAll().AnyAsync(s => s.Id == model.UserId) == false)

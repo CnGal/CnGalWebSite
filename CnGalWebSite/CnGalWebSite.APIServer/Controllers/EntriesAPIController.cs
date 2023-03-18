@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -31,12 +32,12 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 namespace CnGalWebSite.APIServer.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/entries/[action]")]
     public class EntriesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -52,12 +53,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPerfectionService _perfectionService;
         private readonly IEditRecordService _editRecordService;
         private readonly ILogger<EntriesAPIController> _logger;
+        private readonly IUserService _userService;
 
-        public EntriesAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
-        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger,
+        public EntriesAPIController( IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
+        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger, IUserService userService,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;
@@ -73,6 +75,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoService = videoService;
             _videoRepository = videoRepository;
             _lotteryRepository = lotteryRepository;
+            _userService = userService;
         }
 
         /// <summary>
@@ -111,7 +114,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (entry.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Editor") != true)
                 {
                     return NotFound();
                 }
@@ -1236,7 +1239,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenEntryAsync(HiddenEntryModel model)
         {
             //获取当前用户ID
@@ -1254,7 +1257,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
         {
             await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHideOutlink, b => model.IsHidden));
@@ -1262,7 +1265,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryPriorityAsync(EditEntryPriorityViewModel model)
         {
             //判断是否为特殊词条

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -57,6 +57,7 @@
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.14" />
     <PackageReference Include="EPPlus" Version="6.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>

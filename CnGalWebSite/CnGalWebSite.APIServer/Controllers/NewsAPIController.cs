@@ -23,12 +23,12 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Editor")]
+    [Authorize(Roles = "Editor")]
     [ApiController]
     [Route("api/news/[action]")]
     public class NewsAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
@@ -37,13 +37,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
 
 
-        public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository, UserManager<ApplicationUser> userManager, IArticleService articleService, IUserService userService, INewsService newsService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository,
-           IRepository<WeeklyNews, long> weeklyNewsRepository)
+        public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository,  IArticleService articleService, IUserService userService, INewsService newsService,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<ApplicationUser, string> userRepository,
+        IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
-            _userManager = userManager;
+            
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _userService = userService;
@@ -52,6 +53,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _gameNewsRepository = gameNewsRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
             _weiboUserInforRepository = weiboUserInforRepository;
+            _userRepository = userRepository;
         }
 
         [HttpPost]
@@ -305,7 +307,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            article.CreateUser = await _userManager.FindByIdAsync(article.CreateUserId);
+            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s=>s.Id== article.CreateUserId);
 
             //正常流程初始化
             var model = new ArticleViewModel
@@ -507,7 +509,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            article.CreateUser = await _userManager.FindByIdAsync(article.CreateUserId);
+            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s=>s.Id== article.CreateUserId);
 
             //正常流程初始化
             var model = new ArticleViewModel

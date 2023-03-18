@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -26,12 +27,12 @@ namespace CnGalWebSite.APIServer.Controllers
 {
 
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/lotteries/[action]")]
     public class LotteryAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly IRankService _rankService;
@@ -51,14 +52,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
         private readonly ILogger<LotteryAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
+        private readonly IUserService _userService;
 
-        public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService,
-            IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
-        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository, IRepository<Booking, long> bookingRepository,
+        public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService, IUserService userService,
+        IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
+         IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository, IRepository<Booking, long> bookingRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
              IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, int> entryRepository, IRepository<BookingUser, long> bookingUserRepository)
         {
-            _userManager = userManager;
+            
             _appHelper = appHelper;
             _rankService = rankService;
             _gameNewsRepository = gameNewsRepository;
@@ -77,10 +79,11 @@ namespace CnGalWebSite.APIServer.Controllers
             _operationRecordService = operationRecordService;
             _entryRepository = entryRepository;
             _bookingRepository = bookingRepository;
+            _userService = userService;
         }
 
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<DrawLotteryDataModel>> GetLotteryDataAsync(long id)
         {
@@ -125,7 +128,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 foreach (var temp in model.NotWinningUsers.Where(s => s.IsHidden == false))
                 {
                     var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
-                    if (await _userManager.IsInRoleAsync(user, "Admin")==false)
+                    if (_userService.CheckCurrentUserRole( "Admin")==false)
                     {
                         users.Add(temp);
                     }
@@ -161,7 +164,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (lottery.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Editor") != true)
                 {
                     return NotFound();
                 }
@@ -376,7 +379,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> CreateLottery(EditLotteryModel model)
         {
@@ -473,7 +476,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<EditLotteryModel>> EditLottery(long id)
         {
@@ -540,7 +543,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditLottery(EditLotteryModel model)
         {
@@ -716,7 +719,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> DrawLotteryAsync(ManualLotteryModel model)
         {
@@ -751,7 +754,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenLotteryAsync(HiddenLotteryModel model)
         {
@@ -759,7 +762,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EndLotteryAsync(EndLotteryModel model)
         {
@@ -767,7 +770,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditLotteryPriorityAsync(EditLotteryPriorityViewModel model)
         {
@@ -815,7 +818,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<List<WinnerDataModel>>> GetWinnerDatas(long id)
         {
@@ -851,7 +854,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditUserPrize(EditUserPrizeModel model)
         {
@@ -892,7 +895,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenLotteryUserAsync(HiddenLotteryModel model)
         {

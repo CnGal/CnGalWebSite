@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
@@ -22,28 +23,29 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/disambigs/[action]")]
 
     public class DisambigAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Disambig, int> _disambigRepository;
 
+        private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
         private readonly IDisambigService _disambigService;
         private readonly IExamineService _examineService;
         private readonly IEditRecordService _editRecordService;
 
-        public DisambigAPIController(IRepository<Disambig, int> disambigRepository, IDisambigService disambigService, IEditRecordService editRecordService,
-        UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository,
+        public DisambigAPIController(IRepository<Disambig, int> disambigRepository, IDisambigService disambigService, IEditRecordService editRecordService, IUserService userService,
+        IExamineService examineService, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository,
        IRepository<Examine, long> examineRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -52,6 +54,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _disambigService = disambigService;
             _examineService = examineService;
             _editRecordService = editRecordService;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -107,7 +110,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (disambig.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Admin") != true)
                 {
                     return NotFound();
                 }

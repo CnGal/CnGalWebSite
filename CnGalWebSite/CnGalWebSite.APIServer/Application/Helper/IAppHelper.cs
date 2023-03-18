@@ -23,9 +23,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <returns>是否被锁定</returns>
         Task<bool> IsEntryLockedAsync(long entryId, string userId, Operation operation);
 
-
-
-
         /// <summary>
         /// 获取图片路径
         /// </summary>
@@ -50,13 +47,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="operation">用操作表示部分</param>
         /// <returns>是否被锁定</returns>
         Task<bool> IsArticleLockedAsync(long articleId, string userId, Operation operation);
-        /// <summary>
-        /// 判断当前用户是否有权限编辑此文章
-        /// </summary>
-        /// <param name="user">用户</param>
-        /// <param name="articleId">文章Id</param>
-        /// <returns></returns>
-        Task<bool> CanUserEditArticleAsync(ApplicationUser user, long articleId);
 
         /// <summary>
         /// 获取数字令牌
@@ -110,12 +100,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="operation"></param>
         /// <returns></returns>
         Task<bool> IsTagLockedAsync(int tagId, string userId, Operation operation);
-        /// <summary>
-        /// 生成用户JWT令牌
-        /// </summary>
-        /// <param name="user">用户</param>
-        /// <returns>JWT令牌</returns>
-        Task<string> GetUserJWTokenAsync(ApplicationUser user);
+
         /// <summary>
         /// 增加文章阅读数
         /// </summary>
@@ -134,22 +119,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="id">词条Id</param>
         /// <returns></returns>
         Task DeleteComment(long id);
-
-
-        /// <summary>
-        /// 判断用户是否有权限编辑此评论
-        /// </summary>
-        /// <param name="commentId">评论Id</param>
-        /// <param name="user">用户</param>
-        /// <returns></returns>
-        Task<bool> IsUserHavePermissionForCommmentAsync(long commentId, ApplicationUser user);
-        /// <summary>
-        /// 尝试登入历史用户
-        /// </summary>
-        /// <param name="name">账户</param>
-        /// <returns></returns>
-        Task<string> LoginHistoryUser(string name);
-
         /// <summary>
         /// 判断用户错误次数是否超过上限
         /// </summary>
@@ -178,8 +147,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="seccode"></param>
         /// <returns></returns>
         bool CheckRecaptcha(string challenge, string validate, string seccode);
-
-
         /// <summary>
         /// 获取为卡片展示优化的文章数据模型
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
@@ -7,6 +8,7 @@ using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
+using IdentityModel;
 using Markdig;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,13 +31,16 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using Operation = CnGalWebSite.DataModel.Model.Operation;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {
     public class AppHelper : IAppHelper
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -60,17 +65,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
 
         public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository,
             IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
-            IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<Loginkey, long> loginkeyRepository,
+            IRepository<Comment, long> commentRepository, IConfiguration configuration,  IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
-            IRepository<Article, long> aricleRepository, SignInManager<ApplicationUser> signInManager, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository,
+            IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<UserIntegral, long> userIntegralRepository)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
@@ -95,6 +99,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _loginkeyRepository = loginkeyRepository;
             _userIntegralRepository = userIntegralRepository;
             _playedGameRepository = playedGameRepository;
+            _httpClient = httpClient;
         }
 
         public async Task<bool> IsEntryLockedAsync(long entryId, string userId, Operation operation)
@@ -119,19 +124,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public async Task<bool> IsArticleLockedAsync(long articleId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.ArticleId == articleId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != null;
-        }
-
-        public async Task<bool> CanUserEditArticleAsync(ApplicationUser user, long articleId)
-        {
-            //读取当前文章的审核信息 获取最后编辑记录和作者
-            //判断当前用户是否有权限编辑
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
-            {
-                return true;
-            }
-            var sum = await _examineRepository.GetAll().CountAsync(s => s.ArticleId == articleId && s.IsPassed != false && s.ApplicationUserId == user.Id);
-            return sum > 0;
-
         }
 
         public async Task<int> GetShortTokenAsync(string longToken, string userName)
@@ -294,58 +286,38 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task<ApplicationUser> GetAPICurrentUserAsync(HttpContext context)
         {
-            var test = context.Request.Path;
-            var bearer = context.Request.Headers["Authorization"].FirstOrDefault();
-            ApplicationUser result = null;
-            if (string.IsNullOrWhiteSpace(bearer) || !bearer.Contains("Bearer"))
+            var id = context.User?.Claims?.GetUserId();
+            if(string.IsNullOrWhiteSpace(id))
             {
-                //try
-                //{
-                //    var name = context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.Name).Value;
-                //    //获取当前用户ID
-                //    result = await _userManager.FindByNameAsync(name);
-                //}
-                //catch
-                //{
-
-                //}
                 return null;
             }
-            else
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if(user!=null)
             {
-                var jwt = bearer.Split(' ');
-                var tokenObj = new JwtSecurityToken(jwt[1]);
-
-                var claimsIdentity = new ClaimsIdentity(tokenObj.Claims);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                context.User = claimsPrincipal;
-
-                var name = context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.Name).Value;
-
-                //获取当前用户ID
-                result = await _userManager.FindByNameAsync(name);
+                return user;
             }
 
-            //判断是否被封禁
-            if (result != null)
+            //新用户
+            var (email, name) = context.User.Claims.GetExternalUserInfor();
+            if(await _userRepository.AnyAsync(s=>s.Email==email))
             {
-                if (result.UnsealTime == null)
-                {
-                    return result;
-                }
-                else
-                {
-                    if (result.UnsealTime < DateTime.Now.ToCstTime())
-                    {
-                        result.UnsealTime = null;
-                        _ = await _userManager.UpdateAsync(result);
-                        return result;
-                    }
-                }
+                email = null;
             }
+            if(await _userRepository.AnyAsync(s=>s.UserName==name))
+            {
+                name = Guid.NewGuid().ToString();
+            }
+            user = new ApplicationUser
+            {
+                Id = id,
+                UserName = name,
+                Email = email,
+                RegistTime = DateTime.Now.ToCstTime(),
+                LastOnlineTime = DateTime.Now.ToCstTime()
+            };
 
-            return null;
-
+            await _userRepository.InsertAsync(user);
+            return user;
         }
 
         public async Task<bool> DeleteFieAsync(ApplicationUser user, string fileName)
@@ -421,39 +393,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != false;
         }
 
-        public async Task<string> GetUserJWTokenAsync(ApplicationUser user)
-        {
-            var roles = await _signInManager.UserManager.GetRolesAsync(user);
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("image", GetImagePath(user.PhotoPath, "user.png")),
-                new Claim("mbgimage", GetImagePath(user.MBgImage, "")),
-                new Claim("sbgimage", GetImagePath(user.SBgImage, "")),
-                new Claim("userid",user.Id, "")
-            };
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiry = DateTime.Now.ToCstTime().AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"]));
-
-            var token = new JwtSecurityToken(
-                _configuration["JwtIssuer"],
-                _configuration["JwtAudience"],
-                claims,
-                expires: expiry,
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
             _articleRepository.Clear();
@@ -492,70 +431,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
             await _commentRepository.DeleteAsync(comment);
             return;
-        }
-
-
-
-        public async Task<bool> IsUserHavePermissionForCommmentAsync(long commentId, ApplicationUser user)
-        {
-            var comment = await _commentRepository.GetAll().Include(s => s.Article).Include(s => s.Entry).Include(s => s.UserSpaceCommentManager).Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == commentId);
-            if (comment != null)
-            {
-                //判断评论是否归属该用户
-                if (comment.ApplicationUserId == user.Id)
-                {
-
-                }
-                else if (comment.Article != null && comment.Article.CreateUserId == user.Id)
-                {
-
-                }
-                else if (await _userManager.IsInRoleAsync(user, "Admin"))
-                {
-
-                }
-                else if (comment.UserSpaceCommentManager != null && comment.UserSpaceCommentManager.ApplicationUserId == user.Id)
-                {
-
-                }
-                else
-                {
-                    //不符合上述条件 返回
-                    return false;
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public async Task<string> LoginHistoryUser(string name)
-        {
-            //查找历史用户 顺序为 登入Id 电子邮箱 昵称
-            var historyUser = await _historyUserRepository.FirstOrDefaultAsync(s => s.LoginName == name || s.Email == name || s.UserName == name);
-            if (historyUser == null)
-            {
-                return null;
-            }
-
-            //通过后更新关联用户的密码
-            var user = await _userManager.FindByNameAsync(historyUser.UserName);
-
-            //获取长令牌
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            //获取短令牌
-            _ = await GetShortTokenAsync(token, user.UserName);
-            //因为此处已经通过人机验证 直接获取验证码
-            var result_2 = await SendVerificationEmailAsync(null, historyUser.Email, user.UserName);
-            if (result_2 != null)
-            {
-                return null;
-            }
-            //删除历史用户
-            // await _historyUserRepository.DeleteAsync(historyUser);
-            return user.UserName;
         }
 
         public async Task<bool> IsExceedMaxErrorCount(string text, int limit, int maxMinutes)

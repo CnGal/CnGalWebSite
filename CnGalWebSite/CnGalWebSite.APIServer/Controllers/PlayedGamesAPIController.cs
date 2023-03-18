@@ -29,12 +29,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/playedgame/[action]")]
     public class PlayedGamesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
@@ -48,7 +48,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IOperationRecordService _operationRecordService;
         private readonly IEditRecordService _editRecordService;
 
-        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, UserManager<ApplicationUser> userManager,
+        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, 
             ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
@@ -58,7 +58,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameService = playedGameService;
             _steamInforService = steamInforService;
             _userRepository = userRepository;
-            _userManager = userManager;
+            
             _examineService = examineService;
             _userService = userService;
             _examineRepository=examineRepository;
@@ -324,7 +324,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         public async Task<ActionResult<List<int>>> GetUserInSteamGameIdsAsync()
         {
             //获取当前用户ID
@@ -483,7 +483,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="input">分页信息</param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPlayedGameAloneModel>>> GetEntryListAsync(PlayedGamesPagesInfor input)
         {
             var dtos = await _playedGameService.GetPaginatedResult(input.Options, input.SearchModel);

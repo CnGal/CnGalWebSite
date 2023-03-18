@@ -25,18 +25,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<UserMonitor, long> _userMonitorsRepository;
 
         public EditRecordService(IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<UserMonitor, long> userMonitorsRepository, IAppHelper appHelper, IUserService userService,
-            UserManager<ApplicationUser> userManager, IRepository<UserCertification, long> userCertificationRepository, IExamineService examineService)
+             IRepository<UserCertification, long> userCertificationRepository, IExamineService examineService)
         {
             _userMonitorsRepository = userMonitorsRepository;
             _userReviewEditRecordRepository = userReviewEditRecordRepository;
             _appHelper = appHelper;
             _userService = userService;
-            _userManager = userManager;
+            
             _userCertificationRepository = userCertificationRepository;
             _examineService = examineService;
         }
@@ -151,10 +151,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
         /// <param name="user"></param>
         /// <param name="allowEditor"></param>
         /// <returns></returns>
-        public async Task<bool> CheckUserExaminePermission(object entry,ApplicationUser user,  bool allowEditor = true)
+        public async Task<bool> CheckUserExaminePermission( object entry,ApplicationUser user,  bool allowEditor = true)
         {
             var adminRole = allowEditor ? "Editor" : "Admin";
-            var isAdmin = await _userManager.IsInRoleAsync(user, adminRole);
+            var isAdmin = _userService.CheckCurrentUserRole(adminRole);
 
             if (isAdmin == false  && allowEditor)
             {
@@ -178,10 +178,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
         /// <param name="user"></param>
         /// <param name="allowEditor"></param>
         /// <returns></returns>
-        public async Task<bool> CheckUserExaminePermission(Examine examine, ApplicationUser user, bool allowEditor = true)
+        public async Task<bool> CheckUserExaminePermission( Examine examine, ApplicationUser user, bool allowEditor = true)
         {
             var adminRole = allowEditor ? "Editor" : "Admin";
-            var isAdmin = await _userManager.IsInRoleAsync(user, adminRole);
+            var isAdmin = _userService.CheckCurrentUserRole(adminRole);
 
             if (isAdmin == false && allowEditor)
             {

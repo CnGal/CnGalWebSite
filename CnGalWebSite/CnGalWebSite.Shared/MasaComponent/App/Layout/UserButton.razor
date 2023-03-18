@@ -21,7 +21,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-    <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/"))">
+    <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/"))">
         <MIcon Left>mdi-home</MIcon>
         主页
     </MButton>
@@ -45,23 +45,23 @@
                 内容中心
             </MButton>
 
-            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("space/index/" + _dataCacheService.UserInfor.Id))">
+            <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/space/index/" + _dataCacheService.UserInfor.Id))">
                 <MIcon Left>mdi-star</MIcon>
                 个人空间
             </MButton>
-            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/space/editdata"))">
+            <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/space/editdata"))">
                 <MIcon Left>mdi-pencil</MIcon>
                 编辑资料
             </MButton>
-            <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/space/messages"))">
+            <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/space/messages"))">
                 <MIcon Left>mdi-comment-text-multiple  </MIcon>
                 消息通知
             </MButton>
-            <MButton Text Block  Color="primary"  Left OnClick="OnClickCreate">
+            <MButton Text Block Color="primary" Left OnClick="OnClickCreate">
                 <MIcon Left>mdi-plus  </MIcon>
                 创建投稿
             </MButton>
-            <MButton Text Block  Color="primary"  OnClick="@(()=>OnClickUrl("/account/logout"))">
+            <MButton Text Block Color="primary" OnClick="BeginSignOut">
                 <MIcon Left>mdi-logout</MIcon>
                 退出登入
             </MButton>
@@ -70,7 +70,7 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 
-        <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/birthday"))">
+        <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/birthday"))">
             <MIcon Left>mdi-cake-variant</MIcon>
             生日日历
         </MButton>
@@ -80,7 +80,7 @@
         </MButton>
 
 
-        <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/about"))">
+        <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/about"))">
             <MIcon Left>mdi-information-outline</MIcon>
             关于我们
         </MButton>
@@ -113,18 +113,11 @@
 
     CreateObjectCard createObjectCard;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            //清除登入令牌
-            _dataCacheService.LoginKey = "";
-            _dataCacheService.IsOnThirdPartyLogin = true;
-            _dataCacheService.ThirdPartyLoginTempModel = null;
-
-            await RefreshUserInfor();
-        }
+        await RefreshUserInfor();
     }
+
 
     public async Task RefreshUserInfor()
     {
@@ -133,14 +126,8 @@
         {
             try
             {
-                string userId = "";
-                foreach (var item in user.User.Claims)
-                {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
+                string userId = user.User.Claims.GetUserId();
+
 
                 if (string.IsNullOrWhiteSpace(userId) == false)
                 {
@@ -173,4 +160,16 @@
         }
         await OnClosed.InvokeAsync();
     }
+    private void BeginSignOut()
+    {
+        @if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo("Account/Logout", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogout("authentication/logout");
+        }
+    }
+
 }

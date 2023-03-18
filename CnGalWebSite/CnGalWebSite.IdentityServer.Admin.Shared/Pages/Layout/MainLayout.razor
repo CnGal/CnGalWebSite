@@ -11,7 +11,7 @@
                          Prominent
                          Src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/game_head.png"
                          FadeImgOnScroll
-                         ScrollTarget="#scrolling-sheet-3">
+                         ScrollTarget="#main-sheet">
                     <ImgContent>
                         <MImage Gradient="to top right, rgb(240 98 146 / 50%), rgb(240 98 146 / 50%)" @attributes="@context"></MImage>
                     </ImgContent>
@@ -29,7 +29,7 @@
                         </MTabs>
                     </ExtensionContent>
                 </MAppBar>
-                <MSheet Class="overflow-y-auto main-sheet">
+                <MSheet Class="overflow-y-auto" Id="main-sheet">
                     <MContainer Style=" margin-top: 250px;">
                         <ErrorHandler>
                             @Body

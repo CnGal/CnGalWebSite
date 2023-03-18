@@ -33,17 +33,18 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IExamineService _examineService;
         private readonly IFileService _fileService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GameNews>, string, SortOrder, IEnumerable<GameNews>>> SortLambdaCacheGameNews = new();
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<WeeklyNews>, string, SortOrder, IEnumerable<WeeklyNews>>> SortLambdaCacheWeeklyNews = new();
 
 
-        public NewsService(IConfiguration configuration, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService,
+        public NewsService(IConfiguration configuration, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService, IRepository<ApplicationUser, string> userRepository,
         IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<GameNews, long> gameNewsRepository, IExamineService examineService,
-             UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
+              IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _configuration = configuration;
             _rssHelper = rssHelper;
@@ -52,10 +53,11 @@ namespace CnGalWebSite.APIServer.Application.News
             _weiboUserInforRepository = weiboUserInforRepository;
             _gameNewsRepository = gameNewsRepository;
             _examineService = examineService;
-            _userManager = userManager;
+            
             _articleRepository = articleRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
             _fileService = fileService;
+            _userRepository = userRepository;
         }
 
 
@@ -408,7 +410,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var article = await GameNewsToArticle(gameNews);
 
             //走批量导入的流程
-            var admin = await _userManager.FindByIdAsync(article.CreateUserId);
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == article.CreateUserId);
             await _examineService.AddNewArticleExaminesAsync(article, admin, "自动生成动态");
 
             //查找文章
@@ -496,7 +498,7 @@ namespace CnGalWebSite.APIServer.Application.News
             article.PubishTime = DateTime.Now.ToCstTime();
 
             //走批量导入的流程
-            var admin = await _userManager.FindByIdAsync(article.CreateUserId);
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == article.CreateUserId);
             await _examineService.AddNewArticleExaminesAsync(article, admin, "自动生成周报");
 
             //查找文章

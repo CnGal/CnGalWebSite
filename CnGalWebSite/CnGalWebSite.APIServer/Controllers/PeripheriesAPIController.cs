@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Peripheries;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
@@ -24,27 +25,29 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("api/peripheries/[action]")]
     public class PeripheriesAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<PeripheryRelevanceUser, long> _userOwnedPeripheryRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IPeripheryService _peripheryService;
         private readonly IEntryService _entryService;
         private readonly IEditRecordService _editRecordService;
+        private readonly IUserService _userService;
 
         public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService,
-        UserManager<ApplicationUser> userManager, IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository,
-         IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
+         IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository, IUserService userService, IRepository<ApplicationUser, string> userRepository,
+        IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -54,6 +57,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _userOwnedPeripheryRepository = userOwnedPeripheryRepository;
             _entryService = entryService;
             _editRecordService = editRecordService;
+            _userService = userService;
+            _userRepository = userRepository;
         }
 
 
@@ -78,7 +83,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断当前是否隐藏
             if (periphery.IsHidden == true)
             {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
+                if (user == null || _userService.CheckCurrentUserRole( "Editor") != true)
                 {
                     return NotFound();
                 }
@@ -919,7 +924,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenPeripheryAsync(HiddenPeripheryModel model)
         {
             await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
@@ -931,7 +936,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<GameOverviewPeripheriesModel>>> GetUserOverviewPeripheries(string id)
         {
             //获取当前用户ID
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userRepository.FirstOrDefaultAsync(s=>s.Id== id);
             if (user == null)
             {
                 return NotFound("无法找到该用户");
@@ -971,7 +976,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPeripheryPriorityAsync(EditPeripheryPriorityViewModel model)
         {
             await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));

@@ -6,13 +6,33 @@
 <div style="display: flex; align-items: center; justify-content: center;">
     <div class="rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity w-100" style="max-width: 500px; display: flex; flex-direction: column; align-items: center; ">
         <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
-        <h1 class="login-h1-text text-center mt-4 fw-lighter">权限不足</h1>
-        <span class="text-center  h6">呀，目前还不能访问此部分哦，不过你可以尝试<a href="/account/login/@ToolHelper.Base64EncodeUrl( NavigationManager.Uri)" class="alert-link">登入</a>呢~</span>
+        @if (NoPermissions)
+        {
+            <h1 class="login-h1-text text-center mt-4 fw-lighter">权限不足</h1>
+            <span class="text-center  h6">抱歉哦，查看不了这个页面，不过你可以 <a @onclick="OnLogin" class="alert-link">登入其他账号</a> 试一试</span>
+        }
+        else
+        {
+            <h1 class="login-h1-text text-center mt-4 fw-lighter">仅登入可见</h1>
+            <span class="text-center  h6">哎呀，目前还不能访问此部分哦，不过你可以 <a @onclick="OnLogin" class="alert-link">登入</a> 试一试</span>
+        }
     </div>
 </div>
 
 
 @code {
     [Parameter]
-    public bool IsNeedLayput { get; set; }
+    public bool NoPermissions { get; set; }
+
+    protected void OnLogin()
+    {
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri.Replace(NavigationManager.BaseUri, "")}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login");
+        }
+    }
 }

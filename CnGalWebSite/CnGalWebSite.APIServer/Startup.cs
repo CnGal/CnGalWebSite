@@ -67,10 +67,9 @@ namespace CnGalWebSite.APIServer
                         //全局配置查询拆分模式
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     }));
-            // services.AddMvc(async => async.EnableEndpointRouting = false);
-            //不使用终结点路由
-            services.AddControllersWithViews(a => a.EnableEndpointRouting = false)
-                //配置Json
+
+            //配置Json
+            services.AddControllersWithViews()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
@@ -79,7 +78,6 @@ namespace CnGalWebSite.APIServer
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
-
 
             //依赖注入辅助类
             services.AddScoped<IAppHelper, AppHelper>();
@@ -103,6 +101,7 @@ namespace CnGalWebSite.APIServer
                .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
             //注册Swagger生成器，定义一个或多个Swagger文件
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -129,48 +128,28 @@ namespace CnGalWebSite.APIServer
                 c.IncludeXmlComments(xmlPath);
             });
 
-            //添加身份验证
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddDefaultTokenProviders()
-                .AddErrorDescriber<CustomMiddlewares.CustomIdentityErrorDescriber>()
-                .AddEntityFrameworkStores<AppDbContext>();
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.User.AllowedUserNameCharacters = null;
-            });
-
-            //注册JWT令牌验证
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            //添加OpenId 身份验证
+            //添加身份验证服务
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
                 {
+                    options.Authority = Configuration["Authority"];
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["JwtIssuer"],
-                        ValidAudience = Configuration["JwtAudience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
+                        ValidateAudience = false
                     };
                 });
-            services.AddControllersWithViews(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            }).AddXmlSerializerFormatters();
 
-
-            services.Configure<IdentityOptions>(options =>
+            //添加授权范围
+            services.AddAuthorization(options =>
             {
-                //登入时需要验证电子邮件
-                options.SignIn.RequireConfirmedEmail = true;
+                options.AddPolicy("ApiScope", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", "CnGalAPI");
+                });
             });
+
             //添加 MailKit 发送邮件
             services.AddMailKit(optionBuilder =>
             {
@@ -189,7 +168,6 @@ namespace CnGalWebSite.APIServer
                     Security = true
                 });
             });
-            services.AddApplicationInsightsTelemetry();
            
             //添加后台定时任务
             services.AddHostedService<BackgroundTask>();
@@ -199,6 +177,8 @@ namespace CnGalWebSite.APIServer
                 options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
+            //添加HttpContext服务
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //添加状态检查
             services.AddHealthChecks().AddDbContextCheck<AppDbContext>("DbContext");
@@ -259,16 +239,8 @@ namespace CnGalWebSite.APIServer
 
             #endregion
 
-
-            /*   if (env.IsDevelopment())
-               {*/
             app.UseDeveloperExceptionPage();
-            /* }
-             else
-             {
-                 app.UseExceptionHandler("/Error");
-                 app.UseStatusCodePagesWithReExecute("/Error/{0}");
-             }*/
+
             //添加真实IP中间件
             app.UseForwardedHeaders();
             //添加HTTPS中间件
@@ -277,14 +249,8 @@ namespace CnGalWebSite.APIServer
             app.UseStaticFiles();
             //启用中间件Swagger
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");
-            });
+            app.UseSwaggerUI();
 
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "swagger");
-            app.UseRewriter(option);
             //添加状态检查终结点
             app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
@@ -313,14 +279,9 @@ namespace CnGalWebSite.APIServer
             //添加终结点
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=swagger}/{action=Index}/{id?}");
-            });/* app.Run(ctx =>
-             {
-                 ctx.Response.Redirect("/swagger/"); //可以支持虚拟路径或者index.html这类起始页.
-                return Task.FromResult(0);
-             });*/
+                endpoints.MapControllers()
+                    .RequireAuthorization("ApiScope");
+            });
         }
     }
 }

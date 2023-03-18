@@ -306,7 +306,7 @@ namespace IdentityServerHost.Quickstart.UI
                 if (user == null)
                 {
                     //自动填充字段
-                    var (email, name) = GetExternalUserInforAsync(claims);
+                    var (email, name) = claims.GetExternalUserInfor();
                     model.Email = email;
                     model.Name = name;
                 }
@@ -1392,47 +1392,6 @@ namespace IdentityServerHost.Quickstart.UI
         }
 
         /// <summary>
-        /// 获取外部身份验证提供的用户信息
-        /// </summary>
-        /// <param name="claims"></param>
-        /// <returns></returns>
-        private (string email, string name) GetExternalUserInforAsync(IEnumerable<Claim> claims)
-        {
-            // create a list of claims that we want to transfer into our store
-            var filtered = new List<Claim>();
-
-            // user's display name
-            var name = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Name)?.Value ??
-                claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-            if (name == null)
-            {
-                var first = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.GivenName)?.Value ??
-                    claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
-                var last = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.FamilyName)?.Value ??
-                    claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
-                if (first != null && last != null)
-                {
-                    name = first + " " + last;
-                }
-                else if (first != null)
-                {
-                    name = first;
-                }
-                else if (last != null)
-                {
-                    name = last;
-                }
-            }
-
-            // email
-            var email = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Email)?.Value ??
-               claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-
-
-            return (email, name);
-        }
-
-        /// <summary>
         /// 检查并绑定外部用户到当前账号
         /// </summary>
         /// <returns></returns>
@@ -1457,7 +1416,7 @@ namespace IdentityServerHost.Quickstart.UI
 
         private async Task<ApplicationUser> FindLoginUser()
         {
-            var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject)?.Value;
+            var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject || s.Type == ClaimTypes.NameIdentifier)?.Value;
             return await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
         }
 

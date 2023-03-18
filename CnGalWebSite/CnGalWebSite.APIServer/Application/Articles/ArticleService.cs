@@ -1,6 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 
 using CnGalWebSite.DataModel.ExamineModel.Articles;
@@ -32,18 +33,20 @@ namespace CnGalWebSite.APIServer.Application.Articles
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Video, int> _videoRepository;
         private readonly IAppHelper _appHelper;
+        private readonly IUserService _userService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
 
 
-        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<Video, int> videoRepository)
+        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<Video, int> videoRepository,
+            IUserService userService)
         {
             _articleRepository = articleRepository;
             _appHelper = appHelper;
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _videoRepository = videoRepository;
-
+            _userService = userService;
         }
 
         public async Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input)
@@ -1018,6 +1021,18 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 });
             }
 
+        }
+
+        public async Task<bool> CanUserEditArticleAsync(ApplicationUser user, long articleId)
+        {
+            //读取当前文章的审核信息 获取最后编辑记录和作者
+            //判断当前用户是否有权限编辑
+            if (_userService.CheckCurrentUserRole("Admin") == true)
+            {
+                return true;
+            }
+            var sum = await _examineRepository.GetAll().CountAsync(s => s.ArticleId == articleId && s.IsPassed != false && s.ApplicationUserId == user.Id);
+            return sum > 0;
         }
     }
 }

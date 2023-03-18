@@ -30,13 +30,8 @@
 
             UserName = user.User.Identity.Name;
 
-            foreach (var item in user.User.Claims)
-            {
-                if (item.Type == "userid")
-                {
-                    UserId = item.Value;
-                }
-            }
+            UserId = user.User.Claims.GetUserId();
+
 
             //记录数据
             if (string.IsNullOrWhiteSpace(UserName) == false && string.IsNullOrWhiteSpace(UserId) == false)

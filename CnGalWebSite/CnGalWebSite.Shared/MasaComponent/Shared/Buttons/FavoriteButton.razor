@@ -36,17 +36,7 @@
             string userId = "";
             if (user.User.Identity.IsAuthenticated)
             {
-                if (user.User.Identity.IsAuthenticated)
-                {
-                    foreach (var item in user.User.Claims)
-                    {
-                        if (item.Type == "userid")
-                        {
-                            userId = item.Value;
-                        }
-
-                    }
-                }
+                userId = user.User.Claims.GetUserId();
 
                 await GetUserIsFavorited();
                 await GetUserFavoriteInfor(userId);
@@ -123,7 +113,7 @@
         {
             if(chooseFavoriteFolderTip!=null)
             {
-               chooseFavoriteFolderTip.Refresh(UserFavoriteInfor);
+                chooseFavoriteFolderTip.Refresh(UserFavoriteInfor);
             }
         }
         else

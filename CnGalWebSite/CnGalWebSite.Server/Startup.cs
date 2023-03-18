@@ -23,8 +23,10 @@ using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.Server
 {
@@ -41,6 +43,9 @@ namespace CnGalWebSite.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //判断是否 SSR
+            ToolHelper.IsSSR = ToolHelper.PreSetIsSSR == null ? true : ToolHelper.PreSetIsSSR.Value;
+
             _ = services.AddRazorPages()
                  //设置Json格式化配置
                  .AddJsonOptions(options =>
@@ -70,8 +75,6 @@ namespace CnGalWebSite.Server
                 .AddBlazoredLocalStorage()
                 .AddBlazoredSessionStorage()
                 .AddAuthorizationCore()
-                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
-                .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IHttpService, HttpService>()
                 .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
                 .AddScoped<IDataCacheService, DataCatcheService>()
@@ -112,6 +115,82 @@ namespace CnGalWebSite.Server
 
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IEventService, EventService>();
+
+
+            //默认采用cookie认证方案，添加oidc认证方案
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "cookies";
+                options.DefaultChallengeScheme = "oidc";
+            })
+                //配置cookie认证
+                .AddCookie("cookies")
+                .AddOpenIdConnect("oidc", options =>
+                {
+                    //id4服务的地址
+                    options.Authority = Configuration["Authority"];
+
+                    //id4配置的ClientId以及ClientSecrets
+                    options.ClientId = Configuration["ClientId"];
+                    options.ClientSecret = Configuration["ClientSecret"];
+
+                    //认证模式
+                    options.ResponseType = "code";
+                    //保存token到本地
+                    options.SaveTokens = true;
+                    //很重要，指定从Identity Server的UserInfo地址来取Claim
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    //指定要取哪些资料（除Profile之外，Profile是默认包含的）
+                    options.Scope.Add("role");
+                    options.Scope.Add("CnGalAPI");
+                    //这里是个ClaimType的转换，Identity Server的ClaimType和Blazor中间件使用的名称有区别，需要统一。
+                    options.TokenValidationParameters.RoleClaimType = "role";
+                    options.TokenValidationParameters.NameClaimType = "name";
+                    options.Events.OnUserInformationReceived = (context) =>
+                    {
+                        //回顾之前关于WebAssembly的例子，涉及到数组的转换，这里也一样要处理
+
+                        ClaimsIdentity claimsId = context.Principal.Identity as ClaimsIdentity;
+
+                        var roleElement = context.User.RootElement.GetProperty("role");
+                        if (roleElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                        {
+                            var roles = context.User.RootElement.GetProperty("role").EnumerateArray().Select(e =>
+                            {
+                                return e.ToString();
+                            });
+                            claimsId.AddClaims(roles.Select(r => new Claim("role", r)));
+                        }
+                        else
+                        {
+                            claimsId.AddClaim(new Claim("role", roleElement.ToString()));
+                        }
+
+
+                        return Task.CompletedTask;
+                    };
+                });
+
+            //设置Cookies
+            static void CheckSameSite(HttpContext httpContext, CookieOptions options)
+            {
+                if (options.SameSite == SameSiteMode.None)
+                {
+                    var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+
+                    options.SameSite = SameSiteMode.Unspecified;
+
+                }
+            }
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -127,17 +206,23 @@ namespace CnGalWebSite.Server
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
+            //设置Cookies
+            app.UseCookiePolicy();
+
             _ = app.UseStaticFiles();
 
             //添加状态检查终结点
             _ = app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
-
-
             _ = app.UseRouting();
+
+            //添加认证与授权中间件
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             _ = app.UseEndpoints(endpoints =>
             {
+                _ = endpoints.MapDefaultControllerRoute();
                 _ = endpoints.MapBlazorHub();
                 _ = endpoints.MapFallbackToPage("/_Host");
             });

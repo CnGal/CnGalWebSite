@@ -53,13 +53,13 @@ using Util.Reflection.Expressions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/admin/[action]")]
     public class AdminAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        
+        
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -129,8 +129,8 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
+         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
+        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
@@ -138,14 +138,14 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository)
         {
-            _userManager = userManager;
+            
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _examineService = examineService;
-            _roleManager = roleManager;
+            
             _userService = userService;
             _entryService = entryService;
             _articleService = articleService;
@@ -226,12 +226,11 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<EditUserViewModel>> EditUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
             if (user == null)
             {
                 return NotFound();
             }
-            var userClaims = await _userManager.GetClaimsAsync(user);
 
             var model = new EditUserViewModel
             {
@@ -242,7 +241,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 MainPageContext = user.MainPageContext,
                 Integral = user.DisplayIntegral,
                 ContributionValue = user.DisplayContributionValue,
-                Claims = userClaims.Select(c => c.Value).ToList(),
                 MBgImageName = _appHelper.GetImagePath(user.MBgImage, ""),
                 SBgImageName = _appHelper.GetImagePath(user.SBgImage, ""),
                 PhotoName = _appHelper.GetImagePath(user.PhotoPath, ""),
@@ -250,26 +248,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 CanComment = user.CanComment ?? true,
                 Roles = new List<UserRolesModel>(),
                 Birthday = user.Birthday,
-                IsShowFavotites = user.IsShowFavotites,
                 IsPassedVerification = user.IsPassedVerification
             };
-            //获取用户角色
-            var allRoles = _roleManager.Roles;
-            var userRoles = await _userManager.GetRolesAsync(user);
-            foreach (var item in allRoles)
-            {
-                var isSelected = false;
-                foreach (var infor in userRoles)
-                {
-                    if (item.Name == infor)
-                    {
-                        isSelected = true;
-                        break;
-                    }
-                }
-                model.Roles.Add(new UserRolesModel { Name = item.Name, IsSelected = isSelected });
-            }
-
+           
             return model;
         }
 
@@ -281,19 +262,11 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> EditUser(EditUserViewModel model)
         {
-            //获取当前用户ID
-            var user_admin = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
 
             if (user == null)
             {
-                return new Result { Error = "当前用户不存在，可能在编辑过程中被删除", Successful = false };
-            }
-
-            if (await _userManager.IsInRoleAsync(user, "SuperAdmin") && await _userManager.IsInRoleAsync(user_admin, "SuperAdmin") == false)
-            {
-                return new Result { Error = "你没有权限修改超级管理员的信息", Successful = false };
+                return new Result { Error = "当前用户不存在", Successful = false };
             }
 
             user.Email = model.Email;
@@ -301,48 +274,17 @@ namespace CnGalWebSite.APIServer.Controllers
             user.PersonalSignature = model.PersonalSignature;
             user.MainPageContext = model.MainPageContext;
             user.Birthday = model.Birthday;
-            user.Integral = model.Integral;
-            user.ContributionValue = model.ContributionValue;
             user.PhotoPath = model.PhotoName;
             user.MBgImage = model.MBgImageName;
             user.SBgImage = model.SBgImageName;
             user.CanComment = model.CanComment;
             user.BackgroundImage = model.BackgroundName;
             user.IsPassedVerification = model.IsPassedVerification;
-            user.IsShowFavotites = model.IsShowFavotites;
-
-            if (await _userManager.IsInRoleAsync(user_admin, "SuperAdmin"))
-            {
-                //处理用户角色
-                var userRoles = await _userManager.GetRolesAsync(user);
-                foreach (var item in model.Roles)
-                {
-                    var isAdd = false;
-                    foreach (var infor in userRoles)
-                    {
-                        if (item.Name == infor)
-                        {
-                            if (item.IsSelected == false)
-                            {
-                                _ = await _userManager.RemoveFromRoleAsync(user, infor);
-                                isAdd = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (isAdd == false && item.IsSelected == true)
-                    {
-                        _ = await _userManager.AddToRoleAsync(user, item.Name);
-                    }
-                }
-            }
 
             //更新数据
-            var result = await _userManager.UpdateAsync(user);
+            var result = await _userRepository.UpdateAsync(user);
 
-            return result.Succeeded
-                ? (ActionResult<Result>)new Result { Successful = true }
-                : (ActionResult<Result>)new Result { Successful = false, Error = result.Errors.ToList()[0].Description };
+            return new Result { Successful = true };
         }
 
 
@@ -460,7 +402,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListOperationRecordAloneModel>>> GetOperationRecordListAsync(OperationRecordsPagesInfor input)
         {
             var dtos = await _operationRecordService.GetPaginatedResult(input.Options, input.SearchModel);
@@ -469,7 +410,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserCertificationAloneModel>>> GetUserCertificationListAsync(UserCertificationsPagesInfor input)
         {
             var dtos = await _userService.GetPaginatedResult(input.Options, input.SearchModel);

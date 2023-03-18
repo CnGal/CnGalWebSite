@@ -19,5 +19,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
         Task UpdateCommentDataAsync(Comment comment, Examine examine);
 
         Task UpdateCommentDataMainAsync(Comment comment, CommentText examine);
+
+        Task<bool> IsUserHavePermissionForCommmentAsync(long commentId, ApplicationUser user);
     }
 }
