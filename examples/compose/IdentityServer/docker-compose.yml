@@ -1,0 +1,58 @@
+version: "3"
+services:
+  apiserver:
+    image: littlefishtentears/cngalwebsiteidentityserver:latest
+    container_name: identityserver
+    environment:
+      - TZ=${TZ}
+      # 数据库连接字符串
+      - DefaultDBConnection=${DefaultDBConnection}
+      # 外部身份验证
+      # 谷歌
+      - GoogleClientId=${GoogleClientId}
+      - GoogleClientSecret=${GoogleClientSecret}
+      # Github
+      - GitHubClientId=${GitHubClientId}
+      - GitHubClientSecret=${GitHubClientSecret}
+      # Gitee
+      - GiteeClientId=${GiteeClientId}
+      - GiteeClientSecret=${GiteeClientSecret}
+      # QQ
+      - QQClientId=${QQClientId}
+      - QQClientSecret=${QQClientSecret}
+      # 发送验证邮件的电子邮箱
+      - Server=${Server}
+      - SenderName=${SenderName}
+      - SenderEmail=${SenderEmail}
+      - Account=${Account}
+      - Password=${Password}
+      # 短信模板
+      - SMS_ResetPassword=${SMS_ResetPassword}
+      - SMS_AddPhoneNumber=${SMS_AddPhoneNumber}
+      - SMS_ChangePhoneNumber=${SMS_ChangePhoneNumber}
+      # 阿里云
+      - AliyunAccessKeySecret=${AliyunAccessKeySecret}
+      - AliyunAccessKeyId=${AliyunAccessKeyId}
+      # 信任的第三方登录
+      - TrustedExternalAuthProviders=${TrustedExternalAuthProviders}
+      # 极验
+      - GEETEST_KEY=${GEETEST_KEY}
+      - GEETEST_ID=${GEETEST_ID}
+      # 证书
+      - CertPath=${CertPath}
+      - CertPassword=${CertPassword}
+    hostname: apiserver
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 0.7G
+    ports:
+      - "5011:80"
+      - "5001:443"

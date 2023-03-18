@@ -83,7 +83,7 @@ namespace CnGalWebSite.Server
                 }));
 
             //添加状态检查
-            services.AddHealthChecks().AddCheck<SystemMemoryHealthcheck>("Memory");
+            services.AddHealthChecks();
 
             //添加工具箱
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))

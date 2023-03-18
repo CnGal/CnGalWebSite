@@ -40,6 +40,12 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = builder.Configuration["ClientId"];
         options.ClientSecret = builder.Configuration["ClientSecret"];
 
+        //开发模式下关闭http
+        if (builder.Configuration["Authority"].Contains("https") == false)
+        {
+            options.RequireHttpsMetadata = false;
+        }
+
         //认证模式
         options.ResponseType = "code";
 
@@ -98,6 +104,8 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.OnDeleteCookie = cookieContext =>
         CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
 });
+//添加状态检查
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -110,6 +118,9 @@ if (!app.Environment.IsDevelopment())
 app.UseCookiePolicy();
 
 app.UseStaticFiles();
+
+//添加状态检查终结点
+app.UseHealthChecks("/healthz");
 
 app.UseRouting();
 

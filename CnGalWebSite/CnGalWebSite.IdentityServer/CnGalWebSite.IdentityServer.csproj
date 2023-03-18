@@ -5,6 +5,8 @@
     <UserSecretsId>910ee546-046c-409b-821f-8461ca60a574</UserSecretsId>
     <Nullable>disable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,6 +23,7 @@
     <PackageReference Include="Cnblogs.IdentityServer4.AspNetIdentity" Version="4.2.1" />
     <PackageReference Include="Masa.Blazor" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.QQ" Version="2.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.0" />
     <PackageReference Include="My.AspNetCore.Authentication.QQ" Version="3.1.1" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="NetCore.AutoRegisterDi" Version="2.1.0" />
@@ -30,6 +33,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.3" />
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

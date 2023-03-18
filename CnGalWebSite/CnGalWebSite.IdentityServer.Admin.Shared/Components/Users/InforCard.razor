@@ -10,7 +10,7 @@
                     <div class="name">@context.User.Identity.Name</div>
                     <div class="id">@context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.NameIdentifier).Value</div>
                 </div>
-                <MButton Fab Icon OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsApiUrl+"Account/SelectModifyField"))">
+                <MButton Fab Dark Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsApiUrl+"Account/SelectModifyField"))">
                     <MIcon>mdi-pencil</MIcon>
                 </MButton>
             </MCardText>

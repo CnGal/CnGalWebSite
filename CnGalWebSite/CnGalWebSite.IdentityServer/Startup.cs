@@ -26,6 +26,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -129,8 +130,16 @@ namespace CnGalWebSite.IdentityServer
                 .AddInMemoryClients(Config.Clients)
                 .AddAspNetIdentity<ApplicationUser>();
 
-            // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+            //设置证书
+            if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
+            {
+                builder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
+            }
+           
 
             services.AddAuthentication()
                 .AddGoogle(options =>
@@ -158,9 +167,6 @@ namespace CnGalWebSite.IdentityServer
                     options.ClientId = Configuration["GiteeClientId"];
                     options.ClientSecret = Configuration["GiteeClientSecret"];
                 });
-
-
-            services.AddDatabaseDeveloperPageExceptionFilter();
 
             //API终结点
             builder.Services.AddEndpointsApiExplorer();
@@ -190,16 +196,13 @@ namespace CnGalWebSite.IdentityServer
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            //添加状态检查
+            services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("DbContext");
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            if (Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
-            }
-
             //转发Ip
             _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -213,6 +216,9 @@ namespace CnGalWebSite.IdentityServer
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");
             });
+            //添加状态检查终结点
+            app.UseHealthChecks("/healthz");
+
             app.UseRouting();
             //跨域策略
             app.UseCors(options =>
