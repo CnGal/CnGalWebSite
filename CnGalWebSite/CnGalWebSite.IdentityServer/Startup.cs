@@ -130,7 +130,6 @@ namespace CnGalWebSite.IdentityServer
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
 
-
                 //添加本地API到发现文档
                 options.Discovery.CustomEntries.Add("local_api", "~/api");
             })
@@ -147,7 +146,7 @@ namespace CnGalWebSite.IdentityServer
             }
             else
             {
-                builder.AddSigningCredential(new X509Certificate2( Configuration["CertPath"], Configuration["CertPassword"]));
+                builder.AddSigningCredential(new X509Certificate2(Configuration["CertPath"], Configuration["CertPassword"]));
             }
 
 

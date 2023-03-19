@@ -390,6 +390,11 @@ else
             //await _dataCacheService.OnRefreshRequsted(null);
         }
 
+        if (!ToolHelper.IsSSR)
+        {
+            await Task.Delay(1000);
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 

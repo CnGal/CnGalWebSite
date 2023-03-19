@@ -18,11 +18,21 @@
                 <CascadingAuthenticationState>
                     <Router AppAssembly="@typeof(AdminLayout).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
-                            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
-                                <NotAuthorized>
-                                    <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
-                                </NotAuthorized>
-                            </AuthorizeRouteView>
+                            @if (ToolHelper.IsSSR)
+                            {
+                                <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
+                            }
+                            else
+                            {
+                                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
+                                    <NotAuthorized>
+                                        <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                    </NotAuthorized>
+                                    <Authorizing>
+                                        
+                                    </Authorizing>
+                                </AuthorizeRouteView>
+                            }
                             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
                         </Found>
                         <NotFound>

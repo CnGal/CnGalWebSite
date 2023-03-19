@@ -54,12 +54,15 @@ else
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 </div>
+<h1>
+    @count
+</h1>
 
 @code {
 
 
-        [Parameter]
-        public string Id { get; set; }
+    [Parameter]
+    public string Id { get; set; }
     public EditMainViewModel Model { get; set; } = new EditMainViewModel();
     private bool isReady = false;
     [NotNull]
@@ -68,21 +71,21 @@ else
     public ErrorHandler ErrorHandler { get; set; }
 
     AutoSaveTip<EditMainViewModel> autoSave { get; set; }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    public int count;
+
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        try
         {
-            try
-            {
-                //获取词条信息
-                Model = await _httpService.GetAsync<EditMainViewModel>("api/entries/editmain/" + Id);
-                isReady = true;
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
-            }
+            //获取词条信息
+            Model = await _httpService.GetAsync<EditMainViewModel>("api/entries/editmain/" + Id);
+            count++;
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
         }
     }
 
@@ -103,7 +106,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
                 await ToastService.Success("保存成功", "保存词条主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
@@ -122,6 +125,6 @@ else
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 }
