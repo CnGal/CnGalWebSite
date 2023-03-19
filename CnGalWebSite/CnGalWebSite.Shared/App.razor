@@ -64,33 +64,33 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (ToolHelper.IsSSR && !string.IsNullOrWhiteSpace(Token))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
-        }
-        else
-        {
-            if (!ToolHelper.IsSSR)
-            {
-                var TokenProvider = (IAccessTokenProvider)_serviceProvider.GetService(typeof(IAccessTokenProvider));
-                if (TokenProvider != null)
-                {
-                    var accessTokenResult = await TokenProvider.RequestAccessToken();
+        //if (ToolHelper.IsSSR && !string.IsNullOrWhiteSpace(Token))
+        //{
+        //    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
+        //}
+        //else
+        //{
+        //    if (!ToolHelper.IsSSR)
+        //    {
+        //        var TokenProvider = (IAccessTokenProvider)_serviceProvider.GetService(typeof(IAccessTokenProvider));
+        //        if (TokenProvider != null)
+        //        {
+        //            var accessTokenResult = await TokenProvider.RequestAccessToken();
 
-                    var AccessToken = string.Empty;
+        //            var AccessToken = string.Empty;
 
-                    if (accessTokenResult.TryGetToken(out var token))
-                    {
-                        AccessToken = token.Value;
-                    }
-                    if (string.IsNullOrWhiteSpace(AccessToken) == false)
-                    {
-                        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
-                    }
-                }
-            }
+        //            if (accessTokenResult.TryGetToken(out var token))
+        //            {
+        //                AccessToken = token.Value;
+        //            }
+        //            if (string.IsNullOrWhiteSpace(AccessToken) == false)
+        //            {
+        //                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
+        //            }
+        //        }
+        //    }
 
-        }
+        //}
 
     }
 

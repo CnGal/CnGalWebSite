@@ -56,6 +56,7 @@
     <PackageReference Include="Blazored.SessionStorage" Version="2.3.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.14" />
     <PackageReference Include="EPPlus" Version="6.1.2" />
+    <PackageReference Include="IdentityModel.AspNetCore" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.3" />
   </ItemGroup>
