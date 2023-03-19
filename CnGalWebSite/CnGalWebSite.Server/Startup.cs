@@ -69,6 +69,8 @@ namespace CnGalWebSite.Server
             {
                 ToolHelper.WebApiPath = Configuration["WebApiPath"];
             }
+            //Https
+            services.AddScoped(sp => new HttpClient());
             //本地化
             services.AddLocalization()
                 .AddBootstrapBlazor()
