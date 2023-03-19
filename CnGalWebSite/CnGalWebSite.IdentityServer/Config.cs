@@ -23,7 +23,7 @@ namespace CnGalWebSite.IdentityServer
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
-                new IdentityResource("role", new string[]{JwtClaimTypes.Role })
+                new IdentityResource("role", new string[]{JwtClaimTypes.Role,ClaimTypes.Role, })
             };
         public static IEnumerable<ApiScope> ApiScopes =>
           new ApiScope[]
