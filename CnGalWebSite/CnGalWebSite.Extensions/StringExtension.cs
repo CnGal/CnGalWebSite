@@ -167,9 +167,22 @@ namespace CnGalWebSite.Extensions
                 }
 
                 int lenth = value.Length - startLen - endLen;
-                if(lenth<1)
+                if (lenth < 4)
                 {
-                    lenth = value.Length > 2 ? 2 : 1;
+                    endLen = 4;
+                    startLen = 0;
+                }
+
+                lenth = value.Length - startLen - endLen;
+                if (lenth < 1)
+                {
+                    endLen = 2;
+                    startLen = 0;
+                }
+                lenth = value.Length - startLen - endLen;
+                if (lenth < 1)
+                {
+                    return value;
                 }
 
                 string replaceStr = value.Substring(startLen, lenth);

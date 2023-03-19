@@ -12,7 +12,7 @@ namespace CnGalWebSite.Shared.Service
 {
     public class PageModelCatche<TModel> : IDisposable,IPageModelCatche<TModel> where TModel : class
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly PersistentComponentState ApplicationState;
         private readonly IServiceProvider _serviceProvider;
         /// <summary>
@@ -29,9 +29,9 @@ namespace CnGalWebSite.Shared.Service
 
         private PersistingComponentStateSubscription persistingSubscription;
 
-        public PageModelCatche(HttpClient httpClient, IServiceProvider serviceProvider)
+        public PageModelCatche(HttpClient httpClient, IServiceProvider serviceProvider, IHttpService httpService)
         {
-            _httpClient = httpClient;
+            _httpService = httpService;
             _serviceProvider = serviceProvider;
 
 
@@ -65,16 +65,17 @@ namespace CnGalWebSite.Shared.Service
             else
             {
                 //获取数据
+                var client = await _httpService.GetClientAsync();
                 TModel temp = null;
                 if (_useNewtonsoft)
                 {
-                    var str = await _httpClient.GetStringAsync(_baseUrl + apiUrl);
+                    var str = await client.GetStringAsync(_baseUrl + apiUrl);
                     var obj = Newtonsoft.Json.Linq.JObject.Parse(str);
                     temp = obj.ToObject<TModel>();
                 }
                 else
                 {
-                    temp = await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl, ToolHelper.options);
+                    temp = await client.GetFromJsonAsync<TModel>(_baseUrl + apiUrl, ToolHelper.options);
                 }
 
                 return temp;

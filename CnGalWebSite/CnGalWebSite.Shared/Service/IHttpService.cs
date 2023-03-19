@@ -12,6 +12,10 @@ namespace CnGalWebSite.Shared.Service
 
         Task<TValue> PostAsync<TModel, TValue>(string url, TModel model);
 
+        bool IsAuth { get; set; }
+
+        Task<HttpClient> GetClientAsync();
+
         HttpClient GetClient();
     }
 }
