@@ -217,9 +217,16 @@ namespace CnGalWebSite.IdentityServer
 
         public void Configure(IApplicationBuilder app)
         {
+            //设置请求来源
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                return next();
+            });
             _ = Environment.IsDevelopment() ? app.UseDeveloperExceptionPage() : app.UseExceptionHandler("/Error");
 
             //转发Ip
+
             _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
