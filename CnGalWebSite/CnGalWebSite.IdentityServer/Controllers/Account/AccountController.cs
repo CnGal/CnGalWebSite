@@ -34,6 +34,8 @@ using CnGalWebSite.IdentityServer.Services.Geetest;
 using CnGalWebSite.IdentityServer.Models.InputModels.Account;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Services.Records;
+using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -53,13 +55,14 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IAccountService _accountService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IOperationRecordService _operationRecordService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore, IAccountService accountService, IConfiguration configuration, IGeetestService geetestService,
-        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository,
+        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository, IOperationRecordService operationRecordService,
         IEventService events, IVerificationCodeService verificationCodeService, IMessageService messageService)
         {
             _userManager = userManager;
@@ -74,6 +77,7 @@ namespace IdentityServerHost.Quickstart.UI
             _accountService = accountService;
             _configuration = configuration;
             _geetestService = geetestService;
+            _operationRecordService = operationRecordService;
         }
 
         /// <summary>
@@ -194,6 +198,9 @@ namespace IdentityServerHost.Quickstart.UI
                 await _signInManager.SignOutAsync();
                 return check;
             }
+
+            //添加登入操作记录
+            await _operationRecordService.AddOperationRecordAsync(user.Id, OperationRecordType.Login);
 
             //跳转
             if (context != null)
@@ -357,6 +364,9 @@ namespace IdentityServerHost.Quickstart.UI
                 this.AddModelStateErrors(result.Errors);
                 return View(BuildRegisterViewModel(model));
             }
+
+            //添加注册操作记录
+            await _operationRecordService.AddOperationRecordAsync(user.Id, OperationRecordType.Registe);
 
             //添加角色
             result = await _userManager.AddToRoleAsync(user, "User");
@@ -1244,6 +1254,12 @@ namespace IdentityServerHost.Quickstart.UI
 
         private async Task<IActionResult> RedirectToVerifyEmail(ApplicationUser user, string returnUrl)
         {
+            //老用户不检查实名认证
+            if(!await _accountService.IsNewUserAsync(user.Id))
+            {
+                return null;
+            }
+
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var code = await _verificationCodeService.GetCodeAsync(token, user.Id, VerificationCodeType.Register);
             if (!await _messageService.SendVerificationEmailAsync(code, user.Email, user, VerificationCodeType.Register))
@@ -1357,6 +1373,9 @@ namespace IdentityServerHost.Quickstart.UI
             // check if external login is in the context of an OIDC request
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Id, name, true, context?.Client.ClientId));
+
+            //添加登入操作记录
+            await _operationRecordService.AddOperationRecordAsync(user.Id, OperationRecordType.Login);
 
             if (context != null)
             {
