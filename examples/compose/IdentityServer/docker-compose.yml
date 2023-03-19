@@ -47,7 +47,7 @@ services:
       - IdsWASM=${IdsWASM}
       - SSR=${SSR}
       - WASM=${WASM}
-    hostname: apiserver
+    hostname: identityserver
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]

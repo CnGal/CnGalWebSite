@@ -27,6 +27,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -41,7 +42,7 @@ namespace CnGalWebSite.IdentityServer
             Configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public async void ConfigureServices(IServiceCollection services)
         {
             //设置地址
             Config.IdsSSR = Configuration["IdsSSR"];
@@ -151,9 +152,7 @@ namespace CnGalWebSite.IdentityServer
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                Console.ReadKey();
+                await Task.Delay(10000000);
             }
 
 
