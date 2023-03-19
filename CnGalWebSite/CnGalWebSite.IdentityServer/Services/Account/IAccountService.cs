@@ -14,5 +14,7 @@ namespace CnGalWebSite.IdentityServer.Services.Account
         Task<List<ExternalProvider>> GetExternalProvidersAsync(AuthorizationRequest context);
 
         Task<AccountBindInfor> GetAccountBindInforAsync(AuthorizationRequest context, ApplicationUser user);
+
+        Task<bool> IsNewUserAsync(string id);
     }
 }

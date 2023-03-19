@@ -11,6 +11,8 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 using BlazorComponent;
 using IdentityServer4.Stores;
 using IdentityServer4.Models;
+using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 
 namespace CnGalWebSite.IdentityServer.Services.Account
 {
@@ -19,12 +21,14 @@ namespace CnGalWebSite.IdentityServer.Services.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
+        private readonly IRepository<OperationRecord, long> _operationRecordRepository;
 
-        public AccountService(UserManager<ApplicationUser> userManager, IClientStore clientStore, IAuthenticationSchemeProvider schemeProvider)
+        public AccountService(UserManager<ApplicationUser> userManager, IClientStore clientStore, IAuthenticationSchemeProvider schemeProvider, IRepository<OperationRecord, long> operationRecordRepository)
         {
-            _userManager= userManager;
-            _clientStore= clientStore;
-            _schemeProvider= schemeProvider;
+            _userManager = userManager;
+            _clientStore = clientStore;
+            _schemeProvider = schemeProvider;
+            _operationRecordRepository = operationRecordRepository;
         }
 
         /// <summary>
@@ -131,6 +135,11 @@ namespace CnGalWebSite.IdentityServer.Services.Account
             }
 
             return providers;
+        }
+
+        public async Task<bool> IsNewUserAsync(string id)
+        {
+            return await _operationRecordRepository.AnyAsync(s => s.ApplicationUserId == id && s.Type == OperationRecordType.Registe);
         }
     }
 }
