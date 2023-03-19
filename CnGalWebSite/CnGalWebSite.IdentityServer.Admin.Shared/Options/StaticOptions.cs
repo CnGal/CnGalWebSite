@@ -9,7 +9,7 @@ namespace CnGalWebSite.IdentityServer.Admin.Shared.Options
 {
     public static class StaticOptions
     {
-        public static string IdsApiUrl { get; set; } = "https://localhost:5001/";
+        public static string IdsApiUrl { get; set; } = "https://oauth.cngal.org/";
         public static string CnGalApiUrl { get; set; } = "https://api.cngal.org/";
 
         public static bool? PreSetIsSSR = null;
