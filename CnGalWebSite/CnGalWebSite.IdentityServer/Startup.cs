@@ -42,13 +42,15 @@ namespace CnGalWebSite.IdentityServer
             Configuration = configuration;
         }
 
-        public async void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             //设置地址
             Config.IdsSSR = Configuration["IdsSSR"];
             Config.IdsWASM = Configuration["IdsWASM"];
             Config.SSR = Configuration["SSR"];
             Config.WASM = Configuration["WASM"];
+            //添加状态检查
+            services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("DbContext");
             //MVC
             services.AddControllersWithViews();
 
@@ -137,22 +139,15 @@ namespace CnGalWebSite.IdentityServer
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryClients(Config.Clients)
                 .AddAspNetIdentity<ApplicationUser>();
-            try
-            {
-                //设置证书
-                if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
-                {
-                    builder.AddDeveloperSigningCredential();
-                }
-                else
-                {
-                    builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
-                }
 
-            }
-            catch(Exception ex)
+            //设置证书
+            if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
             {
-                await Task.Delay(10000000);
+                builder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
             }
 
 
@@ -169,7 +164,7 @@ namespace CnGalWebSite.IdentityServer
                     options.ClientId = Configuration["GitHubClientId"];
                     options.ClientSecret = Configuration["GitHubClientSecret"];
                 })
-                
+
                 .AddQQ(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
@@ -211,9 +206,6 @@ namespace CnGalWebSite.IdentityServer
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-
-            //添加状态检查
-            services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("DbContext");
 
             //添加真实IP
             services.Configure<ForwardedHeadersOptions>(options =>
