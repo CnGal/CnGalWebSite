@@ -8,6 +8,9 @@ html {
     overflow: hidden;
 }
 /*Layout*/
+header {
+    z-index: 2!important;
+}
 .app-bar .m-responsive__sizer {
     padding-bottom: 28% !important;
 }

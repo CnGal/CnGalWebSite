@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.IdentityServer.Admin.Shared.Services
+namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
 {
     public class CustomUserFactory
          : AccountClaimsPrincipalFactory<RemoteUserAccount>

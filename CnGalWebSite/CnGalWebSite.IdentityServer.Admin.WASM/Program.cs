@@ -2,7 +2,9 @@
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.WASM;
+using CnGalWebSite.IdentityServer.Admin.WASM.Services;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 //判断是否 SSR
 StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? false : StaticOptions.PreSetIsSSR.Value;
@@ -11,12 +13,15 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+//注册身份验证的HttpClient
 builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
-builder.Services.AddHttpClient("IdsAdminAPI")
-    //声明使用以上自定义的处理程序
+builder.Services.AddHttpClient("AuthAPI")
     .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
-    .CreateClient("IdsAdminAPI"));
+    .CreateClient("AuthAPI"));
+
+//注册匿名的HttpClient
+builder.Services.AddHttpClient("AnonymousAPI");
 
 //注入自定义服务
 builder.Services.AddScoped<IDataCacheService, DataCacheService>();
@@ -32,5 +37,8 @@ builder.Services.AddOidcAuthentication(options =>
 {
     builder.Configuration.Bind("Local", options.ProviderOptions);
     options.UserOptions.RoleClaim = "role";
+    options.UserOptions.NameClaim = "name";
+    options.ProviderOptions.ResponseMode = "query";
+    options.ProviderOptions.ResponseType = "code";
 }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 await builder.Build().RunAsync();

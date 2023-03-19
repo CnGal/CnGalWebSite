@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -67,6 +69,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             var context = await _interaction.GetAuthorizationContextAsync(string.Empty);
 
             return await _accountService.GetAccountBindInforAsync(context, user);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<KeyValuePair<string,string>>>> GetUserClaims()
+        {
+            return await Task.FromResult(User?.Claims?.Select(s => new KeyValuePair<string, string>(s.Type, s.Value))?.ToList());
         }
 
         private async Task<ApplicationUser> FindLoginUser()
