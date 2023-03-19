@@ -12,14 +12,10 @@ namespace CnGalWebSite.IdentityServer
 {
     public static class Config
     {
-        //public static string IdsSSR = "http://localhost:5100";
-        //public static string IdsWASM = "http://localhost:5100";
-        //public static string SSR = "http://localhost:5100";
-        //public static string WASM = "http://localhost:5100";
-        public static string IdsSSR = "https://admin.auth.cngal.org";
-        public static string IdsWASM = "https://auth.cngal.org";
-        public static string SSR = "https://www.cngal.org";
-        public static string WASM = "https://app.cngal.org";
+        public static string IdsSSR { get; set; }
+        public static string IdsWASM { get; set; }
+        public static string SSR { get; set; }
+        public static string WASM { get; set; }
 
 
         public static IEnumerable<IdentityResource> IdentityResources =>

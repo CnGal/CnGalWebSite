@@ -21,5 +21,6 @@ RUN dotnet publish "CnGalWebSite.IdentityServer.csproj" -c Release -o /app/publi
 
 FROM base AS final
 WORKDIR /app
+VOLUME /app  ## 用于挂接磁盘
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CnGalWebSite.IdentityServer.dll"]

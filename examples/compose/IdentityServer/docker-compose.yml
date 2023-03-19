@@ -42,6 +42,11 @@ services:
       # 证书
       - CertPath=${CertPath}
       - CertPassword=${CertPassword}
+      # 临时使用配置文件 后续持久化储存
+      - IdsSSR=${IdsSSR}
+      - IdsWASM=${IdsWASM}
+      - SSR=${SSR}
+      - WASM=${WASM}
     hostname: apiserver
     restart: always
     healthcheck:
@@ -54,6 +59,8 @@ services:
       resources:
         limits:
           memory: 0.7G
+    volumes:
+      - "/tmp/typesense/data:/data"
     ports:
       - "5011:80"
       - "5001:443"
