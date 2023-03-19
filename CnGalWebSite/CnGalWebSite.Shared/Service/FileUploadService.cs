@@ -19,13 +19,13 @@ namespace CnGalWebSite.Shared.Service
 {
     public class FileUploadService:IFileUploadService
     {
-        private readonly HttpClient _httpClient;
         private readonly ILogger<FileUploadService> _logger;
+        private readonly IHttpService _httpService;
 
-        public FileUploadService(HttpClient httpClient, ILogger<FileUploadService> logger)
+        public FileUploadService(ILogger<FileUploadService> logger, IHttpService httpService)
         {
-            _httpClient = httpClient;
             _logger = logger;
+            _httpService = httpService;
         }
 
         public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type)
@@ -74,7 +74,8 @@ namespace CnGalWebSite.Shared.Service
                     x = y = 0;
                     break;
             }
-            var response = await _httpClient.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?x={x}&y={y}", content);
+            var client = await _httpService.GetClientAsync();
+            var response = await client.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?x={x}&y={y}", content);
 
             var newUploadResults = await response.Content
                 .ReadFromJsonAsync<List<UploadResult>>();
@@ -99,7 +100,8 @@ namespace CnGalWebSite.Shared.Service
                 name: "\"files\"",
                 fileName: file.Name);
 
-            var response = await _httpClient.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?type={UploadFileType.Audio}", content);
+            var client = await _httpService.GetClientAsync();
+            var response = await client.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?type={UploadFileType.Audio}", content);
 
             var newUploadResults = await response.Content
                 .ReadFromJsonAsync<List<UploadResult>>();
@@ -129,7 +131,8 @@ namespace CnGalWebSite.Shared.Service
                     Type = type
                 };
 
-                var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserUploadFileInfor", model);
+                var client = await _httpService.GetClientAsync();
+                var result = await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserUploadFileInfor", model);
                 string jsonContent = result.Content.ReadAsStringAsync().Result;
                 Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果

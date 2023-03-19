@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CnGalWebSite.DataModel.Helper;
 
-namespace CnGalWebSite.Shared.Provider
+namespace CnGalWebSite.WebAssembly.Services
 {
     public class CustomAuthorizationMessageHandler : AuthorizationMessageHandler
     {
@@ -15,11 +15,7 @@ namespace CnGalWebSite.Shared.Provider
             NavigationManager navigationManager)
             : base(provider, navigationManager)
         {
-            ConfigureHandler(
-                //这是Web Api的根地址
-                authorizedUrls: new[] { ToolHelper.WebApiPath },
-                //对应Api Scope, 表示请求上面的Web Api之前需要先获取该Scope对应的Access Token，并附在Http头里面
-                scopes: new[] { "CnGalAPI" });
+            ConfigureHandler(authorizedUrls: new[] { ToolHelper.WebApiPath });
         }
     }
 }

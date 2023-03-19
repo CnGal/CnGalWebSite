@@ -1,7 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 @inject IJSRuntime JS
-@inject HttpClient Http
 
 @code {
     [CascadingParameter]
@@ -34,7 +33,8 @@
             }
             else
             {
-                Model.Ip = await Http.GetStringAsync(ToolHelper.WebApiPath + "api/account/GetIp");
+                var client = await _httpService.GetClientAsync();
+                Model.Ip = await client.GetStringAsync("api/account/GetIp");
             }
 
         }

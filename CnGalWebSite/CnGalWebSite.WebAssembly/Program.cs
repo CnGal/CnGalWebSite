@@ -8,8 +8,8 @@ using CnGalWebSite.Shared;
 using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Extentions;
 using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
-using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
+using CnGalWebSite.WebAssembly.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -39,6 +39,11 @@ namespace CnGalWebSite.WebAssembly
             ToolHelper.IsSSR = ToolHelper.PreSetIsSSR == null ? false : ToolHelper.PreSetIsSSR.Value;
 
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            //覆盖默认api地址
+            if (string.IsNullOrWhiteSpace(builder.Configuration["WebApiPath"]) == false)
+            {
+                ToolHelper.WebApiPath = builder.Configuration["WebApiPath"];
+            }
 
             builder.RootComponents.Add<App>("app");
 
@@ -50,7 +55,7 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddBlazoredLocalStorage()
                  .AddBlazoredSessionStorage();
 
-            builder.Services.AddScoped<IHttpService, HttpService>();
+            
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 
@@ -95,16 +100,20 @@ namespace CnGalWebSite.WebAssembly
                 builder.Configuration.Bind("Local", options.ProviderOptions);
                 options.UserOptions.RoleClaim = "role";
                 options.UserOptions.NameClaim = "name";
+                options.ProviderOptions.ResponseMode = "query";
+                options.ProviderOptions.ResponseType = "code";
             }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
+            //添加Http服务
+            builder.Services.AddScoped<IHttpService, HttpService>();
+            //注册身份验证的HttpClient
+            builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
+            builder.Services.AddHttpClient("AuthAPI")
+                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+            builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
+                .CreateClient("AuthAPI"));
 
-            //自定义消息
-            //builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
-            //builder.Services.AddHttpClient("CnGalAPI")
-            //    //声明使用以上自定义的处理程序
-            //    .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
-            //builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
-            //    .CreateClient("CnGalAPI"));
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            //注册匿名的HttpClient
+            builder.Services.AddHttpClient("AnonymousAPI");
 
             var host = builder.Build();
 

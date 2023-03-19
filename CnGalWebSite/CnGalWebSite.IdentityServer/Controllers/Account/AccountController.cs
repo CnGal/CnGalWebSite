@@ -1428,6 +1428,22 @@ namespace IdentityServerHost.Quickstart.UI
 
                     return await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerUserId, provider));
                 }
+                else
+                {
+                    //修改绑定
+                    if (idsUser.Id == user.Id)
+                    {
+                        //删除
+                        var cur = (await _userManager.GetLoginsAsync(user)).FirstOrDefault(s => s.ProviderDisplayName == provider);
+                        var result = await _userManager.RemoveLoginAsync(user, cur.LoginProvider, cur.ProviderKey);
+                        if (!result.Succeeded)
+                        {
+                            return result;
+                        }
+                        //添加
+                        return await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerUserId, provider));
+                    }
+                }
             }
 
             return IdentityResult.Success;

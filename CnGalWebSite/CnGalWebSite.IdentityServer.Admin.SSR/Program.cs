@@ -93,6 +93,8 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters.NameClaimType = "name";
         //注册事件
         options.EventsType = typeof(OidcEvents);
+
+
         options.Events.OnUserInformationReceived = (context) =>
         {
             //回顾之前关于WebAssembly的例子，涉及到数组的转换，这里也一样要处理
