@@ -1,0 +1,18 @@
+﻿@inject IHttpService _httpService
+
+<AuthorizeView>
+    <Authorized>
+            @{
+                _httpService.IsAuth = true;
+            }     
+    </Authorized>
+    <NotAuthorized>
+        @{
+            _httpService.IsAuth = false;
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}

@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Messages;
+using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 
 namespace CnGalWebSite.IdentityServer.Data
 {
@@ -12,6 +13,7 @@ namespace CnGalWebSite.IdentityServer.Data
     {
         public DbSet<VerificationCode> VerificationCodes { get; set; }
         public DbSet<SendRecord> SendRecords { get; set; }
+        public DbSet<OperationRecord> OperationRecords { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

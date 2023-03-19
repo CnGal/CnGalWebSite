@@ -62,12 +62,13 @@ namespace CnGalWebSite.IdentityServer
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.LocalApi.ScopeName,
-                        "role"
+                        "role",
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
                     //令牌有效期
-                    AccessTokenLifetime=86400,
+                    AccessTokenLifetime=10,
+                    AllowOfflineAccess=true,
                 },
                 //IdentityServer.Addmin.WASM
                 new Client
@@ -90,12 +91,13 @@ namespace CnGalWebSite.IdentityServer
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.LocalApi.ScopeName,
-                        "role"
+                        "role",
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
                     //令牌有效期
-                    AccessTokenLifetime=86400,
+                    AccessTokenLifetime=10,
+                    AllowOfflineAccess=true,
                 },
                 //Server
                 new Client
@@ -118,12 +120,13 @@ namespace CnGalWebSite.IdentityServer
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         "CnGalAPI",
-                        "role"
+                        "role",
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
                     //令牌有效期
-                    AccessTokenLifetime=86400,
+                    AccessTokenLifetime=10,
+                    AllowOfflineAccess=true,
                 },
                 //WebAsseembly
                 new Client
@@ -146,12 +149,13 @@ namespace CnGalWebSite.IdentityServer
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         "CnGalAPI",
-                        "role"
+                        "role",
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
                     //令牌有效期
-                    AccessTokenLifetime=86400,
+                    AccessTokenLifetime=10,
+                    AllowOfflineAccess=true,
                 },
             };
     }

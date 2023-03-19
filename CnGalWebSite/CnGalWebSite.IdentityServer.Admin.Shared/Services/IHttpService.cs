@@ -13,6 +13,6 @@ namespace CnGalWebSite.IdentityServer.Admin.Shared.Services
 
         Task<TValue> PostAsync<TModel, TValue>(string url, TModel model);
 
-        HttpClient GetClient();
+        bool IsAuth { get; set; }
     }
 }

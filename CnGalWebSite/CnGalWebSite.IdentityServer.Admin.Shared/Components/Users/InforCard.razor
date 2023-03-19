@@ -10,7 +10,7 @@
                     <div class="name">@context.User.Identity.Name</div>
                     <div class="id">@context.User.Claims.GetUserId()</div>
                 </div>
-                <MButton Fab Dark Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsApiUrl+"Account/SelectModifyField"))">
+                <MButton Fab Dark Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsUrl+"Account/SelectModifyField"))">
                     <MIcon>mdi-pencil</MIcon>
                 </MButton>
             </MCardText>
@@ -26,7 +26,7 @@
         {
 
             <MRow>
-                @foreach (var item in Model.AccountFields.Where(s=>s.Type!= Models.ViewModels.Account.SelectModifyFieldType.Password))
+                @foreach (var item in Model.AccountFields.Where(s => s.Type != Models.ViewModels.Account.SelectModifyFieldType.Password))
                 {
                     <MCol Cols="12" Sm="4" Md="3">
                         <MCard>
@@ -89,10 +89,10 @@
         }
     </div>
     <AuthorizeView Context="userContext">
-        <MExpansionPanels Focusable>
+        <MExpansionPanels Focusable Class="mb-4">
             <MExpansionPanel>
                 <MExpansionPanelHeader>
-                    其他信息
+                    本地获取到的信息
                 </MExpansionPanelHeader>
                 <MExpansionPanelContent>
                     <dl class="pt-4">
@@ -108,13 +108,34 @@
             </MExpansionPanel>
         </MExpansionPanels>
     </AuthorizeView>
-
+    @if (Claims != null && Claims.Any())
+    {
+        <MExpansionPanels Focusable Class="mb-4">
+            <MExpansionPanel>
+                <MExpansionPanelHeader>
+                    API远端获取到的信息
+                </MExpansionPanelHeader>
+                <MExpansionPanelContent>
+                    <dl class="pt-4">
+                        @foreach (var prop in Claims)
+                        {
+                            <div>
+                                <dt>@prop.Key</dt>
+                                <dd>@prop.Value</dd>
+                            </div>
+                        }
+                    </dl>
+                </MExpansionPanelContent>
+            </MExpansionPanel>
+        </MExpansionPanels>
+    }
 </div>
 
 
 
 @code {
     AccountBindInfor Model;
+    List<KeyValuePair<string, string>> Claims;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -125,7 +146,8 @@
     {
         try
         {
-            Model = await _httpService.GetAsync<AccountBindInfor>(StaticOptions.IdsApiUrl + "api/account/GetBindInfor");
+            Model = await _httpService.GetAsync<AccountBindInfor>("api/account/GetBindInfor");
+            Claims = await _httpService.GetAsync<List<KeyValuePair<string, string>>>("api/account/GetUserClaims");
         }
         catch (Exception ex)
         {
