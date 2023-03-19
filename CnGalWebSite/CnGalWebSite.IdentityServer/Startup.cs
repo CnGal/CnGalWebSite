@@ -147,7 +147,7 @@ namespace CnGalWebSite.IdentityServer
             }
             else
             {
-                builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
+                builder.AddSigningCredential(new X509Certificate2( Configuration["CertPath"], Configuration["CertPassword"]));
             }
 
 
