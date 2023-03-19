@@ -7,7 +7,8 @@
 @inject ILocalStorageService _localStorage
 @inject IEventService _eventService
 @inject HttpClient _httpClient
-@inject IAccessTokenProvider TokenProvider
+@inject IServiceProvider _serviceProvider
+
 @using BlazorComponent.I18n
 
 <MApp>
@@ -59,18 +60,26 @@
         }
         else
         {
-            var accessTokenResult = await TokenProvider.RequestAccessToken();
-
-            var AccessToken = string.Empty;
-
-            if (accessTokenResult.TryGetToken(out var token))
+            if (!ToolHelper.IsSSR)
             {
-                AccessToken = token.Value;
+                var TokenProvider = (IAccessTokenProvider)_serviceProvider.GetService(typeof(IAccessTokenProvider));
+                if (TokenProvider != null)
+                {
+                    var accessTokenResult = await TokenProvider.RequestAccessToken();
+
+                    var AccessToken = string.Empty;
+
+                    if (accessTokenResult.TryGetToken(out var token))
+                    {
+                        AccessToken = token.Value;
+                    }
+                    if (string.IsNullOrWhiteSpace(AccessToken) == false)
+                    {
+                        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
+                    }
+                }
             }
-            if (string.IsNullOrWhiteSpace(AccessToken) == false)
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
-            }
+
         }
 
     }

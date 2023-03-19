@@ -43,6 +43,11 @@ namespace CnGalWebSite.IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
+            //设置地址
+            Config.IdsSSR = Configuration["IdsSSR"];
+            Config.IdsWASM = Configuration["IdsWASM"];
+            Config.SSR = Configuration["SSR"];
+            Config.WASM = Configuration["WASM"];
             //MVC
             services.AddControllersWithViews();
 

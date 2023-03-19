@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Masa.Blazor.Presets.Message;
 
 namespace CnGalWebSite.Helper.Helper
 {
@@ -88,12 +89,14 @@ namespace CnGalWebSite.Helper.Helper
     {
         public MemoryMetrics GetMetrics()
         {
-            if (IsUnix())
-            {
-                return GetUnixMetrics();
-            }
+            var model = new MemoryMetrics();
+            using var proc = Process.GetCurrentProcess();
 
-            return GetWindowsMetrics();
+            model.Used = proc.PrivateMemorySize64;
+            model.Total = proc.WorkingSet64;
+            model.Free = model.Total - model.Used;
+
+            return model;
         }
 
         private bool IsUnix()
