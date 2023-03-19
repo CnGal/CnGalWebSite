@@ -43,7 +43,7 @@
     min-height: 0;
 }
 
-.mdl-layout-title .nav-drawer {
+.mdl-layout-title.nav-drawer {
     line-height: initial !important;
     display: flex;
     margin-top: 1rem;
