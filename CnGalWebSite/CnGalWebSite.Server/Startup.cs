@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -71,7 +72,6 @@ namespace CnGalWebSite.Server
             //本地化
             services.AddLocalization()
                 .AddBootstrapBlazor()
-                .AddScoped(sp => new HttpClient())
                 .AddBlazoredLocalStorage()
                 .AddBlazoredSessionStorage()
                 .AddAuthorizationCore()
