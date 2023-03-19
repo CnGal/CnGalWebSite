@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-//判断是否 SSR
-StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.PreSetIsSSR.Value;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//判断是否 SSR
+StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.PreSetIsSSR.Value;
+//设置apiUrl
+if(!string.IsNullOrWhiteSpace(builder.Configuration["IdsApiUrl"]))
+{
+    StaticOptions.IdsApiUrl = builder.Configuration["IdsApiUrl"];
+}
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -113,11 +117,15 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 //设置请求来源
-app.Use((context, next) =>
+if (!builder.Environment.IsDevelopment())
 {
-    context.Request.Scheme = "https";
-    return next();
-});
+    app.Use((context, next) =>
+    {
+        context.Request.Scheme = "https";
+        return next();
+    });
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
