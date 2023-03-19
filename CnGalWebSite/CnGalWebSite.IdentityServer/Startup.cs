@@ -136,17 +136,26 @@ namespace CnGalWebSite.IdentityServer
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryClients(Config.Clients)
                 .AddAspNetIdentity<ApplicationUser>();
+            try
+            {
+                //设置证书
+                if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
+                {
+                    builder.AddDeveloperSigningCredential();
+                }
+                else
+                {
+                    builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
+                }
 
-            //设置证书
-            if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
-            {
-                builder.AddDeveloperSigningCredential();
             }
-            else
+            catch(Exception ex)
             {
-                builder.AddSigningCredential(new X509Certificate2(Path.Combine(AppContext.BaseDirectory, Configuration["CertPath"], Configuration["CertPassword"])));
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                Console.ReadKey();
             }
-           
+
 
             services.AddAuthentication()
                 .AddGoogle(options =>
