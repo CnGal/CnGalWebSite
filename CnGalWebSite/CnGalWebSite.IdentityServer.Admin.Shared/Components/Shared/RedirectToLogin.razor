@@ -1,4 +1,4 @@
-﻿@inject NavigationManager Navigation
+﻿@inject NavigationManager NavigationManager
 
 <div class="redirect-login-card">
 
@@ -14,13 +14,19 @@
 @code {
     protected void OnLogin()
     {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
         if (StaticOptions.IsSSR)
         {
-            Navigation.NavigateTo($"Account/Login?returnUrl={Navigation.Uri.Replace(Navigation.BaseUri, "")}", true);
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri.Replace(NavigationManager.BaseUri, "")}", true);
         }
         else
         {
-            Navigation.NavigateToLogin("authentication/login");
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
 
     }

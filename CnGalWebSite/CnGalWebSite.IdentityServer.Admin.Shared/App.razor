@@ -1,9 +1,15 @@
-﻿@inject HttpClient _httpClient
+﻿@inject IHttpService _httpService
 
 <ErrorHandler>
     <CascadingAuthenticationState>
         <Router AppAssembly="@typeof(App).Assembly">
             <Found Context="routeData">
+                <AuthorizeView>
+                    @if (StaticOptions.IsSSR)
+                    {
+                        _httpService.SetRefreshToken(context.User, AccessToken, RefreshToken);
+                    }
+                </AuthorizeView>
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
                         @if (context.User.Identity?.IsAuthenticated != true)
@@ -31,14 +37,13 @@
 
 @code{
     [Parameter]
-    public string Token { get; set; }
+    public string AccessToken { get; set; }
+    [Parameter]
+    public string RefreshToken { get; set; }
 
     protected override void OnInitialized()
     {
-        if (StaticOptions.IsSSR && !string.IsNullOrWhiteSpace(Token))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
-        }
+
     }
 
 }

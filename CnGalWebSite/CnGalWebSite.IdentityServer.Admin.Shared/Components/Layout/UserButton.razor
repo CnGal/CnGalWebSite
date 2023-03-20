@@ -1,4 +1,4 @@
-﻿@inject NavigationManager Navigation
+﻿@inject NavigationManager NavigationManager
 
 
 <AuthorizeView Context="userContext">
@@ -25,26 +25,32 @@
 
     protected void OnLogin()
     {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
         if (StaticOptions.IsSSR)
         {
-            Navigation.NavigateTo($"Account/Login?returnUrl={Navigation.Uri.Replace(Navigation.BaseUri, "")}", true);
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
         }
         else
         {
-            Navigation.NavigateToLogin("authentication/login");
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
-
     }
 
     private void BeginSignOut()
     {
         @if (StaticOptions.IsSSR)
         {
-            Navigation.NavigateTo("Account/Logout", true);
+            NavigationManager.NavigateTo("Account/Logout", true);
         }
         else
         {
-            Navigation.NavigateToLogout("authentication/logout");
+            NavigationManager.NavigateToLogout("authentication/logout","/");
         }
     }
 }

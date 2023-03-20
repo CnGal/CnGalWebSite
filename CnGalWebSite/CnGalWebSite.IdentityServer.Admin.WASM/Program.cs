@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.IdentityServer.Admin.Shared;
+﻿using Blazored.LocalStorage;
+using CnGalWebSite.IdentityServer.Admin.Shared;
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.WASM;
@@ -12,6 +13,10 @@ StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? false : StaticOptions.
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+
+//本地存储
+builder.Services.AddBlazoredLocalStorage();
+
 
 //注册身份验证的HttpClient
 builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
