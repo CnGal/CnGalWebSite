@@ -10,6 +10,7 @@ public class CookieEvents : CookieAuthenticationEvents
 {
     private readonly IUserAccessTokenStore _store;
     private readonly IUserAccessTokenManagementService _userAccessTokenManagementService;
+    private readonly List<KeyValuePair<DateTime,string>> _failedCount = new List<KeyValuePair<DateTime, string>>();
 
     public CookieEvents(IUserAccessTokenStore store, IUserAccessTokenManagementService userAccessTokenManagementService)
     {
@@ -31,7 +32,21 @@ public class CookieEvents : CookieAuthenticationEvents
         var token = await _userAccessTokenManagementService.GetUserAccessTokenAsync(context.Principal);
         if (string.IsNullOrWhiteSpace(token))
         {
-            context.RejectPrincipal();
+            //添加失败记录
+            _failedCount.Add(new KeyValuePair<DateTime, string>(DateTime.UtcNow, id));
+            //清除过期记录
+            _failedCount.RemoveAll(s => s.Key < DateTime.UtcNow.AddSeconds(-30));
+            //判断错误次数
+            if (_failedCount.Count(s => s.Value == id) > 2)
+            {
+                context.RejectPrincipal();
+            }
+        }
+        else
+        {
+            //成功后清除记录
+            _failedCount.RemoveAll(s => s.Value == id);
         }
     }
+
 }
