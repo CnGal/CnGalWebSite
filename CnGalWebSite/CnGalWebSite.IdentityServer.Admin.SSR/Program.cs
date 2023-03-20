@@ -33,8 +33,8 @@ builder.Services.AddAccessTokenManagement();
 builder.Services.AddSingleton<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
-builder.Services.AddScoped<IHttpService,HttpService>();
-builder.Services.AddHttpClient<IHttpService, HttpService>(client=>
+builder.Services.AddTransient<IHttpService, HttpService>();
+builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);
 });
@@ -46,8 +46,8 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client=>
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
 //注册Cookie服务
-//builder.Services.AddScoped<CookieEvents>();
-builder.Services.AddScoped<OidcEvents>();
+builder.Services.AddTransient<CookieEvents>();
+builder.Services.AddTransient<OidcEvents>();
 
 //默认采用cookie认证方案，添加oidc认证方案
 builder.Services.AddAuthentication(options =>
@@ -56,11 +56,17 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = "oidc";
     options.DefaultSignOutScheme = "oidc";
 })
-    .AddCookie("cookie")
+    .AddCookie("cookie", options =>
+    {
+        options.Cookie.Name = "__Host-blazor";
+        options.Cookie.SameSite = SameSiteMode.Lax;
+
+        options.EventsType = typeof(CookieEvents);
+    })
     .AddOpenIdConnect("oidc", options =>
     {
         //id4服务的地址
-        options.Authority =builder.Configuration["Authority"];
+        options.Authority = builder.Configuration["Authority"];
 
         //id4配置的ClientId以及ClientSecrets
         options.ClientId = builder.Configuration["ClientId"];
@@ -88,6 +94,7 @@ builder.Services.AddAuthentication(options =>
         //注册事件
         options.EventsType = typeof(OidcEvents);
 
+
         options.Events.OnUserInformationReceived = (context) =>
         {
             //回顾之前关于WebAssembly的例子，涉及到数组的转换，这里也一样要处理
@@ -108,7 +115,7 @@ builder.Services.AddAuthentication(options =>
                 claimsId.AddClaim(new Claim("role", roleElement.ToString()));
             }
 
-          
+
             return Task.CompletedTask;
         };
     });
@@ -121,7 +128,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
-
 
 var app = builder.Build();
 //设置请求来源

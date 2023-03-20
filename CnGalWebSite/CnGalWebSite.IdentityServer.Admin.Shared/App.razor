@@ -5,7 +5,8 @@
         <Router AppAssembly="@typeof(App).Assembly">
             <Found Context="routeData">
                 <AuthorizeView>
-                    @{
+                    @if (StaticOptions.IsSSR)
+                    {
                         _httpService.SetRefreshToken(context.User, AccessToken, RefreshToken);
                     }
                 </AuthorizeView>

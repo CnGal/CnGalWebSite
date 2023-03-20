@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using IdentityModel.Client;
 using static IdentityModel.OidcConstants;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Blazored.LocalStorage;
 
 namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
 {
@@ -21,7 +24,10 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<HttpService> _logger;
+        private readonly NavigationManager _navigationManager;
+
         private readonly string _baseUrl = "https://localhost:5001/";
+        private bool _isPreRender =true;
 
         public bool IsAuth { get; set; }
 
@@ -30,29 +36,49 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
             PropertyNameCaseInsensitive = true,
         };
 
-        public HttpService(IHttpClientFactory httpClientFactory, ILogger<HttpService> logger)
+        public HttpService(IHttpClientFactory httpClientFactory, ILogger<HttpService> logger, NavigationManager navigationManager)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _navigationManager = navigationManager;
         }
         public async Task<TValue> GetAsync<TValue>(string url)
-        { 
+        {
             _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
-            var client = GetClient();
-            return await client.GetFromJsonAsync<TValue>(_baseUrl+ url, _jsonOptions);
+            var client =await GetClient();
+
+            try
+            {
+                return await client.GetFromJsonAsync<TValue>(_baseUrl + url, _jsonOptions);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                _navigationManager.NavigateToLogout("authentication/logout", "/");
+                throw new Exception("令牌过期，请重新登入", ex);
+            }
         }
 
         public async Task<TValue> PostAsync<TModel, TValue>(string url, TModel model)
         {
-            var client = GetClient();
+            var client =await GetClient();
             var result = await client.PostAsJsonAsync(_baseUrl + url, model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<TValue>(jsonContent, _jsonOptions);
         }
 
-        private HttpClient GetClient()
+        private async Task<HttpClient> GetClient()
         {
-            return _httpClientFactory.CreateClient(IsAuth? "AuthAPI" : "AnonymousAPI");
+            if (_isPreRender)
+            {
+                await Task.Delay(100);
+            }
+            _isPreRender = false;
+            return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
+        }
+
+        public Task SetRefreshToken(ClaimsPrincipal user, string accessToken, string refreshToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
