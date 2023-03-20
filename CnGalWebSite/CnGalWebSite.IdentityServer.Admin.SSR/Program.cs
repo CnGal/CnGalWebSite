@@ -33,21 +33,21 @@ builder.Services.AddAccessTokenManagement();
 builder.Services.AddSingleton<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
-builder.Services.AddTransient<IHttpService,HttpService>();
+builder.Services.AddScoped<IHttpService,HttpService>();
 builder.Services.AddHttpClient<IHttpService, HttpService>(client=>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);
 });
 //添加认身份证
-builder.Services.AddAuthorization(options =>
-{
-    // By default, all incoming requests will be authorized according to the default policy
-    // comment out if you want to drive the login/logout workflow from the UI
-    options.FallbackPolicy = options.DefaultPolicy;
-});
+//builder.Services.AddAuthorization(options =>
+//{
+//    // By default, all incoming requests will be authorized according to the default policy
+//    // comment out if you want to drive the login/logout workflow from the UI
+//    options.FallbackPolicy = options.DefaultPolicy;
+//});
 //注册Cookie服务
-builder.Services.AddTransient<CookieEvents>();
-builder.Services.AddTransient<OidcEvents>();
+//builder.Services.AddScoped<CookieEvents>();
+builder.Services.AddScoped<OidcEvents>();
 
 //默认采用cookie认证方案，添加oidc认证方案
 builder.Services.AddAuthentication(options =>
@@ -56,13 +56,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = "oidc";
     options.DefaultSignOutScheme = "oidc";
 })
-    .AddCookie("cookie", options =>
-    {
-        options.Cookie.Name = "__Host-blazor";
-        options.Cookie.SameSite = SameSiteMode.Lax;
-
-        options.EventsType = typeof(CookieEvents);
-    })
+    .AddCookie("cookie")
     .AddOpenIdConnect("oidc", options =>
     {
         //id4服务的地址
@@ -93,7 +87,6 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters.NameClaimType = "name";
         //注册事件
         options.EventsType = typeof(OidcEvents);
-
 
         options.Events.OnUserInformationReceived = (context) =>
         {
@@ -128,6 +121,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
+
 
 var app = builder.Build();
 //设置请求来源

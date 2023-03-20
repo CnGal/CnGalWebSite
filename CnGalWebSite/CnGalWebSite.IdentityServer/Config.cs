@@ -68,7 +68,9 @@ namespace CnGalWebSite.IdentityServer
                     AlwaysIncludeUserClaimsInIdToken = true,
                     //令牌有效期
                     AccessTokenLifetime=10,
+                    AbsoluteRefreshTokenLifetime=20,
                     AllowOfflineAccess=true,
+                    UpdateAccessTokenClaimsOnRefresh=true,
                 },
                 //IdentityServer.Addmin.WASM
                 new Client

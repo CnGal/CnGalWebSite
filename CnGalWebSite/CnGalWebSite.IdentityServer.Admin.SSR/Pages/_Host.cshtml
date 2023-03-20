@@ -35,9 +35,10 @@
 </head>
 <body>
     @{
-        var token = await HttpContext.GetTokenAsync("access_token").ConfigureAwait(false);
+        var accessToken = await HttpContext.GetTokenAsync("access_token").ConfigureAwait(false);
+        var refreshToken = await HttpContext.GetTokenAsync("refresh_token").ConfigureAwait(false);
     }
-    <component type="typeof(App)" render-mode="ServerPrerendered" param-Token="token" />
+    <component type="typeof(App)" render-mode="ServerPrerendered" param-AccessToken="accessToken" param-RefreshToken="refreshToken" />
 
     <div id="blazor-error-ui">
         发生了一个未知错误，请加群 761794704 反馈，或者按下F12查看控制台输出

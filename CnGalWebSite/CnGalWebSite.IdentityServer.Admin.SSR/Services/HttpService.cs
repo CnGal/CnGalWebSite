@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using IdentityModel.AspNetCore.AccessTokenManagement;
 using IdentityModel.Client;
+using System.Security.Claims;
 
 namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
 {
@@ -22,6 +23,7 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
         private readonly HttpClient _client;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly IUserAccessTokenManagementService _tokenManagementService;
+        private readonly IUserAccessTokenStore _userAccessTokenStore;
 
         public bool IsAuth { get; set; }
 
@@ -30,15 +32,15 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
             PropertyNameCaseInsensitive = true,
         };
 
-        public HttpService(
-               HttpClient client,
-               AuthenticationStateProvider authenticationStateProvider,
+        public HttpService(HttpClient client, IUserAccessTokenStore userAccessTokenStore,AuthenticationStateProvider authenticationStateProvider,
                IUserAccessTokenManagementService tokenManagementService)
         {
             _client = client;
             _authenticationStateProvider = authenticationStateProvider;
             _tokenManagementService = tokenManagementService;
+            _userAccessTokenStore = userAccessTokenStore;
         }
+
         public async Task<TValue> GetAsync<TValue>(string url)
         {
             var client =await GetClient();
@@ -60,6 +62,14 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
 
             _client.SetBearerToken(token);
             return _client;
+        }
+
+        public async Task SetRefreshToken(ClaimsPrincipal user, string accessToken, string refreshToken)
+        {
+            if (await _userAccessTokenStore.GetTokenAsync(user) == null)
+            {
+                await _userAccessTokenStore.StoreTokenAsync(user, accessToken, new DateTimeOffset(DateTime.Now), refreshToken);
+            }
         }
     }
 }
