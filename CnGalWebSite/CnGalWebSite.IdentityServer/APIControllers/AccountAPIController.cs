@@ -27,39 +27,15 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/account/[action]")]
     public class AccountAPIController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
-        private readonly IClientStore _clientStore;
-        private readonly IAuthenticationSchemeProvider _schemeProvider;
-        private readonly IEventService _events;
-        private readonly IVerificationCodeService _verificationCodeService;
-        private readonly IMessageService _messageService;
-        private readonly IGeetestService _geetestService;
         private readonly IAccountService _accountService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IConfiguration _configuration;
 
-        public AccountAPIController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IIdentityServerInteractionService interaction,
-            IClientStore clientStore, IAccountService accountService, IConfiguration configuration, IGeetestService geetestService,
-        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository,
-        IEventService events, IVerificationCodeService verificationCodeService, IMessageService messageService)
+        public AccountAPIController( IIdentityServerInteractionService interaction, IAccountService accountService,IRepository<ApplicationUser, string> userRepository)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _interaction = interaction;
-            _clientStore = clientStore;
-            _schemeProvider = schemeProvider;
-            _events = events;
-            _verificationCodeService = verificationCodeService;
-            _messageService = messageService;
             _userRepository = userRepository;
             _accountService = accountService;
-            _configuration = configuration;
-            _geetestService = geetestService;
         }
 
         [HttpGet]

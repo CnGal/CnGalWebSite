@@ -29,7 +29,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
 builder.Services.AddHttpClient("AnonymousAPI");
 
 //注入自定义服务
-builder.Services.AddScoped<IDataCacheService, DataCacheService>();
+builder.Services.AddScoped<ISingleDataCacheService, SingleDataCacheService>();
 builder.Services.AddScoped<IHttpService, HttpService>();
 //修改Masa主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>

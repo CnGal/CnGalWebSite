@@ -1,0 +1,118 @@
+﻿@page "/admin/users"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+
+<MCard>
+    <MCardTitle>
+        用户列表
+        <MSpacer></MSpacer>
+        <MTextField Value="_search" ValueChanged="OnSearch" TValue="string"
+                    AppendIcon="mdi-magnify"
+                    Label="搜索"
+                    SingleLine
+                    HideDetails="true"></MTextField>
+    </MCardTitle>
+    <MDataTable Headers="_headers"
+                Items="_items"
+                MultiSort
+                OnOptionsUpdate="HandleOnOptionsUpdate"
+                ServerItemsLength="_totalDesserts"
+                Loading="_loading"
+                Class="elevation-1">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Small
+                       Class="mr-2"
+                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </MDataTable>
+</MCard>
+<div>
+
+</div>
+@code {
+
+    private int _totalDesserts = 0;
+    private IEnumerable<UserOverviewModel> _items = new List<UserOverviewModel>();
+    private bool _loading = true;
+    private string _search;
+    private QueryResultModel<UserOverviewModel> Data = new QueryResultModel<UserOverviewModel>();
+
+    private List<DataTableHeader<UserOverviewModel>> _headers = new List<DataTableHeader<UserOverviewModel>>
+    {
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserOverviewModel.Id)
+          },
+          new (){ Text= "用户名", Value= nameof(UserOverviewModel.UserName)},
+          new (){ Text= "电子邮箱", Value= nameof(UserOverviewModel.Email)},
+           new (){ Text= "操作", Value= "actions",Sortable=false }
+        };
+
+    public void HandleOnOptionsUpdate(DataOptions options)
+    {
+        CopyOptions(Data.Parameter,options);
+        GetDataFromApi();
+    }
+
+    protected override void OnInitialized()
+    {
+        //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
+        GetDataFromApi();
+    }
+
+    public void GetDataFromApi()
+    {
+        _loading = true;
+        GetDataAsync().ContinueWith(task =>
+        {
+            var data = task.Result;
+            _items = data.items;
+            _totalDesserts = data.total;
+            _loading = false;
+
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void OnSearch(string text)
+    {
+        Data.Parameter.SearchText = text;
+        StateHasChanged();
+        GetDataFromApi();
+    }
+
+    public async Task<(IEnumerable<UserOverviewModel> items, int total)> GetDataAsync()
+    {
+        Data = await _httpService.PostAsync<QueryParameterModel, QueryResultModel<UserOverviewModel>>("api/users/List", Data.Parameter);
+        return (Data.Items, Data.Total);
+    }
+
+    public void CopyOptions(QueryParameterModel parameter, DataOptions options)
+    {
+        parameter.SortBy = options.SortBy;
+        parameter.SortDesc = options.SortDesc;
+        parameter.MultiSort = options.MultiSort;
+        parameter.MustSort = options.MustSort;
+        parameter.GroupBy = options.GroupBy;
+        parameter.GroupDesc = options.GroupDesc;
+        parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
+        parameter.Page = options.Page == 0 ? 1 : options.Page;
+    }
+
+    public void EditItem(UserOverviewModel item)
+    {
+
+    }
+
+}

@@ -17,7 +17,7 @@ StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.P
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //自定义服务
-builder.Services.AddScoped<IDataCacheService, DataCacheService>();
+builder.Services.AddScoped(typeof(ISingleDataCacheService<>), typeof(SingleDataCacheService<>));
 builder.Services.AddScoped<IHttpService, HttpService>();
 //设置主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
