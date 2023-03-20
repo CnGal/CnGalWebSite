@@ -20,7 +20,6 @@ using NetCore.AutoRegisterDi;
 using NewCngal.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using System;
-using Microsoft.AspNetCore.Authentication.QQ;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -151,19 +150,18 @@ namespace CnGalWebSite.IdentityServer
 
 
             services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    options.ClientId = Configuration["GoogleClientId"];
-                    options.ClientSecret = Configuration["GoogleClientSecret"];
-                })
+                //.AddGoogle(options =>
+                //{
+                //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                //    options.ClientId = Configuration["GoogleClientId"];
+                //    options.ClientSecret = Configuration["GoogleClientSecret"];
+                //})
                 .AddGitHub(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     options.ClientId = Configuration["GitHubClientId"];
                     options.ClientSecret = Configuration["GitHubClientSecret"];
                 })
-
                 .AddQQ(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;

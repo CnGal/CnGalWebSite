@@ -33,7 +33,7 @@ builder.Services.AddAccessTokenManagement();
 builder.Services.AddSingleton<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
-builder.Services.AddTransient<IHttpService, HttpService>();
+builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);
@@ -46,8 +46,8 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
 //注册Cookie服务
-builder.Services.AddTransient<CookieEvents>();
-builder.Services.AddTransient<OidcEvents>();
+builder.Services.AddSingleton<CookieEvents>();
+builder.Services.AddSingleton<OidcEvents>();
 
 //默认采用cookie认证方案，添加oidc认证方案
 builder.Services.AddAuthentication(options =>
