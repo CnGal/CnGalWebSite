@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.IdentityServer.Admin.Shared.Services
+namespace CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 {
-    public class DataCacheService:IDataCacheService
+    public class RoleDetailModel:RoleOverviewModel
     {
+
     }
 }

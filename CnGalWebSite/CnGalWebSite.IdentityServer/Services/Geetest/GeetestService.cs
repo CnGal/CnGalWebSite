@@ -19,7 +19,7 @@ namespace CnGalWebSite.IdentityServer.Services.Geetest
             _configuration = configuration;
         }
 
-        public GeetestCodeModel GetGeetestCode(Controller controller)
+        public GeetestCodeModel GetGeetestCode(ControllerBase controller)
         {
             var ip = controller.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (string.IsNullOrWhiteSpace(ip))

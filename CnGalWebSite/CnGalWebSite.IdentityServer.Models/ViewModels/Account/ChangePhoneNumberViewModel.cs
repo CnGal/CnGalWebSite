@@ -5,7 +5,6 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Account
 {
     public class ChangePhoneNumberViewModel : ChangePhoneNumberInputModel
     {
-        public GeetestCodeModel GeetestCode { get; set; } = new GeetestCodeModel();
 
     }
 }

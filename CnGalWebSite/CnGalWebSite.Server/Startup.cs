@@ -11,7 +11,6 @@ using CnGalWebSite.Server.Plumbing;
 using CnGalWebSite.Server.Services;
 using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Extentions;
-using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using IdentityModel.AspNetCore.AccessTokenManagement;
 using Microsoft.AspNetCore.Builder;
@@ -147,11 +146,11 @@ namespace CnGalWebSite.Server
             //默认采用cookie认证方案，添加oidc认证方案
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = "cookie";
+                options.DefaultScheme = "cookies";
                 options.DefaultChallengeScheme = "oidc";
                 options.DefaultSignOutScheme = "oidc";
             })
-                .AddCookie("cookie", options =>
+                .AddCookie("cookies", options =>
                 {
                     options.Cookie.Name = "__Host-blazor";
                     options.Cookie.SameSite = SameSiteMode.Lax;

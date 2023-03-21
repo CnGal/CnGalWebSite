@@ -13,9 +13,6 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Account
         public bool ShowCpltToast { get; set; }
 
         public AccountBindInfor BindInfor { get; set; } = new AccountBindInfor();
-
-        public GeetestCodeModel GeetestCode { get; set; } = new GeetestCodeModel();
-
     }
 
     public class SelectModifyExternalFieldModel : ExternalProvider

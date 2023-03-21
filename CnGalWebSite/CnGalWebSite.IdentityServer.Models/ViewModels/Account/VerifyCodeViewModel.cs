@@ -8,8 +8,5 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Account
     {
         public bool IsDisableRepost { get; set; }
         public bool IsPhoneNumber { get { return Type.IsPhoneNumber(); } }
-
-        public GeetestCodeModel GeetestCode { get; set; } = new GeetestCodeModel();
-
     }
 }

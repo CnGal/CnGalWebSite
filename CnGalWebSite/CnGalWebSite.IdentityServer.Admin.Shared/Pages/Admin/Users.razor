@@ -1,0 +1,184 @@
+﻿@page "/admin/users"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Small Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == "roles")
+        {
+           <CnGalWebSite.IdentityServer.Admin.Shared.Components.Roles.RoleChips Model="context"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="500">
+    <MCard>
+        <MCardTitle>
+        @(string.IsNullOrWhiteSpace( _tempItem.Id)? $"添加{_name}" : $"编辑{_name}")    
+        </MCardTitle>
+        <MCardText>
+            <MTextField @bind-Value="_tempItem.UserName" Label="用户名"></MTextField>
+
+            <MTextField @bind-Value="_tempItem.Email" Label="电子邮箱" Type="email"></MTextField>
+            <MCheckbox @bind-Value="_tempItem.ChangePassword" Label="修改密码" TValue="bool">
+            </MCheckbox>
+
+            @if (_tempItem.ChangePassword)
+            {
+                <MTextField @bind-Value="_tempItem.Password" Label="密码" Type="password"></MTextField>
+
+                <MTextField @bind-Value="_tempItem.ConfirmPassword" Label="确认密码" Type="password"></MTextField>
+
+            }
+
+
+            <span>角色</span>
+            <AuthorizeView>
+                <MRow>
+                    @foreach (var item in _roles)
+                    {
+                        <MCol Class="pt-0 pb-0">
+                            <MCheckbox Value="_tempItem.Roles.Contains(item)" Label="@item" ValueChanged="@((e)=>EditUserRole(e,item))" TValue="bool" Disabled="@(!context.User.IsInRole("SuperAdmin"))" HideDetails="true">
+                            </MCheckbox>
+                        </MCol>
+                    }
+                </MRow>
+            </AuthorizeView>
+        </MCardText>
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+@code {
+    private bool _editDialog;
+    private UserOverviewModel _editedItem;
+    private UserEditModel _tempItem;
+    private string _baseUrl = "api/users/";
+    private string _name = "用户";
+
+    private List<DataTableHeader<UserOverviewModel>> _headers = new List<DataTableHeader<UserOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserOverviewModel.Id)
+          },
+          new (){ Text= "角色", Value= "roles",Sortable=false },
+          new (){ Text= "用户名", Value= nameof(UserOverviewModel.UserName)},
+          new (){ Text= "电子邮箱", Value= nameof(UserOverviewModel.Email)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    IEnumerable<string> _roles;
+
+    DataTableCard<UserOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _roles = await _httpService.GetAsync<IEnumerable<string>>("api/roles/all");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有用户角色失败");
+        }
+    }
+
+    public void EditItem(UserOverviewModel item)
+    {
+        //创建临时对象
+        _tempItem = new UserEditModel();
+        _editedItem = item;
+        //同步
+        SynchronizationProperties(_tempItem, _editedItem);
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<UserEditModel, Result>(_baseUrl+"edit", _tempItem);
+            if (result.Success)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                {
+                    await PopupService.ToastAsync(result.Message, AlertTypes.Success);
+                }
+                SynchronizationProperties(_editedItem, _tempItem);
+                _editDialog = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, string.IsNullOrWhiteSpace( _tempItem.Id) ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+
+    public void SynchronizationProperties(UserOverviewModel des, UserOverviewModel src)
+    {
+        des.SynchronizationProperties(src);
+        //复制列表
+        des.Roles = new List<string>();
+        foreach (var item in src.Roles)
+        {
+            des.Roles.Add(item);
+        }
+    }
+
+    public void EditUserRole(bool select, string role)
+    {
+        if (select)
+        {
+            _tempItem.Roles.Add(role);
+        }
+        else
+        {
+            _tempItem.Roles.Remove(role);
+        }
+
+        StateHasChanged();
+    }
+
+    public void AddItem()
+    {
+        _tempItem = new UserEditModel();
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+}

@@ -37,7 +37,7 @@ public class CookieEvents : CookieAuthenticationEvents
             //清除过期记录
             _failedCount.RemoveAll(s => s.Key < DateTime.UtcNow.AddSeconds(-30));
             //判断错误次数
-            if (_failedCount.Count(s => s.Value == id) > 2)
+            if (_failedCount.Count(s => s.Value == id) > 3)
             {
                 context.RejectPrincipal();
             }

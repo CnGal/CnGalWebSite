@@ -127,7 +127,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VerificationCodes");
+                    b.ToTable("VerificationCodes", (string)null);
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Messages.SendRecord", b =>
@@ -155,7 +155,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("SendRecords");
+                    b.ToTable("SendRecords", (string)null);
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Records.OperationRecord", b =>
@@ -180,7 +180,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("OperationRecords");
+                    b.ToTable("OperationRecords", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

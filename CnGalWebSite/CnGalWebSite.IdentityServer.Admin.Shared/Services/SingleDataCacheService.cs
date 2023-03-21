@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.IdentityServer.Admin.Shared.Services
 {
-    public interface IDataCacheService
+    public class SingleDataCacheService<TModel> : ISingleDataCacheService<TModel> where TModel : class,new()
     {
+        public TModel Date { get; set; }=new TModel();
     }
 }
