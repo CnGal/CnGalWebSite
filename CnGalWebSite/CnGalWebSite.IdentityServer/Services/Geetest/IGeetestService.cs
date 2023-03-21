@@ -6,7 +6,7 @@ namespace CnGalWebSite.IdentityServer.Services.Geetest
 {
     public interface IGeetestService
     {
-        GeetestCodeModel GetGeetestCode(Controller controller);
+        GeetestCodeModel GetGeetestCode(ControllerBase controller);
 
         bool CheckRecaptcha(HumanMachineVerificationResult model);
     }

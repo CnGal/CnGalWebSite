@@ -7,6 +7,10 @@
 html {
     overflow: hidden;
 }
+/*自定义样式*/
+.w-100{
+    width:100%;
+}
 /*Layout*/
 header {
     z-index: 2!important;
@@ -84,6 +88,7 @@ header {
 .progressing-card {
     display: flex;
     flex-direction: column;
+    padding-top:2rem !important;
 }
 /*dl*/
 dl {

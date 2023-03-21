@@ -1,0 +1,83 @@
+﻿@inject IHttpService _httpService
+
+
+@if (Model == null)
+{
+    <ProgressingCard />
+}
+else
+{
+    <MCard>
+        <MCardTitle>
+            @Model.Name
+        </MCardTitle>
+        <MCardText>
+            @Model.Id
+        </MCardText>
+        <MCardActions>
+            <DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@($"api/roles/listuser?id={Id}")" Title="@($"用户列表")" ShowAddButton="false" Class="w-100">
+                <ItemColContent>
+                    @if (context.Header.Value == "roles")
+                    {
+                        <CnGalWebSite.IdentityServer.Admin.Shared.Components.Roles.RoleChips Model="context" />
+                    }
+                    else
+                    {
+                        @context.Value
+                    }
+                </ItemColContent>
+            </DataTableCard>
+        </MCardActions>
+       
+    </MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    RoleDetailModel Model;
+
+    private bool _editDialog;
+    private UserOverviewModel _editedItem;
+    private UserEditModel _tempItem;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private List<DataTableHeader<UserOverviewModel>> _headers = new List<DataTableHeader<UserOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserOverviewModel.Id)
+          },
+          new (){ Text= "角色", Value= "roles",Sortable=false },
+          new (){ Text= "用户名", Value= nameof(UserOverviewModel.UserName)},
+          new (){ Text= "电子邮箱", Value= nameof(UserOverviewModel.Email)}
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = await _httpService.GetAsync<RoleDetailModel>($"api/roles/view?id={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取角色信息失败");
+        }
+    }
+}

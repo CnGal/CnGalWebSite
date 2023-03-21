@@ -9,7 +9,9 @@ using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 
 namespace CnGalWebSite.IdentityServer.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>,
+        ApplicationUserRole, IdentityUserLogin<string>,
+        IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public DbSet<VerificationCode> VerificationCodes { get; set; }
         public DbSet<SendRecord> SendRecords { get; set; }
@@ -30,6 +32,25 @@ namespace CnGalWebSite.IdentityServer.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
 
+            //建立用户角色关联
+            builder.Entity<ApplicationUserRole>(userRole =>
+            {
+                userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+                userRole.HasOne(ur => ur.Role)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+
+                userRole.HasOne(ur => ur.User)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
+
+            //限定名称唯一
+            builder.Entity<ApplicationUser>().HasIndex(g => g.UserName).IsUnique();
+
             //角色Id
             const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
             const string ROLE_ID = ADMIN_ID;
@@ -38,10 +59,10 @@ namespace CnGalWebSite.IdentityServer.Data
             const string EDITOR_ROLE_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e578";
 
             //创建种子角色
-            builder.Entity<IdentityRole>().HasData(new IdentityRole {Id = ROLE_ID, Name = "Admin", NormalizedName = "Admin"},
-                new IdentityRole { Name = "User", NormalizedName = "USER", Id = USER_ROLE_ID },
-                new IdentityRole { Name = "SuperAdmin", NormalizedName = "SUPERADMIN", Id = SUPER_ADMIN_ROLE_ID } ,
-                new IdentityRole { Name = "Editor", NormalizedName = "EDITOR", Id = EDITOR_ROLE_ID });
+            builder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = ROLE_ID, Name = "Admin", NormalizedName = "ADMIN"},
+                new ApplicationRole { Name = "User", NormalizedName = "USER", Id = USER_ROLE_ID },
+                new ApplicationRole { Name = "SuperAdmin", NormalizedName = "SUPERADMIN", Id = SUPER_ADMIN_ROLE_ID } ,
+                new ApplicationRole { Name = "Editor", NormalizedName = "EDITOR", Id = EDITOR_ROLE_ID });
 
             //创建超级管理员
             var hasher = new PasswordHasher<ApplicationUser>();
@@ -59,20 +80,20 @@ namespace CnGalWebSite.IdentityServer.Data
             });
 
             //添加管理员角色
-            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            builder.Entity<ApplicationUserRole>().HasData(new ApplicationUserRole
                 {
                     RoleId = ROLE_ID,
                     UserId = ADMIN_ID
-                }, new IdentityUserRole<string>
+                }, new ApplicationUserRole
                 {
                     RoleId = USER_ROLE_ID,
                     UserId = ADMIN_ID
                 },
-                new IdentityUserRole<string>
+                new ApplicationUserRole
                 {
                     RoleId = SUPER_ADMIN_ROLE_ID,
                     UserId = ADMIN_ID
-                }, new IdentityUserRole<string>
+                }, new ApplicationUserRole
                 {
                     RoleId = EDITOR_ROLE_ID,
                     UserId = ADMIN_ID

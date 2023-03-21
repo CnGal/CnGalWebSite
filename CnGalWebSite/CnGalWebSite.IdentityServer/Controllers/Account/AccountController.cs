@@ -301,7 +301,6 @@ namespace IdentityServerHost.Quickstart.UI
             var model = new RegisterViewModel
             {
                 ReturnUrl = returnUrl,
-                GeetestCode = _geetestService.GetGeetestCode(this),
             };
 
             //判断是否外部登入跳转
@@ -406,7 +405,6 @@ namespace IdentityServerHost.Quickstart.UI
                 NewPhoneNumber = newPhoneNumber,
                 UserId = userId,
                 SecondCode = secondCode,
-                GeetestCode = _geetestService.GetGeetestCode(this),
                 Type = type
             }));
         }
@@ -416,7 +414,7 @@ namespace IdentityServerHost.Quickstart.UI
         public async Task<IActionResult> VerifyCode(VerifyCodeInputModel model, string button)
         {
             //查找用户
-            var user = await FindLoginUser() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
+            var user = await FindLoginUserAsync() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
             if (user == null)
             {
                 //伪装正确
@@ -573,7 +571,6 @@ namespace IdentityServerHost.Quickstart.UI
                 UserId = userId,
                 Code = code,
                 SecondCode = secondCode,
-                GeetestCode = _geetestService.GetGeetestCode(this)
             }));
         }
 
@@ -593,7 +590,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUser() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
+            var user = await FindLoginUserAsync() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
             if (user == null)
             {
                 //伪装正确
@@ -655,7 +652,6 @@ namespace IdentityServerHost.Quickstart.UI
             return await Task.FromResult(View(new ResetPasswordViewModel
             {
                 ReturnUrl = returnUrl,
-                GeetestCode = _geetestService.GetGeetestCode(this),
             }));
         }
 
@@ -743,7 +739,7 @@ namespace IdentityServerHost.Quickstart.UI
         public async Task<IActionResult> SelectModifyField(string returnUrl, string secondCode, bool showCpltToast)
         {
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 //跳转登录
@@ -775,7 +771,7 @@ namespace IdentityServerHost.Quickstart.UI
                 }
             }
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 //跳转登录
@@ -818,7 +814,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 return RedirectToAction("Login", new { model.ReturnUrl });
@@ -853,7 +849,6 @@ namespace IdentityServerHost.Quickstart.UI
             {
                 ReturnUrl = returnUrl,
                 SecondCode = secondCode,
-                GeetestCode = _geetestService.GetGeetestCode(this),
             }));
         }
 
@@ -873,7 +868,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 return RedirectToAction("Login", new { model.ReturnUrl });
@@ -912,7 +907,6 @@ namespace IdentityServerHost.Quickstart.UI
             {
                 ReturnUrl = returnUrl,
                 SecondCode = secondCode,
-                GeetestCode = _geetestService.GetGeetestCode(this),
             }));
         }
 
@@ -932,7 +926,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 return RedirectToAction("Login", new { model.ReturnUrl });
@@ -986,7 +980,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUser();
+            var user = await FindLoginUserAsync();
             if (user == null)
             {
                 return RedirectToAction("Login", new { model.ReturnUrl });
@@ -1091,7 +1085,6 @@ namespace IdentityServerHost.Quickstart.UI
                 ReturnUrl = returnUrl,
                 Username = context?.LoginHint,
                 ExternalProviders = await _accountService.GetExternalProvidersAsync(context),
-                GeetestCode = _geetestService.GetGeetestCode(this)
             };
         }
 
@@ -1100,7 +1093,6 @@ namespace IdentityServerHost.Quickstart.UI
             var vm = await BuildLoginViewModelAsync(model.ReturnUrl);
             vm.Username = model.Username;
             vm.RememberLogin = model.RememberLogin;
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1170,7 +1162,6 @@ namespace IdentityServerHost.Quickstart.UI
         {
             var vm = new RegisterViewModel();
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1179,7 +1170,6 @@ namespace IdentityServerHost.Quickstart.UI
             var vm = new VerifyCodeViewModel();
 
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             vm.IsDisableRepost = isDisable;
             return vm;
         }
@@ -1188,7 +1178,6 @@ namespace IdentityServerHost.Quickstart.UI
         {
             var vm = new AddPhoneNumberViewModel();
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1196,7 +1185,6 @@ namespace IdentityServerHost.Quickstart.UI
         {
             var vm = new ResetPasswordViewModel();
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1223,7 +1211,6 @@ namespace IdentityServerHost.Quickstart.UI
             model.ReturnUrl = returnUrl;
             model.SecondCode = secondCode;
             model.ShowCpltToast = showCpltToast;
-            model.GeetestCode = _geetestService.GetGeetestCode(this);
             return model;
         }
 
@@ -1231,7 +1218,6 @@ namespace IdentityServerHost.Quickstart.UI
         {
             var vm = new ChangeEmailViewModel();
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1239,7 +1225,6 @@ namespace IdentityServerHost.Quickstart.UI
         {
             var vm = new ChangePhoneNumberViewModel();
             vm.SynchronizationProperties(model);
-            vm.GeetestCode = _geetestService.GetGeetestCode(this);
             return vm;
         }
 
@@ -1449,7 +1434,7 @@ namespace IdentityServerHost.Quickstart.UI
             return IdentityResult.Success;
         }
 
-        private async Task<ApplicationUser> FindLoginUser()
+        private async Task<ApplicationUser> FindLoginUserAsync()
         {
             var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject || s.Type == ClaimTypes.NameIdentifier)?.Value;
             return await _userRepository.FirstOrDefaultAsync(s => s.Id == id);

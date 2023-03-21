@@ -1,7 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Claims;
 using CnGalWebSite.Extensions;
+using CnGalWebSite.IdentityServer.Admin.SSR.Models;
+using CnGalWebSite.IdentityServer.Data;
 using IdentityModel.AspNetCore.AccessTokenManagement;
+using Microsoft.EntityFrameworkCore;
 
 namespace CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 
@@ -11,39 +14,54 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 /// </summary>
 public class ServerSideTokenStore : IUserAccessTokenStore
 {
-    private readonly ConcurrentDictionary<string, UserAccessToken> _tokens = new ConcurrentDictionary<string, UserAccessToken>();
+    private readonly ApplicationDbContext _context;
 
-    public Task ClearTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
+    public ServerSideTokenStore(ApplicationDbContext context)
     {
-        var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
-        
-        _tokens.TryRemove(sub, out _);
-        return Task.CompletedTask;
+        _context = context;
     }
 
-    public Task<UserAccessToken?> GetTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
+    public async Task ClearTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
     {
         var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
-        
-        _tokens.TryGetValue(sub, out var value);
-        
-        return Task.FromResult(value);
+
+        await _context.AppUserAccessTokens.Where(s => s.UserId == sub).ExecuteDeleteAsync();
     }
 
-    public Task StoreTokenAsync(ClaimsPrincipal user, string accessToken, DateTimeOffset expiration, string? refreshToken = null, UserAccessTokenParameters? parameters = null)
+    public async Task<UserAccessToken?> GetTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
     {
         var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
-        
-        var token = new UserAccessToken
+
+        var value =await _context.AppUserAccessTokens.FirstOrDefaultAsync(s => s.UserId == sub);
+        if (value == null)
         {
+            return null;
+        }
+        else
+        {
+            return new UserAccessToken
+            {
+                AccessToken = value.AccessToken,
+                Expiration = value.Expiration,
+                RefreshToken = value.RefreshToken,
+            };
+        }
+       
+    }
+
+    public async Task StoreTokenAsync(ClaimsPrincipal user, string accessToken, DateTimeOffset expiration, string? refreshToken = null, UserAccessTokenParameters? parameters = null)
+    {
+        var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
+
+        await _context.AppUserAccessTokens.Where(s => s.UserId == sub).ExecuteDeleteAsync();
+        await _context.AppUserAccessTokens.AddAsync(new AppUserAccessToken
+        {
+            UserId = sub,
             AccessToken = accessToken,
+            RefreshToken = refreshToken,
             Expiration = expiration,
-            RefreshToken = refreshToken
-        };
-        
-        _tokens[sub] = token;
-        
-        return Task.CompletedTask;
+        });
+        await _context.SaveChangesAsync();
     }
 
 }

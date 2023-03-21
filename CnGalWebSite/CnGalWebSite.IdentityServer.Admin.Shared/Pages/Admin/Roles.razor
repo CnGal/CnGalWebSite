@@ -1,0 +1,150 @@
+﻿@page "/admin/roles"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+@using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
+
+<DataTableCard TModel="RoleOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Small Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            <MIcon Small Color="info"
+                   Class="mr-2"
+                   OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="500">
+    <MCard>
+        <MCardTitle>
+            @(string.IsNullOrWhiteSpace( _tempItem.Id)? "添加角色" : "编辑角色")
+        </MCardTitle>
+        <MCardText>
+            <MTextField @bind-Value="_tempItem.Name" Label="角色名"></MTextField>
+        </MCardText>
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+<MDialog @bind-Value="_detailDialog"
+         MaxWidth="1000">
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Roles.DetailCard Id="@_editedItem.Id" @ref="detailCard"/>
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private bool _detailDialog;
+    private RoleOverviewModel _editedItem;
+    private RoleEditModel _tempItem;
+    private string _baseUrl = "api/roles/";
+    private string _name = "角色";
+
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Roles.DetailCard detailCard;
+
+    private List<DataTableHeader<RoleOverviewModel>> _headers = new List<DataTableHeader<RoleOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RoleOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(RoleOverviewModel.Name)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    IEnumerable<string> _roles;
+
+    DataTableCard<RoleOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public void EditItem(RoleOverviewModel item)
+    {
+        //创建临时对象
+        _tempItem = new RoleEditModel();
+        _editedItem = item;
+        //同步
+        SynchronizationProperties(_tempItem, _editedItem);
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+    public async Task DetailItem(RoleOverviewModel item)
+    {
+        _editedItem = item;
+        if(detailCard!=null)
+        {
+           await detailCard.Refresh();
+        }
+        _detailDialog = true;
+        StateHasChanged();
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<RoleEditModel, Result>(_baseUrl + "edit", _tempItem);
+            if (result.Success)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                {
+                    await PopupService.ToastAsync(result.Message, AlertTypes.Success);
+                }
+                SynchronizationProperties(_editedItem, _tempItem);
+                _editDialog = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, string.IsNullOrWhiteSpace(_tempItem.Id) ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+
+    public void SynchronizationProperties(RoleOverviewModel des, RoleOverviewModel src)
+    {
+        des.SynchronizationProperties(src);
+    }
+
+    public void AddItem()
+    {
+        _tempItem = new RoleEditModel();
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+}

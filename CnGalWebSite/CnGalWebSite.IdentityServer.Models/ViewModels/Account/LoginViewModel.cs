@@ -23,7 +23,5 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Account
         public bool IsExternalLoginOnly => EnableLocalLogin == false && ExternalProviders?.Count() == 1;
         public string ExternalLoginScheme => IsExternalLoginOnly ? ExternalProviders?.SingleOrDefault()?.AuthenticationScheme : null;
 
-        public GeetestCodeModel GeetestCode { get; set; } = new GeetestCodeModel();
-
     }
 }

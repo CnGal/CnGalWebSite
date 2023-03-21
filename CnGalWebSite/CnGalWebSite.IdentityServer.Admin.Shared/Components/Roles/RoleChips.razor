@@ -1,0 +1,39 @@
+﻿@foreach (var item in Model.Item.Roles.OrderBy(s => s))
+{
+    <MChip Class="ma-2"
+           Color="@GetRoleColor(item)"
+           Outlined>
+        <MIcon Left>
+            @GetRoleIcon(item)
+        </MIcon>
+        @item
+    </MChip>
+}
+@code {
+    [Parameter]
+    public ItemColProps<UserOverviewModel> Model { get; set; }
+
+    public string GetRoleColor(string role)
+    {
+        return role switch
+        {
+            "User" => "green",
+            "Editor" => "orange",
+            "Admin" => "red",
+            "SuperAdmin" => "pink",
+            _ => "purple"
+        };
+    }
+
+    public string GetRoleIcon(string role)
+    {
+        return role switch
+        {
+            "User" => "mdi-account",
+            "Editor" => "mdi-shield-edit",
+            "Admin" => "mdi-shield-crown",
+            "SuperAdmin" => "mdi-security",
+            _ => "mdi-account-question"
+        };
+    }
+}

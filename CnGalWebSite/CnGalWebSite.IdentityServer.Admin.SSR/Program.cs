@@ -2,10 +2,12 @@
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 using CnGalWebSite.IdentityServer.Admin.SSR.Services;
+using CnGalWebSite.IdentityServer.Data;
 using IdentityModel.AspNetCore.AccessTokenManagement;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -30,7 +32,7 @@ builder.Services.AddAccessTokenManagement();
 
 // not allowed to programmatically use HttpContext in Blazor Server.
 // that's why tokens cannot be managed in the login session
-builder.Services.AddSingleton<IUserAccessTokenStore, ServerSideTokenStore>();
+builder.Services.AddScoped<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
 builder.Services.AddScoped<IHttpService, HttpService>();
@@ -45,18 +47,27 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 //    // comment out if you want to drive the login/logout workflow from the UI
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
+//添加数据库连接池
+builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
+    options.UseMySql(builder.Configuration["TokenDBConnection"], ServerVersion.AutoDetect(builder.Configuration["TokenDBConnection"]),
+        o =>
+        {
+            //全局配置查询拆分模式
+            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        }));
+
 //注册Cookie服务
-builder.Services.AddSingleton<CookieEvents>();
-builder.Services.AddSingleton<OidcEvents>();
+builder.Services.AddTransient<CookieEvents>();
+builder.Services.AddTransient<OidcEvents>();
 
 //默认采用cookie认证方案，添加oidc认证方案
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "cookie";
+    options.DefaultScheme = "cookies";
     options.DefaultChallengeScheme = "oidc";
     options.DefaultSignOutScheme = "oidc";
 })
-    .AddCookie("cookie", options =>
+    .AddCookie("cookies", options =>
     {
         options.Cookie.Name = "__Host-blazor";
         options.Cookie.SameSite = SameSiteMode.Lax;

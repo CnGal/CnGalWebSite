@@ -39,21 +39,21 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<AccountBindInfor>> GetBindInfor()
+        public async Task<AccountBindInfor> GetBindInfor()
         {
-            var user =await FindLoginUser();
+            var user =await FindLoginUserAsync();
             var context = await _interaction.GetAuthorizationContextAsync(string.Empty);
 
             return await _accountService.GetAccountBindInforAsync(context, user);
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<KeyValuePair<string,string>>>> GetUserClaims()
+        public async Task<List<KeyValuePair<string, string>>> GetUserClaims()
         {
             return await Task.FromResult(User?.Claims?.Select(s => new KeyValuePair<string, string>(s.Type, s.Value))?.ToList());
         }
 
-        private async Task<ApplicationUser> FindLoginUser()
+        private async Task<ApplicationUser> FindLoginUserAsync()
         {
             var id = User?.Claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject||s.Type == ClaimTypes.NameIdentifier)?.Value;
             return await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
