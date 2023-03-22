@@ -10,18 +10,19 @@ using static IdentityServer4.Models.IdentityResources;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Messages;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Messages;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.Services.Messages
 {
     public class MessageService:IMessageService
     {
-        private readonly IRepository<SendRecord, long> _sendRecordRepository;
+        private readonly IRepository<ApplicationDbContext, SendRecord, long> _sendRecordRepository;
         private readonly IEmailService _EmailService;
         private readonly IViewRenderService _viewRenderService;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
 
-        public MessageService(IRepository<SendRecord, long> sendRecordRepository, IEmailService EmailService, IViewRenderService viewRenderService, IConfiguration configuration, IHttpClientFactory clientFactory)
+        public MessageService(IRepository<ApplicationDbContext, SendRecord, long> sendRecordRepository, IEmailService EmailService, IViewRenderService viewRenderService, IConfiguration configuration, IHttpClientFactory clientFactory)
         {
             _sendRecordRepository = sendRecordRepository;
             _EmailService = EmailService;

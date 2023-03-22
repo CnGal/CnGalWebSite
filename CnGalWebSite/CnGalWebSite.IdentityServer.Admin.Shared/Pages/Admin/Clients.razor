@@ -1,0 +1,121 @@
+﻿@page "/admin/clients"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject INavigationService _navigationService
+
+@using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
+
+<DataTableCard TModel="ClientOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == "logo")
+        {
+            <MImage Height="25" Width="25" Src="@context.Item.LogoUri" />
+        }
+        else if (context.Header.Value == "link")
+        {
+            @if (!string.IsNullOrWhiteSpace(context.Item.ClientUri))
+            {
+                <MChip Small Class="mr-2" Color="info" Outlined OnClick="@(()=>_navigationService.OpenNewPage(context.Item.ClientUri))">
+                    <MIcon Left Small>mdi-link</MIcon>
+                    @context.Item.ClientUri
+                </MChip>
+            }
+        }
+        else if (context.Header.Value == "enable")
+        {
+            <MChip Small Class="mr-2" Color="@(context.Item.Enabled?"success":"error")" Outlined>
+                <MIcon Left Small>@(context.Item.Enabled? "mdi-check-bold" : "mdi-alert-circle")</MIcon>
+                @(context.Item.Enabled?"启用":"未启用")
+            </MChip>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private bool _detailDialog;
+    private int _editedItemId;
+    private ClientEditModel _tempItem;
+
+    private string _baseUrl = "api/clients/";
+    private string _name = "客户端";
+
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard editCard;
+
+    private List<DataTableHeader<ClientOverviewModel>> _headers = new List<DataTableHeader<ClientOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ClientOverviewModel.Id)
+          },
+          new (){ Text= "应用Id", Value= nameof(ClientOverviewModel.ClientId)},
+          new (){ Text= "Logo", Value= "logo"},
+          new (){ Text= "名称", Value= nameof(ClientOverviewModel.ClientName)},
+          new (){ Text= "简介", Value= nameof(ClientOverviewModel.Description)},
+          new (){ Text= "主页", Value= "link"},
+          new (){ Text= "启用", Value= "enable" },
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    IEnumerable<string> _roles;
+
+    DataTableCard<ClientOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async void EditItem(ClientOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited(ClientEditModel model)
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+}

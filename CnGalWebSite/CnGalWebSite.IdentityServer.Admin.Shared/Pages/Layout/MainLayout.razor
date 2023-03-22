@@ -29,6 +29,8 @@
                         <AuthorizeView Roles="Admin">
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">用户列表</MTab>
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">角色列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">客户端列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
                         </AuthorizeView>
                     </MTabs>
                 </ExtensionContent>

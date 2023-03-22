@@ -19,6 +19,84 @@ namespace CnGalWebSite.IdentityServer.Migrations
                 .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Admin.SSR.Models.AppUserAccessToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AccessToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset?>("Expiration")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppUserAccessTokens");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
+                            Name = "SuperAdmin",
+                            NormalizedName = "SUPERADMIN"
+                        },
+                        new
+                        {
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
+                            Name = "Editor",
+                            NormalizedName = "EDITOR"
+                        });
+                });
+
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -80,6 +158,9 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.HasData(
@@ -87,7 +168,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e6d77e52-33b9-479e-8580-60e54f9a9f56",
+                            ConcurrencyStamp = "d88957ba-25e6-43dd-a71a-1da086cdd78d",
                             Email = "123456789@qq.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
@@ -98,6 +179,43 @@ namespace CnGalWebSite.IdentityServer.Migrations
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
+                        });
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUserRole", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e575"
+                        },
+                        new
+                        {
+                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e576"
+                        },
+                        new
+                        {
+                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e577"
+                        },
+                        new
+                        {
+                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e578"
                         });
                 });
 
@@ -127,7 +245,69 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VerificationCodes", (string)null);
+                    b.ToTable("VerificationCodes");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.ClientExamine", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ClientName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClientUri")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LogoUri")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ClientExamines");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.Examine", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("ApplyTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("ClientExamineId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("IsPassed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("PassedAdminName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("PassedTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ClientExamineId");
+
+                    b.ToTable("Examines");
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Messages.SendRecord", b =>
@@ -155,7 +335,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("SendRecords", (string)null);
+                    b.ToTable("SendRecords");
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Records.OperationRecord", b =>
@@ -180,59 +360,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("OperationRecords", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            Name = "Admin",
-                            NormalizedName = "Admin"
-                        },
-                        new
-                        {
-                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
-                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        },
-                        new
-                        {
-                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            Name = "Editor",
-                            NormalizedName = "EDITOR"
-                        });
+                    b.ToTable("OperationRecords");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -303,43 +431,6 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e575"
-                        },
-                        new
-                        {
-                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e576"
-                        },
-                        new
-                        {
-                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e577"
-                        },
-                        new
-                        {
-                            UserId = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e578"
-                        });
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
@@ -357,6 +448,40 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUserRole", b =>
+                {
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationRole", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.Examine", b =>
+                {
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Examines.ClientExamine", "ClientExamine")
+                        .WithMany()
+                        .HasForeignKey("ClientExamineId");
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("ClientExamine");
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Messages.SendRecord", b =>
@@ -379,7 +504,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -404,21 +529,6 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", null)
@@ -426,6 +536,16 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationRole", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

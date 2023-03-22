@@ -4,16 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.DataReositories;
 using System.Linq;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.Services.Account
 {
     public class VerificationCodeService : IVerificationCodeService
     {
-        private readonly IRepository<VerificationCode, long> _verificationCodeRepository;
+        private readonly IRepository<ApplicationDbContext, VerificationCode, long> _verificationCodeRepository;
         private readonly int _maxTimeSpan = 15;
         private readonly int _maxFailedCount = 5;
 
-        public VerificationCodeService(IRepository<VerificationCode, long> verificationCodeRepository)
+        public VerificationCodeService(IRepository<ApplicationDbContext, VerificationCode, long> verificationCodeRepository)
         {
             _verificationCodeRepository = verificationCodeRepository;
         }

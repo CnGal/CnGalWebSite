@@ -4,23 +4,21 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CnGalWebSite.IdentityServer.Admin.SSR.Migrations
+namespace CnGalWebSite.IdentityServer.Migrations
 {
     /// <inheritdoc />
-    public partial class InitData : Migration
+    public partial class AddToken : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "AppUserAccessTokens",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AccessToken = table.Column<string>(type: "longtext", nullable: true)
@@ -34,6 +32,26 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Migrations
                     table.PrimaryKey("PK_AppUserAccessTokens", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.UpdateData(
+                table: "AspNetRoles",
+                keyColumn: "Id",
+                keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                column: "NormalizedName",
+                value: "ADMIN");
+
+            migrationBuilder.UpdateData(
+                table: "AspNetUsers",
+                keyColumn: "Id",
+                keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                column: "ConcurrencyStamp",
+                value: "cdbaf5eb-be93-41b3-b28e-c0fda606b2d4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_UserName",
+                table: "AspNetUsers",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -41,6 +59,24 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AppUserAccessTokens");
+
+            migrationBuilder.DropIndex(
+                name: "IX_AspNetUsers_UserName",
+                table: "AspNetUsers");
+
+            migrationBuilder.UpdateData(
+                table: "AspNetRoles",
+                keyColumn: "Id",
+                keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                column: "NormalizedName",
+                value: "Admin");
+
+            migrationBuilder.UpdateData(
+                table: "AspNetUsers",
+                keyColumn: "Id",
+                keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                column: "ConcurrencyStamp",
+                value: "e6d77e52-33b9-479e-8580-60e54f9a9f56");
         }
     }
 }

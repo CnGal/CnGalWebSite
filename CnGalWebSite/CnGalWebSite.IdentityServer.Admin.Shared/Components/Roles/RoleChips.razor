@@ -1,9 +1,9 @@
 ﻿@foreach (var item in Model.Item.Roles.OrderBy(s => s))
 {
-    <MChip Class="ma-2"
+    <MChip Small Class="ma-2"
            Color="@GetRoleColor(item)"
            Outlined>
-        <MIcon Left>
+        <MIcon Left Small>
             @GetRoleIcon(item)
         </MIcon>
         @item

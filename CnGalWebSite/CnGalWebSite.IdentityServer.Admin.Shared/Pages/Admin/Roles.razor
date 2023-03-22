@@ -11,10 +11,10 @@
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
-            <MIcon Small Color="success"
+            <MIcon Color="success"
                    Class="mr-2"
                    OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
-            <MIcon Small Color="info"
+            <MIcon Color="info"
                    Class="mr-2"
                    OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
         }
@@ -100,12 +100,13 @@
     public async Task DetailItem(RoleOverviewModel item)
     {
         _editedItem = item;
-        if(detailCard!=null)
-        {
-           await detailCard.Refresh();
-        }
         _detailDialog = true;
         StateHasChanged();
+        if (detailCard != null)
+        {
+            await detailCard.Refresh();
+        }
+
     }
 
     public async Task SaveEdit()

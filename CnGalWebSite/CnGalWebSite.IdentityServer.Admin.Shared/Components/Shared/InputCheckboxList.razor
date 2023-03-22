@@ -1,0 +1,39 @@
+﻿
+<div class="mb-4">
+    <span>@Title</span>
+    <MRow>
+        @foreach (var item in AllItems)
+        {
+            <MCol Class="pt-0 pb-0">
+                <MCheckbox Value="Items.Any(s=>s==item.Key)" Label="@(item.Value??item.Key)" ValueChanged="@((e)=>EditUserRole(e,item.Key))" TValue="bool" Disabled="Disabled" HideDetails="true">
+                </MCheckbox>
+            </MCol>
+        }
+    </MRow>
+</div> 
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public List<string> Items { get; set; }
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllItems { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    public void EditUserRole(bool select, string role)
+    {
+        if (select)
+        {
+            Items.Add(role);
+        }
+        else
+        {
+            Items.Remove(role);
+        }
+
+        StateHasChanged();
+    }
+
+}

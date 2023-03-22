@@ -36,6 +36,7 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Services.Records;
 using CnGalWebSite.IdentityServer.Models.DataModels.Records;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -53,7 +54,7 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IMessageService _messageService;
         private readonly IGeetestService _geetestService;
         private readonly IAccountService _accountService;
-        private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
         private readonly IConfiguration _configuration;
         private readonly IOperationRecordService _operationRecordService;
 
@@ -62,7 +63,7 @@ namespace IdentityServerHost.Quickstart.UI
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore, IAccountService accountService, IConfiguration configuration, IGeetestService geetestService,
-        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationUser, string> userRepository, IOperationRecordService operationRecordService,
+        IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationDbContext, ApplicationUser, string> userRepository, IOperationRecordService operationRecordService,
         IEventService events, IVerificationCodeService verificationCodeService, IMessageService messageService)
         {
             _userManager = userManager;

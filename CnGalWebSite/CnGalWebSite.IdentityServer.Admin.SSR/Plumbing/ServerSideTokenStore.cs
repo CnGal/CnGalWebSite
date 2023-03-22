@@ -2,9 +2,8 @@
 using System.Security.Claims;
 using CnGalWebSite.Extensions;
 using CnGalWebSite.IdentityServer.Admin.SSR.Models;
-using CnGalWebSite.IdentityServer.Data;
+using CnGalWebSite.IdentityServer.Admin.SSR.Services;
 using IdentityModel.AspNetCore.AccessTokenManagement;
-using Microsoft.EntityFrameworkCore;
 
 namespace CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 
@@ -14,25 +13,30 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 /// </summary>
 public class ServerSideTokenStore : IUserAccessTokenStore
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ITokenStoreService _tokenStoreService;
 
-    public ServerSideTokenStore(ApplicationDbContext context)
+    public ServerSideTokenStore(ITokenStoreService tokenStoreService)
     {
-        _context = context;
+        _tokenStoreService = tokenStoreService;
     }
 
     public async Task ClearTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
     {
         var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
 
-        await _context.AppUserAccessTokens.Where(s => s.UserId == sub).ExecuteDeleteAsync();
+        await _tokenStoreService.DeleteAsync(sub);
     }
 
     public async Task<UserAccessToken?> GetTokenAsync(ClaimsPrincipal user, UserAccessTokenParameters? parameters = null)
     {
         var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
 
-        var value =await _context.AppUserAccessTokens.FirstOrDefaultAsync(s => s.UserId == sub);
+        if(string.IsNullOrWhiteSpace(sub))
+        {
+            return null;
+        }
+
+        var value = await _tokenStoreService.GetAsync(sub);
         if (value == null)
         {
             return null;
@@ -53,15 +57,13 @@ public class ServerSideTokenStore : IUserAccessTokenStore
     {
         var sub = user?.Claims?.GetUserId() ?? throw new InvalidOperationException("no sub claim");
 
-        await _context.AppUserAccessTokens.Where(s => s.UserId == sub).ExecuteDeleteAsync();
-        await _context.AppUserAccessTokens.AddAsync(new AppUserAccessToken
+        await _tokenStoreService.SetAsync(new AppUserAccessToken
         {
             UserId = sub,
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             Expiration = expiration,
         });
-        await _context.SaveChangesAsync();
     }
 
 }

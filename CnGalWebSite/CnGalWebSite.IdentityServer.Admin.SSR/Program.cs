@@ -2,12 +2,11 @@
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 using CnGalWebSite.IdentityServer.Admin.SSR.Services;
-using CnGalWebSite.IdentityServer.Data;
 using IdentityModel.AspNetCore.AccessTokenManagement;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -21,6 +20,8 @@ builder.Services.AddServerSideBlazor();
 //自定义服务
 builder.Services.AddScoped(typeof(ISingleDataCacheService<>), typeof(SingleDataCacheService<>));
 builder.Services.AddScoped<IHttpService, HttpService>();
+builder.Services.AddSingleton<ITokenStoreService, TokenStoreService>();
+builder.Services.AddScoped<INavigationService, NavigationService> ();
 //设置主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
 {
@@ -40,6 +41,7 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);
 });
+
 //添加认身份证
 //builder.Services.AddAuthorization(options =>
 //{
@@ -47,14 +49,6 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 //    // comment out if you want to drive the login/logout workflow from the UI
 //    options.FallbackPolicy = options.DefaultPolicy;
 //});
-//添加数据库连接池
-builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
-    options.UseMySql(builder.Configuration["TokenDBConnection"], ServerVersion.AutoDetect(builder.Configuration["TokenDBConnection"]),
-        o =>
-        {
-            //全局配置查询拆分模式
-            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        }));
 
 //注册Cookie服务
 builder.Services.AddTransient<CookieEvents>();
