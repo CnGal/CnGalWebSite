@@ -1,18 +1,29 @@
-﻿@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-@inject SwalService SwalService
+﻿@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
-@inject ILocalStorageService _localStorage
 
+@if (!ToolHelper.IsSSR)
+{
+    <AuthorizeView>
+        <Authorized>
+            @{
+                _httpService.IsAuth = true;
+            }
+            @ChildContent
+        </Authorized>
+    </AuthorizeView>
+}
 
 
 @code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             if (ToolHelper.IsSSR)
             {

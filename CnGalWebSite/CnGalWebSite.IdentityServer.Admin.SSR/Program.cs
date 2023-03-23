@@ -13,6 +13,12 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 //判断是否 SSR
 StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.PreSetIsSSR.Value;
+//覆盖默认api地址
+if (string.IsNullOrWhiteSpace(builder.Configuration["IdsApiUrl"]) == false)
+{
+    StaticOptions.IdsApiUrl = builder.Configuration["IdsApiUrl"];
+}
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -36,7 +42,6 @@ builder.Services.AddAccessTokenManagement();
 builder.Services.AddScoped<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
-builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);

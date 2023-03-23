@@ -45,7 +45,7 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
         public async Task<TValue> GetAsync<TValue>(string url)
         {
             _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
-            var client =await GetClient();
+            var client =await GetClientAsync();
 
             try
             {
@@ -60,13 +60,22 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
 
         public async Task<TValue> PostAsync<TModel, TValue>(string url, TModel model)
         {
-            var client =await GetClient();
-            var result = await client.PostAsJsonAsync(_baseUrl + url, model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<TValue>(jsonContent, _jsonOptions);
+            _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
+            try
+            {
+                var client = await GetClientAsync();
+                var result = await client.PostAsJsonAsync(_baseUrl + url, model);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                return JsonSerializer.Deserialize<TValue>(jsonContent, _jsonOptions);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                _navigationManager.NavigateToLogout("authentication/logout", "/");
+                throw new Exception("令牌过期，请重新登入", ex);
+            }
         }
 
-        private async Task<HttpClient> GetClient()
+        private async Task<HttpClient> GetClientAsync()
         {
             if (_isPreRender)
             {
@@ -74,11 +83,6 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
             }
             _isPreRender = false;
             return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
-        }
-
-        public Task SetRefreshToken(ClaimsPrincipal user, string accessToken, string refreshToken)
-        {
-            throw new NotImplementedException();
         }
     }
 }

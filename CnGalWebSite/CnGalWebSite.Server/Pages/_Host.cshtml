@@ -17,7 +17,6 @@
         RemoteIpAddress = ip
     };
 
-    var token = await HttpContext.GetTokenAsync("access_token").ConfigureAwait(false);
 }
 
-<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo" param-Token="token" />
+<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo"/>

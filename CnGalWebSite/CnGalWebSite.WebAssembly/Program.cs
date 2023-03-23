@@ -104,7 +104,7 @@ namespace CnGalWebSite.WebAssembly
                 options.ProviderOptions.ResponseType = "code";
             }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
             //添加Http服务
-            builder.Services.AddScoped<IHttpService, HttpService>();
+            builder.Services.AddSingleton<IHttpService, HttpService>();
             //注册身份验证的HttpClient
             builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
             builder.Services.AddHttpClient("AuthAPI")

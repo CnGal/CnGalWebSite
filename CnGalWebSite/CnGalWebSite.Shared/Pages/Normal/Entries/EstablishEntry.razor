@@ -2,14 +2,9 @@
 @attribute [Authorize]
 @inject IDataCacheService _dataCacheService
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-
-@if (ToolHelper.IsSSR == false)
-{
+<MakeSureInWASMTip>
     <CnGalWebSite.Shared.Pages.Webs.Entries.EstablishEntry Name="@Name" />
-
-}
-
+</MakeSureInWASMTip>
 
 @code{
     [SupplyParameterFromQuery]

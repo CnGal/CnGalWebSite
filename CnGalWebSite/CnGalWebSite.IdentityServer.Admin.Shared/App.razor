@@ -4,12 +4,6 @@
     <CascadingAuthenticationState>
         <Router AppAssembly="@typeof(App).Assembly">
             <Found Context="routeData">
-                <AuthorizeView>
-                    @if (StaticOptions.IsSSR)
-                    {
-                        _httpService.SetRefreshToken(context.User, AccessToken, RefreshToken);
-                    }
-                </AuthorizeView>
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
                         @if (context.User.Identity?.IsAuthenticated != true)
@@ -36,10 +30,6 @@
 </ErrorHandler>
 
 @code{
-    [Parameter]
-    public string AccessToken { get; set; }
-    [Parameter]
-    public string RefreshToken { get; set; }
 
     protected override void OnInitialized()
     {
