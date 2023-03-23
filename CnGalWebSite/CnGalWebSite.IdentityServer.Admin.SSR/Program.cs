@@ -24,7 +24,6 @@ if (string.IsNullOrWhiteSpace(builder.Configuration["IdsApiUrl"]) == false)
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //自定义服务
-builder.Services.AddScoped(typeof(ISingleDataCacheService<>), typeof(SingleDataCacheService<>));
 builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddSingleton<ITokenStoreService, TokenStoreService>();
 builder.Services.AddScoped<INavigationService, NavigationService> ();

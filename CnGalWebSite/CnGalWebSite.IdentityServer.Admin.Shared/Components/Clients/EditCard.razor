@@ -39,6 +39,7 @@ else
                     <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" HideDetails="true" />
                     <AuthorizeView Roles="Admin">
                         <MCheckbox @bind-Value="Model.RequireConsent" Label="展示用户同意页面" TValue="bool" HideDetails="true" />
+                        <MCheckbox @bind-Value="Model.RequireClientSecret" Label="需要验证客户端密钥" TValue="bool" HideDetails="true" />
                     </AuthorizeView>
                 </MCol>
 
