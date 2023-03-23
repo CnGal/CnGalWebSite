@@ -13,7 +13,7 @@
 
 function callGeetest() {
     var client = new HttpClient();
-    client.get('https://localhost:5001/api/tool/GetGeetestCode', function (response) {
+    client.get('https://oauth2.cngal.org/api/tool/GetGeetestCode', function (response) {
         //获取页面初始化数据
         re= JSON.parse(response);
         gt = re.gt;

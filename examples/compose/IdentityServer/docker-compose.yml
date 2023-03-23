@@ -52,7 +52,7 @@ services:
       # 白名单
       - IpWhitelist=${IpWhitelist}
     hostname: identityserver
-    restart: always
+    # restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
       interval: 1m30s
@@ -63,8 +63,8 @@ services:
       resources:
         limits:
           memory: 0.7G
-    volumes:
-      - "/tmp/typesense/data:/data"
     ports:
       - "5011:80"
       - "5001:443"
+    volumes:
+      - "/mnt/docker/IdentityServer:/app/cert"
