@@ -9,6 +9,9 @@ services:
       - ClientId=${ClientId}
       - ClientSecret=${ClientSecret}
       - IdsApiUrl=${IdsApiUrl}
+      # 管理令牌储存
+      - TokenAPI=${TokenAPI}
+      - TokenAPISecret=${TokenAPISecret}
     hostname: identityserveradmin
     restart: always
     healthcheck:

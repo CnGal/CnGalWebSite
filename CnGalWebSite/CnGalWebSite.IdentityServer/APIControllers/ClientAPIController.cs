@@ -191,9 +191,10 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 secret = Guid.NewGuid().ToString();
                 client = await _clientRepository.InsertAsync(new Client
                 {
-                    RequireClientSecret=true,
-                    AllowOfflineAccess=true,
-                    AlwaysIncludeUserClaimsInIdToken=true,
+                    RequireClientSecret = true,
+                    AllowOfflineAccess = true,
+                    AlwaysIncludeUserClaimsInIdToken = true,
+                    RequireConsent = true,
                     ClientId = Guid.NewGuid().ToString(),
                     ClientSecrets = new List<ClientSecret> { new ClientSecret { Value = secret } }
                 });

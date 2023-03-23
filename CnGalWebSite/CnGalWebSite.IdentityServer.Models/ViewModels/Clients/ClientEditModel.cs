@@ -18,6 +18,6 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Clients
 
         public List<string> AllowedScopes { get; set; } = new List<string> { "profile", "openid" };
 
-        public bool RequireConsent { get; set; }
+        public bool RequireConsent { get; set; } = true;
     }
 }

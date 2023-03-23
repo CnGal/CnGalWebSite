@@ -47,6 +47,10 @@ services:
       - IdsWASM=${IdsWASM}
       - SSR=${SSR}
       - WASM=${WASM}
+      # SSR端储存令牌服务密匙
+      - TokenAPISecret=${TokenAPISecret}
+      # 白名单
+      - IpWhitelist=${IpWhitelist}
     hostname: identityserver
     restart: always
     healthcheck:

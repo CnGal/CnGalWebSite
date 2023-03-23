@@ -6,6 +6,12 @@ services:
     environment:
       - TZ=${TZ}
       - WebApiPath=${WebApiPath}
+      - Authority=${Authority}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+      # 管理令牌储存
+      - TokenAPI=${TokenAPI}
+      - TokenAPISecret=${TokenAPISecret}
     hostname: blazorserver
     restart: always
     healthcheck:
