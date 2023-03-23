@@ -1,35 +1,28 @@
-@model ConsentViewModel
+﻿@model ConsentViewModel
 
 <div class="page-consent">
-    <div class="lead">
-        @if (Model.ClientLogoUrl != null)
-        {
-            <div class="client-logo"><img src="@Model.ClientLogoUrl"></div>
-        }
-        <h1>
-            @Model.ClientName
-            <small class="text-muted">is requesting your permission</small>
-        </h1>
-        <p>Uncheck the permissions you do not wish to grant.</p>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-8">
-            <partial name="_ValidationSummary" />
+    <div class="consent-card mdl-card mdl-shadow--2dp">
+        <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
+        <div class="mdl-card__title app-name">
+            <img src="@Model.ClientLogoUrl">
+            <h1> @Model.ClientName <small class="text-muted">正在请求你的授权</small></h1>
         </div>
-    </div>
+        <div class="mdl-card__supporting-text text-center">
+            取消勾选你不希望授权的项目
+        </div>
+        <partial name="_ValidationSummary" />
 
-    <form asp-action="Index">
-        <input type="hidden" asp-for="ReturnUrl" />
-        <div class="row">
-            <div class="col-sm-8">
+
+        <div class="mdl-card__supporting-text">
+            <form asp-action="Index">
+                <input type="hidden" asp-for="ReturnUrl" />
+
                 @if (Model.IdentityScopes.Any())
                 {
                     <div class="form-group">
                         <div class="card">
                             <div class="card-header">
-                                <span class="glyphicon glyphicon-user"></span>
-                                Personal Information
+                                个人信息
                             </div>
                             <ul class="list-group list-group-flush">
                                 @foreach (var scope in Model.IdentityScopes)
@@ -46,8 +39,7 @@
                     <div class="form-group">
                         <div class="card">
                             <div class="card-header">
-                                <span class="glyphicon glyphicon-tasks"></span>
-                                Application Access
+                                应用权限
                             </div>
                             <ul class="list-group list-group-flush">
                                 @foreach (var scope in Model.ApiScopes)
@@ -59,46 +51,31 @@
                     </div>
                 }
 
-                <div class="form-group">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="glyphicon glyphicon-tasks"></span>
-                            Description
-                        </div>
-                        <div class="card-body">
-                            <input class="form-control" placeholder="Description or name of device" asp-for="Description" autofocus>
-                        </div>
-                    </div>
-                </div>
-
                 @if (Model.AllowRememberConsent)
                 {
-                    <div class="form-group">
-                        <div class="form-check">
+                    <div class="remeber">
                             <input class="form-check-input" asp-for="RememberConsent">
                             <label class="form-check-label" asp-for="RememberConsent">
-                                <strong>Remember My Decision</strong>
+                                <strong>记住我的选择</strong>
                             </label>
-                        </div>
                     </div>
                 }
-            </div>
+
+                <div class="action">
+                    <button name="button" value="yes" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">同意</button>
+                    <button name="button" value="no" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">拒绝</button>
+
+                </div>
+            </form>
+        </div>
+        <div class="mdl-card__supporting-text text-center">
+            @if (Model.ClientUrl != null)
+            {
+                <a class="btn btn-outline-info" target="_blank" href="@Model.ClientUrl">
+                    @Model.ClientName
+                </a>
+            }
         </div>
 
-        <div class="row">
-            <div class="col-sm-4">
-                <button name="button" value="yes" class="btn btn-primary" autofocus>Yes, Allow</button>
-                <button name="button" value="no" class="btn btn-secondary">No, Do Not Allow</button>
-            </div>
-            <div class="col-sm-4 col-lg-auto">
-                @if (Model.ClientUrl != null)
-                {
-                    <a class="btn btn-outline-info" href="@Model.ClientUrl">
-                        <span class="glyphicon glyphicon-info-sign"></span>
-                        <strong>@Model.ClientName</strong>
-                    </a>
-                }
-            </div>
-        </div>
-    </form>
+    </div>
 </div>

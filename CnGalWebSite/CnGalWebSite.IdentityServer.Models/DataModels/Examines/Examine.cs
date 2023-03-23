@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Models.DataModels.Clients;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -25,10 +26,8 @@ namespace CnGalWebSite.IdentityServer.Models.DataModels.Examines
 
         public ExamineType Type { get; set; }
 
-        public long? ClientId { get; set; }
-
-        public long? ClientExamineId { get; set; }
-        public ClientExamine ClientExamine { get; set; }
+        public long? UserClientId { get; set; }
+        public UserClient UserClient { get; set; }
 
     }
 

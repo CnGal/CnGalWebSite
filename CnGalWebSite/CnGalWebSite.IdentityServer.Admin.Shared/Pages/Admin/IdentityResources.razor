@@ -1,4 +1,4 @@
-﻿@page "/admin/clients"
+﻿@page "/admin/identityresources"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +8,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="ClientOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="IdentityResourceOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -16,13 +16,9 @@
                    Class="mr-2"
                    OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
         }
-        else if (context.Header.Value == "logo")
+        else if (context.Header.Value == "required")
         {
-            <MImage Height="25" Width="25" Src="@context.Item.LogoUri" />
-        }
-        else if (context.Header.Value == "link")
-        {
-            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.LinkChip Link="@context.Item.ClientUri" />
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.ApiScopes.RequiredChip Required="@context.Item.Required" />
         }
         else if (context.Header.Value == "enable")
         {
@@ -37,7 +33,7 @@
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
-    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.IdentityResources.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 
 @code {
@@ -45,33 +41,28 @@
     private int _editedItemId;
     private bool _detailDialog;
 
-    private ClientEditModel _tempItem;
+    private string _baseUrl = "api/identityresources/";
+    private string _name = "IdentityResource";
 
-    private string _baseUrl = "api/clients/";
-    private string _name = "客户端";
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.IdentityResources.EditCard editCard;
 
-    CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard editCard;
-
-    private List<DataTableHeader<ClientOverviewModel>> _headers = new List<DataTableHeader<ClientOverviewModel>>
+    private List<DataTableHeader<IdentityResourceOverviewModel>> _headers = new List<DataTableHeader<IdentityResourceOverviewModel>>
 {
           new ()
           {
             Text= "Id",
             Align= DataTableHeaderAlign.Start,
-            Value= nameof(ClientOverviewModel.Id)
+            Value= nameof(IdentityResourceOverviewModel.Id)
           },
-          new (){ Text= "应用Id", Value= nameof(ClientOverviewModel.ClientId)},
-          new (){ Text= "Logo", Value= "logo"},
-          new (){ Text= "名称", Value= nameof(ClientOverviewModel.ClientName)},
-          new (){ Text= "简介", Value= nameof(ClientOverviewModel.Description)},
-          new (){ Text= "主页", Value= "link"},
+          new (){ Text= "名称", Value= nameof(IdentityResourceOverviewModel.Name)},
+          new (){ Text= "显示名称", Value= nameof(IdentityResourceOverviewModel.DisplayName)},
+          new (){ Text= "简介", Value= nameof(IdentityResourceOverviewModel.Description)},
+          new (){ Text= "必选", Value= "required"},
           new (){ Text= "启用", Value= "enable" },
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    IEnumerable<string> _roles;
-
-    DataTableCard<ClientOverviewModel> dataTableCard;
+    DataTableCard<IdentityResourceOverviewModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -82,7 +73,7 @@
 
     }
 
-    public async void EditItem(ClientOverviewModel item)
+    public async void EditItem(IdentityResourceOverviewModel item)
     {
         _editedItemId = item.Id;
         _editDialog = true;
@@ -93,7 +84,7 @@
         }
     }
 
-    public void OnEdited(ClientEditModel model)
+    public void OnEdited()
     {
         _editDialog = false;
         StateHasChanged();

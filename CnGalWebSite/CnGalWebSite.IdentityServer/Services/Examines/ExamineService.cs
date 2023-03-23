@@ -20,12 +20,11 @@ namespace CnGalWebSite.IdentityServer.Services.Examines
             _examineRepository = examineRepository;
         }
 
-        public async Task AddExamines(ApplicationUser user,Examine examine)
+        public async Task AddExamine(ApplicationUser user,Examine examine)
         {
             //查找是否存在审核
             var cur = await _examineRepository.GetAll()
-                .Include(s=>s.ClientExamine)
-                .FirstOrDefaultAsync(s => s.ApplicationUser.Id == user.Id && s.IsPassed == null && s.Type == examine.Type && s.ClientId == examine.ClientId);
+                .FirstOrDefaultAsync(s => s.ApplicationUser.Id == user.Id && s.IsPassed == null && s.Type == examine.Type);
 
             if (cur == null)
             {
@@ -36,7 +35,6 @@ namespace CnGalWebSite.IdentityServer.Services.Examines
 
             //同步内容
             cur.ApplyTime = DateTime.UtcNow;
-            cur.ClientExamine.SynchronizationProperties(examine.ClientExamine);
 
             //保存
             await _examineRepository.UpdateAsync(examine);

@@ -30,6 +30,7 @@ builder.Services.AddHttpClient("AnonymousAPI");
 
 //注入自定义服务
 builder.Services.AddScoped(typeof(ISingleDataCacheService<>), typeof(SingleDataCacheService<>));
+builder.Services.AddScoped<INavigationService, NavigationService>();
 builder.Services.AddScoped<IHttpService, HttpService>();
 //修改Masa主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>

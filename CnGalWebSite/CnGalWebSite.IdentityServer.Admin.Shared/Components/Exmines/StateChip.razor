@@ -1,6 +1,4 @@
-﻿<MChip Small Class="ma-2"
-       Color="@GetColor()"
-       Outlined>
+﻿<MChip Small Color="@GetColor()" Outlined Class=" ma-1">
     <MIcon Left Small>
         @GetIcon()
     </MIcon>
@@ -25,7 +23,7 @@
     {
         return IsPassed switch
         {
-            true => "mdi-check",
+            true => "mdi-check-bold",
             false => "mdi-alert-circle",
             null => "mdi-clock-outline"
         };

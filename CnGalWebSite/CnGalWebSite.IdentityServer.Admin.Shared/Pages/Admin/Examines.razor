@@ -34,11 +34,12 @@
 <MDialog @bind-Value="_detailDialog"
          MaxWidth="1200">
 
-
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.DetailCard Id="_detailId" OnEdited="OnEdited" @ref="detailCard"/>
 </MDialog>
 
 @code {
     private bool _detailDialog;
+    private long _detailId;
 
     private string _baseUrl = "api/examines/";
     private string _name = "审核";
@@ -64,6 +65,7 @@
     IEnumerable<string> _roles;
 
     DataTableCard<ExamineOverviewModel> dataTableCard;
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.DetailCard detailCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -74,9 +76,26 @@
 
     }
 
-    public void DetailItem(ExamineOverviewModel model)
+    public async Task DetailItem(ExamineOverviewModel model)
+    {
+        _detailDialog = true;
+        _detailId = model.Id;
+        StateHasChanged();
+        if(detailCard!=null)
         {
-
+           await detailCard.Refresh();
         }
+
+    }
+
+    public void OnEdited()
+    {
+        _detailDialog = false;
+        StateHasChanged();
+        if(dataTableCard!=null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
 
 }

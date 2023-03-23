@@ -13,7 +13,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ClientExamines",
+                name: "UserClients",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -25,11 +25,20 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     LogoUri = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientId = table.Column<long>(type: "bigint", nullable: false),
+                    IsPassed = table.Column<bool>(type: "tinyint(1)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClientExamines", x => x.Id);
+                    table.PrimaryKey("PK_UserClients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserClients_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -47,8 +56,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     PassedAdminName = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    ClientId = table.Column<long>(type: "bigint", nullable: true),
-                    ClientExamineId = table.Column<long>(type: "bigint", nullable: true)
+                    UserClientId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -59,9 +67,9 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Examines_ClientExamines_ClientExamineId",
-                        column: x => x.ClientExamineId,
-                        principalTable: "ClientExamines",
+                        name: "FK_Examines_UserClients_UserClientId",
+                        column: x => x.UserClientId,
+                        principalTable: "UserClients",
                         principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -71,7 +79,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 column: "ConcurrencyStamp",
-                value: "d88957ba-25e6-43dd-a71a-1da086cdd78d");
+                value: "4bbde73b-524f-4a43-a9fe-4d73497d2bb1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Examines_ApplicationUserId",
@@ -79,9 +87,14 @@ namespace CnGalWebSite.IdentityServer.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Examines_ClientExamineId",
+                name: "IX_Examines_UserClientId",
                 table: "Examines",
-                column: "ClientExamineId");
+                column: "UserClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserClients_ApplicationUserId",
+                table: "UserClients",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -91,7 +104,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                 name: "Examines");
 
             migrationBuilder.DropTable(
-                name: "ClientExamines");
+                name: "UserClients");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",

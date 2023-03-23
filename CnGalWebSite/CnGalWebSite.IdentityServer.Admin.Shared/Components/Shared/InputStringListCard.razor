@@ -4,10 +4,8 @@
     <MCardTitle>@Title</MCardTitle>
     <MCardSubtitle>@SubTitle</MCardSubtitle>
 </MBorder>
-<div>
-
-    <MTextField Label="@Title" @bind-Value="@_item" TValue="string"></MTextField>
-
+<div class="input-string-card">
+    <MTextField Label="@Title" @bind-Value="@_item" TValue="string"/>
     <MButton Color="primary"
              Dark
              OnClick="Add">
@@ -56,12 +54,15 @@
         if (string.IsNullOrWhiteSpace(_item))
         {
             await PopupService.ToastAsync("项目不能为空", AlertTypes.Error);
+            return;
         }
         if (Items.Any(s => s == _item))
         {
             await PopupService.ToastAsync("不能重复添加同一项目", AlertTypes.Error);
+            return;
         }
         Items.Add(_item);
+        _item = null;
     }
 
     public void Delete(string item)

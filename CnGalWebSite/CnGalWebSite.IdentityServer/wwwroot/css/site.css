@@ -1,29 +1,34 @@
 ﻿/*覆盖全局样式*/
 .theme--light.m-app-bar.m-toolbar.m-sheet {
-     background-color: transparent; 
+    background-color: transparent;
 }
+
 .mdl-button {
     text-transform: none;
     letter-spacing: 0.05rem;
 }
-.mdl-button--fab{
-    margin:0;
+
+.mdl-button--fab {
+    margin: 0;
 }
 
 /*自定义样式*/
 .text-center {
     text-align: center;
 }
-.d-none{
-    display:none;
+
+.d-none {
+    display: none;
 }
 /*颜色*/
 .success--text {
     color: #4CAF50 !important;
 }
+
 .warning--text {
     color: #FB8C00 !important
 }
+
 .info--text {
     color: #2196F3 !important;
 }
@@ -35,10 +40,12 @@
     align-items: center;
     padding: 1rem;
 }
-.mdl-card h2 {
-    font-weight: bold;
-    text-align: center;
-}
+
+    .mdl-card h2 {
+        font-weight: bold;
+        text-align: center;
+    }
+
 .mdl-card {
     min-height: 0;
 }
@@ -55,9 +62,11 @@
 .mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
     color: white;
 }
+
 .mdl-button--fab.mdl-button--colored {
     color: white;
 }
+
 .mdl-button--fab {
     display: flex;
     justify-content: center;
@@ -67,6 +76,7 @@
 body {
     background-color: #f5f6f7;
 }
+
 footer {
     font-size: small;
     display: flex;
@@ -75,21 +85,26 @@ footer {
     background-color: white;
     padding: .5rem;
 }
-footer a{
-    color:gray!important;
-}
+
+    footer a {
+        color: gray !important;
+    }
+
 .container {
     max-width: 500px;
     margin-top: 100px;
 }
-#layout-user{
-    color:white;
+
+#layout-user {
+    color: white;
 }
+
 .page-content {
     display: flex;
     justify-content: center;
     padding: 2rem;
 }
+
 @media screen and (max-width: 768px) {
     .page-content {
         padding: 1rem;
@@ -101,60 +116,70 @@ footer a{
     max-width: 512px;
     width: 100%;
 }
-.home-card img {
-    height: 15rem;
-    width: fit-content;
-    margin-top: 2rem;
-}
-.home-card .date {
-    padding: 0;
-}
+
+    .home-card img {
+        height: 15rem;
+        width: fit-content;
+        margin-top: 2rem;
+    }
+
+    .home-card .date {
+        padding: 0;
+    }
 
 /*账户相关页面*/
 .account-page {
     max-width: 512px;
     width: 100%;
 }
-.account-page .head-logo {
-    height: 10rem;
-    width: fit-content;
-    margin: 2rem;
-}
-.account-page .mdl-textfield {
-    width: 100%;
-}
-.account-page .action {
-    display: flex;
-    justify-content: space-evenly;
-    padding-top: 2rem;
-}
 
-.account-page button {
-    width: 10rem;
-}
+    .account-page .head-logo {
+        height: 10rem;
+        width: fit-content;
+        margin: 2rem;
+    }
+
+    .account-page .mdl-textfield {
+        width: 100%;
+    }
+
+    .account-page .action {
+        display: flex;
+        justify-content: space-evenly;
+        padding-top: 2rem;
+    }
+
+    .account-page button {
+        width: 10rem;
+    }
 /*登入*/
 
 .login-card .external {
     display: flex;
     justify-content: space-evenly;
 }
+
 .login-card .external-text {
     display: flex;
     justify-content: center;
 }
-.login-card .external-text hr {
-    width:100%;
-}
-.login-card .external-text p {
-    width: -webkit-fill-available;
-}
+
+    .login-card .external-text hr {
+        width: 100%;
+    }
+
+    .login-card .external-text p {
+        width: -webkit-fill-available;
+    }
+
 .login-card .ex-action {
     display: flex;
     justify-content: space-between;
 }
-.login-card .ex-action a{
-    word-break: keep-all;
-}
+
+    .login-card .ex-action a {
+        word-break: keep-all;
+    }
 /*注册*/
 .register-card .login-link {
     padding-top: 2rem;
@@ -163,9 +188,10 @@ footer a{
 .verify-code-card .code-input {
     display: flex;
 }
-.verify-code-card .code-input button {
-    margin-left: 2rem;
-}
+
+    .verify-code-card .code-input button {
+        margin-left: 2rem;
+    }
 /*选择账号*/
 
 .choose-realname-card .action, .choose-account-card .action {
@@ -177,26 +203,32 @@ footer a{
 .select-bind-card li > div {
     display: flex;
 }
-.select-bind-card li > div > span {
-    width: 7rem;
-}
-.select-bind-card li > div > div {
-    display: flex;
-    gap: 2rem;
-}
+
+    .select-bind-card li > div > span {
+        width: 7rem;
+    }
+
+    .select-bind-card li > div > div {
+        display: flex;
+        gap: 2rem;
+    }
+
 .select-field-page {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+
 .bind-card {
     padding: 0;
 }
-.bind-card .name-bind {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.3rem;
-}
+
+    .bind-card .name-bind {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.3rem;
+    }
+
     .bind-card .action-bind {
         padding-top: 1rem;
         display: flex;
@@ -220,38 +252,47 @@ footer a{
     position: absolute;
     height: 100%;
 }
+
 .alert-danger .border {
     background-color: #FF5252 !important;
     border-color: #FF5252 !important;
 }
+
 .alert-danger strong {
     color: #FF5252 !important;
 }
+
 .alert-info strong {
     color: #2196F3 !important;
 }
+
 .alert-info .border {
     background-color: #2196F3 !important;
     border-color: #2196F3 !important;
 }
+
 .alert-success strong {
     color: #4CAF50;
 }
+
 .alert-success .border {
     background-color: #4CAF50;
     border-color: #4CAF50;
 }
+
 .alert {
     position: relative;
     display: flex;
 }
-.alert .content {
-    padding: .5rem 0 0 1.5rem;
-}
-.alert ul {
-    padding: 0 1.5rem;
-    margin: 0;
-}
+
+    .alert .content {
+        padding: .5rem 0 0 1.5rem;
+    }
+
+    .alert ul {
+        padding: 0 1.5rem;
+        margin: 0;
+    }
 /*scrollbar*/
 ::-webkit-scrollbar-track {
     border-radius: 15px;
@@ -268,4 +309,29 @@ footer a{
     margin: 5px 0;
     border-radius: 15px;
     background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(170 168 168)), color-stop(0.72, rgb(170 168 168)), color-stop(0.86, rgb(170 168 168)));
+}
+/*同意页面*/
+.consent-card .app-name {
+    padding-bottom: 0;
+}
+
+    .consent-card .app-name img {
+        height: 3rem;
+        width: 3rem;
+        margin-right: 1rem;
+    }
+
+.consent-card h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.consent-card .remeber {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.consent-card .action {
+    display: flex;
+    justify-content: space-between;
 }

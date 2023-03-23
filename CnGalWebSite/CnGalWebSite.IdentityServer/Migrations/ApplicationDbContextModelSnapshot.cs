@@ -168,7 +168,7 @@ namespace CnGalWebSite.IdentityServer.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d88957ba-25e6-43dd-a71a-1da086cdd78d",
+                            ConcurrencyStamp = "4bbde73b-524f-4a43-a9fe-4d73497d2bb1",
                             Email = "123456789@qq.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
@@ -248,10 +248,16 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.ToTable("VerificationCodes");
                 });
 
-            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.ClientExamine", b =>
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Clients.UserClient", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<long>("ClientId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("ClientName")
@@ -263,12 +269,17 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
+                    b.Property<bool?>("IsPassed")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("LogoUri")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ClientExamines");
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("UserClients");
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.Examine", b =>
@@ -283,12 +294,6 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Property<DateTime>("ApplyTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<long?>("ClientExamineId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ClientId")
-                        .HasColumnType("bigint");
-
                     b.Property<bool?>("IsPassed")
                         .HasColumnType("tinyint(1)");
 
@@ -301,11 +306,14 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
+                    b.Property<long?>("UserClientId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("ClientExamineId");
+                    b.HasIndex("UserClientId");
 
                     b.ToTable("Examines");
                 });
@@ -469,19 +477,28 @@ namespace CnGalWebSite.IdentityServer.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Clients.UserClient", b =>
+                {
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Examines.Examine", b =>
                 {
                     b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Examines.ClientExamine", "ClientExamine")
-                        .WithMany()
-                        .HasForeignKey("ClientExamineId");
+                    b.HasOne("CnGalWebSite.IdentityServer.Models.DataModels.Clients.UserClient", "UserClient")
+                        .WithMany("Examines")
+                        .HasForeignKey("UserClientId");
 
                     b.Navigation("ApplicationUser");
 
-                    b.Navigation("ClientExamine");
+                    b.Navigation("UserClient");
                 });
 
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Messages.SendRecord", b =>
@@ -546,6 +563,11 @@ namespace CnGalWebSite.IdentityServer.Migrations
             modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Account.ApplicationUser", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.IdentityServer.Models.DataModels.Clients.UserClient", b =>
+                {
+                    b.Navigation("Examines");
                 });
 #pragma warning restore 612, 618
         }

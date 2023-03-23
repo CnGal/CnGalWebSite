@@ -6,6 +6,6 @@ namespace CnGalWebSite.IdentityServer.Services.Examines
 {
     public interface IExamineService
     {
-        Task AddExamines(ApplicationUser user, Examine examine);
+        Task AddExamine(ApplicationUser user, Examine examine);
     }
 }

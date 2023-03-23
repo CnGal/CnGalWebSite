@@ -18,23 +18,15 @@ else
         <MCardText>
             <MRow>
                 <MCol Cols="12" Xl="6">
-                    <MTextField @bind-Value="Model.ClientId" Label="应用Id" HideDetails="true" />
-
-                </MCol>
-                <MCol Cols="12" Xl="6">
                     <MTextField @bind-Value="Model.ClientName" Label="应用名称" HideDetails="true" />
 
-                </MCol>
-                <MCol Cols="12">
-                    <MTextarea Rows="3" @bind-Value="Model.Description" Label="应用简介" HideDetails="true" />
                 </MCol>
                 <MCol Cols="12" Xl="6">
                     <MTextField @bind-Value="Model.ClientUri" Label="应用主页" HideDetails="true" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
-                    <AuthorizeView>
-                        <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" Disabled="@(!context.User.IsInRole("Admin"))" HideDetails="true" />
-                    </AuthorizeView>
+
+                <MCol Cols="12">
+                    <MTextarea Rows="3" @bind-Value="Model.Description" Label="应用简介" HideDetails="true" />
                 </MCol>
                 <MCol Cols="12">
                     @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
@@ -43,6 +35,12 @@ else
                     }
                     <MTextField @bind-Value="Model.LogoUri" Label="LOGO（请使用CnGal图床上传正方形图片）" HideDetails="true" />
                 </MCol>
+                <MCol Cols="12" Xl="6">
+                    <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" HideDetails="true" />
+                    <AuthorizeView Roles="Admin">
+                        <MCheckbox @bind-Value="Model.RequireConsent" Label="展示用户同意页面" TValue="bool" HideDetails="true" />
+                    </AuthorizeView>
+                </MCol>
 
                 <MCol Cols="12">
                     <InputCheckboxList Title="使用的授权方式" Items="Model.AllowedGrantTypes" AllItems="_allowedGrantTypes" />
@@ -50,6 +48,10 @@ else
                 <MCol Cols="12">
                     <InputCheckboxList Title="权限（请慎重选择所需权限，过高的权限用户可能拒绝授权）" Items="Model.AllowedScopes" AllItems="_allowedScopes" />
                 </MCol>
+                <MCol Cols="12">
+                    <SecretCard Id="Model.Id" ClientId="@Model.ClientId" />
+                </MCol>
+
                 <MCol Cols="12" Xl="6">
                     <InputStringListCard Title="主域" SubTitle="网站运行时的根Url" Items="Model.AllowedCorsOrigins" />
                 </MCol>
@@ -122,7 +124,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取角色信息失败");
+            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
         }
     }
 

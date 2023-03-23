@@ -66,9 +66,7 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
-                    AllowOfflineAccess=true,
+                    AllowOfflineAccess=true
                 },
                 //IdentityServer.Addmin.WASM
                 new Client
@@ -95,8 +93,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
                 //Server
@@ -124,8 +120,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
                 //WebAsseembly
@@ -153,8 +147,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
             };

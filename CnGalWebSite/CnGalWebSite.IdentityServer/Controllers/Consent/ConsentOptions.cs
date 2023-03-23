@@ -7,10 +7,10 @@ namespace IdentityServerHost.Quickstart.UI
     public class ConsentOptions
     {
         public static bool EnableOfflineAccess = true;
-        public static string OfflineAccessDisplayName = "Offline Access";
-        public static string OfflineAccessDescription = "Access to your applications and resources, even when you are offline";
+        public static string OfflineAccessDisplayName = "离线访问";
+        public static string OfflineAccessDescription = "即使处于离线状态也可以访问你的应用和资源";
 
-        public static readonly string MustChooseOneErrorMessage = "You must pick at least one permission";
-        public static readonly string InvalidSelectionErrorMessage = "Invalid selection";
+        public static readonly string MustChooseOneErrorMessage = "你必须至少选择一个授权";
+        public static readonly string InvalidSelectionErrorMessage = "无效的选择";
     }
 }

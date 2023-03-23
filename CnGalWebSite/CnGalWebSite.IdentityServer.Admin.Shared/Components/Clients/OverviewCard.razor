@@ -1,0 +1,65 @@
+﻿
+<MCard Class="@Class">
+    <MCardTitle>
+        @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
+        {
+            <img class="client-img" src="@Model.LogoUri" />
+        }
+        @Model.ClientName
+    </MCardTitle>
+    <MCardText Class="pb-2">
+        <EnableChip Enabled="@Model.Enabled" />
+        <CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.StateChip IsPassed="@Model.IsPassed" />
+        <LinkChip Link="@Model.ClientUri" />
+    </MCardText>
+    <MCardText Class="pt-0 pb-0">
+        客户端Id： @Model.ClientId
+    </MCardText>
+    <MCardText Class="pt-2">
+        @Model.Description
+    </MCardText>
+    <MCardActions>
+        <MSpacer></MSpacer>
+        <MButton Color="primary"
+                 Dark
+                 OnClick="EditItem">
+            <MIcon Left>mdi-pencil</MIcon>
+            编辑
+        </MButton>
+    </MCardActions>
+</MCard>
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="Model.Id" OnEdited="Edited" @ref="editCard" />
+</MDialog>
+@code {
+    [Parameter]
+    public UserClientOverviewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard editCard;
+
+    private bool _editDialog;
+
+    public async void EditItem()
+    {
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public async void Edited(ClientEditModel model)
+    {
+        _editDialog = false;
+        StateHasChanged();
+       await OnEdited.InvokeAsync();
+    }
+}
+

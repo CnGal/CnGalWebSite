@@ -1,0 +1,8 @@
+﻿<MChip Small Color="@(Required?"info":"success")" Outlined Class=" ma-1">
+    <MIcon Left Small>@(Required ? "mdi-send" : " mdi-arrange-send-to-back")</MIcon>
+    @(Required ? "必选":"可选")
+</MChip>
+@code {
+    [Parameter]
+    public bool Required { get; set; }
+}
