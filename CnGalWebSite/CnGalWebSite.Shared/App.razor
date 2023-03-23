@@ -50,8 +50,6 @@
 @code{
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
-    [Parameter]
-    public string Token { get; set; }
 
     public Type LayoutType
     {
@@ -59,38 +57,6 @@
         {
             return NavigationManager.Uri.Contains("/admin") ? typeof(AdminLayout) : (_dataCacheService.IsApp ? typeof(AppLayout) : typeof(PCLayout));
         }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        //if (ToolHelper.IsSSR && !string.IsNullOrWhiteSpace(Token))
-        //{
-        //    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
-        //}
-        //else
-        //{
-        //    if (!ToolHelper.IsSSR)
-        //    {
-        //        var TokenProvider = (IAccessTokenProvider)_serviceProvider.GetService(typeof(IAccessTokenProvider));
-        //        if (TokenProvider != null)
-        //        {
-        //            var accessTokenResult = await TokenProvider.RequestAccessToken();
-
-        //            var AccessToken = string.Empty;
-
-        //            if (accessTokenResult.TryGetToken(out var token))
-        //            {
-        //                AccessToken = token.Value;
-        //            }
-        //            if (string.IsNullOrWhiteSpace(AccessToken) == false)
-        //            {
-        //                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
-        //            }
-        //        }
-        //    }
-
-        //}
-
     }
 
     protected override async Task OnParametersSetAsync()

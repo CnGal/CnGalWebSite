@@ -54,9 +54,6 @@ else
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 </div>
-<h1>
-    @count
-</h1>
 
 @code {
 
@@ -71,7 +68,6 @@ else
     public ErrorHandler ErrorHandler { get; set; }
 
     AutoSaveTip<EditMainViewModel> autoSave { get; set; }
-    public int count;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,7 +75,6 @@ else
         {
             //获取词条信息
             Model = await _httpService.GetAsync<EditMainViewModel>("api/entries/editmain/" + Id);
-            count++;
             isReady = true;
             StateHasChanged();
         }

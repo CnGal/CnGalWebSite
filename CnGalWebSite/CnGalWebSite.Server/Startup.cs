@@ -119,19 +119,22 @@ namespace CnGalWebSite.Server
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IEventService, EventService>();
 
+            //自定义服务
+            services.AddScoped<IHttpService, HttpService>();
+            services.AddSingleton<ITokenStoreService, TokenStoreService>();
             //使用 IdentityModel 管理刷新令牌
             services.AddAccessTokenManagement();
 
             // not allowed to programmatically use HttpContext in Blazor Server.
             // that's why tokens cannot be managed in the login session
-            services.AddSingleton<IUserAccessTokenStore, ServerSideTokenStore>();
+            services.AddScoped<IUserAccessTokenStore, ServerSideTokenStore>();
 
             // registers HTTP client that uses the managed user access token
-            services.AddTransient<IHttpService, HttpService>();
             services.AddHttpClient<IHttpService, HttpService>(client =>
             {
                 client.BaseAddress = new Uri(ToolHelper.WebApiPath);
             });
+
             //添加认身份证
             //services.AddAuthorization(options =>
             //{

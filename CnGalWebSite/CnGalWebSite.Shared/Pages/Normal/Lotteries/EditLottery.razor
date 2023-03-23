@@ -3,13 +3,10 @@
 
 @inject IDataCacheService _dataCacheService
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-
-@if (ToolHelper.IsSSR == false)
-{
+<MakeSureInWASMTip>
     <CnGalWebSite.Shared.Pages.Webs.Lotteries.EditLottery Id="@Id" />
+</MakeSureInWASMTip>
 
-}
 
 
 
@@ -17,7 +14,7 @@
     [Parameter]
     public string Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         //清空当前缓存
         _dataCacheService.LotteryIndexPageCatche.Clean(Id);

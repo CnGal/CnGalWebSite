@@ -26,13 +26,20 @@
 
     protected void OnLogin()
     {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
         if (ToolHelper.IsSSR)
         {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri.Replace(NavigationManager.BaseUri, "")}", true);
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
         }
         else
         {
-            NavigationManager.NavigateToLogin("authentication/login");
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
     }
 }

@@ -36,7 +36,6 @@ builder.Services.AddAccessTokenManagement();
 builder.Services.AddScoped<IUserAccessTokenStore, ServerSideTokenStore>();
 
 // registers HTTP client that uses the managed user access token
-builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["IdsApiUrl"]);

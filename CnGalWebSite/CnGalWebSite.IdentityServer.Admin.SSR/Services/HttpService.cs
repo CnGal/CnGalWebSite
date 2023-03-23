@@ -63,13 +63,5 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
             _client.SetBearerToken(token);
             return _client;
         }
-
-        public async Task SetRefreshToken(ClaimsPrincipal user, string accessToken, string refreshToken)
-        {
-            if (await _userAccessTokenStore.GetTokenAsync(user) == null)
-            {
-                //await _userAccessTokenStore.StoreTokenAsync(user, accessToken, new DateTimeOffset(DateTime.Now), refreshToken);
-            }
-        }
     }
 }

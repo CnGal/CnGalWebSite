@@ -3,12 +3,10 @@
 
 @inject IDataCacheService _dataCacheService
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-
-@if (ToolHelper.IsSSR == false)
-{
+<MakeSureInWASMTip>
     <CnGalWebSite.Shared.Pages.Webs.Videos.CreateVideo />
-}
+</MakeSureInWASMTip>
+
 
 
 @code{

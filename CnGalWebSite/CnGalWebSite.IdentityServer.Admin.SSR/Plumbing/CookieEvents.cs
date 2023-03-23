@@ -9,13 +9,10 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 public class CookieEvents : CookieAuthenticationEvents
 {
     private readonly IUserAccessTokenStore _store;
-    private readonly IUserAccessTokenManagementService _userAccessTokenManagementService;
-    private readonly List<KeyValuePair<DateTime,string>> _failedCount = new List<KeyValuePair<DateTime, string>>();
 
-    public CookieEvents(IUserAccessTokenStore store, IUserAccessTokenManagementService userAccessTokenManagementService)
+    public CookieEvents(IUserAccessTokenStore store)
     {
         _store = store;
-        _userAccessTokenManagementService = userAccessTokenManagementService;
     }
 
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)

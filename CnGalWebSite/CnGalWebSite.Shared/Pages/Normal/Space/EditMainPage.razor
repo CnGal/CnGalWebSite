@@ -3,19 +3,16 @@
 
 @inject IDataCacheService _dataCacheService
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-@if (ToolHelper.IsSSR == false)
-{
+<MakeSureInWASMTip>
     <CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage>
-
-}
+</MakeSureInWASMTip>
 
 
 @code{
     [Parameter]
     public string Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         //清空当前缓存
         _dataCacheService.PersonalSpaceDataCatche.Clean(Id);

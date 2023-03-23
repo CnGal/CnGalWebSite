@@ -27,24 +27,6 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
-<AuthorizeView>
-    <Authorized>
-        <dl>
-            @foreach (var item in context.User.Claims)
-            {
-                <div>
-                    <dt>@item.Type</dt>
-                    <dd>@item.Value</dd>
-                </div>
-
-            }
-            </dl>
-     
-    </Authorized>
-</AuthorizeView>
-
-
-
 @code {
 
     private List<CarouselViewModel> Images = new List<CarouselViewModel>();
@@ -64,11 +46,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         try
         {
-
-
             Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 
             Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
