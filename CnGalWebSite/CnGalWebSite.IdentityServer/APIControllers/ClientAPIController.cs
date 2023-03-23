@@ -158,6 +158,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 Description = client.Description,
                 Enabled = client.Enabled,
                 RequireConsent = client.RequireConsent,
+                RequireClientSecret = client.RequireClientSecret,
                 Id = client.Id,
                 LogoUri = client.LogoUri,
                 AllowedScopes = client.AllowedScopes.Select(s => s.Scope).ToList(),
@@ -242,6 +243,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 client.ClientUri = model.ClientUri;
                 client.Description = model.Description;
                 client.RequireConsent = model.RequireConsent;
+                client.RequireClientSecret = model.RequireClientSecret;
                 await _userClientRepository.UpdateAsync(userClient);
             }
             else
