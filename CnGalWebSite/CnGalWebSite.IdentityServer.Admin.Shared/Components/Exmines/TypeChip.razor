@@ -1,0 +1,31 @@
+﻿    <MChip Small
+       Color="@GetColor()"
+       Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @Type.GetDisplayName()
+</MChip>
+
+@code {
+    [Parameter]
+    public ExamineType Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            ExamineType.Client => "green",
+            _ => "purple"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return Type switch
+        {
+            ExamineType.Client => "mdi-application",
+            _ => "mdi-lightbulb-question"
+        };
+    }
+}

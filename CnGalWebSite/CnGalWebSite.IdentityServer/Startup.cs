@@ -66,7 +66,7 @@ namespace CnGalWebSite.IdentityServer
                     }));
 
             //依赖注入仓储
-            services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
+            services.AddTransient(typeof(IRepository<,,>), typeof(RepositoryBase<,,>));
 
             //添加 MailKit 发送邮件
             services.AddMailKit(optionBuilder =>
@@ -276,6 +276,7 @@ namespace CnGalWebSite.IdentityServer
 
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
+
                 if (!context.Clients.Any())
                 {
                     foreach (var client in Config.Clients)

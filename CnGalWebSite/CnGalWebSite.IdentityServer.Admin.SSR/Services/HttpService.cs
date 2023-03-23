@@ -68,7 +68,7 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
         {
             if (await _userAccessTokenStore.GetTokenAsync(user) == null)
             {
-                await _userAccessTokenStore.StoreTokenAsync(user, accessToken, new DateTimeOffset(DateTime.Now), refreshToken);
+                //await _userAccessTokenStore.StoreTokenAsync(user, accessToken, new DateTimeOffset(DateTime.Now), refreshToken);
             }
         }
     }

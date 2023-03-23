@@ -1,0 +1,93 @@
+﻿@page "/users/clients"
+@attribute [Authorize]
+@inject IHttpService _httpService
+
+<MRow>
+    <MCol Cols="12" Lg="6" Xl="4">
+        <MCard Class="list-card">
+            <MCardTitle>应用列表</MCardTitle>
+            <MCardText>
+                创建第三方应用后，你可以将CnGal资料站作为第三方登入提供商加入到你的网站、APP中，之后你的用户可以使用CnGal资料站的账户登入你的应用
+            </MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="primary"
+                         Dark
+                         OnClick="OnClickAdd">
+                    <MIcon Left>mdi-plus</MIcon>
+                    创建
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </MCol>
+    @if (Model == null)
+    {
+        <MCol Cols="12" Lg="6" Xl="4">
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Shared.ProgressingCard  Class="h-100"/>
+        </MCol>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <MCol Cols="12" Lg="6" Xl="4">
+                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card"  OnEdited="OnEdited"/>
+            </MCol>
+        }
+    }
+
+</MRow>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    List<UserClientOverviewModel> Model;
+
+    private bool _editDialog;
+    private int _editedItemId;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard editCard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = await _httpService.GetAsync<List<UserClientOverviewModel>>("api/clients/list");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取客户端列表失败");
+        }
+    }
+
+    public async Task OnClickAdd()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public async Task OnEdited()
+    {
+        _editDialog = false;
+        await Refresh();
+    }
+}

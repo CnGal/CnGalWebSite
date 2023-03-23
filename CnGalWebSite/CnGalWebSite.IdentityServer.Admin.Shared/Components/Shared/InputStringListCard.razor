@@ -1,0 +1,72 @@
+﻿@inject IPopupService PopupService
+
+<MBorder Color="primary" Style="border-radius:0;height:50%;margin: auto 0;">
+    <MCardTitle>@Title</MCardTitle>
+    <MCardSubtitle>@SubTitle</MCardSubtitle>
+</MBorder>
+<div class="input-string-card">
+    <MTextField Label="@Title" @bind-Value="@_item" TValue="string"/>
+    <MButton Color="primary"
+             Dark
+             OnClick="Add">
+        <MIcon Left>mdi-plus</MIcon>
+        添加
+    </MButton>
+</div>
+<MSimpleTable>
+    <thead>
+        <tr>
+            <th class="text-left">
+                @Title
+            </th>
+            <th class="text-left">
+                操作
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr @key="Items.IndexOf( item)">
+                <td>@item</td>
+                <td>
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>Delete(item)">mdi-trash-can</MIcon>
+                </td>
+            </tr>
+        }
+    </tbody>
+</MSimpleTable>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string SubTitle { get; set; }
+    [Parameter]
+    public List<string> Items { get; set; }
+
+    string _item;
+
+    public async Task Add()
+    {
+        if (string.IsNullOrWhiteSpace(_item))
+        {
+            await PopupService.ToastAsync("项目不能为空", AlertTypes.Error);
+            return;
+        }
+        if (Items.Any(s => s == _item))
+        {
+            await PopupService.ToastAsync("不能重复添加同一项目", AlertTypes.Error);
+            return;
+        }
+        Items.Add(_item);
+        _item = null;
+    }
+
+    public void Delete(string item)
+    {
+        Items.Remove(item);
+    }
+}

@@ -25,8 +25,8 @@ namespace CnGalWebSite.IdentityServer
                 new IdentityResources.Profile(),
                 new IdentityResource("role", new string[]{JwtClaimTypes.Role,ClaimTypes.Role, })
             };
-        public static IEnumerable<ApiScope> ApiScopes =>
-          new ApiScope[]
+        public static List<ApiScope> ApiScopes =>
+          new List<ApiScope>
           {
               new ApiScope(IdentityServerConstants.LocalApi.ScopeName,new List<string>(){JwtClaimTypes.Role,ClaimTypes.Role,ClaimTypes.Name,JwtClaimTypes.Name,ClaimTypes.Email,JwtClaimTypes.Email}),
               new ApiScope("CnGalAPI", "CnGal V3 API",new List<string>(){JwtClaimTypes.Role,ClaimTypes.Role,ClaimTypes.Name,JwtClaimTypes.Name,ClaimTypes.Email,JwtClaimTypes.Email}),
@@ -38,8 +38,8 @@ namespace CnGalWebSite.IdentityServer
             new ApiResource("CnGalAPI", "CnGal V3 API"),
         };
 
-        public static IEnumerable<Client> Clients =>
-            new Client[]
+        public static List<Client> Clients =>
+            new List<Client>
             {
                 //IdentityServer.Addmin.SSR
                 new Client
@@ -66,9 +66,7 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
-                    AllowOfflineAccess=true,
+                    AllowOfflineAccess=true
                 },
                 //IdentityServer.Addmin.WASM
                 new Client
@@ -95,8 +93,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
                 //Server
@@ -124,8 +120,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
                 //WebAsseembly
@@ -153,8 +147,6 @@ namespace CnGalWebSite.IdentityServer
                     },
                     AlwaysSendClientClaims = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
-                    //令牌有效期
-                    AccessTokenLifetime=10,
                     AllowOfflineAccess=true,
                 },
             };

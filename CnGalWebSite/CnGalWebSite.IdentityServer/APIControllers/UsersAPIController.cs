@@ -26,6 +26,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using BlazorComponent;
 using CnGalWebSite.IdentityServer.Services.Shared;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -34,12 +35,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/users/[action]")]
     public class UsersAPIController : ControllerBase
     {
-        private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
         private readonly IQueryService _queryService;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IRepository<ApplicationRole, string> _roleRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationRole, string> _roleRepository;
 
-        public UsersAPIController(IRepository<ApplicationUser, string> userRepository, IQueryService queryService, UserManager<ApplicationUser> userManager, IRepository<ApplicationRole, string> roleRepository)
+        public UsersAPIController(IRepository<ApplicationDbContext, ApplicationUser, string> userRepository, IQueryService queryService, UserManager<ApplicationUser> userManager, IRepository<ApplicationDbContext, ApplicationRole, string> roleRepository)
         {
             _userRepository = userRepository;
             _queryService = queryService;

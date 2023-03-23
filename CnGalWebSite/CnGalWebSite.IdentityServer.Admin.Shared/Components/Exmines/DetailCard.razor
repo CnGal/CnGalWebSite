@@ -1,0 +1,161 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+@if (Model == null)
+{
+    <ProgressingCard />
+}
+else
+{
+<MCard>
+    <MCardTitle>
+        审核
+    </MCardTitle>
+    <MCardText>
+        Id：@Model.Id
+    </MCardText>
+    <MCardText>
+        <TypeChip Type="Model.Type" />
+        <StateChip IsPassed="Model.IsPassed" />
+    </MCardText>
+    <MCardText>
+        <dl>
+            <div>
+                <dt>申请用户</dt>
+                <dd>@Model.UserName</dd>
+            </div>
+            <div>
+                <dt>申请时间</dt>
+                <dd>@Model.ApplyTime</dd>
+            </div>
+            @if (Model.PassedTime != null)
+            {
+                <div>
+                    <dt>处理人</dt>
+                    <dd>@Model.PassedAdminName</dd>
+                </div>
+                <div>
+                    <dt>处理时间</dt>
+                    <dd>@Model.PassedTime</dd>
+                </div>
+            }
+
+        </dl>
+    </MCardText>
+    @if (Model.KeyValues.Any())
+    {
+        <MCardText>
+            <dl>
+                @foreach (var item in Model.KeyValues)
+                {
+                    <div>
+                        <dt>@item.Key</dt>
+                        <dd>@item.Vaule</dd>
+                    </div>
+                }
+            </dl>
+        </MCardText>
+    }
+    @if (Model.Images.Any())
+    {
+        <MCardText>
+            <dl>
+                @foreach (var item in Model.Images)
+                {
+                    <div>
+                        <dt>@item.Name</dt>
+                        <dd><MImage Height="50" Width="50" Src="@item.Url" /></dd>
+                    </div>
+                }
+            </dl>
+        </MCardText>
+    }
+
+    <MCardActions>
+        <MButton Color="error"
+                 Text
+                 OnClick="@(()=>SaveEdit(false))">
+            <MIcon Left>mdi-close-thick</MIcon>
+            驳回
+        </MButton>
+        <MSpacer></MSpacer>
+        <MButton Color="success"
+                 Text
+                 OnClick="@(()=>SaveEdit(true))">
+            <MIcon Left>mdi-check</MIcon>
+            通过
+        </MButton>
+    </MCardActions>
+
+</MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    ExamineDetailModel Model;
+
+    private string _baseUrl = "api/examines/";
+    private string _name = "审核";
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = await _httpService.GetAsync<ExamineDetailModel>($"{_baseUrl}view?id={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取审核记录失败");
+        }
+    }
+
+    public async Task SaveEdit(bool isPassed)
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<ExamineProcModel, Result>($"{_baseUrl}proc", new ExamineProcModel
+            {
+                Id = Id,
+                IsPassed = isPassed
+            });
+            if (result.Success)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                {
+                    await PopupService.ToastAsync(result.Message, AlertTypes.Success);
+                }
+                await OnEdited.InvokeAsync(Model);
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"处理{_name}失败");
+        }
+
+    }
+}

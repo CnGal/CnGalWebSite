@@ -11,21 +11,19 @@ namespace CnGalWebSite.APIServer.DataReositories
     /// <summary>
     /// 默认仓储的通用功能实现，用于所有领域模型
     /// </summary>
-    /// <typeparam name="Tentity"></typeparam>
-    /// <typeparam name="TPrimaryKey"></typeparam>
-    public class RepositoryBase<Tentity, TPrimaryKey> : IRepository<Tentity, TPrimaryKey> where Tentity : class
+    public class RepositoryBase<TDbContext, Tentity, TPrimaryKey> : IRepository<TDbContext,Tentity, TPrimaryKey> where Tentity : class where TDbContext : DbContext
     {
         /// <summary>
         /// 数据库上下文
         /// </summary>
-        protected readonly ApplicationDbContext _dbContext;
+        protected readonly TDbContext _dbContext;
 
         /// <summary>
         /// 通过泛型，从数据库上下文中获取领域模型
         /// </summary>
         public virtual DbSet<Tentity> Table => _dbContext.Set<Tentity>();
 
-        public RepositoryBase(ApplicationDbContext dbContext)
+        public RepositoryBase(TDbContext dbContext)
         {
             _dbContext = dbContext;
         }

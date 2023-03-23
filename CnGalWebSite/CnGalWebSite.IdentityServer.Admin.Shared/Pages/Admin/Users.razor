@@ -9,7 +9,7 @@
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
-            <MIcon Small Color="success"
+            <MIcon Color="success"
                    Class="mr-2"
                    OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
         }
@@ -46,17 +46,8 @@
             }
 
 
-            <span>角色</span>
             <AuthorizeView>
-                <MRow>
-                    @foreach (var item in _roles)
-                    {
-                        <MCol Class="pt-0 pb-0">
-                            <MCheckbox Value="_tempItem.Roles.Contains(item)" Label="@item" ValueChanged="@((e)=>EditUserRole(e,item))" TValue="bool" Disabled="@(!context.User.IsInRole("SuperAdmin"))" HideDetails="true">
-                            </MCheckbox>
-                        </MCol>
-                    }
-                </MRow>
+                <InputCheckboxList Title="角色" AllItems="_roles" Disabled="@(!context.User.IsInRole("SuperAdmin"))" Items="_tempItem.Roles"/>
             </AuthorizeView>
         </MCardText>
         <MCardActions>
@@ -91,7 +82,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    IEnumerable<string> _roles;
+    IEnumerable<KeyValuePair<string, string>> _roles;
 
     DataTableCard<UserOverviewModel> dataTableCard;
 
@@ -103,7 +94,7 @@
     {
         try
         {
-            _roles = await _httpService.GetAsync<IEnumerable<string>>("api/roles/all");
+            _roles = await _httpService.GetAsync<IEnumerable<KeyValuePair<string, string>>>("api/roles/all");
         }
         catch (Exception ex)
         {

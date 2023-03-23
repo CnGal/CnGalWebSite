@@ -14,6 +14,7 @@ using IdentityServer4.Models;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 using Microsoft.AspNetCore.Http;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.Services.Account
 {
@@ -23,9 +24,9 @@ namespace CnGalWebSite.IdentityServer.Services.Account
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IHttpContextAccessor _accessor;
-        private readonly IRepository<OperationRecord, long> _operationRecordRepository;
+        private readonly IRepository<ApplicationDbContext, OperationRecord, long> _operationRecordRepository;
 
-        public AccountService(UserManager<ApplicationUser> userManager, IClientStore clientStore, IAuthenticationSchemeProvider schemeProvider, IRepository<OperationRecord, long> operationRecordRepository, IHttpContextAccessor accessor)
+        public AccountService(UserManager<ApplicationUser> userManager, IClientStore clientStore, IAuthenticationSchemeProvider schemeProvider, IRepository<ApplicationDbContext, OperationRecord, long> operationRecordRepository, IHttpContextAccessor accessor)
         {
             _userManager = userManager;
             _clientStore = clientStore;

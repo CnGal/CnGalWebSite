@@ -1,0 +1,108 @@
+﻿@page "/admin/identityresources"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject INavigationService _navigationService
+
+@using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
+
+<DataTableCard TModel="IdentityResourceOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == "required")
+        {
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.ApiScopes.RequiredChip Required="@context.Item.Required" />
+        }
+        else if (context.Header.Value == "enable")
+        {
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EnableChip Enabled="@context.Item.Enabled" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.IdentityResources.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private int _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/identityresources/";
+    private string _name = "IdentityResource";
+
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.IdentityResources.EditCard editCard;
+
+    private List<DataTableHeader<IdentityResourceOverviewModel>> _headers = new List<DataTableHeader<IdentityResourceOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(IdentityResourceOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(IdentityResourceOverviewModel.Name)},
+          new (){ Text= "显示名称", Value= nameof(IdentityResourceOverviewModel.DisplayName)},
+          new (){ Text= "简介", Value= nameof(IdentityResourceOverviewModel.Description)},
+          new (){ Text= "必选", Value= "required"},
+          new (){ Text= "启用", Value= "enable" },
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<IdentityResourceOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async void EditItem(IdentityResourceOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+}

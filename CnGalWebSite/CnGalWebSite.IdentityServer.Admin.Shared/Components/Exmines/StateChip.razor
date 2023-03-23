@@ -1,0 +1,41 @@
+﻿<MChip Small Color="@GetColor()" Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @GetText()
+</MChip>
+
+@code {
+    [Parameter]
+    public bool? IsPassed { get; set; }
+
+    public string GetColor()
+    {
+        return IsPassed switch
+        {
+            true => "green",
+            false => "error",
+            null => "info"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return IsPassed switch
+        {
+            true => "mdi-check-bold",
+            false => "mdi-alert-circle",
+            null => "mdi-clock-outline"
+        };
+    }
+
+    public string GetText()
+    {
+        return IsPassed switch
+        {
+            true => "已通过",
+            false => "未通过",
+            null => "待审核"
+        };
+    }
+}

@@ -6,6 +6,9 @@ using System;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Messages;
 using CnGalWebSite.IdentityServer.Models.DataModels.Records;
+using CnGalWebSite.IdentityServer.Admin.SSR.Models;
+using CnGalWebSite.IdentityServer.Models.DataModels.Examines;
+using CnGalWebSite.IdentityServer.Models.DataModels.Clients;
 
 namespace CnGalWebSite.IdentityServer.Data
 {
@@ -16,6 +19,9 @@ namespace CnGalWebSite.IdentityServer.Data
         public DbSet<VerificationCode> VerificationCodes { get; set; }
         public DbSet<SendRecord> SendRecords { get; set; }
         public DbSet<OperationRecord> OperationRecords { get; set; }
+        public DbSet<AppUserAccessToken> AppUserAccessTokens { get; set; }
+        public DbSet<UserClient> UserClients { get; set; }
+        public DbSet<Examine> Examines { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

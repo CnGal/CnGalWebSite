@@ -17,7 +17,7 @@
                 </ImgContent>
 
                 <ChildContent>
-                    <MAppBarNavIcon></MAppBarNavIcon>
+                    <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
                     <MAppBarTitle>CnGal资料站 - 开放平台</MAppBarTitle>
                     <MSpacer></MSpacer>
                     <CnGalWebSite.IdentityServer.Admin.Shared.Components.Layout.UserButton />
@@ -26,10 +26,17 @@
                     <MTabs AlignWithTitle>
                         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
                         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">个人信息</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">应用列表</MTab>
+
                         <AuthorizeView Roles="Admin">
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">用户列表</MTab>
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">角色列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">客户端列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">API范围列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">身份资源列表</MTab>
                         </AuthorizeView>
+
                     </MTabs>
                 </ExtensionContent>
             </MAppBar>
@@ -42,6 +49,49 @@
             </MSheet>
         </div>
     </MMain>
+    <MNavigationDrawer @bind-Value="_drawer" Absolute Temporary>
+        <div class="nav-drawer">
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/"))">
+                <MIcon Left>mdi-home</MIcon>
+                主页
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">
+                <MIcon Left>mdi-account</MIcon>
+                个人信息
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">
+                <MIcon Left>mdi-application-outline</MIcon>
+                应用列表
+            </MButton>
+            <AuthorizeView Roles="Admin">
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">
+                    <MIcon Left>mdi-account-group</MIcon>
+                    用户列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">
+                    <MIcon Left>mdi-account-lock</MIcon>
+                    角色列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">
+                    <MIcon Left>mdi-application</MIcon>
+                    客户端列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">
+                    <MIcon Left>mdi-bell-outline</MIcon>
+                    审核列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">
+                    <MIcon Left>mdi-lock</MIcon>
+                    API范围列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">
+                    <MIcon Left>mdi-forest</MIcon>
+                    身份资源列表
+                </MButton>
+            </AuthorizeView>
+          
+        </div>
+    </MNavigationDrawer>
     <MFooter App Absolute>
         &copy; 2023 - CnGal资料站
         &nbsp;&nbsp;&nbsp;<a target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备15055899号</a>
@@ -52,6 +102,15 @@
 
 <SynchronousAuthStateCard />
 
-@code {
 
+
+@code {
+    private bool _drawer = false;
+    private StringNumber _value = default;
+
+    void ValueChanged(StringNumber value)
+    {
+        _value = value;
+        _drawer = false;
+    }
 }

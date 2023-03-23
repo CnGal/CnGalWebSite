@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;
@@ -29,9 +30,9 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     {
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IAccountService _accountService;
-        private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
 
-        public AccountAPIController( IIdentityServerInteractionService interaction, IAccountService accountService,IRepository<ApplicationUser, string> userRepository)
+        public AccountAPIController( IIdentityServerInteractionService interaction, IAccountService accountService,IRepository<ApplicationDbContext, ApplicationUser, string> userRepository)
         {
             _interaction = interaction;
             _userRepository = userRepository;

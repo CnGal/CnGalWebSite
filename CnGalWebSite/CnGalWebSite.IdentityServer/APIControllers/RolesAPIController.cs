@@ -28,6 +28,7 @@ using BlazorComponent;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
 using CnGalWebSite.IdentityServer.Services.Shared;
 using OneOf.Types;
+using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -36,11 +37,11 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/roles/[action]")]
     public class RolesAPIController : ControllerBase
     {
-        private readonly IRepository<ApplicationRole, string> _roleRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationRole, string> _roleRepository;
         private readonly IQueryService _queryService;
-        private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
 
-        public RolesAPIController(IRepository<ApplicationRole, string> roleRepository, IQueryService queryService, IRepository<ApplicationUser, string> userRepository)
+        public RolesAPIController(IRepository<ApplicationDbContext, ApplicationRole, string> roleRepository, IQueryService queryService, IRepository<ApplicationDbContext, ApplicationUser, string> userRepository)
         {
             _roleRepository = roleRepository;
             _queryService = queryService;
@@ -48,9 +49,9 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpGet]
-        public async Task< IEnumerable<string>> All()
+        public async Task<IEnumerable< KeyValuePair<string, string>>> All()
         {
-            return await _roleRepository.GetAll().Select(s => s.Name).ToListAsync();
+            return await _roleRepository.GetAll().Select(s => new KeyValuePair<string, string>(s.Name, null)).ToListAsync();
         }
 
         [HttpPost]

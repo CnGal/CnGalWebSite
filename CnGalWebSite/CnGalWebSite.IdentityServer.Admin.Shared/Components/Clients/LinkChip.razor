@@ -1,0 +1,14 @@
+﻿@inject INavigationService _navigationService
+
+@if (!string.IsNullOrWhiteSpace(Link))
+{
+<MChip Small Color="info" Outlined OnClick="@(()=>_navigationService.OpenNewPage(Link))" Class=" ma-1">
+    <MIcon Left Small>mdi-link</MIcon>
+    @Link
+</MChip>
+}
+
+@code {
+    [Parameter]
+    public string Link { get; set; }
+}

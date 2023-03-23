@@ -1,4 +1,5 @@
 ﻿using IdentityModel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace CnGalWebSite.APIServer.DataReositories
     /// </summary>
     /// <typeparam name="TEntity">当前传入的仓储的实体类型</typeparam>
     /// <typeparam name="TPrimaryKey">传入仓储的主键类型</typeparam>
-    public interface IRepository<TEntity, TPrimaryKey> where TEntity : class
+    /// <typeparam name="TDbContext">数据库</typeparam>
+    public interface IRepository<TDbContext,TEntity, TPrimaryKey> where TEntity : class where TDbContext : DbContext
     {
         #region 查询
         /// <summary>

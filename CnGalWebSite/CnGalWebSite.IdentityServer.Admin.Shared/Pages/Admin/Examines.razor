@@ -1,0 +1,101 @@
+﻿@page "/admin/examines"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject INavigationService _navigationService
+
+@using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
+
+<DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+        }
+        else if (context.Header.Value == "type")
+        {
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.TypeChip Type="context.Item.Type"/>
+        }
+        else if (context.Header.Value == "state")
+        {
+           <CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.StateChip IsPassed="context.Item.IsPassed"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_detailDialog"
+         MaxWidth="1200">
+
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.DetailCard Id="_detailId" OnEdited="OnEdited" @ref="detailCard"/>
+</MDialog>
+
+@code {
+    private bool _detailDialog;
+    private long _detailId;
+
+    private string _baseUrl = "api/examines/";
+    private string _name = "审核";
+
+
+    private List<DataTableHeader<ExamineOverviewModel>> _headers = new List<DataTableHeader<ExamineOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExamineOverviewModel.Id)
+          },
+          new (){ Text= "类型", Value="type"},
+          new (){ Text= "申请用户", Value=  nameof(ExamineOverviewModel.UserName)},
+          new (){ Text= "申请时间", Value= nameof(ExamineOverviewModel.ApplyTime)},
+          new (){ Text= "处理人", Value=  nameof(ExamineOverviewModel.PassedAdminName)},
+          new (){ Text= "处理时间", Value= nameof(ExamineOverviewModel.PassedTime)},
+          new (){ Text= "状态", Value= "state"},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    IEnumerable<string> _roles;
+
+    DataTableCard<ExamineOverviewModel> dataTableCard;
+    CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.DetailCard detailCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task DetailItem(ExamineOverviewModel model)
+    {
+        _detailDialog = true;
+        _detailId = model.Id;
+        StateHasChanged();
+        if(detailCard!=null)
+        {
+           await detailCard.Refresh();
+        }
+
+    }
+
+    public void OnEdited()
+    {
+        _detailDialog = false;
+        StateHasChanged();
+        if(dataTableCard!=null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+}
