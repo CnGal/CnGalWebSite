@@ -26,7 +26,7 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
         private readonly ILogger<HttpService> _logger;
         private readonly NavigationManager _navigationManager;
 
-        private readonly string _baseUrl = "https://localhost:5001/";
+        private readonly string _baseUrl = "https://oauth2.cngal.org/";
         private bool _isPreRender =true;
 
         public bool IsAuth { get; set; }

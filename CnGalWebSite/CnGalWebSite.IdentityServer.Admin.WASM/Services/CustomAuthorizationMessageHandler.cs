@@ -15,7 +15,7 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
             NavigationManager navigationManager)
             : base(provider, navigationManager)
         {
-            ConfigureHandler(authorizedUrls: new[] { "https://localhost:5001/" });
+            ConfigureHandler(authorizedUrls: new[] { "https://oauth2.cngal.org/" });
         }
     }
 }
