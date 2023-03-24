@@ -16,6 +16,10 @@
 
 </details>
 
+## Docker
+
+以下配置可能已过时，请查看 [Docker 示例配置文件](/examples/compose)，快速运行项目
+
 ## 安装开发环境
 
 选择安装 [Visual Studio 2022](https://visualstudio.microsoft.com/zh-hans/vs/) 需要安装 ASP .Net 和Web 开发的工作负载，也可以使用 VS Code 等编辑器并安装 .Net 6.0 SDK

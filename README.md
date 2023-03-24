@@ -116,6 +116,10 @@ PWA 应用：https://app.cngal.org/
 
 ![主页](Docs/Images/主页v3.3.png)
 
+![开放平台](Docs/Images/开放平台.png)
+
+![鉴权中心](Docs/Images/鉴权中心.png)
+
 <!-- 把你项目的demo放在这里，可以是具体的访问地址、图片截图、Gif或者视频等。 -->
 
 <span id="nav-5"></span>
@@ -170,6 +174,14 @@ PWA 应用：https://app.cngal.org/
   - 合并词条
   - 转载文章
   - 转载视频
+- 开放平台
+  - 注册应用
+  - 提供聚合登入
+- 鉴权中心
+  - 登入授权
+  - 修改账号资料
+  - 绑定第三方账号
+  - 身份验证
 - 其他
   - 数据汇总页面
   - 编辑指引与词条完善度检查
@@ -195,6 +207,12 @@ ORM：Entity Framework Core 7.0
 
 SDK：.Net 7.0
 
+### 鉴权中心
+
+架构：ASP.NET Core MVC
+
+基于 IdentityServer4 二次开发
+
 ### 看板娘
 
 QQ机器人框架使用 [Mirai](https://github.com/mamoe/mirai) 和 [Mirai-API-HTTP](https://github.com/project-mirai/mirai-api-http) 插件
@@ -207,23 +225,31 @@ QQ频道使用官方API，在 [.Net](https://github.com/microsoft/dotnet) 平台
 <!-- 在这里填写你的项目架构图或描述，你可以放置项目目录描述 -->
 
 ```
-|—— .git                              Git 配置文件
-|—— CnGalWebSite                      项目代码
-| |—— CnGalWebSite.APIServer          API项目
-| | |—— Application                     公共方法
-| | |—— Controllers                     控制器
-| | |—— CustomMiddlewares               中间件
-| | |—— DataReositories                 数据库基础设施
-| | |—— Infrastructure                  接口
-| | |—— Migrations                      数据库迁移文件
-| |—— CnGalWebSite.Server             服务端渲染项目
-| |—— CnGalWebSite.WebAssembly        客户端渲染项目
-| |—— CnGalWebSite.DataModel          数据模型类库
-| |—— CnGalWebSite.Shared             Blazor页面组件类库
-|—— CHANGELOG.md                    发布日志
-|—— LICENSE                         许可证
-|—— README.md                       中文 README
-|—— README.en-US.md                 英语 README
+|—— .git                                       Git 配置文件
+|—— CnGalWebSite                               项目代码
+| |—— CnGalWebSite.APIServer                       主站 - API
+| |—— CnGalWebSite.DataModel                       主站 - 数据模型
+| |—— CnGalWebSite.DrawingBed                      图床 - API
+| |—— CnGalWebSite.Extensions                      公共 - 扩展类库
+| |—— CnGalWebSite.HealthCheck                     公共 - 健康检查
+| |—— CnGalWebSite.Helper                          公共 - 工具类库
+| |—— CnGalWebSite.HistoryData                     资料表处理脚本（已弃用）
+| |—— CnGalWebSite.IdentityServer                  鉴权中心
+| |—— CnGalWebSite.IdentityServer.Admin.Shared     开放平台 - 共享组件
+| |—— CnGalWebSite.IdentityServer.Admin.SSR        开放平台 - SSR
+| |—— CnGalWebSite.IdentityServer.Admin.WASM       开放平台 - WASM
+| |—— CnGalWebSite.IdentityServer.Models           鉴权中心 - 数据模型
+| |—— CnGalWebSite.Maui                            MAUI
+| |—— CnGalWebSite.PostTools                       投稿工具（已弃用）
+| |—— CnGalWebSite.PublicToolbox                   投稿工具
+| |—— CnGalWebSite.RobotClient                     看板娘
+| |—— CnGalWebSite.Server                          主站 - SSR
+| |—— CnGalWebSite.Shared                          主站 - 共享组件
+| |—— CnGalWebSite.WebAssembly                     主站 - WASM
+|—— CHANGELOG.md                              发布日志
+|—— LICENSE                                   许可证
+|—— README.md                                 中文 README
+|—— README.en-US.md                           英语 README
 
 ```
 
@@ -254,7 +280,7 @@ QQ频道使用官方API，在 [.Net](https://github.com/microsoft/dotnet) 平台
 <details>
   <summary>点我 打开/关闭 维护者列表</summary>
 
-- [沙雕の方块](https://github.com/LittleFish-233) - 项目开发者，大二，努力成为全栈工程师中
+- [沙雕の方块](https://github.com/LittleFish-233) - 项目开发者，大三，努力成为全栈工程师中
 
 </details>
 
