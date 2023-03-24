@@ -150,8 +150,8 @@ namespace CnGalWebSite.Server
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "cookies";
-                options.DefaultChallengeScheme = "oidc";
-                options.DefaultSignOutScheme = "oidc";
+                options.DefaultChallengeScheme = "cngal";
+                options.DefaultSignOutScheme = "cngal";
             })
                 .AddCookie("cookies", options =>
                 {
@@ -160,7 +160,7 @@ namespace CnGalWebSite.Server
 
                     options.EventsType = typeof(CookieEvents);
                 })
-                .AddOpenIdConnect("oidc", options =>
+                .AddOpenIdConnect("cngal", options =>
                 {
                     //id4服务的地址
                     options.Authority = Configuration["Authority"];

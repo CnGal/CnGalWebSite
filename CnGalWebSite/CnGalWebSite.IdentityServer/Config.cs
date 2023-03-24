@@ -53,9 +53,9 @@ namespace CnGalWebSite.IdentityServer
                     //Blazor运行时的URL
                     AllowedCorsOrigins =     { IdsSSR },
                     //登录成功之后将要跳转的Blazor的URL
-                    RedirectUris = { $"{IdsSSR}/signin-oidc" },
+                    RedirectUris = { $"{IdsSSR}/signin-cngal" },
                     //登出之后将要跳转的Blazor的URL
-                    PostLogoutRedirectUris = { $"{IdsSSR}/signout-callback-oidc" },
+                    PostLogoutRedirectUris = { $"{IdsSSR}/signout-callback-cngal" },
                     //允许的Scope，openid包含用户id，profile包含用户基本资料，api为自定义的scope，也可以为其他名字
                     AllowedScopes = new List<string>
                     {
@@ -107,9 +107,9 @@ namespace CnGalWebSite.IdentityServer
                     //Blazor运行时的URL
                     AllowedCorsOrigins =     { SSR },
                     //登录成功之后将要跳转的Blazor的URL
-                    RedirectUris = { $"{SSR}/signin-oidc" },
+                    RedirectUris = { $"{SSR}/signin-cngal" },
                     //登出之后将要跳转的Blazor的URL
-                    PostLogoutRedirectUris = { $"{SSR}/signout-callback-oidc" },
+                    PostLogoutRedirectUris = { $"{SSR}/signout-callback-cngal" },
                     //允许的Scope，openid包含用户id，profile包含用户基本资料，api为自定义的scope，也可以为其他名字
                     AllowedScopes = new List<string>
                     {

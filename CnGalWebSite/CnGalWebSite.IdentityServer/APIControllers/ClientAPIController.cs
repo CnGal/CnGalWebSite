@@ -184,11 +184,20 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             {
                 return new Result { Success = false, Message = "客户端链接不能为空" };
             }
+            var user = await FindLoginUserAsync();
 
             Client client = null;
             string secret = null;
             if (model.Id == 0)
             {
+                //检查用户客户端上限
+                if(!User.IsInRole("Admin"))
+                {
+                    if (await _userClientRepository.CountAsync(s => s.ApplicationUserId == user.Id) > 10)
+                    {
+                        return new Result { Success = false, Message = "客户端达到上限" };
+                    }
+                }
                 secret = Guid.NewGuid().ToString();
                 client = await _clientRepository.InsertAsync(new Client
                 {
@@ -219,7 +228,6 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
 
             //保存用户客户端
-            var user = await FindLoginUserAsync();
             var userClient = await _userClientRepository.FirstOrDefaultAsync(s => s.ClientId == client.Id);
             if (userClient == null)
             {

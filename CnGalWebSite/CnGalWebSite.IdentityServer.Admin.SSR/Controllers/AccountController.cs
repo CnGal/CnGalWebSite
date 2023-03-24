@@ -34,7 +34,7 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Controllers
             _logger.LogInformation($"id4跳转登录, returnUrl={returnUrl}");
 
             //跳转到Identity Server 4统一登录
-            return Challenge(properties, "oidc");
+            return Challenge(properties, "cngal");
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Controllers
             };
 
             //跳转到Identity Server 4统一退出登录
-            return SignOut(properties, "oidc");
+            return SignOut(properties, "cngal");
         }
     }
 }
