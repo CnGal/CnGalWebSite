@@ -1,18 +1,17 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IHttpService _httpService
 
 
 @if (_dataCacheService.ThemeSetting.IsTransparent)
 {
-    <AuthorizeView>
-        @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.MBgImage) == false)
-        {
-            <div id="web_bg" style="@($"background-image: url({_dataCacheService.UserInfor?.MBgImage})")" class=" d-none d-sm-block"></div>
-        }
-        @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.SBgImage) == false)
-        {
-            <div id="web_bg" style="@($"background-image: url({_dataCacheService.UserInfor?.SBgImage})")" class="d-md-none"></div>
-        }
-    </AuthorizeView>
+    @if (string.IsNullOrWhiteSpace(Model?.MBgImage) == false)
+    {
+        <div id="web_bg" style="@($"background-image: url({Model?.MBgImage})")" class=" d-none d-sm-block"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model?.SBgImage) == false)
+    {
+        <div id="web_bg" style="@($"background-image: url({Model?.SBgImage})")" class="d-md-none"></div>
+    }
     @if (_dataCacheService.ThemeSetting.IsDark)
     {
         <div id="web_bg" style="background-color: rgba(36,36,36,0.9);z-index:-8"></div>
@@ -21,8 +20,31 @@
 }
 
 @code {
-    public void Refresh()
+    UserInforViewModel Model;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        StateHasChanged();
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated&& Model==null)
+        {
+            try
+            {
+                string userId = userId = user.User.Claims.GetUserId();
+
+                if (string.IsNullOrWhiteSpace(userId) == false)
+                {
+                    Model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + userId);
+
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+
+            }
+        }
     }
 }
