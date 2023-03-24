@@ -16,7 +16,7 @@
             <partial name="_ValidationSummary" />
 
             <div class="mdl-card__supporting-text">
-                <form asp-route="SelectModifyField">
+                <form asp-route="SelectModifyField" onsubmit="return callGeetest()">
                     <input type="hidden" asp-for="ReturnUrl" />
 
                     <!--极验-->
@@ -29,7 +29,7 @@
                     <!--极验-->
 
                     <div class="action">
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="callGeetest()" type="button">验证</button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">验证</button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
                     </div>
                 </form>

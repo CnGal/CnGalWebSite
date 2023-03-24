@@ -12,9 +12,9 @@
 
 <MApp>
     <BootstrapBlazorRoot>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-            <CascadingValue Value="connectionInfo" IsFixed="true">
-                <CascadingAuthenticationState>
+        <CascadingValue Value="connectionInfo" IsFixed="true">
+            <CascadingAuthenticationState>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
                     <Router AppAssembly="@typeof(AdminLayout).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
                             @if (ToolHelper.IsSSR)
@@ -28,7 +28,7 @@
                                         <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
                                     </NotAuthorized>
                                     <Authorizing>
-                                        
+
                                     </Authorizing>
                                 </AuthorizeRouteView>
                             }
@@ -40,9 +40,9 @@
                             </LayoutView>
                         </NotFound>
                     </Router>
-                </CascadingAuthenticationState>
-            </CascadingValue>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+            </CascadingAuthenticationState>
+        </CascadingValue>
     </BootstrapBlazorRoot>
 </MApp>
 
@@ -50,7 +50,7 @@
 @code{
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
-
+    private System.Threading.Timer mytimer;
     public Type LayoutType
     {
         get
@@ -150,8 +150,6 @@
             }
         }
     }
-
-
 
     public async Task<bool> IsMobile()
     {

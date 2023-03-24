@@ -189,10 +189,23 @@
         }
     }
 
-    public void OnLogin()
+    protected void OnLogin()
     {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
     }
 
     public async Task OnLookPrize()
@@ -233,13 +246,13 @@
             Size= Size.Large,
             OnEditAsync = async context =>
             {
-            // Trace.Log("保存按钮被点击");
+                // Trace.Log("保存按钮被点击");
                 var item = (EditUserAddressModel)context.Model;
 
                 try
                 {
                     var obj = await _httpService.PostAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", item);
-                //判断结果
+                    //判断结果
                     if (obj.Successful == false)
                     {
                         await ToastService.Error("编辑收货地址失败", obj.Error);

@@ -8,7 +8,7 @@
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
-            <form asp-route="Register">
+            <form asp-route="Register" onsubmit="return callGeetest()">
                 <input type="hidden" asp-for="ReturnUrl" />
 
 
@@ -40,7 +40,7 @@
                 </div>
 
                 <div class="action">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="callGeetest()" type="button">注册</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">注册</button>
                 </div>
                 <div class="text-center login-link"> 已经有账号了？<a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">立即登入</a></div>
             </form>

@@ -92,8 +92,8 @@ namespace CnGalWebSite.Helper.Helper
             var model = new MemoryMetrics();
             using var proc = Process.GetCurrentProcess();
 
-            model.Used = proc.PrivateMemorySize64;
-            model.Total = proc.WorkingSet64;
+            model.Used = proc.PrivateMemorySize64/1024.0/1024.0;
+            model.Total = proc.WorkingSet64/1024.0/1024.0;
             model.Free = model.Total - model.Used;
 
             return model;

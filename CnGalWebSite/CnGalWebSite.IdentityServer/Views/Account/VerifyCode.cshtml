@@ -26,7 +26,7 @@
                 <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
 
                 <div id="captcha-box"></div>
-                <button class="d-none" id="geetestCode-submit-button"  name="button" value="repost" type="submit"></button>
+                <button class="d-none" id="repost-submit-button" name="button" value="repost" type="submit"></button>
                 <!--极验-->
 
 
@@ -35,11 +35,11 @@
                         <input class="mdl-textfield__input" asp-for="Code" autofocus autocomplete="off">
                         <label class="mdl-textfield__label" asp-for="Code">验证码</label>
                     </div>
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" onclick="callGeetest()" type="button">重新发送</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" type="button" onclick="return callGeetest('repost-submit-button')">重新发送</button>
                 </div>
 
                 <div class="action">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="verify">验证</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="verify" type="submit">验证</button>
                 </div>
             </form>
         </div>

@@ -24,7 +24,7 @@
         @if (Model.EnableLocalLogin)
         {
             <div class="mdl-card__supporting-text">
-                <form asp-route="Login">
+                <form asp-route="Login" onsubmit="return callGeetest()">
                     <input type="hidden" asp-for="ReturnUrl" />
 
                     <!--极验-->
@@ -59,8 +59,7 @@
                     </div>
 
                     <div class="action">
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="login" onclick="callGeetest()" type="button">登入</button>
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="login">登入</button>
                     </div>
                 </form>
             </div>
