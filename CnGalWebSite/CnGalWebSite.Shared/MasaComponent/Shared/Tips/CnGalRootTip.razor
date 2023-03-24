@@ -9,10 +9,13 @@
     <ImagesLargeViewTip />
     <FloatToolTip @ref="FloatTool" />
     <UserLicenseAgreementTip />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+    <BackgroundImageTip/>
     <audio id="bgMusic"></audio>
     <CascadingValue Value=this IsFixed="true">
         @ChildContent
     </CascadingValue>
+
 </ErrorHandler>
 
 
@@ -27,15 +30,26 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
     private System.Threading.Timer mytimer;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
 
             //启动定时器
             mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
+            var user = await authenticationStateTask;
+            if (user.User.Identity.IsAuthenticated)
+            {
+                if (trackEven != null)
+                {
+                    var (email, name) = user.User.Claims.GetExternalUserInfor();
+                    await trackEven.SendTrackEvent(TrackEventType.Login, TrackEventDataType.User, user.User.Claims.GetUserId(), name);
+                }
+            }
         }
     }
     public async void Send(object o)

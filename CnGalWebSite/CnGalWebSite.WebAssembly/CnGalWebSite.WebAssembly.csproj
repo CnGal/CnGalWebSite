@@ -2,11 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <InvariantGlobalization>false</InvariantGlobalization>
-    <PublishTrimmed>true</PublishTrimmed>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <EmccExtraLDFlags>-s WARN_ON_UNDEFINED_SYMBOLS=0</EmccExtraLDFlags>
     <UserSecretsId>1737d662-c973-4079-8bf7-847f4fb0f926</UserSecretsId>
   </PropertyGroup>
   

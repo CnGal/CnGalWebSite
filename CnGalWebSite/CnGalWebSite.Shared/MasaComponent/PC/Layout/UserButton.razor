@@ -5,7 +5,7 @@
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
-    <MBadge Content="messageCount" Value="messageCount!=0"   OffsetX="30" OffsetY="20">
+    <MBadge Content="messageCount" Value="messageCount!=0" OffsetX="30" OffsetY="20">
         <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
             <ActivatorContent Context="m">
                 <MTooltip Bottom>
@@ -15,7 +15,7 @@
                             m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                             c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         }
-                        <MButton Icon  Class="@Class" @attributes="@attrs">
+                        <MButton Icon Class="@Class" @attributes="@attrs">
                             <img style="width: 35px; border-radius: 50%; aspect-ratio: 1" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
                         </MButton>
                     </ActivatorContent>
@@ -27,7 +27,7 @@
 
             <ChildContent>
                 <div style="width:300px;">
-                    <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting" MessageCount="messageCount" MessageCountChanged="MessageCountChanged"/>
+                    <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting" MessageCount="messageCount" MessageCountChanged="MessageCountChanged" />
                 </div>
             </ChildContent>
         </MMenu>
@@ -36,10 +36,10 @@
 }
 @code {
 
-        [Parameter]
-        public string Class { get; set; }
-        [Parameter]
-        public EventCallback OnClickSetting { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public EventCallback OnClickSetting { get; set; }
 
     private bool menu { get; set; }
     private long messageCount { get; set; }

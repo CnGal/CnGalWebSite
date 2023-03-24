@@ -82,7 +82,7 @@
                 StateHasChanged();
                 _dataCacheService.UserInfor = model;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ErrorHandler.ProcessError(ex, "获取用户信息失败");
                 _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
