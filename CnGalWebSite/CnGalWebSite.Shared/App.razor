@@ -50,6 +50,10 @@
 @code{
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
+    [Parameter]
+    public bool Mobile { get; set; }
+
+
     private System.Threading.Timer mytimer;
     public Type LayoutType
     {
@@ -66,7 +70,7 @@
         I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
 
         //判断移动端
-        if (NavigationManager.Uri.Contains("m.cngal.org"))
+        if (Mobile)
         {
             _dataCacheService.IsApp = true;
         }
