@@ -52,7 +52,13 @@ namespace CnGalWebSite.WebAssembly.Services
             }
             catch (AccessTokenNotAvailableException ex)
             {
-                _navigationManager.NavigateToLogout("authentication/logout", "/");
+                InteractiveRequestOptions requestOptions = new()
+                {
+                    Interaction = InteractionType.SignIn,
+                    ReturnUrl = _navigationManager.Uri,
+                };
+                _navigationManager.NavigateToLogin("authentication/login", requestOptions);
+
                 throw new Exception("令牌过期，请重新登入", ex);
             }
         }
@@ -69,7 +75,13 @@ namespace CnGalWebSite.WebAssembly.Services
             }
             catch (AccessTokenNotAvailableException ex)
             {
-                _navigationManager.NavigateToLogout("authentication/logout", "/");
+                InteractiveRequestOptions requestOptions = new()
+                {
+                    Interaction = InteractionType.SignIn,
+                    ReturnUrl = _navigationManager.Uri,
+                };
+                _navigationManager.NavigateToLogin("authentication/login", requestOptions);
+                
                 throw new Exception("令牌过期，请重新登入", ex);
             }
         }
