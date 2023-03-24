@@ -164,8 +164,10 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             }
 
             //基本信息
-            user.UserName=model.UserName;
-            user.Email=model.Email;
+            user.UserName = model.UserName;
+            user.NormalizedUserName = model.UserName.ToUpper();
+            user.Email = model.Email;
+            user.NormalizedEmail = model.Email.ToUpper();
 
             //保存
             await _userRepository.UpdateAsync(user);
