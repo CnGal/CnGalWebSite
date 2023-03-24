@@ -1,10 +1,13 @@
 ﻿/*以下为加载时自动执行的代码*/
-Blazor.start({
-    reconnectionOptions: {
-        maxRetries: 3,
-        retryIntervalMilliseconds: 2000
-    }
-});
+if (typeof Blazor != "undefined") {
+    Blazor.start({
+        reconnectionOptions: {
+            maxRetries: 3,
+            retryIntervalMilliseconds: 2000
+        }
+    });
+}
+
 /*显示重连提示*/
 window.setInterval(showalert, 500);
 var count = 0;

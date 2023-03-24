@@ -49,7 +49,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public DateTime LastDisplayBrithdayTime { get; set; }
 
-        public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
+        public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
 
         /// <summary>
         /// 显示错误详细信息
