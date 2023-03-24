@@ -105,5 +105,56 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return _operationRecordService.GetIp(HttpContext, null);
         }
+
+        /// <summary>
+        /// 当前用户在线 定期调用
+        /// </summary>
+        /// <remarks>
+        /// 每次调用会增加用户在线时间
+        /// 间隔超过十分钟的按十分钟计算
+        /// 建议每十分钟调用一次
+        /// </remarks>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<Result>> MakeUserOnlineAsync()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (user != null)
+            {
+                //判断上次登入时间是否在 10分钟之前
+                if (user.LastOnlineTime.AddSeconds(60 * 10) < DateTime.Now.ToCstTime())
+                {
+                    //添加在线时间
+                    user.OnlineTime += 60 * 10;
+                }
+                else
+                {
+                    user.OnlineTime += (long)((DateTime.Now.ToCstTime() - user.LastOnlineTime).TotalSeconds);
+                }
+                user.LastOnlineTime = DateTime.Now.ToCstTime();
+
+                await _userRepository.UpdateAsync(user);
+
+                //判断是否写入登入信息
+                var tempDateTimeNow = DateTime.Now.ToCstTime();
+                if (await _userOnlineInforRepository.GetAll().AnyAsync(s => s.Date.Date == tempDateTimeNow.Date && s.ApplicationUserId == user.Id) == false)
+                {
+                    await _userOnlineInforRepository.InsertAsync(new UserOnlineInfor
+                    {
+                        ApplicationUser = user,
+                        ApplicationUserId = user.Id,
+                        Date = DateTime.Now.ToCstTime().Date
+                    });
+                }
+
+                return new Result { Successful = true, Error = user.Email };
+            }
+            else
+            {
+                return new Result { Successful = false };
+            }
+
+        }
     }
 }
