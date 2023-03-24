@@ -199,7 +199,7 @@ PWA 应用：https://app.cngal.org/
 
 前端：ASP .Net Core Blazor
 
-UI 库：Masa Blzor, BlazorBootstrap
+UI 库：Masa Blazor, BlazorBootstrap
 
 数据库：Mysql 8.0
 
