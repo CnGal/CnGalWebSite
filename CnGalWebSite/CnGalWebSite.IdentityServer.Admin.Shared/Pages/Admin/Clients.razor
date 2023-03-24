@@ -37,7 +37,7 @@
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
-    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" AllowedScopes="_scopes" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 
 @code {
@@ -69,7 +69,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    IEnumerable<string> _roles;
+    List<KeyValuePair<string, string>> _scopes;
 
     DataTableCard<ClientOverviewModel> dataTableCard;
 
@@ -79,7 +79,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        try
+        {
+            _scopes =( await _httpService.GetAsync<IEnumerable<KeyValuePair<string, string>>>("api/identityresources/all")).ToList();
+            _scopes.AddRange(await _httpService.GetAsync<IEnumerable<KeyValuePair<string, string>>>("api/apiscopes/all"));
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有用户角色失败");
+        }
     }
 
     public async void EditItem(ClientOverviewModel item)

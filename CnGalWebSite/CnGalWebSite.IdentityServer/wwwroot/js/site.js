@@ -10,9 +10,10 @@
         anHttpRequest.send(null);
     }
 }
-
+i = 0;
 function callGeetest(buttonId = 'geetestCode-submit-button') {
-    if (document.getElementById('geetestResult-validate').value != null&&document.getElementById('geetestResult-validate').value != '') {
+    if (i != 0) {
+        i = 0;
         return true;
     }
     var client = new HttpClient();
@@ -40,6 +41,7 @@ function callGeetest(buttonId = 'geetestCode-submit-button') {
             });
             //成功回调
             captchaObj.onSuccess(function () {
+                i = 1;
                 var result = captchaObj.getValidate();
                 //设置数据
                 document.getElementById('geetestResult-validate').value = result.geetest_validate;

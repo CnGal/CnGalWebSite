@@ -43,6 +43,13 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             _userRepository = userRepository;
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IEnumerable<KeyValuePair<string, string>>> All()
+        {
+            return await _apiScopeRepository.GetAll().Select(s => new KeyValuePair<string, string>(s.Name, s.DisplayName)).ToListAsync();
+        }
+
         [HttpPost]
         public async Task<QueryResultModel<ApiScopeOverviewModel>> List(QueryParameterModel model)
         {
