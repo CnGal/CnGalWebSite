@@ -304,6 +304,8 @@ namespace CnGalWebSite.APIServer.Application.Users
                 Id = user.Id,
                 PersonalSignature = user.PersonalSignature,
                 Name = user.UserName,
+                SBgImage=user.SBgImage,
+                MBgImage=user.MBgImage,
                 PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
                 BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
                 Ranks = await _rankService.GetUserRanks(user),

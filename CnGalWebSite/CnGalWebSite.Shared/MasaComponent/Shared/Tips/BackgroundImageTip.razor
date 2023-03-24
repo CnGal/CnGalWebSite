@@ -3,15 +3,16 @@
 
 @if (_dataCacheService.ThemeSetting.IsTransparent)
 {
-    if (string.IsNullOrWhiteSpace(BigImage) == false)
-    {
-        <div id="web_bg" style="@($"background-image: url({BigImage})")" class=" d-none d-sm-block"></div>
-    }
-    @if (string.IsNullOrWhiteSpace(SmallImage) == false)
-    {
-        <div id="web_bg" style="@($"background-image: url({SmallImage})")" class="d-md-none"></div>
-
-    }
+    <AuthorizeView>
+        @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.MBgImage) == false)
+        {
+            <div id="web_bg" style="@($"background-image: url({_dataCacheService.UserInfor?.MBgImage})")" class=" d-none d-sm-block"></div>
+        }
+        @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.SBgImage) == false)
+        {
+            <div id="web_bg" style="@($"background-image: url({_dataCacheService.UserInfor?.SBgImage})")" class="d-md-none"></div>
+        }
+    </AuthorizeView>
     @if (_dataCacheService.ThemeSetting.IsDark)
     {
         <div id="web_bg" style="background-color: rgba(36,36,36,0.9);z-index:-8"></div>
@@ -20,61 +21,8 @@
 }
 
 @code {
-    string BigImage = "";
-    string SmallImage = "";
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-
-    protected override async Task OnInitializedAsync()
+    public void Refresh()
     {
-        await Refresh();
-    }
-
-    public async Task Refresh()
-    {
-        try
-        {
-            string mimage = null;
-            string simage = null;
-            if (authenticationStateTask != null)
-            {
-                var user = await authenticationStateTask;
-                if (user.User.Identity.IsAuthenticated)
-                {
-                    foreach (var item in user.User.Claims)
-                    {
-                        if (item.Type == "mbgimage")
-                        {
-                            mimage = item.Value;
-                        }
-                        else if (item.Type == "sbgimage")
-                        {
-                            simage = item.Value;
-                        }
-                    }
-
-                }
-            }
-            BigImage = mimage ?? "";
-            SmallImage = simage ?? "";
-
-            if (BigImage.Contains("default"))
-            {
-                BigImage = "";
-            }
-            if (SmallImage.Contains("default"))
-            {
-                SmallImage = "";
-            }
-
-            StateHasChanged();
-        }
-        catch
-        {
-
-        }
-
+        StateHasChanged();
     }
 }

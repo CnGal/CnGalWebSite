@@ -19,6 +19,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public int SignInDays { get; set; }
         public bool IsSignIn { get; set; }
 
+        /// <summary>
+        /// 用户背景图 大屏幕
+        /// </summary>
+        public string MBgImage { get; set; }
+
+        /// <summary>
+        /// 用户背景图 小屏幕
+        /// </summary>
+        public string SBgImage { get; set; }
+
         public List<RankViewModel> Ranks { get; set; } = new List<RankViewModel>();
 
     }

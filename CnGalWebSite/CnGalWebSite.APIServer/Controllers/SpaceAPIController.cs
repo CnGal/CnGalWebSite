@@ -102,7 +102,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     PhotoPath = s.PhotoPath,
                     UserName = s.UserName,
                     PersonalSignature = s.PersonalSignature,
-                    DisplayIntegral = s.DisplayIntegral
+                    DisplayIntegral = s.DisplayIntegral,
+                    SBgImage = s.SBgImage,
+                    MBgImage=s.MBgImage,
                 }).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -203,8 +205,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 Id = user.Id,
                 IsCurrentUser = isCurrentUser,
                 ContributionValue = user.DisplayContributionValue,
-                SBgImage = _appHelper.GetImagePath(user.SBgImage, ""),
-                MBgImage = _appHelper.GetImagePath(user.MBgImage, ""),
                 OnlineTime = ((double)user.OnlineTime / 60 / 60),
                 LastOnlineTime = user.LastOnlineTime,
                 CanComment = user.CanComment ?? true,
