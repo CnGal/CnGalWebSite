@@ -1,0 +1,53 @@
+﻿@page "/admin/records"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+@using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
+
+<DataTableCard TModel="OperationRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false">
+    <ItemColContent>
+        @if (context.Header.Value == "type")
+        {
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Records.TypeChip Type="context.Item.Type"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+@code {
+    private string _baseUrl = "api/records/";
+    private string _name = "操作记录";
+
+    private List<DataTableHeader<OperationRecordOverviewModel>> _headers = new List<DataTableHeader<OperationRecordOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(OperationRecordOverviewModel.Id)
+          },
+          new (){ Text= "类型", Value= "type"},
+          new (){ Text= "用户名", Value= nameof(OperationRecordOverviewModel.UserName)},
+          new (){ Text= "IP", Value= nameof(OperationRecordOverviewModel.Ip)},
+          new (){ Text= "时间", Value= nameof(OperationRecordOverviewModel.Time)},
+    };
+
+    IEnumerable<string> _roles;
+
+    DataTableCard<RoleOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}

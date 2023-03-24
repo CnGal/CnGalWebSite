@@ -24,7 +24,7 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Shared
 
         public int ItemsPerPage { get; set; } = 10;
 
-        public IEnumerable<bool> SortDesc { get; set; } = Enumerable.Empty<bool>();
+        public IEnumerable<bool> SortDesc { get; set; } = new bool[] { true };
 
         public IEnumerable<bool> GroupDesc { get; set; } = Enumerable.Empty<bool>();
 
@@ -32,7 +32,7 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Shared
 
         public bool MultiSort { get; set; }
 
-        public IEnumerable<string> SortBy { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<string> SortBy { get; set; } = new string[] { "Id" };
 
         public IEnumerable<string> GroupBy { get; set; } = Enumerable.Empty<string>();
     }

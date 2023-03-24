@@ -35,6 +35,7 @@
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">API范围列表</MTab>
                             <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">身份资源列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">操作记录列表</MTab>
                         </AuthorizeView>
 
                     </MTabs>
@@ -87,6 +88,10 @@
                 <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">
                     <MIcon Left>mdi-forest</MIcon>
                     身份资源列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">
+                    <MIcon Left>mdi-record</MIcon>
+                    操作记录列表
                 </MButton>
             </AuthorizeView>
           

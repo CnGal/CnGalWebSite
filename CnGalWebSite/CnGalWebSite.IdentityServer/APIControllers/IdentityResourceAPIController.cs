@@ -45,6 +45,15 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             _userRepository = userRepository;
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IEnumerable<KeyValuePair<string, string>>> All()
+        {
+            return await _identityResourceRepository.GetAll().Select(s => new KeyValuePair<string, string>(s.Name, s.DisplayName)).ToListAsync();
+        }
+
+
+
         [HttpPost]
         public async Task<QueryResultModel<IdentityResourceOverviewModel>> List(QueryParameterModel model)
         {

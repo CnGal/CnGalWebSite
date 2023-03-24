@@ -1,0 +1,33 @@
+﻿<MChip Small
+       Color="@GetColor()"
+       Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @Type.GetDisplayName()
+</MChip>
+
+@code {
+    [Parameter]
+    public OperationRecordType Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            OperationRecordType.Login => "green",
+            OperationRecordType.Registe => "info",
+            _ => "purple"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return Type switch
+        {
+            OperationRecordType.Login => "mdi-login",
+            OperationRecordType.Registe => "mdi-account-plus",
+            _ => "mdi-lightbulb-question"
+        };
+    }
+}

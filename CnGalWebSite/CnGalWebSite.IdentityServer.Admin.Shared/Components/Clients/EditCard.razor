@@ -35,19 +35,24 @@ else
                     }
                     <MTextField @bind-Value="Model.LogoUri" Label="LOGO（请使用CnGal图床上传正方形图片）" HideDetails="true" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Lg="6" Xl="4">
                     <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" HideDetails="true" />
-                    <AuthorizeView Roles="Admin">
-                        <MCheckbox @bind-Value="Model.RequireConsent" Label="展示用户同意页面" TValue="bool" HideDetails="true" />
-                        <MCheckbox @bind-Value="Model.RequireClientSecret" Label="需要验证客户端密钥" TValue="bool" HideDetails="true" />
-                    </AuthorizeView>
-                </MCol>
 
+                </MCol>
+                <AuthorizeView Roles="Admin">
+                    <MCol Cols="12" Lg="6" Xl="4">
+                        <MCheckbox @bind-Value="Model.RequireConsent" Label="展示用户同意页面" TValue="bool" HideDetails="true" />
+                    </MCol>
+                    <MCol Cols="12" Lg="6" Xl="4">
+                        <MCheckbox @bind-Value="Model.RequireClientSecret" Label="需要验证客户端密钥" TValue="bool" HideDetails="true" />
+                    </MCol>
+
+                </AuthorizeView>
                 <MCol Cols="12">
                     <InputCheckboxList Title="使用的授权方式" Items="Model.AllowedGrantTypes" AllItems="_allowedGrantTypes" />
                 </MCol>
                 <MCol Cols="12">
-                    <InputCheckboxList Title="权限（请慎重选择所需权限，过高的权限用户可能拒绝授权）" Items="Model.AllowedScopes" AllItems="_allowedScopes" />
+                    <InputCheckboxList Title="权限（请慎重选择所需权限，过高的权限用户可能拒绝授权）" Items="Model.AllowedScopes" AllItems="AllowedScopes" />
                 </MCol>
                 <MCol Cols="12">
                     <SecretCard Id="Model.Id" ClientId="@Model.ClientId" />
@@ -82,10 +87,13 @@ else
 
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-    [Parameter]
-    public EventCallback<ClientEditModel> OnEdited { get; set; }
+        [Parameter]
+        public int Id { get; set; }
+        [Parameter]
+        public EventCallback<ClientEditModel> OnEdited { get; set; }
+
+        [Parameter]
+        public IEnumerable<KeyValuePair<string, string>> AllowedScopes  { get; set; }
 
     ClientEditModel Model;
 
@@ -95,6 +103,9 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+
+
 
     IEnumerable<KeyValuePair<string, string>> _allowedGrantTypes = new List<KeyValuePair<string, string>>
     {
