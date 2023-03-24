@@ -1,0 +1,28 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="绑定信息" Icon="@IconType.Link.ToIconString()" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>绑定的邮箱、手机号、第三方登入等信息</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block OnClick="OnClick" Color="primary">
+                    <MIcon Left>mdi-pencil</MIcon>
+                    编辑绑定信息
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+
+    public void OnClick()
+    {
+        _eventService.OpenNewPage("https://oauth2.cngal.org/Account/SelectModifyField");
+
+    }
+}

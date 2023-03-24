@@ -685,7 +685,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //不管是否发送邮件 都伪装已发送
-            return RedirectToAction("VerifyCode", new { UserId = user.Id, Type = VerificationCodeType.ResetPassword, model.ReturnUrl });
+            return RedirectToAction("VerifyCode", new { UserId = user?.Id, Type = VerificationCodeType.ResetPassword, model.ReturnUrl });
         }
 
         [HttpGet]

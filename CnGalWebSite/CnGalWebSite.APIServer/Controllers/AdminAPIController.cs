@@ -663,27 +663,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var examines = await _examineRepository.GetAll().AsNoTracking()
-                    .Include(s=>s.Entry)
-                    .Where(s => s.Operation == Operation.EstablishMain && (s.Entry.Type== EntryType.Role|| s.Entry.Type == EntryType.Staff) && s.ApplicationUserId == "a27c27d9-8c42-49f4-a315-05a167e1a6d4"&&s.Note== "补全审核记录"&&s.Context.Contains("MainPicture")&& s.Context.Contains("Thumbnail")==false)
-                    .Select(s => new
-                    {
-                        s.Id,
-                        EntryId= s.EntryId.Value
-                    })
-                    .ToListAsync();
-
-                await _examineRepository.GetAll().Where(s => examines.Select(s => s.Id).Contains(s.Id)).ExecuteDeleteAsync();
-
-                foreach(var item in examines.GroupBy(s=>s.EntryId).Select(s=>s.Key))
-                {
-                    Entry cur =(Entry) await _examineService.GenerateModelFromExamines(new Entry { Id = item });
-                    var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == item);
-                    entry.MainPicture = cur.MainPicture;
-                    await _entryRepository.UpdateAsync(entry);
-
-                    _logger.LogInformation("{id}", item);
-                }
+                var result = await _fileService.TransferDepositFile("https://image.cngal.org/images/upload/20230324/09e7c73a9e6f7d07052228773808cd16f6ff32ef.webp");
 
                 return new Result { Successful = true };
             }
