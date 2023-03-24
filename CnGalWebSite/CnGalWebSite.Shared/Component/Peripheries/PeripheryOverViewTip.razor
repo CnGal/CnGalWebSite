@@ -12,7 +12,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
 
             <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity " +Class)">
-                <a class="a-font-color" href="@Url">
+                <a class="a-font-color" @onclick="OnClick">
                     <div class="row m-0">
                         @if (Model.IsThumbnail)
                         {
@@ -77,7 +77,7 @@
                     </Authorized>
                     <NotAuthorized>
                         <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLoginClick" Icon="@IconType.Login.ToIconString()" />
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
                         </div>
                     </NotAuthorized>
                 </AuthorizeView>
@@ -108,8 +108,6 @@
     [Parameter]
     public GameOverviewPeripheriesModel Model { get; set; }
 
-    string Url;
-
     protected override async Task OnParametersSetAsync()
     {
         if (EntryId > 0)
@@ -129,24 +127,51 @@
             isReady = true;
         }
 
+
+    }
+
+    public void OnClick()
+    {
+        string url = null;
         if (Model.Type == PeripheryOverviewType.Entry)
         {
-            Url = "/entries/index/" + Model.ObjectId;
+            url = "/entries/index/" + Model.ObjectId;
         }
         else if (Model.Type == PeripheryOverviewType.Periphery)
         {
-            Url = "/peripheries/index/" + Model.ObjectId;
+            url = "/peripheries/index/" + Model.ObjectId;
         }
         else if (Model.Type == PeripheryOverviewType.User)
         {
-            Url = string.IsNullOrWhiteSpace(Model.ObjectId) ? ("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri)) : ("/space/index/" + Model.ObjectId + "?TabIndex=11");
+            url = string.IsNullOrWhiteSpace(Model.ObjectId) ? null : ("/space/index/" + Model.ObjectId + "?TabIndex=11");
+        }
+
+        if(string.IsNullOrWhiteSpace(url))
+        {
+            OnLogin();
+        }
+        else
+        {
+            NavigationManager.NavigateTo(url);
         }
     }
 
-    public void OnLoginClick()
+    protected void OnLogin()
     {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        
-    }
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
 
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
 }

@@ -87,13 +87,24 @@
             ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
         }
     }
-
-    public void OnLogin()
+    protected void OnLogin()
     {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        
-    }
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
 
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
     public async Task OnClickEditGameRecored()
     {
         if (editGameRecordTip != null)

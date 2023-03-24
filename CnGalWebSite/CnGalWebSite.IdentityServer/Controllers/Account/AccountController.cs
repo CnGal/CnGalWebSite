@@ -415,7 +415,7 @@ namespace IdentityServerHost.Quickstart.UI
         public async Task<IActionResult> VerifyCode(VerifyCodeInputModel model, string button)
         {
             //查找用户
-            var user = await FindLoginUserAsync() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId) ??await FindLoginUserAsync() ;
             if (user == null)
             {
                 //伪装正确
@@ -591,7 +591,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user = await FindLoginUserAsync() ?? await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
+            var user =  await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId)?? await FindLoginUserAsync();
             if (user == null)
             {
                 //伪装正确

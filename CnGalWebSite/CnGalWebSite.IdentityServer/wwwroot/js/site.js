@@ -11,7 +11,10 @@
     }
 }
 
-function callGeetest() {
+function callGeetest(buttonId = 'geetestCode-submit-button') {
+    if (document.getElementById('geetestResult-validate').value != null&&document.getElementById('geetestResult-validate').value != '') {
+        return true;
+    }
     var client = new HttpClient();
     client.get('https://oauth2.cngal.org/api/tool/GetGeetestCode', function (response) {
         //获取页面初始化数据
@@ -43,8 +46,9 @@ function callGeetest() {
                 document.getElementById('geetestResult-challenge').value = result.geetest_challenge;
                 document.getElementById('geetestResult-seccode').value = result.geetest_seccode;
                 //提交表单
-                document.getElementById('geetestCode-submit-button').click();
+                document.getElementById(buttonId).click();
             });
         });
     });
+    return false;
 }

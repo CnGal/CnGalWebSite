@@ -54,16 +54,7 @@
         var user = await authenticationStateTask;
         if (user.User.Identity.IsAuthenticated == false)
         {
-            if (_dataCacheService.IsApp == true)
-            {
-                NavigationManager.NavigateTo("account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-
-            }
-            else
-            {
-                NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-
-            }
+            OnLogin();
             return;
         }
         try
@@ -97,5 +88,24 @@
     {
 
         IsAnonymous = state;
+    }
+
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
     }
 }

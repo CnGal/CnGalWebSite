@@ -73,13 +73,30 @@
     {
         if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.Id))
         {
-            NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+            OnLogin();
             return false;
         }
 
         return true;
     }
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
 
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
     public async Task OnMergeEntries()
     {
         if (Login() == false)

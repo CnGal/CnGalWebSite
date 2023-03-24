@@ -14,7 +14,7 @@
                 </Authorized>
                 <NotAuthorized>
                     <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="@IconType.Login.ToIconString()" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
                     </div>
                 </NotAuthorized>
             </AuthorizeView>
@@ -78,9 +78,22 @@
             ErrorHandler.ProcessError(ex, "获取评论列表失败");
         }
     }
-    public void OnLoginClick()
+    protected void OnLogin()
     {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
     }
 }
