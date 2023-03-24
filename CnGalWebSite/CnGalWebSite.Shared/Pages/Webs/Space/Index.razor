@@ -11,13 +11,13 @@
 }
 @if (_dataCacheService.ThemeSetting.IsTransparent)
 {
-    @if (string.IsNullOrWhiteSpace(Model.SBgImage) == false)
+    @if (string.IsNullOrWhiteSpace(Model.BasicInfor.SBgImage) == false)
     {
-        <div id="web_bg" style="background-image: url(@Model.SBgImage)" class="d-none bg-d-lg-block bgimage-ison"></div>
+        <div id="web_bg" style="background-image: url(@Model.BasicInfor.SBgImage)" class="d-none bg-d-lg-block bgimage-ison"></div>
     }
-    @if (string.IsNullOrWhiteSpace(Model.MBgImage) == false)
+    @if (string.IsNullOrWhiteSpace(Model.BasicInfor.MBgImage) == false)
     {
-        <div id="web_bg" style="background-image: url(@Model.MBgImage)" class=" d-none d-sm-block bgimage-ison"></div>
+        <div id="web_bg" style="background-image: url(@Model.BasicInfor.MBgImage)" class=" d-none d-sm-block bgimage-ison"></div>
     }
 }
 

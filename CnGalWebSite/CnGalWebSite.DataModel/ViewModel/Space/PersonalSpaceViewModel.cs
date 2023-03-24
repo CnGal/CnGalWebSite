@@ -29,15 +29,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public long TotalExamine { get; set; }
         public DateTime LastOnlineTime { get; set; }
-        /// <summary>
-        /// 用户背景图 大屏幕
-        /// </summary>
-        public string MBgImage { get; set; }
-
-        /// <summary>
-        /// 用户背景图 小屏幕
-        /// </summary>
-        public string SBgImage { get; set; }
 
         /// <summary>
         /// 在线时间 单位 小时
