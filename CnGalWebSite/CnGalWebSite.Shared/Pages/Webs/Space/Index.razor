@@ -91,10 +91,6 @@ else
                                 {
                                     <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
                                 }
-                                @if (Model.IsCurrentUser)
-                                {
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard />
-                                }
                                 @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                                 {
                                     <div class="mb-4">

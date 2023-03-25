@@ -35,7 +35,7 @@
         else if (Model.DisplayMode == UserPendingDataDisplayMode.Text)
         {
             <div class=" p-4 pt-2 pb-2">
-                <div>@Model.BriefIntroduction</div>
+                <MarkdownViewTip IsNeedHighlight="true" Text="@(Model.BriefIntroduction)" />
                 <div class="mt-2 " style="color:gray;">@Model.Name</div>
             </div>
 
@@ -51,7 +51,7 @@
 
     public string url { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         url = Model.Type switch
         {

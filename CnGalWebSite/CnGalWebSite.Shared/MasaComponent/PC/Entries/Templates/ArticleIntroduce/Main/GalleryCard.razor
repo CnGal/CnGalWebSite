@@ -5,6 +5,11 @@
 @if (Model.Pictures.Any())
 {
     <section id="gallery">
+
+        @if (Model.ImagesState == EditState.Preview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditImages/" + Model.Id)" ExamineType="Operation.EstablishImages" OnClickRevoke="OnRevoke" Class="m-0" />
+        }
         <h2>相册</h2>
         <div class="row">
             @foreach (var item in imagesList.OrderByDescending(s => s.Priority))
@@ -49,4 +54,8 @@
         }
 
     }
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
 }
