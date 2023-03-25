@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 @inject IStructuredDataService _structuredDataService
 @inject NavigationManager NavigationManager
-
+@inject IMauiService _mauiService
 <TitleTip></TitleTip>
 
 <div itemscope itemtype="https://schema.org/WebSite" style="display:none;">
@@ -119,6 +119,15 @@
             ErrorHandler.ProcessError(ex, "获取轮播结构化数据失败");
         }
 
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    {
+        if(firstRender)
+        {
+            //通知MAUI
+            _mauiService.OnLoaded();
+        }
     }
     public async Task GenerateCarouselStructuredDataJson()
     {

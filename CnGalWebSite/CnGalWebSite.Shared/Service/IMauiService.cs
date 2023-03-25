@@ -18,5 +18,7 @@ namespace CnGalWebSite.Shared.Service
         void SetStatusBarTransparent(bool hide);
 
         Task OpenNewPage(string url);
+
+        void OnLoaded();
     }
 }

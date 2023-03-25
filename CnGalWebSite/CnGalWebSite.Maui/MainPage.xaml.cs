@@ -1,6 +1,7 @@
 ﻿
 using CnGalWebSite.Maui.Services;
 using Microsoft.AspNetCore.Components.WebView;
+using Microsoft.AspNetCore.Components.WebView.Maui;
 
 namespace CnGalWebSite.Maui
 {
@@ -19,6 +20,15 @@ namespace CnGalWebSite.Maui
 
             InitializeComponent();
 
+            blazorWebView.UrlLoading +=
+            (sender, urlLoadingEventArgs) =>
+            {
+                if (urlLoadingEventArgs.Url.Host != "0.0.0.0")
+                {
+                    urlLoadingEventArgs.UrlLoadingStrategy =
+                        UrlLoadingStrategy.OpenInWebView;
+                }
+            };
             Loaded += MainPage_LoadedAsync;
         }
 

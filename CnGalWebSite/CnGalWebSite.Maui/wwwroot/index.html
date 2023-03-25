@@ -55,9 +55,7 @@
 </head>
 
 <body class="overflow-hidden">
-    <div id="app"></div>
-
-    <div class="loader" id="loading">
+    <app id="app">
         <div style="display:flex;flex-direction: column;align-items: center;justify-content: center;height: calc(100vh);">
             <img src="_content/CnGalWebSite.Shared/images/logo.png" style="height: 50px;width: 50px;" alt="logo">
 
@@ -68,7 +66,7 @@
                 愿每一个CnGal创作者的作品都能不被忘记
             </div>
         </div>
-    </div>
+    </app>
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
@@ -101,6 +99,7 @@
     <script src="https://cdn.masastack.com/npm/echarts/5.1.1/echarts.min.js"></script>
 
     <script async defer data-website-id="5d00ea9a-0bc7-4ea9-bf86-661c5e7cd01e" src="https://umami.cngal.top/umami.js"></script>
+    <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="_content/BlazorComponent/js/blazor-component.js"></script>

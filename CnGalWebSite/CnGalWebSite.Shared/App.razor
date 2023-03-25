@@ -7,6 +7,7 @@
 @inject ILocalStorageService _localStorage
 @inject IEventService _eventService
 @inject IServiceProvider _serviceProvider
+@inject IMauiService _mauiService
 
 @using BlazorComponent.I18n
 
@@ -153,6 +154,9 @@
                 //await _dataCacheService.OnRefreshRequsted(null);
             }
         }
+
+
+
     }
 
     public async Task<bool> IsMobile()

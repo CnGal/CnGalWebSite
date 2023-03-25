@@ -21,8 +21,12 @@ namespace CnGalWebSite.Maui.Services
 
         public void ChangeTheme(string theme)
         {
-            _overviewService.HideLoadingOverview();
             ThemeService.SetStatusBarColor(Color.FromArgb(theme));
+        }
+
+        public void OnLoaded()
+        {
+            _overviewService.HideLoadingOverview();
         }
 
         public async Task ShareLink(ShareLinkModel model)
