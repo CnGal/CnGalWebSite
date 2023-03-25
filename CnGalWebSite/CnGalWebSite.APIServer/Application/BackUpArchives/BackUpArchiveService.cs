@@ -1,5 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.Models;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
@@ -13,6 +14,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Xml;
+using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.BackUpArchives
 {
@@ -22,6 +25,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
         private readonly IRepository<Entry, long> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<Tag, int> _tagRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -29,8 +35,8 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<BackUpArchive>, string, SortOrder, IEnumerable<BackUpArchive>>> SortLambdaCacheApplicationUser = new();
 
-        public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IConfiguration configuration,
-            IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment)
+        public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IConfiguration configuration, IRepository<Periphery, long> peripheryRepository,
+        IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment, IRepository<Tag, int> tagRepository, IRepository<Video, long> videoRepository)
         {
             _backUpArchiveRepository = backUpArchiveRepository;
             _entryRepository = entryRepository;
@@ -39,6 +45,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             _clientFactory = clientFactory;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
             _webHostEnvironment = webHostEnvironment;
+            _tagRepository = tagRepository;
+            _videoRepository = videoRepository;
+            _peripheryRepository = peripheryRepository;
         }
 
         public Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListBackUpArchiveAloneModel searchModel)
@@ -236,38 +245,144 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
 
         public async Task UpdateSitemap()
         {
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "site.txt");
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "sitemap.xml");
             try
             {
                 File.Delete(path);
             }
             catch { }
 
-            using var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
-            using var sw = new StreamWriter(fs); // 创建写入流
-
             //获取词条名称和id 文章id
-            var entryIds = await _entryRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
-            var entryNames = await _entryRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Name).ToListAsync();
-            var articleIds = await _articleRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            var entries = await _entryRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s => new
+                {
+                    s.Type,
+                    s.LastEditTime,
+                    s.Id
+                }).ToListAsync();
 
-            var tempStr1 = "";
-            foreach (var item in entryIds)
+            var articles = await _articleRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s => new
+                {
+                    s.LastEditTime,
+                    s.Id
+                }).ToListAsync();
+            var tags = await _tagRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s => new
+                {
+                    s.LastEditTime,
+                    s.Id
+                }).ToListAsync();
+            var peripheries = await _peripheryRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s => new
+                {
+                    s.LastEditTime,
+                    s.Id
+                }).ToListAsync();
+            var videos = await _videoRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s => new
+                {
+                    s.LastEditTime,
+                    s.Id
+                }).ToListAsync();
+            var host = "https://www.cngal.org/";
+
+            var mainurls = new List<string>
             {
-                tempStr1 += "https://www.cngal.org/entries/index/" + item + "\n";
+                $"{host}data",
+                $"{host}about",
+                $"{host}structure",
+                $"{host}privacy",
+                $"{host}updatelog",
+                $"{host}entries",
+                $"{host}cv",
+                $"{host}articles",
+                $"{host}square",
+            };
+            var data = new List<SitemapModel>
+            {
+                new SitemapModel
+                {
+                    Loc =host,
+                    ChangeFreq = "daily",
+                    Priority = "1.00"
+                }
+            };
+            foreach (var item in mainurls)
+            {
+                data.Add(new SitemapModel
+                {
+                    Loc = item,
+                    ChangeFreq = "daily",
+                    Priority = "0.90"
+                });
             }
-            //foreach (var item in entryNames)
-            //{
-            //    tempStr1 += "https://www.cngal.org/entries/index/" + ToolHelper.Base64EncodeName(item) + "\n";
-            //}
-            foreach (var item in articleIds)
+            foreach (var item in entries)
             {
-                tempStr1 += "https://www.cngal.org/articles/index/" + item + "\n";
+                data.Add(new SitemapModel
+                {
+                    Loc = $"{host}entries/index/{item.Id}",
+                    ChangeFreq = "monthly",
+                    LastModified = item.LastEditTime.ToString("s"),
+                    Priority = item.Type == EntryType.Game ? "0.80" : "0.70"
+                });
+            }
+            foreach (var item in articles)
+            {
+                data.Add(new SitemapModel
+                {
+                    Loc = $"{host}articles/index/{item.Id}",
+                    ChangeFreq = "yearly",
+                    LastModified = item.LastEditTime.ToString("s"),
+                    Priority = "0.65"
+                });
+            }
+            foreach (var item in tags)
+            {
+                data.Add(new SitemapModel
+                {
+                    Loc = $"{host}tags/index/{item.Id}",
+                    ChangeFreq = "monthly",
+                    LastModified = item.LastEditTime.ToString("s"),
+                    Priority = "0.60"
+                });
+            }
+            foreach (var item in peripheries)
+            {
+                data.Add(new SitemapModel
+                {
+                    Loc = $"{host}peripheries/index/{item.Id}",
+                    ChangeFreq = "monthly",
+                    LastModified = item.LastEditTime.ToString("s"),
+                    Priority = "0.50"
+                });
+            }
+            foreach (var item in videos)
+            {
+                data.Add(new SitemapModel
+                {
+                    Loc = $"{host}videos/index/{item.Id}",
+                    ChangeFreq = "monthly",
+                    LastModified = item.LastEditTime.ToString("s"),
+                    Priority = "0.40"
+                });
             }
 
-            await sw.WriteLineAsync(tempStr1);
-            sw.Close();
-            fs.Close();
+            using (var xml = XmlWriter.Create(path, new XmlWriterSettings { Indent = true }))
+            {
+                xml.WriteStartDocument();
+                xml.WriteStartElement("urlset", "http://www.sitemaps.org/schemas/sitemap/0.9");
+                foreach (var item in data)
+                {
+                    xml.WriteStartElement("url");
+                    xml.WriteElementString("loc",  item.Loc);
+                    xml.WriteElementString("priority", item.Priority);
+                    xml.WriteElementString("changefreq", item.ChangeFreq);
+                    xml.WriteElementString("lastmod", item.LastModified);
+                    xml.WriteEndElement();
+                }
+                xml.WriteEndElement();
+            }
         }
     }
 }
