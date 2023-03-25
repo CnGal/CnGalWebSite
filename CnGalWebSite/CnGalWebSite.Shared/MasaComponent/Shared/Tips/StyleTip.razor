@@ -375,9 +375,12 @@ else
             var theme = MasaBlazor.Theme;
             theme.Themes.Light.Primary = colorMain;
             MasaBlazor.Theme = theme;
+
             //通知MAUI
             _mauiService.ChangeTheme(colorMain);
         }
+
+
 
         //通知主题模式切换
         if (MasaBlazor.Theme.Dark != _dataCacheService.ThemeSetting.IsDark)

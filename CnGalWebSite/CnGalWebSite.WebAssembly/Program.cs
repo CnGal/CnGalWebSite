@@ -109,8 +109,6 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
             builder.Services.AddHttpClient("AuthAPI")
                 .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
-            builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
-                .CreateClient("AuthAPI"));
 
             //注册匿名的HttpClient
             builder.Services.AddHttpClient("AnonymousAPI");

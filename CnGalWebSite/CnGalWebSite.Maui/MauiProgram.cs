@@ -7,9 +7,10 @@ using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Extentions;
-using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 using MauiService = CnGalWebSite.Maui.Services.MauiService;
 
 namespace CnGalWebSite.Maui
@@ -18,6 +19,10 @@ namespace CnGalWebSite.Maui
     {
         public static MauiApp CreateMauiApp()
         {
+            //设置模式
+            ToolHelper.IsMaui = true;
+            ToolHelper.IsSSR = false;
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -26,11 +31,18 @@ namespace CnGalWebSite.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            //添加本地配置文件
+            var a = Assembly.GetExecutingAssembly();
+            using var stream = a.GetManifestResourceStream("CnGalWebSite.Maui.appsettings.json");
+            var config = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+            builder.Configuration.AddConfiguration(config);
+
+
             builder.Services.AddMauiBlazorWebView();
 
             builder.Services.AddBootstrapBlazor();
-
-            builder.Services.AddScoped(sp => new HttpClient());
 
             //依赖注入主页
             builder.Services.AddSingleton<MainPage>();
@@ -40,8 +52,6 @@ namespace CnGalWebSite.Maui
 
             //身份验证
             builder.Services.AddAuthorizationCore();
-            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
 
             //缓存
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
@@ -78,6 +88,25 @@ namespace CnGalWebSite.Maui
 
             builder.Services.AddScoped<IFileUploadService, FileUploadService>();
             builder.Services.AddScoped<IEventService, EventService>();
+
+            //添加OpenId
+            builder.Services.AddOidcAuthentication(options =>
+            {
+                builder.Configuration.Bind("Local", options.ProviderOptions);
+                options.UserOptions.RoleClaim = "role";
+                options.UserOptions.NameClaim = "name";
+                options.ProviderOptions.ResponseMode = "query";
+                options.ProviderOptions.ResponseType = "code";
+            }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
+            //添加Http服务
+            builder.Services.AddSingleton<IHttpService, HttpService>();
+            //注册身份验证的HttpClient
+            builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
+            builder.Services.AddHttpClient("AuthAPI")
+                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+
+            //注册匿名的HttpClient
+            builder.Services.AddHttpClient("AnonymousAPI");
 
 
             return builder.Build();

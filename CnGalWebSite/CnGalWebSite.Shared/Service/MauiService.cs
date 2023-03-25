@@ -14,6 +14,11 @@ namespace CnGalWebSite.Shared.Service
             
         }
 
+        public void OnLoaded()
+        {
+            
+        }
+
         public async Task OpenNewPage(string url)
         {
             
