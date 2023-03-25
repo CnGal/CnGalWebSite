@@ -14,15 +14,15 @@
 
 <div class="rounded shadow-sm bg-opacity rounded p-4 mb-4">
     <div class="article-introduce">
-        <TitleCard Model="Model" />
+        <TitleCard Model="Model" OnRevoke="OnRevoke"/>
         <OperationCard Model="Model" />
         <SteamCard Model="Model"/>
-        <InformationCard Model="Model" />
-        <StoryCard Model="Model" />
-        <CharacterCard Model="Model" />
-        <GalleryCard Model="Model" />
-        <StaffCard Model="Model" />
-        <RelevanceCard Model="Model" />
+        <InformationCard Model="Model"  OnRevoke="OnRevoke"/>
+        <StoryCard Model="Model" OnRevoke="OnRevoke" />
+        <CharacterCard Model="Model"  OnRevoke="OnRevoke"/>
+        <GalleryCard Model="Model"  OnRevoke="OnRevoke"/>
+        <StaffCard Model="Model"  OnRevoke="OnRevoke"/>
+        <RelevanceCard Model="Model"  OnRevoke="OnRevoke"/>
 
     </div>
 </div>
@@ -31,7 +31,7 @@
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             <div class="mb-4">
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="Model"/>
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="Model" OnRevoke="OnRevoke"/>
             </div>
 
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -62,4 +62,7 @@
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public bool CanDeleted { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
 }

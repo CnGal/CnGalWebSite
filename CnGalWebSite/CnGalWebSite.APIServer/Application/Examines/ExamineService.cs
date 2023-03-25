@@ -723,7 +723,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     Id = infor.Id.ToString(),
                     Link = link,
-                    BriefIntroduction = infor.Text,
+                    BriefIntroduction = _appHelper.MarkdownToHtml(infor.Text),
                     DisplayMode = UserPendingDataDisplayMode.Text,
                     MainPicture = _appHelper.GetImagePath(image, "app.png"),
                     Name = string.IsNullOrWhiteSpace(name) ? "回复评论" : $"评论『{name}』",

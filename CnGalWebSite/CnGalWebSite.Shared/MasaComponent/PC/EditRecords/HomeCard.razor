@@ -4,7 +4,7 @@
 @if (isReady)
 {
     <div>
-        @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false)
+        @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false && _dataCacheService.UserPendingDataCatche.Items.Any()==false)
         {
             <div class="  rounded shadow-sm p-3 bg-opacity">
                 <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
@@ -23,6 +23,7 @@
         <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEntriesCard Model="_dataCacheService.UserContentCenterCatche.UnReviewEntries" />
         <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEditRecordsCard Model="_dataCacheService.UserContentCenterCatche.UnReviewExamines" />
         <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListPendingExaminesCard Model="_dataCacheService.UserContentCenterCatche.PendingExamines" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard Model="_dataCacheService.UserPendingDataCatche.Items" />
     </div>
 }
 else
@@ -52,6 +53,10 @@ else
                 if (_dataCacheService.UserContentCenterCatche == null)
                 {
                     _dataCacheService.UserContentCenterCatche = await _httpService.GetAsync<UserContentCenterViewModel>("api/examines/GetUserContentCenterView");
+                }
+                if (_dataCacheService.UserPendingDataCatche.Items.Any() == false)
+                {
+                    _dataCacheService.UserPendingDataCatche.Items = (await _httpService.GetAsync<List<UserPendingDataModel>>("api/space/GetUserPendingData")).OrderByDescending(s => s.DisplayMode).ToList();
                 }
 
                 isReady = true;

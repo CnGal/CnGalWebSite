@@ -1182,7 +1182,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
-                    videoIds = await _videoService.GetIdsFromNames(articleNames);
+                    videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
                 catch (Exception ex)
                 {
@@ -1191,7 +1191,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //获取词条文章
                 var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
                 var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-                var videos = await _videoRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
+                var videos = await _videoRepository.GetAll().Where(s => videoIds.Contains(s.Id)).ToListAsync();
                 //检查预约关联抽奖是否存在
                 int lotteryId = 0;
                 if (string.IsNullOrWhiteSpace(model.AddInfor.Booking.LotteryName) == false)

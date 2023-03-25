@@ -3,8 +3,14 @@
 @if (Model.StaffGames.Any() || Model.EntryRelevances.Any()|| Model.ArticleRelevances.Any()|| Model.OtherRelevances.Any())
 {
     <section id="relevance">
+
+        @if (Model.RelevancesState == EditState.Preview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"  Class="m-0"/>
+        }
+
         <h2>相关链接</h2>
-       
+
         <ul>
             <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="动态" Outlink
                                                                                                               Items="@( Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime).Select(s=>new KeyValueModel { DisplayName=$"{s.HappenedTime:yyyy年M月d日} - {s.Title}",DisplayValue=s.Link}))" />
@@ -32,11 +38,14 @@
                                                                                                               Items="@( Model.VideoRelevances.Select(s=>new KeyValueModel { DisplayName=s.Name,DisplayValue=$"/videos/index/{s.Id}"}))" />
             <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Others.RelevanceItemCard Title="外部" Outlink
                                                                                                               Items="@(Model.OtherRelevances.Select(s=>new KeyValueModel { DisplayName=s.DisplayName,DisplayValue=s.Link}))" />
-        </ul> 
+        </ul>
     </section>
 }
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
 }
