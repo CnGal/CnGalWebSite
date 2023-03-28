@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -663,12 +664,22 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var result = await _fileService.TransferDepositFile("https://image.cngal.org/images/upload/20230324/09e7c73a9e6f7d07052228773808cd16f6ff32ef.webp");
+                var ids = await _playedGameRepository.GetAll().AsNoTracking().Select(s => new
+                {
+                    s.Id,
+                    s.EntryId,
+                    s.ApplicationUserId
+                }).ToListAsync();
 
+                var deleteIds = ids.Where(s => ids.Count(x => s.ApplicationUserId == x.ApplicationUserId && s.EntryId== x.EntryId) > 2).Select(s => s.Id);
+
+                var count = await _playedGameRepository.GetAll().Where(s => deleteIds.Contains(s.Id)).ExecuteDeleteAsync();
+                _logger.LogInformation("共删除 {count} 条记录", count);
                 return new Result { Successful = true };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "执行临时脚本失败");
                 return new Result { Successful = false, Error = ex.Message + "\n" + ex.StackTrace + "\n" + ex.Source };
             }
 

@@ -4,61 +4,61 @@
     <loc>https://www.cngal.org/</loc>
     <priority>1.00</priority>
     <changefreq>daily</changefreq>
-    <lastmod />
+    <lastmod>2023-03-28T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/data</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/about</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/structure</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/privacy</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/updatelog</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/entries</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/cv</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/articles</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/square</loc>
     <priority>0.90</priority>
-    <changefreq>daily</changefreq>
-    <lastmod />
+    <changefreq>weekly</changefreq>
+    <lastmod>2023-03-26T00:00:00</lastmod>
   </url>
   <url>
     <loc>https://www.cngal.org/entries/index/1</loc>
