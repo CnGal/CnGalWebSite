@@ -671,7 +671,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     s.ApplicationUserId
                 }).ToListAsync();
 
-                var deleteIds = ids.Where(s => ids.Count(x => s.ApplicationUserId == x.ApplicationUserId && s.EntryId== x.EntryId) > 2).Select(s => s.Id);
+                var deleteIds = ids.Where(s => ids.Count(x => s.ApplicationUserId == x.ApplicationUserId && s.EntryId== x.EntryId) > 1).Select(s => s.Id);
 
                 var count = await _playedGameRepository.GetAll().Where(s => deleteIds.Contains(s.Id)).ExecuteDeleteAsync();
                 _logger.LogInformation("共删除 {count} 条记录", count);
