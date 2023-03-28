@@ -1,4 +1,5 @@
 ﻿@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
 
 
 <PageTitle>@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))</PageTitle>
@@ -9,6 +10,14 @@
     @if (NoIndex)
     {
         <meta name="robots" content="noindex">
+    }
+    @if (_dataCacheService.IsApp)
+    {
+        <meta name="applicable-device" content="mobile">
+    }
+    else
+    {
+        <meta name="applicable-device" content="pc">
     }
 </HeadContent>
 
