@@ -305,7 +305,8 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc =host,
                     ChangeFreq = "daily",
-                    Priority = "1.00"
+                    Priority = "1.00",
+                    LastModified =DateTime.UtcNow.Date.ToString("s"),
                 }
             };
             foreach (var item in mainurls)
@@ -313,8 +314,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 data.Add(new SitemapModel
                 {
                     Loc = item,
-                    ChangeFreq = "daily",
-                    Priority = "0.90"
+                    ChangeFreq = "weekly",
+                    Priority = "0.90",
+                    LastModified = DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek).ToString("s"),
                 });
             }
             foreach (var item in entries)

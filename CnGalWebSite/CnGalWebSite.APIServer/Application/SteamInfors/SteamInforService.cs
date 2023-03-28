@@ -388,7 +388,16 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             //查找
             var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
             var appids = steamGames.games.Select(s => s.appid).Distinct();
-            var steams = await _steamInforRepository.GetAll().Where(s => appids.Contains(s.SteamId)).ToListAsync();
+            var steams = await _steamInforRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
+                .Where(s => appids.Contains(s.SteamId))
+                .Select(s => new
+                {
+                    s.EntryId,
+                    s.SteamId
+                })
+                .ToListAsync();
 
             //遍历列表更新已玩游戏信息
             foreach (var item in userGames)
