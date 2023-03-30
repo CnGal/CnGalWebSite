@@ -1,20 +1,15 @@
 ﻿using Aliyun.OSS;
-using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files;
-using CnGalWebSite.DataModel.ViewModel.Others;
-using CnGalWebSite.Helper.Helper;
+using CnGalWebSite.DrawingBed.Models.DataModels;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
 using COSXML;
 using COSXML.Auth;
 using FFmpeg.NET;
 using MediaInfo;
-using OneOf.Types;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Policy;
 using System.Text;
 using Tweetinvi.Security;
-using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.DrawingBed.Services
 {
@@ -28,14 +23,16 @@ namespace CnGalWebSite.DrawingBed.Services
         private readonly string _fileTempPath = "";
         private readonly ILogger<FileService> _logger;
         private readonly IUploadService _uploadService;
+        private readonly IRecordService _recordService;
 
-        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService)
+        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService, IRecordService recordService)
         {
             _httpClient = httpClient;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _logger = logger;
             _uploadService = uploadService;
+            _recordService = recordService;
 
             _imageTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "images");
             _fileTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "files");
@@ -46,7 +43,7 @@ namespace CnGalWebSite.DrawingBed.Services
             Directory.CreateDirectory(_audioTempPath);
         }
 
-        public async Task<UploadResult> TransferDepositFile(string url,double x=0,double y=0, UploadFileType type= UploadFileType.Image)
+        public async Task<UploadResult> TransferDepositFile(string url, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
         {
             string pathSaveFile = null;
             string pathCutFile = null;
@@ -55,7 +52,7 @@ namespace CnGalWebSite.DrawingBed.Services
             try
             {
 
-                pathSaveFile = await SaveFileFromUrl(url,type);
+                pathSaveFile = await SaveFileFromUrl(url, type);
                 if (type == UploadFileType.Image)
                 {
                     pathCutFile = CutLocalImage(pathSaveFile, x, y);
@@ -64,36 +61,39 @@ namespace CnGalWebSite.DrawingBed.Services
                 }
                 else
                 {
-                    result =await CutAudioAsync(pathSaveFile);
+                    result = await CutAudioAsync(pathSaveFile);
                     pathCompressFile = result.FileURL;
                 }
 
 
                 var sha1 = GetSHA1(pathCompressFile);
-                var uploadedFile = await CheckSameFileFromServer(sha1);
-                if (string.IsNullOrWhiteSpace(uploadedFile))
-                {
-                    if (url.Contains("image.cngal.org")&&x==0&&y==0)
-                    {
-                        //原链接已经在图床中，直接返回
-                        uploadedFile = url;
-                    }
-                    else
-                    {
-                        uploadedFile = await UploadLocalFileToServer(pathCompressFile, sha1, type);
-                    }
 
-                }
-
-                return new UploadResult
+                var model = new UploadResult
                 {
                     Uploaded = true,
                     Sha1 = sha1,
-                    Url = uploadedFile,
+                    Url = await _recordService.Get(sha1),
                     FileSize = result.FileSize,
-                    OriginalUrl=url,
-                    Duration = result.Duration
+                    OriginalUrl = url,
+                    Duration = result.Duration,
+                    Type = type,
                 };
+                if (string.IsNullOrWhiteSpace(model.Url))
+                {
+                    if (url.Contains("image.cngal.org") && x == 0 && y == 0)
+                    {
+                        //原链接已经在图床中，直接返回
+                        model.Url = url;
+                    }
+                    else
+                    {
+                        model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type);
+                        //添加文件上传记录
+                        await _recordService.Add(model);
+                    }
+                }
+
+                return model;
             }
             catch (Exception ex)
             {
@@ -106,7 +106,6 @@ namespace CnGalWebSite.DrawingBed.Services
                 DeleteFile(pathCutFile);
                 DeleteFile(pathCompressFile);
             }
-
         }
 
         public async Task<UploadResult> UploadFormFile(IFormFile file, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
@@ -127,30 +126,35 @@ namespace CnGalWebSite.DrawingBed.Services
                 }
                 else
                 {
-                    result =await CutAudioAsync(pathSaveFile);
+                    result = await CutAudioAsync(pathSaveFile);
                     pathCompressFile = result.FileURL;
                 }
 
                 var sha1 = GetSHA1(pathCompressFile);
-                var uploadedFile = await CheckSameFileFromServer(sha1);
-                if (string.IsNullOrWhiteSpace(uploadedFile))
-                {
-                    uploadedFile = await UploadLocalFileToServer(pathCompressFile, sha1, type);
-                }
 
-                return new UploadResult
+                var model = new UploadResult
                 {
                     Uploaded = true,
                     Sha1 = sha1,
                     FileName = file.FileName,
-                    Url = uploadedFile,
+                    Url = await _recordService.Get(sha1),
                     FileSize = (new FileInfo(pathCompressFile)).Length,
-                    Duration = result.Duration
+                    Duration = result.Duration,
+                    Type = type,
                 };
+
+                if (string.IsNullOrWhiteSpace(model.Url))
+                {
+                    model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type);
+                    //添加文件上传记录
+                    await _recordService.Add(model);
+                }
+
+                return model;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "上传文件失败：{file}" ,file.Name);
+                _logger.LogError(ex, "上传文件失败：{file}", file.Name);
                 throw;
             }
             finally
@@ -168,43 +172,14 @@ namespace CnGalWebSite.DrawingBed.Services
         {
             return type switch
             {
-                UploadFileType.Audio => UploadToAudioServer(filePath, shar1),
+                UploadFileType.Audio => await _uploadService.UploadToAliyunOSS(filePath, shar1),
                 UploadFileType.Image => await _uploadService.UploadToTencentOSS(filePath, shar1),
                 _ => null
 
             };
         }
 
-        private string UploadToAudioServer(string filePath, string shar1)
-        {
-            // yourEndpoint填写Bucket所在地域对应的Endpoint。以华东1（杭州）为例，Endpoint填写为https://oss-cn-hangzhou.aliyuncs.com
-            var endpoint = _configuration["OSSEndpoint"];
-            // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户
-            var accessKeyId = _configuration["OSSAccessKeyId"];
-            var accessKeySecret = _configuration["OSSAccessKeySecret"];
-            // yourBucketName填写Bucket名称
-            var bucketName = _configuration["OSSBucketName"];
 
-            // 创建OSSClient实例
-            var client = new OssClient(endpoint, accessKeyId, accessKeySecret);
-
-            // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt
-            var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{shar1}.mp3";
-            try
-            {
-                // 上传文件
-                var result = client.PutObject(bucketName, objectName, filePath);
-                var url = _configuration["AudioUrl"] + objectName;
-                _logger.LogInformation("成功上传音频到OSS：{url}", url);
-                return url;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "上传音频到OSS失败：{filePath}", filePath);
-                throw;
-            }
-
-        }
 
         #endregion
 
@@ -297,23 +272,6 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 _logger.LogError(ex, "计算文件Sha1失败");
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// 检测是否存在相同的文件 存在则返回
-        /// </summary>
-        /// <returns></returns>
-        private async Task<string> CheckSameFileFromServer(string sha1)
-        {
-            var result = await _httpClient.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/files/GetSameFile?sha1=" + sha1);
-            if(result.Successful&&string.IsNullOrWhiteSpace(result.Error)==false)
-            {
-                return result.Error;
-            }
-            else
-            {
-                return null;
             }
         }
 

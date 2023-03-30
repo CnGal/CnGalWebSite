@@ -1,5 +1,4 @@
-﻿@inject IHttpService _httpService
-@inject IFileUploadService _fileUploadService
+﻿@inject IFileUploadService _fileUploadService
 
 <div class="@Class">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="转存图片并整理格式" IsAsync="true" OnClick="OnClick" Icon="mdi-transit-connection-variant " Color="success" />
@@ -18,14 +17,8 @@
 
     public async Task OnClick()
     {
-        var model =await ToolHelper.TransformImagesAsync(Text, _httpService.GetClient());
+        var model =await _fileUploadService.TransformImagesAsync(Text);
         Text = model.Text;
-        foreach(var item in model.UploadResults)
-        {
-            //向用户文件管理添加信息
-            await _fileUploadService.AddUserLoadedFileInfor(item, UploadFileType.Image);
-        }
-
         await TextChanged.InvokeAsync(Text);
     }
 

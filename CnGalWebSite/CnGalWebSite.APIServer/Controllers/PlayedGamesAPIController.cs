@@ -1,5 +1,4 @@
-﻿using BlazorComponent;
-using CnGalWebSite.APIServer.Application.Examines;
+﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;
@@ -276,7 +275,12 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //获取词条
-            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).ThenInclude(s=>s.Tags).Where(s => s.ApplicationUserId == id).ToListAsync();
+            var games = await _playedGameRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry).ThenInclude(s => s.Tags)
+                .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
+                .Where(s => s.ApplicationUserId == id)
+                .ToListAsync();
+
             var gameIds = games.Select(s => s.Id).ToList();
             //提前加载预览
             //获取审核记录

@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.Helper.Extensions;
 using Markdig;
 using Microsoft.AspNetCore.Identity;
@@ -36,15 +37,16 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IExamineService _examineService;
         private readonly IFileService _fileService;
-        
+        private readonly IFileUploadService _fileUploadService;
+
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GameNews>, string, SortOrder, IEnumerable<GameNews>>> SortLambdaCacheGameNews = new();
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<WeeklyNews>, string, SortOrder, IEnumerable<WeeklyNews>>> SortLambdaCacheWeeklyNews = new();
 
 
         public NewsService(IConfiguration configuration, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService, IRepository<ApplicationUser, string> userRepository,
-        IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<GameNews, long> gameNewsRepository, IExamineService examineService,
-              IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
+        IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<GameNews, long> gameNewsRepository, IExamineService examineService, IFileUploadService fileUploadService,
+        IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _configuration = configuration;
             _rssHelper = rssHelper;
@@ -58,6 +60,7 @@ namespace CnGalWebSite.APIServer.Application.News
             _weeklyNewsRepository = weeklyNewsRepository;
             _fileService = fileService;
             _userRepository = userRepository;
+            _fileUploadService = fileUploadService;
         }
 
 
@@ -932,7 +935,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     //提取链接
                     var link = videoHtml.MidStrEx("<a href=\"", "\"");
                     //替换
-                    markdown = markdown.Replace($"<video{videoHtml}</video>", $"![]({await _fileService.SaveImageAsync( image, _configuration["NewsAdminId"])})\n视频无法显示，请前往[微博视频]({link})观看\n");
+                    markdown = markdown.Replace($"<video{videoHtml}</video>", $"![]({await _fileUploadService.TransformImageAsync( image)})\n视频无法显示，请前往[微博视频]({link})观看\n");
                 }
 
             }
@@ -943,7 +946,7 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task<string> GetMicroblogMainImage(string description)
         {
             var links = description.GetImageLinks();
-            return links.Any() ? await _fileService.SaveImageAsync(links.Last(), _configuration["NewsAdminId"], 460, 215) : "";
+            return links.Any() ? await _fileUploadService.TransformImageAsync(links.Last(), 460, 215) : "";
         }
 
         private int WeekOfYear(DateTime curDay)

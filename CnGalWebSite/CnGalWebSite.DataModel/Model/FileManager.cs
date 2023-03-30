@@ -2,8 +2,12 @@
 using CnGalWebSite.DataModel.ViewModel.Files;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace CnGalWebSite.DataModel.Models
 {
+    [Obsolete("已迁移到图床")]
     public class FileManager
     {
         public int Id { get; set; }
@@ -18,6 +22,7 @@ namespace CnGalWebSite.DataModel.Models
         public ApplicationUser ApplicationUser { get; set; }
     }
 
+    [Obsolete("已迁移到图床")]
     public class UserFile
     {
         public int Id { get; set; }
@@ -44,9 +49,15 @@ namespace CnGalWebSite.DataModel.Models
 
         public FileManager FileManager { get; set; }
 
-
-
-
         public string UserId { get; set; }
+    }
+
+    [Obsolete("已迁移到图床")]
+    public enum UploadFileType
+    {
+        [Display(Name = "图片")]
+        Image,
+        [Display(Name = "音频")]
+        Audio
     }
 }

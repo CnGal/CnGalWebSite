@@ -1,5 +1,4 @@
-﻿using BlazorComponent;
-using BootstrapBlazor.Components;
+﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -337,28 +336,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             //查找是否修改发行时间 对下文不影响 只是更新字段缓存
                             if (item.DisplayName == "发行时间")
                             {
-                                if (item.DisplayValue == null)
-                                {
-                                    entry.PubulishTime = null;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
-                                    }
-                                    catch
-                                    {
-                                        try
-                                        {
-                                            entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
-                                        }
-                                        catch
-                                        {
-
-                                        }
-                                    }
-                                }
+                                entry.PubulishTime = item.DisplayValue.ToDate();
                             }
                             else if (item.DisplayName == "Steam平台Id")
                             {
@@ -2470,22 +2448,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             switch (item.DisplayName)
                             {
                                 case "发行时间":
-                                    try
-                                    {
-                                        model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null).AddHours(12);
-                                    }
-                                    catch
-                                    {
-                                        try
-                                        {
-                                            model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null).AddHours(12);
-                                        }
-                                        catch
-                                        {
-                                            model.IssueTime = null;
-                                        }
-                                    }
-
+                                    model.IssueTime = item.DisplayValue.ToDate();
                                     break;
                                 case "发行时间备注":
                                     model.IssueTimeString = item.DisplayValue;
@@ -3591,11 +3554,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             foreach (var role in roles)
             {
-                model.Add(new RoleBrithdayViewModel
-                {
-                    Brithday = role.Birthday,
-                    Infor = _appHelper.GetEntryInforTipViewModel(role.Role)
-                });
+                var entry = new RoleBrithdayViewModel();
+                entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(role.Role));
+                entry.Brithday = role.Birthday;
+
+                model.Add(entry);
                  
             }
 

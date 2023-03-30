@@ -1,0 +1,19 @@
+﻿
+@if (string.IsNullOrWhiteSpace(Model.Url) == false)
+{
+    @if (Model.Type == UploadFileType.Image)
+    {
+        <img src="@Model.Url" style="@Style" class="pt-1 pb-1"/>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@Model.Url" />
+    }
+}
+
+@code {
+    [Parameter]
+    public UploadRecordOverviewModel Model { get; set; }
+    [Parameter]
+    public string Style { get; set; } = "height:80px;width:fit-content;";
+}

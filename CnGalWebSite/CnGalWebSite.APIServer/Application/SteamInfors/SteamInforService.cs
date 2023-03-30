@@ -117,7 +117,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 var json = JObject.Parse(content);
 
                 steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
-                steam.RecommendationRate = json["positive"].ToObject<int>()*100 / steam.EvaluationCount;
+                if (steam.EvaluationCount != 0)
+                {
+                    steam.RecommendationRate = json["positive"].ToObject<int>() * 100 / steam.EvaluationCount;
+                }
+              
 
                 var minutes = json["average_forever"].ToObject<double>();
                 if (minutes > 3000)
@@ -419,6 +423,12 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             //添加新游戏
             foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
             {
+                //检查是否已经存在
+                if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId == item.EntryId))
+                {
+                    continue;
+                }
+
                 _ = await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     IsInSteam = true,

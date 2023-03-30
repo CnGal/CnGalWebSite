@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using IdentityModel.AspNetCore.AccessTokenManagement;
 using IdentityModel.Client;
 using CnGalWebSite.Shared.Service;
+using CnGalWebSite.Core.Services;
 
 namespace CnGalWebSite.Server.Services
 {

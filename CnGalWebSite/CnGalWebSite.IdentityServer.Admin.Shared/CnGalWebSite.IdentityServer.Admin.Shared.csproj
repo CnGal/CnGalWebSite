@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>disable</Nullable>
-    <ImplicitUsings>disableenable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>fe275a75-946f-45d0-87c4-79a70a2a1a31</UserSecretsId>
   </PropertyGroup>
 
@@ -21,10 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Components\CnGalWebSite.Components.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
     <ProjectReference Include="..\CnGalWebSite.IdentityServer.Models\CnGalWebSite.IdentityServer.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Using Include="CnGalWebSite.Core.Models" />
     <Using Include="CnGalWebSite.Extensions" />
   </ItemGroup>
 </Project>

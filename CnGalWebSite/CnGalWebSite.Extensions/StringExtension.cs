@@ -149,6 +149,7 @@ namespace CnGalWebSite.Extensions
 
             return false;
         }
+
         /// <summary>
         /// 将传入的字符串中间部分字符替换成特殊字符
         /// </summary>
@@ -204,6 +205,34 @@ namespace CnGalWebSite.Extensions
             return value;
         }
 
+        /// <summary>
+        /// 将字符串转换成日期 并居中时间 以消除东八区时区转换可能带来的影响
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static DateTime? ToDate(this string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                try
+                {
+                    return new DateTime(DateTime.ParseExact(value, "yyyy年M月d日", null).AddHours(12).Ticks, DateTimeKind.Utc);
+                }
+                catch
+                {
+                    try
+                    {
+                        return  new DateTime(DateTime.ParseExact(value, "yyyy/M/d", null).AddHours(12).Ticks, DateTimeKind.Utc);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 
    

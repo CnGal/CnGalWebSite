@@ -16,6 +16,7 @@ using CnGalWebSite.Shared.Service;
 using Microsoft.Extensions.Logging;
 using CnGalWebSite.DataModel.Helper;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using CnGalWebSite.Core.Services;
 
 namespace CnGalWebSite.WebAssembly.Services
 {

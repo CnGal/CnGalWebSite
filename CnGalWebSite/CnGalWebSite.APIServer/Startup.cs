@@ -9,8 +9,10 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.APIServer.MessageHandlers;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.HealthCheck.Checks;
 using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.Helper.Extensions;
@@ -78,12 +80,16 @@ namespace CnGalWebSite.APIServer
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
-
+            //自动注入服务到依赖注入容器
+            services.RegisterAssemblyPublicNonGenericClasses()
+               .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
+               .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
             //依赖注入辅助类
             services.AddScoped<IAppHelper, AppHelper>();
             services.AddScoped<IRSSHelper, RSSHelper>();
             //添加HTTP请求
             services.AddHttpClient();
+            services.AddScoped<IHttpService, HttpService>();
             //添加ElasticSearch服务
             services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //添加搜索服务
@@ -95,10 +101,8 @@ namespace CnGalWebSite.APIServer
                 });
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
-            //自动注入服务到依赖注入容器
-            services.RegisterAssemblyPublicNonGenericClasses()
-               .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
-               .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+            //添加文件上传服务
+            services.AddScoped<IFileUploadService, FileUploadService>();
 
             //注册Swagger生成器，定义一个或多个Swagger文件
             services.AddEndpointsApiExplorer();
@@ -106,7 +110,7 @@ namespace CnGalWebSite.APIServer
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "CnGal API",
+                    Title = "CnGal资料站 - 主站 API",
                     Description = "我们欢迎开发者使用这些API开发各个平台应用，如有困难请咨询网站管理人员",
                     Contact = new OpenApiContact
                     {

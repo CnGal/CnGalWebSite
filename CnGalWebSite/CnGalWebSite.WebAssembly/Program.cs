@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared;
@@ -43,6 +45,10 @@ namespace CnGalWebSite.WebAssembly
             if (string.IsNullOrWhiteSpace(builder.Configuration["WebApiPath"]) == false)
             {
                 ToolHelper.WebApiPath = builder.Configuration["WebApiPath"];
+            }
+            if (string.IsNullOrWhiteSpace(builder.Configuration["ImageApiPath"]) == false)
+            {
+                ToolHelper.ImageApiPath = builder.Configuration["ImageApiPath"];
             }
 
             builder.RootComponents.Add<App>("app");

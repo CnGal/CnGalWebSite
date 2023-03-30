@@ -41,7 +41,7 @@
 
     private bool menu { get; set; }
 
-    List<EntryInforTipViewModel> Model;
+    List<RoleBrithdayViewModel> Model;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog masaCatalog;
     [CascadingParameter]
@@ -58,7 +58,7 @@
                 {
                     var url = $"?month={DateTime.Now.ToCstTime().Month}";
 
-                    Model = (await _dataCacheService.RoleBrithdaysDataCatche.GetCache(url)).Where(s => s.Brithday.Day == DateTime.Now.ToCstTime().Day).Select(s => s.Infor).ToList();
+                    Model = (await _dataCacheService.RoleBrithdaysDataCatche.GetCache(url)).Where(s => s.Brithday.Day == DateTime.Now.ToCstTime().Day).ToList();
 
 
                     StateHasChanged();

@@ -1,13 +1,16 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files;
-using CnGalWebSite.DataModel.ViewModel.Others;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DrawingBed.DataReositories;
+using CnGalWebSite.DrawingBed.Models.DataModels;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
 using CnGalWebSite.DrawingBed.Services;
-using CnGalWebSite.Helper.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace CnGalWebSite.DrawingBed.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/files/[action]")]
     public class FileController : ControllerBase
@@ -16,14 +19,17 @@ namespace CnGalWebSite.DrawingBed.Controllers
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IFileService _fileService;
+        private readonly IQueryService _queryService;
+        private readonly IRepository<UploadRecord, long> _uploadRecordRepository;
 
-        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService)
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _fileService = fileService;
-
+            _queryService = queryService;
+            _uploadRecordRepository = uploadRecordRepository;
         }
 
         /// <summary>
@@ -34,6 +40,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <param name="y"></param>
         /// <returns></returns>
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
         {
             if (files.Count == 0)
@@ -68,6 +75,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <param name="url"></param>
         /// <returns></returns>
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -109,5 +117,73 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
         }
 
+
+        [HttpPost]
+        public async Task<QueryResultModel<UploadRecordOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<UploadRecord, long>(_uploadRecordRepository.GetAll(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Sha1.Contains(model.SearchText) || s.Url.Contains(model.SearchText) || s.UserId.Contains(model.SearchText)));
+
+            return new QueryResultModel<UploadRecordOverviewModel>
+            {
+                Items = await items.Select(s => new UploadRecordOverviewModel
+                {
+                    Id = s.Id,
+                    Sha1 = s.Sha1,
+                    Size = s.Size,
+                    Duration = s.Duration,
+                    Type = s.Type,
+                    UploadTime = s.UploadTime,
+                    Url = s.Url,
+                    UserId = s.UserId,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<Result>> GetSameFileAsync([FromQuery] string sha1)
+        {
+            if (string.IsNullOrWhiteSpace(sha1))
+            {
+                return new Result { Success = false };
+            }
+
+            var file = await _uploadRecordRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Sha1 == sha1);
+            if (file == null)
+            {
+                return new Result { Success = false };
+            }
+
+            return new Result { Success = true, Message = file.Url };
+
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<Result>> GetRandomFileAsync([FromQuery] UploadFileType type)
+        {
+            var random = new Random();
+            var length = await _uploadRecordRepository.CountAsync(s => string.IsNullOrWhiteSpace(s.Url) == false&&s.Type==type);
+            if (length > 0)
+            {
+                var p = random.Next(1, length - 1);
+                var temp = await _uploadRecordRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Url) == false && s.Type == type).OrderBy(s => s.Id).Skip(p).Take(1).ToListAsync();
+                if (temp.Any())
+                {
+                    return new Result { Success = true, Message = temp[0].Url };
+                }
+                else
+                {
+                    return new Result { Success = false };
+                }
+            }
+            else
+            {
+                return new Result { Success = false };
+            }
+        }
     }
 }

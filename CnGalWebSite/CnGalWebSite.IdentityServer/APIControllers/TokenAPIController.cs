@@ -1,9 +1,10 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.IdentityServer.Admin.SSR.Models;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Shared;
+
 using CnGalWebSite.IdentityServer.Models.ViewModels.Tokens;
 using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;

@@ -114,15 +114,15 @@
                 <div class="rounded shadow-sm bg-opacity p-3">
                     <MTimeline Dense="_dataCacheService.IsApp||TimelineModel.Count<3">
 
-                        @foreach (var item in TimelineModel.OrderByDescending(s => s.Infor.PublishTime))
+                        @foreach (var item in TimelineModel.OrderByDescending(s => s.PublishTime))
                         {
                             <MTimelineItem Large Color="@GetColor(i)">
                                 <OppositeContent>
-                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.Infor.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
+                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
                                 </OppositeContent>
                                 <ChildContent>
-                                    <MCard Class="elevation-2" @onclick="@(() => ViewAt(item.Infor.Id))">
-                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" ShowType="false" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@_dataCacheService.IsApp" AllowNav="false" />
+                                    <MCard Class="elevation-2" @onclick="@(() => ViewAt(item.Id))">
+                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ShowType="false" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@_dataCacheService.IsApp" AllowNav="false" />
                                     </MCard>
                                 </ChildContent>
                             </MTimelineItem>

@@ -44,11 +44,11 @@ else
 
 @code {
     [Parameter]
-    public List<EntryInforTipViewModel> Model { get; set; }
+    public List<RoleBrithdayViewModel> Model { get; set; }
 
     public string Text = "";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         var sb = new System.Text.StringBuilder(DateTime.Now.ToCstTime().ToString("M月d日"));
         sb.Append("是");

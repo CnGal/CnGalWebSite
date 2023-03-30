@@ -50,7 +50,6 @@ using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Util.Reflection.Expressions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -341,15 +340,6 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListMessageAloneModel>>> GetMessageListAsync(MessagesPagesInfor input)
         {
             var dtos = await _messageService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFileAloneModel>>> GetFileListAsync(FilesPagesInfor input)
-        {
-            var dtos = await _fileService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }
@@ -664,17 +654,26 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var ids = await _playedGameRepository.GetAll().AsNoTracking().Select(s => new
+
+                var entries = await _entryRepository.GetAll().AsNoTracking()
+                    .Include(s => s.Information)
+                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && s.PubulishTime != null && s.Information.Any(s => s.DisplayName == "发行时间"))
+                    .Select(s => new
+                    {
+                        s.Id,
+                        s.Name,
+                        PubulishTime= s.PubulishTime.Value,
+                        s.Information
+                    })
+                    .ToListAsync();
+
+                foreach(var item in  entries)
                 {
-                    s.Id,
-                    s.EntryId,
-                    s.ApplicationUserId
-                }).ToListAsync();
+                    var PubulishTime = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue?.ToDate();
+                    await _entryRepository.GetAll().Where(s => s.Id == item.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.PubulishTime, b => PubulishTime));
+                    _logger.LogInformation("将词条 - {name}({id}) 的发行时间从 {before} 修改为 {after}", item.Name, item.Id, item.PubulishTime.ToString("yyyy-MM-dd"), PubulishTime == null ? "null" : PubulishTime.Value.ToString("yyyy-MM-dd"));
+                }
 
-                var deleteIds = ids.Where(s => ids.Count(x => s.ApplicationUserId == x.ApplicationUserId && s.EntryId== x.EntryId) > 1).Select(s => s.Id);
-
-                var count = await _playedGameRepository.GetAll().Where(s => deleteIds.Contains(s.Id)).ExecuteDeleteAsync();
-                _logger.LogInformation("共删除 {count} 条记录", count);
                 return new Result { Successful = true };
             }
             catch (Exception ex)

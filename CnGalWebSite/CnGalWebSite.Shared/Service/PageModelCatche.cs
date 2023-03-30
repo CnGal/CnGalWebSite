@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Shared.Pages.Normal.Admin;
 using Microsoft.AspNetCore.Components;
 using System;

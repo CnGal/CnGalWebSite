@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Clients;
@@ -6,7 +7,7 @@ using CnGalWebSite.IdentityServer.Models.DataModels.Examines;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Clients;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Examines;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Shared;
+
 using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;

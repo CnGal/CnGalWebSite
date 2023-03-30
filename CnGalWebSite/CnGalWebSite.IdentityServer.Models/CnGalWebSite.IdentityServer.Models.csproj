@@ -9,4 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.3" />  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModels\Shared\" />
+  </ItemGroup>
 </Project>

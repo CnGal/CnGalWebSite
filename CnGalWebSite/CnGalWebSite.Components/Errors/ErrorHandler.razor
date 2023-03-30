@@ -1,0 +1,87 @@
+﻿@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Hosting
+
+@inject IServiceProvider _serviceProvider
+@inject ILogger<ErrorHandler> Logger
+@inject IJSRuntime JS
+@inject IPopupService PopupService
+
+
+
+<MErrorHandler OnErrorHandleAsync="OnErrorHandleAsync">
+    <CascadingValue Value=this IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</MErrorHandler>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public bool IsSSR { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public bool ShowDetailedErrorInfor { get; set; }
+
+    private DateTime LastErrorTime { get; set; } = DateTime.UtcNow.AddYears(-1);
+
+    public async Task<bool> OnErrorHandleAsync(Exception ex)
+    {
+        if (ex is OutOfMemoryException)
+        {
+
+            //内存溢出 强制关闭服务端 由于Docker设置 会重启
+            if (IsSSR)
+            {
+                IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
+                if (_applicationLifetime != null)
+                {
+                    _applicationLifetime.StopApplication();
+                }
+            }
+            throw ex;
+        }
+        else
+        {
+            ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            return true;
+        }
+    }
+
+    public async void ProcessError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "")
+    {
+        try
+        {
+            Logger.LogError(ex, message);
+
+
+            //向用户发送通知
+            var time = (DateTime.UtcNow - LastErrorTime).TotalSeconds;
+            if (time > 2 && string.IsNullOrWhiteSpace(message) == false)
+            {
+
+                if (string.IsNullOrWhiteSpace(resolvent))
+                {
+                    var qq = "761794704";
+                    var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
+                    resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 {qq} 反馈Bug";
+                }
+                await PopupService.ToastAsync(new ToastConfig
+                {
+                    Type = AlertTypes.Error,
+                    Title = message,
+                    Duration = 20000,
+                    Content = $"报错：{ex.Message}\n{(ShowDetailedErrorInfor ? ($"{ex.StackTrace}\n") : "")}可能原因：{reason}\n解决方法：{resolvent}",
+                });
+
+
+                LastErrorTime = DateTime.UtcNow;
+            }
+        }
+        catch
+        {
+
+        }
+    }
+}
