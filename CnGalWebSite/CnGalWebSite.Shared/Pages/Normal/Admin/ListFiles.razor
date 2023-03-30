@@ -4,47 +4,48 @@
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
+    <TitleTip Title="文件版块"></TitleTip>
 
-<DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
-        }
-        else if (context.Header.Value == "type")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.TypeChip Type="context.Item.Type" />
-        }
-        else if (context.Header.Value == "preview")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.PreviewCard Model="context.Item" />
-        }
-        else if (context.Header.Value == "size")
-        {
-            <span>  @(((double)context.Item.Size/(1024*1024)).ToString("0.00")) MB</span>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+    <DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+            }
+            else if (context.Header.Value == "type")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.TypeChip Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == "preview")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.PreviewCard Model="context.Item" />
+            }
+            else if (context.Header.Value == "size")
+            {
+                <span>  @(((double)context.Item.Size/(1024*1024)).ToString("0.00")) MB</span>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
 
-<MDialog @bind-Value="_detailDialog"
-         MaxWidth="1000">
-    <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard @ref="detailCard" Model="@_detailItem" />
-</MDialog>
+    <MDialog @bind-Value="_detailDialog"
+             MaxWidth="1000">
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard @ref="detailCard" Model="@_detailItem" />
+    </MDialog>
 
-@code {
-    private bool _detailDialog;
-    private UploadRecordOverviewModel _detailItem;
-    private string _baseUrl = ToolHelper.ImageApiPath + "api/files/";
-    private string _name = "上传记录";
+    @code {
+        private bool _detailDialog;
+        private UploadRecordOverviewModel _detailItem;
+        private string _baseUrl = ToolHelper.ImageApiPath + "api/files/";
+        private string _name = "上传记录";
 
 
-    private List<DataTableHeader<UploadRecordOverviewModel>> _headers = new List<DataTableHeader<UploadRecordOverviewModel>>
+        private List<DataTableHeader<UploadRecordOverviewModel>> _headers = new List<DataTableHeader<UploadRecordOverviewModel>>
 {
           new ()
           {
@@ -62,18 +63,18 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<UploadRecordOverviewModel> dataTableCard;
-    CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard detailCard;
+        DataTableCard<UploadRecordOverviewModel> dataTableCard;
+        CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard detailCard;
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
 
 
-    public void DetailItem(UploadRecordOverviewModel item)
-    {
-        _detailItem = item;
-        _detailDialog = true;
-        StateHasChanged();
+        public void DetailItem(UploadRecordOverviewModel item)
+        {
+            _detailItem = item;
+            _detailDialog = true;
+            StateHasChanged();
+        }
+
     }
-
-}
