@@ -7,6 +7,7 @@ using System.Xml.Linq;
 
 namespace CnGalWebSite.DataModel.Models
 {
+    [Obsolete("已迁移到图床")]
     public class FileManager
     {
         public int Id { get; set; }
@@ -21,6 +22,7 @@ namespace CnGalWebSite.DataModel.Models
         public ApplicationUser ApplicationUser { get; set; }
     }
 
+    [Obsolete("已迁移到图床")]
     public class UserFile
     {
         public int Id { get; set; }
@@ -50,6 +52,7 @@ namespace CnGalWebSite.DataModel.Models
         public string UserId { get; set; }
     }
 
+    [Obsolete("已迁移到图床")]
     public enum UploadFileType
     {
         [Display(Name = "图片")]

@@ -423,6 +423,12 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             //添加新游戏
             foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
             {
+                //检查是否已经存在
+                if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId == item.EntryId))
+                {
+                    continue;
+                }
+
                 _ = await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     IsInSteam = true,

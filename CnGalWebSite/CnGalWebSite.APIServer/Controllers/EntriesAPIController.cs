@@ -1601,15 +1601,12 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new List<PublishGamesTimelineModel>();
             foreach (var item in games)
             {
-                var entry= _appHelper.GetEntryInforTipViewModel(item);
+                var entry = new PublishGamesTimelineModel();
+                entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(item));
 
-                var note = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
+                entry.PublishTimeNote= item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
 
-                model.Add(new PublishGamesTimelineModel
-                {
-                    Infor = entry,
-                    PublishTimeNote = note,
-                });
+                model.Add(entry);
             }
 
             return model;

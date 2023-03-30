@@ -5,11 +5,9 @@ using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Entries
 {
-    public class PublishGamesTimelineModel
+    public class PublishGamesTimelineModel: EntryInforTipViewModel
     {
         public string PublishTimeNote { get; set; }
-
-        public EntryInforTipViewModel Infor { get; set; }
     }
 
     public enum PublishGamesDisplayType

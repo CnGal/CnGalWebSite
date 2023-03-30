@@ -18,7 +18,7 @@
                 @foreach (var item in Model.Where(s => s.Brithday.Day == context.Day && s.Brithday.Month == context.Month))
                 {
                     <div class="p-1">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.RoleButton Model="item.Infor" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.RoleButton Model="item" />
                     </div>
                 }
             </div>

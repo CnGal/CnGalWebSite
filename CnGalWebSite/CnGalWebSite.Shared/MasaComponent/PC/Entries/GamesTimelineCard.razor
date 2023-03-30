@@ -10,7 +10,7 @@
             时间轴
         </MCardTitle>
         <MCardText>
-            @Name 制作的游戏
+            @Name 制作的游戏，没有发布的游戏不会展示哦
         </MCardText>
        
         <MCardText>
@@ -20,15 +20,15 @@
 
                     <MTimeline Dense="_dataCacheService.IsApp||TimelineModel.Count<3">
 
-                        @foreach (var item in TimelineModel.OrderByDescending(s => s.Infor.PublishTime))
+                        @foreach (var item in TimelineModel.OrderByDescending(s => s.PublishTime))
                         {
                             <MTimelineItem Large Color="@GetColor(i)">
                                 <OppositeContent>
-                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.Infor.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
+                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
                                 </OppositeContent>
                                 <ChildContent>
-                                    <MCard Class="elevation-2" @onclick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Infor.Id))">
-                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" Outline ShowType="false" ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
+                                    <MCard Class="elevation-2" @onclick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Id))">
+                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" Outline ShowType="false" ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
                                     </MCard>
                                 </ChildContent>
                             </MTimelineItem>
