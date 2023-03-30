@@ -7,7 +7,6 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
-using CnGalWebSite.Helper.ViewModel.Files;
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices;
@@ -36,7 +35,7 @@ namespace CnGalWebSite.DataModel.Helper
         public static bool? PreSetIsSSR = null; //=> WebApiPath == "http://172.17.0.1:2001/";
         public static bool IsSSR = true; //=> WebApiPath == "http://172.17.0.1:2001/";
 
-        public const string ImageApiPath = "https://api.cngal.top/";
+        public static string ImageApiPath = "https://api.cngal.top/";
         //public const string ImageApiPath = "http://localhost:5098/";
 
 
@@ -1217,62 +1216,6 @@ namespace CnGalWebSite.DataModel.Helper
                 }
             }
         }
-
-      
-        public static async Task<TransformImageResult> TransformImagesAsync(string text, HttpClient _httpClient)
-        {
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return new TransformImageResult { Text = text };
-            }
-
-            var model = new TransformImageResult();
-
-            StringBuilder sb = new StringBuilder(text);
-            sb.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
-            sb.Replace("pic.cngal.top", "image.cngal.org");
-            //提取全部图片
-            var oldImages = sb.ToString().GetImageLinks();
-            //判断外部图片
-            oldImages.RemoveAll(s => s.Contains("image.cngal.org"));
-            //依次转存
-            //替换原图片
-            foreach (var item in oldImages)
-            {
-                try
-                {
-                    var result = await _httpClient.PostAsJsonAsync($"{ImageApiPath}api/files/linkToImgUrl?url={item}", new TransferDepositFileModel());
-                    if (result.IsSuccessStatusCode)
-                    {
-                        var jsonContent = result.Content.ReadAsStringAsync().Result;
-                        var obj = JsonSerializer.Deserialize<UploadResult>(jsonContent, ToolHelper.options);
-
-                        if (obj.Uploaded)
-                        {
-                            model.UploadResults.Add(obj);
-
-                            sb.Replace(item, obj.Url);
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    //ErrorHandler.ProcessError(ex, "图片转存失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
-                }
-
-            }
-            //保存
-            sb.Replace("<br>", "\n");
-            sb.Replace("\\[\\]", "[]");
-
-            model.Text = sb.ToString();
-
-            return model;
-        }
-
-
 
     }
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions

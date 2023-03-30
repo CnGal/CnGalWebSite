@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.HistoryData;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
@@ -10,50 +11,20 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 {
     public class ImageService : IImageService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IFileUploadService _fileUploadService;
         private readonly IRepository<OriginalImageToDrawingBedUrl> _imageRepository;
         private readonly ILogger<ImageService> _logger;
 
-        public ImageService(HttpClient client, IRepository<OriginalImageToDrawingBedUrl> imageRepository, ILogger<ImageService> logger)
+        public ImageService(IFileUploadService fileUploadService, IRepository<OriginalImageToDrawingBedUrl> imageRepository, ILogger<ImageService> logger)
         {
-            _httpClient = client;
+            _fileUploadService = fileUploadService;
             _imageRepository = imageRepository;
             _logger = logger;
         }
 
         private async Task<string> UploadImageAsync(string url, double x = 0, double y = 0)
         {
-            try
-            {
-                var result = await _httpClient.PostAsJsonAsync($"{ToolHelper.ImageApiPath}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel
-                {
-                    Url = url,
-                    X = x,
-                    Y = y
-                });
-
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<UploadResult>(jsonContent, ToolHelper.options);
-
-                if (obj.Uploaded)
-                {
-                    var temp = obj.Url;
-                    _logger.LogInformation("上传完成：{link}", temp);
-
-                    return temp;
-                }
-                else
-                {
-                    _logger.LogError("上传失败：{link}", url);
-                    return url;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "上传失败：{link}", url);
-                return url;
-            }
-
+            return await _fileUploadService.TransformImageAsync(url, x, y);
         }
 
         public async Task<string> GetImage(string url, double x = 0, double y = 0)

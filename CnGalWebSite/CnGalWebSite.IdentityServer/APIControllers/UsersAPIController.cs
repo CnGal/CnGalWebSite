@@ -27,6 +27,7 @@ using Microsoft.EntityFrameworkCore;
 using BlazorComponent;
 using CnGalWebSite.IdentityServer.Services.Shared;
 using CnGalWebSite.IdentityServer.Data;
+using CnGalWebSite.Core.Models;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {

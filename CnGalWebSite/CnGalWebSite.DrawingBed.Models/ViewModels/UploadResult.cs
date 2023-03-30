@@ -1,6 +1,11 @@
-﻿using System;
+﻿using CnGalWebSite.DrawingBed.Models.DataModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CnGalWebSite.DataModel.Model
+namespace CnGalWebSite.DrawingBed.Models.ViewModels
 {
     public class UploadResult
     {
@@ -37,21 +42,11 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public string Sha1 { get; set; }
 
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public UploadFileType Type { get; set; }
+
     }
 
-    public class CutFileResult
-    {
-        /// <summary>
-        /// 音频长度
-        /// </summary>
-        public TimeSpan? Duration { get; set; }
-        /// <summary>
-        /// 文件长度
-        /// </summary>
-        public long? FileSize { get; set; }
-        /// <summary>
-        /// 处理过的文件url
-        /// </summary>
-        public string FileURL { get; set; }
-    }
 }

@@ -89,9 +89,6 @@
                 if (mMarkdown != null)
                 {
                     await mMarkdown.InsertValueAsync($"\n![]({item.Url})\n");
-
-                    //向用户文件管理添加信息
-                    await _fileUploadService.AddUserLoadedFileInfor(item, UploadFileType.Image);
                 }
             }
         }
@@ -102,6 +99,7 @@
 
 
     }
+
     [JSInvokable]
     public async Task HandleLinkToImgFormatAsync(string res)
     {
@@ -112,10 +110,6 @@
             {
                 Context = Context.Replace(model.OriginalUrl, model.Url);
                 await ContextChanged.InvokeAsync(Context);
-
-                //向用户文件管理添加信息
-                await _fileUploadService.AddUserLoadedFileInfor(model, UploadFileType.Image);
-
             }
         }
         catch

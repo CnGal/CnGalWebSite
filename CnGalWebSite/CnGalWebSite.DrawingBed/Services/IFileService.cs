@@ -1,6 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files;
-using CnGalWebSite.DataModel.ViewModel.Others;
+﻿using CnGalWebSite.DrawingBed.Models.DataModels;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
 
 namespace CnGalWebSite.DrawingBed.Services
 {

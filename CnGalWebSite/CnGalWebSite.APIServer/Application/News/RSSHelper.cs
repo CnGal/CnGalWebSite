@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -17,12 +18,14 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IFileService _fileService;
+        private readonly IFileUploadService _fileUploadService;
 
-        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService)
+        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService, IFileUploadService fileUploadService)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _fileService = fileService;
+            _fileUploadService = fileUploadService;
         }
 
         public async Task<List<OriginalRSS>> GetOriginalWeibo(long id, DateTime fromTime)
@@ -68,7 +71,7 @@ namespace CnGalWebSite.APIServer.Application.News
             //将图片上传到图床
             foreach (var item in model)
             {
-                item.Description= await _fileService.TransformImagesAsync(item.Description, _configuration["NewsAdminId"]);
+                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
             }
 
             return model;
@@ -97,7 +100,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             //获取头像
             item = (XmlElement)doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectSingleNode("image").SelectSingleNode("url");
-            model.Image = await _fileService.SaveImageAsync(item.InnerText, _configuration["NewsAdminId"]);
+            model.Image = await _fileUploadService.TransformImageAsync(item.InnerText);
 
             return model;
         }
@@ -187,7 +190,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 {
                     //将图片上传到图床
 
-                    weibo.Description= await _fileService.TransformImagesAsync(weibo.Description, _configuration["NewsAdminId"]);
+                    weibo.Description = (await _fileUploadService.TransformImagesAsync(weibo.Description)).Text;
                     
 
                     return weibo;

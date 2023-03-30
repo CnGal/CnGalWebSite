@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.IdentityServer.Admin.SSR.Models;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;

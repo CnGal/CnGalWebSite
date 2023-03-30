@@ -29,6 +29,7 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
 using CnGalWebSite.IdentityServer.Services.Shared;
 using OneOf.Types;
 using CnGalWebSite.IdentityServer.Data;
+using CnGalWebSite.Core.Models;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {

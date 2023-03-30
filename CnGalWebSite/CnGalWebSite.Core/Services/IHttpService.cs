@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.Shared.Service
+namespace CnGalWebSite.Core.Services
 {
     public interface IHttpService
     {

@@ -1,0 +1,33 @@
+﻿<MChip Small
+       Color="@GetColor()"
+       Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @Type.GetDisplayName()
+</MChip>
+
+@code {
+    [Parameter]
+    public UploadFileType Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            UploadFileType.Image => "green",
+            UploadFileType.Audio => "info",
+            _ => "purple"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return Type switch
+        {
+            UploadFileType.Image => "mdi-image",
+            UploadFileType.Audio => "mdi-volume-high",
+            _ => " mdi-file-question"
+        };
+    }
+}

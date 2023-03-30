@@ -117,7 +117,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 var json = JObject.Parse(content);
 
                 steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
-                steam.RecommendationRate = json["positive"].ToObject<int>()*100 / steam.EvaluationCount;
+                if (steam.EvaluationCount != 0)
+                {
+                    steam.RecommendationRate = json["positive"].ToObject<int>() * 100 / steam.EvaluationCount;
+                }
+              
 
                 var minutes = json["average_forever"].ToObject<double>();
                 if (minutes > 3000)

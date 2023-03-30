@@ -1,12 +1,10 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.Helper.ViewModel.Files
+namespace CnGalWebSite.DrawingBed.Models.ViewModels
 {
     public class TransformImageResult
     {

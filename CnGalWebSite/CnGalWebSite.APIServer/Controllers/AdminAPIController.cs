@@ -345,15 +345,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFileAloneModel>>> GetFileListAsync(FilesPagesInfor input)
-        {
-            var dtos = await _fileService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListErrorCountAloneModel>>> GetErrorCountListAsync(ErrorCountsPagesInfor input)
         {

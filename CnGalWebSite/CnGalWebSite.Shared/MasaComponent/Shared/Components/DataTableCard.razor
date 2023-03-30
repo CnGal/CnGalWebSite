@@ -1,0 +1,127 @@
+﻿@typeparam TModel where TModel : class, new()
+
+@inject IHttpService _httpService
+
+
+<MDataTable Headers="Headers"
+            Items="_items"
+            MustSort
+            SortBy="@("Id")"
+            SortDesc="true"
+            OnOptionsUpdate="HandleOnOptionsUpdate"
+            ServerItemsLength="_totalDesserts"
+            Loading="_loading"
+            Class="@Class">
+    <TopContent>
+        <MToolbar Flat>
+            <MToolbarTitle> @Title</MToolbarTitle>
+            <MDivider Class="mx-4" Inset Vertical />
+            <MSpacer></MSpacer>
+            @if (ShowAddButton)
+            {
+                <MButton Color="primary"
+                         Dark
+                         Class="me-8"
+                         OnClick="OnClickAdd">
+                    <MIcon Left>mdi-plus</MIcon>
+                    添加
+                </MButton>
+            }
+
+            <MTextField Value="_search" ValueChanged="OnSearch" TValue="string"
+                        AppendIcon="mdi-magnify"
+                        Label="搜索"
+                        SingleLine
+                        HideDetails="true"></MTextField>
+        </MToolbar>
+
+    </TopContent>
+    <ItemColContent>
+        @ItemColContent(context)
+    </ItemColContent>
+</MDataTable>
+
+@code {
+    [Parameter]
+    public List<DataTableHeader<TModel>> Headers { get; set; }
+    [Parameter]
+    public string ApiUrl { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public bool ShowAddButton { get; set; } = true;
+    [Parameter]
+    public string Class { get; set; } = "elevation-1";
+    [Parameter]
+    public RenderFragment<ItemColProps<TModel>> ItemColContent { get; set; }
+    [Parameter]
+    public EventCallback OnClickAdd { get; set; }
+
+    private int _totalDesserts = 0;
+    private IEnumerable<TModel> _items = new List<TModel>();
+    private bool _loading = true;
+    private string _search;
+    private QueryResultModel<TModel> Data = new QueryResultModel<TModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void HandleOnOptionsUpdate(DataOptions options)
+    {
+        CopyOptions(Data.Parameter, options);
+        GetDataFromApi();
+    }
+
+    protected override void OnInitialized()
+    {
+        //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
+        GetDataFromApi();
+    }
+
+    public void GetDataFromApi()
+    {
+        _loading = true;
+        GetDataAsync().ContinueWith(task =>
+        {
+            var data = task.Result;
+            _items = data.items;
+            _totalDesserts = data.total;
+            _loading = false;
+
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void OnSearch(string text)
+    {
+        Data.Parameter.SearchText = text;
+        StateHasChanged();
+        GetDataFromApi();
+    }
+
+    public async Task<(IEnumerable<TModel> items, int total)> GetDataAsync()
+    {
+        try
+        {
+            Data = await _httpService.PostAsync<QueryParameterModel, QueryResultModel<TModel>>(ApiUrl, Data.Parameter);
+            return (Data.Items, Data.Total);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
+            return (new List<TModel>(), 0);
+        }
+    }
+
+    public void CopyOptions(QueryParameterModel parameter, DataOptions options)
+    {
+        parameter.SortBy = options.SortBy;
+        parameter.SortDesc = options.SortDesc;
+        parameter.MultiSort = options.MultiSort;
+        parameter.MustSort = options.MustSort;
+        parameter.GroupBy = options.GroupBy;
+        parameter.GroupDesc = options.GroupDesc;
+        parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
+        parameter.Page = options.Page == 0 ? 1 : options.Page;
+    }
+}

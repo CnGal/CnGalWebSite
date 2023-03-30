@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.HealthCheck.Checks;
 using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.Helper.Extensions;
@@ -52,6 +54,10 @@ namespace CnGalWebSite.Server
             if (string.IsNullOrWhiteSpace(Configuration["WebApiPath"]) == false)
             {
                 ToolHelper.WebApiPath = Configuration["WebApiPath"];
+            }
+            if (string.IsNullOrWhiteSpace(Configuration["ImageApiPath"]) == false)
+            {
+                ToolHelper.ImageApiPath = Configuration["ImageApiPath"];
             }
 
             _ = services.AddRazorPages()
@@ -184,6 +190,7 @@ namespace CnGalWebSite.Server
                     options.Scope.Add("role");
                     options.Scope.Add("openid");
                     options.Scope.Add("CnGalAPI");
+                    options.Scope.Add("FileAPI");
                     options.Scope.Add("offline_access");
                     //这里是个ClaimType的转换，Identity Server的ClaimType和Blazor中间件使用的名称有区别，需要统一。
                     options.TokenValidationParameters.RoleClaimType = "role";

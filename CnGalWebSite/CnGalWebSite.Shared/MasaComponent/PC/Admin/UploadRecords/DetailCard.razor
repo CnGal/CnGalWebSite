@@ -1,0 +1,67 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+@if (Model != null)
+{
+    <MCard>
+        <MCardTitle>
+            上传记录
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <PreviewCard Model="Model" Style="@("width:100%;")" />
+        </MCardText>
+        <MCardText>
+            <TypeChip Type="Model.Type" />
+        </MCardText>
+        <MCardText>
+            <dl>
+                <div>
+                    <dt>大小</dt>
+                    <dd> @(((double)Model.Size/(1024*1024)).ToString("0.00")) MB</dd>
+                </div>
+                <div>
+                    <dt>Sha1</dt>
+                    <dd>@Model.Sha1</dd>
+                </div>
+                @if (Model.Type == UploadFileType.Audio)
+                {
+                    <div>
+                        <dt>时长</dt>
+                        <dd>@Model.Duration</dd>
+                    </div>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.UserId) == false)
+                {
+                    <div>
+                        <dt>用户Id</dt>
+                        <dd>@Model.UserId</dd>
+                    </div>
+                }
+                <div>
+                    <dt>上传时间</dt>
+                    <dd>@Model.UploadTime</dd>
+                </div>
+            </dl>
+        </MCardText>
+    </MCard>
+}
+
+
+@code {
+    [Parameter]
+    public  UploadRecordOverviewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void Refresh(UploadRecordOverviewModel model)
+    {
+        Model = model;
+        StateHasChanged();
+    }
+
+
+}

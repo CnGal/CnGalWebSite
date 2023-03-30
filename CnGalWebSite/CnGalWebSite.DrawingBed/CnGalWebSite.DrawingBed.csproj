@@ -5,6 +5,15 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>1dcbfde8-0a22-4155-a546-7d381bc82e12</UserSecretsId>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,18 +21,28 @@
     <PackageReference Include="MediaInfo.Wrapper.Core" Version="21.9.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
     <PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.34" />
     <PackageReference Include="TweetinviAPI" Version="5.0.4" />
-    <PackageReference Include="xFFmpeg.NET" Version="7.1.3" />
-  </ItemGroup>
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
-    <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
+    <PackageReference Include="xFFmpeg.NET" Version="7.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.DrawingBed.Models\CnGalWebSite.DrawingBed.Models.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

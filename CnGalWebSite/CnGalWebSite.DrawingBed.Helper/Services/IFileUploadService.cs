@@ -1,14 +1,14 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files.Images;
-using CnGalWebSite.DataModel.ViewModel.Files;
+﻿
 using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
+using CnGalWebSite.DrawingBed.Models.DataModels;
 
-namespace CnGalWebSite.Shared.Service
+namespace CnGalWebSite.DrawingBed.Helper.Services
 {
     public interface IFileUploadService
     {
@@ -16,8 +16,10 @@ namespace CnGalWebSite.Shared.Service
 
         Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type);
 
-        Task AddUserLoadedFileInfor(UploadResult infor, UploadFileType type);
-
         Task<UploadResult> UploadAudioAsync(IBrowserFile file);
+
+        Task<string> TransformImageAsync(string url, double x = 0, double y = 0);
+
+        Task<TransformImageResult> TransformImagesAsync(string text);
     }
 }

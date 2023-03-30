@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
     <ProjectReference Include="..\CnGalWebSite.IdentityServer.Admin.Shared\CnGalWebSite.IdentityServer.Admin.Shared.csproj" />
   </ItemGroup>
 

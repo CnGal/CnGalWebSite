@@ -1,71 +1,79 @@
 ﻿@page "/admin/listfiles"
+
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+        }
+        else if (context.Header.Value == "type")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.TypeChip Type="context.Item.Type" />
+        }
+        else if (context.Header.Value == "preview")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.PreviewCard Model="context.Item" />
+        }
+        else if (context.Header.Value == "size")
+        {
+            <span>  @(((double)context.Item.Size/(1024*1024)).ToString("0.00")) MB</span>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard>
 
-<TitleTip Title="文件板块"></TitleTip>
-
-<div>
-    <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-               >
-
-            <MTab Value="1">
-                信息列表<MIcon>mdi-format-list-bulleted-square </MIcon>
-            </MTab>
-
-            <MTab Value="2">
-                图库预览<MIcon>mdi-image-multiple </MIcon>
-            </MTab>
-
-            <MTab Value="3">
-                音频列表<MIcon>mdi-volume-high</MIcon>
-            </MTab>
-        </MTabs>
-    </div>
-    <MTabsItems @bind-Value="TabIndex">
-        <MTabItem Value="1">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Files.ImageChartListView />
-            </div>
-
-        </MTabItem>
-        <MTabItem Value="2">
-            <div class="">
-                <CnGalWebSite.Shared.Component.Admin.Files.ImageOutlineListView />
-            </div>
-
-        </MTabItem>
-        <MTabItem Value="3">
-            <div class=" rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Files.AudioListCard />
-            </div>
-
-        </MTabItem>
-    </MTabsItems>
-</div>
+<MDialog @bind-Value="_detailDialog"
+         MaxWidth="1000">
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard @ref="detailCard" Model="@_detailItem" />
+</MDialog>
 
 @code {
+    private bool _detailDialog;
+    private UploadRecordOverviewModel _detailItem;
+    private string _baseUrl = ToolHelper.ImageApiPath + "api/files/";
+    private string _name = "上传记录";
 
-    public ListFilesInforViewModel InforModel { get; set; } = new ListFilesInforViewModel();
+
+    private List<DataTableHeader<UploadRecordOverviewModel>> _headers = new List<DataTableHeader<UploadRecordOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UploadRecordOverviewModel.Id)
+          },
+          new (){ Text= "预览", Value= "preview"},
+          new (){ Text= "类型", Value= "type"},
+          new (){ Text= "大小", Value= "size"},
+          new (){ Text= "Sha1", Value= nameof(UploadRecordOverviewModel.Sha1)},
+          new (){ Text= "时长", Value= nameof(UploadRecordOverviewModel.Duration)},
+          new (){ Text= "用户Id", Value= nameof(UploadRecordOverviewModel.UserId)},
+          new (){ Text= "上传时间", Value= nameof(UploadRecordOverviewModel.UploadTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard<UploadRecordOverviewModel> dataTableCard;
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard detailCard;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    public StringNumber TabIndex { get; set; } = 1;
 
 
-    protected override async Task OnInitializedAsync()
+    public void DetailItem(UploadRecordOverviewModel item)
     {
-        //try
-        //{
-        //    InforModel = await _httpService.GetAsync<ListFilesInforViewModel>("api/admin/listfiles");
-        //}
-        //catch (Exception ex)
-        //{
-        //    ErrorHandler.ProcessError(ex, "无法获取图片数据");
-        //}
-
+        _detailItem = item;
+        _detailDialog = true;
+        StateHasChanged();
     }
+
 }

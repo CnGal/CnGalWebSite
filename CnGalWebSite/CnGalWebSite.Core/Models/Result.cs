@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.IdentityServer.Models.ViewModels.Shared
+namespace CnGalWebSite.Core.Models
 {
     public class Result
     {
