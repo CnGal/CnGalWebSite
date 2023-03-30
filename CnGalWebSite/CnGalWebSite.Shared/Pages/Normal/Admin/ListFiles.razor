@@ -5,7 +5,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+<DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -30,7 +30,7 @@
             @context.Value
         }
     </ItemColContent>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard>
+</DataTableCard>
 
 <MDialog @bind-Value="_detailDialog"
          MaxWidth="1000">
@@ -62,7 +62,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.DataTableCard<UploadRecordOverviewModel> dataTableCard;
+    DataTableCard<UploadRecordOverviewModel> dataTableCard;
     CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard detailCard;
 
     [CascadingParameter]

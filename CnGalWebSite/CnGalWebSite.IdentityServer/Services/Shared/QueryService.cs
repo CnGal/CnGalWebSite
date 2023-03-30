@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Shared;
+
 using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

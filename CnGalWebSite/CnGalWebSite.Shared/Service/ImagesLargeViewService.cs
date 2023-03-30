@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using Microsoft.AspNetCore.Components;
 
-namespace CnGalWebSite.DataModel.ViewModel.Files.Images
+namespace CnGalWebSite.Shared.Service
 {
     public class ImagesLargeViewService
     {

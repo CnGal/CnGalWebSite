@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Shared;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;
@@ -31,6 +30,7 @@ using OneOf.Types;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Records;
+using CnGalWebSite.Core.Models;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {

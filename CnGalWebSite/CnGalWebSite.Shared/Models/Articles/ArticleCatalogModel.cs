@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 
-namespace CnGalWebSite.Helper.ViewModel.Articles
+namespace CnGalWebSite.Shared.Models.Articles
 {
     public class ArticleCatalogModel
     {

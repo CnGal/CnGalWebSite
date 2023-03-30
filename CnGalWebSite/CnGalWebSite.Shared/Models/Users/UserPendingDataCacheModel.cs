@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.Helper.ViewModel.Users
+namespace CnGalWebSite.Shared.Models.Users
 {
     public class UserPendingDataCacheModel
     {

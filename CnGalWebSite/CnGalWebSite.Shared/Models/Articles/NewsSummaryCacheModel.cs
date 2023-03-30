@@ -1,7 +1,12 @@
 ﻿using BlazorComponent;
 using CnGalWebSite.DataModel.ViewModel.Articles;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CnGalWebSite.Helper.ViewModel.Articles
+namespace CnGalWebSite.Shared.Models.Articles
 {
     public class NewsSummaryCacheModel
     {
@@ -14,6 +19,5 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
         public int CurrentPage { get; set; } = 1;
 
         public List<NewsSummaryAloneViewModel> Items = new List<NewsSummaryAloneViewModel>();
-
     }
 }

@@ -10,6 +10,7 @@ using IdentityModel;
 using System.Linq.Expressions;
 using System;
 using CnGalWebSite.DrawingBed.Models.ViewModels;
+using CnGalWebSite.Core.Models;
 
 namespace CnGalWebSite.DrawingBed.Services
 {

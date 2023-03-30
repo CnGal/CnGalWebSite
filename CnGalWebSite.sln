@@ -37,9 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.IdentityServer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DrawingBed.Models", "CnGalWebSite\CnGalWebSite.DrawingBed.Models\CnGalWebSite.DrawingBed.Models.csproj", "{74D192BF-81D7-47B5-A792-0CB20C85DDA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.DrawingBed.Helper", "CnGalWebSite\CnGalWebSite.DrawingBed.Helper\CnGalWebSite.DrawingBed.Helper.csproj", "{EDB745FE-24F4-41E6-BD3B-C806C959458C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DrawingBed.Helper", "CnGalWebSite\CnGalWebSite.DrawingBed.Helper\CnGalWebSite.DrawingBed.Helper.csproj", "{EDB745FE-24F4-41E6-BD3B-C806C959458C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Core", "CnGalWebSite\CnGalWebSite.Core\CnGalWebSite.Core.csproj", "{B60BE8AA-D81C-4047-9B3F-E682196CBF39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Core", "CnGalWebSite\CnGalWebSite.Core\CnGalWebSite.Core.csproj", "{B60BE8AA-D81C-4047-9B3F-E682196CBF39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Components", "CnGalWebSite\CnGalWebSite.Components\CnGalWebSite.Components.csproj", "{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -435,6 +437,26 @@ Global
 		{B60BE8AA-D81C-4047-9B3F-E682196CBF39}.Release|x64.Build.0 = Release|Any CPU
 		{B60BE8AA-D81C-4047-9B3F-E682196CBF39}.Release|x86.ActiveCfg = Release|Any CPU
 		{B60BE8AA-D81C-4047-9B3F-E682196CBF39}.Release|x86.Build.0 = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|ARM.Build.0 = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|x64.Build.0 = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Debug|x86.Build.0 = Debug|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|ARM.ActiveCfg = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|ARM.Build.0 = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|ARM64.Build.0 = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|x64.ActiveCfg = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|x64.Build.0 = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|x86.ActiveCfg = Release|Any CPU
+		{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

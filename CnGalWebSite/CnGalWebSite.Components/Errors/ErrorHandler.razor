@@ -4,6 +4,7 @@
 @inject IServiceProvider _serviceProvider
 @inject ILogger<ErrorHandler> Logger
 @inject IJSRuntime JS
+@inject IPopupService PopupService
 
 
 
@@ -13,15 +14,17 @@
     </CascadingValue>
 </MErrorHandler>
 
-<PToast @ref="_toast" MaxCount="3">
-</PToast>
-
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public bool IsSSR { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public bool ShowDetailedErrorInfor { get; set; }
 
-    PToast _toast;
-    private DateTime LastErrorTime { get; set; } = DateTime.Now.AddYears(-1);
+    private DateTime LastErrorTime { get; set; } = DateTime.UtcNow.AddYears(-1);
 
     public async Task<bool> OnErrorHandleAsync(Exception ex)
     {
@@ -29,7 +32,7 @@
         {
 
             //内存溢出 强制关闭服务端 由于Docker设置 会重启
-            if (StaticOptions.IsSSR)
+            if (IsSSR)
             {
                 IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
                 if (_applicationLifetime != null)
@@ -54,7 +57,7 @@
 
 
             //向用户发送通知
-            var time = (DateTime.Now - LastErrorTime).TotalSeconds;
+            var time = (DateTime.UtcNow - LastErrorTime).TotalSeconds;
             if (time > 2 && string.IsNullOrWhiteSpace(message) == false)
             {
 
@@ -64,25 +67,21 @@
                     var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
                     resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 {qq} 反馈Bug";
                 }
-                if (_toast != null)
+                await PopupService.ToastAsync(new ToastConfig
                 {
-                    await _toast.AddToast(new ToastConfig
-                    {
-                        Type = AlertTypes.Error,
-                        Title = message,
-                        Duration = 20000,
-                        Content = $"报错：{ex.Message}\n{ex.StackTrace}\n可能原因：{reason}\n解决方法：{resolvent}",
-                    });
-                }
+                    Type = AlertTypes.Error,
+                    Title = message,
+                    Duration = 20000,
+                    Content = $"报错：{ex.Message}\n{(ShowDetailedErrorInfor ? ($"{ex.StackTrace}\n") : "")}可能原因：{reason}\n解决方法：{resolvent}",
+                });
 
-                LastErrorTime = DateTime.Now;
+
+                LastErrorTime = DateTime.UtcNow;
             }
         }
         catch
         {
 
         }
-
-
     }
 }

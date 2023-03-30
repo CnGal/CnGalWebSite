@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Masa.Blazor.Presets.Message;
 
 namespace CnGalWebSite.Helper.Helper
 {

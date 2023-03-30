@@ -1,5 +1,4 @@
-﻿using BlazorComponent;
-using CnGalWebSite.DataModel.ViewModel.Articles;
+﻿using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject I18n I18n
 
-<ErrorHandler>
+<ErrorHandler IsSSR="StaticOptions.IsSSR" ShowDetailedErrorInfor>
     <CascadingAuthenticationState>
         <Router AppAssembly="@typeof(App).Assembly">
             <Found Context="routeData">

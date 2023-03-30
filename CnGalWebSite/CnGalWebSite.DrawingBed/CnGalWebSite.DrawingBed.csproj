@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="CnGalWebSite.Core.Models" />
     <Using Include="CnGalWebSite.Extensions" />
   </ItemGroup>
 

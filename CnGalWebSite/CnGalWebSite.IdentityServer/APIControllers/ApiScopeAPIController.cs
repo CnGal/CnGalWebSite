@@ -7,7 +7,6 @@ using CnGalWebSite.IdentityServer.Models.DataModels.Examines;
 using CnGalWebSite.IdentityServer.Models.ViewModels.ApiScopes;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Clients;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Shared;
 using CnGalWebSite.IdentityServer.Services.Examines;
 using CnGalWebSite.IdentityServer.Services.Shared;
 using IdentityModel;

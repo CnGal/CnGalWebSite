@@ -1,5 +1,4 @@
-﻿using BlazorComponent;
-using BootstrapBlazor.Components;
+﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;

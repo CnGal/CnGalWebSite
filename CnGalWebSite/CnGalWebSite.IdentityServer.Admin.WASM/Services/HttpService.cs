@@ -17,6 +17,7 @@ using static IdentityModel.OidcConstants;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Blazored.LocalStorage;
+using CnGalWebSite.Core.Services;
 
 namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
 {
@@ -75,13 +76,18 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
             }
         }
 
-        private async Task<HttpClient> GetClientAsync()
+        public async Task<HttpClient> GetClientAsync()
         {
             if (_isPreRender)
             {
                 await Task.Delay(100);
             }
             _isPreRender = false;
+            return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
+        }
+
+        public HttpClient GetClient()
+        {
             return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
         }
     }

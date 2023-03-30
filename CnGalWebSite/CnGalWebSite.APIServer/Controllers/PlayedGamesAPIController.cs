@@ -1,5 +1,4 @@
-﻿using BlazorComponent;
-using CnGalWebSite.APIServer.Application.Examines;
+﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;

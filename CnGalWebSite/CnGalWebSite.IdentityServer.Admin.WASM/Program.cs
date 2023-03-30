@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.IdentityServer.Admin.Shared;
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
