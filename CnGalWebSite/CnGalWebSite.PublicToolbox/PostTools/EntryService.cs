@@ -14,21 +14,22 @@ using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Logging;
 using System.Security.Policy;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Core.Services;
 
 namespace CnGalWebSite.PublicToolbox.PostTools
 {
     public class EntryService:IEntryService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly IRepository<MergeEntryModel> _mergeEntryRepository;
         private readonly ILogger<EntryService> _logger;
         public event Action<KeyValuePair<OutputLevel, string>> ProgressUpdate;
 
 
-        public EntryService(HttpClient httpClient, IRepository<MergeEntryModel> mergeEntryRepository, ILogger<EntryService> logger)
+        public EntryService(IHttpService httpService, IRepository<MergeEntryModel> mergeEntryRepository, ILogger<EntryService> logger)
         {
             _logger = logger;
-            _httpClient = httpClient;
+            _httpService = httpService;
             _mergeEntryRepository = mergeEntryRepository;
         }
 
@@ -145,8 +146,8 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.Examines.Clear();
 
             //获取词条
-            var hostEntry = await _httpClient.GetFromJsonAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.HostId);
-            var subEntry = await _httpClient.GetFromJsonAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.SubId);
+            var hostEntry = await _httpService.GetAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.HostId);
+            var subEntry = await _httpService.GetAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.SubId);
 
             if (subEntry == null || hostEntry == null)
             {
@@ -181,7 +182,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //替换关联信息
             foreach (var item in reEntryIds)
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + item);
+                var examineModel = await _httpService.GetAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + item);
                 ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.staffs, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
@@ -196,7 +197,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //替换Staff，开发商和发行商
             foreach (var item in reGameIds)
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + item);
+                var examineModel = await _httpService.GetAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + item);
                 var tempStaffs = examineModel.Staffs.Where(s => s.Name == model.SubName);
                 foreach (var temp in tempStaffs)
                 {
@@ -221,7 +222,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //替换关联信息
             foreach (var item in reArticleIds)
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editrelevances/" + item);
+                var examineModel = await _httpService.GetAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editrelevances/" + item);
                 ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Staffs, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
@@ -236,7 +237,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //替换关联信息
             foreach (var item in reVideoIds)
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditVideoRelevancesViewModel>(ToolHelper.WebApiPath + "api/videos/editrelevances/" + item);
+                var examineModel = await _httpService.GetAsync<EditVideoRelevancesViewModel>(ToolHelper.WebApiPath + "api/videos/editrelevances/" + item);
                 ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.staffs, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
@@ -293,8 +294,8 @@ namespace CnGalWebSite.PublicToolbox.PostTools
         private async Task GetMergeEntryId(MergeEntryModel model)
         {
             //获取词条
-            model.HostId = await _httpClient.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.HostName));
-            model.SubId = await _httpClient.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.SubName));
+            model.HostId = await _httpService.GetAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.HostName));
+            model.SubId = await _httpService.GetAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.SubName));
 
             if(model.HostId==0||model.SubId==0)
             {
@@ -308,24 +309,17 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 var result = item.GetType().Name switch
                 {
-                    "EditArticleRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/articles/editrelevances", item as EditArticleRelevancesViewModel),
-                    "EditAddInforViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
-                    "EditRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
-                    "EditVideoRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/videos/editrelevances", item as EditVideoRelevancesViewModel),
+                    "EditArticleRelevancesViewModel" => await _httpService.PostAsync<EditArticleRelevancesViewModel, Result>(ToolHelper.WebApiPath + "api/articles/editrelevances", item as EditArticleRelevancesViewModel),
+                    "EditAddInforViewModel" => await _httpService.PostAsync<EditAddInforViewModel, Result>(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
+                    "EditRelevancesViewModel" => await _httpService.PostAsync<EditRelevancesViewModel, Result>(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
+                    "EditVideoRelevancesViewModel" => await _httpService.PostAsync<EditVideoRelevancesViewModel, Result>(ToolHelper.WebApiPath + "api/videos/editrelevances", item as EditVideoRelevancesViewModel),
                     _ => null
                 };
 
-                if(result.StatusCode!= System.Net.HttpStatusCode.OK)
-                {
-                    throw new Exception("服务器网络异常，或代码存在Bug，请联系管理员");
-                }
-
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
-                if (obj.Successful == false)
+                if (result.Successful == false)
                 {
-                    throw new Exception(obj.Error);
+                    throw new Exception(result.Error);
                 }
             }
         }
@@ -335,29 +329,25 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             try
             {
 
-                var result = await _httpClient.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenArticleModel { Ids = new long[] { model.SubId }, IsHidden = true });
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var result = await _httpService.PostAsync<HiddenArticleModel, Result>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenArticleModel { Ids = new long[] { model.SubId }, IsHidden = true });
                 //判断结果
-                if (obj.Successful == false)
+                if (result.Successful == false)
                 {
-                    throw new Exception(obj.Error);
+                    throw new Exception(result.Error);
                 }
 
             }
             catch
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/EditMain/" + model.SubId);
+                var examineModel = await _httpService.GetAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/EditMain/" + model.SubId);
                 examineModel.Name = examineModel.DisplayName = "已删除_" + examineModel.Name;
 
 
-                var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var result = await _httpService.PostAsync<EditMainViewModel, Result>(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
                 //判断结果
-                if (obj.Successful == false)
+                if (result.Successful == false)
                 {
-                    throw new Exception(obj.Error);
+                    throw new Exception(result.Error);
                 }
 
                 _logger.LogWarning("{SubName}({SubId}) -> {HostName}({HostId}) 隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求", model.SubName, model.SubId, model.HostName, model.HostId);
