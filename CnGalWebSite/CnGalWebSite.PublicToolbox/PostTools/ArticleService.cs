@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.HistoryData;
@@ -22,16 +23,16 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 {
     public class ArticleService:IArticleService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly IImageService _imageService;
         private readonly IRepository<RepostArticleModel> _outlinkArticleRepository;
         private readonly ILogger<ArticleService> _logger;
 
         public event Action<KeyValuePair<OutputLevel, string>> ProgressUpdate;
 
-        public ArticleService(HttpClient httpClient, IRepository<RepostArticleModel> outlinkArticleRepository, IImageService imageService, ILogger<ArticleService> logger)
+        public ArticleService(IHttpService httpService, IRepository<RepostArticleModel> outlinkArticleRepository, IImageService imageService, ILogger<ArticleService> logger)
         {
-            _httpClient = httpClient;
+            _httpService = httpService;
             _outlinkArticleRepository = outlinkArticleRepository;
             _imageService = imageService;
             _logger = logger;
@@ -49,13 +50,18 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                     OnProgressUpdate(model, OutputLevel.Dager, $"-> 链接 {model.Url} 已于 {tempArticle.PostTime} 提交审核[Id:{tempArticle.Id}]");
                     return;
                 }
+                //复制数据
+                tempArticle.Title = string.IsNullOrWhiteSpace(model.Title) ? tempArticle.Title : model.Title;
+                tempArticle.IsCreatedByCurrentUser = model.IsCreatedByCurrentUser;
+                model.SynchronizationProperties(tempArticle);
             }
             else
             {
                 try
                 {
                     OnProgressUpdate(model, OutputLevel.Infor, $"获取文章内容");
-                     await GetArticleContext( model);
+                    await GetArticleContext( model);
+                    await _outlinkArticleRepository.InsertAsync(model);
                 }
                 catch (Exception ex)
                 {
@@ -64,7 +70,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                     return;
                 }
 
-                await _outlinkArticleRepository.InsertAsync(model);
+                
             }
             if (articles.Any(s => s == model.Title))
             {
@@ -374,16 +380,14 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             try
             {
 
-                var result = await _httpClient.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/create", model);
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var result = await _httpService.PostAsync<CreateArticleViewModel, Result>(ToolHelper.WebApiPath + "api/articles/create", model);
                 //判断结果
-                if (obj.Successful == false)
+                if (result.Successful == false)
                 {
-                    throw new Exception(obj.Error);
+                    throw new Exception(result.Error);
                 }
-                _logger.LogInformation($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核[Id:{obj.Error}]");
-                return long.Parse(obj.Error);
+                _logger.LogInformation($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核[Id:{result.Error}]");
+                return long.Parse(result.Error);
 
             }
             catch (Exception ex)

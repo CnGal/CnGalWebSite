@@ -69,7 +69,14 @@ namespace CnGalWebSite.WebAssembly
 
             builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
             {
-                s.Themes.Light.Primary = "#f06292";
+                if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
+                {
+                    s.Themes.Light.Primary = "#4CAF50";
+                }
+                else
+                {
+                    s.Themes.Light.Primary = "#f06292";
+                }
                 s.Themes.Dark.Primary = "#2196F3";
             }));
 

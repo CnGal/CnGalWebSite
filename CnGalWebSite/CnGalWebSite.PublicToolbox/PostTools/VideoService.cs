@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.PostTools;
 using CnGalWebSite.DataModel.ViewModel.Videos;
@@ -14,16 +15,16 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 {
     public class VideoService : IVideoService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly IImageService _imageService;
         private readonly IRepository<RepostVideoModel> _outlinkVideoRepository;
         private readonly ILogger<VideoService> _logger;
 
         public event Action<KeyValuePair<OutputLevel, string>> ProgressUpdate;
 
-        public VideoService(HttpClient httpClient, IRepository<RepostVideoModel> outlinkVideoRepository, IImageService imageService, ILogger<VideoService> logger)
+        public VideoService(IHttpService httpService, IRepository<RepostVideoModel> outlinkVideoRepository, IImageService imageService, ILogger<VideoService> logger)
         {
-            _httpClient = httpClient;
+            _httpService = httpService;
             _outlinkVideoRepository = outlinkVideoRepository;
             _imageService = imageService;
             _logger = logger;
@@ -99,7 +100,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             OnProgressUpdate(item, OutputLevel.Infor, $"获取视频内容");
             //获取视频内容
-            var json = await _httpClient.GetStringAsync(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoInfor?id=" + model.Relevances.BilibiliId);
+            var json = await _httpService.GetClient().GetStringAsync(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoInfor?id=" + model.Relevances.BilibiliId);
             var data = JObject.Parse(json);
 
             if (data["code"].ToObject<int>() != 0)
@@ -129,7 +130,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             try
             {
                 //获取视频快照
-                var images = await _httpClient.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoImageImposition?id=" + model.Relevances.BilibiliId);
+                var images = await _httpService.GetAsync<List<string>>(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoImageImposition?id=" + model.Relevances.BilibiliId);
 
                 item.TotalTaskCount += images.Count;
 
@@ -203,16 +204,14 @@ namespace CnGalWebSite.PublicToolbox.PostTools
         {
             try
             {
-                var result = await _httpClient.PostAsJsonAsync<CreateVideoViewModel>(ToolHelper.WebApiPath + "api/videos/create", model);
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var result = await _httpService.PostAsync<CreateVideoViewModel, Result>(ToolHelper.WebApiPath + "api/videos/create", model);
                 //判断结果
-                if (obj.Successful == false)
+                if (result.Successful == false)
                 {
-                    throw new Exception(obj.Error);
+                    throw new Exception(result.Error);
                 }
-                _logger.LogInformation($"已提交{model.Main.Type}《{model.Main.Name}》审核[Id:{obj.Error}]");
-                return long.Parse(obj.Error);
+                _logger.LogInformation($"已提交{model.Main.Type}《{model.Main.Name}》审核[Id:{result.Error}]");
+                return long.Parse(result.Error);
 
             }
             catch (Exception ex)
