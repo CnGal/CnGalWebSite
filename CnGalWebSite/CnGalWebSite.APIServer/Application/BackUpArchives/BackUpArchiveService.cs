@@ -306,7 +306,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                     Loc =host,
                     ChangeFreq = "daily",
                     Priority = "1.00",
-                    LastModified =DateTime.UtcNow.Date.ToString("s"),
+                    LastModified =DateTime.UtcNow.Date.ToString("yyyy-MM-dd"),
                 }
             };
             foreach (var item in mainurls)
@@ -316,7 +316,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                     Loc = item,
                     ChangeFreq = "weekly",
                     Priority = "0.90",
-                    LastModified = DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek).ToString("s"),
+                    LastModified = DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek).ToString("yyyy-MM-dd"),
                 });
             }
             foreach (var item in entries)
@@ -325,7 +325,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc = $"{host}entries/index/{item.Id}",
                     ChangeFreq = "monthly",
-                    LastModified = item.LastEditTime.ToString("s"),
+                    LastModified = item.LastEditTime.ToString("yyyy-MM-dd"),
                     Priority = item.Type == EntryType.Game ? "0.80" : "0.70"
                 });
             }
@@ -335,7 +335,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc = $"{host}articles/index/{item.Id}",
                     ChangeFreq = "yearly",
-                    LastModified = item.LastEditTime.ToString("s"),
+                    LastModified = item.LastEditTime.ToString("yyyy-MM-dd"),
                     Priority = "0.65"
                 });
             }
@@ -345,7 +345,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc = $"{host}tags/index/{item.Id}",
                     ChangeFreq = "monthly",
-                    LastModified = item.LastEditTime.ToString("s"),
+                    LastModified = item.LastEditTime.ToString("yyyy-MM-dd"),
                     Priority = "0.60"
                 });
             }
@@ -355,7 +355,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc = $"{host}peripheries/index/{item.Id}",
                     ChangeFreq = "monthly",
-                    LastModified = item.LastEditTime.ToString("s"),
+                    LastModified = item.LastEditTime.ToString("yyyy-MM-dd"),
                     Priority = "0.50"
                 });
             }
@@ -365,7 +365,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 {
                     Loc = $"{host}videos/index/{item.Id}",
                     ChangeFreq = "monthly",
-                    LastModified = item.LastEditTime.ToString("s"),
+                    LastModified = item.LastEditTime.ToString("yyyy-MM-dd"),
                     Priority = "0.40"
                 });
             }
