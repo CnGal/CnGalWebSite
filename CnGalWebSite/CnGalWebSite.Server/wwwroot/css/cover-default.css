@@ -63,6 +63,7 @@ ins {
 .alert {
     padding: .75rem 1.25rem;
 }
+
 .form-group {
     margin-bottom: 1rem;
 }
@@ -85,15 +86,19 @@ html {
 .layout-menu .scroll {
     overflow-x: hidden;
 }
+
 .dropdown-arrow.arrow-primary {
     display: none;
 }
+
 .layout.is-page .layout-side {
     box-shadow: none;
 }
+
 .layout.is-page .layout-user-state {
     background-color: white;
 }
+
 span#cnzz_stat_icon_1280206141 {
     display: none;
     margin-top: -30px;
@@ -102,12 +107,15 @@ span#cnzz_stat_icon_1280206141 {
 .layout-menu {
     overflow: hidden;
 }
+
 input.te-image-file-input {
     display: none;
 }
+
 .tabs-border-card {
     background: transparent;
 }
+
 .upload .upload-body.is-avatar .upload-item .avatar {
     background-color: transparent;
 }
@@ -115,18 +123,23 @@ input.te-image-file-input {
 .layout.is-page .layout-header {
     justify-content: space-between;
 }
+
 .alert-link {
     font-weight: bolder;
 }
+
 .menu .nav-link {
     color: white;
 }
+
 .overflow-hidden {
     overflow: auto !important;
 }
+
 .link-primary:focus, .link-primary:hover {
     color: #26adf8;
 }
+
 .link-primary {
     color: #009ef7;
 }
@@ -142,33 +155,36 @@ input.te-image-file-input {
 }
 
 .layout-item .layout-right .layout-right-header, .layout-item .layout-top {
-    background-color:  var(--main-color);
+    background-color: var(--main-color);
 }
+
 .btn-info-1 {
     background-color: var(--main-color);
     color: white;
     border-color: var(--main-color);
 }
 
-.btn-info-1:hover {
-    background-color:var(--hover-color);
-    color: white;
-    border-color: var(--hover-color);
-}
+    .btn-info-1:hover {
+        background-color: var(--hover-color);
+        color: white;
+        border-color: var(--hover-color);
+    }
 
-.btn-info-1:active {
-    background-color:  var(--active-color);
-    color: white;
-    border-color:  var(--active-color);
-}
+    .btn-info-1:active {
+        background-color: var(--active-color);
+        color: white;
+        border-color: var(--active-color);
+    }
 
 /*弹窗边框消除*/
 .table-modal-footer {
     border: 0;
 }
+
 .modal-content {
     border: 0;
 }
+
 .modal-header {
     border: 0;
 }
@@ -187,13 +203,12 @@ input.te-image-file-input {
 }
 /*Markdown编辑器*/
 .markdown-body img {
-    background-color: transparent!important;
-    height: auto!important;
+    background-color: transparent !important;
+    height: auto !important;
 }
 
 .markdown-body {
-    background-color: transparent!important;
-   
+    background-color: transparent !important;
 }
 
 /*.markdown-body b, .markdown-body strong {
@@ -204,47 +219,59 @@ input.te-image-file-input {
 .row {
     margin-bottom: 0;
 }
+
 .col-xl, .col-xl-auto, .col-xl-12, .col-xl-11, .col-xl-10, .col-xl-9, .col-xl-8, .col-xl-7, .col-xl-6, .col-xl-5, .col-xl-4, .col-xl-3, .col-xl-2, .col-xl-1, .col-lg, .col-lg-auto, .col-lg-12, .col-lg-11, .col-lg-10, .col-lg-9, .col-lg-8, .col-lg-7, .col-lg-6, .col-lg-5, .col-lg-4, .col-lg-3, .col-lg-2, .col-lg-1, .col-md, .col-md-auto, .col-md-12, .col-md-11, .col-md-10, .col-md-9, .col-md-8, .col-md-7, .col-md-6, .col-md-5, .col-md-4, .col-md-3, .col-md-2, .col-md-1, .col-sm, .col-sm-auto, .col-sm-12, .col-sm-11, .col-sm-10, .col-sm-9, .col-sm-8, .col-sm-7, .col-sm-6, .col-sm-5, .col-sm-4, .col-sm-3, .col-sm-2, .col-sm-1, .col, .col-auto, .col-12, .col-11, .col-10, .col-9, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3, .col-2, .col-1 {
     padding-bottom: 0;
     padding-top: 0;
 }
+
 .theme--light.m-application code {
-     background-color: transparent;
+    background-color: transparent;
 }
-.modal-open{
+
+.modal-open {
     padding-right: 0;
 }
 
-@media (min-width: 960px){
+@media (min-width: 960px) {
     .d-md-none-co {
-        display: none!important;
+        display: none !important;
     }
 }
+
 .editormd-toolbar {
-    z-index: 4!important;
+    z-index: 4 !important;
 }
+
 .editormd .CodeMirror {
-   z-index: 4!important;
+    z-index: 4 !important;
 }
-.editormd-fullscreen{
-    z-index: 10000!important;
+
+.editormd-fullscreen {
+    z-index: 10000 !important;
 }
+
 .layout.is-page .layout-header {
     background-color: var(--main-color);
 }
+
 .layout.is-page .layout-side .layout-banner {
     background-color: var(--hover-color);
 }
+
 .layout-header-bar {
     background-color: var(--hover-color);
     border-color: var(--hover-color);
 }
+
 .layout-drawer:hover {
     background-color: var(--hover-color);
 }
+
 .toastui-editor-contents {
     z-index: 4;
 }
+
 .m-card__title {
     font-weight: bold;
 }
@@ -253,12 +280,15 @@ input.te-image-file-input {
     background-color: transparent;
     text-shadow: none;
 }
+
 .placeholder {
     background-color: transparent;
 }
+
 .toastui-editor-contents {
     z-index: 4;
 }
+
 .theme--light.m-application {
     background-color: transparent;
 }
@@ -266,15 +296,19 @@ input.te-image-file-input {
 .m-main__wrap {
     background-color: transparent;
 }
+
 .m-toast-detail {
     white-space: pre-line;
 }
+
 .m-rating .m-icon {
     padding: 0.1rem;
 }
+
 .theme--light.m-tabs > .m-tabs-bar {
     background-color: transparent;
 }
+
 .theme--light.m-tabs-items {
     background-color: transparent;
 }
@@ -283,12 +317,15 @@ input.te-image-file-input {
 .markdown-body h3 {
     font-size: 1.38em !important;
 }
+
 .markdown-body h4 {
     font-size: 1.25em !important;
 }
+
 .markdown-body h5 {
     font-size: 1.13em !important;
 }
+
 .markdown-body h6 {
     font-size: 1em !important;
 }
@@ -297,9 +334,15 @@ input.te-image-file-input {
 .m-main {
     padding-bottom: 186px !important;
 }
+
 .img-fluid {
     width: 100%;
 }
+
 .m-application a {
     color: var(--main-color);
+}
+/*步骤条*/
+.m-stepper__wrapper.active{
+    height:auto !important;
 }

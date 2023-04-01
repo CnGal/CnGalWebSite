@@ -50,7 +50,7 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
 
             try
             {
-                return await client.GetFromJsonAsync<TValue>(_baseUrl + url, _jsonOptions);
+                return await client.GetFromJsonAsync<TValue>(url.Contains("://") ? url : _baseUrl + url, _jsonOptions);
             }
             catch (AccessTokenNotAvailableException ex)
             {
@@ -65,7 +65,7 @@ namespace CnGalWebSite.IdentityServer.Admin.WASM.Services
             try
             {
                 var client = await GetClientAsync();
-                var result = await client.PostAsJsonAsync(_baseUrl + url, model);
+                var result = await client.PostAsJsonAsync(url.Contains("://") ? url : _baseUrl + url, model);
                 string jsonContent = result.Content.ReadAsStringAsync().Result;
                 return JsonSerializer.Deserialize<TValue>(jsonContent, _jsonOptions);
             }
