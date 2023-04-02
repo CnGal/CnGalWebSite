@@ -94,7 +94,7 @@
         try
         {
 
-            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = false });
+            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUp", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = false });
             //判断结果
             if (obj.Successful == false)
             {
@@ -116,7 +116,7 @@
     {
         try
         {
-            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = true });
+            var obj = await _httpService.PostAsync<ThumbsUpArticleModel, Result>("api/articles/ThumbsUp", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = true });
             //判断结果
             if (obj.Successful == false)
             {
