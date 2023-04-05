@@ -7,19 +7,19 @@
             @Month.ToString("yyyy年M月")
         </div>
         <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
-            <MButton Text  OnClick="@(()=>ValueChanged(0))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(0))" Class="me-4" Color="primary">
                 上一年
             </MButton>
-            <MButton Text  OnClick="@(()=>ValueChanged(1))" Class="me-4">
+            <MButton Text OnClick="@(()=>ValueChanged(1))" Class="me-4" Color="primary">
                 上一月
             </MButton>
-            <MButton Text  OnClick="@(()=>ValueChanged(2))" Class="me-4">
+            <MButton Text OnClick="@(()=>ValueChanged(2))" Class="me-4" Color="primary">
                 今天
             </MButton>
-            <MButton Text  OnClick="@(()=>ValueChanged(3))" Class="me-4">
+            <MButton Text OnClick="@(()=>ValueChanged(3))" Class="me-4" Color="primary">
                 下一月
             </MButton>
-            <MButton Text  OnClick="@(()=>ValueChanged(4))" Class="me-4">
+            <MButton Text OnClick="@(()=>ValueChanged(4))" Class="me-4" Color="primary">
                 下一年
             </MButton>
         </div>
