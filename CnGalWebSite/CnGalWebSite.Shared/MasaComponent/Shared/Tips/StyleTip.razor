@@ -139,6 +139,7 @@ else
     public string colorActive;
 
     public string DefaultTheme = "pink lighten-2";
+    private string _theme;
 
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
@@ -211,16 +212,15 @@ else
         }
         _dataCacheService.ThemeSetting.IsFullScreen = isFullScreen;
 
-        //将旧版颜色字符串转化为新版
-        if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))
+        //消除愚人节颜色的影响
+        if(_dataCacheService.ThemeSetting.Theme=="green")
         {
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
-            await SaveTheme();
         }
-
         //若为默认主题 则设置主题色
         if (ThemeModel.DefaultTheme == _dataCacheService.ThemeSetting.Theme && _dataCacheService.ThemeSetting.IsDark == false)
         {
+            _theme = _dataCacheService.ThemeSetting.Theme;
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
     }
@@ -353,6 +353,7 @@ else
     /// <returns></returns>
     public async Task SaveTheme()
     {
+        _dataCacheService.ThemeSetting.Theme = _theme;
         await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
     }
 
