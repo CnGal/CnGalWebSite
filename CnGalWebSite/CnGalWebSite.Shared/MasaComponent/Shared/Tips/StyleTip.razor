@@ -217,10 +217,12 @@ else
         {
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
+
         //若为默认主题 则设置主题色
+        _theme = _dataCacheService.ThemeSetting.Theme;
         if (ThemeModel.DefaultTheme == _dataCacheService.ThemeSetting.Theme && _dataCacheService.ThemeSetting.IsDark == false)
         {
-            _theme = _dataCacheService.ThemeSetting.Theme;
+
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
     }
