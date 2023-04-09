@@ -1395,7 +1395,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     var displayName = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.DisplayName ?? item.Name) : item.CustomName;
                     var mainModifier = string.IsNullOrWhiteSpace(item.Modifier) ? null : item.Modifier;
                     var secordModifier = item.PositionOfficial;
-                    var staffId = item.ToEntry ?? 0;
+                    var staffId = (item.ToEntryNavigation?.IsHidden == false && string.IsNullOrWhiteSpace(item.ToEntryNavigation.Name) == false) ? item.ToEntry ?? 0 : 0;
 
                     //检测是否为制作组发行商
                     if (item.PositionGeneral == PositionGeneralType.ProductionGroup)
