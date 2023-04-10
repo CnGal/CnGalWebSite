@@ -8,5 +8,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
         Task UpdateAllInforListAsync();
 
         Task<EChartsTreeMapOptionModel> GetGroupGameRoleTreeMap();
+
+        Task<EChartsGraphOptionModel> GetEntryGraph();
     }
 }

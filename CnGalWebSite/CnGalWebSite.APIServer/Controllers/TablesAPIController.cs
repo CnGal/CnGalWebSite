@@ -161,5 +161,11 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return await _tableService.GetGroupGameRoleTreeMap();
         }
+
+        [HttpGet]
+        public async Task<ActionResult<EChartsGraphOptionModel>> GetEntryGraph()
+        {
+            return await _tableService.GetEntryGraph();
+        }
     }
 }
