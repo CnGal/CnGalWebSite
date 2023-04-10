@@ -5,6 +5,7 @@ using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -45,6 +46,10 @@ namespace CnGalWebSite.APIServer.Application.Users
         Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel);
 
         bool CheckCurrentUserRole( string role);
+
+        Task<EChartsHeatMapOptionModel> GetUserEditRecordHeatMap(string id, DateTime afterTime, DateTime beforeTime);
+
+        Task<EChartsHeatMapOptionModel> GetUserSignInDaysHeatMap(string id, DateTime afterTime, DateTime beforeTime);
 
     }
 }

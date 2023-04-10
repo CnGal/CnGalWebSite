@@ -510,6 +510,13 @@ namespace CnGalWebSite.APIServer.Application.Charts
             var temp = GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["已完善"] = excellentCounts, ["待完善"] = goodCounts, ["急需完善"] = toBeImprovedCounts }, "全站完善度概览");
             return temp;
         }
+
+        /// <summary>
+        /// 生成折线图
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="title"></param>
+        /// <returns></returns>
         public EChartsOptionModel GetCountLine(Dictionary<string, List<LineChartSingleData>> data,  string title)
         {
             var ds = new EChartsOptionModel();
@@ -589,6 +596,8 @@ namespace CnGalWebSite.APIServer.Application.Charts
 
             return ds;
         }
+
+
 
     }
 }

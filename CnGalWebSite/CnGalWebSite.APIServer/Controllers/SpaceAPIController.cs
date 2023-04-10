@@ -14,6 +14,7 @@ using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -199,7 +200,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new PersonalSpaceViewModel
             {
-                EditCountList = userEditInfor.EditCountList,
                 Email = user.Email,
                 MainPageContext = user.MainPageContext,
                 Id = user.Id,
@@ -221,7 +221,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 SteamId = user.SteamId,
                 IsShowGameRecord = user.IsShowGameRecord,
                 BasicInfor = await _userService.GetUserInforViewModel(user),
-                SignInDaysList = user.SignInDays.Select(s => new KeyValuePair<DateTime, int>(s.Time.Date, 1)).ToList(),
                 UserCertification = user.Certification?.Entry != null ?_appHelper.GetEntryInforTipViewModel(user.Certification.Entry) : null
 
             };
@@ -899,6 +898,25 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<string>>> GetAllNotCertificatedEntriesAsync([FromQuery] EntryType type)
         {
             return await _userService.GetAllNotCertificatedEntriesAsync(type);
+        }
+
+
+        /// <summary>
+        /// 获取用户热力图
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<EChartsHeatMapOptionModel>> GetUserHeatMap([FromQuery]string id, [FromQuery]UserHeatMapType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
+        {
+            var after = afterTime.ToString().TransTime();
+            var before = beforeTime.ToString().TransTime();
+
+            return type switch
+            {
+                UserHeatMapType.EditRecords => await _userService.GetUserEditRecordHeatMap(id, after, before),
+                UserHeatMapType.SignInDays => await _userService.GetUserSignInDaysHeatMap(id, after, before)
+            };
         }
 
     }

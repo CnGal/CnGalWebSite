@@ -35,9 +35,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         /// </summary>
         public double OnlineTime { get; set; }
 
-        public List<KeyValuePair<DateTime, int>> EditCountList { get; set; } = new List<KeyValuePair<DateTime, int>>();
-        public List<KeyValuePair<DateTime, int>> SignInDaysList { get; set; } = new List<KeyValuePair<DateTime, int>>();
-
         public long TotalFilesSpace { get; set; }
         public long UsedFilesSpace { get; set; }
 

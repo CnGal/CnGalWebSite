@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DrawingBed.Hel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Core", "CnGalWebSite\CnGalWebSite.Core\CnGalWebSite.Core.csproj", "{B60BE8AA-D81C-4047-9B3F-E682196CBF39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Components", "CnGalWebSite\CnGalWebSite.Components\CnGalWebSite.Components.csproj", "{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Components", "CnGalWebSite\CnGalWebSite.Components\CnGalWebSite.Components.csproj", "{FEBAABAF-97CB-43A9-B96F-3A0B86DDC9AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

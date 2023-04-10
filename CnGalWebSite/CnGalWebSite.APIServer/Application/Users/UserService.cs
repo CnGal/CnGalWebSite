@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
@@ -264,24 +265,6 @@ namespace CnGalWebSite.APIServer.Application.Users
                 model.UsedFilesSpace = 0;
                 model.TotalFilesSpace = 500 * 1024 * 1024;
             }
-
-            //计算编辑数据 获取过去30天的词条编辑数量
-            //从30天前开始倒数 遇到第一个开始添加
-            var MaxCountLineDay = DateTime.Now.DayOfYear;
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            var editCounts = await _examineRepository.GetAll().AsNoTracking()
-                .Where(s => s.ApplicationUserId == user.Id && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-                   // 先进行了时间字段变更为String字段，切只保留到天
-                   // 采用拼接的方式
-                   .Select(n => new { Time = n.ApplyTime.Date })
-                  // 分类
-                  .GroupBy(n => n.Time)
-                  // 返回汇总样式
-                  .Select(n => new KeyValuePair<DateTime, int>(n.Key, n.Count()))
-                   .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-                  .ToListAsync();
-            model.EditCountList = editCounts;
-
 
             return model;
         }
@@ -570,5 +553,71 @@ namespace CnGalWebSite.APIServer.Application.Users
             return await temp.Select(s => s.Name).ToListAsync();
         }
         #endregion
+
+        /// <summary>
+        /// 获取用户编辑记录热力图
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="afterTime"></param>
+        /// <param name="beforeTime"></param>
+        /// <returns></returns>
+        public async Task<EChartsHeatMapOptionModel> GetUserEditRecordHeatMap(string id, DateTime afterTime, DateTime beforeTime)
+        {
+            var datas = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == id && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+                // 先进行了时间字段变更为String字段，切只保留到天
+                // 采用拼接的方式
+                .Select(n => new { Time = n.ApplyTime.Date })
+                // 分类
+                .GroupBy(n => n.Time)
+                // 返回汇总样式
+                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
+                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                .ToListAsync();
+
+            return GetHeatMap(datas, "编辑概览", afterTime, beforeTime);
+        }
+        /// <summary>
+        /// 获取用户签到热力图
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="afterTime"></param>
+        /// <param name="beforeTime"></param>
+        /// <returns></returns>
+        public async Task<EChartsHeatMapOptionModel> GetUserSignInDaysHeatMap(string id, DateTime afterTime, DateTime beforeTime)
+        {
+            var datas = await _signInDayRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == id && s.Time <= beforeTime && s.Time >= afterTime)
+                // 先进行了时间字段变更为String字段，切只保留到天
+                // 采用拼接的方式
+                .Select(n => new { Time = n.Time.Date })
+                // 分类
+                .GroupBy(n => n.Time)
+                // 返回汇总样式
+                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
+                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                .ToListAsync();
+
+            return GetHeatMap(datas, "签到记录", afterTime, beforeTime);
+        }
+
+        /// <summary>
+        /// 生成热力图
+        /// </summary>
+        /// <returns></returns>
+        public EChartsHeatMapOptionModel GetHeatMap(List<LineChartSingleData> data, string title, DateTime afterTime, DateTime beforeTime)
+        {
+            var ds = new EChartsHeatMapOptionModel();
+            ds.Title.Text = title;
+            ds.Series.Add(new EChartsHeatMapOptionSery
+            {
+                Data = data.Select(s => new EChartsHeatMapOptionSeryData { Value = new List<object> { s.Time.ToString("yyyy-MM-dd"), s.Count } }).ToList()
+            });
+            ds.Calendar.Range = new List<string> { afterTime.ToString("yyyy-MM-dd"), beforeTime.ToString("yyyy-MM-dd") };
+            ds.VisualMap.Max = data.Any() ? (int)data.Max(s => s.Count) : 1;
+
+            return ds;
+        }
+
     }
 }
