@@ -1,0 +1,43 @@
+﻿@page "/tree"
+
+@inject IHttpService _httpService
+<MakeSureInWASMTip>
+    <div class="rounded shadow-sm bg-opacity p-4">
+        @if (isReady)
+        {
+            <MECharts Option="Model" MinWidth="@("100%")" MinHeight="1000" Height="1000">
+            </MECharts>
+        }
+        else
+        {
+            <div style="height:300px">
+                <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+            </div>
+        }
+
+    </div>
+    @code {
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
+
+        bool isReady;
+        EChartsTreeMapOptionModel Model;
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                try
+                {
+                    Model = await _httpService.GetAsync<EChartsTreeMapOptionModel>("api/tables/GetGroupGameRoleTreeMap");
+                    isReady = true;
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    ErrorHandler.ProcessError(ex, "无法获取 制作组->游戏->角色 矩形树图");
+                }
+            }
+        }
+    }
+
+</MakeSureInWASMTip>

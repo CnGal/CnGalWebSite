@@ -6,6 +6,8 @@ using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ReverseMarkdown.Converters;
+using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -675,10 +677,91 @@ namespace CnGalWebSite.APIServer.Application.Tables
             await _playedGameService.UpdateAllGameScore();
         }
 
+        public async Task<EChartsGraphOptionModel> GetEntryGraph()
+        {
+            //获取所有词条
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Type,
+                    s.DisplayName,
+                    Entries = s.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation != null && s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation.Id).ToList(),
+                    Staffs = s.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation != null && s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation.Id).ToList()
+                })
+                .ToListAsync();
+            //类型
+            var sery = new EChartsGraphOptionSery
+            {
+                Categories = new List<EChartsGraphOptionSeryCategory>
+                {
+                    new EChartsGraphOptionSeryCategory
+                    {
+                        Name="游戏",
+                        Base="游戏"
+                    },
+                    new EChartsGraphOptionSeryCategory
+                    {
+                        Name="角色",
+                        Base="角色"
+                    },
+                    new EChartsGraphOptionSeryCategory
+                    {
+                        Name="组织",
+                        Base="组织"
+                    },
+                    new EChartsGraphOptionSeryCategory
+                    {
+                        Name="STAFF",
+                        Base="STAFF"
+                    },
+                }
+            };
+            var model = new EChartsGraphOptionModel
+            {
+                Series = new List<EChartsGraphOptionSery> { sery },
+                Legend=new EChartsOptionLegend
+                {
+                    Data=new List<string> { "游戏", "角色", "组织", "STAFF" }
+                }
+            };
+            int i = 0;
+            foreach (var item in entries)
+            {
+                var data = new EChartsGraphOptionSeryData();
+                if (item.Staffs.Any())
+                {
+                    item.Entries.AddRange(item.Staffs);
+                }
+
+                data.Category = (int)item.Type;
+                data.Id = data.Value = item.Id;
+                data.Name = item.DisplayName;
+
+               
+                //关联信息
+                foreach (var infor in item.Entries)
+                {
+                    sery.Edges.Add(new EChartsGraphOptionSeryEdge
+                    {
+                        source = i,
+                        target = entries.IndexOf(entries.Find(s=>s.Id==infor)) 
+                    });
+                }
+
+                sery.Data.Add(data);
+                i++;
+            }
+
+            return model;
+        }
+
+
         public async Task<EChartsTreeMapOptionModel> GetGroupGameRoleTreeMap()
         {
-           
-
             //获取所有制作组
             var groups = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

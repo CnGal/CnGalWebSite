@@ -108,7 +108,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
     /// </summary>
     public class EChartsGraphOptionModel
     {
-        public List<EChartsTreeMapOptionSery> Series { get; set; } = new List<EChartsTreeMapOptionSery>();
+        public EChartsOptionLegend Legend { get; set; }=new EChartsOptionLegend();
+        public List<EChartsGraphOptionSery> Series { get; set; } = new List<EChartsGraphOptionSery>();
         public EChartsOptionTooltip Tooltip { get; set; } = new EChartsOptionTooltip
         {
             Trigger = "item"
@@ -271,6 +272,49 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
 
             Color = isDark? new List<string> { "#39d353", "#26a641", "#006d32", "#0e4429" }: new List<string> { "#216e39", "#30a14e", "#40c463", "#9be9a8" };
         }
+    }
+    #endregion
+
+    #region 关系图
+    public class EChartsGraphOptionSery
+    {
+        public string Type { get; set; } = "graph";
+        public string Layout { get; set; } = "force";
+        public bool Animation { get; set; } = false;
+        public bool Draggable { get; set; } = true;
+        public List<EChartsGraphOptionSeryData> Data { get; set; } = new List<EChartsGraphOptionSeryData>();
+        public List<EChartsGraphOptionSeryCategory> Categories { get; set; } = new List<EChartsGraphOptionSeryCategory>();
+        public List<EChartsGraphOptionSeryEdge> Edges { get; set; } = new List<EChartsGraphOptionSeryEdge>();
+        public EChartsGraphOptionSeryForce Force { get; set; } = new EChartsGraphOptionSeryForce();
+        public EChartsGraphOptionSeryLable Label { get; set; }=new EChartsGraphOptionSeryLable();
+    }
+    public class EChartsGraphOptionSeryLable
+    {
+        public string Position { get; set; } = "top";
+        public string Formatter { get; set; } = "{b}";
+    }
+    public class EChartsGraphOptionSeryData
+    {
+        public string Name { get; set; }
+        public int Id { get; set; } 
+        public int Value { get; set; } = 1;
+        public int Category { get; set; }
+    }
+    public class EChartsGraphOptionSeryCategory
+    {
+        public string Name { get; set; }
+        public string Base { get; set; }
+    }
+    public class EChartsGraphOptionSeryForce
+    {
+        public int EdgeLength { get; set; } = 5;
+        public int Repulsion { get; set; } = 20;
+        public double gravity { get; set; } = 0.2;
+    }
+    public class EChartsGraphOptionSeryEdge
+    {
+        public int source { get; set; }
+        public int target { get; set; } 
     }
     #endregion
 
