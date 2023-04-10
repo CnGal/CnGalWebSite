@@ -140,7 +140,11 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
         /// <summary>
-        /// 图表缓存
+        /// 用户热力图缓存
+        /// </summary>
+        public IPageModelCatche<EChartsHeatMapOptionModel> HeatMapDataCatche { get; set; }
+        /// <summary>
+        /// 游玩记录缓存
         /// </summary>
         public IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
         /// <summary>
@@ -321,7 +325,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<VideoViewModel> videoIndexPageCatche,
         IPageModelCatche<List<RoleBrithdayViewModel>> roleBrithdaysDataCatche,
         IPageModelCatche<FavoriteFolderViewModel> favoriteFolderIndexPageCatche,
-         IPageModelCatche<List<PublishGamesTimelineModel>> publishGamesTimelineDataCatche)
+         IPageModelCatche<List<PublishGamesTimelineModel>> publishGamesTimelineDataCatche, IPageModelCatche<EChartsHeatMapOptionModel> heatMapDataCatche)
         {
             (EntryIndexPageCatche = entryIndexPageCatche).Init(nameof(EntryIndexPageCatche), ToolHelper.WebApiPath + "api/entries/GetEntryView/");
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(nameof(ArticleIndexPageCatche), ToolHelper.WebApiPath + "api/articles/GetArticleView/");
@@ -356,6 +360,7 @@ namespace CnGalWebSite.Shared.Service
             (HomePageNewsCatche = homePageNewsCatche).Init(nameof(HomePageNewsCatche), "");
             (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
             (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
+            (HeatMapDataCatche = heatMapDataCatche).Init(nameof(HeatMapDataCatche), ""); ;
         }
 
         public void RefreshAllCatche()

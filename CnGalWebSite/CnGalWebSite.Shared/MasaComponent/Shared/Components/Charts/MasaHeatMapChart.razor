@@ -1,0 +1,102 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+
+
+
+<div class="rounded shadow-sm bg-opacity p-4">
+    <div style="display: flex; justify-content: flex-end; ">
+        <div style="width:250px;">
+            <MMenu @bind-Value="_menu1"
+                   CloseOnContentClick="false"
+                   Transition="scale-transition"
+                   OffsetY
+                   MaxWidth="290"
+                   MinWidth="@("auto")">
+                <ActivatorContent>
+                    <MTextField Value="DateRangeText" Label="时间范围" PrependIcon="@IconType.DeterminedTime.ToIconString()" @attributes="context.Attrs"/>
+                </ActivatorContent>
+                <ChildContent>
+                    <MDatePicker Value="_dates" TValue="List<DateOnly>" Range ValueChanged="ValueChanged" NoTitle Locale="zh-CN"/>
+                </ChildContent>
+            </MMenu>
+
+        </div>
+    </div>
+    <div class="d-flex align-center justify-center">
+        @if (isReady)
+        {
+            <MECharts Option="Model" InitOptions="@(opt => opt.Locale = "zh")" Width="@("100%")" Height="@(_dataCacheService.IsApp?(ShowScrollBar?"900px":"850px"):(ShowScrollBar?"250px":"200px"))" @ref="echarts">
+            </MECharts>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public UserHeatMapType Type { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public bool ShowScrollBar { get; set; }
+
+    private MECharts echarts;
+    private bool _menu1;
+    int _days = 30;
+    bool isReady;
+    EChartsHeatMapOptionModel Model { get; set; } = new EChartsHeatMapOptionModel();
+    private List<DateOnly> _dates = new List<DateOnly>
+{
+            new DateOnly(DateTime.Now.Year,1,1),
+            new DateOnly(DateTime.Now.Year,12,31),
+        };
+    public string DateRangeText => string.Join(" ~ ", _dates.Select(date => date.ToString("yyyy-MM-dd")));
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await Refresh();
+        }
+    }
+
+    public async Task ValueChanged(List<DateOnly> dates)
+    {
+        _dates = dates;
+
+        if (dates.Count==1)
+        {
+            return;
+        }
+        _menu1 = false;
+        StateHasChanged();
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if(_dates.Count!=2)
+            {
+                return;
+            }
+            Model = await _dataCacheService.HeatMapDataCatche.GetCache($"api/space/GetUserHeatMap?Id={Id}&Type={Type}&AfterTime={_dates[0].ToUnixTimeMilliseconds()}&BeforeTime={_dates[1].ToUnixTimeMilliseconds()}");
+
+            Model.SetTheme(_dataCacheService.IsApp, _dataCacheService.ThemeSetting.IsDark, ShowScrollBar);
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{Type.GetDisplayName()}图表数据失败");
+        }
+    }
+}
+

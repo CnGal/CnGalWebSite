@@ -3,6 +3,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject IApplicationStateService _applicationStateService
+@implements IDisposable
 
 
 @if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
@@ -27,7 +28,7 @@
 }
 else
 {
-    @if (isReady)
+    @if (_dataCacheService.PersonalSpaceDataCatche.Check(Id) || isReady)
     {
 
         <div class="row">
@@ -45,8 +46,7 @@ else
                 <div>
 
                     <div class="rounded  shadow-sm bg-opacity mb-4">
-                        <MTabs Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive ValueChanged="TabValueChanged"
-                               >
+                        <MTabs Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive ValueChanged="TabValueChanged">
 
                             <MTab Value="1">
                                 首页<MIcon>mdi-home</MIcon>
@@ -111,16 +111,11 @@ else
                                 }
 
                                 <div class="row">
-                                    <div class="col-12 col-lg-6 mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">
-                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.SignInDaysCard Model="Model" />
-
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    <div class="col-12 mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
                                     </div>
-                                    <div class="col-12 col-lg-6 mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="h-100">
-                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.EditOverviewCard Model="Model" />
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    <div class="col-12 mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
                                     </div>
 
                                 </div>
@@ -212,32 +207,15 @@ else
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.User" EventType="TrackEventType.View" ObjectId="@Model.Id"
                                                                 ObjectName="@Model.BasicInfor.Name" />
+@if (isFirstLoad == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
+}
 
 @code {
 
-    private string id = "";
     [Parameter]
-    public string Id
-    {
-        get
-        {
-            return id;
-        }
-        set
-        {
-            id = value;
-            if (isFirstLoad == true)
-            {
-
-            }
-            else
-            {
-                OnInitializedAsync();
-            }
-
-
-        }
-    }
+    public string Id { get; set; }
 
     public StringNumber TabIndex { get; set; } = 0;
 
@@ -245,8 +223,9 @@ else
     public int currentPage { get; set; } = 1;
     public string NoticeCard { get; set; } = "";
     bool isReady = false;
-    bool isFirstLoad = true;
     bool isNotFound = false;
+    bool isLoading = false;
+    bool isFirstLoad = true;
 
     public PersonalSpaceViewModel Model { get; set; } = new PersonalSpaceViewModel();
 
@@ -263,36 +242,34 @@ else
     public bool CanDeleted { get; set; }
 
     string LastLookName = "";
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
             isFirstLoad = false;
         }
     }
+
     protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    protected async Task Refresh()
     {
 
         try
         {
             TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
 
-
-            isReady = false;
-            isNotFound = false;
-
             var userState = await authenticationStateTask;
             var user = userState.User;
 
             //获取用户基本信息
             Model = await _dataCacheService.PersonalSpaceDataCatche.GetCache(Id);
-
-            if (_applicationStateService.InPreRendered)
-            {
-                _dataCacheService.PersonalSpaceDataCatche.Clean(Id);
-            }
 
             if (Model.IsCurrentUser)
             {
@@ -319,7 +296,7 @@ else
     }
 
 
-    private async Task EditMainPage()
+    private void EditMainPage()
     {
         NavigationManager.NavigateTo("/space/editmainpage/" + Model.Id);
 
@@ -329,6 +306,38 @@ else
     {
         _dataCacheService.SpaceViewCache.TabIndex = index.ToInt32();
         TabIndex = index;
-        
+
     }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCacheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+                StateHasChanged();
+            }
+
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

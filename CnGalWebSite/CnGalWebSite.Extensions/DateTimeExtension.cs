@@ -56,7 +56,10 @@ namespace CnGalWebSite.Extensions
         {
             return new DateTimeOffset(time).ToUnixTimeMilliseconds();
         }
+        public static long ToUnixTimeMilliseconds(this DateOnly time)
+        {
+            return new DateTimeOffset(time.ToDateTime(new TimeOnly(0))).ToUnixTimeMilliseconds();
+        }
 
-       
     }
 }

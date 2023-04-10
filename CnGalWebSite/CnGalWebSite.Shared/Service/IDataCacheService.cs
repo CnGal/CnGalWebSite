@@ -110,6 +110,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<RoleBrithdayViewModel>> RoleBrithdaysDataCatche { get; set; }
 
+        IPageModelCatche<EChartsHeatMapOptionModel> HeatMapDataCatche { get; set; }
+
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }

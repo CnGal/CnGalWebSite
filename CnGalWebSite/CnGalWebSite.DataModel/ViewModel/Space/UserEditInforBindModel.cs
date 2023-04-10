@@ -8,8 +8,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public string Name { get; set; }
 
-        public List<KeyValuePair<DateTime, int>> EditCountList { get; set; }
-
         public long EditCount { get; set; }
 
         public DateTime? LastEditTime { get; set; }

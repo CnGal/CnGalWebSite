@@ -1,5 +1,7 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Ranks;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class UserInforViewModel
@@ -31,5 +33,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public List<RankViewModel> Ranks { get; set; } = new List<RankViewModel>();
 
+    }
+
+    public enum UserHeatMapType
+    {
+        [Display(Name ="编辑记录")]
+        EditRecords,
+        [Display(Name = "签到")]
+        SignInDays
     }
 }
