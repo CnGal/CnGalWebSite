@@ -13,7 +13,7 @@
                    MaxWidth="290"
                    MinWidth="@("auto")">
                 <ActivatorContent>
-                    <MTextField Value="DateRangeText" Label="时间范围" PrependIcon="@IconType.DeterminedTime.ToIconString()" @attributes="context.Attrs"/>
+                    <MTextField Value="DateRangeText" Label="时间范围" PrependIcon="@IconType.Left.ToIconString()" OnPrependClick="OnPrependClick" AppendOuterIcon="@IconType.Right.ToIconString()" OnAppendOuterClick="OnAppendOuterClick"  @attributes="context.Attrs"/>
                 </ActivatorContent>
                 <ChildContent>
                     <MDatePicker Value="_dates" TValue="List<DateOnly>" Range ValueChanged="ValueChanged" NoTitle Locale="zh-CN"/>
@@ -79,6 +79,28 @@
         await Refresh();
     }
 
+    public async Task OnPrependClick()
+    {
+        var dates = new List<DateOnly>();
+        foreach (var item in _dates)
+        {
+            dates.Add(item.AddYears(-1));
+        }
+        _dates = dates;
+        StateHasChanged();
+        await Refresh();
+    }
+    public async Task OnAppendOuterClick()
+    {
+        var dates = new List<DateOnly>();
+        foreach (var item in _dates)
+        {
+            dates.Add(item.AddYears(1));
+        }
+        _dates = dates;
+        StateHasChanged();
+        await Refresh();
+    }
     public async Task Refresh()
     {
         try
@@ -87,7 +109,7 @@
             {
                 return;
             }
-            Model = await _dataCacheService.HeatMapDataCatche.GetCache($"api/space/GetUserHeatMap?Id={Id}&Type={Type}&AfterTime={_dates[0].ToUnixTimeMilliseconds()}&BeforeTime={_dates[1].ToUnixTimeMilliseconds()}");
+            Model = await _dataCacheService.HeatMapDataCatche.GetCache($"{ToolHelper.WebApiPath}api/space/GetUserHeatMap?Id={Id}&Type={Type}&AfterTime={_dates[0].ToUnixTimeMilliseconds()}&BeforeTime={_dates[1].ToUnixTimeMilliseconds()}");
 
             Model.SetTheme(_dataCacheService.IsApp, _dataCacheService.ThemeSetting.IsDark, ShowScrollBar);
             isReady = true;
