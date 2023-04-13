@@ -30,6 +30,13 @@ services:
       - Authority=${Authority}
       # IP 白名单
       - IpWhitelist=${IpWhitelist}
+      # gpt相关
+      # 上限 每分钟
+      - ChatGPTLimit=${ChatGPTLimit}
+      - ChatGPTApiUrl=${ChatGPTApiUrl}
+      - ChatGPTApiKey=${ChatGPTApiKey}
+      - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
+      - ChatGPT_UserMessageTemplate=${ChatGPT_UserMessageTemplate}
     hostname: apiserver
     restart: always
     healthcheck:

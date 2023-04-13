@@ -4,6 +4,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
+using CnGalWebSite.APIServer.Application.GPT;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Lotteries;
@@ -99,6 +100,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<RobotEvent, long> _robotEventRepository;
         private readonly IRepository<RobotFace, long> _robotFaceRepository;
         private readonly IRobotService _robotService;
+        private readonly IChatGPTService _chatGPTService;
 
         public RobotAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -106,7 +108,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<RobotFace, long> robotFaceRepository,
          IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
-        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository,
+        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, IChatGPTService chatGPTService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRobotService robotService,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotGroup, long> robotGroupRepository,
@@ -162,6 +164,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _robotReplyRepository = robotReplyRepository;
             _robotService = robotService;
             _robotFaceRepository = robotFaceRepository;
+            _chatGPTService= chatGPTService;
         }
 
         [AllowAnonymous]
@@ -780,11 +783,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     "NewestEditGames" => await _weiXinService.GetNewestEditGames(true),
                     "NewestUnPublishGames" => await _weiXinService.GetNewestUnPublishGames(true),
                     "NewestPublishGames" => await _weiXinService.GetNewestPublishGames(true),
+                    "chatgpt" => await _chatGPTService.GetReply(model.Infor),
                     "NewestNews" => await _weiXinService.GetNewestNews(true, model.SenderId != 0),
                     _ => ""
                 };
 
-                return new Result { Successful = true, Error = value.DeleteHtmlLinks() };
+                return new Result { Successful = true, Error = value?.DeleteHtmlLinks() };
             }
 
         }
