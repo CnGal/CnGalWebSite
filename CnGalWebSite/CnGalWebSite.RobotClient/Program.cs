@@ -1,11 +1,11 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
 using CnGalWebSite.RobotClient.DataRepositories;
 using CnGalWebSite.RobotClient.Extentions;
 using CnGalWebSite.RobotClient.Services.Events;
 using CnGalWebSite.RobotClient.Services.ExternalDatas;
+using CnGalWebSite.RobotClient.Services.Https;
 using CnGalWebSite.RobotClient.Services.Messages;
 using CnGalWebSite.RobotClient.Services.QQClients;
 using CnGalWebSite.RobotClient.Services.SensitiveWords;
@@ -15,14 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetCore.AutoRegisterDi;
-using System.Linq.Dynamic.Core.Tokenizer;
 
 MasudaBot asudaBot
     = new(1, "", "");
-
-//设置Json格式化配置
-ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
-ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
 
 //添加依赖注入
 using IHost host = Host.CreateDefaultBuilder(args)
@@ -34,10 +29,16 @@ using IHost host = Host.CreateDefaultBuilder(args)
     {
         config.AddUserSecrets<Program>();
     })
-    .ConfigureServices((_, services) =>
+    .ConfigureServices((builder, services) =>
     {
+        //添加仓储
         services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
-        services.AddSingleton(sp => new HttpClient());
+        //添加HTTP请求
+        services.AddSingleton(sp => new HttpClient
+        {
+            BaseAddress = new Uri(builder.Configuration["WebApiPath"])
+        });
+        services.AddSingleton<IHttpService, HttpService>();
 
         services.RegisterAssemblyPublicNonGenericClasses()
           .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))

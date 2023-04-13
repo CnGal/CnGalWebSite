@@ -1,6 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient.DataRepositories;
 using CnGalWebSite.RobotClient.Services.ExternalDatas;
 using CnGalWebSite.RobotClient.Services.SensitiveWords;
@@ -24,11 +23,11 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
         private readonly IRepository<RobotEvent> _robotEventRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<SynchronousService> _logger;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
 
         System.Timers.Timer t =null;
 
-        public SynchronousService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, HttpClient httpClient, IRepository<RobotGroup> robotGroupRepository, IRepository<RobotEvent> robotEventRepository,
+        public SynchronousService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService, IRepository<RobotGroup> robotGroupRepository, IRepository<RobotEvent> robotEventRepository,
         ILogger<SynchronousService> logger,
         IConfiguration configuration,
             ISensitiveWordService sensitiveWordService)
@@ -37,7 +36,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
             _logger = logger;
             _configuration = configuration;
             _robotFaceRepository = robotFaceRepository;
-            _httpClient = httpClient;
+            _httpService = httpService;
             _robotGroupRepository = robotGroupRepository;
             _robotEventRepository = robotEventRepository;
 
@@ -66,7 +65,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
             _logger.LogInformation("正在同步数据");
             try
             {
-                var model = await _httpClient.GetFromJsonAsync<List<RobotFace>>(ToolHelper.WebApiPath + "api/robot/getrobotFaces", ToolHelper.options);
+                var model = await _httpService.GetAsync<List<RobotFace>>("api/robot/getrobotFaces");
 
                 if (_robotFaceRepository.GetAll().Any())
                 {
@@ -82,7 +81,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 
             try
             {
-                var model = await _httpClient.GetFromJsonAsync<List<RobotEvent>>(ToolHelper.WebApiPath + "api/robot/getrobotEvents", ToolHelper.options);
+                var model = await _httpService.GetAsync<List<RobotEvent>>("api/robot/getrobotEvents");
                 var name = _configuration["RobotName"] ?? "看板娘";
                 foreach (var reply in model)
                 {
@@ -104,7 +103,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 
             try
             {
-                var model = await _httpClient.GetFromJsonAsync<List<RobotGroup>>(ToolHelper.WebApiPath + "api/robot/getrobotGroups", ToolHelper.options);
+                var model = await _httpService.GetAsync<List<RobotGroup>>("api/robot/getrobotGroups");
 
                 if (_robotGroupRepository.GetAll().Any())
                 {
@@ -122,12 +121,16 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 
             try
             {
-                var model = await _httpClient.GetFromJsonAsync<List<RobotReply>>(ToolHelper.WebApiPath + "api/robot/getrobotreplies",ToolHelper.options);
+                var model = await _httpService.GetAsync<List<RobotReply>>("api/robot/getrobotreplies");
                 var name = _configuration["RobotName"] ?? "看板娘";
+                var qq = _configuration["QQ"] ;
                 foreach (var reply in model)
                 {
                     reply.Key = reply.Key.Replace("$(name)", name);
                     reply.Value = reply.Value.Replace("$(name)", name);
+
+                    reply.Key = reply.Key.Replace("$(robotqq)", qq);
+                    reply.Value = reply.Value.Replace("$(robotqq)", qq);
                 }
                 if (_robotReplyRepository.GetAll().Any())
                 {

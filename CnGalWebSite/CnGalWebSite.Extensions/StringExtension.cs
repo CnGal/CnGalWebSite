@@ -233,6 +233,26 @@ namespace CnGalWebSite.Extensions
 
             return null;
         }
+
+        /// <summary>
+        /// 在给定的字符串A 和 字符串列表B 中查找A包含B的字符串
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="strings"></param>
+        /// <returns></returns>
+        public static List<string> FindStringListInText(this string text, List<string> strings)
+        {
+            var list = new List<string>();
+            foreach (var str in strings)
+            {
+                if (text.Contains(str))
+                {
+                    list.Add(str);
+                }
+            }
+
+            return list;
+        }
     }
 
    

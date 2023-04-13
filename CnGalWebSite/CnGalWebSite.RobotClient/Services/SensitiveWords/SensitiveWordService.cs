@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -64,7 +62,7 @@ namespace CnGalWebSite.RobotClient.Services.SensitiveWords
             var words = new List<string>();
             foreach (var item in texts)
             {
-                words.AddRange(ToolHelper.FindStringListInText(item, SensitiveWords));
+                words.AddRange(item.FindStringListInText( SensitiveWords));
             }
 
             return words;
@@ -72,7 +70,7 @@ namespace CnGalWebSite.RobotClient.Services.SensitiveWords
 
         public List<string> Check(string text)
         {
-            return ToolHelper.FindStringListInText(text, SensitiveWords);
+            return text.FindStringListInText(SensitiveWords);
         }
     }
 }

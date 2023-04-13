@@ -7,16 +7,16 @@ using CnGalWebSite.RobotClient.Services.SensitiveWords;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.RobotClient.Extentions;
 using Message = MeowMiraiLib.Msg.Type.Message;
-using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.RobotClient.Services.ExternalDatas;
 using System.Text.Json;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using System.Net.Http.Json;
-using CnGalWebSite.DataModel.Helper;
 using Masuda.Net.HelpMessage;
 using CnGalWebSite.RobotClient.DataModels.Messages;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using CnGalWebSite.Core.Services;
+using CnGalWebSite.RobotClient.Services.GPT;
 
 namespace CnGalWebSite.RobotClient.Services.Messages
 {
@@ -28,9 +28,10 @@ namespace CnGalWebSite.RobotClient.Services.Messages
         private readonly IConfiguration _configuration;
         private readonly ILogger<MessageService> _logger;
         private readonly IExternalDataService _externalDataService;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
+        private readonly IChatGPTService _chatGPTService;
 
-        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, HttpClient httpClient,
+        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService, IChatGPTService chatGPTService,
         ILogger<MessageService> logger,
         IConfiguration configuration,
             ISensitiveWordService sensitiveWordService)
@@ -41,7 +42,8 @@ namespace CnGalWebSite.RobotClient.Services.Messages
             _configuration = configuration;
             _robotFaceRepository = robotFaceRepository;
             _externalDataService = externalDataService;
-            _httpClient = httpClient;
+            _httpService = httpService;
+            _chatGPTService = chatGPTService;
         }
 
         /// <summary>
@@ -376,6 +378,7 @@ namespace CnGalWebSite.RobotClient.Services.Messages
                     "qq" => qq.ToString(),
                     "weather" => await _externalDataService.GetWeather(),
                     "sender" => name,
+                    "chatgpt" => await _chatGPTService.GetReply(message),
                     "n" => "\n",
                     "r" => "\r",
                     "facelist" => "该功能暂未实装",
@@ -433,7 +436,7 @@ namespace CnGalWebSite.RobotClient.Services.Messages
         {
 
             //若本地没有 则请求服务器
-            var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
+            var result = await _httpService.PostAsync<GetArgValueModel, Result>( "api/robot/GetArgValue", new GetArgValueModel
             {
                 Infor = infor,
                 Name = name,
@@ -442,16 +445,14 @@ namespace CnGalWebSite.RobotClient.Services.Messages
                 
             });
 
-            var jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
-            if (obj.Successful == false)
+            if (result.Successful == false)
             {
-                throw new ArgError(obj.Error);
+                throw new ArgError(result.Error);
             }
             else
             {
-                return obj.Error;
+                return result.Error;
             }
         }
     }

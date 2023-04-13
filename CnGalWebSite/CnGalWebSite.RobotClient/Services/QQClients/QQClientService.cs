@@ -197,7 +197,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
                  };
             }
 
-            _logger.LogInformation("CnGal资料站 看板娘 v3.3.30");
+            _logger.LogInformation("CnGal资料站 看板娘 v3.3.40");
 
         }
 
