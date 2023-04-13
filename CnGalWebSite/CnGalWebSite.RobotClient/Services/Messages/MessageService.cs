@@ -16,7 +16,6 @@ using CnGalWebSite.RobotClient.DataModels.Messages;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using CnGalWebSite.Core.Services;
-using CnGalWebSite.RobotClient.Services.GPT;
 
 namespace CnGalWebSite.RobotClient.Services.Messages
 {
@@ -29,9 +28,8 @@ namespace CnGalWebSite.RobotClient.Services.Messages
         private readonly ILogger<MessageService> _logger;
         private readonly IExternalDataService _externalDataService;
         private readonly IHttpService _httpService;
-        private readonly IChatGPTService _chatGPTService;
 
-        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService, IChatGPTService chatGPTService,
+        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService,
         ILogger<MessageService> logger,
         IConfiguration configuration,
             ISensitiveWordService sensitiveWordService)
@@ -43,7 +41,6 @@ namespace CnGalWebSite.RobotClient.Services.Messages
             _robotFaceRepository = robotFaceRepository;
             _externalDataService = externalDataService;
             _httpService = httpService;
-            _chatGPTService = chatGPTService;
         }
 
         /// <summary>
@@ -378,7 +375,6 @@ namespace CnGalWebSite.RobotClient.Services.Messages
                     "qq" => qq.ToString(),
                     "weather" => await _externalDataService.GetWeather(),
                     "sender" => name,
-                    "chatgpt" => await _chatGPTService.GetReply(message),
                     "n" => "\n",
                     "r" => "\r",
                     "facelist" => "该功能暂未实装",

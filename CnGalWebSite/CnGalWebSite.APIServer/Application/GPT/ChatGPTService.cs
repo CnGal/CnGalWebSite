@@ -1,9 +1,5 @@
 ﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.RobotClient.DataModels.GPT;
-using CnGalWebSite.RobotClient.Extentions;
-using MeowMiraiLib.Msg.Type;
-using MeowMiraiLib;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
@@ -16,8 +12,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using CnGalWebSite.RobotClient.DataModels.GPT;
 
-namespace CnGalWebSite.RobotClient.Services.GPT
+namespace CnGalWebSite.APIServer.Application.GPT
 {
     public class ChatGPTService:IChatGPTService
     {
@@ -64,7 +61,7 @@ namespace CnGalWebSite.RobotClient.Services.GPT
                 return null;
             }
             //替换文字
-            question = question.Replace(_configuration["RobotName"] ?? "看板娘", "").Replace($"[@{_configuration["QQ"]}]", "");
+            question = question.Replace("看板娘", "").Replace($"[@3257277748]", "");
 
             //填充消息模板
             sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
