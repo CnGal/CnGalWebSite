@@ -14,6 +14,7 @@ using IdentityModel.AspNetCore.AccessTokenManagement;
 using IdentityModel.Client;
 using CnGalWebSite.Shared.Service;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Shared.Extentions;
 
 namespace CnGalWebSite.Server.Services
 {
@@ -38,6 +39,10 @@ namespace CnGalWebSite.Server.Services
             _client = client;
             _authenticationStateProvider = authenticationStateProvider;
             _tokenManagementService = tokenManagementService;
+
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
