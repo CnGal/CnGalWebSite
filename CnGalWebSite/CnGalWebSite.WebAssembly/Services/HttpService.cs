@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using CnGalWebSite.DataModel.Helper;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Shared.Extentions;
 
 namespace CnGalWebSite.WebAssembly.Services
 {
@@ -41,6 +42,10 @@ namespace CnGalWebSite.WebAssembly.Services
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _navigationManager = navigationManager;
+
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
