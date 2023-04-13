@@ -733,19 +733,7 @@ namespace CnGalWebSite.DataModel.Helper
             }
         }
 
-        public static List<string> FindStringListInText(string text, List<string> strings)
-        {
-            var list = new List<string>();
-            foreach (var str in strings)
-            {
-                if (text.Contains(str))
-                {
-                    list.Add(str);
-                }
-            }
-
-            return list;
-        }
+        
 
         public static int GetLevelIntegral(int level)
         {

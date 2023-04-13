@@ -1117,52 +1117,5 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
 
         }
-
-        public async Task<List<string>> GetSensitiveWordsInText(string text)
-        {
-            //读取关键词列表
-            var words = new List<string>();
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "1.txt");
-
-            using var fs1 = new FileStream(path, FileMode.Open, FileAccess.Read);
-            using var sr1 = new StreamReader(fs1);
-            while (sr1.EndOfStream == false)
-            {
-                words.Add(await sr1.ReadLineAsync());
-            }
-
-            path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "2.txt");
-
-            using var fs2 = new FileStream(path, FileMode.Open, FileAccess.Read);
-            using var sr2 = new StreamReader(fs2);
-            while (sr2.EndOfStream == false)
-            {
-                words.Add(await sr2.ReadLineAsync());
-            }
-
-            path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "3.txt");
-
-            using var fs3 = new FileStream(path, FileMode.Open, FileAccess.Read);
-            using var sr3 = new StreamReader(fs3);
-            while (sr3.EndOfStream == false)
-            {
-                words.Add(await sr3.ReadLineAsync());
-            }
-            //释放
-            fs1.Close();
-            await fs1.DisposeAsync();
-            fs2.Close();
-            await fs2.DisposeAsync();
-            fs3.Close();
-            await fs3.DisposeAsync();
-
-            //删除特殊屏蔽词
-            _ = words.RemoveAll(s => s == "se");
-
-            //查找
-            return ToolHelper.FindStringListInText(text, words);
-        }
-
-
     }
 }

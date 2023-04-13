@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.RobotClient.DataModels.Events;
 using CnGalWebSite.RobotClient.DataRepositories;
 using CnGalWebSite.RobotClient.Extentions;

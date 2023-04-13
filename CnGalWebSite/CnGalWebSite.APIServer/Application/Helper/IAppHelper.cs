@@ -257,13 +257,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <returns></returns>
         string MarkdownToHtml(string str);
 
-        /// <summary>
-        /// 获取文本中包含的敏感词列表
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        Task<List<string>> GetSensitiveWordsInText(string text);
-
         Task<long> GetUserIntegral(string userId, DateTime time);
 
         bool CheckRecaptcha(HumanMachineVerificationResult model);
