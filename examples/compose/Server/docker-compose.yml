@@ -12,6 +12,8 @@ services:
       # 管理令牌储存
       - TokenAPI=${TokenAPI}
       - TokenAPISecret=${TokenAPISecret}
+      # 图床API
+      - ImageApiPath=${ImageApiPath}
     hostname: blazorserver
     restart: always
     healthcheck:
