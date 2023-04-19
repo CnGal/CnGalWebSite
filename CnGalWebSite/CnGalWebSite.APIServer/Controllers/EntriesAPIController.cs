@@ -425,6 +425,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s=>s.Booking).ThenInclude(s=>s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Include(s=>s.Releases)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (entry == null)
             {
@@ -474,12 +475,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Releases)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Booking).ThenInclude(s => s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Releases)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (currentEntry == null)
             {

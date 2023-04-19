@@ -169,7 +169,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 发行列表
         /// </summary>
-        public virtual ICollection<EntryRelease> Releases { get; set; } = new List<EntryRelease>();
+        public virtual ICollection<GameRelease> Releases { get; set; } = new List<GameRelease>();
 
         /// <summary>
         /// 评分列表 也是已玩用户列表
@@ -375,7 +375,7 @@ namespace CnGalWebSite.DataModel.Model
     }
 
 
-    public class EntryRelease
+    public class GameRelease
     {
         public long Id { get; set; }
 
@@ -387,17 +387,22 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 发行平台类型
         /// </summary>
-        public EntryPlatformType PlatformType { get; set; }
+        public PublishPlatformType PublishPlatformType { get; set; }
 
         /// <summary>
         /// 发行平台名称
         /// </summary>
-        public string PlatformName { get; set; }
+        public string PublishPlatformName { get; set; }
 
         /// <summary>
         /// 类别
         /// </summary>
-        public EntryReleaseType Type { get; set; }
+        public GameReleaseType Type { get; set; }
+
+        /// <summary>
+        /// 游戏平台
+        /// </summary>
+        public GamePlatformType[] GamePlatformTypes { get; set; } = new GamePlatformType[0];
 
         /// <summary>
         /// 发行时间
@@ -422,7 +427,8 @@ namespace CnGalWebSite.DataModel.Model
         public int? EntryId { get; set; }
         public Entry Entry { get; set; }
     }
-    public enum EntryPlatformType
+
+    public enum PublishPlatformType
     {
         [Display(Name = "Steam")]
         Steam,
@@ -437,7 +443,7 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "其他")]
         Other,
     }
-    public enum EntryReleaseType
+    public enum GameReleaseType
     {
         [Display(Name = "正式版")]
         Official,

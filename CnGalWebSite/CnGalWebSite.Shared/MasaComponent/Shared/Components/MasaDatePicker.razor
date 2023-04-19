@@ -98,7 +98,11 @@
                 _date = DateOnly.FromDateTime(NullableValue.Value);
                 _time = TimeOnly.FromDateTime(NullableValue.Value);
             }
-
+            else
+            {
+                _time = null;
+                _date = null;
+            }
         }
         else
         {

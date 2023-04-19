@@ -45,6 +45,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string QQgroupGame { get; set; }
         [Display(Name = "STAFF")]
         public List<StaffModel> Staffs { get; set; } = new List<StaffModel>();
+
+        public List<EditReleaseModel> Releases { get; set; } = new List<EditReleaseModel>();
         #endregion
         #region 角色
 
@@ -226,6 +228,37 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string Name { get; set; }
         [Display(Name = "链接")]
         [Required(ErrorMessage = "请填写链接")]
+        public string Link { get; set; }
+    }
+
+    public class EditReleaseModel
+    {
+        [Display(Name = "名称")]
+        public string Name { get; set; }
+
+        [Display(Name = "发行平台类型")]
+        public PublishPlatformType PublishPlatformType { get; set; }
+
+        [Display(Name = "发行平台名称")]
+        public string PublishPlatformName { get; set; }
+
+        [Display(Name = "类别")]
+        public GameReleaseType Type { get; set; }
+
+        [Display(Name = "游戏平台")]
+        public List< GamePlatformType> GamePlatformTypes { get; set; } = new List<GamePlatformType>();
+
+
+        [Display(Name = "发行时间")]
+        public DateTime? Time { get; set; }
+
+        [Display(Name = "发行时间备注")]
+        public string TimeNote { get; set; }
+
+        [Display(Name = "引擎")]
+        public string Engine { get; set; }
+
+        [Display(Name = "平台Id/链接")]
         public string Link { get; set; }
     }
 }

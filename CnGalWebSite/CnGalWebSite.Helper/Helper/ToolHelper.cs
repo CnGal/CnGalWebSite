@@ -32,7 +32,7 @@ namespace CnGalWebSite.DataModel.Helper
         //public static string WebApiPath = "http://172.17.0.1:2001/";
         public static string WebApiPath = "https://api.cngal.org/";
 
-        public static bool? PreSetIsSSR = null; //=> WebApiPath == "http://172.17.0.1:2001/";
+        public static bool? PreSetIsSSR = false; //=> WebApiPath == "http://172.17.0.1:2001/";
         public static bool IsSSR = true; //=> WebApiPath == "http://172.17.0.1:2001/";
 
         public static string ImageApiPath = "https://api.cngal.top/";
@@ -1153,6 +1153,24 @@ namespace CnGalWebSite.DataModel.Helper
                 if (informations.Count(s => item.Name == s.Name) > 1)
                 {
                     var temp = informations.FirstOrDefault(s => item.Name == s.Name);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        public static List<GameRelease> Purge(this List<GameRelease> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link);
                     if (temp != null)
                     {
                         informations.Remove(temp);

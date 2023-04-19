@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
+using System;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ExamineModel.Entries
 {
@@ -7,6 +8,7 @@ namespace CnGalWebSite.DataModel.ExamineModel.Entries
     {
         public List<BasicEntryInformation_> Information { get; set; } = new List<BasicEntryInformation_> { };
         public List<EntryStaffExamineModel> Staffs { get; set; } = new List<EntryStaffExamineModel> { };
+        public List<GameReleaseExamineModel> Releases { get; set; } = new List<GameReleaseExamineModel> { };
 
         public EditBooking Booking { get; set; }=new EditBooking();
     }
@@ -86,5 +88,56 @@ namespace CnGalWebSite.DataModel.ExamineModel.Entries
         /// 分组
         /// </summary>
         public string Modifier { get; set; }
+    }
+
+    public class GameReleaseExamineModel
+    {
+        public bool IsDelete { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 发行平台类型
+        /// </summary>
+        public PublishPlatformType PublishPlatformType { get; set; }
+
+        /// <summary>
+        /// 发行平台名称
+        /// </summary>
+        public string PublishPlatformName { get; set; }
+
+        /// <summary>
+        /// 类别
+        /// </summary>
+        public GameReleaseType Type { get; set; }
+
+        /// <summary>
+        /// 游戏平台
+        /// </summary>
+        public GamePlatformType[] GamePlatformTypes { get; set; } = new GamePlatformType[0];
+
+
+        /// <summary>
+        /// 发行时间
+        /// </summary>
+        public DateTime? Time { get; set; }
+
+        /// <summary>
+        /// 发行时间备注
+        /// </summary>
+        public string TimeNote { get; set; }
+
+        /// <summary>
+        /// 引擎
+        /// </summary>
+        public string Engine { get; set; }
+
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Link { get; set; }
     }
 }
