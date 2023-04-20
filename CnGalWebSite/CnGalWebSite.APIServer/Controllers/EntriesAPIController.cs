@@ -103,7 +103,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
-                    .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
+                    .Include(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.Tags)
+                    .Include(s => s.Pictures)
+                    .Include(s=>s.Releases)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
 

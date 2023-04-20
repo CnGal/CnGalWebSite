@@ -34,16 +34,6 @@
     @if (_dataCatcheService.IsApp)
     {
         <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
-            @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
-
-                    </div>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-
-            }
             @if (EntryView.Information.Any())
             {
                 <div class="mb-4">
@@ -56,13 +46,13 @@
                 <div class=" mb-4">
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
-
             }
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
+
             @if (EntryView.Type == EntryType.Game)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                     <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
-
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             }
         </div>
@@ -210,7 +200,7 @@
                 @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
                 {
                     <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense/>
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense />
                     </div>
                 }
                 @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
@@ -219,14 +209,6 @@
                     <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
 
                 }
-                @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
-                {
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
-
-                    </div>
-                }
-
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             @if (EntryView.Information.Any())
             {
@@ -243,6 +225,7 @@
                 </div>
 
             }
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
 
             @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
             {
@@ -269,7 +252,7 @@
     {
         get
         {
-            return (EntryView.Information.Count == 0 && (EntryView.SteamId <= 0 || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
+            return (EntryView.Information.Count == 0 && (EntryView.Releases.Any() || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
                       ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }

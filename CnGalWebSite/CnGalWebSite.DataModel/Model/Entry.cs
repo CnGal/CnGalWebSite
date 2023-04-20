@@ -440,6 +440,10 @@ namespace CnGalWebSite.DataModel.Model
         AppStore,
         [Display(Name = "Google Play")]
         GooglePlay,
+        [Display(Name = "Nintendo Switch")]
+        NS,
+        [Display(Name = "DLsite")]
+        DLsite,
         [Display(Name = "其他")]
         Other,
     }
@@ -448,11 +452,7 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "正式版")]
         Official,
         [Display(Name = "Demo")]
-        Demo,
-        [Display(Name = "DLC")]
-        DLC,
-        [Display(Name = "其他")]
-        Other
+        Demo
     }
     public enum EntryType
     {

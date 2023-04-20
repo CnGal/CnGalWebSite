@@ -19,24 +19,12 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EditBookingModel Booking { get; set; }=new EditBookingModel();
 
         #region 游戏
-        [Display(Name = "发行时间")]
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime? IssueTime { get; set; }
-        [Display(Name = "发行时间备注")]
-        public string IssueTimeString { get; set; }
         [Display(Name = "原作")]
         public string Original { get; set; }
         [Display(Name = "制作组")]
         public string ProductionGroup { get; set; }
-        [Display(Name = "游戏平台")]
-        public List<GamePlatformModel> GamePlatforms { get; set; } = new List<GamePlatformModel>();
-        [Display(Name = "引擎")]
-        public string Engine { get; set; }
         [Display(Name = "发行商")]
         public string Publisher { get; set; }
-        [Display(Name = "发行方式")]
-        public string IssueMethod { get; set; }
         [Display(Name = "官网")]
         public string OfficialWebsite { get; set; }
         [Display(Name = "Steam平台Id")]
@@ -115,10 +103,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public override Result Validate()
         {
             //调整时间
-            if (IssueTime != null)
-            {
-                IssueTime = IssueTime.Value.AddHours(IssueTime.Value.Hour < 12 ? (12 - IssueTime.Value.Hour) : 0);
-            }
             if (Birthday != null)
             {
                 Birthday = Birthday.Value.AddHours(Birthday.Value.Hour < 12 ? (12 - Birthday.Value.Hour) : 0);

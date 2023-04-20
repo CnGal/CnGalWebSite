@@ -236,7 +236,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.Chart:
                     return "mdi-chart-bar";
                 case IconType.Price:
-                    return "mdi-currency-usd";
+                    return "mdi-cash";
                 case IconType.ThumbsUp:
                     return "mdi-thumb-up ";
                 case IconType.Facebook:

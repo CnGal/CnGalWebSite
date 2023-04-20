@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,25 +41,48 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _logger = logger;
         }
 
-        public async Task<SteamInfor> GetSteamInforAsync(int steamId, int entryId = 0)
+        public async Task<StoreInforViewModel> GetSteamInforAsync(int steamId, int entryId = 0)
         {
 
             //尝试到数据库中查找信息
             //没有找到 则尝试更新数据
             //无法更新则返回错误
             var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            if (steamInfor != null/* && steamInfor.PriceNow != -1 && steamInfor.PriceNow != -2*/)
+            if (steamInfor == null)
             {
-                return steamInfor;
+                if (await _entryRepository.GetAll().AnyAsync(s => s.Id == entryId) == false)
+                {
+                    return null;
+                }
+
+                steamInfor = await UpdateSteamInfor(steamId, entryId);
+                if(steamInfor==null)
+                {
+                    return null;
+                }
             }
 
-            if (await _entryRepository.GetAll().AnyAsync(s => s.Id == entryId) == false)
+           
+            return new StoreInforViewModel
             {
-                return null;
-            }
-
-            steamInfor = await UpdateSteamInfor(steamId, entryId);
-            return steamInfor ?? null;
+                StoreId=steamId.ToString(),
+                PriceLowestString=steamInfor.PriceLowestString,
+                PriceNowString=steamInfor.PriceNowString,
+                CutLowest = steamInfor.CutLowest,
+                EstimationOwnersMax = steamInfor.EstimationOwnersMax,
+                EstimationOwnersMin = steamInfor.EstimationOwnersMin,
+                EvaluationCount = steamInfor.EvaluationCount,
+                LowestTime = steamInfor.LowestTime,
+                OriginalPrice = steamInfor.OriginalPrice,
+                PriceLowest = steamInfor.PriceLowest,
+                CutNow = steamInfor.CutNow,
+                PriceNow = steamInfor.PriceNow,
+                PublishPlatformType =  PublishPlatformType.Steam,
+                RecommendationRate = steamInfor.RecommendationRate,
+                PlayTime = steamInfor.PlayTime,
+                EntryId = entryId,
+                UpdateTime = steamInfor.UpdateTime,
+            };
         }
 
         public async Task UpdateAllGameSteamInfor()

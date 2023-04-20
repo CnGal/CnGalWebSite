@@ -2,10 +2,10 @@
     <div class=" mb-3 ">
         <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" HiddenButton ForceSmall />
     </div>
-    @if (Model.SteamId > 0)
+    @if (Model.Releases.Any())
     {
         <div class="mb-3">
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="Model" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="Model" />
 
         </div>
     }

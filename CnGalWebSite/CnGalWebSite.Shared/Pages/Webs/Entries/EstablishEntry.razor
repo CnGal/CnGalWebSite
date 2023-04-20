@@ -61,25 +61,7 @@
     [SupplyParameterFromQuery]
     public string Name { get; set; }
 
-    private EstablishEntryViewModel Model { get; set; } = new EstablishEntryViewModel
-    {
-        AddInfor = new EditAddInforViewModel
-        {
-            GamePlatforms = new List<GamePlatformModel>
-    {
-                new GamePlatformModel{GamePlatformType= GamePlatformType.Android},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.DOS},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.IOS},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.Linux},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.Mac},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.NS},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.PS},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.Windows},
-                new GamePlatformModel{GamePlatformType= GamePlatformType.HarmonyOS},
-                  new GamePlatformModel{GamePlatformType= GamePlatformType.H5},
-            }
-        }
-    };
+    private EstablishEntryViewModel Model { get; set; } = new EstablishEntryViewModel();
 
 
 

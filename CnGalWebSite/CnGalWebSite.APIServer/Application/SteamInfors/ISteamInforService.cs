@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids);
 
-        Task<SteamInfor> GetSteamInforAsync(int steamId, int entryId = 0);
+        Task<StoreInforViewModel> GetSteamInforAsync(int steamId, int entryId = 0);
 
         Task BatchUpdateGameSteamInfor(int count);
     }

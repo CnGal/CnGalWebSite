@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -38,10 +39,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 缩略图
         /// </summary>
         public string Thumbnail { get; set; }
-        /// <summary>
-        /// Steam平台Id
-        /// </summary>
-        public int SteamId { get; set; }
         /// <summary>
         /// 是否处于编辑状态
         /// </summary>
@@ -170,6 +167,63 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 标签列表
         /// </summary>
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel> { };
+        /// <summary>
+        /// 发行列表列表
+        /// </summary>
+        public List<GameReleaseViewModel> Releases { get; set; } = new List<GameReleaseViewModel> { };
+    }
+
+    public class GameReleaseViewModel
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 发行平台类型
+        /// </summary>
+        public PublishPlatformType PublishPlatformType { get; set; }
+
+        /// <summary>
+        /// 发行平台名称
+        /// </summary>
+        public string PublishPlatformName { get; set; }
+
+        /// <summary>
+        /// 类别
+        /// </summary>
+        public GameReleaseType Type { get; set; }
+
+        /// <summary>
+        /// 游戏平台
+        /// </summary>
+        public GamePlatformType[] GamePlatformTypes { get; set; } = new GamePlatformType[0];
+
+        /// <summary>
+        /// 发行时间
+        /// </summary>
+        public DateTime? Time { get; set; }
+
+        /// <summary>
+        /// 发行时间备注
+        /// </summary>
+        public string TimeNote { get; set; }
+
+        /// <summary>
+        /// 引擎
+        /// </summary>
+        public string Engine { get; set; }
+
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Link { get; set; }
+
+        /// <summary>
+        /// 商店信息
+        /// </summary>
+        public StoreInforViewModel StoreInfor { get; set; } = new StoreInforViewModel();
     }
 
     public class EntryRoleViewModel:EntryInforTipViewModel
