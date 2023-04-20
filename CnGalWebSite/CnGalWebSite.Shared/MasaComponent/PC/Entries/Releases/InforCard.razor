@@ -1,0 +1,98 @@
+﻿@inject IHttpService _httpService
+
+
+<div class="rounded shadow-sm bg-opacity p-4">
+    <div class="row" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        @if (Model.StoreInfor.PriceNow > 0)
+        {
+            <span class="col-12 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
+                <span class="me-2">当前价格：¥</span>
+                @if (Model.StoreInfor.CutNow > 0)
+                {
+                    <s class="me-2">@((Model.StoreInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
+                }
+                <span> @((Model.StoreInfor.PriceNow/100.0).ToString("0.00") + (Model.StoreInfor.CutNow == 0 ? "" : " - 折扣 " + Model.StoreInfor.CutNow + "%"))</span>
+            </span>
+            @if (Model.StoreInfor.CutLowest > 0)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@("历史最低：" + Model.StoreInfor.PriceLowestString + (Model.StoreInfor.CutLowest == 0 ? "" : " - 折扣 " + Model.StoreInfor.CutLowest + "%"))" Class="col-12" />
+            }
+        }
+        else if (Model.StoreInfor.PriceNow == 0)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Free" Text="当前价格：¥ 0.00 - Free" Class="col-12" />
+
+        }
+        else if (Model.StoreInfor.PriceNow == -1)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.IndeterminateTime" Text="未发售" Class="col-12" />
+            <meta itemprop="availability" content="PreOrder" />
+
+        }
+        else if (Model.StoreInfor.PriceNow == -2)
+        {
+            @if (Model.StoreInfor.OriginalPrice > 0)
+            {
+                <span class="col-12">
+                    <i class="@IconType.Price"></i>&nbsp; &nbsp;
+                    <span>价格：¥</span>
+
+                    <span>  @((Model.StoreInfor.OriginalPrice / 100.0).ToString(" 0.00") + "（数据未更新）")</span>
+
+                </span>
+            }
+            else if (Model.StoreInfor.OriginalPrice == 0)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.OutOfDate" Text="价格：¥ 0.00 - Free（数据未更新）" Class="col-12" />
+            }
+            else
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.OutOfDate" Text="数据未更新" Class="col-12" />
+            }
+            <meta itemprop="availability" content="SoldOut" />
+        }
+        else if (Model.StoreInfor.PriceNow == -3)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Takedown" Text="已下架" Class="col-12" />
+            <meta itemprop="availability" content="SoldOut" />
+        }
+        @if (Model.StoreInfor.PlayTime > 0)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@($"平均游玩时长：{Model.StoreInfor.PlayTime:0.0} 小时")" Class="col-12" />
+        }
+        @if (Model.StoreInfor.EstimationOwnersMax > 0)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Users" Text="@($"拥有人数（估计）：{ (Model.StoreInfor.EstimationOwnersMin == 0 ? $"< {Model.StoreInfor.EstimationOwnersMax:#,#}" : $"> {Model.StoreInfor.EstimationOwnersMin:#,#}")}")" Class="col-12" />
+        }
+        @if (Model.StoreInfor.EvaluationCount > 0)
+        {
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.StoreInfor.RecommendationRate}% 好评（{Model.StoreInfor.EvaluationCount}条评测）")" Class="col-12" />
+
+        }
+
+
+        @if (Model.StoreInfor.OriginalPrice >= 0)
+        {
+            <meta itemprop="priceCurrency" content="CNY" />
+            <meta itemprop="price" content="@(Model.StoreInfor.OriginalPrice/100.0)" />
+        }
+
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Link" Text="商店页面：" Url="@GetLink()" Class="col-12 text-truncate-1" ItemProp="url" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public GameReleaseViewModel Model { get; set; }
+
+    public string GetLink()
+    {
+        return Model.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "https://store.steampowered.com/app/" + Model.Link,
+            _ => ""
+        };
+    }
+}
