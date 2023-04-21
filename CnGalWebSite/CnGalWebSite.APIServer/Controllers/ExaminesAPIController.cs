@@ -216,6 +216,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         .Include(s=>s.Booking).ThenInclude(s => s.Goals)
                         .Include(s => s.Information).ThenInclude(s => s.Additional)
                         .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                        .Include(s=>s.Releases)
                         .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
                 case Operation.EstablishImages:

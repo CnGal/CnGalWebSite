@@ -43,7 +43,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{steamId}/{entryId}")]
-        public async Task<ActionResult<SteamInfor>> GetSteamInforAsync(int steamId, int entryId)
+        public async Task<ActionResult<StoreInforViewModel>> GetSteamInforAsync(int steamId, int entryId)
         {
             var model = await _steamInforService.GetSteamInforAsync(steamId, entryId);
             return (model == null) ? NotFound() : model;
@@ -51,50 +51,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{steamId}")]
-        public async Task<ActionResult<SteamInfor>> GetSteamInforAsync(int steamId)
+        public async Task<ActionResult<StoreInforViewModel>> GetSteamInforAsync(int steamId)
         {
             var model = await _steamInforService.GetSteamInforAsync(steamId);
             return (model == null) ? NotFound() : model;
-        }
-
-
-        /// <summary>
-        /// 使所有词条的steamId同步到数据库
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<Result>> GetAllEntriesSteamAsync()
-        {
-
-            //通过Id获取词条 
-            var entries = await _entryRepository.GetAll().Include(s => s.Information).Where(s => s.Type == EntryType.Game && s.IsHidden != true).ToListAsync();
-
-            //循环添加
-            foreach (var infor in entries)
-            {
-
-                foreach (var item in infor.Information)
-                {
-                    if (item.Modifier == "基本信息" && item.DisplayName == "Steam平台Id")
-                    {
-                        try
-                        {
-                            var steamId = int.Parse(item.DisplayValue);
-                            var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-                            if (steamInfor == null)
-                            {
-                                await _steamInforService.UpdateSteamInfor(steamId, infor.Id);
-                            }
-                            break;
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
-            }
-            return new Result { Successful = true };
         }
 
         [HttpGet]
@@ -112,33 +72,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [HttpGet("{Id}")]
-        public async Task<ActionResult<Result>> UpdateAllSteamInforAsync(int Id)
-        {
-            try
-            {
-                await _steamInforService.UpdateSteamInfor(Id,0);
-                return new Result { Successful = true };
-            }
-            catch (Exception exc)
-            {
-                return new Result { Successful = false, Error = exc.Message };
-            }
-
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<Result>> GetAllSteamImageToGame()
-        {
-            await _appHelper.GetAllSteamImageToGame();
-            return new Result { Successful = true };
-        }
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<SteamInforTipViewModel>>> GetAllDiscountSteamGame()
         {
-            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).ToListAsync();
+            var entryIds = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).Select(s=>s.Id).ToListAsync();
+            entryIds = entryIds.ToList().Random().Take(30).ToList();
+
+            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).AsNoTracking().Where(s => entryIds.Contains(s.Id)).ToListAsync();
 
             var model = new List<SteamInforTipViewModel>();
             foreach (var item in games)

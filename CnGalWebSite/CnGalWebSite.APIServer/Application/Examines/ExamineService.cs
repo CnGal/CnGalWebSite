@@ -40,6 +40,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -938,6 +939,87 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 
             }
 
+            if (entry.Releases.Any())
+            {
+
+                foreach (var item in entry.Releases)
+                {
+                    var temp = new List<KeyValueModel>();
+
+                    if (string.IsNullOrWhiteSpace(item.Name) == false)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "名称",
+                            DisplayValue = item.Name
+                        });
+                    }
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "发行平台类型",
+                            DisplayValue = item.PublishPlatformType.GetDisplayName()
+                        });
+                    temp.Add(new KeyValueModel
+                    {
+                        DisplayName = "类别",
+                        DisplayValue = item.Type.GetDisplayName()
+                    });
+                    if (string.IsNullOrWhiteSpace(item.PublishPlatformName) == false)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "发行平台名称",
+                            DisplayValue = item.PublishPlatformName
+                        });
+                    }
+                    if (item.GamePlatformTypes.Any())
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "发行平台名称",
+                            DisplayValue =string.Join("、", item.GamePlatformTypes.Select(s=>s.GetDisplayName()))
+                        });
+                    }
+                    if (string.IsNullOrWhiteSpace(item.TimeNote) == false)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "发行时间备注",
+                            DisplayValue = item.TimeNote
+                        });
+                    }
+                    if (item.Time!=null)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "发行时间",
+                            DisplayValue = item.Time.Value.ToString("yyyy年M月d日")
+                        });
+                    }
+                    if (string.IsNullOrWhiteSpace(item.Engine) == false)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "引擎",
+                            DisplayValue = item.Engine
+                        });
+                    }
+                    if (string.IsNullOrWhiteSpace(item.Link) == false)
+                    {
+                        temp.Add(new KeyValueModel
+                        {
+                            DisplayName = "平台Id/链接",
+                            DisplayValue = item.Link
+                        });
+                    }
+                    information.Add(new InformationsModel
+                    {
+                        Modifier = "发行版本 - " + (item.PublishPlatformType == PublishPlatformType.Other && string.IsNullOrWhiteSpace(item.PublishPlatformName) == false ? item.PublishPlatformName : item.PublishPlatformType.GetDisplayName()),
+                        Informations = temp
+                    });
+                }
+            }
+
             if (entry.Booking != null && (entry.Booking.Open || entry.Booking.Goals.Any() || entry.Booking.IsNeedNotification || entry.Booking.LotteryId != 0))
             {
                 var texts = new List<KeyValueModel>
@@ -991,6 +1073,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var entry = await _entryRepository.GetAll()
                    .Include(s => s.Information).ThenInclude(s => s.Additional)
                    .Include(s=>s.Booking).ThenInclude(s => s.Goals)
+                   .Include(s => s.Releases)
                    .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                    .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
@@ -5779,7 +5862,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                  .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.Articles)
                  .Include(s => s.Videos)
-                 .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
+                 .Include(s => s.Information).ThenInclude(s => s.Additional)
+                 .Include(s => s.Tags)
+                 .Include(s => s.Pictures)
+                 .Include(s=>s.Releases)
                  .FirstOrDefaultAsync(s => s.Id == entryId);
                 //获取通过审核记录叠加的旧模型
                 var examineModel = await GenerateModelFromExamines(entry);

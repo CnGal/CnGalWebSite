@@ -48,10 +48,10 @@
                 <BookingButton Template="EntryStyleTemplate.OfficialWebsite" Id="Model.Id" />
             </div>
         }
-        @if (Model.SteamId > 0)
+        @if (Model.Releases.Any(s=>s.PublishPlatformType== PublishPlatformType.Steam))
         {
             <div>
-                <MButton Rounded Color="primary" Block XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                <MButton Rounded Color="primary" Block XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.Releases.FirstOrDefault(s=>s.PublishPlatformType== PublishPlatformType.Steam)?.Link}"))">
                     <MIcon Left Class="me-4">
                         @IconType.Steam.ToIconString()
                     </MIcon>

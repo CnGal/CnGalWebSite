@@ -1,0 +1,54 @@
+﻿@typeparam TValue where TValue : Enum
+
+
+<div class="mb-4">
+    <span>@Label</span>
+    <MRow>
+        @foreach (var item in _items)
+        {
+            <MCol Class="pt-0 pb-0">
+                <MCheckbox Value="Items.Any(s=>s.Equals(item.Value))" Label="@(item.Key)" ValueChanged="@((e)=>ValueChanged(e,item.Value))" TValue="bool" Disabled="Disabled" HideDetails="true">
+                </MCheckbox>
+            </MCol>
+        }
+    </MRow>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public List<TValue> Items { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    List<KeyValuePair<string, TValue>> _items = new List<KeyValuePair<string, TValue>>();
+
+    protected override void OnInitialized()
+    {
+        _items.Clear();
+
+        System.Array values = System.Enum.GetValues(typeof(TValue));
+        foreach (var value in values)
+        {
+            var item = (TValue)value;
+            _items.Add(new KeyValuePair<string, TValue>((item).GetDisplayName(), item));
+        }
+
+    }
+
+    public void ValueChanged(bool select, TValue value)
+    {
+        if (select)
+        {
+            Items.Add(value);
+        }
+        else
+        {
+            Items.Remove(value);
+        }
+
+        StateHasChanged();
+    }
+
+}

@@ -7,8 +7,10 @@ using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
+using System.Text.Json;
 
 namespace CnGalWebSite.APIServer.Infrastructure
 {
@@ -231,6 +233,16 @@ namespace CnGalWebSite.APIServer.Infrastructure
                     .HasConstraintName("FK_VideoRelation_Video_To");
             });
 
+            //设置枚举数组转换
+            modelBuilder.Entity<GameRelease>()
+                .Property(e => e.GamePlatformTypes)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<GamePlatformType[]>(v, (JsonSerializerOptions)null),
+                    new ValueComparer<GamePlatformType[]>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToArray()));
 
             //角色Id
             const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";

@@ -216,13 +216,13 @@ namespace CnGalWebSite.Extensions
             {
                 try
                 {
-                    return new DateTime(DateTime.ParseExact(value, "yyyy年M月d日", null).AddHours(12).Ticks, DateTimeKind.Utc);
+                    return new DateTime(DateTime.ParseExact(value, "yyyy年M月d日", null).Ticks, DateTimeKind.Utc);
                 }
                 catch
                 {
                     try
                     {
-                        return  new DateTime(DateTime.ParseExact(value, "yyyy/M/d", null).AddHours(12).Ticks, DateTimeKind.Utc);
+                        return  new DateTime(DateTime.ParseExact(value, "yyyy/M/d", null).Ticks, DateTimeKind.Utc);
                     }
                     catch
                     {

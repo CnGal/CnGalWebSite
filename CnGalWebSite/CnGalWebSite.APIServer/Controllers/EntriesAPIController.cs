@@ -103,7 +103,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
-                    .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
+                    .Include(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.Tags)
+                    .Include(s => s.Pictures)
+                    .Include(s=>s.Releases)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
 
@@ -425,6 +428,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s=>s.Booking).ThenInclude(s=>s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Include(s=>s.Releases)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (entry == null)
             {
@@ -474,12 +478,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Releases)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Booking).ThenInclude(s => s.Goals)
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Releases)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (currentEntry == null)
             {

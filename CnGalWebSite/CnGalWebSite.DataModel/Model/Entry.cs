@@ -166,6 +166,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 关联外部链接
         /// </summary>
         public ICollection<Outlink> Outlinks { get; set; } = new List<Outlink>();
+        /// <summary>
+        /// 发行列表
+        /// </summary>
+        public virtual ICollection<GameRelease> Releases { get; set; } = new List<GameRelease>();
 
         /// <summary>
         /// 评分列表 也是已玩用户列表
@@ -371,39 +375,84 @@ namespace CnGalWebSite.DataModel.Model
     }
 
 
-    public class EditionModel
+    public class GameRelease
     {
-        public int Id { get; set; }
-        [Display(Name = "Steam平台Id")]
-        public string SteamId { get; set; }
-        [Display(Name = "发行平台")]
-        public string PlatformName { get; set; }
-        [Display(Name = "版本名称")]
-        [Required(ErrorMessage = "请输入版本名称")]
-        public string EditionName { get; set; }
-        [Display(Name = "版本类别")]
-        public EditionType EditionType { get; set; }
-        [Display(Name = "发行时间")]
-        [Required(ErrorMessage = "请选择发行时间")]
-        public DateTime IssueTime { get; set; }
+        public long Id { get; set; }
 
-        public string Publisher { get; set; }
-        [Display(Name = "引擎")]
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 发行平台类型
+        /// </summary>
+        public PublishPlatformType PublishPlatformType { get; set; }
+
+        /// <summary>
+        /// 发行平台名称
+        /// </summary>
+        public string PublishPlatformName { get; set; }
+
+        /// <summary>
+        /// 类别
+        /// </summary>
+        public GameReleaseType Type { get; set; }
+
+        /// <summary>
+        /// 游戏平台
+        /// </summary>
+        public GamePlatformType[] GamePlatformTypes { get; set; } = new GamePlatformType[0];
+
+        /// <summary>
+        /// 发行时间
+        /// </summary>
+        public DateTime? Time { get; set; }
+
+        /// <summary>
+        /// 发行时间备注
+        /// </summary>
+        public string TimeNote { get; set; }
+
+        /// <summary>
+        /// 引擎
+        /// </summary>
         public string Engine { get; set; }
-        [Display(Name = "介绍")]
-        [StringLength(100000)]
-        public string MainPage { get; set; }
+
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Link { get; set; }
+
+        public int? EntryId { get; set; }
+        public Entry Entry { get; set; }
     }
-    public enum EditionType
+
+    public enum PublishPlatformType
+    {
+        [Display(Name = "Steam")]
+        Steam,
+        [Display(Name = "TapTap")]
+        TapTap,
+        [Display(Name = "Epic")]
+        Epic,
+        [Display(Name = "App Store")]
+        AppStore,
+        [Display(Name = "Google Play")]
+        GooglePlay,
+        [Display(Name = "Nintendo Switch")]
+        NS,
+        [Display(Name = "DLsite")]
+        DLsite,
+        [Display(Name = "其他")]
+        Other,
+    }
+    public enum GameReleaseType
     {
         [Display(Name = "正式版")]
-        OfficialEdition,
-        [Display(Name = "DEMO")]
-        DEMO,
-        [Display(Name = "DLC")]
-        DLC,
-        [Display(Name = "其他")]
-        Other
+        Official,
+        [Display(Name = "Demo")]
+        Demo
     }
     public enum EntryType
     {

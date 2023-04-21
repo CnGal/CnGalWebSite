@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Models;
@@ -49,10 +50,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly ILogger<EntryService> _logger;
         private readonly IEmailService _emailService;
         private readonly IViewRenderService _viewRenderService;
+        private readonly ISteamInforService _steamInforService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
-        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
+        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository, ISteamInforService steamInforService,
         IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository,
          IEmailService emailService, IRepository<BookingUser, long> bookingUserRepository, IViewRenderService viewRenderService)
         {
@@ -70,6 +72,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _emailService = emailService;
             _bookingUserRepository = bookingUserRepository;
             _viewRenderService = viewRenderService;
+            _steamInforService = steamInforService;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -325,47 +328,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //附加信息
             foreach (var item in examine.Information)
             {
-                //预处理
-                //更新部分重要信息缓存
-                if (item.IsDelete == false)
-                {
-                    if (entry.Type == EntryType.Game)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
-                            if (item.DisplayName == "发行时间")
-                            {
-                                entry.PubulishTime = item.DisplayValue.ToDate();
-                            }
-                            else if (item.DisplayName == "Steam平台Id")
-                            {
-                                if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
-                                {
-                                    entry.MainPicture = "https://media.st.dl.eccdnx.com/steam/apps/" + item.DisplayValue + "/header.jpg";
-                                }
-                            }
-
-                        }
-                    }
-                }
-                else
-                {
-                    if (entry.Type == EntryType.Game)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
-                            if (item.DisplayName == "发行时间")
-                            {
-                                entry.PubulishTime = null;
-                            }
-                        }
-                    }
-                }
-
-
-
                 var entryInformation = entry.Information.FirstOrDefault(s => s.Modifier == item.Modifier && s.DisplayValue == item.DisplayValue && s.DisplayName == item.DisplayName);
                 if (entryInformation != null)
                 {
@@ -478,7 +440,58 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     });
                 }
             }
+            //处理游戏发行列表
+            foreach (var infor in examine.Releases)
+            {
+                var isSame = false;
+                foreach (var item in entry.Releases)
+                {
+                    if (item.PublishPlatformType == infor.PublishPlatformType && item.PublishPlatformName == infor.PublishPlatformName && item.Link == infor.Link)
+                    {
+                        if (infor.IsDelete == true)
+                        {
+                            entry.Releases.Remove(item);
+                        }
+                        else
+                        {
+                            item.Name = infor.Name;
+                            item.Type = infor.Type;
+                            item.Time = infor.Time;
+                            item.TimeNote = infor.TimeNote;
+                            item.Engine = infor.Engine;
+                            item.GamePlatformTypes = infor.GamePlatformTypes;
+                        }
+                        isSame = true;
+                        break;
 
+                    }
+                }
+                if (isSame == false)
+                {
+                    entry.Releases.Add(new GameRelease
+                    {
+                        PublishPlatformType = infor.PublishPlatformType,
+                        PublishPlatformName = infor.PublishPlatformName,
+                        Link = infor.Link,
+                        Name = infor.Name,
+                        Type = infor.Type,
+                        Time = infor.Time,
+                        TimeNote = infor.TimeNote,
+                        Engine = infor.Engine,
+                        GamePlatformTypes = infor.GamePlatformTypes,
+                    });
+                }
+            }
+            //提取发行时间
+            var release = entry.Releases.OrderBy(s=>s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official);
+            if (release != null)
+            {
+                entry.PubulishTime = release.Time;
+            }
+            else
+            {
+                entry.PubulishTime = null;
+            }
             //预约
             if (examine.Booking.Goals.Any() || examine.Booking.MainInfor.Any())
             {
@@ -1229,15 +1242,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //添加别称到附加信息
             if (string.IsNullOrWhiteSpace(entry.AnotherName) == false)
             {
-                entry.Information.Add(new BasicEntryInformation
+                model.Information.Add(new InformationsModel
                 {
-                    DisplayName = "别称",
-                    DisplayValue = model.AnotherName,
+                    Informations=new List<KeyValueModel>
+                    {
+                        new KeyValueModel
+                        {
+                            DisplayName="别称",
+                            DisplayValue=model.AnotherName,
+                        }
+                    },
                     Modifier = "基本信息"
                 });
             }
-
-            var information = new List<InformationsModel>();
 
             //添加角色CV
             if (model.Type == EntryType.Role)
@@ -1253,7 +1270,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (cvs.Length > 0)
                 {
-                    information.Add(new InformationsModel
+                    model.Information.Add(new InformationsModel
                     {
                         Modifier = "基本信息",
                         Informations = new List<KeyValueModel>
@@ -1270,7 +1287,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             }
 
-            foreach (var item in entry.Information.Where(s => s.DisplayName.Contains("发行时间") == false))
+            foreach (var item in entry.Information)
             {
                 //判断
                 if (item.DisplayName == "性别")
@@ -1280,20 +1297,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         item.DisplayValue = ((GenderType)gender).GetDisplayName();
                     }
                 }
-                else if (item.DisplayName == "Steam平台Id")
-                {
-                    if (string.IsNullOrWhiteSpace(item.DisplayValue) == false)
-                    {
-                        try
-                        {
-                            model.SteamId = int.Parse(item.DisplayValue);
-                            continue;
-                        }
-                        catch { }
-                    }
-
-                }
-                else if(item.DisplayName == "昵称（官方称呼）")
+                else if (item.DisplayName == "Steam平台Id"|| item.DisplayName == "昵称（官方称呼）"
+                    || item.DisplayName == "发行时间" || item.DisplayName == "游戏平台"
+                    || item.DisplayName == "引擎" || item.DisplayName == "发行方式")
                 {
                     continue;
                 }
@@ -1305,7 +1311,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     continue;
                 }
                 //遍历信息列表寻找关键词
-                foreach (var infor in information)
+                foreach (var infor in model.Information)
                 {
                     if (infor.Modifier == item.Modifier)
                     {
@@ -1332,46 +1338,30 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         DisplayName = item.DisplayName,
                         DisplayValue = item.DisplayValue
                     });
-                    information.Add(temp);
+                    model.Information.Add(temp);
                 }
             }
 
-            //添加发行时间
-            if (entry.Type == EntryType.Game)
+            //添加发行列表
+           foreach(var item in entry.Releases)
             {
-                var publishTime = new KeyValueModel
+                var infor = new GameReleaseViewModel
                 {
-                    DisplayName = "发行时间"
+                    Engine = item.Engine,
+                    GamePlatformTypes = item.GamePlatformTypes,
+                    Link = item.Link,
+                    Name = item.Name,
+                    PublishPlatformName = item.PublishPlatformName,
+                    PublishPlatformType = item.PublishPlatformType,
+                    Time = item.Time,
+                    TimeNote = item.TimeNote,
+                    Type = item.Type,
                 };
-                publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间备注"))?.DisplayValue;
-
-                if (string.IsNullOrWhiteSpace(publishTime.DisplayValue))
+                if(item.PublishPlatformType== PublishPlatformType.Steam&&int.TryParse(item.Link,out int steamId))
                 {
-                    publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间"))?.DisplayValue;
+                    infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, entry.Id);
                 }
-
-                if (string.IsNullOrWhiteSpace(publishTime.DisplayValue) == false)
-                {
-                    var basic = information.FirstOrDefault(s => s.Modifier == "基本信息");
-                    if (basic == null)
-                    {
-                        basic = new InformationsModel
-                        {
-                            Modifier = "基本信息",
-                            Informations = new List<KeyValueModel>
-                            {
-                               publishTime
-                            }
-                        };
-                        information.Add(basic);
-                    }
-                    else
-                    {
-                        basic.Informations.Add(publishTime);
-                    }
-
-
-                }
+                model.Releases.Add(infor);
             }
 
             //序列化 STAFF
@@ -1717,7 +1707,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //赋值
-            model.Information = information;
             model.Pictures = picturesViewModels;
             model.ArticleRelevances = relevanceArticle;
             model.EntryRelevances = relevancesEntry;
@@ -1962,8 +1951,75 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     });
                 }
             }
+
+            //发行列表
+            //遍历当前词条数据 打上删除标签
+            foreach (var item in currentEntry.Releases)
+            {
+                entryAddInfor.Releases.Add(new GameReleaseExamineModel
+                {
+                    Engine = item.Engine,
+                    Link = item.Link,
+                    Name = item.Name,
+                    GamePlatformTypes = item.GamePlatformTypes.ToArray(),
+                    PublishPlatformName = item.PublishPlatformName,
+                    Time = item.Time,
+                    TimeNote = item.TimeNote,
+                    Type = item.Type,
+                    PublishPlatformType = item.PublishPlatformType,
+                    IsDelete = true,
+                });
+            }
+
+
+            //再遍历视图 对应修改
+
+            foreach (var infor in newEntry.Releases.ToList().Purge())
+            {
+                var isSame = false;
+                foreach (var item in entryAddInfor.Releases)
+                {
+                    if (item.PublishPlatformName == infor.PublishPlatformName && item.PublishPlatformType == infor.PublishPlatformType && item.Link == infor.Link)
+                    {
+                        if (item.Name != infor.Name || item.Type != infor.Type || item.Time != infor.Time || item.TimeNote != infor.TimeNote || item.Engine != infor.Engine || item.GamePlatformTypes.SequenceEqual(infor.GamePlatformTypes)==false)
+                        {
+                            item.Name = infor.Name;
+                            item.Type = infor.Type;
+                            item.Time = infor.Time;
+                            item.TimeNote = infor.TimeNote;
+                            item.Engine = infor.Engine;
+                            item.GamePlatformTypes = infor.GamePlatformTypes;
+                            item.IsDelete = false;
+                        }
+                        else
+                        {
+                            entryAddInfor.Releases.Remove(item);
+                        }
+                        isSame = true;
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    entryAddInfor.Releases.Add(new GameReleaseExamineModel
+                    {
+                        Engine = infor.Engine,
+                        Link = infor.Link,
+                        Name = infor.Name,
+                        GamePlatformTypes = infor.GamePlatformTypes,
+                        PublishPlatformName = infor.PublishPlatformName,
+                        Time = infor.Time,
+                        TimeNote = infor.TimeNote,
+                        Type = infor.Type,
+                        PublishPlatformType = infor.PublishPlatformType,
+                        IsDelete = false
+                    });
+                }
+            }
+
             //检测是否有修改
-            if (entryAddInfor.Information.Any() || entryAddInfor.Staffs.Any() || entryAddInfor.Booking.MainInfor.Any() || entryAddInfor.Booking.Goals.Any())
+            if (entryAddInfor.Information.Any() || entryAddInfor.Staffs.Any() || entryAddInfor.Booking.MainInfor.Any() || entryAddInfor.Booking.Goals.Any() || entryAddInfor.Releases.Any())
             {
                 examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
 
@@ -2427,19 +2483,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 case EntryType.Game:
                     model.Staffs = new List<StaffModel>();
-                    model.GamePlatforms = new List<GamePlatformModel>
-                    {
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.Android, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.Windows, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.DOS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.IOS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.Linux, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.Mac, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.NS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.PS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.HarmonyOS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.H5, IsSelected = false }
-};
                     //遍历基本信息
                     foreach (var item in entry.Information)
                     {
@@ -2447,36 +2490,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         {
                             switch (item.DisplayName)
                             {
-                                case "发行时间":
-                                    model.IssueTime = item.DisplayValue.ToDate();
-                                    break;
-                                case "发行时间备注":
-                                    model.IssueTimeString = item.DisplayValue;
-                                    break;
                                 case "原作":
                                     model.Original = item.DisplayValue;
                                     break;
-                                case "游戏平台":
-                                    var sArray = Regex.Split(item.DisplayValue, "、", RegexOptions.IgnoreCase);
-                                    foreach (var infor in model.GamePlatforms)
-                                    {
-                                        if (sArray.Contains(infor.GamePlatformType.ToString()))
-                                        {
-                                            infor.IsSelected = true;
-                                        }
-                                    }
-                                    break;
-                                case "引擎":
-                                    model.Engine = item.DisplayValue;
-                                    break;
-                                case "发行方式":
-                                    model.IssueMethod = item.DisplayValue;
-                                    break;
                                 case "官网":
                                     model.OfficialWebsite = item.DisplayValue;
-                                    break;
-                                case "Steam平台Id":
-                                    model.SteamId = item.DisplayValue;
                                     break;
                                 case "QQ群":
                                     model.QQgroupGame = item.DisplayValue;
@@ -2490,9 +2508,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                 Name = item.DisplayName,
                                 Link = item.DisplayValue
                             };
-
                             model.SocialPlatforms.Add(socialPlatform);
-
                         }
                     }
 
@@ -2513,6 +2529,22 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     //处理制作组发行商信息
                     model.Publisher = GetStringFromStaffs(entry, PositionGeneralType.Publisher);
                     model.ProductionGroup = GetStringFromStaffs(entry, PositionGeneralType.ProductionGroup);
+                    //处理游戏发行列表
+                    foreach (var item in entry.Releases)
+                    {
+                        model.Releases.Add(new EditReleaseModel
+                        {
+                            Engine = item.Engine,
+                            Link = item.Link,
+                            Name = item.Name,
+                            GamePlatformTypes = item.GamePlatformTypes.ToList(),
+                            PublishPlatformName = item.PublishPlatformName,
+                            Time = item.Time,
+                            TimeNote = item.TimeNote,
+                            Type = item.Type,
+                            PublishPlatformType = item.PublishPlatformType,
+                        });
+                    }
                     break;
                 case EntryType.ProductionGroup:
                     //遍历基本信息
@@ -3079,6 +3111,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model,int lotteryId)
         {
             newEntry.Information.Clear();
+            newEntry.Releases.Clear();
             newEntry.EntryStaffFromEntryNavigation.Clear();
             //根据类别进行序列化操作
             switch (model.Type)
@@ -3104,36 +3137,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                         newEntry.EntryStaffFromEntryNavigation.Add(temp);
                     }
-                    //序列化游戏平台
-                    string gamePlatforms = null;
-                    var isFirst = true;
-                    foreach (var item in model.GamePlatforms)
+                    //游戏发行列表
+                    foreach (var item in model.Releases)
                     {
-                        if (item.IsSelected == true)
+                        var temp = new GameRelease
                         {
-                            if (isFirst == true)
-                            {
-                                isFirst = false;
-                            }
-                            else
-                            {
-                                gamePlatforms += "、";
-                            }
-                            gamePlatforms += item.GamePlatformType.ToString();
-                        }
+                            Engine = item.Engine,
+                            Link = item.Link,
+                            Name = item.Name,
+                            GamePlatformTypes = item.GamePlatformTypes.ToArray(),
+                            PublishPlatformName = item.PublishPlatformName,
+                            Time = item.Time,
+                            TimeNote = item.TimeNote,
+                            Type = item.Type,
+                            PublishPlatformType = item.PublishPlatformType,
+                        };
+                        newEntry.Releases.Add(temp);
                     }
                     //添加制作组发行商
                     await SetStaffsFromString(newEntry, model.Publisher, PositionGeneralType.Publisher);
                     await SetStaffsFromString(newEntry, model.ProductionGroup, PositionGeneralType.ProductionGroup);
                     //添加基本信息
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
                     break;
                 case EntryType.ProductionGroup:

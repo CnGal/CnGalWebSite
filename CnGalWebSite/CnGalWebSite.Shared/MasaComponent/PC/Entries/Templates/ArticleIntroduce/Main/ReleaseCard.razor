@@ -1,0 +1,200 @@
+﻿@inject IHttpService _httpService
+
+
+@if (Model.Releases.Any() && Model.IsHideOutlink == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <section id="release">
+            <h2>发行列表</h2>
+            @foreach (var item in Model.Releases)
+            {
+                <div>
+                    <h3>@(item.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(item.PublishPlatformName)==false? item.PublishPlatformName: item.PublishPlatformType.GetDisplayName())</h3>
+                 
+                    <dl>
+                        @if (string.IsNullOrWhiteSpace(item.StoreInfor.StoreId) == false)
+                        {
+                            @if (item.StoreInfor.PriceNow > 0)
+                            {
+                                <div>
+                                    <dt>当前价格</dt>
+                                    <dd>
+                                        <span class="me-2">¥</span>
+                                        @if (item.StoreInfor.CutNow > 0)
+                                        {
+                                            <s class="me-2">@((item.StoreInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
+                                        }
+                                        <span> @((item.StoreInfor.PriceNow/100.0).ToString("0.00") + (item.StoreInfor.CutNow == 0 ? "" : " - 折扣 " + item.StoreInfor.CutNow + "%"))</span>
+                                    </dd>
+                                </div>
+
+                                @if (item.StoreInfor.CutLowest > 0)
+                                {
+                                    <div>
+                                        <dt>历史最低</dt>
+                                        <dd>
+                                            @(item.StoreInfor.PriceLowestString + (item.StoreInfor.CutLowest == 0 ? "" : " - 折扣 " + item.StoreInfor.CutLowest + "%"))
+                                        </dd>
+                                    </div>
+                                }
+                            }
+                            else if (item.StoreInfor.PriceNow == 0)
+                            {
+                                <div>
+                                    <dt>当前价格</dt>
+                                    <dd>
+                                        ¥ 0.00 - Free
+                                    </dd>
+                                </div>
+
+                            }
+                            else if (item.StoreInfor.PriceNow == -1)
+                            {
+                                <div>
+                                    未发售
+                                </div>
+
+                            }
+                            else if (item.StoreInfor.PriceNow == -2)
+                            {
+                                @if (item.StoreInfor.OriginalPrice > 0)
+                                {
+                                    <div>
+                                        <dt>价格</dt>
+                                        <dd>
+                                            <span>¥</span>
+
+                                            <span>  @((item.StoreInfor.OriginalPrice / 100.0).ToString(" 0.00") + "（数据未更新）")</span>
+                                        </dd>
+                                    </div>
+                                }
+                                else if (item.StoreInfor.OriginalPrice == 0)
+                                {
+                                    <div>
+                                        <dt>价格</dt>
+                                        <dd>
+                                            ¥ 0.00 - Free（数据未更新）
+                                        </dd>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        数据未更新
+                                    </div>
+                                }
+                            }
+                            else if (item.StoreInfor.PriceNow == -3)
+                            {
+                                <div>
+                                    已下架
+                                </div>
+                            }
+                            @if (item.StoreInfor.PlayTime > 0)
+                            {
+                                <div>
+                                    <dt>平均游玩时长</dt>
+                                    <dd>@($"{item.StoreInfor.PlayTime:0.0} 小时")</dd>
+                                </div>
+                            }
+                            @if (item.StoreInfor.EstimationOwnersMax > 0)
+                            {
+                                <div>
+                                    <dt>拥有人数（估计）</dt>
+                                    <dd>@($"{ (item.StoreInfor.EstimationOwnersMin == 0 ? $"< {item.StoreInfor.EstimationOwnersMax:#,#}" : $"> {item.StoreInfor.EstimationOwnersMin:#,#}")}")</dd>
+                                </div>
+                            }
+                            @if (item.StoreInfor.EvaluationCount > 0)
+                            {
+                                <div>
+                                    <dt>好评率</dt>
+                                    <dd>@($"{item.StoreInfor.RecommendationRate}%（{item.StoreInfor.EvaluationCount}条评测）")</dd>
+                                </div>
+
+                            }
+                        }
+
+                        @if (string.IsNullOrWhiteSpace(item.Link) == false)
+                        {
+                            <div>
+                                <dt>链接</dt>
+                                <dd>
+                                    <a href="@item.GetLink()" target="_blank">
+                                        @item.GetLink()
+                                    </a>
+                                </dd>
+                            </div>
+                        }
+                        @if (string.IsNullOrWhiteSpace(item.Name) == false)
+                        {
+                            <div>
+                                <dt>发行名称</dt>
+                                <dd>@item.Name</dd>
+                            </div>
+
+                        }
+                        @if (string.IsNullOrWhiteSpace(item.TimeNote))
+                        {
+                            @if (item.Time != null)
+                            {
+                                <div>
+                                    <dt>发行时间</dt>
+                                    <dd>@(item.Time.Value.ToString("yyyy年M月d日"))</dd>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div>
+                                <dt>发行名称</dt>
+                                <dd>@item.TimeNote</dd>
+                            </div>
+                        }
+                        @if (item.GamePlatformTypes.Any())
+                        {
+                            <div>
+                                <dt>游戏平台</dt>
+                                <dd>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</dd>
+                            </div>
+                        }
+                        @if (string.IsNullOrWhiteSpace(item.Engine) == false)
+                        {
+                            <div>
+                                <dt>引擎</dt>
+                                <dd>@item.Engine</dd>
+                            </div>
+                        }
+                        <div>
+                            <dt>类型</dt>
+                            <dd>@item.Type.GetDisplayName()</dd>
+                        </div>
+                    </dl>
+
+                </div>
+
+            }
+        </section>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+}
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    public string GetLink(GameReleaseViewModel model)
+    {
+        return model.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "https://store.steampowered.com/app/" + model.Link,
+            PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + model.Link,
+            PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + model.Link,
+            PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" + model.Link,
+            PublishPlatformType.TapTap => "https://www.taptap.cn/app/" + model.Link,
+            PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + model.Link,
+            PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{model.Link}.html",
+            _ => model.Link
+        };
+    }
+}
