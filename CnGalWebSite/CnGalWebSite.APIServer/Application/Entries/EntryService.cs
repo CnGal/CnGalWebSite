@@ -482,7 +482,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
             //提取发行时间
-            var release = entry.Releases.OrderBy(s=>s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official);
+            var release = entry.Releases.OrderBy(s=>s.Time).FirstOrDefault(s =>s.Time!=null&& s.Type == GameReleaseType.Official);
             if (release != null)
             {
                 entry.PubulishTime = release.Time;
