@@ -133,6 +133,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Number1, Number2, Number3, Number4, Number5, Number6, Number7,
         Right,
         Left,
+        Published,
+        UnPublished
     }
 
     public static class IconTypeHelper
@@ -141,6 +143,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Published:
+                    return "mdi-publish";
+                case IconType.UnPublished:
+                    return "mdi-publish-off";
                 case IconType.Left:
                     return "mdi-chevron-left";
                 case IconType.Right:
