@@ -657,6 +657,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entries = await _entryRepository.GetAll()
                     .Include(s => s.Information)
+                    .Include(s=>s.Outlinks)
                     .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Information.Any(s => s.Modifier == "相关网站" || s.DisplayName == "官网"))
                     .ToListAsync();
 
