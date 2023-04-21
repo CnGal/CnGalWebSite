@@ -1,31 +1,84 @@
-﻿<div class="@Class">
-    <BootstrapInput Value="Id" ShowLabel="true" DisplayText="@Label" ValueChanged="OnIdChanged" TValue="string"/>
+﻿
+<div class="row">
+    @foreach (var item in Enum.GetValues(typeof(OutlinkType)))
+    {
+        var type = (OutlinkType)item;
+        var id = (int)item;
+
+        <div class="form-group col-12  col-sm-6">
+            <BootstrapInput Value="_values[id]" ShowLabel="true" DisplayText="@type.GetDisplayName()" ValueChanged="@((s)=>ValueChanged(type,id,s))" TValue="string" />
+        </div>
+    }
 </div>
 
 @code {
     [Parameter]
-    public string Class { get; set; } = "form-group col-12  col-sm-6";
-    [Parameter]
-    public string Id { get; set; }
-    [Parameter]
-    public string Label { get; set; }
-    [Parameter]
-    public EventCallback<string> IdChanged { get; set; }
+    public EditRelevancesViewModel Model { get; set; }
 
-    public async Task OnIdChanged(string id)
+    public string[] _values = new string[Enum.GetValues(typeof(OutlinkType)).Length];
+
+    protected override void OnInitialized()
     {
-        if(id.Contains("http"))
+        foreach (var item in Enum.GetValues(typeof(OutlinkType)))
         {
-            id = System.Web.HttpUtility.UrlDecode(id);
-            var temp = id.Split('?').FirstOrDefault()?.Split('/');
-            Id = temp?.LastOrDefault(s=>string.IsNullOrWhiteSpace(s)==false).Replace("@","");
-
+            var model = Model.others.FirstOrDefault(s => s.DisplayName.ToLower() == ((OutlinkType)item).GetDisplayName().ToLower());
+            if (model != null)
+            {
+                ValueChanged((OutlinkType)item, (int)item, model.Link);
+            }
         }
-        else
+    }
+
+    public void ValueChanged(OutlinkType type, int id, string value)
+    {
+        if (value.Contains("http")&&type!= OutlinkType.Official)
         {
-            Id = id;
+            value = System.Web.HttpUtility.UrlDecode(value);
+            var temp = value.Split('?').FirstOrDefault()?.Split('/');
+            value = temp?.LastOrDefault(s => string.IsNullOrWhiteSpace(s) == false).Replace("@", "");
         }
 
-        await IdChanged.InvokeAsync(Id);
+        _values[id] = value;
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            Model.others.RemoveAll(s => s.DisplayName == type.GetDisplayName());
+            return;
+        }
+
+        Model.others.RemoveAll(s => s.DisplayName.ToLower() == type.GetDisplayName().ToLower());
+
+        Model.others.Add(new RelevancesModel
+        {
+            DisplayName = type.GetDisplayName(),
+            Link = type switch
+            {
+                OutlinkType.Moegirl => "https://zh.moegirl.org.cn/" + value,
+                OutlinkType.VNDB => "https://vndb.org/" + value,
+                OutlinkType.YMGal => "https://www.ymgal.games/" + value,
+                OutlinkType.Bangumi => "https://bangumi.tv/" + Model.Type switch
+                {
+                    EntryType.Game => "subject/",
+                    EntryType.Role => "character/",
+                    EntryType.Staff => "person/",
+                    EntryType.ProductionGroup => "person/",
+                    _ => "subject/",
+                } + value,
+                OutlinkType.WikiData => "https://www.wikidata.org/wiki/" + value,
+                OutlinkType.BaiDu => "https://baike.baidu.com/item/" + value,
+                OutlinkType.ZhWikiPedia => "https://zh.wikipedia.org/wiki/" + value,
+                OutlinkType._2DFan => "https://galge.fun/subjects/" + value,
+                OutlinkType.Weibo => "https://weibo.com/u/" + value,
+                OutlinkType.Bilibili => "https://space.bilibili.com/" + value,
+                OutlinkType.AcFun => "https://www.acfun.cn/u/" + value,
+                OutlinkType.Zhihu => "https://www.zhihu.com/people/" + value,
+                OutlinkType.Afdian => "https://afdian.net/@" + value,
+                OutlinkType.Pixiv => "https://www.pixiv.net/users/" + value,
+                OutlinkType.Twitter => "https://twitter.com/" + value,
+                OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
+                OutlinkType.Facebook => "https://www.facebook.com/" + value,
+                _ => value
+            }
+        });
     }
 }

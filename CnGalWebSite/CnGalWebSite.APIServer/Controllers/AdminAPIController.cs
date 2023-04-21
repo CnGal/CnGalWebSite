@@ -657,97 +657,30 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entries = await _entryRepository.GetAll()
                     .Include(s => s.Information)
-                    .Include(s=>s.Releases)
-                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game&&s.Information.Any()&&s.Releases.Any()==false)
+                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Information.Any(s => s.Modifier == "相关网站" || s.DisplayName == "官网"))
                     .ToListAsync();
 
                 foreach (var item in entries)
                 {
-                    var steamId = item.Information.FirstOrDefault(s => s.DisplayName == "Steam平台Id")?.DisplayValue;
-                    var engine = item.Information.FirstOrDefault(s => s.DisplayName == "引擎")?.DisplayValue;
-                    var time = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue?.ToDate();
-                    var timeNote = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
-                    var gamePlatformTypesString = item.Information.FirstOrDefault(s => s.DisplayName == "游戏平台")?.DisplayValue;
-                    var gamePlatformTypes = new List<GamePlatformType>();
-                    var taptapId = item.Information.FirstOrDefault(s => s.DisplayName == "TapTap")?.DisplayValue?.Split("/")?.LastOrDefault();
-
-                    if (string.IsNullOrWhiteSpace(gamePlatformTypesString) == false)
+                    foreach (var infor in item.Information.Where(s => s.Modifier == "相关网站" || s.DisplayName == "官网"))
                     {
-                        var temp = gamePlatformTypesString.Split("、");
-                        foreach (var infor in temp)
+                        if (item.Outlinks.Any(s => s.Name.ToLower() == infor.DisplayName.ToLower()) == false)
                         {
-                            foreach (var itemEnum in Enum.GetValues(typeof(GamePlatformType)))
+                            item.Outlinks.Add(new Outlink
                             {
-                                var tempEnum = (GamePlatformType)itemEnum;
-                                if (infor == tempEnum.GetDisplayName())
-                                {
-                                    gamePlatformTypes.Add(tempEnum);
-                                }
-                            }
+                                Name = infor.DisplayName,
+                                Link = infor.DisplayValue,
+                            });
                         }
                     }
 
-                    if (string.IsNullOrWhiteSpace(steamId) == false)
-                    {
-                        item.Releases.Add(new GameRelease
-                        {
-                            Engine = engine,
-                            GamePlatformTypes = gamePlatformTypes.ToArray(),
-                            Link = steamId,
-                            Name = item.Name,
-                            PublishPlatformType = PublishPlatformType.Steam,
-                            Time = item.Releases.Any() ? null : time,
-                            TimeNote = item.Releases.Any() ? null : timeNote,
-                            Type = GameReleaseType.Official
-                        });
-                    }
-
-                    if (string.IsNullOrWhiteSpace(taptapId) == false)
-                    {
-                        item.Releases.Add(new GameRelease
-                        {
-                            Engine = engine,
-                            GamePlatformTypes = gamePlatformTypes.ToArray(),
-                            Link = taptapId,
-                            Name = item.Name,
-                            PublishPlatformType = PublishPlatformType.TapTap,
-                            Time = item.Releases.Any() ? null : time,
-                            TimeNote = item.Releases.Any() ? null : timeNote,
-                            Type = GameReleaseType.Official
-                        });
-                    }
-
-                    if (item.Releases.Any() == false && (string.IsNullOrWhiteSpace(timeNote) == false || time != null))
-                    {
-                        item.Releases.Add(new GameRelease
-                        {
-                            Engine = engine,
-                            GamePlatformTypes = gamePlatformTypes.ToArray(),
-                            Name = item.Name,
-                            PublishPlatformType = PublishPlatformType.Other,
-                            Time =  time,
-                            TimeNote = timeNote,
-                            Type = GameReleaseType.Official
-                        });
-                    }
-
                     var informations = item.Information.ToList();
-                    var names = new string[]
-                    {
-                        "Steam平台Id",
-                         "引擎",
-                         "发行时间",
-                         "发行时间备注",
-                         "游戏平台",
-                         "TapTap",
-                    };
-                    informations.RemoveAll(s => names.Contains(s.DisplayName));
+                    informations.RemoveAll(s => s.Modifier == "相关网站" || s.DisplayName == "官网");
                     item.Information = informations;
-
 
                     await _entryRepository.UpdateAsync(item);
 
-                    _logger.LogInformation("更新词条 - {name}({id}) 的发行列表", item.Name, item.Id);
+                    _logger.LogInformation("更新词条 - {name}({id}) 的外部链接", item.Name, item.Id);
                 }
 
                 return new Result { Successful = true };

@@ -58,7 +58,7 @@
     {
         try
         {
-            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"https://store.steampowered.com/app/{SteamId}?l=schinese");
+            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"api/steam/GetSteamHtml/{SteamId}");
 
             var document = new HtmlAgilityPack.HtmlDocument();
             document.LoadHtml(content);
@@ -145,7 +145,7 @@
                         Type = GameReleaseType.Official,
                     };
 
-                    if (AddInforModel.Releases.Any(s => s.PublishPlatformType == item.PublishPlatformType && s.PublishPlatformName == item.PublishPlatformName && s.Link == item.Link)==false)
+                    if (AddInforModel.Releases.Any(s => s.PublishPlatformType == item.PublishPlatformType && s.PublishPlatformName == item.PublishPlatformName && s.Link == item.Link && s.Name == item.Name) ==false)
                     {
                         AddInforModel.Releases.Add(item);
                     }

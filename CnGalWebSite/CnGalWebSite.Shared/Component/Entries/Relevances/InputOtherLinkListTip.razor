@@ -4,20 +4,19 @@
 <div class="@Class">
     <InputRelevanceListTitle Title="自定义链接" />
     <div class="row">
-        @for (int i = 0; i < Model.Count; i++)
+        @foreach (var item in Model.Where(s=> Check(s.DisplayName) ))
         {
-            int temp = i;
             <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
                 <div class="card p-3" style="background-color:transparent">
                     <div class="row">
                         <div class="col mt-2">
                             <p class="text-truncate text-center">
-                                @Model[i].DisplayName：@Model[i].DisPlayValue
+                                @item.DisplayName：@(string.IsNullOrWhiteSpace(item.DisPlayValue)? item.Link : item.DisPlayValue)
                             </p>
                         </div>
                         <div class="col-12 d-flex" style="justify-content: space-between;">
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(item))" Text="删除"></Button>
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(item))" Text="编辑" class="ms-1"></Button>
                         </div>
 
                     </div>
@@ -37,13 +36,26 @@
     [Parameter]
     public string Class { get; set; }
 
-    public async Task DeleteOther(int i)
+    public bool Check(string name)
     {
-        Model.RemoveAt(i);
+        var items = Enum.GetValues(typeof(OutlinkType));
+        foreach(var item in Enum.GetValues(typeof(OutlinkType)))
+        {
+            if(name.ToLower()== ((OutlinkType)item).GetDisplayName().ToLower())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public async Task DeleteOther(RelevancesModel item)
+    {
+        Model.Remove(item);
         StateHasChanged();
         await ToastService.Success("删除成功", "成功删除自定义链接");
     }
-    public async Task EditOther(int i)
+    public async Task EditOther(RelevancesModel item)
     {
         var items = Utility.GenerateEditorItems<RelevancesModel>();
         // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
@@ -52,12 +64,12 @@
         var option = new EditDialogOption<RelevancesModel>()
         {
             Title = "编辑自定义链接",
-            Model = Model[i],
+            Model = item,
             Items = items,
             OnEditAsync = async context =>
             {
-            // Trace.Log("保存按钮被点击");
-            Model[i] = (RelevancesModel)context.Model;
+                // Trace.Log("保存按钮被点击");
+                Model[Model.IndexOf(item)] = (RelevancesModel)context.Model;
                 StateHasChanged();
                 await ToastService.Success("修改成功", "成功修改自定义链接");
                 return true;
@@ -80,8 +92,8 @@
             Items = items,
             OnEditAsync = async context =>
             {
-            // Trace.Log("保存按钮被点击");
-            Model.Add((RelevancesModel)context.Model);
+                // Trace.Log("保存按钮被点击");
+                Model.Add((RelevancesModel)context.Model);
                 StateHasChanged();
                 await ToastService.Success("添加成功", "成功添加自定义链接");
                 return true;

@@ -35,7 +35,7 @@
         <tbody>
             @foreach (var item in Model.OrderBy(s => s.Time))
             {
-                <tr @key="@(item.Type.GetDisplayName()+item.Link)">
+                <tr @key="@(item.PublishPlatformType.GetDisplayName()+item.PublishPlatformName+item.Link+item.Name)">
                     <td style="overflow-wrap: anywhere; ">@item.Type.GetDisplayName()</td>
                     <td style="overflow-wrap: anywhere; ">@item.Name</td>
                     <td style="overflow-wrap: anywhere; ">
