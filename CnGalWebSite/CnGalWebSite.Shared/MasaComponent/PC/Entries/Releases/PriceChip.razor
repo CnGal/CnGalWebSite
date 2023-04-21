@@ -1,0 +1,25 @@
+﻿@inject IEventService _eventService
+
+@if (Model.StoreInfor.EvaluationCount > 0)
+{
+    @if (Model.StoreInfor.PriceNow > 0)
+    {
+        <MChip Small Color="info" Outlined Class="ma-1">
+            <MIcon Left Small>@IconType.Price.ToIconString()</MIcon>
+            <span>@("¥ "+(Model.StoreInfor.PriceNow / 100.0).ToString("0.00")) </span>
+        </MChip>
+    }
+    else
+    {
+        <MChip Small Color="success" Outlined Class="ma-1">
+            <MIcon Left Small>@IconType.Free.ToIconString()</MIcon>
+            <span>Free</span>
+        </MChip>
+    }
+
+}
+
+@code {
+    [Parameter]
+    public GameReleaseViewModel Model { get; set; }
+}
