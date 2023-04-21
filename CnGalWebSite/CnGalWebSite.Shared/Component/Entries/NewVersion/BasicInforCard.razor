@@ -138,31 +138,31 @@
                         {
                             @if (item.DisplayValue.Contains("bilibili.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("weibo.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Weibo" Text="微博：" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("youtube.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Youtube" Text="YouTube：" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("twitter.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Twitter" Text="Twitter：" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("facebook.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Facebook" Text="Facebook：" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("官方") || item.DisplayValue.Contains("官网"))
                             {
-                               <BasicInforAloneTip Icon="@IconType.Home" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                               <BasicInforAloneTip Icon="@IconType.Home" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                            }
                             else
                             {
-                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="ma-1" ItemProp="url" />
                             }
                         }
                     }
@@ -172,7 +172,7 @@
                         @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
                         {
                             var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
-                            <BasicInforAloneTip Icon="@IconType.Home" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon="@IconType.Home" Text="官网：" Url="@item.DisplayValue" Class="ma-1" />
                         }
                     }
                 </div>

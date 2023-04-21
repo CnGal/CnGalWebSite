@@ -34,6 +34,7 @@ using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -654,24 +655,99 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-
-                var entries = await _entryRepository.GetAll().AsNoTracking()
+                var entries = await _entryRepository.GetAll()
                     .Include(s => s.Information)
-                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && s.PubulishTime != null && s.Information.Any(s => s.DisplayName == "发行时间"))
-                    .Select(s => new
-                    {
-                        s.Id,
-                        s.Name,
-                        PubulishTime= s.PubulishTime.Value,
-                        s.Information
-                    })
+                    .Include(s=>s.Releases)
+                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game&&s.Information.Any()&&s.Releases.Any()==false)
                     .ToListAsync();
 
-                foreach(var item in  entries)
+                foreach (var item in entries)
                 {
-                    var PubulishTime = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue?.ToDate();
-                    await _entryRepository.GetAll().Where(s => s.Id == item.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.PubulishTime, b => PubulishTime));
-                    _logger.LogInformation("将词条 - {name}({id}) 的发行时间从 {before} 修改为 {after}", item.Name, item.Id, item.PubulishTime.ToString("yyyy-MM-dd"), PubulishTime == null ? "null" : PubulishTime.Value.ToString("yyyy-MM-dd"));
+                    var steamId = item.Information.FirstOrDefault(s => s.DisplayName == "Steam平台Id")?.DisplayValue;
+                    var engine = item.Information.FirstOrDefault(s => s.DisplayName == "引擎")?.DisplayValue;
+                    var time = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue?.ToDate();
+                    var timeNote = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
+                    var gamePlatformTypesString = item.Information.FirstOrDefault(s => s.DisplayName == "游戏平台")?.DisplayValue;
+                    var gamePlatformTypes = new List<GamePlatformType>();
+                    var taptapId = item.Information.FirstOrDefault(s => s.DisplayName == "TapTap")?.DisplayValue?.Split("/")?.LastOrDefault();
+
+                    if (string.IsNullOrWhiteSpace(gamePlatformTypesString) == false)
+                    {
+                        var temp = gamePlatformTypesString.Split("、");
+                        foreach (var infor in temp)
+                        {
+                            foreach (var itemEnum in Enum.GetValues(typeof(GamePlatformType)))
+                            {
+                                var tempEnum = (GamePlatformType)itemEnum;
+                                if (infor == tempEnum.GetDisplayName())
+                                {
+                                    gamePlatformTypes.Add(tempEnum);
+                                }
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(steamId) == false)
+                    {
+                        item.Releases.Add(new GameRelease
+                        {
+                            Engine = engine,
+                            GamePlatformTypes = gamePlatformTypes.ToArray(),
+                            Link = steamId,
+                            Name = item.Name,
+                            PublishPlatformType = PublishPlatformType.Steam,
+                            Time = item.Releases.Any() ? null : time,
+                            TimeNote = item.Releases.Any() ? null : timeNote,
+                            Type = GameReleaseType.Official
+                        });
+                    }
+
+                    if (string.IsNullOrWhiteSpace(taptapId) == false)
+                    {
+                        item.Releases.Add(new GameRelease
+                        {
+                            Engine = engine,
+                            GamePlatformTypes = gamePlatformTypes.ToArray(),
+                            Link = taptapId,
+                            Name = item.Name,
+                            PublishPlatformType = PublishPlatformType.TapTap,
+                            Time = item.Releases.Any() ? null : time,
+                            TimeNote = item.Releases.Any() ? null : timeNote,
+                            Type = GameReleaseType.Official
+                        });
+                    }
+
+                    if (item.Releases.Any() == false && (string.IsNullOrWhiteSpace(timeNote) == false || time != null))
+                    {
+                        item.Releases.Add(new GameRelease
+                        {
+                            Engine = engine,
+                            GamePlatformTypes = gamePlatformTypes.ToArray(),
+                            Name = item.Name,
+                            PublishPlatformType = PublishPlatformType.Other,
+                            Time =  time,
+                            TimeNote = timeNote,
+                            Type = GameReleaseType.Official
+                        });
+                    }
+
+                    var informations = item.Information.ToList();
+                    var names = new string[]
+                    {
+                        "Steam平台Id",
+                         "引擎",
+                         "发行时间",
+                         "发行时间备注",
+                         "游戏平台",
+                         "TapTap",
+                    };
+                    informations.RemoveAll(s => names.Contains(s.DisplayName));
+                    item.Information = informations;
+
+
+                    await _entryRepository.UpdateAsync(item);
+
+                    _logger.LogInformation("更新词条 - {name}({id}) 的发行列表", item.Name, item.Id);
                 }
 
                 return new Result { Successful = true };
@@ -692,7 +768,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<ServerRealTimeOverviewModel>> GetServerRealTimeDataOverview()
         {
-            return SystemEnvironmentHelper.GetServerRealTimeDataOverview();
+            return await Task.FromResult(SystemEnvironmentHelper.GetServerRealTimeDataOverview());
         }
 
         /// <summary>
@@ -702,7 +778,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<ServerStaticOverviewModel>> GetServerStaticDataOverview()
         {
-            return SystemEnvironmentHelper.GetServerStaticDataOverview();
+            return await Task.FromResult(SystemEnvironmentHelper.GetServerStaticDataOverview());
         }
 
         /// <summary>

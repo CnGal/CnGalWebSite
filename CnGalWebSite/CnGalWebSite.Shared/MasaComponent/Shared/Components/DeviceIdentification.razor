@@ -34,7 +34,7 @@
             else
             {
                 var client = await _httpService.GetClientAsync();
-                Model.Ip = await client.GetStringAsync("api/account/GetIp");
+                Model.Ip = await client.GetStringAsync(ToolHelper.WebApiPath+"api/account/GetIp");
             }
 
         }

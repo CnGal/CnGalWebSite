@@ -1,0 +1,189 @@
+﻿@inject IHttpService _httpService
+@inject IFileUploadService _fileUploadService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    游戏在Steam上发布？尝试 <a class="info--text fw-bold" @onclick="OnClick">导入Steam信息</a>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+<MDialog @bind-Value="Dialog"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            导入Steam信息
+        </MCardTitle>
+        <MCardText>
+            自动抓取Steam商店页面的信息，请注意“制作组”和“发行商”需要根据站内信息进行修改
+        </MCardText>
+
+        <MCardText Class="pb-0">
+            <MTextField @bind-Value="SteamId" Label="SteamId" Type="number" />
+        </MCardText>
+        <MCardActions Class="pb-6 pe-6 ps-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="SynchronousSteamInfor" Icon="mdi-check" Color="success" TextStyle />
+        </MCardActions>
+
+    </MCard>
+</MDialog>
+
+@code {
+    [Parameter]
+    public EditMainViewModel MainModel { get; set; }
+    [Parameter]
+    public EditAddInforViewModel AddInforModel { get; set; }
+    [Parameter]
+    public EditMainPageViewModel MainPageModel { get; set; }
+    [Parameter]
+    public EditImagesViewModel ImagesModel { get; set; }
+    [Parameter]
+    public EventCallback OnSynchronized { get; set; }
+
+    bool Dialog { get; set; }
+    string SteamId { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void OnClick()
+    {
+        Dialog = true;
+        StateHasChanged();
+    }
+
+    public string ClearString(string str)
+    {
+        return str?.Replace("\t", "")?.Replace("\n", "")?.Replace("\r", "");
+    }
+
+    public async Task SynchronousSteamInfor()
+    {
+        try
+        {
+            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"https://store.steampowered.com/app/{SteamId}?l=schinese");
+
+            var document = new HtmlAgilityPack.HtmlDocument();
+            document.LoadHtml(content);
+
+            //游戏名
+            var name = document.GetElementbyId("appHubAppName")?.InnerText;
+            //主图
+            var mainImage = document.GetElementbyId("gameHeaderImageCtn")?.ChildNodes.FirstOrDefault(s => s.HasClass("game_header_image_full"))?.GetAttributeValue("src", null);
+            var glance_ctn = document.GetElementbyId("game_highlights")?.ChildNodes.FirstOrDefault(s => s.HasClass("rightcol"))?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn"));
+            //简介
+            var briefIntroduction = ClearString(glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("game_description_snippet"))?.InnerText)?.Replace(" ", "");
+            //发行日期
+            var timeNote = glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn_responsive_left"))?.ChildNodes.FirstOrDefault(s => s.HasClass("release_date"))?.ChildNodes.FirstOrDefault(s => s.HasClass("date"))?.InnerText?.Replace(" ", "");
+            var time = timeNote.ToDate();
+            //开发商
+            var group = ClearString(document.GetElementbyId("developers_list")?.InnerText);
+            //发行商
+            var publisher = ClearString(glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn_responsive_left"))?.ChildNodes.FirstOrDefault(s => s.HasClass("dev_row") && s.ChildNodes.Any(s => s.HasClass("summary") && s.Id != "developers_list"))?.ChildNodes.FirstOrDefault(s => s.HasClass("summary"))?.InnerText);
+            //相册
+            var imagesNode = document.GetElementbyId("highlight_strip_scroll");
+            var images = imagesNode?.ChildNodes.Where(s => s.ChildNodes.Count == 3).Select(s =>
+            {
+                var image = s.ChildNodes.FirstOrDefault(s => s.Name == "img")?.GetAttributeValue("src", null)?.Split('?')?.First();
+                var temp = image?.Split('.');
+                return image.Replace("." + temp[^2], "");
+            });
+
+            var html = document.GetElementbyId("game_area_description")?.InnerHtml?.Replace("\t","");
+            var mainPage = "";
+            if (string.IsNullOrWhiteSpace(html) == false)
+            {
+                var converter = new ReverseMarkdown.Converter();
+                mainPage = converter.Convert(html.Replace("<h2>关于这款游戏</h2>", ""));
+                mainPage += $"\n > 以上介绍转载自Steam商店 https://store.steampowered.com/app/{SteamId}";
+            }
+
+            //不覆盖原有信息的情况下同步Steam信息
+            //主要信息
+            if(MainModel!=null)
+            {
+                if (string.IsNullOrWhiteSpace(MainModel.MainPicture) && string.IsNullOrWhiteSpace(mainImage) == false)
+                {
+                    string result = await _fileUploadService.TransformImageAsync(mainImage);
+                    if (string.IsNullOrWhiteSpace(result) == false)
+                    {
+                        MainModel.MainPicture = result;
+                    }
+                }
+                if (string.IsNullOrWhiteSpace(MainModel.Name) && string.IsNullOrWhiteSpace(name) == false)
+                {
+                    MainModel.Name = name;
+                }
+                if (string.IsNullOrWhiteSpace(MainModel.DisplayName) && string.IsNullOrWhiteSpace(name) == false)
+                {
+                    MainModel.DisplayName = name;
+                }
+                if (string.IsNullOrWhiteSpace(MainModel.BriefIntroduction) && string.IsNullOrWhiteSpace(briefIntroduction) == false)
+                {
+                    MainModel.BriefIntroduction = briefIntroduction;
+                }
+
+            }
+            //附加信息
+            if(AddInforModel!=null)
+            {
+                if (string.IsNullOrWhiteSpace(AddInforModel.Publisher) && string.IsNullOrWhiteSpace(publisher) == false)
+                {
+                    AddInforModel.Publisher = publisher;
+                }
+                if (string.IsNullOrWhiteSpace(AddInforModel.ProductionGroup) && string.IsNullOrWhiteSpace(group) == false)
+                {
+                    AddInforModel.ProductionGroup = group;
+                }
+                if (string.IsNullOrWhiteSpace(timeNote) == false || string.IsNullOrWhiteSpace(publisher) == false || string.IsNullOrWhiteSpace(group) == false)
+                {
+                    var item = new EditReleaseModel
+                    {
+                        Link = SteamId,
+                        GamePlatformTypes = new List<GamePlatformType> { GamePlatformType.Windows },
+                        Name = name,
+                        PublishPlatformType = PublishPlatformType.Steam,
+                        Time = time == null ? null : time.Value.AddDays(1),
+                        TimeNote = time == null ? timeNote : null,
+                        Type = GameReleaseType.Official,
+                    };
+
+                    if (AddInforModel.Releases.Any(s => s.PublishPlatformType == item.PublishPlatformType && s.PublishPlatformName == item.PublishPlatformName && s.Link == item.Link)==false)
+                    {
+                        AddInforModel.Releases.Add(item);
+                    }
+
+                }
+            }
+            //相册
+            if(ImagesModel!=null)
+            {
+                if (images.Any())
+                {
+                    foreach (var item in images)
+                    {
+                        ImagesModel.Images.Add(new EditImageAloneModel
+                        {
+                            Image = await _fileUploadService.TransformImageAsync(item)
+                        });
+                    }
+                }
+                ImagesModel.Images.RemoveAll(s => string.IsNullOrWhiteSpace(s.Image));
+            }
+            //主页
+            if(MainPageModel!=null)
+            {
+                if (string.IsNullOrWhiteSpace(MainPageModel.Context) && string.IsNullOrWhiteSpace(mainPage) == false)
+                {
+                    MainPageModel.Context = mainPage;
+                }
+            }
+
+            await OnSynchronized.InvokeAsync();
+            Dialog = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "导入Steam信息失败");
+        }
+
+    }
+}

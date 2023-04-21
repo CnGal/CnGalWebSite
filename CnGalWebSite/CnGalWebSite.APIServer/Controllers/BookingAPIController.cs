@@ -145,9 +145,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 catch(Exception ex)
                 {
                     _logger.LogError(ex, "BookingId:{id} User:{id} LotteryId:{id},自动参与抽奖失败", booking.Id, user.Id, lottery.Id);
-                    return new Result { Successful = false, Error = ex.Message };
+                    //return new Result { Successful = false, Error = ex.Message };
                 }
-              
             }
 
             try

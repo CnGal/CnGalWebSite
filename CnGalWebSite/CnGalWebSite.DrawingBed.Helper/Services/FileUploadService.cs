@@ -170,8 +170,7 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
             {
                 var result = await _httpService.PostAsync<UploadResult, UploadResult>($"{_baseUrl}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new UploadResult());
 
-
-                _logger.LogInformation("转存图片 {result}，url：{url}", result.Uploaded ? "成功" : "失败", result.Url);
+                _logger.LogInformation("转存图片 {result}，url：{url}", result.Uploaded ? "成功" : "失败", result.Uploaded ? result.Url:result.OriginalUrl);
 
                 if (result.Uploaded)
                 {

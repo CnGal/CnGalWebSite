@@ -40,6 +40,10 @@
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
+        @if (Model.Type == EntryType.Game)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.SynchronousSteamInforCard AddInforModel="Model.AddInfor" ImagesModel="Model.Images" MainModel="Model.Main" MainPageModel="Model.MainPage" OnSynchronized="OnSynchronized" />
+        }
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建词条" Icon="@IconType.Entry.ToIconString()" Outline>
 
@@ -135,9 +139,14 @@
         }
     }
 
+    public void OnSynchronized()
+    {
+        StateHasChanged();
+    }
+
     public void TypeChanged(EntryType type)
     {
-        Model.AddInfor.Type = Model.Relevances.Type = type;
+        Model.Type= Model.AddInfor.Type = Model.Relevances.Type = type;
         StateHasChanged();
 
     }

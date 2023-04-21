@@ -993,7 +993,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         temp.Add(new KeyValueModel
                         {
                             DisplayName = "发行时间",
-                            DisplayValue = item.Time.Value.ToString("yyyy年MM月dd日")
+                            DisplayValue = item.Time.Value.ToString("yyyy年M月d日")
                         });
                     }
                     if (string.IsNullOrWhiteSpace(item.Engine) == false)

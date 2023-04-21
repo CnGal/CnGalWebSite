@@ -48,6 +48,11 @@ else
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
+        @if (Model.Type == EntryType.Game)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.SynchronousSteamInforCard MainPageModel="Model" OnSynchronized="OnSynchronized" />
+        }
+
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Entry.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainPageCard Model="Model" Class="mb-4" />
@@ -92,6 +97,10 @@ else
             }
         }
     }
+    public void OnSynchronized()
+    {
+        StateHasChanged();
+    }
 
     private async Task OnSubmit()
     {
@@ -124,7 +133,7 @@ else
         Model = model;
         isReady = true;
         StateHasChanged();
-        
+
     }
 
 }
