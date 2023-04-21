@@ -74,7 +74,7 @@
 <div>
     @if (string.IsNullOrWhiteSpace(Model.Link) == false)
     {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Link" Text="链接：" Url="@GetLink()" Class="ma-1" ItemProp="url" />
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Link" Text="链接：" Url="@Model.GetLink()" Class="ma-1" ItemProp="url" />
     }
     @if (string.IsNullOrWhiteSpace(Model.Name) == false)
     {
@@ -119,22 +119,6 @@
             PublishPlatformType.AppStore => "mdi-apple",
             PublishPlatformType.GooglePlay => "mdi-google-play",
             _ => "mdi-pine-tree"
-        };
-    }
-
-
-    public string GetLink()
-    {
-        return Model.PublishPlatformType switch
-        {
-            PublishPlatformType.Steam => "https://store.steampowered.com/app/" + Model.Link,
-            PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + Model.Link,
-            PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + Model.Link,
-            PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" + Model.Link,
-            PublishPlatformType.TapTap => "https://www.taptap.cn/app/" + Model.Link,
-            PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + Model.Link,
-            PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{Model.Link}.html",
-            _ => Model.Link
         };
     }
 }
