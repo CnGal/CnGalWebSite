@@ -1,0 +1,22 @@
+﻿@inject IEventService _eventService
+
+@if (Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
+{
+    <MChip Small Color="success" Outlined Class="ma-1">
+        <MIcon Left Small>@IconType.Published.ToIconString()</MIcon>
+      已发布
+    </MChip>
+
+}
+else
+{
+    <MChip Small Color="error" Outlined Class="ma-1">
+        <MIcon Left Small>@IconType.UnPublished.ToIconString()</MIcon>
+        未发布
+    </MChip>
+}
+
+@code {
+    [Parameter]
+    public GameReleaseViewModel Model { get; set; }
+}
