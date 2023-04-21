@@ -252,7 +252,7 @@
     {
         get
         {
-            return (EntryView.Information.Count == 0 && (EntryView.Releases.Any() || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
+            return (EntryView.Information.Count == 0 && (EntryView.Releases.Any()==false || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
                       ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }
