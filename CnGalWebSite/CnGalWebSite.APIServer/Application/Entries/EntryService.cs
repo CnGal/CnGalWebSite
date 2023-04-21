@@ -446,7 +446,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var isSame = false;
                 foreach (var item in entry.Releases)
                 {
-                    if (item.PublishPlatformType == infor.PublishPlatformType && item.PublishPlatformName == infor.PublishPlatformName && item.Link == infor.Link)
+                    if (item.PublishPlatformType == infor.PublishPlatformType && item.PublishPlatformName == infor.PublishPlatformName && item.Link == infor.Link && item.Name == infor.Name)
                     {
                         if (infor.IsDelete == true)
                         {
@@ -454,7 +454,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         }
                         else
                         {
-                            item.Name = infor.Name;
                             item.Type = infor.Type;
                             item.Time = infor.Time;
                             item.TimeNote = infor.TimeNote;
@@ -1979,11 +1978,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var isSame = false;
                 foreach (var item in entryAddInfor.Releases)
                 {
-                    if (item.PublishPlatformName == infor.PublishPlatformName && item.PublishPlatformType == infor.PublishPlatformType && item.Link == infor.Link)
+                    if (item.PublishPlatformName == infor.PublishPlatformName && item.PublishPlatformType == infor.PublishPlatformType && item.Link == infor.Link && item.Name == infor.Name)
                     {
-                        if (item.Name != infor.Name || item.Type != infor.Type || item.Time != infor.Time || item.TimeNote != infor.TimeNote || item.Engine != infor.Engine || item.GamePlatformTypes.SequenceEqual(infor.GamePlatformTypes)==false)
+                        if ( item.Type != infor.Type || item.Time != infor.Time || item.TimeNote != infor.TimeNote || item.Engine != infor.Engine || item.GamePlatformTypes.SequenceEqual(infor.GamePlatformTypes)==false)
                         {
-                            item.Name = infor.Name;
                             item.Type = infor.Type;
                             item.Time = infor.Time;
                             item.TimeNote = infor.TimeNote;
@@ -2208,7 +2206,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             //循环查找外部链接是否相同
-            foreach (var infor in newEntry.Outlinks)
+            foreach (var infor in newEntry.Outlinks.ToList().Purge())
             {
                 var isSame = false;
                 foreach (var item in entryRelevances.Relevances.Where(s => s.Type == RelevancesType.Outlink))
@@ -2501,15 +2499,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                     break;
                             }
                         }
-                        else if (item.Modifier == "相关网站")
-                        {
-                            var socialPlatform = new SocialPlatform
-                            {
-                                Name = item.DisplayName,
-                                Link = item.DisplayValue
-                            };
-                            model.SocialPlatforms.Add(socialPlatform);
-                        }
                     }
 
                     //处理Staff信息
@@ -2559,66 +2548,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                     break;
                             }
                         }
-                        else if (item.Modifier == "相关网站")
-                        {
-                            if (item.DisplayValue.Contains("weibo.com"))
-                            {
-                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("bilibili.com"))
-                            {
-                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("acfun.cn"))
-                            {
-                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("zhihu.com"))
-                            {
-                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("afdian.net"))
-                            {
-                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("pixiv.net"))
-                            {
-                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("twitter.com"))
-                            {
-                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("youtube.com"))
-                            {
-                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("facebook.com"))
-                            {
-                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else
-                            {
-                                var socialPlatform = new SocialPlatform
-                                {
-                                    Name = item.DisplayName,
-                                    Link = item.DisplayValue
-                                };
-
-                                model.SocialPlatforms.Add(socialPlatform);
-                            }
-
-                        }
-
                     }
                     break;
                 case EntryType.Role:
@@ -2684,18 +2613,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
                         }
-                        else if (item.Modifier == "相关网站")
-                        {
-                            var socialPlatform = new SocialPlatform
-                            {
-                                Name = item.DisplayName,
-                                Link = item.DisplayValue
-                            };
-
-                            model.SocialPlatforms.Add(socialPlatform);
-
-                        }
-
                     }
 
                     //处理声优信息
@@ -2714,70 +2631,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                     model.RealName = item.DisplayValue;
                                     break;
                             }
-
-                        }
-                        else if (item.Modifier == "相关网站")
-                        {
-                            if (item.DisplayValue.Contains("weibo.com"))
-                            {
-                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("bilibili.com"))
-                            {
-                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("acfun.cn"))
-                            {
-                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("zhihu.com"))
-                            {
-                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("afdian.net"))
-                            {
-                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("pixiv.net"))
-                            {
-                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("twitter.com"))
-                            {
-                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("youtube.com"))
-                            {
-                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else if (item.DisplayValue.Contains("facebook.com"))
-                            {
-                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
-
-                            }
-                            else
-                            {
-                                var socialPlatform = new SocialPlatform
-                                {
-                                    Name = item.DisplayName,
-                                    Link = item.DisplayValue
-                                };
-
-                                model.SocialPlatforms.Add(socialPlatform);
-                            }
-
                         }
                     }
-
-
                     break;
             }
 
@@ -2931,57 +2786,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
             foreach (var item in entry.Videos)
             {
-              
-                        videos.Add(new RelevancesModel
-                        {
-                            DisplayName = item.Name
-                        });
-                     
+                videos.Add(new RelevancesModel
+                {
+                    DisplayName = item.Name
+                });
             }
             foreach (var item in entry.Outlinks)
             {
-                if (item.Link.Contains("zh.moegirl.org.cn"))
+                others.Add(new RelevancesModel
                 {
-                    model.MoegirlName = HttpUtility.UrlDecode(item.Link.Replace("https://zh.moegirl.org.cn/", "").Split('/').FirstOrDefault());
-                }
-                else if (item.Link.Contains("vndb.org"))
-                {
-                    model.VNDBId = item.Link.Replace("https://vndb.org/", "").Split('/').FirstOrDefault();
-                }
-                else if (item.Link.Contains("www.ymgal.com") || item.Link.Contains("www.ymgal.games"))
-                {
-                    model.YMGalId = item.Link.Split('/').LastOrDefault();
-                }
-                else if (item.Link.Contains("bangumi.tv")|| item.Link.Contains("bgm.tv"))
-                {
-                    model.BangumiId = item.Link.Split('/').LastOrDefault();
-                }
-                else if (item.Link.Contains("wikidata.org"))
-                {
-                    model.WikiDataId = item.Link.Replace("https://www.wikidata.org/wiki/", "").Split('/').FirstOrDefault();
-                }
-                else if (item.Link.Contains("galge.fun") || item.Link.Contains("www.2dfan.com"))
-                {
-                    model._2DFanId = item.Link.Replace("https://galge.fun/subjects/", "").Replace("https://www.2dfan.com/subjects/", "").Split('/').FirstOrDefault();
-                }
-                else if (item.Link.Contains("baike.baidu.com"))
-                {
-                    model.BaiDuName = HttpUtility.UrlDecode(item.Link.Replace("https://baike.baidu.com/item/", "").Split('/').FirstOrDefault());
-                }
-                else if (item.Link.Contains("zh.wikipedia.org"))
-                {
-                    model.ZhWikiPediaName = HttpUtility.UrlDecode(item.Link.Replace("https://zh.wikipedia.org/wiki/", "").Split('/').FirstOrDefault());
-                }
-                else
-                {
-                    others.Add(new RelevancesModel
-                    {
-                        DisplayName = item.Name,
-                        DisPlayValue = item.BriefIntroduction,
-                        Link = item.Link
-                    });
-                }
-
+                    DisplayName = item.Name,
+                    DisPlayValue = item.BriefIntroduction,
+                    Link = item.Link
+                });
             }
 
             model.Roles = roles;
@@ -3188,93 +3005,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "姓名", DisplayValue = model.RealName });
                     break;
             }
-            //序列化相关网站
-
-            //加载在基本信息中的网站
-            if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "微博",
-                    Link = "https://weibo.com/u/" + model.WeiboId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "Bilibili",
-                    Link = "https://space.bilibili.com/" + model.BilibiliId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "AcFun",
-                    Link = "https://www.acfun.cn/u/" + model.AcFunId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "知乎",
-                    Link = "https://www.zhihu.com/people/" + model.ZhihuId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "爱发电",
-                    Link = "https://afdian.net/@" + model.AfdianId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.PixivId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "Pixiv",
-                    Link = "https://www.pixiv.net/users/" + model.PixivId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "Twitter",
-                    Link = "https://twitter.com/" + model.TwitterId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "YouTube",
-                    Link = "https://www.youtube.com/channel/" + model.YouTubeId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
-            {
-                model.SocialPlatforms.Add(new SocialPlatform
-                {
-                    Name = "Facebook",
-                    Link = "https://www.facebook.com/" + model.FacebookId
-                });
-            }
-
-
-            //遍历一遍当前视图中 相关网站
-            foreach (var item in model.SocialPlatforms)
-            {
-                newEntry.Information.Add(new BasicEntryInformation
-                {
-                    Modifier = "相关网站",
-                    DisplayName = item.Name,
-                    DisplayValue = item.Link
-                });
-            }
 
             var tempList = newEntry.Information.ToList();
             tempList.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayValue));
@@ -3317,82 +3047,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos)
         {
-            //加载在关联信息中的网站
-            if (string.IsNullOrWhiteSpace(model.MoegirlName) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "萌娘百科",
-                    Link = "https://zh.moegirl.org.cn/" + HttpUtility.UrlDecode(model.MoegirlName)
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(model.VNDBId) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "VNDB",
-                    Link = "https://vndb.org/" + model.VNDBId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.YMGalId) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "月幕Galgame",
-                    Link = "https://www.ymgal.games/" + model.YMGalId
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(model.BangumiId) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "Bangumi",
-                    Link = "https://bangumi.tv/" +model.Type switch
-                    {
-                        EntryType.Game => "subject/",
-                        EntryType.Role => "character/",
-                        EntryType.Staff => "person/",
-                        EntryType.ProductionGroup => "person/",
-                        _ => "subject/",
-                    } + model.BangumiId
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(model.WikiDataId) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "WikiData",
-                    Link = "https://www.wikidata.org/wiki/" + model.WikiDataId
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.BaiDuName) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "百度百科",
-                    Link = "https://baike.baidu.com/item/" + HttpUtility.UrlDecode(model.BaiDuName)
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.ZhWikiPediaName) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "中文维基百科",
-                    Link = "https://zh.wikipedia.org/wiki/" + HttpUtility.UrlDecode(model.ZhWikiPediaName)
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model._2DFanId) == false)
-            {
-                model.others.Add(new RelevancesModel
-                {
-                    DisplayName = "2DFan",
-                    Link = "https://galge.fun/subjects/" + model._2DFanId
-                });
-            }
-
             newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
             newEntry.Videos = videos;

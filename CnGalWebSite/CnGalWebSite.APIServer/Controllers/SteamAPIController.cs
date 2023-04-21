@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -27,11 +28,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<SteamInfor, int> _steamInforRepository;
         private readonly IAppHelper _appHelper;
+        private readonly IHttpService _httpService;
         private readonly ISteamInforService _steamInforService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
         public SteamAPIController(IRepository<SteamInfor, int> steamInforRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository,
-        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository)
+        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository, IHttpService httpService)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -39,6 +41,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforService = steamInforService;
             _userRepository = userRepository;
             _tagRepository = tagRepository;
+            _httpService = httpService;
         }
 
         [AllowAnonymous]
@@ -55,6 +58,14 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var model = await _steamInforService.GetSteamInforAsync(steamId);
             return (model == null) ? NotFound() : model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{steamId}")]
+        public async Task<string> GetSteamHtml(int steamId)
+        {
+            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"https://store.steampowered.com/app/{steamId}?l=schinese");
+            return content;
         }
 
         [HttpGet]

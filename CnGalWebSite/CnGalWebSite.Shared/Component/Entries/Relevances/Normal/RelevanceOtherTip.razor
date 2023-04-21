@@ -1,133 +1,119 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-<TabLink target="_blank" Url="@Model.Link.Replace("www.ymgal.com","www.ymgal.games")" class="a-font-color" rel="noreferrer">
+<a target="_blank" href="@GetLink()" class="a-font-color" rel="noreferrer">
     <div class="div-shadow rounded  bg-opacity aticle-home-layout p-3 h-100">
         <div class="" style="height: 100%; align-content: center;display:flex;">
-            @{
-                string imageStr = Model.Image;
-                if (string.IsNullOrWhiteSpace(imageStr))
+            @if (string.IsNullOrWhiteSpace(GetImage()))
+            {
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <header class="text-truncate-2">
+                        <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
+                    </header>
+                    <span class="text-truncate-3">
+                        @GetValue()
+                    </span>
+                </div>
+            }
+            else
+            {
+                if (_dataCatcheService.IsApp)
                 {
-                    //尝试匹配标题
-                    if (Model.DisplayName == "萌娘百科")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/Moegirl.png";
-                    }
-                    else if (Model.DisplayName == "Bangumi")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/Bangumi.png";
-                    }
-                    else if (Model.DisplayName == "百度百科")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/BaiDuWiki.png";
-                    }
-                    else if (Model.DisplayName == "2DFan")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/2DFan.png";
-                    }
-                    //else if (Model.DisplayName == "VNDB")
-                    //{
-                    //    imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/VNDB.png";
-                    //}
-                    else if (Model.DisplayName == "App Store")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/AppStore.png";
-                    }
-                    else if (Model.DisplayName == "Google Play")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/GooglePlay.png";
-                    }
-                    else if (Model.DisplayName == "方块游戏")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/CraftGame.png";
-                    }
-                    else if (Model.DisplayName == "DLsite")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/DLsite.png";
-                    }
-                    else if (Model.DisplayName.Contains("维基百科"))
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/Wiki.png";
-                    }
-                    else if (Model.DisplayName.Contains("月幕"))
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/YMGal.png";
-                    }
-                    else if (Model.DisplayName == "TapTap")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/TapTap.png";
-                    }
-                    else if (Model.DisplayName.Contains("bilibili"))
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/bilibili.png";
-                        Model.DisplayName = "前往 bilibili 观看";
-                    }
-                    else if (Model.DisplayName.ToLower() == "bilibili" || Model.DisplayName.ToLower() == "b站")
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/bilibili.png";
-                    }
-                    else if (Model.DisplayName == "WikiData" || Model.DisplayName == "Wikidata" || Model.DisplayName == "维基数据" )
-                    {
-                        imageStr = "https://res.cngal.org/_content/CnGalWebSite.Shared/images/Wikidata.png";
-
-                    }
-                }
-                if(Model.DisplayName== "VNDB")
-                {
-                    Model.DisplayValue = "VNDB.org力争成为一个关于视觉小说的全面的信息数据库";
-                }
-
-                if (string.IsNullOrWhiteSpace(imageStr))
-                {
-                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style=" display: flex; flex-direction: column; justify-content: center;">
+                        <img src="@GetImage()" style="width: 50px;" />
+                    </div>
+                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
                         <header class="text-truncate-2">
-                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
                         </header>
                         <span class="text-truncate-3">
-                            @Model.DisplayValue
+                            @GetValue()
                         </span>
                     </div>
                 }
                 else
                 {
-                    if (_dataCatcheService.IsApp)
-                    {
-                        <div style=" display: flex; flex-direction: column; justify-content: center;">
-                            <img src="@imageStr" style="width: 50px;" />
-                        </div>
-                        <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                            <header class="text-truncate-2">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                            </header>
-                            <span class="text-truncate-3">
-                                @Model.DisplayValue
-                            </span>
-                        </div>
-                    }
-                    else
-                    {
-                        <div style=" display: flex; flex-direction: column; justify-content: center;">
-                            <img src="@imageStr" style="width: 50px;" />
-                        </div>
-                        <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                            <header class="text-truncate-2">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                            </header>
-                            <span class="text-truncate-3">
-                                @Model.DisplayValue
-                            </span>
-                        </div>
-                    }
-
+                    <div style=" display: flex; flex-direction: column; justify-content: center;">
+                        <img src="@GetImage()" style="width: 50px;" />
+                    </div>
+                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                        <header class="text-truncate-2">
+                            <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
+                        </header>
+                        <span class="text-truncate-3">
+                            @GetValue()
+                        </span>
+                    </div>
                 }
             }
-
         </div>
     </div>
 
 
-</TabLink>
+</a>
 
 @code {
     [Parameter]
     public RelevancesKeyValueModel Model { get; set; }
+    [Parameter]
+    public bool IsVideo { get; set; }
+
+    public string GetImage()
+    {
+        var image= Model.DisplayName switch
+        {
+            "萌娘百科" => "Moegirl.png",
+            "Bangumi" => "Bangumi.png",
+            "百度百科" => "BaiDuWiki.png",
+            "2DFan" => "2DFan.png",
+            "中文维基百科" => "Wiki.png",
+            "月幕Galgame" => "YMGal.png",
+            "Bilibili" => "bilibili.png",
+            "WikiData" => "Wikidata.png",
+            "微博" => "weibo.png",
+            "AcFun" => "AcFun.png",
+            "知乎" => "zhihu.png",
+            "爱发电" => "Afdian.png",
+            "Pixiv" => "pixiv.png",
+            "Twitter" => "twitter.png",
+            "YouTube" => "Youtube.png",
+            "Facebook" => "Facebook.png",
+            "官网"=> "SmartHome.png",
+            _ => null
+        };
+
+        if(string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
+    public string GetValue()
+    {
+        return Model.DisplayName switch
+        {
+            "VNDB" => "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
+            _ => Model.DisplayValue
+        };
+    }
+
+    public string GetName()
+    {
+        return Model.DisplayName switch
+        {
+            "Bilibili" => IsVideo ? "前往 bilibili 观看" : Model.DisplayName,
+            _ => Model.DisplayName
+        };
+    }
+
+
+    public string GetLink()
+    {
+        return Model.DisplayName switch
+        {
+            "月幕Galgame" => Model.Link.Replace("www.ymgal.com", "www.ymgal.games"),
+            _ => Model.Link
+        };
+    }
 }
