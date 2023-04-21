@@ -1549,7 +1549,8 @@ namespace CnGalWebSite.APIServer.Controllers
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Year == year && s.PubulishTime.Value.Month == month)
-                .Where(s => s.Information.Where(s => s.DisplayName == "发行时间备注").Any(s => string.IsNullOrWhiteSpace(s.DisplayValue) == false) == false || s.PubulishTime < time)
+                .Where(s => s.Releases.Any(s => s.Type == GameReleaseType.Official))
+                .Where(s => string.IsNullOrWhiteSpace(s.Releases.OrderBy(s => s.Time).First(s => s.Type == GameReleaseType.Official).TimeNote) || s.PubulishTime < time)
                 .ToListAsync();
 
             var model = new List<EntryInforTipViewModel>();
@@ -1601,7 +1602,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s=>groupId==0||s.EntryStaffFromEntryNavigation.Any(s=>s.PositionGeneral== PositionGeneralType.ProductionGroup&&s.ToEntry==groupId))
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Date> after && s.PubulishTime.Value.Date< before)
-                .Where(s => s.Information.Where(s => s.DisplayName == "发行时间备注").Any(s => string.IsNullOrWhiteSpace(s.DisplayValue) == false) == false || s.PubulishTime < time)
+                .Where(s => s.Releases.Any(s => s.Type == GameReleaseType.Official))
+                .Where(s => string.IsNullOrWhiteSpace(s.Releases.OrderBy(s => s.Time).First(s => s.Type == GameReleaseType.Official).TimeNote) || s.PubulishTime < time)
                 .ToListAsync();
 
             var model = new List<PublishGamesTimelineModel>();
