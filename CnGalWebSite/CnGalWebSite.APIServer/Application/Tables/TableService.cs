@@ -372,7 +372,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     s.Name,
                     s.DisplayName,
                     s.AnotherName,
-                    s.Information
+                    s.Outlinks
                 })
                 .ToListAsync();
             var Infors = new List<MakerInforTableModel>();
@@ -386,15 +386,15 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     AnotherName = infor.AnotherName
 
                 };
-                foreach (var item in infor.Information)
+                foreach (var item in infor.Outlinks)
                 {
-                    if(item.DisplayValue?.Contains("weibo.com")??false)
+                    if(item.Link?.Contains("weibo.com")??false)
                     {
-                        tableModel.MicroBlog = item.DisplayValue;
+                        tableModel.MicroBlog = item.Link;
                     }
-                    else if (item.DisplayValue?.Contains("bilibili.com") ?? false)
+                    else if (item.Link?.Contains("bilibili.com") ?? false)
                     {
-                        tableModel.Bilibili = item.DisplayValue;
+                        tableModel.Bilibili = item.Link;
                     }
                 }
                 Infors.Add(tableModel);

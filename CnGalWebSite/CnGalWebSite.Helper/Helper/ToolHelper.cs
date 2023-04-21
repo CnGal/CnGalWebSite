@@ -1168,9 +1168,9 @@ namespace CnGalWebSite.DataModel.Helper
             var list = informations.ToList();
             foreach (var item in list)
             {
-                if (informations.Count(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link) > 1)
+                if (informations.Count(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link && item.Name == s.Name) > 1)
                 {
-                    var temp = informations.FirstOrDefault(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link);
+                    var temp = informations.FirstOrDefault(s => item.PublishPlatformType == s.PublishPlatformType && item.PublishPlatformName == s.PublishPlatformName && item.Link == s.Link && item.Name == s.Name);
                     if (temp != null)
                     {
                         informations.Remove(temp);
