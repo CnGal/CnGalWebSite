@@ -30,9 +30,11 @@
             <StaffEditorChartListTip Staffs="Model.Staffs" />
             break;
         case EntryType.ProductionGroup:
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
-                相关网站已迁移到外部链接
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            <div class="row">
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.QQgroupGroup" ShowLabel="true" />
+                </div>
+            </div>
             break;
         case EntryType.Role:
             <div class="row">

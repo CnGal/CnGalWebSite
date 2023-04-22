@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Nest;
 using ReverseMarkdown.Converters;
 using Senparc.CO2NET.Extensions;
 using System;
@@ -52,7 +53,10 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 //通过Id获取词条
 
                 var entries = await _entryRepository.GetAll().AsNoTracking()
-                     .Include(s => s.Information).Include(s => s.Tags)
+                     .Include(s => s.Information)
+                     .Include(s => s.Outlinks)
+                     .Include(s => s.Releases)
+                     .Include(s => s.Tags)
                      .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                      .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                      .Select(s => new
@@ -62,6 +66,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
                          s.DisplayName,
                          s.Name,
                          s.PubulishTime,
+                         s.Releases,
+                         s.Outlinks,
                          s.Information,
                          Tags = s.Tags.Select(s => s.Name).ToList(),
                          Staffs=s.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral== PositionGeneralType.Publisher|| s.PositionGeneral == PositionGeneralType.ProductionGroup)
@@ -105,23 +111,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 case "原作":
                                     tableModel.Original = item.DisplayValue;
                                     break;
-                                case "游戏平台":
-
-                                    tableModel.GamePlatforms = item.DisplayValue;
-
-                                    break;
-                                case "引擎":
-                                    tableModel.Engine = item.DisplayValue;
-                                    break;
-                                case "发行方式":
-                                    tableModel.IssueMethod = item.DisplayValue;
-                                    break;
-                                case "官网":
-                                    tableModel.OfficialWebsite = item.DisplayValue;
-                                    break;
-                                case "Steam平台Id":
-                                    tableModel.SteamId = item.DisplayValue;
-                                    break;
                                 case "QQ群":
                                     tableModel.QQgroupGame = item.DisplayValue;
                                     break;
@@ -129,8 +118,18 @@ namespace CnGalWebSite.APIServer.Application.Tables
                         }
                     }
 
+                    if (infor.Releases.Any())
+                    {
+                        tableModel.GamePlatforms = string.Join("、", infor.Releases.FirstOrDefault(s => s.GamePlatformTypes.Any())?.GamePlatformTypes?.Select(s => s.GetDisplayName()) ?? Array.Empty<string>());
+                        tableModel.Engine = infor.Releases.FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Engine) == false)?.Engine;
+                        tableModel.SteamId = infor.Releases.FirstOrDefault(s => s.PublishPlatformType== PublishPlatformType.Steam)?.Link;
+                    }
+
+                    tableModel.OfficialWebsite = infor.Outlinks.FirstOrDefault(s => s.Name == "官网")?.Link;
+
+
                     //添加制作组发行商
-                    foreach(var item in infor.Staffs.Where(s => s.PositionGeneral == PositionGeneralType.Publisher))
+                    foreach (var item in infor.Staffs.Where(s => s.PositionGeneral == PositionGeneralType.Publisher))
                     {
                         if (string.IsNullOrWhiteSpace( tableModel.Publisher)==false)
                         {
@@ -204,6 +203,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //通过Id获取词条 
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
+                .Include(s => s.Outlinks)
                 .Where(s => s.Type == EntryType.ProductionGroup && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
@@ -212,6 +212,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     s.DisplayName,
                     s.AnotherName,
                     s.Id,
+                    s.Outlinks,
                     s.Information
                 })
                 .ToListAsync();
@@ -235,18 +236,20 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 tableModel.QQgroupGroup = item.DisplayValue;
                                 break;
                         }
-
                     }
-
-                        if (item.DisplayValue?.Contains("weibo.com") ?? false)
-                        {
-                            tableModel.MicroBlog = item.DisplayValue;
-                        }
-                        else if (item.DisplayValue?.Contains("bilibili.com") ?? false)
-                        {
-                            tableModel.Bilibili = item.DisplayValue;
-                        }
                 }
+                foreach (var item in infor.Outlinks)
+                {
+                    if (item.Link?.Contains("weibo.com") ?? false)
+                    {
+                        tableModel.MicroBlog = item.Link;
+                    }
+                    else if (item.Link?.Contains("bilibili.com") ?? false)
+                    {
+                        tableModel.Bilibili = item.Link;
+                    }
+                }
+
                 Infors.Add(tableModel);
             }
 
@@ -364,7 +367,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
         {
             //通过Id获取词条 
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.Information)
+                .Include(s => s.Outlinks)
                 .Where(s => s.Type == EntryType.Staff && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {

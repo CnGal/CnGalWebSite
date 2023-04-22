@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
 
-namespace CnGalWebSite.IdentityServer.Services.Shared
+namespace CnGalWebSite.Core.Services.Query
 {
     public interface IQueryService
     {

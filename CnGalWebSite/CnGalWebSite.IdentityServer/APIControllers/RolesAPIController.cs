@@ -26,10 +26,10 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using BlazorComponent;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
-using CnGalWebSite.IdentityServer.Services.Shared;
 using OneOf.Types;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -58,7 +58,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpPost]
         public async Task<QueryResultModel<RoleOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationRole, string>(_roleRepository.GetAll(), model, s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ApplicationRole, string>(_roleRepository.GetAll().AsSingleQuery(), model, s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.Name.Contains(model.SearchText)));
 
             return new QueryResultModel<RoleOverviewModel>
             {

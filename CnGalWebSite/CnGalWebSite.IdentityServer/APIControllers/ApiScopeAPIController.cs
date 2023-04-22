@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Clients;
@@ -8,7 +9,6 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.ApiScopes;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Clients;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
 using CnGalWebSite.IdentityServer.Services.Examines;
-using CnGalWebSite.IdentityServer.Services.Shared;
 using IdentityModel;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Entities;
@@ -53,7 +53,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpPost]
         public async Task<QueryResultModel<ApiScopeOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApiScope, string>(_apiScopeRepository.GetAll(), model,
+            var (items, total) = await _queryService.QueryAsync<ApiScope, string>(_apiScopeRepository.GetAll().AsSingleQuery(), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
 
             return new QueryResultModel<ApiScopeOverviewModel>

@@ -25,9 +25,9 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using BlazorComponent;
-using CnGalWebSite.IdentityServer.Services.Shared;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -52,7 +52,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpPost]
         public async Task<QueryResultModel<UserOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().Include(s => s.UserRoles).ThenInclude(s => s.Role), model,
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().AsSingleQuery().Include(s => s.UserRoles).ThenInclude(s => s.Role), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText)));
 
             return new QueryResultModel<UserOverviewModel>
