@@ -35,7 +35,7 @@
         {
             value = System.Web.HttpUtility.UrlDecode(value);
             var temp = value.Split('?').FirstOrDefault()?.Split('/');
-            value = temp?.LastOrDefault(s => string.IsNullOrWhiteSpace(s) == false).Replace("@", "");
+            value = temp?.LastOrDefault(s => string.IsNullOrWhiteSpace(s) == false).Replace("@", "").Replace(".html","");
         }
 
         _values[id] = value;
@@ -77,6 +77,7 @@
                 OutlinkType.Twitter => "https://twitter.com/" + value,
                 OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
                 OutlinkType.Facebook => "https://www.facebook.com/" + value,
+                OutlinkType.Modian => $"https://zhongchou.modian.com/item/{value}.html",
                 _ => value
             }
         });
