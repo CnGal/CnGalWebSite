@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"已有{Model.Booking.BookingCount}人预约")" Icon="@IconType.Booking.ToIconString()" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"已有{Model.Booking.BookingCount}人预约")" Icon="@IconType.Bookings.ToIconString()" Collapable>
     <Scroll style="max-height:500px">
         <MTimeline AlignTop Dense="Dense" Class="me-2">
             @foreach (var item in Model.Booking.Goals)
@@ -19,6 +19,9 @@
             }
         </MTimeline>
     </Scroll>
+    <div style=" display: flex; justify-content: center; " class="mt-3">
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.BookingButton Id="Model.Id" Template="EntryStyleTemplate.Default" />
+    </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {

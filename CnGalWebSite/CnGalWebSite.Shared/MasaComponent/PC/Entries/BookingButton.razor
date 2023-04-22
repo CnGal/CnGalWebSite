@@ -3,12 +3,13 @@
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
-@if (IsHidden==false)
+@if (IsHidden == false)
 {
     @if (Template == EntryStyleTemplate.Default)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Tooltip="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
     }
     else
     {
@@ -34,8 +35,8 @@
     [Parameter]
     public bool IsHidden { get; set; }
 
-    bool isBooking ;
-    public bool IsBooking{ get { return isBooking; } }
+    bool isBooking;
+    public bool IsBooking { get { return isBooking; } }
     bool isReady = false;
 
     [CascadingParameter]
@@ -110,16 +111,23 @@
 
     private async Task UnThumbsUp()
     {
+        var confirmed = await PopupService.ConfirmAsync("取消预约", "确定要取消预约吗？", AlertTypes.Info);
+        if(confirmed==false)
+        {
+            return;
+        }
+
         try
         {
             var obj = await _httpService.PostAsync<BookingGameModel, Result>("api/booking/BookingGame", new BookingGameModel { GameId = Id, IsBooking = false, Identification = await deviceIdentification.GetDeviceIdentificationModel() });
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("取消预约游戏失败", obj.Error);
+                await PopupService.ToastAsync($"取消预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error)?null:obj.Error)}", AlertTypes.Error);
             }
             else
             {
+                await PopupService.ToastAsync($"成功取消预约游戏", AlertTypes.Success);
                 isBooking = false;
                 StateHasChanged();
             }
@@ -137,11 +145,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("预约游戏失败", obj.Error);
+                await PopupService.ToastAsync($"预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error) ? null : obj.Error)}", AlertTypes.Error);
             }
             else
             {
-                await ToastService.Success("成功预约游戏", "成功预约游戏");
+                await PopupService.ToastAsync($"成功预约游戏", AlertTypes.Success);
                 isBooking = true;
                 StateHasChanged();
             }

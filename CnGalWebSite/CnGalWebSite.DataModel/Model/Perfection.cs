@@ -111,7 +111,7 @@ namespace CnGalWebSite.DataModel.Model
         Roles,
         [Display(Name = "Staff")]
         Staff,
-        [Display(Name = "Steam平台Id")]
+        [Display(Name = "发行版本链接")]/*Steam平台Id*/
         SteamId,
         [Display(Name = "制作组")]
         ProductionGroup,
