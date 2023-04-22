@@ -452,7 +452,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "正式版")]
         Official,
         [Display(Name = "Demo")]
-        Demo
+        Demo,
+        [Display(Name = "EA")]
+        EA
     }
     public enum EntryType
     {
