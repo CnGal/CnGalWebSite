@@ -40,6 +40,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         Zhihu,
         [Display(Name = "爱发电")]
         Afdian,
+        [Display(Name = "摩点")]
+        Modian,
         [Display(Name = "Pixiv")]
         Pixiv,
         [Display(Name = "Twitter")]
