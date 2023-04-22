@@ -34,6 +34,12 @@
     @if (_dataCatcheService.IsApp)
     {
         <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
+            @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
+            {
+                <div class="mb-4">
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense />
+                </div>
+            }
             @if (EntryView.Information.Any())
             {
                 <div class="mb-4">
@@ -86,12 +92,7 @@
                                     <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
                                 </div>
                             }
-                            @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
-                            {
-                                <div class="mb-4">
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BookingCard Model="EntryView" Dense/>
-                                </div>
-                            }
+                          
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                         @if (EntryView.Pictures.Count != 0)
                         {

@@ -439,6 +439,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)
+                    .Include(s => s.Outlinks)
+                    .Include(s => s.Releases)
                     .FirstOrDefaultAsync(s => s.Id == entryId);
                 if (entry == null)
                 {
@@ -713,8 +715,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public PerfectionCheck CheckEntryOfficialWebsite(Entry entry)
         {
-            var officialWebsite = entry.Information.FirstOrDefault(s => (s.Modifier == "基本信息" || s.Modifier == "相关网站") && s.DisplayName == "官网");
-            if (officialWebsite != null && string.IsNullOrWhiteSpace(officialWebsite.DisplayValue) == false)
+            var officialWebsite = entry.Outlinks.FirstOrDefault();
+            if (officialWebsite != null && string.IsNullOrWhiteSpace(officialWebsite.Link) == false)
             {
                 return new PerfectionCheck
                 {
@@ -736,8 +738,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public PerfectionCheck CheckEntryGamePlatforms(Entry entry)
         {
-            var gamePlatforms = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "游戏平台");
-            if (gamePlatforms != null && string.IsNullOrWhiteSpace(gamePlatforms.DisplayValue) == false)
+            var gamePlatforms = entry.Releases.FirstOrDefault(s => s.GamePlatformTypes.Any());
+            if (gamePlatforms != null)
             {
                 return new PerfectionCheck
                 {
@@ -759,7 +761,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public PerfectionCheck CheckEntryIssueTime(Entry entry)
         {
-            var issueTime = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && (s.DisplayName == "发行时间" || s.DisplayName == "发行时间备注") && string.IsNullOrWhiteSpace(s.DisplayValue) == false);
+            var issueTime = entry.Releases.FirstOrDefault(s=>s.Time!=null||string.IsNullOrWhiteSpace(s.TimeNote)==false);
             if (issueTime != null)
             {
                 return new PerfectionCheck
@@ -849,8 +851,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public PerfectionCheck CheckEntrySteamId(Entry entry)
         {
-            var steamId = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "Steam平台Id");
-            if (steamId != null && string.IsNullOrWhiteSpace(steamId.DisplayValue) == false)
+            var steamId = entry.Releases.FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Link));
+            if (steamId != null)
             {
                 return new PerfectionCheck
                 {

@@ -126,6 +126,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Goal,
         Booking,
         UnBooking,
+        Bookings,
         Edit,
         Delete,
         Check,
@@ -174,9 +175,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.Edit:
                     return "mdi-pencil";
                 case IconType.Booking:
-                    return "mdi-cart-heart";
+                    return "mdi-heart";
+                case IconType.Bookings:
+                    return "mdi-heart-multiple";
                 case IconType.UnBooking:
-                    return "mdi-cart-outline";
+                    return "mdi-heart-outline";
                 case IconType.Goal:
                     return "mdi-flag-checkered";
                 case IconType.Collapsed:
