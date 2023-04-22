@@ -1,18 +1,9 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
-
-using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Linq.Dynamic.Core;
-using System.Collections.Generic;
-using IdentityModel;
 using System.Linq.Expressions;
-using System;
+using CnGalWebSite.Core.Models;
 
-namespace CnGalWebSite.IdentityServer.Services.Shared
+namespace CnGalWebSite.Core.Services.Query
 {
     public class QueryService:IQueryService
     {
@@ -23,12 +14,12 @@ namespace CnGalWebSite.IdentityServer.Services.Shared
             var page = model.Page;
             var itemsPerPage = model.ItemsPerPage;
 
-            var items = _query.AsSingleQuery();
+            var items = _query;
             //搜索
            items = items.Where(predicate);
 
             //计算总数
-            var total = await items.CountAsync();
+            var total = await Task.FromResult(items.Count());
 
             //排序
             var sb = new StringBuilder();

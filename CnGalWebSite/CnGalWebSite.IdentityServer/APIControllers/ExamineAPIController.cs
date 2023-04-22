@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Clients;
@@ -12,7 +13,6 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;
 using CnGalWebSite.IdentityServer.Services.Messages;
-using CnGalWebSite.IdentityServer.Services.Shared;
 using IdentityModel;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Entities;
@@ -59,7 +59,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpPost]
         public async Task<QueryResultModel<ExamineOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<Examine, string>(_examineRepository.GetAll().Include(s => s.ApplicationUser), model,
+            var (items, total) = await _queryService.QueryAsync<Examine, string>(_examineRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PassedAdminName.Contains(model.SearchText)));
 
             return new QueryResultModel<ExamineOverviewModel>

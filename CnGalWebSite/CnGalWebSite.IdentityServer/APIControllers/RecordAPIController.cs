@@ -25,12 +25,12 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using BlazorComponent;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
-using CnGalWebSite.IdentityServer.Services.Shared;
 using OneOf.Types;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Records;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Records;
 using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -53,7 +53,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpPost]
         public async Task<QueryResultModel<OperationRecordOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<OperationRecord, string>(_operationRecordRepository.GetAll().Include(s => s.ApplicationUser), model,
+            var (items, total) = await _queryService.QueryAsync<OperationRecord, string>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
 
             return new QueryResultModel<OperationRecordOverviewModel>

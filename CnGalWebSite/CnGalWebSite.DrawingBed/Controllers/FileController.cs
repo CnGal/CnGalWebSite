@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.DataReositories;
 using CnGalWebSite.DrawingBed.Models.DataModels;
 using CnGalWebSite.DrawingBed.Models.ViewModels;
@@ -121,7 +122,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         [HttpPost]
         public async Task<QueryResultModel<UploadRecordOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<UploadRecord, long>(_uploadRecordRepository.GetAll(), model,
+            var (items, total) = await _queryService.QueryAsync<UploadRecord, long>(_uploadRecordRepository.GetAll().AsSingleQuery(), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Sha1.Contains(model.SearchText) || s.Url.Contains(model.SearchText) || s.UserId.Contains(model.SearchText)));
 
             return new QueryResultModel<UploadRecordOverviewModel>
