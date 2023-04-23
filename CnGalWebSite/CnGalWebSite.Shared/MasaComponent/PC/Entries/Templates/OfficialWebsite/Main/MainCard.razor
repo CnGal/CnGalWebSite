@@ -78,6 +78,23 @@
 
     protected override void OnInitialized()
     {
-        publishTime = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息")?.Informations?.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
+        var release = Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) == false);
+        if(release==null)
+        {
+            publishTime = null;
+            return;
+        }
+        if(string.IsNullOrWhiteSpace(release.TimeNote)==false)
+        {
+            publishTime = release.TimeNote;
+            return;
+        }
+
+        if(release.Time!=null)
+        {
+            publishTime = release.Time.Value.ToString("yyyy年MM月dd日");
+            return;
+        }
+
     }
 }

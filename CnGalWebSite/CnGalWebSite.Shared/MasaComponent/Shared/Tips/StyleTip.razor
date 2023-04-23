@@ -332,9 +332,9 @@ else
                 colorActive = "#616161";
                 break;
             default:
-                if (_dataCacheService.ThemeSetting.Theme.Contains("#"))
+                if (theme.Contains("#"))
                 {
-                    colorMain = colorHover = colorActive = _dataCacheService.ThemeSetting.Theme;
+                    colorMain = colorHover = colorActive = theme;
                 }
                 else
                 {
@@ -395,6 +395,10 @@ else
             var theme = MasaBlazor.Theme;
             theme.Dark = _dataCacheService.ThemeSetting.IsDark;
             MasaBlazor.Theme = theme;
+            //重新生成颜色
+            ProcColor(MasaBlazor.Theme.Themes.Dark.Primary);
+            //通知MAUI
+            _mauiService.ChangeTheme(colorMain);
 
             //await _dataCacheService.OnRefreshRequsted(null);
         }
