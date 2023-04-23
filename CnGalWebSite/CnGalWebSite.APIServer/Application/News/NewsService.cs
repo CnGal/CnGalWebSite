@@ -606,34 +606,20 @@ namespace CnGalWebSite.APIServer.Application.News
             user ??= await _rssHelper.GetWeiboUserInfor(weiboId);
 
 
-            var entry = await _entryRepository.GetAll().Include(s => s.Information).FirstOrDefaultAsync(s => s.Name == entryName);
+            var entry = await _entryRepository.GetAll().Include(s => s.Outlinks).FirstOrDefaultAsync(s => s.Name == entryName);
 
-
-            //添加主图
-            //if (string.IsNullOrWhiteSpace(entry.MainPicture))
-            //{
-            //    if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
-            //    {
-            //        entry.MainPicture = user.Image;
-            //    }
-            //    else
-            //    {
-            //        entry.MainPicture = await _fileService.SaveImageAsync(user.Image, _configuration["NewsAdminId"], 460, 215);
-            //    }
-            //}
             if (string.IsNullOrWhiteSpace(entry.Thumbnail))
             {
                 entry.Thumbnail = user.Image;
             }
-
-            entry.Information.Remove(entry.Information.FirstOrDefault(s => s.DisplayName == "微博"));
-            entry.Information.Add(new BasicEntryInformation
+            if (entry.Outlinks.Any(s => s.Name == "微博") == false)
             {
-                Modifier = "相关网站",
-                DisplayName = "微博",
-                DisplayValue = "https://weibo.com/u/" + weiboId,
-            });
-
+                entry.Outlinks.Add(new Outlink
+                {
+                    Name = "微博",
+                    Link = "https://weibo.com/u/" + weiboId,
+                });
+            }           
             user.EntryId = entry.Id;
 
             if (user.Id == 0)
