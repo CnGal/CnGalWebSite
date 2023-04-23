@@ -1296,7 +1296,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         item.DisplayValue = ((GenderType)gender).GetDisplayName();
                     }
                 }
-                else if (item.DisplayName == "Steam平台Id"|| item.DisplayName == "昵称（官方称呼）"
+                else if (item.Modifier=="相关网站"|| item.DisplayName == "Steam平台Id"|| item.DisplayName == "昵称（官方称呼）"
                     || item.DisplayName == "发行时间" || item.DisplayName == "游戏平台"
                     || item.DisplayName == "引擎" || item.DisplayName == "发行方式")
                 {
