@@ -13,7 +13,7 @@
     }
     else
     {
-        <MButton Rounded Color="primary" Block XLarge OnClick="OnClick">
+        <MButton Rounded Color="primary" Block  XLarge="@(_dataCacheService.IsApp?false:true)"  OnClick="OnClick">
             <MIcon Left Class="me-4">
                 @(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())
             </MIcon>
