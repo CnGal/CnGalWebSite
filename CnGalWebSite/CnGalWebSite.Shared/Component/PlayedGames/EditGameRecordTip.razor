@@ -16,20 +16,20 @@
         <MCardText Class="pb-0">
             @if (isReady)
             {
-                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged"  Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
-                    <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay" Color="primary">
                         想玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Playing">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Playing" Color="primary">
                         正在玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Played">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Played" Color="primary">
                         已玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested" Color="primary">
                         不感兴趣
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed" Color="primary">
                         未玩
                     </MButton>
                 </MButtonGroup>
@@ -45,7 +45,7 @@
                 }
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Lable="总评" />
 
-                <MTextarea Label="评语" Rows="5"  Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
+                <MTextarea Label="评语" Rows="5" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
                            @bind-Value="Model.PlayImpressions" Counter="true">
 
                 </MTextarea>
@@ -53,14 +53,12 @@
                     <div class="col-12 col-md-6">
                         <MCheckbox @bind-Value="Model.ShowPublicly"
                                    Label="公开（参与评选）" Class="m-0"
-                                   HideDetails="true"
-                                   ></MCheckbox>
+                                   HideDetails="true"></MCheckbox>
                     </div>
                     <div class="col-12 col-md-6">
                         <MCheckbox @bind-Value="Model.IsHidden"
                                    Label="不展示在个人主页中" Class="m-0"
-                                   HideDetails="true"
-                                   ></MCheckbox>
+                                   HideDetails="true"></MCheckbox>
                     </div>
                 </div>
             }
@@ -114,13 +112,10 @@
 
     public void ValueChanged(StringNumber index)
     {
-        if (index == null)
+        if (index != null)
         {
-            
+            Model.Type = (PlayedGameType)index.ToInt32();
         }
-        Model.Type = (PlayedGameType)index.ToInt32();
-
-        
     }
 
     protected async Task OnInit()

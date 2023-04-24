@@ -140,6 +140,8 @@ else
 
     public string DefaultTheme = "pink lighten-2";
     private string _theme;
+    private bool isInitialized;
+    private bool isAfterRenderAsync;
 
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
@@ -166,11 +168,43 @@ else
 
         _eventService.TempEffectTheme -= OnTempEffectTheme;
         _eventService.TempEffectTheme += OnTempEffectTheme;
+
+        isInitialized = true;
     }
 
     public async void OnTempEffectTheme()
     {
+        var time = 0;
+        while (!isInitialized)
+        {
+            time += 100;
+            await Task.Delay(100);
+            if(time > 10000)
+            {
+                return;
+            }
+        }
         await Refresh();
+        if(time != 0)
+        {
+            return;
+        }
+
+        time = 0;
+        while (!isAfterRenderAsync)
+        {
+            time += 100;
+            await Task.Delay(100);
+            if (time > 10000)
+            {
+                return;
+            }
+        }
+        await Refresh();
+        if (time != 0)
+        {
+            return;
+        }
     }
 
     public async void OnSavaTheme()
@@ -193,6 +227,8 @@ else
             await LoadTheme();
             //刷新
             await Refresh();
+
+            isAfterRenderAsync = true;
         }
     }
 
@@ -396,7 +432,7 @@ else
             theme.Dark = _dataCacheService.ThemeSetting.IsDark;
             MasaBlazor.Theme = theme;
             //重新生成颜色
-            ProcColor(MasaBlazor.Theme.Themes.Dark.Primary);
+            ProcColor(_dataCacheService.ThemeSetting.IsDark?MasaBlazor.Theme.Themes.Dark.Primary: MasaBlazor.Theme.Themes.Light.Primary);
             //通知MAUI
             _mauiService.ChangeTheme(colorMain);
 
