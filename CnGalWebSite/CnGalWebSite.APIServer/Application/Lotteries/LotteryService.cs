@@ -391,19 +391,20 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             var users = booking.Users.Where(s => lottery.Users.Any(x => x.ApplicationUserId == s.ApplicationUserId) == false).Select(s => s.ApplicationUser);
 
             var time = DateTime.Now.ToCstTime();
+            var count = lottery.Users.Count;
             foreach (var item in users)
             {
+                await _operationRecordService.CopyOperationRecord(OperationRecordType.Booking, booking.Id.ToString(), OperationRecordType.Lottery, lottery.Id.ToString(), item);
+
                 await _lotteryUserRepository.InsertAsync(new LotteryUser
                 {
                     ApplicationUserId = item.Id,
                     LotteryId = lottery.Id,
                     ParticipationTime = time,
-                    Number = lottery.Users.Count + 1,
+                    Number = count + 1,
                     //查找是否有相同的特征值
                     IsHidden = await _operationRecordService.CheckOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), item)
                 });
-
-                await _operationRecordService.CopyOperationRecord(OperationRecordType.Booking, booking.Id.ToString(), OperationRecordType.Lottery, lottery.Id.ToString(), item);
             }
         }
 
