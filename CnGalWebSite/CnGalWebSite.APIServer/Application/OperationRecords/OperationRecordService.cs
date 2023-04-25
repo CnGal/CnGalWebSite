@@ -175,12 +175,20 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             return await _operationRecordRepository.GetAll().AnyAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == model.Cookie || s.Ip == model.Ip));
         }
 
+        /// <summary>
+        /// 检查是否存在相同特征值的操作记录
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="objectId"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user)
         {
             var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
             if(item==null)
             {
-                return true;
+                return false;
             }
 
             if (string.IsNullOrEmpty(item.Cookie) || string.IsNullOrWhiteSpace(item.Ip))
