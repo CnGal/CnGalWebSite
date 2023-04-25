@@ -2647,7 +2647,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else
                 {
-                    model.Booking.LotteryName = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.Id == entry.Booking.Id).Select(s => s.Name).FirstOrDefaultAsync();
+                    model.Booking.LotteryName = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.Id == entry.Booking.LotteryId).Select(s => s.Name).FirstOrDefaultAsync();
                 }
 
                 foreach (var item in entry.Booking.Goals)
