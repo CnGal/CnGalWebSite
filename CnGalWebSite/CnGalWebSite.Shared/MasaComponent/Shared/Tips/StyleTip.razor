@@ -140,6 +140,7 @@ else
 
     public string DefaultTheme = "pink lighten-2";
     private string _theme;
+    ThemeModel _themeSetting = new ThemeModel();
 
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
@@ -371,6 +372,11 @@ else
         {
             return;
         }
+        //检查是否修改配置
+        if(_themeSetting.DeepEquals(_dataCacheService.ThemeSetting))
+        {
+            return;
+        }
 
         //刷新默认主题色
         if (MasaBlazor.Theme.Themes.Light.Primary != _dataCacheService.ThemeSetting.Theme)
@@ -407,7 +413,8 @@ else
         {
             //await Task.Delay(10000);
         }
-
+        //缓存配置
+        _themeSetting.SynchronizationProperties(_dataCacheService.ThemeSetting);
         await InvokeAsync(StateHasChanged);
     }
 
