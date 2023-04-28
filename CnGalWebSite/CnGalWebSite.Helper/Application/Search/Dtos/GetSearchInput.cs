@@ -311,7 +311,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
         Game,
         [Display(Name = "角色")]
         Role,
-        [Display(Name = "制作组")]
+        [Display(Name = "组织")]
         ProductionGroup,
         [Display(Name = "STAFF")]
         Staff,
