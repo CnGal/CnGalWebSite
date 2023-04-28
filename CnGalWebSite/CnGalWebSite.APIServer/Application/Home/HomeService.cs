@@ -42,10 +42,10 @@ namespace CnGalWebSite.APIServer.Application.Home
         public async Task<List<MainImageCardModel>> GetHomeNewestGameViewAsync()
         {
             var model = new List<MainImageCardModel>();
-            var dateTime = DateTime.Now.ToCstTime();
+            var dateTime = DateTime.Now.ToCstTime().Date;
             //获取即将发售
             var entry_result1 = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime > dateTime)
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime!=null&& s.PubulishTime.Value.Date > dateTime)
                 .OrderBy(s => s.PubulishTime).Take(12).ToListAsync();
             if (entry_result1 != null)
             {
@@ -71,12 +71,12 @@ namespace CnGalWebSite.APIServer.Application.Home
         public async Task<List<MainImageCardModel>> GetHomeRecentEditViewAsync()
         {
             var model = new List<MainImageCardModel>();
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
+            var tempDateTimeNow = DateTime.Now.ToCstTime().Date;
 
             var entryIds = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
-                    .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s => s.Id).Take(12).ToListAsync();
+                    .Where(s => s.Type == EntryType.Game && s.PubulishTime !=null&&s.PubulishTime.Value.Date < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s => s.Id).Take(12).ToListAsync();
             entryIds.AddRange(await _entryRepository.GetAll().AsNoTracking()
-                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime > tempDateTimeNow)
+                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime!=null&& s.PubulishTime.Value.Date > tempDateTimeNow)
                     .OrderBy(s => s.PubulishTime).Select(s => s.Id).Take(12).ToListAsync());
 
 

@@ -1,4 +1,5 @@
 ﻿using Autofac.Core;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.DataReositories;
 using CnGalWebSite.DrawingBed.Infrastructure;
 using CnGalWebSite.DrawingBed.Services;
