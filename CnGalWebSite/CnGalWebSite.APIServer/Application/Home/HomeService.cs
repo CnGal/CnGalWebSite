@@ -45,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             var dateTime = DateTime.Now.ToCstTime().Date;
             //获取即将发售
             var entry_result1 = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime!=null&& s.PubulishTime.Value.Date > dateTime)
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime != null && s.PubulishTime.Value.Date > dateTime)
                 .OrderBy(s => s.PubulishTime).Take(12).ToListAsync();
             if (entry_result1 != null)
             {
@@ -55,9 +55,9 @@ namespace CnGalWebSite.APIServer.Application.Home
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        Name = item.DisplayName ,
-                        IsOutlink=false,
-                        Url="entries/index/"+item.Id,
+                        Name = item.DisplayName,
+                        IsOutlink = false,
+                        Url = "entries/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         // DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -74,9 +74,9 @@ namespace CnGalWebSite.APIServer.Application.Home
             var tempDateTimeNow = DateTime.Now.ToCstTime().Date;
 
             var entryIds = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
-                    .Where(s => s.Type == EntryType.Game && s.PubulishTime !=null&&s.PubulishTime.Value.Date < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s => s.Id).Take(12).ToListAsync();
+                    .Where(s => s.Type == EntryType.Game && s.PubulishTime != null && s.PubulishTime.Value.Date < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s => s.Id).Take(12).ToListAsync();
             entryIds.AddRange(await _entryRepository.GetAll().AsNoTracking()
-                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime!=null&& s.PubulishTime.Value.Date > tempDateTimeNow)
+                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime != null && s.PubulishTime.Value.Date > tempDateTimeNow)
                     .OrderBy(s => s.PubulishTime).Select(s => s.Id).Take(12).ToListAsync());
 
 

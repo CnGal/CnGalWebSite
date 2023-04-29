@@ -356,10 +356,10 @@ else
     /// <returns></returns>
     public async Task SaveTheme()
     {
-        if(string.IsNullOrWhiteSpace(_theme)==false)
-        {
-            _dataCacheService.ThemeSetting.Theme = _theme;
-        }
+        //if(string.IsNullOrWhiteSpace(_theme)==false)
+        //{
+        //    _dataCacheService.ThemeSetting.Theme = _theme;
+        //}
         await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
     }
 
