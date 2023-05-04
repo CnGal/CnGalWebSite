@@ -1,7 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
@@ -19,33 +19,26 @@ namespace CnGalWebSite.APIServer.Application.Files
 {
     public class FileService : IFileService
     {
-        private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
+        private readonly IHttpService _httpService;
         private readonly IFileUploadService _fileUploadService;
-        private readonly HttpClient _httpClient;
-        private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<FileService> _logger;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<UserFile>, string, SortOrder, IEnumerable<UserFile>>> SortLambdaCache = new();
-
-
-        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, HttpClient httpClient, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration,
-            IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository, IFileUploadService fileUploadService)
+        public FileService(IAppHelper appHelper,IConfiguration configuration, IHttpService httpService,
+        IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository, IFileUploadService fileUploadService)
         {
-            _userFileRepository = userFileRepository;
             _appHelper = appHelper;
-            _httpClient = httpClient;
-            _fileManagerRepository = fileManagerRepository;
             _configuration = configuration;
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
             _logger = logger;
             _videoRepository = videoRepository;
-            _fileUploadService = fileUploadService; 
+            _fileUploadService = fileUploadService;
+            _httpService = httpService;
         }
 
         /// <summary>
@@ -67,8 +60,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     url = "https:" + url;
                 }
 
+                var client = await _httpService.GetClientAsync();
                 using var content = new MultipartFormDataContent();
-                using var fileContent = new StreamContent(await _httpClient.GetStreamAsync(url));
+                using var fileContent = new StreamContent(await client.GetStreamAsync(url));
 
                 content.Add(
                     content: fileContent,
@@ -76,7 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     fileName: "test.png");
                 content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
 
-                var response = await _httpClient.PostAsync(_configuration["TucangCCAPIUrl"], content);
+                var response = await client.PostAsync(_configuration["TucangCCAPIUrl"], content);
 
                 var newUploadResults = await response.Content.ReadAsStringAsync();
                 var result = JObject.Parse(newUploadResults);
@@ -124,7 +118,6 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存词条 - {Name}({Id}) 主图失败", item.Name, item.Id);
-                    throw;
                 }
 
             }
@@ -148,7 +141,6 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存文章 - {Name}({Id}) 主图失败", item.Name, item.Id);
-                    throw;
                 }
             }
 
@@ -171,7 +163,6 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存视频 - {Name}({Id}) 主图失败", item.Name, item.Id);
-                    throw;
                 }
             }
 
@@ -208,7 +199,6 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存 词条 - {name}({id}) 相册失败", item.Name, item.Id);
-                    throw;
                 }
             }
         }
