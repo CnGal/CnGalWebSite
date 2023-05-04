@@ -464,15 +464,16 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //给用户发送通知
+            //TODO:应该修改为ObjectId和ObjectType实现手动关联 目前的方式占用了无效列
             if (examine.IsPassed == false)
             {
                 await _messageRepository.InsertAsync(new Message
                 {
-                    Title = (examine.IsPassed ?? false) ? "编辑通过提醒" : "编辑驳回提醒",
+                    Title = "编辑驳回提醒",
                     PostTime = DateTime.Now.ToCstTime(),
                     Image = "default/logo.png",
                     Rank = "系统",
-                    Text = "你的『" + examine.Operation.GetDisplayName() + "』操作被『" + currentUser.UserName + "』" + ((examine.IsPassed ?? false) ? "通过，感谢你为CnGal资料站做出的贡献" : "驳回") + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
+                    Text = "你的『" + examine.Operation.GetDisplayName() + "』操作被『" + currentUser.UserName + "』驳回" + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
                     Link = "home/examined/" + examine.Id,
                     LinkTitle = "第" + examine.Id + "条审核记录",
                     Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
