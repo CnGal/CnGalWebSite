@@ -222,7 +222,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             if (model.Type == EntryType.Game)
             {
 
-                var steamIdStr = entry.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).Link;
+                var steamIdStr = entry.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false)?.Link;
                 if (steamIdStr != null && int.TryParse(steamIdStr, out var steamId))
                 {
                     _ = sb.AppendLine();
