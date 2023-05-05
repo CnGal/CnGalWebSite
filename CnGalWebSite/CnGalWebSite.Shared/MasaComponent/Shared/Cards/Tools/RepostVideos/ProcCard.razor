@@ -26,10 +26,6 @@
     string infor = "";
     RepostVideoModel item = new RepostVideoModel();
 
-    private System.Threading.Timer mytimer;
-
-
-
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -50,22 +46,6 @@
         }
     }
 
-    public async void Send(object o)
-    {
-        try
-        {
-            await InvokeAsync(() =>
-            {
-                StateHasChanged();
-            });
-        }
-        catch
-        {
-
-        }
-    }
-
-
     public async Task Proc()
     {
         try
@@ -73,8 +53,6 @@
             //获取所有词条
             EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
             VideoItems = await _httpService.GetAsync<List<string>>("api/videos/GetNames");
-
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
 
             _videoService.ProgressUpdate += OnProgressUpdate;
 
@@ -92,9 +70,6 @@
         }
         finally
         {
-            mytimer.Dispose();
-            mytimer = null;
-
             _articleService.ProgressUpdate -= OnProgressUpdate;
         }
     }
@@ -102,10 +77,6 @@
     #region 释放实例
     public void Dispose()
     {
-        if (mytimer != null)
-        {
-            mytimer?.Dispose();
-        }
         _articleService.ProgressUpdate -= OnProgressUpdate;
         GC.SuppressFinalize(this);
     }

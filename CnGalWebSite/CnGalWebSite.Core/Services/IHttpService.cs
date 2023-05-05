@@ -15,7 +15,5 @@ namespace CnGalWebSite.Core.Services
         bool IsAuth { get; set; }
 
         Task<HttpClient> GetClientAsync();
-
-        HttpClient GetClient();
     }
 }

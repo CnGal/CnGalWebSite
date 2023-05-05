@@ -66,15 +66,5 @@ namespace CnGalWebSite.Server.Services
             _client.SetBearerToken(token);
             return _client;
         }
-
-        public HttpClient GetClient()
-        {
-            var state = _authenticationStateProvider.GetAuthenticationStateAsync().GetAwaiter().GetResult();
-            var token = _tokenManagementService.GetUserAccessTokenAsync(state.User).GetAwaiter().GetResult();
-
-            _client.SetBearerToken(token);
-            return _client;
-
-        }
     }
 }

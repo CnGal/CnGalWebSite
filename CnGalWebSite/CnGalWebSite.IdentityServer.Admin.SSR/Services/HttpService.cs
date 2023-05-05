@@ -64,10 +64,5 @@ namespace CnGalWebSite.IdentityServer.Admin.SSR.Services
             _client.SetBearerToken(token);
             return _client;
         }
-
-        public HttpClient GetClient()
-        {
-            return GetClientAsync().GetAwaiter().GetResult();
-        }
     }
 }

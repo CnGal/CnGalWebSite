@@ -21,7 +21,6 @@ namespace CnGalWebSite.APIServer.Application.GPT
         private readonly IHttpService _httpService;
         private readonly IConfiguration _configuration;
         private readonly List<DateTime> _record = new List<DateTime>();
-        private readonly HttpClient _httpClient;
         private readonly ILogger<ChatGPTService> _logger;
 
         private readonly JsonSerializerOptions _jsonOptions = new()
@@ -34,13 +33,18 @@ namespace CnGalWebSite.APIServer.Application.GPT
             _httpService = httpService;
             _configuration = configuration;
             _logger = logger;
-
-            _httpClient = _httpService.GetClient();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
         }
 
         public async Task< string > GetReply(string question)
         {
+            HttpClient _httpClient = null;
+            if (_httpClient == null)
+            {
+                _httpClient =await _httpService.GetClientAsync();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
+            }
+
+
             var datetime= DateTime.Now.ToCstTime();
 
             //检查上限
