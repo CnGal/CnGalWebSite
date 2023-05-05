@@ -100,7 +100,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             OnProgressUpdate(item, OutputLevel.Infor, $"获取视频内容");
             //获取视频内容
-            var json = await _httpService.GetClient().GetStringAsync(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoInfor?id=" + model.Relevances.BilibiliId);
+            var json = await(await _httpService.GetClientAsync()).GetStringAsync(ToolHelper.WebApiPath + "api/thirdparties/GetBilibiliVideoInfor?id=" + model.Relevances.BilibiliId);
             var data = JObject.Parse(json);
 
             if (data["code"].ToObject<int>() != 0)
