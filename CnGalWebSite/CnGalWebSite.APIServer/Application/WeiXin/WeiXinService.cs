@@ -179,7 +179,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false, bool showOutlink = true)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.Information)
+                .Include(s => s.Releases)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -222,7 +222,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             if (model.Type == EntryType.Game)
             {
 
-                var steamIdStr = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "Steam平台Id")?.DisplayValue;
+                var steamIdStr = entry.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).Link;
                 if (steamIdStr != null && int.TryParse(steamIdStr, out var steamId))
                 {
                     _ = sb.AppendLine();
