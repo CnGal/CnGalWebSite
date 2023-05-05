@@ -21,9 +21,6 @@
     string infor = "";
     MergeEntryModel item = new MergeEntryModel();
 
-    private System.Threading.Timer mytimer;
-
-
     public async void OnProgressUpdate(KeyValuePair<OutputLevel, string> model)
     {
 
@@ -41,26 +38,8 @@
         }
     }
 
-    public async void Send(object o)
-    {
-
-        try
-        {
-            await InvokeAsync(() =>
-            {
-                StateHasChanged();
-            });
-        }
-        catch
-        {
-
-        }
-    }
-
     public async Task Proc()
     {
-        mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
-
         _entryService.ProgressUpdate += OnProgressUpdate;
 
         for (index = 0; index < Model.Count; index++)
@@ -69,18 +48,12 @@
             await _entryService.ProcMergeEntry(item);
         }
 
-        mytimer?.Dispose();
-
         _entryService.ProgressUpdate -= OnProgressUpdate;
     }
 
     #region 释放实例
     public void Dispose()
     {
-        if (mytimer != null)
-        {
-            mytimer?.Dispose();
-        }
         _entryService.ProgressUpdate -= OnProgressUpdate;
         GC.SuppressFinalize(this);
     }
