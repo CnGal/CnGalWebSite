@@ -122,6 +122,30 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
+            entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+               .OrderBy(s => s.Id)
+               .Take(maxCount).ToListAsync();
+
+            foreach (var item in entries)
+            {
+                try
+                {
+                    var temp = await TransferDepositFile(item.Thumbnail);
+                    if (string.IsNullOrWhiteSpace(temp) == false)
+                    {
+                        item.Thumbnail = temp;
+                        await _entryRepository.UpdateAsync(item);
+                        _logger.LogInformation("转存 词条 - {name}({id}) 缩略图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.Thumbnail);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存词条 - {Name}({Id}) 缩略图失败", item.Name, item.Id);
+                }
+
+            }
+
+
             var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
