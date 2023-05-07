@@ -35,7 +35,7 @@
                     <CnGalWebSite.Components.Checkboxes.InputEnumCheckboxList Items="Model.GamePlatformTypes" TValue="GamePlatformType" Label="游戏平台" />
                 </div>
                 <div class="col-12  col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Time" Nullable Lable="发行时间" ShowDate ShowTime="false"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Time" Nullable Lable="发行时间" ShowDate ShowTime="false" />
                 </div>
                 <div class="col-12  col-sm-6">
                     <MTextField @bind-Value="Model.TimeNote" Label="发行时间备注" />
@@ -86,17 +86,17 @@
 
     public async Task OnSave()
     {
-        if(string.IsNullOrWhiteSpace(Model.Name))
+        if (string.IsNullOrWhiteSpace(Model.Name))
         {
             await PopupService.ToastAsync("请填写游戏发行名称", AlertTypes.Error);
             return;
         }
-        if (Items.Count(s => s.PublishPlatformType == Model.PublishPlatformType&& s.PublishPlatformName == Model.PublishPlatformName && s.Link == Model.Link && s.Name == Model.Name) > 1)
+        if (Items.Any(s => s != _model && s.PublishPlatformType == Model.PublishPlatformType && s.PublishPlatformName == Model.PublishPlatformName && s.Link == Model.Link && s.Name == Model.Name))
         {
             await PopupService.ToastAsync("平台和链接必须保持唯一", AlertTypes.Error);
             return;
         }
-        if(Items.Any(s=>s== _model) ==false)
+        if (Items.Any(s => s == _model) == false)
         {
             Items.Add(_model);
         }
