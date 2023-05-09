@@ -4,18 +4,18 @@
 @inject IDataCacheService _dataCatcheService
 
 <section class="recommends">
-    @if (_items.Any())
+    @if (_personalRecommends.Any())
     {
         <h2>随机推荐</h2>
 
     }
     <div class="recommends-group">
-        @foreach (var item in _items)
+        @foreach (var item in _personalRecommends)
         {
             <div class="recommends-item">
-                @if (item.Item2 == PersonalRecommendDisplayType.PlainText)
+                @if (item.DisplayType == PersonalRecommendDisplayType.PlainText)
                 {
-                    <PlainTextCard Model="item.Item1" />
+                    <PlainTextCard Model="item" />
                 }
             </div>
         }
@@ -31,7 +31,6 @@
 
 @code {
     List<PersonalRecommendModel> _personalRecommends { get; set; } = new List<PersonalRecommendModel>();
-    List<(EntryIndexViewModel, PersonalRecommendDisplayType)> _items { get; set; } = new List<(EntryIndexViewModel, PersonalRecommendDisplayType)>();
 
     bool loading;
 
@@ -45,16 +44,15 @@
     {
         try
         {
+            if(loading)
+            {
+                return;
+            }
             loading = true;
             StateHasChanged();
 
-            var result = await _httpService.PostAsync<List<PersonalRecommendModel>, List<PersonalRecommendModel>>("api/home/GetPersonalizedRecommendations", _personalRecommends);
+            var result = await _httpService.PostAsync<IEnumerable<int>, List<PersonalRecommendModel>>("api/home/GetPersonalizedRecommendations", _personalRecommends.Select(s=>s.Id));
             _personalRecommends.AddRange(result);
-
-            foreach(var item in result)
-            {
-                _items.Add((await _dataCatcheService.EntryIndexPageCatche.GetCache(item.ObjectId.ToString()),item.DisplayType));
-            }
 
             loading = false;
             StateHasChanged();

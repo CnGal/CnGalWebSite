@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
@@ -33,9 +34,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ILogger<HomeAPIController> _logger;
+        private readonly ISteamInforService _steamInforService;
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger,
-        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
+        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, ISteamInforService steamInforService)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -46,6 +48,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
+            _steamInforService= steamInforService;
         }
 
         /// <summary>
@@ -269,20 +272,136 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<List<PersonalRecommendModel>> GetPersonalizedRecommendations(List<PersonalRecommendModel> model)
+        public async Task<List<PersonalRecommendModel>> GetPersonalizedRecommendations(IEnumerable<int> ids)
         {
+            var model =new List<PersonalRecommendModel>();
+
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && model.Select(s => s.ObjectId).Contains(s.Id) == false)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && ids.Contains(s.Id) == false)
                 .Select(s => s.Id)
                 .ToListAsync();
 
-            return entryIds.Random().Take(5).Select(s => new PersonalRecommendModel
+            entryIds = entryIds.Random().Take(10).ToList() ;
+
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Releases)
+                .Where(s => entryIds.Contains(s.Id))
+                .ToListAsync();
+
+            foreach(var item in entries)
             {
-                DisplayType = PersonalRecommendDisplayType.PlainText,
-                ObjectId = s
-            }).ToList();
+                var release = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official);
+
+                var temp = new PersonalRecommendModel
+                {
+                    Id = item.Id,
+                    BriefIntroduction = item.BriefIntroduction,
+                    DisplayType = PersonalRecommendDisplayType.PlainText,
+                    MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Name = item.Name
+                };
+
+                model.Add(temp);
+
+                if(release!=null)
+                {
+                    var infor = new GameReleaseViewModel
+                    {
+                        Engine = release.Engine,
+                        GamePlatformTypes = release.GamePlatformTypes,
+                        Link = release.Link,
+                        Name = release.Name,
+                        PublishPlatformName = release.PublishPlatformName,
+                        PublishPlatformType = release.PublishPlatformType,
+                        Time = release.Time,
+                        TimeNote = release.TimeNote,
+                        Type = release.Type,
+                    };
+                    if (release.PublishPlatformType == PublishPlatformType.Steam && int.TryParse(release.Link, out int steamId))
+                    {
+                        infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, item.Id);
+                    }
+
+                    temp.Release = infor;
+                }
+
+            }
+
+            return model;
         }
 
+        #region 存档
+        /// <summary>
+        /// 获取即将发售游戏
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeNewestGameViewAsync()
+        {
+            return await _homeService.GetHomeNewestGameViewAsync();
+        }
+        /// <summary>
+        /// 获取近期编辑的游戏或制作组
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeRecentEditViewAsync()
+        {
+            return await _homeService.GetHomeRecentEditViewAsync();
 
+        }
+        /// <summary>
+        /// 获取近期发售的游戏
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeRecentIssuelGameViewAsync()
+        {
+            return await _homeService.GetHomeRecentIssuelGameViewAsync();
+
+        }
+
+        /// <summary>
+        /// 获取友情链接 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeFriendLinksViewAsync()
+        {
+            return await _homeService.GetHomeFriendLinksViewAsync();
+
+        }
+
+        /// <summary>
+        /// 获取通知
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeNoticesViewAsync()
+        {
+            return await _homeService.GetHomeNoticesViewAsync();
+
+        }
+        /// <summary>
+        /// 获取最近发布的文章
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeArticlesViewAsync()
+        {
+            return await _homeService.GetHomeArticlesViewAsync();
+
+        }
+        /// <summary>
+        /// 获取最近发布的视频
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<HomeItemModel>>> GetHomeVideosViewAsync()
+        {
+            return await _homeService.GetHomeVideosViewAsync();
+
+        }
+        #endregion
     }
 }

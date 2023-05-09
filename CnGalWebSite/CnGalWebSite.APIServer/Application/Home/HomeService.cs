@@ -311,5 +311,194 @@ namespace CnGalWebSite.APIServer.Application.Home
 
             return model;
         }
+
+        #region 存档
+        public async Task<List<HomeItemModel>> GetHomeNewestGameViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+            var dateTime = DateTime.Now.ToCstTime().Date;
+            //获取即将发售
+            var entry_result1 = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime != null && s.PubulishTime.Value.Date > dateTime)
+                .OrderBy(s => s.PubulishTime).Take(12).ToListAsync();
+            if (entry_result1 != null)
+            {
+                foreach (var item in entry_result1)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
+                        // DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+            }
+
+            return model;
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeRecentEditViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+            var tempDateTimeNow = DateTime.Now.ToCstTime().Date;
+
+            var entryIds = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
+                    .Where(s => s.Type == EntryType.Game && s.PubulishTime != null && s.PubulishTime.Value.Date < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s => s.Id).Take(12).ToListAsync();
+            entryIds.AddRange(await _entryRepository.GetAll().AsNoTracking()
+                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime != null && s.PubulishTime.Value.Date > tempDateTimeNow)
+                    .OrderBy(s => s.PubulishTime).Select(s => s.Id).Take(12).ToListAsync());
+
+
+            //获取近期编辑
+            var entry_result2 = await _entryRepository.GetAll().OrderByDescending(s => s.LastEditTime).AsNoTracking()
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && entryIds.Contains(s.Id) == false).Take(12).ToListAsync();
+            if (entry_result2 != null)
+            {
+                foreach (var item in entry_result2)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
+                        //  DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+            }
+            return model;
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeRecentIssuelGameViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+
+            //获取近期新作
+            var tempDateTimeNow = DateTime.Now.ToCstTime();
+            var entry_result3 = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
+                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Take(12).ToListAsync();
+            if (entry_result3 != null)
+            {
+                foreach (var item in entry_result3)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
+                        //  DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+            }
+            return model;
+
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeFriendLinksViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+
+            //获取友情置顶词条 根据优先级排序
+            var entry_result4 = await _friendLinkRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority)
+                .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
+            if (entry_result4 != null)
+            {
+                foreach (var item in entry_result4)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.Image, "app.png"),
+                        Url = item.Link,
+                        Name = item.Name,
+                        CommentCount = -1,
+                        ReadCount = -1
+                        //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+
+            }
+            return model;
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeNoticesViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+
+            //获取公告
+            var articles = await _articleRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().OrderByDescending(s => s.Priority).ThenByDescending(s => s.PubishTime)
+                .Where(s => s.Type == ArticleType.Notice && s.IsHidden != true).Take(12).ToListAsync();
+            foreach (var item in articles)
+            {
+                model.Add(new HomeItemModel
+                {
+                    Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
+                    Name = item.DisplayName,
+                    Url = "articles/index/" + item.Id,
+                    CommentCount = item.CommentCount,
+                    ReadCount = item.ReaderCount,
+                    //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                });
+            }
+            return model;
+
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeArticlesViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+
+            //获取近期发布的文章
+            var article_result2 = await _articleRepository.GetAll().Where(s => s.IsHidden != true && s.Type != ArticleType.Notice && s.Type != ArticleType.News).AsNoTracking().OrderByDescending(s => s.PubishTime).ThenByDescending(s => s.Id)
+                .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
+            if (article_result2 != null)
+            {
+                foreach (var item in article_result2)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
+                        Name = item.DisplayName,
+                        Url = "articles/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
+                        //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+            }
+            return model;
+
+        }
+
+        public async Task<List<HomeItemModel>> GetHomeVideosViewAsync()
+        {
+            var model = new List<HomeItemModel>();
+
+            //获取近期发布的视频
+            var article_result2 = await _videoRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().OrderByDescending(s => s.PubishTime).ThenByDescending(s => s.Id)
+                .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
+            if (article_result2 != null)
+            {
+                foreach (var item in article_result2)
+                {
+                    model.Add(new HomeItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "videos/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
+                    });
+                }
+            }
+            return model;
+
+        }
+        #endregion
     }
 }
