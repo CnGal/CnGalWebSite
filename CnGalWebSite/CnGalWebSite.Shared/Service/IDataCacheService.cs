@@ -40,8 +40,6 @@ namespace CnGalWebSite.Shared.Service
 
         bool IsMiniMode { get; set; }
 
-        HomeViewModel HomeViewModel { get; set; }
-
         int RenderTimes { get; set; }
 
         CommentViewModel DetailComment { get; set; }
@@ -114,7 +112,7 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
-        IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }
+        IPageModelCatche<List<HomeItemModel>> HomeListCardsCache { get; set; }
 
         IPageModelCatche<List<PublishGamesTimelineModel>> PublishGamesTimelineDataCatche { get; set; }
 

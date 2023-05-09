@@ -1,0 +1,508 @@
+﻿/*全局*/
+:root {
+    --home-bg-color: #f8fafd;
+    --home-text-color: #1f1f1f;
+    --home-subtle-color: gray;
+}
+
+/*幻灯片组*/
+#home-page .m-slide-group__content {
+    gap: 1rem;
+    padding: .5rem 0;
+}
+
+/*字体*/
+#home-page {
+    letter-spacing: .05rem;
+    font-family: "Google Sans Text", sans-serif;
+}
+    /*分栏*/
+    #home-page .left-content, #home-page {
+        display: flex;
+        flex-direction: column;
+        gap: 6rem;
+    }
+
+        #home-page .right-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        /*卡片组*/
+        #home-page h2 {
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: .4rem;
+            margin-left: 5rem;
+        }
+
+        #home-page section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /*单个卡片*/
+        #home-page .item {
+            display: flex;
+            border-radius: 24px;
+            background-color: var(--home-bg-color);
+            color: var(--home-text-color);
+            transition: .3s;
+            cursor: pointer;
+            white-space: normal;
+        }
+
+            #home-page .item:hover {
+                background-color: var( --hover-color);
+            }
+
+            #home-page .item:active {
+                border-radius: 48px;
+            }
+
+            #home-page .item > img, #home-page .item .image {
+                transition: .3s;
+                border-radius: 24px;
+                width: 100%;
+            }
+
+            #home-page .item:active > img, #home-page .item:active .image {
+                border-radius: 48px;
+            }
+/*轮播图*/
+.carousels-card {
+    border-radius: 24px !important;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
+}
+
+    .carousels-card .carousel-inner {
+        border-radius: 24px !important;
+    }
+
+/*游戏列表*/
+.published-games-card .item, .upcoming-games-card .item {
+    display: flex;
+    flex-direction: column;
+}
+
+    .published-games-card .item .content, .upcoming-games-card .item .content {
+        margin: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .published-games-card .item .name, .upcoming-games-card .item .name {
+        font-size: 1.5rem;
+    }
+
+
+
+/*近期发布游戏*/
+
+.published-games-card .item {
+    width: 15rem;
+}
+
+/*即将发布的游戏*/
+
+.upcoming-games-card .item {
+    width: 25rem;
+}
+/*最新动态*/
+
+
+
+.news-card .item {
+    display: flex;
+    width: 35rem;
+    gap: 1rem;
+    padding: .7rem;
+    cursor: pointer;
+}
+
+.news-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.news-card img {
+    width: 3rem;
+    border-radius: 50%;
+}
+
+.news-card .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.news-card .head {
+    display: flex;
+    gap: .5rem;
+}
+
+.news-card .name {
+    color: var( --home-text-color);
+    font-weight: bold;
+}
+
+.news-card .time {
+    color: var( --home-subtle-color);
+}
+
+.news-card .text {
+    color: var( --home-text-color);
+}
+/*最新文章*/
+.latest-articles-card .row {
+    margin-left: 3rem;
+}
+
+.latest-articles-card .item {
+    margin-bottom: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 25rem;
+}
+
+.latest-articles-card .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .latest-articles-card .content .name {
+        color: var( --home-text-color);
+        font-size: 1.5rem;
+    }
+
+    .latest-articles-card .content .brief {
+        color: var( --home-text-color);
+    }
+
+.latest-articles-card .addinfo {
+    display: flex;
+    justify-content: space-between;
+}
+
+.latest-articles-card .author {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.latest-articles-card .user-image {
+    width: 1.5rem;
+    border-radius: 50%;
+}
+
+.latest-articles-card .author .name {
+    color: var( --home-text-color);
+}
+
+.latest-articles-card .time {
+    color: var( --home-text-color);
+}
+
+.latest-articles-card .head {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+/*边栏*/
+#home-page .right-content h2 {
+    font-size: 2rem !important;
+    margin-left: 1rem !important;
+    margin-top: 1rem;
+}
+
+/*社区*/
+.community-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.community-card .item {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    padding: .5rem 1rem;
+}
+
+.community-card .content {
+    display: flex;
+    flex-direction: column;
+}
+
+    .community-card .content .name {
+        font-weight: bold;
+    }
+
+.community-card .item:hover i {
+    color: var(--active-color);
+}
+
+/*最近编辑*/
+
+.recently-edited-games-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.recently-edited-games-card img {
+    width: 8rem !important;
+    height: fit-content;
+}
+
+.recently-edited-games-card .name {
+    font-size: 1rem;
+}
+
+.recently-edited-games-card .time {
+    color: var( --home-subtle-color);
+}
+
+.recently-edited-games-card .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.4rem 1rem;
+}
+/*最新视频*/
+.latest-videoes-card .row {
+    margin-left: 3rem;
+}
+
+.latest-videoes-card .item {
+    margin-bottom: 1rem;
+    flex-direction: row;
+    width: 25rem;
+}
+
+.latest-videoes-card .image {
+    width: 12rem !important;
+}
+
+.latest-videoes-card .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .latest-videoes-card .content .name {
+        color: var( --home-text-color);
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .latest-videoes-card .content .brief {
+        color: var( --home-text-color);
+    }
+
+.latest-videoes-card .addinfo {
+    display: flex;
+    justify-content: space-between;
+}
+
+.latest-videoes-card .author {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+
+    .latest-videoes-card .author .name {
+        color: var( --home-text-color);
+    }
+
+.latest-videoes-card .time {
+    color: var( --home-text-color);
+}
+
+.latest-videoes-card .head {
+    padding: .5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+/*公告*/
+
+.announcements-card .content {
+    display: flex;
+    flex-direction: column;
+}
+
+.announcements-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.announcements-card .item {
+    display: flex;
+    justify-content: flex-start;
+    padding: .5rem 1rem;
+    gap: .5rem;
+}
+
+    .announcements-card .item:hover i {
+        color: var(--active-color) !important;
+    }
+
+.announcements-card .name.active {
+    font-weight: bold;
+}
+/*友情链接*/
+.friend-links-card .group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-left: 3.5rem;
+    gap: 1rem;
+}
+
+.friend-links-card .item {
+    display: flex;
+    flex-direction: column;
+    width: 12rem;
+}
+
+.friend-links-card .content {
+    padding: 1rem;
+}
+
+.friend-links-card .name {
+    font-size: 1rem;
+}
+/*关于我们*/
+
+.about-card {
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+    .about-card .head {
+        display: flex;
+        gap: 6rem;
+        flex-wrap: wrap;
+    }
+
+    .about-card .links-groups {
+        display: flex;
+        gap: 4rem;
+        margin-top: 3rem;
+    }
+
+    .about-card .links-item {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+.links-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+
+
+.about-card h2 {
+    margin-left: 0 !important;
+    margin-bottom: 3rem;
+    font-size: 2rem !important;
+    max-width: 65rem;
+}
+
+.links-group h3 {
+    font-size: inherit;
+}
+
+.links-item a {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.about-card .introduce img {
+    height: 50px;
+    aspect-ratio: 23/5;
+}
+
+.about-card .introduce {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 40rem;
+    gap: 1rem;
+}
+
+.about-card .text {
+    line-height: 1.3rem;
+}
+
+.about-card .addinfo {
+    display: flex;
+    justify-content: flex-start;
+    gap: 2rem;
+    align-items: center;
+}
+
+    .about-card .addinfo div {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .about-card .addinfo a {
+        color: var(--home-text-color) !important;
+    }
+
+.about-card a:hover {
+    text-decoration: underline;
+}
+
+/*推荐*/
+.recommends-group {
+    margin: 0 3.5rem;
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+}
+
+/*纯文本*/
+.plain-text-card.item {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+    .plain-text-card.item img {
+        min-width: 25rem !important;
+        width: 25rem !important;
+        height: fit-content;
+    }
+
+    .plain-text-card.item .content {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
+
+    .plain-text-card.item .name {
+        font-size: 2rem;
+    }

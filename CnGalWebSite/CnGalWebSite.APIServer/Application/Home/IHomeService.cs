@@ -8,37 +8,37 @@ namespace CnGalWebSite.APIServer.Application.Home
     public interface IHomeService
     {
         /// <summary>
-        /// 获取即将发售游戏
+        /// 获取近期发售的游戏
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeNewestGameViewAsync();
+        Task<List<PublishedGameItemModel>> ListPublishedGames();
         /// <summary>
         /// 获取近期编辑的游戏或制作组
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeRecentEditViewAsync();
+        Task<List<RecentlyEditedGameItemModel>> ListRecentlyEditedGames();
 
         /// <summary>
-        /// 获取近期发售的游戏
+        /// 获取即将发售游戏
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeRecentIssuelGameViewAsync();
+        Task<List<UpcomingGameItemModel>> ListUpcomingGames();
         /// <summary>
         /// 获取友情链接 
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeFriendLinksViewAsync();
+        Task<List<FriendLinkItemModel>> ListFriendLinks();
 
         /// <summary>
         /// 获取通知
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeNoticesViewAsync();
+        Task<List<AnnouncementItemModel>> ListAnnouncements();
         /// <summary>
         /// 获取最近发布的文章
         /// </summary>
         /// <returns></returns>
-        Task<List<MainImageCardModel>> GetHomeArticlesViewAsync();
+        Task<List<LatastArticleItemModel>> ListLatastArticles();
 
         /// <summary>
         /// 获取轮播图
@@ -51,7 +51,44 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// <returns></returns>
         Task<List<HomeNewsAloneViewModel>> GetHomeNewsViewAsync();
 
-        Task<List<MainImageCardModel>> GetHomeVideosViewAsync();
+        Task<List<LatastVideoItemModel>> ListLatastVideoes();
 
+        #region 存档
+        /// <summary>
+        /// 获取即将发售游戏
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeNewestGameViewAsync();
+        /// <summary>
+        /// 获取近期编辑的游戏或制作组
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeRecentEditViewAsync();
+
+        /// <summary>
+        /// 获取近期发售的游戏
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeRecentIssuelGameViewAsync();
+        /// <summary>
+        /// 获取友情链接 
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeFriendLinksViewAsync();
+
+        /// <summary>
+        /// 获取通知
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeNoticesViewAsync();
+        /// <summary>
+        /// 获取最近发布的文章
+        /// </summary>
+        /// <returns></returns>
+        Task<List<HomeItemModel>> GetHomeArticlesViewAsync();
+
+
+        Task<List<HomeItemModel>> GetHomeVideosViewAsync();
+        #endregion
     }
 }

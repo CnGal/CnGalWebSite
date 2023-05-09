@@ -1,0 +1,58 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<LatastArticleItemModel>> _pageModelCatche
+
+<section class="latest-articles-card">
+    <h2>最新文章</h2>
+    <MSlideGroup ShowArrows="true">
+        <ChildContent>
+            @foreach (var item in _items)
+            {
+                <MSlideItem>
+
+                    <a class="item" href="@item.Url">
+                        <img class="image" src="@item.Image" alt="@item.Name" />
+                        <div class="head">
+                            <div class="content">
+                                <div class="name text-truncate-2">@item.Name</div>
+                                <div class="brief text-truncate-3">@item.BriefIntroduction</div>
+                            </div>
+                            <div class="addinfo">
+                                <div class="author">
+                                    <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
+                                    <div class="name">@item.UserName</div>
+                                </div>
+                                <div class="time">@item.PublishTime</div>
+                            </div>
+                        </div>
+                    </a>
+            </MSlideItem>
+                    }
+            </ChildContent>
+    </MSlideGroup>
+</section>
+
+@code {
+
+    List<LatastArticleItemModel> _items { get; set; } = new List<LatastArticleItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListLatastArticles");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页最新文章列表失败");
+        }
+    }
+}

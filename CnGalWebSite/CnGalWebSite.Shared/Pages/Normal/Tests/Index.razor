@@ -1,70 +1,49 @@
-﻿@page "/tests/index/"
+﻿
 @inject IDataCacheService _dataCacheService
 
-
-<style>
-    .browser-link {
-        color: #d979a2;
-        transition: all .6s ease;
-    }
-
-        .browser-link:hover {
-            color: #C6447E;
-            cursor: pointer;
+@if (ToolHelper.IsSSR)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
+}
+else
+{
+    <style>
+        .variable.container {
+            max-width: none;
         }
 
-    a {
-        color: #d979a2;
-        transition: all .6s ease;
-    }
-
-        a:hover {
-            color: #C6447E;
+        body {
+            background-color: white;
         }
 
-        a, a:hover, a:focus {
-            text-decoration: none;
-            outline: none;
+        .load-footer {
+            display: none;
         }
-</style>
-<div style="display: flex; flex-direction: column; align-items: center;">
-    <div style="width: 100%; max-width: 700px;">
-        <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
-        <h4 class="text-center mt-4" style=" font-weight: 600;">呐，貌似这个网站不支持你的浏览器哦</h4>
-        <p class="text-center mt-4">
-            你可以选择安装下方任一浏览器或其他支持最新Web标准的浏览器，再重新进入
-            <a rel="进入CnGal资料站" href="https://www.cngal.org">www.cngal.org</a>
-            <br />如果你使用的是QQ浏览器或360极速浏览器，请右击网页，选择极速模式，并重新打开标签页
-            <br />有任何疑问可以加群 <a rel="点击链接加入群聊【CnGal-NewType反馈群】" href="https://jq.qq.com/?_wv=1027&k=oNCWoamp" target="_blank" class="word-warp-break">761794704</a> 进行反馈
-            <br />感谢你访问 CnGal资料站
-        </p>
-    </div>
-    <div class="mt-4 w-100">
-        <div class="row w-100" style="justify-content: space-between;">
-            <a class="col-12 col-md-6 col-lg-3 col-xl-2 mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Google Chrome" href="https://www.google.cn/chrome/">
-                <i class="fa fa-chrome fa-5x"></i>
-                <p class="m-0 mt-2">Google Chrome</p>
-            </a>
-            <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Mozilla Firefox" href="https://www.mozilla.org/zh-CN/firefox/">
-                <i class="fa fa-firefox fa-5x"></i>
-                <p class="m-0 mt-2">Mozilla Firefox</p>
-            </a>
-
-            <a class="col-12  col-md-6 col-lg-3 col-xl-2  mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Safari" href="https://www.apple.com/safari/">
-                <i class="fa fa-safari fa-5x"></i>
-                <p class="m-0 mt-2">Safari</p>
-            </a>
-            <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4  browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Opera" href="https://www.opera.com/">
-                <i class="fa fa-opera fa-5x"></i>
-                <p class="m-0 mt-2">Opera</p>
-            </a>
-            <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4 browser-link " style="display: flex; flex-direction: column;align-items: center;" rel="Microsoft Edge" href="https://www.microsoft.com/zh-cn/edge">
-                <i class="fa fa-edge fa-5x"></i>
-                <p class="m-0 mt-2">Microsoft Edge</p>
-            </a>
+    </style>
+    <div id="home-page">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.CarouselsCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.NewsCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.PublishedGamesCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.UpcomingGamesCard />
+        <div class="row">
+            <div class="left-content col-12 col-md-9">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.LatestArticlesCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.LatestVideoesCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.FriendLinksCard />
+            </div>
+            <div class="right-content col-12 col-md-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.CommunityCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.AnnouncementsCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.RecentlyEditedGamesCard />
+            </div>
         </div>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.AboutCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
     </div>
-</div>
+
+}
+
+
 
 @code{
 

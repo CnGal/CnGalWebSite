@@ -1598,7 +1598,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             DateTime time = DateTime.Now.ToCstTime();
             var games = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Information)
+                .Include(s=>s.Releases)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s=>groupId==0||s.EntryStaffFromEntryNavigation.Any(s=>s.PositionGeneral== PositionGeneralType.ProductionGroup&&s.ToEntry==groupId))
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Date> after && s.PubulishTime.Value.Date< before)
@@ -1612,7 +1612,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var entry = new PublishGamesTimelineModel();
                 entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(item));
 
-                entry.PublishTimeNote= item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
+                entry.PublishTimeNote= item.Releases.OrderBy(s=>s.Time).FirstOrDefault(s =>s.Type== GameReleaseType.Official)?.TimeNote;
 
                 model.Add(entry);
             }

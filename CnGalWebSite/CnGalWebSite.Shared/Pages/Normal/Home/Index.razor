@@ -1,6 +1,7 @@
 ﻿@page "/home/index"
 @page "/home"
 @page "/"
+
 @inject IDataCacheService _dataCacheService
 
 @if (_dataCacheService.IsApp == true)
@@ -9,6 +10,6 @@
 }
 else
 {
-    <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
+   <CnGalWebSite.Shared.Pages.Normal.Tests.Index/>
 }
 

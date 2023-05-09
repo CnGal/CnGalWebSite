@@ -1,0 +1,54 @@
+﻿
+
+<section class="community-card">
+    <h2>社区交流</h2>
+    <div class="group">
+        @foreach (var item in _items)
+        {
+            <a class="item" href="@item.Link" target="_blank" rel="noreferrer">
+                <MIcon Size="@("2rem")">@item.Icon.ToIconString()</MIcon>
+                <div class="content">
+                    <div class="name">@item.Title</div>
+                    <div>@item.Text</div>
+                </div>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+    List<CommunityModel> _items = new List<CommunityModel>
+    {
+        new CommunityModel
+        {
+            Icon=IconType.QQ,
+            Title="CnGal玩家交流群",
+            Text="本群无资源请支持正版，调戏看板娘要注意节度哦",
+            Link="https://jq.qq.com/?_wv=1027&k=mG6qNvyg"
+        }
+        , new CommunityModel
+        {
+            Icon=IconType.Bug,
+            Title="CnGal编辑者交流与Bug反馈群",
+            Text="群主很懒,什么都没有留下",
+            Link="https://jq.qq.com/?_wv=1027&k=JzuI1IkF"
+        }, new CommunityModel
+        {
+            Icon=IconType.QQChannel,
+            Title="QQ频道",
+            Text="CnGal资料站官方QQ频道",
+            Link="https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=onAQQ&from=246610&biz=ka"
+        }
+    };
+
+    class CommunityModel
+    {
+        public IconType Icon { get; set; }
+
+        public string Title { get; set; }
+
+        public string Text { get; set; }
+
+        public string Link { get; set; }
+    }
+}

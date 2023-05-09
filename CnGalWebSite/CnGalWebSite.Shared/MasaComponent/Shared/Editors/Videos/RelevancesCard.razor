@@ -27,7 +27,9 @@
     <InputRelevanceListTitle Title="外部链接" />
     <ValidateForm Model="@Model">
         <div class="row">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="B站视频Id（bvid/aid）" />
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.BilibiliId" DisplayText="B站视频Id（bvid/aid）" ShowLabel="true" />
+            </div>
         </div>
     </ValidateForm>
 

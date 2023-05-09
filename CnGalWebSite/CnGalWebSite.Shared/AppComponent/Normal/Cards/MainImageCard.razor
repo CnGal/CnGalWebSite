@@ -1,8 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IEventService _eventService
 
-@if (Model.IsOutlink)
-{
+
     <a @onclick="OnClick" target="_blank" class="a-font-color">
         <div class="rounded h-100 shadow-sm  bg-opacity" style="cursor: pointer ">
             <div>
@@ -24,37 +23,10 @@
             </div>
         </div>
     </a>
-}
-else
-{
-    <a href="@Model.Url" class="a-font-color">
-        <div class="rounded h-100 shadow-sm  bg-opacity" style="cursor: pointer ">
-            <div>
-                <img loading="lazy" src="@Model.Image" class="card-img-top" style=" aspect-ratio: 460/215;" alt="@Model.Name" />
-                @if (Model.ReadCount >= 0 && Model.CommentCount >= 0)
-                {
-                        <div class="ms-2 me-2" style="display: flex; justify-content: space-between; color: white; margin-top: -23px;">
-                            <span class="d-flex">
-                                <MIcon Small Class="me-2" Color="white">@IconType.Read.ToIconString()</MIcon>@Model.ReadCount
-                            </span>
-                            <span class="d-flex">
-                                <MIcon Small Class="me-2" Color="white">@IconType.Comment.ToIconString()</MIcon>@Model.CommentCount
-                            </span>
-                        </div>
-
-                }
-            </div>
-            <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
-                <span style="font-size: 15px;" class="home-card-name-text">@Model.Name</span>
-            </div>
-        </div>
-    </a>
-}
-
 
 @code {
     [Parameter]
-    public MainImageCardModel Model { get; set; }
+    public HomeItemModel Model { get; set; }
 
     public async Task OnClick()
     {

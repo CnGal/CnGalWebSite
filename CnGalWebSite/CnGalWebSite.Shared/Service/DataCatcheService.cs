@@ -52,11 +52,7 @@ namespace CnGalWebSite.Shared.Service
         /// 是否为精简模式
         /// </summary>
         public bool IsMiniMode { get; set; }
-    
-        /// <summary>
-        /// 主页数据缓存
-        /// </summary>
-        public HomeViewModel HomeViewModel { get; set; } = null;
+   
         /// <summary>
         /// 主页渲染次数
         /// </summary>
@@ -198,7 +194,8 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 主页缓存
         /// </summary>
-        public IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }
+        public IPageModelCatche<List<HomeItemModel>> HomeListCardsCache { get; set; }
+
         /// <summary>
         /// 用户待审核对象列表缓存
         /// </summary>
@@ -321,7 +318,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
         IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche,
         IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche,
-        IPageModelCatche<List<MainImageCardModel>> homeListCardsCache,
+        IPageModelCatche<List<HomeItemModel>> homeListCardsCache,
         IPageModelCatche<VideoViewModel> videoIndexPageCatche,
         IPageModelCatche<List<RoleBrithdayViewModel>> roleBrithdaysDataCatche,
         IPageModelCatche<FavoriteFolderViewModel> favoriteFolderIndexPageCatche,

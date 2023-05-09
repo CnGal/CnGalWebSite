@@ -1,0 +1,45 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche< List < RecentlyEditedGameItemModel> > _pageModelCatche
+
+
+<section class="recently-edited-games-card">
+    <h2>近期编辑</h2>
+    <div class="group">
+        @foreach (var item in _items)
+        {
+            <a class="item" href="@item.Url">
+                <img src="@item.Image" alt="@item.Name" />
+                <div class="content">
+                    <div class="name text-truncate-1">@item.Name</div>
+                    <div class="time">@item.PublishTime</div>
+                </div>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+
+    List<RecentlyEditedGameItemModel> _items { get; set; } = new List<RecentlyEditedGameItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListRecentlyEditedGames");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页最新编辑游戏列表失败");
+        }
+    }
+}

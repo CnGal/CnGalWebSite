@@ -1,0 +1,77 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+@inject IStructuredDataService _structuredDataService
+
+
+<section class="carousels-card">
+    <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick"></BootstrapBlazor.Components.Carousel>
+</section>
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
+@code {
+
+    private List<string> Images = new List<string>();
+    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
+
+            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).Select(s => s.Image).ToList();
+            if (Carousels.Count >= 6)
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s => s.Image));
+
+            }
+            else
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s => s.Image));
+            }
+
+            //生成轮播结构数据
+            //await GenerateCarouselStructuredDataJson();
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
+        }
+    }
+
+    public async Task GenerateCarouselStructuredDataJson()
+    {
+        var urls = new List<string>();
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeRecentIssuelGameView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNewestGameView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeRecentEditView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNoticesView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeArticlesView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNewsView")).Select(s => s.Url));
+        await _structuredDataService.SetStructuredData(urls);
+
+    }
+
+    private async Task OnClick(string imageUrl)
+    {
+        //查找图片对应的Link
+        var item = Carousels.FirstOrDefault(s => s.Image == imageUrl);
+        if (item == null)
+        {
+            return;
+        }
+
+        await _eventService.OpenNewPage(item.Link);
+        await trackEven?.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, item.Id.ToString(), item.Note);
+
+    }
+
+}

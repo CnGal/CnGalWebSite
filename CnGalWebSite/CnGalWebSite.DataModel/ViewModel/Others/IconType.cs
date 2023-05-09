@@ -135,7 +135,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Right,
         Left,
         Published,
-        UnPublished
+        UnPublished,
+        Bug,
+        QQChannel,
+        Pin,
+        New,
+        UnknowTime,
     }
 
     public static class IconTypeHelper
@@ -144,6 +149,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.UnknowTime:
+                    return "mdi-calendar-question";
+                case IconType.New:
+                    return "mdi-new-box";
+                case IconType.Pin:
+                    return "mdi-pin";
+                case IconType.QQChannel:
+                    return "mdi-music-accidental-sharp";
+                case IconType.Bug:
+                    return "mdi-bug";
                 case IconType.Published:
                     return "mdi-publish";
                 case IconType.UnPublished:

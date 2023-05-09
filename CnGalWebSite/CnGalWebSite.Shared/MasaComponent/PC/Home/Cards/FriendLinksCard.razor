@@ -1,0 +1,44 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<FriendLinkItemModel >> _pageModelCatche
+
+<section class="friend-links-card">
+    <h2>友情链接</h2>
+
+    <div class="group">
+        @foreach (var item in _items)
+        {
+            <a class="item" href="@item.Url" target="_blank">
+                <img src="@item.Image" alt="@item.Name" />
+                <div class="content">
+                    <div class="name text-truncate-1">@item.Name</div>
+                </div>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+
+    List<FriendLinkItemModel> _items { get; set; } = new List<FriendLinkItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListFriendLinks");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页友情链接列表失败");
+        }
+    }
+}

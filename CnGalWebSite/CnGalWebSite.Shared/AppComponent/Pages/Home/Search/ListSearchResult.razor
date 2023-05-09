@@ -11,7 +11,7 @@
             @if (context.article != null)
             {
                 <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new HomeItemModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
 
                 </div>
 
@@ -21,7 +21,7 @@
                 @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
                 {
                     <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.Name, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new HomeItemModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.Name, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
 
                     </div>
 
@@ -38,7 +38,7 @@
             else if (context.periphery != null)
             {
                 <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new HomeItemModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
 
                 </div>
 
@@ -46,7 +46,7 @@
             else if (context.tag != null)
             {
                 <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new HomeItemModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
 
                 </div>
 
@@ -54,7 +54,7 @@
             else if (context.video != null)
             {
                 <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.video.CommentCount, Image = context.video.MainImage, Name = context.video.DisplayName, ReadCount = context.video.ReaderCount, Url = "/videos/index/" + context.video.Id })" />
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new HomeItemModel { CommentCount = context.video.CommentCount, Image = context.video.MainImage, Name = context.video.DisplayName, ReadCount = context.video.ReaderCount, Url = "/videos/index/" + context.video.Id })" />
 
                 </div>
 
