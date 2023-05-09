@@ -976,7 +976,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     {
                         temp.Add(new KeyValueModel
                         {
-                            DisplayName = "发行平台名称",
+                            DisplayName = "游戏平台",
                             DisplayValue =string.Join("、", item.GamePlatformTypes.Select(s=>s.GetDisplayName()))
                         });
                     }

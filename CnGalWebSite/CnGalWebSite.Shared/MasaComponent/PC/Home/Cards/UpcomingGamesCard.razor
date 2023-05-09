@@ -1,0 +1,73 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<UpcomingGameItemModel>> _pageModelCatche
+
+<section class="upcoming-games-card">
+    <h2>即将发布</h2>
+
+    <MSlideGroup ShowArrows="true">
+        <ChildContent>
+            @foreach (var item in _items)
+            {
+                <MSlideItem>
+                    <a class="item" href="@item.Url">
+                        <img src="@item.Image" alt="@item.Name" />
+                        <div class="content">
+                            <div>
+                                <div class="name text-truncate-1">@item.Name</div>
+                                <div class="brief text-truncate-3">@item.BriefIntroduction</div>
+                            </div>
+                            <div class="tags">
+                                <MChip Small Color="@GetPublishTimeChipColor(item)" Class="ma-1">
+                                    <MIcon Left Small>@GetPublishTimeChipIcon(item)</MIcon>
+                                    @GetPublishTimeChipText(item)
+                                </MChip>
+                            </div>
+                        </div>
+                    </a>
+                </MSlideItem>
+            }
+        </ChildContent>
+    </MSlideGroup>
+</section>
+
+@code {
+
+    List<UpcomingGameItemModel> _items { get; set; } = new List<UpcomingGameItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListUpcomingGames");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页即将发布游戏列表失败");
+        }
+    }
+
+    string GetPublishTimeChipColor(UpcomingGameItemModel model)
+    {
+        return DateTime.TryParse(model.PublishTime, out DateTime time) ? "success" : "info";
+    }
+
+    string GetPublishTimeChipIcon(UpcomingGameItemModel model)
+    {
+        return DateTime.TryParse(model.PublishTime, out DateTime time) ? IconType.DeterminedTime.ToIconString() : IconType.IndeterminateTime.ToIconString();
+    }
+
+    string GetPublishTimeChipText(UpcomingGameItemModel model)
+    {
+        return string.IsNullOrWhiteSpace(model.PublishTime) ? "未知" : model.PublishTime;
+    }
+
+}

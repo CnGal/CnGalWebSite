@@ -1,0 +1,97 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+<a class="plain-text-card item" href="@($"entries/index/{Model.Id}")">
+    <img src="@Model.MainPicture" alt="@Model.Name" />
+    <div class="content">
+        <div class="name text-truncate-1">@Model.Name</div>
+        <div class="tags">
+            @*<MChip Small Color="@GetPublishTimeChipColor()" Outlined Class="ma-1">
+            <MIcon Left Small>@GetPublishTimeChipIcon()</MIcon>
+            @GetPublishTimeChipText()
+        </MChip>*@
+            @{ var release = Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official);}
+            @if (release!=null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.TimeChip Model="release" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.EvaluationChip Model="release" />
+            }
+        </div>
+        <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
+    </div>
+</a>
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+
+    string GetPublishTimeChipColor()
+    {
+        if (Model.Releases.Any(s => s.Time != null && string.IsNullOrWhiteSpace(s.TimeNote)))
+        {
+            return "success";
+        }
+        else
+        {
+            if(Model.Releases.Any(s=>s.Time!=null || string.IsNullOrWhiteSpace(s.TimeNote)!=false))
+            {
+                return "info";
+            }
+            else
+            {
+                return "warning";
+            }
+
+        }
+    }
+
+    string GetPublishTimeChipIcon()
+    {
+        if (Model.Releases.Any(s => s.Time != null && string.IsNullOrWhiteSpace(s.TimeNote)))
+        {
+            return IconType.DeterminedTime.ToIconString();
+        }
+        else
+        {
+            if (Model.Releases.Any(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) != false))
+            {
+                return IconType.IndeterminateTime.ToIconString();
+            }
+            else
+            {
+                return IconType.UnknowTime.ToIconString();
+            }
+
+        }
+    }
+
+    string GetPublishTimeChipText()
+    {
+        var time =Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official&&s.Time!=null)?.Time;
+        var note = Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official)?.TimeNote;
+
+        if (time!=null)
+        {
+            if (string.IsNullOrWhiteSpace(note))
+            {
+                return time.Value.ToString("yyyy年M月d日");
+            }
+            else
+            {
+                return note;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(note))
+            {
+                return "未知";
+            }
+            else
+            {
+                return note;
+            }
+        }
+    }
+}

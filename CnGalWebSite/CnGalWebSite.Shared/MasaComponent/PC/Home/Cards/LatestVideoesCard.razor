@@ -1,0 +1,60 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<LatastVideoItemModel>>  _pageModelCatche
+
+<section class="latest-videoes-card">
+    <h2>最新视频</h2>
+    <MSlideGroup ShowArrows="true">
+        <ChildContent>
+            @foreach (var item in _items)
+            {
+                <MSlideItem>
+
+                    <div class="item">
+                        <a href="@item.Url">
+                            <img class="image" src="@item.Image" alt="@item.Name" />
+                        </a>
+                        <div class="head">
+                            <a href="@item.Url" class="content">
+                                <div class="name text-truncate-2">@item.Name</div>
+                            </a>
+                            <div class="addinfo">
+                                <a href="@($"/space/index/{item.UserId}")" class="author">
+                                    <div class="name text-truncate-1">@item.UserName</div>
+                                </a>
+                                <a href="@item.Url">
+                                    <div class="time text-truncate-1">@item.PublishTime</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </MSlideItem>
+            }
+        </ChildContent>
+    </MSlideGroup>
+</section>
+
+@code {
+
+    List<LatastVideoItemModel> _items { get; set; } = new List<LatastVideoItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListLatastVideoes");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页最新视频列表失败");
+        }
+    }
+}

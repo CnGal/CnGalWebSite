@@ -1,0 +1,81 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+<section class="news-card">
+    <h2>最新动态</h2>
+
+    <MSlideGroup ShowArrows="true">
+        <ChildContent>
+
+            @foreach (var items in _items)
+            {
+                <MSlideItem>
+                    <div class="group">
+                        @foreach (var item in items)
+                        {
+                            <div class="item">
+                                <a href="@($"/entries/index/{item.GroupId}")">
+                                    <img src="@item.Image" alt="@item.Title" />
+                                </a>
+                                <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
+                                    <div class="head">
+                                        <div class="name text-truncate-1">@item.Title</div>
+                                        <div class="time">@item.Time.ToTimeFromNowString()</div>
+                                    </div>
+                                    <div class="text text-truncate-1">@item.Text</div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                </MSlideItem>
+            }
+
+        </ChildContent>
+    </MSlideGroup>
+</section>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
+@code {
+
+    public List<IEnumerable<HomeNewsAloneViewModel>> _items { get; set; } = new List<IEnumerable<HomeNewsAloneViewModel>>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            var items = await _dataCacheService.HomePageNewsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
+
+            var i = 0;
+            _items.Clear();
+            while (i < items.Count)
+            {
+                _items.Add(items.Skip(i).Take(3));
+                i += 3;
+            }
+
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页动态列表失败");
+        }
+    }
+
+    public async Task OnClickNews(HomeNewsAloneViewModel model)
+    {
+        if (trackEven != null)
+        {
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, model.ArticleId.ToString(), model.Text);
+        }
+    }
+}

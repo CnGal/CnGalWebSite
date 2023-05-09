@@ -53,18 +53,18 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeNewestGameViewAsync()
+        public async Task<ActionResult<List<PublishedGameItemModel>>> ListPublishedGames()
         {
-            return await _homeService.GetHomeNewestGameViewAsync();
+            return await _homeService.ListPublishedGames();
         }
         /// <summary>
         /// 获取近期编辑的游戏或制作组
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeRecentEditViewAsync()
+        public async Task<ActionResult<List<RecentlyEditedGameItemModel>>> ListRecentlyEditedGames()
         {
-            return await _homeService.GetHomeRecentEditViewAsync();
+            return await _homeService.ListRecentlyEditedGames();
 
         }
         /// <summary>
@@ -72,9 +72,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeRecentIssuelGameViewAsync()
+        public async Task<ActionResult<List<UpcomingGameItemModel>>> ListUpcomingGames()
         {
-            return await _homeService.GetHomeRecentIssuelGameViewAsync();
+            return await _homeService.ListUpcomingGames();
 
         }
 
@@ -83,9 +83,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeFriendLinksViewAsync()
+        public async Task<ActionResult<List<FriendLinkItemModel>>> ListFriendLinks()
         {
-            return await _homeService.GetHomeFriendLinksViewAsync();
+            return await _homeService.ListFriendLinks();
 
         }
 
@@ -94,9 +94,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeNoticesViewAsync()
+        public async Task<ActionResult<List<AnnouncementItemModel>>> ListAnnouncements()
         {
-            return await _homeService.GetHomeNoticesViewAsync();
+            return await _homeService.ListAnnouncements();
 
         }
         /// <summary>
@@ -104,9 +104,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeArticlesViewAsync()
+        public async Task<ActionResult<List<LatastArticleItemModel>>> ListLatastArticles()
         {
-            return await _homeService.GetHomeArticlesViewAsync();
+            return await _homeService.ListLatastArticles();
 
         }
         /// <summary>
@@ -114,9 +114,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeVideosViewAsync()
+        public async Task<ActionResult<List<LatastVideoItemModel>>> ListLatastVideoes()
         {
-            return await _homeService.GetHomeVideosViewAsync();
+            return await _homeService.ListLatastVideoes();
 
         }
         /// <summary>
@@ -266,6 +266,21 @@ namespace CnGalWebSite.APIServer.Controllers
             });
 
             return model;
+        }
+
+        [HttpPost]
+        public async Task<List<PersonalRecommendModel>> GetPersonalizedRecommendations(List<PersonalRecommendModel> model)
+        {
+            var entryIds = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && model.Select(s => s.ObjectId).Contains(s.Id) == false)
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            return entryIds.Random().Take(5).Select(s => new PersonalRecommendModel
+            {
+                DisplayType = PersonalRecommendDisplayType.PlainText,
+                ObjectId = s
+            }).ToList();
         }
 
 
