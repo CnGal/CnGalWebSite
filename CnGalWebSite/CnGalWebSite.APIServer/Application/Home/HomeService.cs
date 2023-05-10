@@ -206,7 +206,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in article_result2)
                 {
-                    model.Add(new LatastArticleItemModel
+                    var temp = new LatastArticleItemModel
                     {
                         Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
                         Name = item.DisplayName,
@@ -214,11 +214,28 @@ namespace CnGalWebSite.APIServer.Application.Home
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         BriefIntroduction = item.BriefIntroduction,
-                        UserId = item.CreateUser.Id,
+                        OriginalAuthor = item.OriginalAuthor,
                         UserName = item.CreateUser.UserName,
                         UserImage = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png"),
-                        PublishTime=item.PubishTime.ToTimeFromNowString()
-                    });
+                        PublishTime = item.PubishTime.ToTimeFromNowString()
+                    };
+                    model.Add(temp);
+
+                    if (temp.BriefIntroduction.Contains("原作者："))
+                    {
+                        var link = temp.BriefIntroduction.MidStrEx("原作者：", "游戏链接：");
+                        var game = temp.BriefIntroduction.MidStrEx("游戏链接：", "》");
+
+                        if (string.IsNullOrWhiteSpace(game) == false && game.Length < 20)
+                        {
+                            temp.BriefIntroduction = temp.BriefIntroduction.Replace($"原作者：{link}游戏链接：{game}》", "");
+                        }
+                        else
+                        {
+                            temp.BriefIntroduction = temp.BriefIntroduction.Replace($"原作者：{link}游戏链接：", "");
+                        }
+
+                    }
                 }
             }
             return model;
@@ -246,8 +263,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                         Url = "videos/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
-                        UserId = item.CreateUser.Id,
-                        UserName = item.CreateUser.UserName,
+                        OriginalAuthor = item.OriginalAuthor,
                         PublishTime = item.PubishTime.ToTimeFromNowString()
 
                     });
@@ -266,7 +282,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 .Include(s => s.CreateUser)
                 .Include(s => s.Entries)
                 .OrderByDescending(s => s.RealNewsTime).ThenByDescending(s => s.PubishTime)
-                .Where(s => s.Name != null && s.Name != "").Take(15).ToListAsync();
+                .Where(s => s.Name != null && s.Name != "").Take(18).ToListAsync();
             if (article_result2 != null)
             {
                 foreach (var item in article_result2)

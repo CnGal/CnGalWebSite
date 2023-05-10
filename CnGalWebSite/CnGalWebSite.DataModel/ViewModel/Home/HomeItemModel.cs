@@ -42,18 +42,17 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
     public class LatastArticleItemModel : HomeItemModel
     {
         public string UserImage { get; set; }
-        public string UserId { get; set; }
         public string UserName { get; set; }
 
         public string PublishTime { get; set; }
 
         public string BriefIntroduction { get; set; }
+        public string OriginalAuthor { get; set; }
     }
 
     public class LatastVideoItemModel : HomeItemModel
     {
-        public string UserId { get; set; }
-        public string UserName { get; set; }
+        public string OriginalAuthor { get; set; }
 
         public string PublishTime { get; set; }
 

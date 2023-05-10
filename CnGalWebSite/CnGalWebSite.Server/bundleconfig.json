@@ -6,7 +6,8 @@
       "wwwroot/css/calendar-heatMap.css",
       "wwwroot/css/site.css",
       "wwwroot/css/official-website.css",
-      "wwwroot/css/article-introduce.css"
+      "wwwroot/css/article-introduce.css",
+      "wwwroot/css/home.css"
     ]
   },
   {
@@ -55,7 +56,8 @@
     "outputFileName": "wwwroot/scripts/bundle-js.min.js",
     "inputFiles": [
       "wwwroot/js/tools-inline.js",
-      "wwwroot/js/lottery.js"
+      "wwwroot/js/lottery.js",
+      "wwwroot/js/home.js"
     ]
   },
   {

@@ -70,6 +70,21 @@
             #home-page .item:active > img, #home-page .item:active .image {
                 border-radius: 48px;
             }
+            /*内部纸片*/
+            #home-page .item .m-chip {
+                transition: .3s;
+            }
+
+            #home-page .item:hover .m-chip {
+                background-color: var(--active-color) !important;
+                border-color: var(--active-color) !important;
+            }
+
+            #home-page .item:hover .m-chip--outlined {
+                background-color: transparent !important;
+                color: var(--active-color) !important;
+                caret-color: var(--active-color) !important;
+            }
 /*轮播图*/
 .carousels-card {
     border-radius: 24px !important;
@@ -118,7 +133,7 @@
 
 .news-card .item {
     display: flex;
-    width: 35rem;
+    width: 28rem;
     gap: 1rem;
     padding: .7rem;
     cursor: pointer;
@@ -168,7 +183,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    width: 25rem;
+    width: 20rem;
 }
 
 .latest-articles-card .content {
@@ -189,7 +204,13 @@
 .latest-articles-card .addinfo {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
 }
+
+    .latest-articles-card .addinfo .m-chip {
+        min-width: 4rem;
+    }
 
 .latest-articles-card .author {
     display: flex;
@@ -207,7 +228,8 @@
 }
 
 .latest-articles-card .time {
-    color: var( --home-text-color);
+    color: var( --home-subtle-color);
+    word-break: keep-all;
 }
 
 .latest-articles-card .head {
@@ -376,7 +398,7 @@
 .friend-links-card .item {
     display: flex;
     flex-direction: column;
-    width: 12rem;
+    width: 15rem;
 }
 
 .friend-links-card .content {
@@ -506,3 +528,84 @@
     .plain-text-card.item .name {
         font-size: 2rem;
     }
+/*每周速报*/
+.weekly-news-card .content {
+    display: flex;
+    flex-direction: column;
+}
+
+.weekly-news-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.weekly-news-card .item {
+    display: flex;
+    justify-content: flex-start;
+    padding: .5rem 1rem;
+    gap: .5rem;
+}
+
+    .weekly-news-card .item:hover i {
+        color: var(--active-color) !important;
+    }
+
+.weekly-news-card .name.active {
+    font-weight: bold;
+}
+/*生日角色*/
+.birthday-card .default.item {
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.birthday-card .default .content {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.birthday-card .default .head {
+    font-size: 3rem;
+}
+
+.birthday-card .group .item {
+    padding: .5rem 1rem;
+    gap: 1rem;
+    align-items: center;
+}
+
+    .birthday-card .group .item img {
+        width: 5rem !important;
+        height: 5rem;
+        border-radius: 50% !important;
+    }
+
+    .birthday-card .group .item .content {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        justify-content: center;
+    }
+
+    .birthday-card .group .item .head {
+        display: flex;
+        gap: .5rem;
+        align-items: flex-end;
+    }
+
+    .birthday-card .group .item .name {
+        font-size: 1.5rem;
+    }
+
+    .birthday-card .group .item .debut-game {
+        color: var( --home-subtle-color);
+    }
+
+.birthday-card .group {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}

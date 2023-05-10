@@ -7,7 +7,6 @@
     @if (_personalRecommends.Any())
     {
         <h2>随机推荐</h2>
-
     }
     <div class="recommends-group">
         @foreach (var item in _personalRecommends)
@@ -23,7 +22,6 @@
     @if (loading)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Class="mt-8" />
-
     }
 </section>
 
@@ -38,6 +36,22 @@
     public ErrorHandler ErrorHandler { get; set; }
 
     private DotNetObjectReference<MainCard> objRef;
+
+    bool firstRender;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (firstRender)
+        {
+            return;
+        }
+        firstRender = true;
+
+        objRef = DotNetObjectReference.Create(this);
+        await TriggerDotNetInstanceMethod();
+
+        firstRender = false;
+    }
 
     [JSInvokable]
     public async Task LoadMore()
@@ -64,14 +78,7 @@
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            objRef = DotNetObjectReference.Create(this);
-            await TriggerDotNetInstanceMethod();
-        }
-    }
+
 
 
     public async Task TriggerDotNetInstanceMethod()

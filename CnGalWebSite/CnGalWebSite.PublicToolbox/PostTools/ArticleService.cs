@@ -483,7 +483,25 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "#", "#")) == false);
 
-            return title.Abbreviate(maxLength).Replace("\n", "").Replace("\r", "").Replace("image", "");
+            var result= title.Abbreviate(maxLength).Replace("\n", "").Replace("\r", "").Replace("image", "");
+
+            //处理国G寄事特有的格式
+            if (result.Contains("原作者："))
+            {
+                var link = result.MidStrEx("原作者：", "游戏链接：");
+                var game = result.MidStrEx("游戏链接：", "》");
+
+                if (string.IsNullOrWhiteSpace(game) == false && game.Length < 20)
+                {
+                    result = result.Replace($"原作者：{link}游戏链接：{game}》", "");
+                }
+                else
+                {
+                    result = result.Replace($"原作者：{link}游戏链接：", "");
+                }
+            }
+
+            return result;
         }
     }
 }

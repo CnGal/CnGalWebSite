@@ -141,6 +141,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Pin,
         New,
         UnknowTime,
+        Carry
     }
 
     public static class IconTypeHelper
@@ -149,6 +150,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Carry:
+                    return "mdi-swap-horizontal";
                 case IconType.UnknowTime:
                     return "mdi-calendar-question";
                 case IconType.New:

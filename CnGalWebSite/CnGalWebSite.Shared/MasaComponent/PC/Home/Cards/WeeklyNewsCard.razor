@@ -1,0 +1,66 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IPageModelCatche<List<ArticleInforTipViewModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+
+
+<section class="weekly-news-card">
+    <h2>每周速报</h2>
+    <div class="group">
+        @foreach (var item in _items.Take(5))
+        {
+            <a class="item" href="@($"articles/index/{item.Id}")">
+                @if (GetIcon(item) != null)
+                {
+                    <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
+                }
+
+                <div class="content">
+                    <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name.MidStrEx("CnGal每周速报（","）")</div>
+                </div>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+
+    List<ArticleInforTipViewModel> _items { get; set; } = new List<ArticleInforTipViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await _pageModelCatche.GetCache("api/news/GetWeeklyNewsOverview");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页周报列表失败");
+        }
+    }
+
+    public string GetIcon(ArticleInforTipViewModel model)
+    {
+        if (model == _items.OrderByDescending(s=>s.LastEditTime).FirstOrDefault())
+        {
+            return IconType.New.ToIconString();
+        }
+
+        return null;
+    }
+
+    public string GetIconColor(ArticleInforTipViewModel model)
+    {
+        if (model == _items.OrderByDescending(s => s.LastEditTime).FirstOrDefault())
+        {
+            return "success";
+        }
+
+        return null;
+    }
+}

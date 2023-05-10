@@ -35,6 +35,7 @@ namespace CnGalWebSite.Shared.Service
             _httpService = httpService;
             _serviceProvider = serviceProvider;
             _token = Guid.NewGuid().ToString();
+            _baseUrl = ToolHelper.WebApiPath;
 
             if (ToolHelper.IsSSR)
             {
@@ -45,7 +46,7 @@ namespace CnGalWebSite.Shared.Service
 
         public void Init(string name, string baseUrl, bool useNewtonsoft = false)
         {
-            _baseUrl = baseUrl ?? string.Empty;
+            _baseUrl = baseUrl ?? string.Empty ;
             _useNewtonsoft = useNewtonsoft;
         }
 

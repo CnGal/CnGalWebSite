@@ -1,6 +1,8 @@
 ﻿
 @inject IDataCacheService _dataCacheService
 
+    <TitleTip></TitleTip>
+
 @if (ToolHelper.IsSSR)
 {
     <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
@@ -22,7 +24,14 @@ else
     </style>
     <div id="home-page">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.CarouselsCard />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.NewsCard />
+        <div class="row">
+            <div class="left-content col-12 col-md-10">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.NewsCard />
+            </div>
+            <div class="right-content col-12 col-md-2">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.WeeklyNewsCard/>
+            </div>
+        </div>
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.PublishedGamesCard />
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.UpcomingGamesCard />
         <div class="row">
@@ -32,9 +41,11 @@ else
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.FriendLinksCard />
             </div>
             <div class="right-content col-12 col-md-3">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.CommunityCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.BirthdayCard />
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.AnnouncementsCard />
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.RecentlyEditedGamesCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.CommunityCard />
+
             </div>
         </div>
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.AboutCard />
