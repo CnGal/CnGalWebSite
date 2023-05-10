@@ -17,7 +17,17 @@
                         <div class="content">
                             <div class="name text-truncate-1">@item.Name</div>
                             <div class="brief text-truncate-2">@item.BriefIntroduction</div>
+                            <div class="tags">
+                                @foreach (var item in item.Tags.Random().Take(2))
+                                {
+                                    <MChip Small Color="primary" Class=" ma-1">
+                                        <MIcon Left Small>@IconType.Tag.ToIconString() </MIcon>
+                                        @item
+                                    </MChip>
+                                }
+                            </div>
                         </div>
+                       
                     </a>
                 </MSlideItem>
             }

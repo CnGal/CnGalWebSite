@@ -1,0 +1,51 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+<div class="image-games-card row">
+    @{ var model = Model.ImageCards.First();}
+    <a class="item-game col-6" href="@($"entries/index/{model.Id}")">
+        <MImage AspectRatio="1" Width="@("100%")" Src="@model.Image">
+            <ChildContent>
+                <div class="game-name">
+                    @model.Name
+                </div>
+            </ChildContent>
+            <PlaceholderContent>
+                <MRow Class="fill-height ma-0"
+                      Align="@AlignTypes.Center"
+                      Justify="@JustifyTypes.Center">
+                    <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                </MRow>
+            </PlaceholderContent>
+        </MImage>
+    </a>
+    <div class="sub-group col-6">
+        <div class="row">
+            @foreach (var item in Model.ImageCards.Skip(1))
+            {
+                <a class="item-game col-6" href="@($"entries/index/{item.Id}")">
+                    <MImage AspectRatio="1" Width="@("100%")" Src="@item.Image">
+                        <ChildContent>
+                            <div class="game-name">
+                                @item.Name
+                            </div>
+                        </ChildContent>
+                        <PlaceholderContent>
+                            <MRow Class="fill-height ma-0"
+                                  Align="@AlignTypes.Center"
+                                  Justify="@JustifyTypes.Center">
+                                <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                            </MRow>
+                        </PlaceholderContent>
+                    </MImage>
+                </a>
+            }
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public PersonalRecommendModel Model { get; set; }
+}

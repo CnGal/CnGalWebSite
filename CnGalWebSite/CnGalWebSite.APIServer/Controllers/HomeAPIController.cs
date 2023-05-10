@@ -277,6 +277,8 @@ namespace CnGalWebSite.APIServer.Controllers
             var model =new List<PersonalRecommendModel>();
 
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
+                //.Include(s => s.Pictures)
+                //.Where(s=>s.Pictures.Any())
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game && ids.Contains(s.Id) == false)
                 .Select(s => s.Id)
                 .ToListAsync();
@@ -285,46 +287,113 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Releases)
+                .Include(s => s.Pictures)
+                .Include(s=>s.Tags)
                 .Where(s => entryIds.Contains(s.Id))
                 .ToListAsync();
 
-            foreach(var item in entries)
-            {
-                var release = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null && s.Type == GameReleaseType.Official);
+            //随机
+            var random = new Random();
 
+            //图墙
+            if(entries.Count(s=>s.Pictures.Any())>=5)
+            {
                 var temp = new PersonalRecommendModel
                 {
-                    Id = item.Id,
-                    BriefIntroduction = item.BriefIntroduction,
-                    DisplayType = PersonalRecommendDisplayType.PlainText,
-                    MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                    Name = item.Name
+                    DisplayType = PersonalRecommendDisplayType.ImageGames
                 };
 
-                model.Add(temp);
+                var imageEntries = new List<Entry>();
 
-                if(release!=null)
+                foreach(var item in entries.Where(s => s.Pictures.Any()).Take(5))
                 {
-                    var infor = new GameReleaseViewModel
-                    {
-                        Engine = release.Engine,
-                        GamePlatformTypes = release.GamePlatformTypes,
-                        Link = release.Link,
-                        Name = release.Name,
-                        PublishPlatformName = release.PublishPlatformName,
-                        PublishPlatformType = release.PublishPlatformType,
-                        Time = release.Time,
-                        TimeNote = release.TimeNote,
-                        Type = release.Type,
-                    };
-                    if (release.PublishPlatformType == PublishPlatformType.Steam && int.TryParse(release.Link, out int steamId))
-                    {
-                        infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, item.Id);
-                    }
-
-                    temp.Release = infor;
+                    imageEntries.Add(item);
                 }
 
+                foreach (var item in imageEntries)
+                {
+                    entries.Remove(item);
+
+                    temp.ImageCards.Add(new PersonalRecommendImageCardModel
+                    {
+                        Id = item.Id,
+                        Name=item.DisplayName,
+                        Image = item.Pictures.OrderBy(s => s.Priority).FirstOrDefault()?.Url
+                    });
+                }
+
+                model.Add(temp);
+            }
+
+            foreach (var item in entries)
+            {
+
+
+                var randomNum = random.Next(0, 2);
+                if (/*randomNum == 0&&*/item.Pictures.Count > 3)
+                {
+                    var temp = new PersonalRecommendModel
+                    {
+                        Id = item.Id,
+                        BriefIntroduction = item.BriefIntroduction,
+                        DisplayType = PersonalRecommendDisplayType.Gallery,
+                        MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Images = item.Pictures.Select(s => s.Url).ToList(),
+                        Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false).Select(s => s.Name).ToList()
+                    };
+                    if (string.IsNullOrWhiteSpace(item.MainPicture) == false)
+                    {
+                        temp.Images.Add(item.MainPicture);
+                    }
+
+                    model.Add(temp);
+
+                    var release = item.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false);
+                    if (release != null)
+                    {
+                        temp.SteamId = release.Link;
+                    }
+                }
+                else
+                {
+                    //纯文本
+
+                    var temp = new PersonalRecommendModel
+                    {
+                        Id = item.Id,
+                        BriefIntroduction = item.BriefIntroduction,
+                        DisplayType = PersonalRecommendDisplayType.PlainText,
+                        MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName
+                    };
+
+                    model.Add(temp);
+
+                    var release = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null && s.Type == GameReleaseType.Official);
+
+                    if (release != null)
+                    {
+                        var infor = new GameReleaseViewModel
+                        {
+                            Engine = release.Engine,
+                            GamePlatformTypes = release.GamePlatformTypes,
+                            Link = release.Link,
+                            Name = release.Name,
+                            PublishPlatformName = release.PublishPlatformName,
+                            PublishPlatformType = release.PublishPlatformType,
+                            Time = release.Time,
+                            TimeNote = release.TimeNote,
+                            Type = release.Type,
+                        };
+                        if (release.PublishPlatformType == PublishPlatformType.Steam && int.TryParse(release.Link, out int steamId))
+                        {
+                            infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, item.Id);
+                        }
+
+                        temp.Release = infor;
+                    }
+                }
             }
 
             return model;

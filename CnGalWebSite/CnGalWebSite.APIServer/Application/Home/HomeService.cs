@@ -45,8 +45,11 @@ namespace CnGalWebSite.APIServer.Application.Home
 
             //获取近期新作
             var tempDateTimeNow = DateTime.Now.ToCstTime();
-            var entry_result3 = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
-                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Take(12).ToListAsync();
+            var entry_result3 = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Tags)
+                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Take(16)
+                .OrderByDescending(s => s.PubulishTime)
+                .ToListAsync();
             if (entry_result3 != null)
             {
                 foreach (var item in entry_result3)
@@ -59,6 +62,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         BriefIntroduction = item.BriefIntroduction,
+                        Tags=item.Tags.Where(s=>s.Name.Contains("字幕")==false&& s.Name.Contains("语音") == false).Select(s=>s.Name).ToList()
                     });
                 }
             }
@@ -107,7 +111,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             var entry_result1 = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Releases)
                 .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime != null && s.PubulishTime.Value.Date > dateTime)
-                .OrderBy(s => s.PubulishTime).Take(12).ToListAsync();
+                .OrderBy(s => s.PubulishTime).Take(16).ToListAsync();
             if (entry_result1 != null)
             {
                 foreach (var item in entry_result1)

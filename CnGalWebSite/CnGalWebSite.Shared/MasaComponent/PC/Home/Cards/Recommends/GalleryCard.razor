@@ -1,0 +1,79 @@
+﻿@inject NavigationManager NavigationManager
+@inject ImagesLargeViewService ImagesLargeViewService
+@inject IDataCacheService _dataCatcheService
+@inject IEventService _eventService
+
+<div class="gallery-card">
+    <div class="content">
+        <div class="head">
+            <div class="name text-truncate-1">@Model.Name</div>
+            <div class="tags">
+                @foreach (var item in Model.Tags.Random().Take(2))
+                {
+                    <MChip Small Color="primary" Class=" ma-1">
+                        <MIcon Left Small>@IconType.Tag.ToIconString() </MIcon>
+                        @item
+                    </MChip>
+                }
+            </div>
+
+        </div>
+        <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
+    </div>
+    <div class="gallery">
+        <MSlideGroup ShowArrows="true" CenterActive>
+            @foreach (var item in Model.Images)
+            {
+                <MSlideItem>
+                    <MImage Height="180" Width="320" Src="@item" @onclick="@(async ()=>{ if (!context.Active) {await context.Toggle.Invoke(); }await OnClickImage(item); })" RefBack="context.Ref">
+                        <PlaceholderContent>
+                            <MRow Class="fill-height ma-0"
+                                  Align="@AlignTypes.Center"
+                                  Justify="@JustifyTypes.Center">
+                                <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                            </MRow>
+                        </PlaceholderContent>
+                    </MImage>
+                </MSlideItem>
+            }
+        </MSlideGroup>
+    </div>
+    <div class="actions">
+        <MButton Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
+            <MIcon Left>@IconType.Game.ToIconString()</MIcon>
+            访问作品页面
+        </MButton>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
+        <MButton Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+            <MIcon Left>@IconType.Steam.ToIconString()</MIcon>
+            访问Steam商店
+        </MButton>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public PersonalRecommendModel Model { get; set; }
+
+    public async Task OnClickImage(string image)
+    {
+        if (_dataCatcheService.IsApp)
+        {
+            await _eventService.OpenNewPage(image);
+        }
+        else
+        {
+            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            {
+                Index = Model.Images.IndexOf(image),
+                Pictures = Model.Images.Select(s => new EditImageAloneModel
+                {
+                    Image = s,
+                }).ToList()
+            });
+        }
+
+    }
+
+}

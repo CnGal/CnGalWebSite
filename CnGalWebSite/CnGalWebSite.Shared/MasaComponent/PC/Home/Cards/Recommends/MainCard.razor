@@ -4,25 +4,44 @@
 @inject IDataCacheService _dataCatcheService
 
 <section class="recommends">
-    @if (_personalRecommends.Any())
-    {
-        <h2>随机推荐</h2>
-    }
-    <div class="recommends-group">
-        @foreach (var item in _personalRecommends)
+    <MContainer>
+        @if (_personalRecommends.Any())
         {
-            <div class="recommends-item">
-                @if (item.DisplayType == PersonalRecommendDisplayType.PlainText)
-                {
-                    <PlainTextCard Model="item" />
-                }
-            </div>
+            <h2>随机推荐</h2>
         }
-    </div>
-    @if (loading)
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Class="mt-8" />
-    }
+        <div class="recommends-group">
+            @foreach (var item in _personalRecommends)
+            {
+                <div class="recommends-item">
+                    @if (item.DisplayType == PersonalRecommendDisplayType.PlainText)
+                    {
+                        <PlainTextCard Model="item" />
+                    }
+                    else if (item.DisplayType == PersonalRecommendDisplayType.ImageGames)
+                    {
+                        <ImageGamesCard Model="item" />
+                    }
+                    else if (item.DisplayType == PersonalRecommendDisplayType.Gallery)
+                    {
+                        <GalleryCard Model="item" />
+                    }
+                </div>
+            }
+        </div>
+        @if (loading)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Class="mt-8" />
+        }
+        @if (completed)
+        {
+           <div class="completed-card">
+               <DivideCard />
+               <div class="content">不能再往下划啦 o(〃＾▽＾〃)o</div>
+               <DivideCard />
+           </div>
+        }
+    </MContainer>
+ 
 </section>
 
 
@@ -31,6 +50,7 @@
     List<PersonalRecommendModel> _personalRecommends { get; set; } = new List<PersonalRecommendModel>();
 
     bool loading;
+    bool completed;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -56,6 +76,10 @@
     {
         try
         {
+            if(completed)
+            {
+                return;
+            }
             if(loading)
             {
                 return;
@@ -64,7 +88,15 @@
             StateHasChanged();
 
             var result = await _httpService.PostAsync<IEnumerable<int>, List<PersonalRecommendModel>>("api/home/GetPersonalizedRecommendations", _personalRecommends.Select(s=>s.Id));
-            _personalRecommends.AddRange(result);
+
+            if(result.Any()==false)
+            {
+                completed = true;
+            }
+            else
+            {
+                _personalRecommends.AddRange(result);
+            }
 
             loading = false;
             StateHasChanged();
