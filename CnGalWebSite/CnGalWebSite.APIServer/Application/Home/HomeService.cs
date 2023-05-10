@@ -47,8 +47,9 @@ namespace CnGalWebSite.APIServer.Application.Home
             var tempDateTimeNow = DateTime.Now.ToCstTime();
             var entry_result3 = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Tags)
-                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Take(16)
+                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true)
                 .OrderByDescending(s => s.PubulishTime)
+                .Take(16)
                 .ToListAsync();
             if (entry_result3 != null)
             {
