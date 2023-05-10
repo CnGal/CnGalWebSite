@@ -21,16 +21,29 @@
                             </div>
                             <div class="addinfo">
                                 <div class="author">
-                                    <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
-                                    <div class="name">@item.UserName</div>
+                                    @if (string.IsNullOrWhiteSpace(item.OriginalAuthor))
+                                    {
+                                        <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
+                                        <div class="name">@item.UserName</div>
+                                    }
+                                    else
+                                    {
+                                        <MChip Small Color="info" Class=" ma-1">
+                                            <MIcon Left Small>@IconType.Carry.ToIconString() </MIcon>
+                                            搬运
+                                        </MChip>
+                                        <div class="name text-truncate-1">
+                                            作者：@item.OriginalAuthor
+                                        </div>
+                                    }
                                 </div>
                                 <div class="time">@item.PublishTime</div>
                             </div>
                         </div>
                     </a>
-            </MSlideItem>
-                    }
-            </ChildContent>
+                </MSlideItem>
+            }
+        </ChildContent>
     </MSlideGroup>
 </section>
 

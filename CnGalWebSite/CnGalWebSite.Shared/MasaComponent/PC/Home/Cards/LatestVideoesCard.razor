@@ -11,25 +11,18 @@
             @foreach (var item in _items)
             {
                 <MSlideItem>
-
-                    <div class="item">
-                        <a href="@item.Url">
-                            <img class="image" src="@item.Image" alt="@item.Name" />
-                        </a>
+                    <a class="item" href="@item.Url">
+                        <img class="image" src="@item.Image" alt="@item.Name" />
                         <div class="head">
-                            <a href="@item.Url" class="content">
+                            <div class="content">
                                 <div class="name text-truncate-2">@item.Name</div>
-                            </a>
+                            </div>
                             <div class="addinfo">
-                                <a href="@($"/space/index/{item.UserId}")" class="author">
-                                    <div class="name text-truncate-1">@item.UserName</div>
-                                </a>
-                                <a href="@item.Url">
-                                    <div class="time text-truncate-1">@item.PublishTime</div>
-                                </a>
+                                <div class="name text-truncate-1">@item.OriginalAuthor</div>
+                                <div class="time text-truncate-1">@item.PublishTime</div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </MSlideItem>
             }
         </ChildContent>
