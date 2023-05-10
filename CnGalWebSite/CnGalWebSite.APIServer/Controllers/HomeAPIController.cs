@@ -290,7 +290,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach(var item in entries)
             {
-                var release = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official);
+                var release = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null && s.Type == GameReleaseType.Official);
 
                 var temp = new PersonalRecommendModel
                 {

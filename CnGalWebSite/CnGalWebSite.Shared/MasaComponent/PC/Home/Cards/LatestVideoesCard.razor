@@ -8,21 +8,28 @@
     <h2>最新视频</h2>
     <MSlideGroup ShowArrows="true">
         <ChildContent>
-            @foreach (var item in _items)
+            @foreach (var group in _items)
             {
                 <MSlideItem>
-                    <a class="item" href="@item.Url">
-                        <img class="image" src="@item.Image" alt="@item.Name" />
-                        <div class="head">
-                            <div class="content">
-                                <div class="name text-truncate-2">@item.Name</div>
-                            </div>
-                            <div class="addinfo">
-                                <div class="name text-truncate-1">@item.OriginalAuthor</div>
-                                <div class="time text-truncate-1">@item.PublishTime</div>
-                            </div>
-                        </div>
-                    </a>
+                    <div class="group">
+                        @foreach (var item in group)
+                        {
+                            <a class="item" href="@item.Url">
+                                <img class="image" src="@item.Image" alt="@item.Name" />
+                                <div class="head">
+                                    <div class="content">
+                                        <div class="name text-truncate-2">@item.Name</div>
+                                    </div>
+                                    <div class="addinfo">
+                                        <div class="name text-truncate-1">@item.OriginalAuthor</div>
+                                        <div class="time text-truncate-1">@item.PublishTime</div>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+
+                    </div>
+                
                 </MSlideItem>
             }
         </ChildContent>
@@ -31,7 +38,7 @@
 
 @code {
 
-    List<LatastVideoItemModel> _items { get; set; } = new List<LatastVideoItemModel>();
+    List<IEnumerable<LatastVideoItemModel>> _items { get; set; } = new List<IEnumerable<LatastVideoItemModel>>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -42,7 +49,16 @@
         try
         {
             //获取主页信息
-            _items = await _pageModelCatche.GetCache("api/home/ListLatastVideoes");
+            var items = await _pageModelCatche.GetCache("api/home/ListLatastVideoes");
+
+            var i = 0;
+            _items.Clear();
+            while (i < items.Count)
+            {
+                _items.Add(items.Skip(i).Take(2));
+                i += 2;
+            }
+
             StateHasChanged();
         }
         catch (Exception ex)
