@@ -40,7 +40,7 @@
 
 @code {
 
-    public List<IEnumerable<HomeNewsAloneViewModel>> _items { get; set; } = new List<IEnumerable<HomeNewsAloneViewModel>>();
+    List<IEnumerable<HomeNewsAloneViewModel>> _items { get; set; } = new List<IEnumerable<HomeNewsAloneViewModel>>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

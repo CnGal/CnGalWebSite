@@ -302,18 +302,19 @@
     padding: 0.4rem 1rem;
 }
 /*最新视频*/
-.latest-videoes-card .row {
-    margin-left: 3rem;
+.latest-videoes-card .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .latest-videoes-card .item {
-    margin-bottom: 1rem;
     flex-direction: row;
-    width: 25rem;
+    width: 30rem;
 }
 
 .latest-videoes-card .image {
-    width: 12rem !important;
+    width: 15rem !important;
 }
 
 .latest-videoes-card .content {
@@ -350,6 +351,7 @@
 
 .latest-videoes-card .time {
     color: var( --home-text-color);
+    word-break: keep-all;
 }
 
 .latest-videoes-card .head {

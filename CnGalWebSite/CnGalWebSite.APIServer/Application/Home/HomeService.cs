@@ -263,7 +263,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                         Url = "videos/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
-                        OriginalAuthor = item.OriginalAuthor,
+                        OriginalAuthor =string.IsNullOrWhiteSpace( item.OriginalAuthor)?item.CreateUser.UserName : item.OriginalAuthor,
                         PublishTime = item.PubishTime.ToTimeFromNowString()
 
                     });

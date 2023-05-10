@@ -1,6 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IJSRuntime JS
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IDataCacheService _dataCatcheService
 
 <section class="recommends">
@@ -37,20 +37,18 @@
 
     private DotNetObjectReference<MainCard> objRef;
 
-    bool firstRender;
+    bool firstRender=true;
 
     protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        if (firstRender==false)
         {
             return;
         }
-        firstRender = true;
+        firstRender = false;
 
         objRef = DotNetObjectReference.Create(this);
         await TriggerDotNetInstanceMethod();
-
-        firstRender = false;
     }
 
     [JSInvokable]
@@ -92,8 +90,16 @@
 
         }
     }
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         objRef?.Dispose();
+        try
+        {
+            await JS.InvokeAsync<string>("deinitInfiniteScroll");
+        }
+        catch
+        {
+
+        }
     }
 }
