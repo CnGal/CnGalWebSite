@@ -344,7 +344,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     };
                     if (string.IsNullOrWhiteSpace(item.MainPicture) == false)
                     {
-                        temp.Images.Add(item.MainPicture);
+                        temp.Images.Insert(0,item.MainPicture);
                     }
 
                     model.Add(temp);
