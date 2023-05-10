@@ -3,10 +3,19 @@
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
 
+@if (PlainText)
+{
+    <MButton Rounded Color="primary" Outlined OnClick="OnClickStar">
+        <MIcon Left>@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())</MIcon>
+        @(IsUserFavorited?"取消收藏":"收藏")
+    </MButton>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
+}
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsUserFavorited?"mdi-heart":"mdi-heart-outline")" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
-
-<ChooseFavoriteFolderTip @ref="chooseFavoriteFolderTip" ObjectId="Id" Type="Type" OnFavorited="@(() => {  IsUserFavorited = true; StateHasChanged();})"/>
+<ChooseFavoriteFolderTip @ref="chooseFavoriteFolderTip" ObjectId="Id" Type="Type" OnFavorited="@(() => {  IsUserFavorited = true; StateHasChanged();})" />
 
 @code {
     [Parameter]
@@ -16,6 +25,8 @@
     public FavoriteObjectType Type { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool PlainText { get; set; }
 
     public bool IsUserFavorited { get; set; }
     public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
@@ -129,7 +140,7 @@
         var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
         if (favoriteFolderIds.Length == 0)
         {
-            if(chooseFavoriteFolderTip!=null)
+            if (chooseFavoriteFolderTip != null)
             {
                 chooseFavoriteFolderTip.Refresh(UserFavoriteInfor);
             }

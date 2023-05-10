@@ -1580,6 +1580,8 @@ a .aspect-ratio + p > strong {
     --home-bg-color: #f8fafd;
     --home-text-color: #1f1f1f;
     --home-subtle-color: gray;
+    --home-border-radius: 12px;
+    --home-active-border-radius: 24px;
 }
 
 /*幻灯片组*/
@@ -1622,7 +1624,7 @@ a .aspect-ratio + p > strong {
         /*单个卡片*/
         #home-page .item {
             display: flex;
-            border-radius: 24px;
+            border-radius: var( --home-border-radius);
             background-color: var(--home-bg-color);
             color: var(--home-text-color);
             transition: .3s;
@@ -1635,17 +1637,17 @@ a .aspect-ratio + p > strong {
             }
 
             #home-page .item:active {
-                border-radius: 48px;
+                border-radius: var( --home-active-border-radius);
             }
 
             #home-page .item > img, #home-page .item .image {
                 transition: .3s;
-                border-radius: 24px;
+                border-radius: var( --home-border-radius);
                 width: 100%;
             }
 
             #home-page .item:active > img, #home-page .item:active .image {
-                border-radius: 48px;
+                border-radius: var( --home-active-border-radius);
             }
             /*内部纸片*/
             #home-page .item .m-chip {
@@ -1696,7 +1698,7 @@ a .aspect-ratio + p > strong {
 /*近期发布游戏*/
 
 .published-games-card .item {
-    width: 15rem;
+    width: 17rem;
 }
 
 /*即将发布的游戏*/
@@ -1927,7 +1929,7 @@ a .aspect-ratio + p > strong {
     }
 
 .latest-videoes-card .time {
-    color: var( --home-text-color);
+    color: var( --home-subtle-color);
     word-break: keep-all;
 }
 
@@ -2078,12 +2080,27 @@ a .aspect-ratio + p > strong {
 
 /*推荐*/
 .recommends-group {
-    margin: 0 3.5rem;
     display: flex;
-    gap: 2rem;
+    gap: 5rem;
     flex-direction: column;
 }
 
+.recommends .container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.recommends h2 {
+    margin-left: 3rem !important;
+}
+
+.recommends .completed-card .content {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    font-size: 1rem;
+}
 /*纯文本*/
 .plain-text-card.item {
     display: flex;
@@ -2106,6 +2123,134 @@ a .aspect-ratio + p > strong {
 
     .plain-text-card.item .name {
         font-size: 2rem;
+    }
+/*图墙*/
+.image-games-card .m-image__image {
+    border-radius: var( --home-border-radius);
+    transition: .3s;
+}
+
+.image-games-card .item-game:active .m-image__image {
+    border-radius: var( --home-active-border-radius);
+}
+
+.sub-group > .row {
+    row-gap: 1.5rem;
+}
+
+.image-games-card .game-name {
+    display: none;
+    transition: .3s;
+}
+
+.image-games-card .item-game:hover .game-name {
+    display: flex;
+    /*调用动画效果*/
+    -webkit-animation-name: fadeIn; /*动画名称*/
+    -webkit-animation-duration: .3s; /*动画持续时间*/
+    -webkit-animation-iteration-count: 1; /*动画次数*/
+    -webkit-animation-delay: 0s; /*延迟时间*/
+}
+
+.image-games-card .item-game:active .game-name {
+    border-radius: var( --home-active-border-radius);
+}
+
+.image-games-card .game-name {
+    background: linear-gradient(to bottom,rgba(0,0,0,0) 70%,rgba(0,0,0,.7));
+    height: 100%;
+    width: 100%;
+    align-items: flex-end;
+    color: white;
+    font-size: 1.5rem;
+    padding: 1rem;
+    border-radius: var( --home-border-radius);
+}
+
+/*动画效果*/
+@-webkit-keyframes fadeIn {
+    0% {
+        opacity: 0; /*初始状态 透明度为0*/
+    }
+
+    20% {
+        opacity: .2;
+    }
+
+    50% {
+        opacity: .5; /*中间状态 透明度为0.5*/
+    }
+
+    70% {
+        opacity: .7;
+    }
+
+    100% {
+        opacity: 1; /*结尾状态 透明度为1*/
+    }
+}
+/*画廊 游戏相册*/
+.gallery-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.gallery-card {
+    display: flex;
+    border-radius: var(--home-border-radius);
+    background-color: var(--home-bg-color);
+    color: var(--home-text-color);
+    transition: .3s;
+    white-space: normal;
+}
+
+    .gallery-card .head {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+
+        .gallery-card .head img {
+            width: 13rem;
+            height: fit-content;
+            border-radius: 12px;
+        }
+
+    .gallery-card .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        padding: 1rem 1.5rem;
+        gap: .5rem;
+    }
+
+    .gallery-card .name {
+        font-size: 2rem;
+    }
+
+    .gallery-card .gallery img {
+        height: 20rem;
+        width: fit-content;
+    }
+
+    .gallery-card .actions {
+        display: flex;
+        justify-content: space-around;
+        padding: 1rem;
+    }
+
+    .gallery-card button {
+        transition: .3s;
+    }
+
+        .gallery-card button:hover {
+            background-color: #F06292 !important;
+            color: white !important;
+        }
+
+    .gallery-card .m-image {
+        border-radius: 12px;
+        cursor: pointer;
     }
 /*每周速报*/
 .weekly-news-card .content {

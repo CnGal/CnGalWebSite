@@ -60,6 +60,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
     public class PublishedGameItemModel : HomeItemModel
     {
         public string BriefIntroduction { get; set; }
+        public List<string> Tags { get; set; }
     }
 
     public class RecentlyEditedGameItemModel : HomeItemModel

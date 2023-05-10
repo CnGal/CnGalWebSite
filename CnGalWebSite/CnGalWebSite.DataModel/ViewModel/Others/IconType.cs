@@ -141,7 +141,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Pin,
         New,
         UnknowTime,
-        Carry
+        Carry,
+        Favorite,
+        UnFavorite
     }
 
     public static class IconTypeHelper
@@ -150,6 +152,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Favorite:
+                    return "mdi-heart";
+                case IconType.UnFavorite:
+                    return "mdi-heart-outline";
                 case IconType.Carry:
                     return "mdi-swap-horizontal";
                 case IconType.UnknowTime:
