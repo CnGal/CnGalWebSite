@@ -7,7 +7,6 @@
 <section class="latest-videoes-card">
     <h2>最新视频</h2>
     <MSlideGroup ShowArrows="true">
-        <ChildContent>
             @foreach (var group in _items)
             {
                 <MSlideItem>
@@ -29,10 +28,16 @@
                         }
 
                     </div>
-                
+
                 </MSlideItem>
             }
-        </ChildContent>
+            <MSlideItem>
+                <a class="item more-link" href="/search/?Types=Video">
+                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                    <div class="text">查看更多</div>
+                </a>
+            </MSlideItem>
+
     </MSlideGroup>
 </section>
 

@@ -1,11 +1,11 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-<div class="image-games-card row">
+<div class="image-games-card masa-image row">
     @{ var model = Model.ImageCards.First();}
-    <a class="item-game col-6" href="@($"entries/index/{model.Id}")">
+    <a class="item-image col-6" href="@($"entries/index/{model.Id}")">
         <MImage AspectRatio="1" Width="@("100%")" Src="@model.Image">
             <ChildContent>
-                <div class="game-name">
+                <div class="image-name">
                     @model.Name
                 </div>
             </ChildContent>
@@ -22,10 +22,10 @@
         <div class="row">
             @foreach (var item in Model.ImageCards.Skip(1))
             {
-                <a class="item-game col-6" href="@($"entries/index/{item.Id}")">
+                <a class="item-image col-6" href="@($"entries/index/{item.Id}")">
                     <MImage AspectRatio="1" Width="@("100%")" Src="@item.Image">
                         <ChildContent>
-                            <div class="game-name">
+                            <div class="image-name">
                                 @item.Name
                             </div>
                         </ChildContent>

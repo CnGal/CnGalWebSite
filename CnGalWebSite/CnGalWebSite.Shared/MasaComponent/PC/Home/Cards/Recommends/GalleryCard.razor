@@ -38,17 +38,22 @@
             }
         </MSlideGroup>
     </div>
-    <div class="actions">
-        <MButton Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
-            <MIcon Left>@IconType.Game.ToIconString()</MIcon>
-            访问作品页面
-        </MButton>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
-        <MButton Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
-            <MIcon Left>@IconType.Steam.ToIconString()</MIcon>
-            访问Steam商店
-        </MButton>
-    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <div class="actions">
+            <MButton Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
+                <MIcon Left>@IconType.Game.ToIconString()</MIcon>
+                访问作品页面
+            </MButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
+            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false)
+            {
+                <MButton Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                    <MIcon Left>@IconType.Steam.ToIconString()</MIcon>
+                    访问Steam商店
+                </MButton>
+            }
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 </div>
 
 

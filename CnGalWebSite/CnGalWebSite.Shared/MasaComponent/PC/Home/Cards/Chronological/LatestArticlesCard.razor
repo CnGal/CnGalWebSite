@@ -7,7 +7,6 @@
 <section class="latest-articles-card">
     <h2>最新文章</h2>
     <MSlideGroup ShowArrows="true">
-        <ChildContent>
             @foreach (var item in _items)
             {
                 <MSlideItem>
@@ -43,7 +42,12 @@
                     </a>
                 </MSlideItem>
             }
-        </ChildContent>
+            <MSlideItem>
+                <a class="item more-link" href="/articles">
+                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                    <div class="text">查看更多</div>
+                </a>
+            </MSlideItem>
     </MSlideGroup>
 </section>
 

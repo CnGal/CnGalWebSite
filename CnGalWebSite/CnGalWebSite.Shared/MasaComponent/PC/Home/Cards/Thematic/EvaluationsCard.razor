@@ -1,0 +1,76 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<EvaluationItemModel>> _pageModelCatche
+
+<section class="evaluations-card">
+    <h2>专题推荐</h2>
+
+    <div class="evaluations-group row">
+        @foreach (var item in _items)
+        {
+            <div class="evaluations-item col-12 col-md-6">
+                <div class="masa-image">
+                    <a class="item-image" href="@item.Url">
+                        <MImage AspectRatio="460/215D" Width="@("100%")" Src="@item.Image">
+                            <ChildContent>
+                                <div class="image-name">
+                                    @item.Name
+                                </div>
+                            </ChildContent>
+                            <PlaceholderContent>
+                                <MRow Class="fill-height ma-0"
+                                      Align="@AlignTypes.Center"
+                                      Justify="@JustifyTypes.Center">
+                                    <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                                </MRow>
+                            </PlaceholderContent>
+                        </MImage>
+                    </a>
+                </div>
+
+                <div class="articles-group">
+                    @foreach (var infor in item.Articles)
+                    {
+                            <a class="item" href="@($"/articles/index/{infor.Id}")">
+                                <img class="image" src="@infor.Image" alt="@infor.Name" />
+                                <div class="head">
+                                    <div class="content">
+                                        <div class="name text-truncate-1">@infor.Name</div>
+                                    </div>
+                                    <div class="addinfo">
+                                        <div class="name text-truncate-1">@infor.OriginalAuthor</div>
+                                        <div class="type"> @infor.Type.GetDisplayName() </div>
+                                    </div>
+                                </div>
+                            </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+  
+</section>
+
+@code {
+
+    List<EvaluationItemModel> _items { get; set; } = new List<EvaluationItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await _pageModelCatche.GetCache("api/home/ListEvaluations");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页专题推荐列表失败");
+        }
+    }
+}

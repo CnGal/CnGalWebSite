@@ -1,0 +1,44 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IPageModelCatche<List<HotTagItemModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+
+
+<section class="hot-tags-card">
+    <h2>热门标签</h2>
+    <div class="group">
+        @foreach (var item in _items)
+        {
+            <a class="item" href="@item.Url">
+                <MIcon Small>@IconType.Tag.ToIconString()</MIcon>
+                <div class="content">
+                    <div class="name">@item.Name</div>
+                </div>
+
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+
+    List<HotTagItemModel> _items { get; set; } = new List<HotTagItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListHotTags");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页热门标签列表失败");
+        }
+    }
+}
