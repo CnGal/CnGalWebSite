@@ -480,13 +480,22 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<EvaluationItemModel>>> ListEvaluations()
         {
+            var entryIds = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .Include(s=>s.Pictures)
+                .Where(s => s.Articles.Count >= 6 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Select(s=>s.Id)
+                .ToListAsync();
+
+            entryIds = entryIds.ToList().Random().Take(4).ToList();
+
+
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                 .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
-                .Where(s => s.Articles.Count >= 6 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
-                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .OrderByDescending(s => s.Priority)
-                .Take(4)
+                .Include(s => s.Pictures)
+                .Where(s => entryIds.Contains(s.Id))
                 .ToListAsync();
 
             var model = new List<EvaluationItemModel>();
@@ -495,7 +504,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 model.Add(new EvaluationItemModel
                 {
-                    Image = _appHelper.GetImagePath(item.WebsiteAddInfor.Images.OrderByDescending(s=>s.Priority).ThenBy(s=>s.Type).First().Url, "app.png"),
+                    Image = _appHelper.GetImagePath(item.Pictures.Any(s=>s.Priority!=0)? item.Pictures.OrderByDescending(s => s.Priority).First().Url : item.WebsiteAddInfor.Images.OrderByDescending(s=>s.Priority).ThenBy(s=>s.Type).ThenBy(s=>s.Size).First().Url, "app.png"),
                     Name = item.DisplayName,
                     Url = "entries/index/" + item.Id,
                     CommentCount = item.CommentCount,
@@ -550,6 +559,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s=>s.Entries)
                 .Where(s => s.Entries.Count >= 6 )
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Where(s=>s.Name.Contains("STAFF")==false&& s.Name.Contains("配音") == false&& s.Name.Contains("城市群") == false)
                 .OrderByDescending(s => s.Priority).ThenByDescending(s=>s.Entries.Count)
                 .Take(15)
                 .ToListAsync();
