@@ -51,7 +51,7 @@
 
     public string ClearString(string str)
     {
-        return str?.Replace("\t", "")?.Replace("\n", "")?.Replace("\r", "");
+        return str?.Trim()?.Replace("\t", "")?.Replace("\n", "")?.Replace("\r", "");
     }
 
     public async Task SynchronousSteamInfor()

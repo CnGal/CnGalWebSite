@@ -208,7 +208,6 @@
 
 .latest-articles-card .item {
     margin-bottom: 1rem;
-    height: 100%;
     display: flex;
     flex-direction: column;
     width: 20rem;
