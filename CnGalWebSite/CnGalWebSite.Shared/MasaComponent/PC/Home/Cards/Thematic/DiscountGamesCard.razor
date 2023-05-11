@@ -1,0 +1,63 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<DiscountGameItemModel>> _pageModelCatche
+
+<section class="discount-games-card">
+    <h2>折扣中的游戏</h2>
+
+    <MSlideGroup ShowArrows="true">
+        @foreach (var item in _items)
+        {
+            <MSlideItem>
+                <a class="item" href="@item.Url">
+                    <img src="@item.Image" alt="@item.Name" />
+                    <div class="content">
+                        <div>
+                            <div class="name text-truncate-1">@item.Name</div>
+                            <div class="brief text-truncate-3">@item.BriefIntroduction</div>
+                        </div>
+                        <div class="tags">
+                            <MChip Small Color="success" Class="ma-1">
+                                <MIcon Left Small>@IconType.Discount.ToIconString()</MIcon>
+                                @item.Cut% OFF
+                            </MChip>
+                            <MChip Small Color="info" Class="ma-1">
+                                ¥ @item.Price.ToString("0.00")
+                            </MChip>
+                        </div>
+                    </div>
+                </a>
+            </MSlideItem>
+        }
+        <MSlideItem>
+            <a class="item more-link" href="/discount">
+                <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                <div class="text">查看更多</div>
+            </a>
+        </MSlideItem>
+    </MSlideGroup>
+</section>
+
+@code {
+
+    List<DiscountGameItemModel> _items { get; set; } = new List<DiscountGameItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await _pageModelCatche.GetCache("api/home/ListDiscountGames");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页折扣游戏列表失败");
+        }
+    }
+}

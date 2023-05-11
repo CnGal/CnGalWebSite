@@ -1664,6 +1664,21 @@ a .aspect-ratio + p > strong {
                 color: var(--active-color) !important;
                 caret-color: var(--active-color) !important;
             }
+
+/*查看更多卡片*/
+.item.more-link {
+    flex-direction: column !important;
+    gap:1rem;
+    align-items: center;
+    justify-content: center;
+    width: 10rem !important;
+}
+
+    .item.more-link:hover i {
+        color: var(--active-color);
+    }
+
+
 /*轮播图*/
 .carousels-card {
     border-radius: 24px !important;
@@ -1675,12 +1690,12 @@ a .aspect-ratio + p > strong {
     }
 
 /*游戏列表*/
-.published-games-card .item, .upcoming-games-card .item {
+.published-games-card .item, .upcoming-games-card .item, .free-games-card .item, .discount-games-card .item {
     display: flex;
     flex-direction: column;
 }
 
-    .published-games-card .item .content, .upcoming-games-card .item .content {
+    .published-games-card .item .content, .upcoming-games-card .item .content, .free-games-card .item .content, .discount-games-card .item .content {
         margin: 1rem;
         display: flex;
         flex-direction: column;
@@ -1689,7 +1704,7 @@ a .aspect-ratio + p > strong {
         height: 100%;
     }
 
-    .published-games-card .item .name, .upcoming-games-card .item .name {
+    .published-games-card .item .name, .upcoming-games-card .item .name, .free-games-card .item .name, .discount-games-card .item .name {
         font-size: 1.5rem;
     }
 
@@ -1706,6 +1721,16 @@ a .aspect-ratio + p > strong {
 .upcoming-games-card .item {
     width: 25rem;
 }
+
+/*免费的游戏*/
+.free-games-card .item {
+    width: 17rem;
+}
+/*折扣中的游戏*/
+.discount-games-card .item {
+    width: 20rem;
+}
+
 /*最新动态*/
 
 
@@ -1752,6 +1777,7 @@ a .aspect-ratio + p > strong {
 .news-card .text {
     color: var( --home-text-color);
 }
+
 /*最新文章*/
 .latest-articles-card .row {
     margin-left: 3rem;
@@ -2025,11 +2051,8 @@ a .aspect-ratio + p > strong {
 
 
 
-.about-card h2 {
-    margin-left: 0 !important;
-    margin-bottom: 3rem;
-    font-size: 2rem !important;
-    max-width: 65rem;
+.about-card .quote-card {
+    max-width: 68rem;
 }
 
 .links-group h3 {
@@ -2125,12 +2148,12 @@ a .aspect-ratio + p > strong {
         font-size: 2rem;
     }
 /*图墙*/
-.image-games-card .m-image__image {
+.masa-image .m-image__image {
     border-radius: var( --home-border-radius);
     transition: .3s;
 }
 
-.image-games-card .item-game:active .m-image__image {
+.masa-image .item-image:active .m-image__image {
     border-radius: var( --home-active-border-radius);
 }
 
@@ -2138,12 +2161,12 @@ a .aspect-ratio + p > strong {
     row-gap: 1.5rem;
 }
 
-.image-games-card .game-name {
+.masa-image .image-name {
     display: none;
     transition: .3s;
 }
 
-.image-games-card .item-game:hover .game-name {
+.masa-image .item-image:hover .image-name {
     display: flex;
     /*调用动画效果*/
     -webkit-animation-name: fadeIn; /*动画名称*/
@@ -2152,11 +2175,11 @@ a .aspect-ratio + p > strong {
     -webkit-animation-delay: 0s; /*延迟时间*/
 }
 
-.image-games-card .item-game:active .game-name {
+.masa-image .item-image:active .image-name {
     border-radius: var( --home-active-border-radius);
 }
 
-.image-games-card .game-name {
+.masa-image .image-name {
     background: linear-gradient(to bottom,rgba(0,0,0,0) 70%,rgba(0,0,0,.7));
     height: 100%;
     width: 100%;
@@ -2332,4 +2355,152 @@ a .aspect-ratio + p > strong {
     gap: 1rem;
     display: flex;
     flex-direction: column;
+}
+/*一言*/
+.quote-card .quote-content {
+    margin-left: 0 !important;
+    font-size: 2rem !important;
+    font-weight: bold;
+    letter-spacing: .4rem;
+}
+
+.quote-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .quote-card .quote-by {
+        font-size: 0.8rem;
+        letter-spacing: .05rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+/*看板娘*/
+.kanban-card {
+    display: flex;
+    align-items: center;
+    gap: 3rem !important;
+}
+
+    .kanban-card .quote-card + img {
+        transform: rotateY(180deg);
+    }
+
+    .kanban-card .quote-card {
+        max-width: 70rem;
+    }
+
+    .kanban-card img {
+        width: 12rem;
+    }
+
+    .kanban-card .content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+/*专题推荐*/
+.evaluations-group {
+    margin-left: 2.5rem;
+    row-gap: 2rem;
+    padding-right: 2rem;
+}
+
+.evaluations-card .articles-group img {
+    width: 10rem !important;
+}
+
+.evaluations-card .head {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: .5rem 1rem;
+    justify-content: space-between;
+}
+
+.evaluations-card .content {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.evaluations-card .addinfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.articles-group {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.evaluations-card .type {
+    color: var( --home-subtle-color);
+}
+
+.evaluations-card .evaluations-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+/*最新评论*/
+.latast-comments-card .item {
+    display: flex;
+    padding: 1rem;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.latast-comments-card .user-image {
+    width: 3rem !important;
+    border-radius: 50% !important;
+    height: 3rem !important;
+}
+
+.latast-comments-card .content {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    word-break: break-word;
+    width: 100%;
+}
+
+.latast-comments-card .name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.latast-comments-card .time {
+    text-align: end;
+    color: gray;
+}
+
+.latast-comments-card .group {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+/*热门标签*/
+.hot-tags-card .group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.hot-tags-card .item {
+    padding: .5rem 1rem;
+    gap: .5rem;
+}
+
+.hot-tags-card .content {
+    display: flex;
+    align-items: center;
+}
+
+.hot-tags-card .item:hover i {
+    color: var(--active-color);
 }

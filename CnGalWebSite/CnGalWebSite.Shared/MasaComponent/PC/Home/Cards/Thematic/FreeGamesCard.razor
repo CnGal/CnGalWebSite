@@ -2,13 +2,12 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject IPageModelCatche< List < PublishedGameItemModel> > _pageModelCatche
+@inject IPageModelCatche<List<PublishedGameItemModel>> _pageModelCatche
 
-<section class="published-games-card">
-    <h2>近期新作</h2>
+<section class="free-games-card">
+    <h2>免费游玩</h2>
 
     <MSlideGroup ShowArrows="true">
-        <ChildContent>
             @foreach (var item in _items)
             {
                 <MSlideItem>
@@ -27,11 +26,16 @@
                                 }
                             </div>
                         </div>
-                       
+
                     </a>
                 </MSlideItem>
             }
-        </ChildContent>
+            <MSlideItem>
+                <a class="item more-link" href="/free">
+                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                    <div class="text">查看更多</div>
+                </a>
+            </MSlideItem>
     </MSlideGroup>
 </section>
 
@@ -48,12 +52,12 @@
         try
         {
             //获取主页信息
-            _items = await _pageModelCatche.GetCache("api/home/ListPublishedGames");
+            _items = await _pageModelCatche.GetCache("api/home/ListFreeGames");
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页近期发布游戏列表失败");
+            ErrorHandler.ProcessError(ex, "获取主页免费游戏列表失败");
         }
     }
 }

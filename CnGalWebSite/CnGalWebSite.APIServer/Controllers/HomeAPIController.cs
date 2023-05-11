@@ -8,10 +8,12 @@ using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Tag, int> _tagRepository;
+        private readonly IRepository<SteamInfor, long> _steamInforRepository;
+        private readonly IRepository<Comment, long> _commentRepository;
         private readonly IHomeService _homeService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
@@ -37,7 +42,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ISteamInforService _steamInforService;
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger,
-        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, ISteamInforService steamInforService)
+        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository,
+        IRepository<SteamInfor, long> steamInforRepository, IRepository<Comment, long> commentRepository)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -48,7 +54,10 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
-            _steamInforService= steamInforService;
+            _steamInforService = steamInforService;
+            _tagRepository = tagRepository;
+            _steamInforRepository = steamInforRepository;
+            _commentRepository = commentRepository;
         }
 
         /// <summary>
@@ -298,17 +307,19 @@ namespace CnGalWebSite.APIServer.Controllers
             //图墙
             if(entries.Count(s=>s.Pictures.Any())>=5)
             {
-                var temp = new PersonalRecommendModel
-                {
-                    DisplayType = PersonalRecommendDisplayType.ImageGames
-                };
-
+               
                 var imageEntries = new List<Entry>();
 
                 foreach(var item in entries.Where(s => s.Pictures.Any()).Take(5))
                 {
                     imageEntries.Add(item);
                 }
+
+                var temp = new PersonalRecommendModel
+                {
+                    Id = imageEntries.First().Id,
+                    DisplayType = PersonalRecommendDisplayType.ImageGames
+                };
 
                 foreach (var item in imageEntries)
                 {
@@ -318,7 +329,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Id = item.Id,
                         Name=item.DisplayName,
-                        Image = item.Pictures.OrderBy(s => s.Priority).FirstOrDefault()?.Url
+                        Image = item.Pictures.ToList().Random().OrderBy(s => s.Priority).FirstOrDefault()?.Url
                     });
                 }
 
@@ -394,6 +405,164 @@ namespace CnGalWebSite.APIServer.Controllers
                         temp.Release = infor;
                     }
                 }
+            }
+
+            return model;
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<FreeGameItemModel>>> ListFreeGames()
+        {
+            var entryIds = await _tagRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entries)
+                .Where(s => s.Name == "免费")
+                .Select(s => s.Entries.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToList())
+                .FirstOrDefaultAsync();
+
+            entryIds = entryIds.ToList().Random().Take(16).ToList();
+
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Tags)
+                .Where(s => entryIds.Contains(s.Id)).ToListAsync();
+
+            var model = new List<FreeGameItemModel>();
+            foreach (var item in entries)
+            {
+                model.Add(new FreeGameItemModel
+                {
+                    Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Name = item.DisplayName,
+                    Url = "entries/index/" + item.Id,
+                    CommentCount = item.CommentCount,
+                    ReadCount = item.ReaderCount,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false && s.Name.Contains("免费") == false && s.Name.Contains("界面") == false).Select(s => s.Name).ToList()
+                });
+            }
+
+            return model;
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<DiscountGameItemModel>>> ListDiscountGames()
+        {
+            var entryIds = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).Select(s => s.Id).ToListAsync();
+            entryIds = entryIds.ToList().Random().Take(16).ToList();
+
+            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).AsNoTracking().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+
+            var model = new List<DiscountGameItemModel>();
+            foreach (var item in games)
+            {
+                var temp = new DiscountGameItemModel
+                {
+                    Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    Name = item.Entry.DisplayName,
+                    Url = "entries/index/" + item.Entry.Id,
+                    CommentCount = item.Entry.CommentCount,
+                    ReadCount = item.Entry.ReaderCount,
+                    BriefIntroduction = item.Entry.BriefIntroduction,
+                    Price = item.PriceNow * 0.01,
+                    Cut = item.CutNow
+                };
+
+                model.Add(temp);
+            }
+
+            return model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<EvaluationItemModel>>> ListEvaluations()
+        {
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .Where(s => s.Articles.Count >= 6 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .OrderByDescending(s => s.Priority)
+                .Take(4)
+                .ToListAsync();
+
+            var model = new List<EvaluationItemModel>();
+
+            foreach (var item in entries)
+            {
+                model.Add(new EvaluationItemModel
+                {
+                    Image = _appHelper.GetImagePath(item.WebsiteAddInfor.Images.OrderByDescending(s=>s.Priority).ThenBy(s=>s.Type).First().Url, "app.png"),
+                    Name = item.DisplayName,
+                    Url = "entries/index/" + item.Id,
+                    CommentCount = item.CommentCount,
+                    ReadCount = item.ReaderCount,
+                    Articles=item.Articles.OrderByDescending(s=>s.Priority).ThenByDescending(s=>s.Type).Take(4).Select(s=>new EvaluationArticleItemModel
+                    {
+                        Id = s.Id,
+                        Image = _appHelper.GetImagePath(s.MainPicture, "app.png"),
+                        Name=s.Name,
+                        OriginalAuthor = string.IsNullOrWhiteSpace(s.OriginalAuthor) ? s.CreateUser.UserName : s.OriginalAuthor,
+                        Type = s.Type,
+                    }).ToList()
+                });
+            }
+
+            return model;
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<LatastCommentItemModel>>> ListLatastComments()
+        {
+            var comments = await _commentRepository.GetAll().AsNoTracking()
+                .Include(s=>s.ApplicationUser)
+                .Where(s => s.IsHidden == false&&string.IsNullOrWhiteSpace(s.Text)==false)
+                .OrderByDescending(s => s.CommentTime)
+                .Take(6)
+                .ToListAsync();
+
+            var model = new List<LatastCommentItemModel>();
+
+            foreach (var item in comments)
+            {
+                model.Add(new LatastCommentItemModel
+                {
+                    Url = item.EntryId != null ? $"entries/index/{item.EntryId}" : item.ArticleId != null ? $"articles/index/{item.ArticleId}" : item.Periphery != null ? $"peripheries/index/{item.PeripheryId}" : item.LotteryId != null ? $"lotteries/index/{item.LotteryId}" : item.VoteId != null ? $"votes/index/{item.VoteId}" : item.VideoId != null ? $"videoes/index/{item.VideoId}" : $"space/index/{item.ApplicationUserId}",
+                    UserName = item.ApplicationUser.UserName,
+                    Time = item.CommentTime.ToTimeFromNowString(),
+                    Content = _appHelper.MarkdownToHtml(item.Text),
+                    UserImage = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png")
+                });
+            }
+
+            return model;
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<HotTagItemModel>>> ListHotTags()
+        {
+            var entries = await _tagRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Entries)
+                .Where(s => s.Entries.Count >= 6 )
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .OrderByDescending(s => s.Priority).ThenByDescending(s=>s.Entries.Count)
+                .Take(15)
+                .ToListAsync();
+
+            var model = new List<HotTagItemModel>();
+
+            foreach (var item in entries)
+            {
+                model.Add(new HotTagItemModel
+                {
+                    Name = item.Name,
+                    Url = "tags/index/" + item.Id,
+                });
             }
 
             return model;

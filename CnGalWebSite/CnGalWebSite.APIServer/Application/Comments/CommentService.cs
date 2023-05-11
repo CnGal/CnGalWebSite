@@ -162,8 +162,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             //提前将MarkDown语法转为Html
             if (comment.IsHidden == false)
             {
-                var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-                model.Text = Markdig.Markdown.ToHtml(comment.Text ?? "", pipeline);
+                model.Text =_appHelper.MarkdownToHtml(comment.Text ?? "");
             }
             else
             {

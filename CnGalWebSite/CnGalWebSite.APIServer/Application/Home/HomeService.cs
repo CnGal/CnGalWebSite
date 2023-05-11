@@ -63,7 +63,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         BriefIntroduction = item.BriefIntroduction,
-                        Tags=item.Tags.Where(s=>s.Name.Contains("字幕")==false&& s.Name.Contains("语音") == false).Select(s=>s.Name).ToList()
+                        Tags=item.Tags.Where(s=>s.Name.Contains("字幕")==false && s.Name.Contains("语音") == false && s.Name.Contains("界面") == false).Select(s=>s.Name).ToList()
                     });
                 }
             }

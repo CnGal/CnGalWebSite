@@ -1,0 +1,48 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IPageModelCatche<List<LatastCommentItemModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <section class="latast-comments-card">
+        <h2>近期留言</h2>
+        <div class="group">
+            @foreach (var item in _items)
+            {
+                <a class="item" href="@item.Url">
+                    <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
+                    <div class="content">
+                        <div class="name">@item.UserName</div>
+                        <div class="text">
+                            <MarkdownViewTip Text="@item.Content" IsNeedHighlight="false"/>
+                        </div>
+                        <div class="time">@item.Time</div>
+                    </div>
+                </a>
+            }
+        </div>
+    </section>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+
+@code {
+
+    List<LatastCommentItemModel> _items { get; set; } = new List<LatastCommentItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await _pageModelCatche.GetCache("api/home/ListLatastComments");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
+        }
+    }
+}

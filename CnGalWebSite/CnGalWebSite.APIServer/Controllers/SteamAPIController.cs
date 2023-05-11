@@ -192,7 +192,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var entryIds = await _tagRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entries)
                 .Where(s => s.Name == "免费")
-                .Select(s => s.Entries.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s=>s.Id).ToList())
+                .Select(s => s.Entries.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToList())
                 .FirstOrDefaultAsync();
 
             entryIds = entryIds.ToList().Random().Take(30).ToList();
@@ -202,7 +202,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new List<EntryInforTipViewModel>();
             foreach (var entry in entries)
             {
-                model.Add( _appHelper.GetEntryInforTipViewModel(entry));
+                model.Add(_appHelper.GetEntryInforTipViewModel(entry));
             }
 
             return model;
