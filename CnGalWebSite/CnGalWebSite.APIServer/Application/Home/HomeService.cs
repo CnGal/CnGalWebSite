@@ -129,7 +129,7 @@ namespace CnGalWebSite.APIServer.Application.Home
 
                     if(item.PubulishTime!=null)
                     {
-                        var note = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official&&s.Time!=null)?.TimeNote;
+                        var note = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official && string.IsNullOrWhiteSpace(s.TimeNote) == false)?.TimeNote;
                         if(string.IsNullOrWhiteSpace(note))
                         {
                             temp.PublishTime = item.PubulishTime.Value.ToString("yyyy年M月d日");
