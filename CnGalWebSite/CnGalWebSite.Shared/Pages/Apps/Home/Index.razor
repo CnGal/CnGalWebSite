@@ -22,29 +22,31 @@
 </style>
 <MTabsItems @bind-Value="_dataCacheService.HomeTabIndex" Class="pb-12">
     <MTabItem Value="0">
-        <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
-
-        <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
+        <div style=" padding: .1rem;">
+            <CnGalWebSite.Shared.Pages.Webs.Home.Index Lock="_dataCacheService.HomeTabIndex!=0"/>
+        </div>
     </MTabItem>
-    <MTabItem Value="1">
+    @*<MTabItem Value="1">
         <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
         <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
         <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
 
-    </MTabItem>
-    <MTabItem Value="2">
+    </MTabItem>*@
+<MTabItem Value="1">
+    <div style=" padding: .1rem;">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.HomeCard />
-    </MTabItem>
-    <MTabItem Value="3">
+    </div>
+</MTabItem>
+    @*<MTabItem Value="3">
         <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
         <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
 
     </MTabItem>
     <MTabItem Value="4">
         <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
-    </MTabItem>
+    </MTabItem>*@
 
-    <MTabItem Value="5">
+    <MTabItem Value="2">
         <AuthorizeView>
             <Authorized>
                 <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
@@ -66,18 +68,18 @@
             <MIcon>mdi-home-outline </MIcon>
         </MButton>
 
-        <MButton ActiveClass="font-color">
+        @*<MButton ActiveClass="font-color">
             <span>词条</span>
 
             <MIcon>mdi-archive-outline</MIcon>
-        </MButton>
+        </MButton>*@
         <MButton ActiveClass="font-color">
             <span>专题</span>
 
             <MIcon>mdi-align-vertical-top </MIcon>
         </MButton>
 
-        <MButton ActiveClass="font-color">
+        @*<MButton ActiveClass="font-color">
             <span>文章</span>
 
             <MIcon>mdi-sticker-text-outline </MIcon>
@@ -87,15 +89,13 @@
             <span>广场</span>
 
             <MIcon>mdi-av-timer</MIcon>
-        </MButton>
+        </MButton>*@
 
-
-
-        @*<MButton ActiveClass="font-color">
+        <MButton ActiveClass="font-color">
             <span>空间</span>
 
             <MIcon>mdi-account-outline</MIcon>
-        </MButton>*@
+        </MButton>
     </MBottomNavigation>
 </MFooter>
 

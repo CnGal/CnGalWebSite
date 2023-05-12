@@ -11,6 +11,9 @@
 
 
   <ItemGroup>
+    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\app.min.css" Link="wwwroot\css\app.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\CnGalWebSite.Server\wwwroot\styles\bundle-css.min.css" Link="wwwroot\css\bundle-css.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

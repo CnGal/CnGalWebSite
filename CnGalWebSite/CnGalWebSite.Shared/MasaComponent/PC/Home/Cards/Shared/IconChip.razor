@@ -1,0 +1,17 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<MChip XSmall="_dataCacheService.IsApp" Small="!_dataCacheService.IsApp" Color="@Color" Class=" ma-1">
+    <MIcon Left XSmall>@Icon.ToIconString() </MIcon>
+    @Text
+</MChip>
+
+@code {
+    [Parameter]
+    public IconType Icon { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Color { get; set; } = "primary";
+
+}

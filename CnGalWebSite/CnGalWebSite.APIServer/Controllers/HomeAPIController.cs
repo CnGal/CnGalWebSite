@@ -285,6 +285,12 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var model =new List<PersonalRecommendModel>();
 
+            //上限
+            if (ids.Count() > 100)
+            {
+                return model;
+            }
+
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 //.Include(s => s.Pictures)
                 //.Where(s=>s.Pictures.Any())

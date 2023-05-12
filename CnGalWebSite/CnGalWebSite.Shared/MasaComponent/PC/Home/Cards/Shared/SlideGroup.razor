@@ -1,0 +1,58 @@
+﻿@typeparam TItem
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.IsApp)
+{
+    <div class="slide-group">
+        @foreach (var item in Items)
+        {
+            <div class="slide-item">
+                @ChildContent(item)
+            </div>
+
+        }
+        @if (string.IsNullOrWhiteSpace(MoreLink) == false)
+        {
+            <div class="slide-item">
+                <a class="item more-link" href="@MoreLink">
+                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                    <div class="text">查看更多</div>
+                </a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <MSlideGroup ShowArrows="true">
+        @foreach (var item in Items)
+        {
+            <MSlideItem>
+                @ChildContent(item)
+            </MSlideItem>
+
+        }
+
+        @if (string.IsNullOrWhiteSpace(MoreLink) == false)
+        {
+            <MSlideItem>
+                <a class="item more-link" href="@MoreLink">
+                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
+                    <div class="text">查看更多</div>
+                </a>
+            </MSlideItem>
+        }
+    </MSlideGroup>
+
+}
+
+@code {
+    [Parameter]
+    public RenderFragment<TItem> ChildContent { get; set; }
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    public string MoreLink { get; set; }
+}

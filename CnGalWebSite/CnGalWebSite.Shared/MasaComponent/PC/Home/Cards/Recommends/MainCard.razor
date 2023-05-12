@@ -34,19 +34,23 @@
         }
         @if (completed)
         {
-           <div class="completed-card">
-               <DivideCard />
-               <div class="content">不能再往下划啦 o(〃＾▽＾〃)o</div>
-               <DivideCard />
-           </div>
+            <div class="completed-card">
+                <DivideCard />
+                <div class="content">不能再往下划啦 o(〃＾▽＾〃)o</div>
+                <DivideCard />
+            </div>
         }
     </MContainer>
- 
+
 </section>
 
 
 
 @code {
+
+    [Parameter]
+    public bool Lock { get; set; }
+
     List<PersonalRecommendModel> _personalRecommends { get; set; } = new List<PersonalRecommendModel>();
 
     bool loading;
@@ -57,39 +61,39 @@
 
     private DotNetObjectReference<MainCard> objRef;
 
-    bool firstRender=true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender==false)
+        if (firstRender)
         {
-            return;
+
+            objRef = DotNetObjectReference.Create(this);
+            await TriggerDotNetInstanceMethod();
         }
-        firstRender = false;
-
-        objRef = DotNetObjectReference.Create(this);
-        await TriggerDotNetInstanceMethod();
     }
-
     [JSInvokable]
     public async Task LoadMore()
     {
         try
         {
-            if(completed)
+            if(Lock)
             {
                 return;
             }
-            if(loading)
+            if (completed)
+            {
+                return;
+            }
+            if (loading)
             {
                 return;
             }
             loading = true;
             StateHasChanged();
 
-            var result = await _httpService.PostAsync<IEnumerable<int>, List<PersonalRecommendModel>>("api/home/GetPersonalizedRecommendations", _personalRecommends.Select(s=>s.Id));
+            var result = await _httpService.PostAsync<IEnumerable<int>, List<PersonalRecommendModel>>("api/home/GetPersonalizedRecommendations", _personalRecommends.Select(s => s.Id));
 
-            if(result.Any()==false)
+            if (result.Any() == false)
             {
                 completed = true;
             }

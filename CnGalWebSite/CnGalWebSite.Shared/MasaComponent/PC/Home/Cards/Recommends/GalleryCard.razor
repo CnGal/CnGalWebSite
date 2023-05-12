@@ -10,10 +10,7 @@
             <div class="tags">
                 @foreach (var item in Model.Tags.Random().Take(2))
                 {
-                    <MChip Small Color="primary" Class=" ma-1">
-                        <MIcon Left Small>@IconType.Tag.ToIconString() </MIcon>
-                        @item
-                    </MChip>
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.Tag" Text="@item" />
                 }
             </div>
 
@@ -21,34 +18,29 @@
         <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
     </div>
     <div class="gallery">
-        <MSlideGroup ShowArrows="true" CenterActive>
-            @foreach (var item in Model.Images)
-            {
-                <MSlideItem>
-                    <MImage Height="180" Width="320" Src="@item" @onclick="@(async ()=>{ if (!context.Active) {await context.Toggle.Invoke(); }await OnClickImage(item); })" RefBack="context.Ref">
-                        <PlaceholderContent>
-                            <MRow Class="fill-height ma-0"
-                                  Align="@AlignTypes.Center"
-                                  Justify="@JustifyTypes.Center">
-                                <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
-                            </MRow>
-                        </PlaceholderContent>
-                    </MImage>
-                </MSlideItem>
-            }
-        </MSlideGroup>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="Model.Images">
+            <MImage Height="_dataCatcheService.IsApp?126: 180" Width="_dataCatcheService.IsApp?224: 320" Src="@context" @onclick="()=>OnClickImage(context)">
+                <PlaceholderContent>
+                    <MRow Class="fill-height ma-0"
+                          Align="@AlignTypes.Center"
+                          Justify="@JustifyTypes.Center">
+                        <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                    </MRow>
+                </PlaceholderContent>
+            </MImage>
+        </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
     </div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <div class="actions">
-            <MButton Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
-                <MIcon Left>@IconType.Game.ToIconString()</MIcon>
+            <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
+                <MIcon Small="_dataCatcheService.IsApp" Left>@IconType.Game.ToIconString()</MIcon>
                 访问作品页面
             </MButton>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
-            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false)
+            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false&&_dataCatcheService.IsApp==false)
             {
-                <MButton Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
-                    <MIcon Left>@IconType.Steam.ToIconString()</MIcon>
+                <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
+                    <MIcon Left Small="_dataCatcheService.IsApp">@IconType.Steam.ToIconString()</MIcon>
                     访问Steam商店
                 </MButton>
             }
