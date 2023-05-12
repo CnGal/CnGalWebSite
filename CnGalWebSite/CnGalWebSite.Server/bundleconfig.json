@@ -36,6 +36,12 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/styles/app.min.css",
+    "inputFiles": [
+      "wwwroot/css/home-app.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/styles/github-markdown.min.css",
     "inputFiles": [
       "wwwroot/css/github-markdown.css"

@@ -6,38 +6,21 @@
 
 <section class="discount-games-card">
     <h2>折扣中的游戏</h2>
-
-    <MSlideGroup ShowArrows="true">
-        @foreach (var item in _items)
-        {
-            <MSlideItem>
-                <a class="item" href="@item.Url">
-                    <img src="@item.Image" alt="@item.Name" />
-                    <div class="content">
-                        <div>
-                            <div class="name text-truncate-1">@item.Name</div>
-                            <div class="brief text-truncate-3">@item.BriefIntroduction</div>
-                        </div>
-                        <div class="tags">
-                            <MChip Small Color="success" Class="ma-1">
-                                <MIcon Left Small>@IconType.Discount.ToIconString()</MIcon>
-                                @item.Cut% OFF
-                            </MChip>
-                            <MChip Small Color="info" Class="ma-1">
-                                ¥ @item.Price.ToString("0.00")
-                            </MChip>
-                        </div>
-                    </div>
-                </a>
-            </MSlideItem>
-        }
-        <MSlideItem>
-            <a class="item more-link" href="/discount">
-                <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                <div class="text">查看更多</div>
-            </a>
-        </MSlideItem>
-    </MSlideGroup>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/discount">
+        <a class="item" href="@context.Url">
+            <img src="@context.Image" alt="@context.Name" />
+            <div class="content">
+                <div>
+                    <div class="name text-truncate-1">@context.Name</div>
+                    <div class="brief text-truncate-3">@context.BriefIntroduction</div>
+                </div>
+                <div class="tags">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="success" Icon="IconType.Discount" Text="@($"{context.Cut}% OFF")" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="info" Text="@($"¥ {context.Price:0.00}")" />
+                </div>
+            </div>
+        </a>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 
 @code {

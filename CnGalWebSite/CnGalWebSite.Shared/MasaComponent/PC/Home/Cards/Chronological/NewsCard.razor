@@ -6,41 +6,25 @@
 <section class="news-card">
     <h2>最新动态</h2>
 
-    <MSlideGroup ShowArrows="true">
-        <ChildContent>
-
-            @foreach (var items in _items)
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news">
+        <div class="group">
+            @foreach (var item in context)
             {
-                <MSlideItem>
-                    <div class="group">
-                        @foreach (var item in items)
-                        {
-                            <div class="item">
-                                <a href="@($"/entries/index/{item.GroupId}")">
-                                    <img src="@item.Image" alt="@item.Title" />
-                                </a>
-                                <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
-                                    <div class="head">
-                                        <div class="name text-truncate-1">@item.Title</div>
-                                        <div class="time">@item.Time.ToTimeFromNowString()</div>
-                                    </div>
-                                    <div class="text text-truncate-1">@item.Text</div>
-                                </a>
-                            </div>
-                        }
-                    </div>
-
-                </MSlideItem>
-
+                <div class="item">
+                    <a href="@($"/entries/index/{item.GroupId}")">
+                        <img src="@item.Image" alt="@item.Title" />
+                    </a>
+                    <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
+                        <div class="head">
+                            <div class="name text-truncate-1">@item.Title</div>
+                            <div class="time">@item.Time.ToTimeFromNowString()</div>
+                        </div>
+                        <div class="text text-truncate-1">@item.Text</div>
+                    </a>
+                </div>
             }
-            <MSlideItem>
-                <a class="item more-link" href="/articles/news">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
-                </a>
-            </MSlideItem>
-        </ChildContent>
-    </MSlideGroup>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 

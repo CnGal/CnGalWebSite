@@ -6,39 +6,26 @@
 
 <section class="latest-videoes-card">
     <h2>最新视频</h2>
-    <MSlideGroup ShowArrows="true">
-            @foreach (var group in _items)
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?10:12)" MoreLink="/search/?Types=Video">
+        <div class="group">
+            @foreach (var item in context)
             {
-                <MSlideItem>
-                    <div class="group">
-                        @foreach (var item in group)
-                        {
-                            <a class="item" href="@item.Url">
-                                <img class="image" src="@item.Image" alt="@item.Name" />
-                                <div class="head">
-                                    <div class="content">
-                                        <div class="name text-truncate-2">@item.Name</div>
-                                    </div>
-                                    <div class="addinfo">
-                                        <div class="name text-truncate-1">@item.OriginalAuthor</div>
-                                        <div class="time text-truncate-1">@item.PublishTime</div>
-                                    </div>
-                                </div>
-                            </a>
-                        }
-
+                <a class="item" href="@item.Url">
+                    <img class="image" src="@item.Image" alt="@item.Name" />
+                    <div class="head">
+                        <div class="content">
+                            <div class="name text-truncate-2">@item.Name</div>
+                        </div>
+                        <div class="addinfo">
+                            <div class="name text-truncate-1">@item.OriginalAuthor</div>
+                            <div class="time text-truncate-1">@item.PublishTime</div>
+                        </div>
                     </div>
-
-                </MSlideItem>
-            }
-            <MSlideItem>
-                <a class="item more-link" href="/search/?Types=Video">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
                 </a>
-            </MSlideItem>
+            }
 
-    </MSlideGroup>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 
 @code {

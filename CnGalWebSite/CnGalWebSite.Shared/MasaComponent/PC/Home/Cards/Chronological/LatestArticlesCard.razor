@@ -6,49 +6,35 @@
 
 <section class="latest-articles-card">
     <h2>最新文章</h2>
-    <MSlideGroup ShowArrows="true">
-            @foreach (var item in _items)
-            {
-                <MSlideItem>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:12)" MoreLink="/articles">
+        <a class="item" href="@context.Url">
+            <img class="image" src="@context.Image" alt="@context.Name" />
+            <div class="head">
+                <div class="content">
+                    <div class="name text-truncate-2">@context.Name</div>
+                    <div class="brief text-truncate-3">@context.BriefIntroduction</div>
+                </div>
+                <div class="addinfo">
+                    <div class="author">
+                        @if (string.IsNullOrWhiteSpace(context.OriginalAuthor))
+                        {
+                            <img class="user-image" src="@context.UserImage" alt="@context.UserName" />
+                            <div class="name">@context.UserName</div>
+                        }
+                        else
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="info" Icon="IconType.Carry" Text="搬运" />
 
-                    <a class="item" href="@item.Url">
-                        <img class="image" src="@item.Image" alt="@item.Name" />
-                        <div class="head">
-                            <div class="content">
-                                <div class="name text-truncate-2">@item.Name</div>
-                                <div class="brief text-truncate-3">@item.BriefIntroduction</div>
+                            <div class="name text-truncate-1">
+                                作者：@context.OriginalAuthor
                             </div>
-                            <div class="addinfo">
-                                <div class="author">
-                                    @if (string.IsNullOrWhiteSpace(item.OriginalAuthor))
-                                    {
-                                        <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
-                                        <div class="name">@item.UserName</div>
-                                    }
-                                    else
-                                    {
-                                        <MChip Small Color="info" Class=" ma-1">
-                                            <MIcon Left Small>@IconType.Carry.ToIconString() </MIcon>
-                                            搬运
-                                        </MChip>
-                                        <div class="name text-truncate-1">
-                                            作者：@item.OriginalAuthor
-                                        </div>
-                                    }
-                                </div>
-                                <div class="time">@item.PublishTime</div>
-                            </div>
-                        </div>
-                    </a>
-                </MSlideItem>
-            }
-            <MSlideItem>
-                <a class="item more-link" href="/articles">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
-                </a>
-            </MSlideItem>
-    </MSlideGroup>
+                        }
+                    </div>
+                    <div class="time">@context.PublishTime</div>
+                </div>
+            </div>
+        </a>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 
 @code {

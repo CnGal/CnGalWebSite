@@ -2,11 +2,12 @@
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCatcheService
 
 @if (PlainText)
 {
-    <MButton Rounded Color="primary" Outlined OnClick="OnClickStar">
-        <MIcon Left>@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())</MIcon>
+    <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="OnClickStar">
+        <MIcon Small="_dataCatcheService.IsApp" Left>@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())</MIcon>
         @(IsUserFavorited?"取消收藏":"收藏")
     </MButton>
 }

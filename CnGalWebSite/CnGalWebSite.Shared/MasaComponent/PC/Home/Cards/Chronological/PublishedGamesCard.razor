@@ -6,39 +6,22 @@
 
 <section class="published-games-card">
     <h2>近期新作</h2>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
+        <a class="item" href="@context.Url">
+            <img src="@context.Image" alt="@context.Name" />
+            <div class="content">
+                <div class="name text-truncate-1">@context.Name</div>
+                <div class="brief text-truncate-2">@context.BriefIntroduction</div>
+                <div class="tags">
+                    @foreach (var item in context.Tags.Random().Take(2))
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.Tag" Text="@item"/>
+                    }
+                </div>
+            </div>
 
-    <MSlideGroup ShowArrows="true">
-        <ChildContent>
-            @foreach (var item in _items)
-            {
-                <MSlideItem>
-                    <a class="item" href="@item.Url">
-                        <img src="@item.Image" alt="@item.Name" />
-                        <div class="content">
-                            <div class="name text-truncate-1">@item.Name</div>
-                            <div class="brief text-truncate-2">@item.BriefIntroduction</div>
-                            <div class="tags">
-                                @foreach (var item in item.Tags.Random().Take(2))
-                                {
-                                    <MChip Small Color="primary" Class=" ma-1">
-                                        <MIcon Left Small>@IconType.Tag.ToIconString() </MIcon>
-                                        @item
-                                    </MChip>
-                                }
-                            </div>
-                        </div>
-
-                    </a>
-                </MSlideItem>
-            }
-            <MSlideItem>
-                <a class="item more-link" href="/times">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
-                </a>
-            </MSlideItem>
-        </ChildContent>
-    </MSlideGroup>
+        </a>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 
 @code {
