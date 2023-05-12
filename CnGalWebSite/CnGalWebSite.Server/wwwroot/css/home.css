@@ -17,6 +17,7 @@
 #home-page {
     letter-spacing: .05rem;
     font-family: "Google Sans Text", sans-serif;
+    color: var( --home-text-color);
 }
     /*分栏*/
     #home-page .left-content, #home-page {
@@ -91,7 +92,7 @@
 /*查看更多卡片*/
 .item.more-link {
     flex-direction: column !important;
-    gap:1rem;
+    gap: 1rem;
     align-items: center;
     justify-content: center;
     width: 10rem !important;
@@ -110,6 +111,7 @@
 
     .carousels-card .carousel-inner {
         border-radius: 24px !important;
+        cursor: pointer;
     }
 
 /*游戏列表*/
@@ -689,7 +691,8 @@
     }
 
         .gallery-card button:hover {
-            background-color: #F06292 !important;
+            background-color: var(--main-color) !important;
+            border-color: var(--main-color) !important;
             color: white !important;
         }
 

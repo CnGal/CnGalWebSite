@@ -1,7 +1,7 @@
 ﻿
 @inject IDataCacheService _dataCacheService
 
-    <TitleTip></TitleTip>
+<TitleTip></TitleTip>
 
 @if (ToolHelper.IsSSR)
 {
@@ -9,15 +9,17 @@
 }
 else
 {
+
+        <style>
+            body {
+                background-color: #fff;
+            }
+        </style>
+    
     <style>
         .variable.container {
             max-width: none;
         }
-
-        body {
-            background-color: white;
-        }
-
         .load-footer {
             display: none;
         }
@@ -55,13 +57,13 @@ else
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
             </div>
             <div class="right-content col-12 col-xl-3">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard/>
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard/>
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard />
             </div>
         </div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard/>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard/>
-       <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.KanbanCard/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.KanbanCard />
 
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
     </div>

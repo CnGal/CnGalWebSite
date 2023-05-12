@@ -25,7 +25,8 @@
   {
     "outputFileName": "wwwroot/styles/dark-cover.min.css",
     "inputFiles": [
-      "wwwroot/css/dark-cover.css"
+      "wwwroot/css/dark-cover.css",
+      "wwwroot/css/home-dark.css"
     ]
   },
   {

@@ -1,0 +1,21 @@
+﻿/*全局*/
+:root {
+    --home-bg-color: #28292a;
+    --home-text-color: #e3e3e3;
+    --home-subtle-color: gray;
+    --home-border-radius: 12px;
+    --home-active-border-radius: 24px;
+}
+
+body {
+    background-color: #1f1f1f !important;
+}
+/*纸片*/
+#home-page .item:hover .m-chip--outlined {
+    color: var( --home-text-color) !important;
+    caret-color: var( --home-text-color) !important;
+}
+
+#home-page .item:hover .m-chip {
+    border-color: var( --home-text-color) !important;
+}
