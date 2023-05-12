@@ -559,7 +559,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s=>s.Entries)
                 .Where(s => s.Entries.Count >= 6 )
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .Where(s=>s.Name.Contains("STAFF")==false&& s.Name.Contains("配音") == false && s.Name.Contains("城市群") == false && s.Name.Contains("声线") == false)
+                .Where(s=>s.Name.Contains("STAFF")==false&& s.Name.Contains("配音") == false && s.Name.Contains("城市群") == false && s.Name.Contains("声线") == false && s.Name.Contains("字幕") == false)
                 .OrderByDescending(s => s.Priority).ThenByDescending(s=>s.Entries.Count)
                 .Take(15)
                 .ToListAsync();

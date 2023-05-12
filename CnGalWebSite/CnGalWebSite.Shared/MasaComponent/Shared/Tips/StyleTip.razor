@@ -33,6 +33,8 @@
             }
         </style>
     }
+
+    <link rel="stylesheet" href="css/home-dark.css">
 }
 else
 {
@@ -214,7 +216,7 @@ else
         _dataCacheService.ThemeSetting.IsFullScreen = isFullScreen;
 
         //消除愚人节颜色的影响
-        if(_dataCacheService.ThemeSetting.Theme=="green")
+        if (_dataCacheService.ThemeSetting.Theme == "green")
         {
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
@@ -234,7 +236,7 @@ else
         {
             case "red":
                 colorMain = "#F44336";
-                colorHover = "#D32F2F";
+                colorHover = "#FBB3AC";
                 colorActive = "#B71C1C";
                 break;
             case "pink lighten-2":
@@ -244,92 +246,92 @@ else
                 break;
             case "purple":
                 colorMain = "#9C27B0";
-                colorHover = "#7B1FA2";
+                colorHover = "#DFA2EA";
                 colorActive = "#4A148C";
                 break;
             case "deep-purple":
                 colorMain = "#673AB7";
-                colorHover = "#512DA8";
+                colorHover = "#C7B6E7";
                 colorActive = "#311B92";
                 break;
             case "indigo":
                 colorMain = "#3F51B5";
-                colorHover = "#303F9F";
+                colorHover = "#B8BEE7";
                 colorActive = "#1A237E";
                 break;
             case "blue":
                 colorMain = "#2196F3";
-                colorHover = "#1976D2";
+                colorHover = "#B7DCFB";
                 colorActive = "#0D47A1";
                 break;
             case "light-blue":
                 colorMain = "#03A9F4";
-                colorHover = "#039BE5";
+                colorHover = "#BEEBFE";
                 colorActive = "#01579B";
                 break;
             case "cyan":
                 colorMain = "#00BCD4";
-                colorHover = "#0097A7";
+                colorHover = "#BDF7FF";
                 colorActive = "#006064";
                 break;
             case "teal":
                 colorMain = "#009688";
-                colorHover = "#00796B";
+                colorHover = "#B9F9D2";
                 colorActive = "#004D40";
                 break;
             case "green":
                 colorMain = "#4CAF50";
-                colorHover = "#388E3C";
+                colorHover = "#C6E6C8";
                 colorActive = "#1B5E20";
                 break;
             case "light-green":
                 colorMain = "#8BC34A";
-                colorHover = "#689F38";
+                colorHover = "#D8EBC2";
                 colorActive = "#33691E";
                 break;
             case "lime":
-                colorMain = "#CDDC39";
-                colorHover = "#AFB42B";
+                colorMain = "#B5C523";
+                colorHover = "#E2E1B6";
                 colorActive = "#827717";
                 break;
             case "yellow":
                 colorMain = "#FFEB3B";
-                colorHover = "#FBC02D";
-                colorActive = "#F57F17";
+                colorHover = "#E2E1B6";
+                colorActive = "#CAB600";
                 break;
             case "amber":
                 colorMain = "#FFC107";
-                colorHover = "#FFA000";
-                colorActive = "#FF6F00";
+                colorHover = "#FFECB3";
+                colorActive = "#FF6F00";// "#F48C00";
                 break;
             case "orange":
                 colorMain = "#FF9800";
-                colorHover = "#F57C00";
-                colorActive = "#E65100";
+                colorHover = "#FFE3BB";
+                colorActive = "#E65100";//"#EA7102";
                 break;
             case "deep-orange":
                 colorMain = "#FF5722";
-                colorHover = "#E64A19";
-                colorActive = "#BF360C";
+                colorHover = "#FFC9B7";
+                colorActive = "#BF360C";//"#E6342B";
                 break;
             case "brown":
                 colorMain = "#795548";
-                colorHover = "#5D4037";
+                colorHover = "#DECDC7";
                 colorActive = "#3E2723";
                 break;
             case "blue-grey":
                 colorMain = "#607D8B";
-                colorHover = "#455A64";
+                colorHover = "#CED8DD";
                 colorActive = "#263238";
                 break;
             case "grey":
-                colorMain = "#2196F3";
-                colorHover = "#2196F3";
-                colorActive = "#2196F3";
+                colorMain = "#0078BF";
+                colorHover = "#004a77";
+                colorActive = "#00304D ";
                 break;
             case "white":
                 colorMain = "#FFFFFF";
-                colorHover = "#757575";
+                colorHover = "#004a77";
                 colorActive = "#616161";
                 break;
             default:
@@ -341,7 +343,7 @@ else
                 {
                     _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
                     colorMain = "#F06292";
-                    colorHover = "#D81B60";
+                    colorHover = "#F9B7CE";
                     colorActive = "#880E4F";
                 }
 
@@ -373,7 +375,7 @@ else
             return;
         }
         //检查是否修改配置
-        if(_themeSetting.DeepEquals(_dataCacheService.ThemeSetting))
+        if (_themeSetting.DeepEquals(_dataCacheService.ThemeSetting))
         {
             return;
         }
@@ -402,7 +404,7 @@ else
             theme.Dark = _dataCacheService.ThemeSetting.IsDark;
             MasaBlazor.Theme = theme;
             //重新生成颜色
-            ProcColor(_dataCacheService.ThemeSetting.IsDark?MasaBlazor.Theme.Themes.Dark.Primary: MasaBlazor.Theme.Themes.Light.Primary);
+            ProcColor(_dataCacheService.ThemeSetting.IsDark ? "grey" : _dataCacheService.ThemeSetting.Theme);
             //通知MAUI
             _mauiService.ChangeTheme(colorMain);
 

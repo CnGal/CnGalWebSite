@@ -98,7 +98,7 @@ namespace CnGalWebSite.Server
                     {
                         s.Themes.Light.Primary = "#f06292";
                     }        
-                    s.Themes.Dark.Primary = "#2196F3";
+                    s.Themes.Dark.Primary = "#0078BF";
                 }));
 
             //添加状态检查
