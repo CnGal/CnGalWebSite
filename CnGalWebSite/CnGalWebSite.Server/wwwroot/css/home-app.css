@@ -29,6 +29,10 @@
 .slide-item {
     display: flex;
 }
+/*最新动态*/
+.news-card .item {
+    width: 20rem;
+}
 
 /*近期发布的游戏*/
 .published-games-card .brief, .upcoming-games-card .brief {
@@ -58,14 +62,38 @@
 /*最新文章*/
 .latest-articles-card .content .name {
     font-size: 1rem;
+    font-weight: bold;
+}
+
+.latest-articles-card .content, .latest-articles-card .head {
+    gap: .5rem;
 }
 /*最新视频*/
 .latest-videoes-card .image {
     width: 9rem !important;
 }
 
-.latest-videoes-card .content .name {
-    -webkit-line-clamp: 1;
+.latest-videoes-card .group {
+    flex-direction: row;
+}
+
+.latest-videoes-card .item {
+    flex-direction: column;
+    width: 12rem;
+}
+
+.latest-videoes-card .image {
+    width: 100% !important;
+    height: auto;
+}
+
+.latest-videoes-card .head {
+    gap: .5rem;
+}
+
+.latest-videoes-card .addinfo {
+    word-break: keep-all;
+    flex-wrap: wrap;
 }
 /*友情连接*/
 .friend-links-card .group {
@@ -115,6 +143,34 @@
 .evaluations-card .articles-group img {
     width: 9rem !important;
 }
+
+.articles-group .item {
+    flex-direction: column;
+    width: calc((100% - 1rem)*0.5);
+}
+
+    .articles-group .item img {
+        width: 100% !important;
+    }
+
+.articles-group {
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+    .articles-group .head {
+        gap: .5rem;
+    }
+
+    .articles-group .addinfo {
+        word-break: keep-all;
+        flex-wrap: wrap;
+    }
+
+    .articles-group .name {
+        -webkit-line-clamp: 2;
+    }
 /*免费游戏*/
 .free-games-card .name {
     font-size: 1rem !important;
