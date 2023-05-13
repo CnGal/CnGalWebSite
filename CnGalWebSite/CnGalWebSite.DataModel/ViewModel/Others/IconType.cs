@@ -144,7 +144,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Carry,
         Favorite,
         UnFavorite,
-        SeeMore
+        SeeMore,
+        Official,
+        Demo,
+        EA,
+        OtherReleaseType
     }
 
     public static class IconTypeHelper
@@ -153,6 +157,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Official:
+                    return "mdi-check-decagram";
+                case IconType.Demo:
+                    return "mdi-palette-outline";
+                case IconType.EA:
+                    return "mdi-party-popper";
+                case IconType.OtherReleaseType:
+                    return "mdi-lightbulb-question";
                 case IconType.SeeMore:
                     return "mdi-plus-circle";
                 case IconType.Favorite:

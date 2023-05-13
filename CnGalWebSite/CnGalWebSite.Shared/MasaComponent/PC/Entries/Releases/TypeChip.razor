@@ -1,9 +1,5 @@
-﻿<MChip Dark Small Color="@GetColor()" Class=" ma-1">
-    <MIcon Left Small>
-        @GetIcon()
-    </MIcon>
-    @Model.Type.GetDisplayName()
-</MChip>
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@Model.Type.GetDisplayName()" />
 
 @code {
     [Parameter]
@@ -20,14 +16,14 @@
         };
     }
 
-    public string GetIcon()
+    public IconType GetIcon()
     {
         return Model.Type switch
         {
-            GameReleaseType.Official => "mdi-check-decagram",
-            GameReleaseType.Demo => "mdi-palette-outline",
-            GameReleaseType.EA => "mdi-party-popper",
-            _ => "mdi-lightbulb-question"
+            GameReleaseType.Official => IconType.Official,
+            GameReleaseType.Demo =>IconType.Demo,
+            GameReleaseType.EA => IconType.EA,
+            _ => IconType.OtherReleaseType
         };
     }
 }
