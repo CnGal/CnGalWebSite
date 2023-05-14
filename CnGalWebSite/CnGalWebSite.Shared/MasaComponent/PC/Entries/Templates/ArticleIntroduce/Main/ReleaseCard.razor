@@ -12,7 +12,7 @@
                     <h3>@(item.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(item.PublishPlatformName)==false? item.PublishPlatformName: item.PublishPlatformType.GetDisplayName())</h3>
                  
                     <dl>
-                        @if (string.IsNullOrWhiteSpace(item.StoreInfor.StoreId) == false)
+                        @if (item.StoreInfor.State != StoreState.None)
                         {
                             @if (item.StoreInfor.PriceNow > 0)
                             {
@@ -22,9 +22,9 @@
                                         <span class="me-2">¥</span>
                                         @if (item.StoreInfor.CutNow > 0)
                                         {
-                                            <s class="me-2">@((item.StoreInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
+                                            <s class="me-2">@(item.StoreInfor.OriginalPrice.Value.ToString(" 0.00"))</s>
                                         }
-                                        <span> @((item.StoreInfor.PriceNow/100.0).ToString("0.00") + (item.StoreInfor.CutNow == 0 ? "" : " - 折扣 " + item.StoreInfor.CutNow + "%"))</span>
+                                        <span> @(item.StoreInfor.PriceNow.Value.ToString("0.00") + (item.StoreInfor.CutNow == 0 ? "" : " - 折扣 " + item.StoreInfor.CutNow + "%"))</span>
                                     </dd>
                                 </div>
 
@@ -33,7 +33,7 @@
                                     <div>
                                         <dt>历史最低</dt>
                                         <dd>
-                                            @(item.StoreInfor.PriceLowestString + (item.StoreInfor.CutLowest == 0 ? "" : " - 折扣 " + item.StoreInfor.CutLowest + "%"))
+                                            @(item.StoreInfor.PriceLowest.Value.ToString("0.00") + (item.StoreInfor.CutLowest == 0 ? "" : " - 折扣 " + item.StoreInfor.CutLowest + "%"))
                                         </dd>
                                     </div>
                                 }
@@ -48,14 +48,20 @@
                                 </div>
 
                             }
-                            else if (item.StoreInfor.PriceNow == -1)
+                            else if (item.StoreInfor.State == StoreState.NotPublished)
                             {
                                 <div>
                                     未发售
                                 </div>
 
                             }
-                            else if (item.StoreInfor.PriceNow == -2)
+                            else if (item.StoreInfor.State == StoreState.Takedown)
+                            {
+                                <div>
+                                    已下架
+                                </div>
+                            }
+                            else if (item.StoreInfor.PriceNow == null)
                             {
                                 @if (item.StoreInfor.OriginalPrice > 0)
                                 {
@@ -64,7 +70,7 @@
                                         <dd>
                                             <span>¥</span>
 
-                                            <span>  @((item.StoreInfor.OriginalPrice / 100.0).ToString(" 0.00") + "（数据未更新）")</span>
+                                            <span>  @(item.StoreInfor.OriginalPrice.Value.ToString(" 0.00") + "（数据未更新）")</span>
                                         </dd>
                                     </div>
                                 }
@@ -84,17 +90,12 @@
                                     </div>
                                 }
                             }
-                            else if (item.StoreInfor.PriceNow == -3)
-                            {
-                                <div>
-                                    已下架
-                                </div>
-                            }
+
                             @if (item.StoreInfor.PlayTime > 0)
                             {
                                 <div>
                                     <dt>平均游玩时长</dt>
-                                    <dd>@($"{item.StoreInfor.PlayTime:0.0} 小时")</dd>
+                                    <dd>@($"{item.StoreInfor.PlayTime/60.0:0.0} 小时")</dd>
                                 </div>
                             }
                             @if (item.StoreInfor.EstimationOwnersMax > 0)
@@ -108,7 +109,7 @@
                             {
                                 <div>
                                     <dt>好评率</dt>
-                                    <dd>@($"{item.StoreInfor.RecommendationRate}%（{item.StoreInfor.EvaluationCount}条评测）")</dd>
+                                    <dd>@($"{item.StoreInfor.RecommendationRate:0}%（{item.StoreInfor.EvaluationCount}条评测）")</dd>
                                 </div>
 
                             }

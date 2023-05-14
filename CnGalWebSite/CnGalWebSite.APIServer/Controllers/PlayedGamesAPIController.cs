@@ -329,13 +329,13 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<List<int>>> GetUserInSteamGameIdsAsync()
+        public async Task<ActionResult<List<int>>> GetUserGameIdsAsync()
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             //获取词条
-            var gameIds = await _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id&&s.IsInSteam&&s.EntryId!=null).Select(s=>s.EntryId.Value).ToListAsync();
+            var gameIds = await _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
            
 
             return gameIds;

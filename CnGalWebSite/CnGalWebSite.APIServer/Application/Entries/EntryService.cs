@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Models;
@@ -50,11 +51,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly ILogger<EntryService> _logger;
         private readonly IEmailService _emailService;
         private readonly IViewRenderService _viewRenderService;
-        private readonly ISteamInforService _steamInforService;
+        private readonly IStoreInfoService _storeInfoService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
-        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository, ISteamInforService steamInforService,
+        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository, IStoreInfoService storeInfoService,
         IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository,
          IEmailService emailService, IRepository<BookingUser, long> bookingUserRepository, IViewRenderService viewRenderService)
         {
@@ -72,7 +73,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _emailService = emailService;
             _bookingUserRepository = bookingUserRepository;
             _viewRenderService = viewRenderService;
-            _steamInforService = steamInforService;
+            _storeInfoService = storeInfoService;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -1342,7 +1343,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //添加发行列表
-           foreach(var item in entry.Releases)
+            foreach (var item in entry.Releases)
             {
                 var infor = new GameReleaseViewModel
                 {
@@ -1355,11 +1356,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Time = item.Time,
                     TimeNote = item.TimeNote,
                     Type = item.Type,
+                    StoreInfor = await _storeInfoService.Get(item.PublishPlatformType, item.PublishPlatformName, item.Link,item.Name, entry.Id)
                 };
-                if(item.PublishPlatformType== PublishPlatformType.Steam&&int.TryParse(item.Link,out int steamId))
-                {
-                    infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, entry.Id);
-                }
+
                 model.Releases.Add(infor);
             }
 

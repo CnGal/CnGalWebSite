@@ -602,73 +602,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
         }
 
-        public async Task UpdateSteamInforListAsync()
-        {
-            //循环添加
-            var steamList = await _steamInforRepository.GetAll().AsNoTracking()
-                .Include(s => s.Entry)
-                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
-                .Select(s => new SteamInforTableModel
-                {
-                    SteamId = s.SteamId,
-                    CutLowest = s.CutLowest,
-                    CutNow = s.CutNow,
-                    EntryId = s.Entry.Id,
-                    EvaluationCount = s.EvaluationCount,
-                    LowestTime = s.LowestTime,
-                    Name = s.Entry.Name,
-                    OriginalPrice = s.OriginalPrice,
-                    PriceLowest = s.PriceLowest,
-                    PriceNow = s.PriceNow,
-                    RecommendationRate = s.RecommendationRate,
-                    EstimationOwners = s.EstimationOwnersMin == 0 ? $"< {s.EstimationOwnersMax}" : $"> {s.EstimationOwnersMin}",
-                    PlayTime=s.PlayTime
-                })
-                .ToListAsync();
-
-            //与数据中现有的项目对比
-            //删除不存在的项目
-            var currentIds = steamList.Select(s => s.SteamId);
-
-            await _steamInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.SteamId) == false).ExecuteDeleteAsync();
-            //添加不存在的项目
-            var oldIds = await _steamInforTableModelRepository.GetAll().Select(s => s.SteamId).ToListAsync();
-
-            var newItems = steamList.Where(s => oldIds.Contains(s.SteamId) == false);
-            foreach (var item in newItems)
-            {
-                await _steamInforTableModelRepository.InsertAsync(item);
-            }
-            //对已存在的项目进行更新
-            var currentItems = steamList.Where(s => oldIds.Contains(s.SteamId)).ToList();
-            var oldItems = await _steamInforTableModelRepository.GetAll().Where(s => oldIds.Contains(s.SteamId)).ToListAsync();
-            foreach (var item in oldItems)
-            {
-                var temp = currentItems.Find(s => s.SteamId == item.SteamId);
-                temp.Id = item.Id;
-
-                if (item.Name != temp.Name || item.EntryId != temp.EntryId || item.OriginalPrice != temp.OriginalPrice
-                    || item.PriceNow != temp.PriceNow || item.CutNow != temp.CutNow || item.PriceLowest != temp.PriceLowest || item.CutLowest != temp.CutLowest
-                    || item.LowestTime != temp.LowestTime || item.EvaluationCount != temp.EvaluationCount || item.RecommendationRate != temp.RecommendationRate || item.EstimationOwners != temp.EstimationOwners || item.PlayTime != temp.PlayTime)
-                {
-                    item.Name = temp.Name;
-                    item.EntryId = temp.EntryId;
-                    item.OriginalPrice = temp.OriginalPrice;
-                    item.PriceNow = temp.PriceNow;
-                    item.CutNow = temp.CutNow;
-                    item.PriceLowest = temp.PriceLowest;
-                    item.CutLowest = temp.CutLowest;
-                    item.LowestTime = temp.LowestTime;
-                    item.EvaluationCount = temp.EvaluationCount;
-                    item.EstimationOwners = temp.EstimationOwners;
-                    item.PlayTime = temp.PlayTime;
-                    item.RecommendationRate = temp.RecommendationRate;
-
-                    await _steamInforTableModelRepository.UpdateAsync(item);
-                }
-            }
-        }
-
         public async Task UpdateAllInforListAsync()
         {
             await UpdateBasicInforListAsync();
@@ -676,7 +609,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
             await UpdateMakerInforListAsync();
             await UpdateRoleInforListAsync();
             await UpdateStaffInforListAsync();
-            await UpdateSteamInforListAsync();
             await _playedGameService.UpdateAllGameScore();
         }
 

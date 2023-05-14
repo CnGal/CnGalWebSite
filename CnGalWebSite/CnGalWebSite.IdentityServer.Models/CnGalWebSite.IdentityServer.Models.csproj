@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.3" />  </ItemGroup>
+    <Compile Remove="ViewModels\Shared\**" />
+    <EmbeddedResource Remove="ViewModels\Shared\**" />
+    <None Remove="ViewModels\Shared\**" />
+  </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\Shared\" />
-  </ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.3" />  </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 
 <section class="latest-videoes-card">
     <h2>最新视频</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?10:12)" MoreLink="/search/?Types=Video">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
         <div class="group">
             @foreach (var item in context)
             {
@@ -47,8 +47,8 @@
             _items.Clear();
             while (i < items.Count)
             {
-                _items.Add(items.Skip(i).Take(2));
-                i += 2;
+                _items.Add(items.Skip(i).Take(3));
+                i += 3;
             }
 
             StateHasChanged();

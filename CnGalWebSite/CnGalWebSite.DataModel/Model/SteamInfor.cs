@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
+    [Obsolete("迁移至StoreInfo")]
     public class SteamInfor
     {
         public int Id { get; set; }
@@ -92,15 +93,15 @@ namespace CnGalWebSite.DataModel.Model
 
     public class SteamNowJson
     {
-        public int price { get; set; }
-        public int cut { get; set; }
+        public double? price { get; set; }
+        public int? cut { get; set; }
         public string price_formatted { get; set; } = "¥ 0";
     }
 
     public class SteamLowestJson
     {
-        public int price { get; set; }
-        public int cut { get; set; }
+        public double? price { get; set; }
+        public int? cut { get; set; }
         public string price_formatted { get; set; } = "¥ 0";
         public long recorded { get; set; }
     }

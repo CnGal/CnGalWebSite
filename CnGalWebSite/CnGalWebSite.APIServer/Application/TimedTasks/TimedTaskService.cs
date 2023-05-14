@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -27,7 +28,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
     public class TimedTaskService : ITimedTaskService
     {
         private readonly IRepository<TimedTask, int> _timedTaskRepository;
-        private readonly ISteamInforService _steamInforService;
+        private readonly IStoreInfoService _storeInfoService;
         private readonly ITableService _tableService;
         private readonly IBackUpArchiveService _backUpArchiveService;
         private readonly IPerfectionService _perfectionService;
@@ -41,11 +42,11 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
-        public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
+        public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
         IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService)
         {
             _timedTaskRepository = timedTaskRepository;
-            _steamInforService = steamInforService;
+            _storeInfoService = storeInfoService;
             _backUpArchiveService = backUpArchiveService;
             _tableService = tableService;
             _perfectionService = perfectionService;
@@ -138,7 +139,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             }
             try
             {
-
+                int maxNum = 0;
                 //更新执行状态
                 _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
@@ -151,38 +152,26 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                 switch (item.Type)
                 {
                     case TimedTaskType.UpdateGameSteamInfor:
-                        var maxNum = 20;
-                        try
+                        if(!int.TryParse(item.Parameter, out maxNum))
                         {
-                            if (string.IsNullOrWhiteSpace(item.Parameter) == false)
-                            {
-                                maxNum = int.Parse(item.Parameter);
-                            }
+                            maxNum = 20;
                         }
-                        catch { }
-                        await _steamInforService.BatchUpdateGameSteamInfor(maxNum);
+                        await _storeInfoService.BatchUpdate(maxNum);
                         break;
                     case TimedTaskType.UpdateUserSteamInfor:
-                        await _steamInforService.UpdateAllUserSteamInfor();
-                        break;
+                        throw new Exception("不支持此任务");
                     case TimedTaskType.BackupEntry:
-                        maxNum = 10;
-                        try
-                        {
-                            if (string.IsNullOrWhiteSpace(item.Parameter) == false)
-                            {
-                                maxNum = int.Parse(item.Parameter);
-                            }
-                        }
-                        catch { }
-                        await _backUpArchiveService.BackUpAllEntries(maxNum);
-                        break;
-                    case TimedTaskType.BackupArticle:
-                        if (int.TryParse(item.Parameter, out maxNum) == false)
+                        if (!int.TryParse(item.Parameter, out maxNum))
                         {
                             maxNum = 10;
                         }
-
+                        await _backUpArchiveService.BackUpAllEntries(maxNum);
+                        break;
+                    case TimedTaskType.BackupArticle:
+                        if (!int.TryParse(item.Parameter, out maxNum))
+                        {
+                            maxNum = 10;
+                        }
                         await _backUpArchiveService.BackUpAllArticles(maxNum);
                         break;
                     case TimedTaskType.UpdateDataSummary:
@@ -216,19 +205,17 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _lotteryService.DrawAllLottery();
                         break;
                     case TimedTaskType.TransferAllMainImages:
-
-                        if (int.TryParse(item.Parameter, out maxNum) == false)
+                        if (!int.TryParse(item.Parameter, out maxNum))
                         {
                             maxNum = 2;
                         }
-
                         await _fileService.TransferMainImagesToPublic(maxNum);
                         break;
                     case TimedTaskType.UpdateRoleBrithdays:
                         await _entryService.UpdateRoleBrithday();
                         break;
                     case TimedTaskType.PostAllBookingNotice:
-                        if (int.TryParse(item.Parameter, out maxNum) == false)
+                        if (!int.TryParse(item.Parameter, out maxNum))
                         {
                             maxNum = 2;
                         }

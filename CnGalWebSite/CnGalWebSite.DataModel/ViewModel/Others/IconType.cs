@@ -148,7 +148,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Official,
         Demo,
         EA,
-        OtherReleaseType
+        OtherReleaseType,
+        Automatic,
+        Manual,
+        Store
     }
 
     public static class IconTypeHelper
@@ -157,6 +160,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Store:
+                    return "mdi-store";
+                case IconType.Automatic:
+                    return "mdi-autorenew";
+                case IconType.Manual:
+                    return "mdi-pencil";
                 case IconType.Official:
                     return "mdi-check-decagram";
                 case IconType.Demo:

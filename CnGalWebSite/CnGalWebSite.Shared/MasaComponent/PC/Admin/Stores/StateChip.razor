@@ -1,0 +1,29 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@State.GetDisplayName()" />
+
+@code {
+    [Parameter]
+    public StoreState State { get; set; }
+
+    public string GetColor()
+    {
+        return State switch
+        {
+            StoreState.NotPublished => "info",
+            StoreState.OnSale => "success",
+            StoreState.Takedown => "error",
+            _ => "purple"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return State switch
+        {
+            StoreState.NotPublished => IconType.UnPublished,
+            StoreState.OnSale => IconType.Published,
+            StoreState.Takedown => IconType.Takedown,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

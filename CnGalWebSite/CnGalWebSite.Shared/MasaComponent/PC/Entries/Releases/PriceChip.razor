@@ -6,7 +6,7 @@
     {
         <MChip Small Color="info" Outlined Class="ma-1">
             <MIcon Left Small>@IconType.Price.ToIconString()</MIcon>
-            <span>@("¥ "+(Model.StoreInfor.PriceNow / 100.0).ToString("0.00")) </span>
+            <span>@("¥ "+Model.StoreInfor.PriceNow.Value.ToString("0.00")) </span>
         </MChip>
     }
     else

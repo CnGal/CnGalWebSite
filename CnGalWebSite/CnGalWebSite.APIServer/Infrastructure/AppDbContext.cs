@@ -95,6 +95,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingUser> BookingUsers { get; set; }
         public DbSet<EntryWebsite> EntryWebsites { get; set; }
+        public DbSet<StoreInfo> StoreInfo { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

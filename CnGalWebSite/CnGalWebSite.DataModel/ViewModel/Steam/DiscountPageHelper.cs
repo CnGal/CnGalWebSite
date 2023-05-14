@@ -5,8 +5,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 {
     public class DiscountPageHelper
     {
-        public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
-        public IEnumerable<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
+        public List<StoreInfoCardModel> Model = new List<StoreInfoCardModel>();
+        public IEnumerable<StoreInfoCardModel> Items = new List<StoreInfoCardModel>();
 
         public List<int> PurchasedGames=new List<int>();
 
@@ -96,7 +96,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             ThenOrderType = SteamSortType.RecommendationRate;
         }
 
-        public void Init(List<SteamInforTipViewModel> model)
+        public void Init(List<StoreInfoCardModel> model)
         {
             Model = model;
             SetItems();

@@ -34,7 +34,7 @@ namespace CnGalWebSite.Shared.Service
         {
             _httpService = httpService;
             _serviceProvider = serviceProvider;
-            _token = Guid.NewGuid().ToString();
+            _token =typeof( TModel).ToString();
             _baseUrl = ToolHelper.WebApiPath;
 
             if (ToolHelper.IsSSR)
@@ -50,6 +50,8 @@ namespace CnGalWebSite.Shared.Service
             _useNewtonsoft = useNewtonsoft;
         }
 
+        string GetUrl(string apiUrl) => apiUrl.Contains("http://") ? apiUrl : _baseUrl + apiUrl;
+
         private async Task<TModel> GetCacheFromMemory(string apiUrl)
         {
             //判断是否两次请求同一个API
@@ -59,9 +61,11 @@ namespace CnGalWebSite.Shared.Service
             //    _catches.Remove(_baseUrl + apiUrl);
             //}
 
-            if (_catches.Any(s => s.Key == _baseUrl + apiUrl))
+            var url = GetUrl(apiUrl);
+
+            if (_catches.Any(s => s.Key == url))
             {
-                return _catches[_baseUrl + apiUrl];
+                return _catches[url];
             }
             else
             {
@@ -70,13 +74,13 @@ namespace CnGalWebSite.Shared.Service
                 TModel temp = null;
                 if (_useNewtonsoft)
                 {
-                    var str = await client.GetStringAsync(_baseUrl + apiUrl);
+                    var str = await client.GetStringAsync(url);
                     var obj = Newtonsoft.Json.Linq.JObject.Parse(str);
                     temp = obj.ToObject<TModel>();
                 }
                 else
                 {
-                    temp = await client.GetFromJsonAsync<TModel>(_baseUrl + apiUrl, ToolHelper.options);
+                    temp = await client.GetFromJsonAsync<TModel>(url, ToolHelper.options);
                 }
 
                 return temp;
@@ -85,11 +89,14 @@ namespace CnGalWebSite.Shared.Service
 
         public void Clean(string apiUrl)
         {
-            _ = _catches.Remove(_baseUrl + apiUrl);
+            var url = GetUrl(apiUrl);
+
+            _ = _catches.Remove(url);
         }
         public bool Check(string apiUrl)
         {
-            return _catches.Any(s => s.Key == _baseUrl + apiUrl);
+            var url = GetUrl(apiUrl);
+            return _catches.Any(s => s.Key == url);
         }
         public void Clean()
         {
@@ -98,6 +105,8 @@ namespace CnGalWebSite.Shared.Service
 
         public async Task<TModel> GetCache(string apiUrl)
         {
+            var url = GetUrl(apiUrl);
+
             if (ApplicationState != null)
             {
                 if (!ApplicationState.TryTakeFromJson<Dictionary<string, TModel>>(_token, out var restored))
@@ -113,13 +122,13 @@ namespace CnGalWebSite.Shared.Service
            var temp = await GetCacheFromMemory(apiUrl);
 
             //保存数据
-            if (_catches.Any(s => s.Key == _baseUrl + apiUrl))
+            if (_catches.Any(s => s.Key == url))
             {
-                _catches[_baseUrl + apiUrl] = temp;
+                _catches[url] = temp;
             }
             else
             {
-                _catches.Add(_baseUrl + apiUrl, temp);
+                _catches.Add(url, temp);
             }
 
 

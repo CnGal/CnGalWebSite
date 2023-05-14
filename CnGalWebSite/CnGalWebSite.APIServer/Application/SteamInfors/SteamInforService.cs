@@ -41,342 +41,6 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _logger = logger;
         }
 
-        public async Task<StoreInforViewModel> GetSteamInforAsync(int steamId, int entryId = 0)
-        {
-
-            //尝试到数据库中查找信息
-            //没有找到 则尝试更新数据
-            //无法更新则返回错误
-            var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            if (steamInfor == null)
-            {
-                if (await _entryRepository.GetAll().AnyAsync(s => s.Id == entryId) == false)
-                {
-                    return null;
-                }
-
-                steamInfor = await UpdateSteamInfor(steamId, entryId);
-                if(steamInfor==null)
-                {
-                    return null;
-                }
-            }
-
-           
-            return new StoreInforViewModel
-            {
-                StoreId=steamId.ToString(),
-                PriceLowestString=steamInfor.PriceLowestString,
-                PriceNowString=steamInfor.PriceNowString,
-                CutLowest = steamInfor.CutLowest,
-                EstimationOwnersMax = steamInfor.EstimationOwnersMax,
-                EstimationOwnersMin = steamInfor.EstimationOwnersMin,
-                EvaluationCount = steamInfor.EvaluationCount,
-                LowestTime = steamInfor.LowestTime,
-                OriginalPrice = steamInfor.OriginalPrice,
-                PriceLowest = steamInfor.PriceLowest,
-                CutNow = steamInfor.CutNow,
-                PriceNow = steamInfor.PriceNow,
-                PublishPlatformType =  PublishPlatformType.Steam,
-                RecommendationRate = steamInfor.RecommendationRate,
-                PlayTime = steamInfor.PlayTime,
-                EntryId = entryId,
-                UpdateTime = steamInfor.UpdateTime,
-            };
-        }
-
-        public async Task UpdateAllGameSteamInfor()
-        {
-            var steams = await _steamInforRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId).Select(s => s.SteamId).ToListAsync();
-
-            foreach (var item in steams)
-            {
-                _ = await UpdateSteamInfor(item, 0);
-            }
-
-        }
-
-        [Obsolete("一次性更新所有信息负载过高")]
-        public async Task BatchUpdateGameSteamInfor(int count)
-        {
-            var date = DateTime.Now.ToCstTime().Date;
-
-            var steams = await _steamInforRepository.GetAll().AsNoTracking()
-                .Where(s => s.UpdateTime.Date < date&&s.PriceNow != -3)
-                .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
-                .Select(s => s.SteamId)
-                .Take(count)
-                .ToListAsync();
-
-            foreach (var item in steams)
-            {
-                _ = await UpdateSteamInfor(item, 0);
-            }
-
-        }
-
-        [Obsolete("已迁移用户Steam信息")]
-        public async Task UpdateAllUserSteamInfor()
-        {
-            var steamIds = await _steamUserInforRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).Select(s => s.SteamId).ToListAsync();
-
-            foreach (var item in steamIds)
-            {
-                _ = await UpdateSteamUserInfor(item);
-            }
-        }
-
-        #region 获取Steam信息
-
-        /// <summary>
-        /// 获取Steam附加信息
-        /// </summary>
-        /// <param name="steam"></param>
-        /// <returns></returns>
-        public async Task GetSteamAdditionInformationAsync(SteamInfor steam)
-        {
-            try
-            {
-                var content = await _httpClient.GetStringAsync(_configuration["SteamspyUrl"] + "api.php?request=appdetails&appid=" + steam.SteamId);
-                var json = JObject.Parse(content);
-
-                steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
-                if (steam.EvaluationCount != 0)
-                {
-                    steam.RecommendationRate = json["positive"].ToObject<int>() * 100 / steam.EvaluationCount;
-                }
-              
-
-                var minutes = json["average_forever"].ToObject<double>();
-                if (minutes > 3000)
-                {
-                    steam.PlayTime = 0;
-                }
-                else
-                {
-                    steam.PlayTime = minutes / 60;
-                }
-            
-
-                var times = json["owners"].ToObject<string>().Split("..");
-
-                steam.EstimationOwnersMin = int.Parse(times[0].Replace(" ", "").Replace(",", ""));
-                steam.EstimationOwnersMax = int.Parse(times[1].Replace(" ", "").Replace(",", ""));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Id：{id} 获取Steam附加信息失败", steam.SteamId);
-            }
-
-        }
-
-        /// <summary>
-        /// 获取Steam价格
-        /// </summary>
-        /// <param name="steam"></param>
-        /// <returns></returns>
-        private async Task UpdateSteamInforByRemoteAPI(SteamInfor steam)
-        {
-            //获取信息
-
-            var jsonContent = await _httpClient.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steam.SteamId + "&allowed=steam");
-            var thirdResult = JObject.Parse(jsonContent);
-            var steamNowJson = new SteamNowJson
-            {
-                price = -1,
-                cut = -1
-            };
-            var steamLowestJson = new SteamLowestJson
-            {
-                price = -1,
-                cut = -1
-            };
-            if (thirdResult["data"]["app/" + steam.SteamId]["lowest"].Count() != 0)
-            {
-                steamLowestJson = thirdResult["data"]["app/" + steam.SteamId]["lowest"].ToObject<SteamLowestJson>();
-            }
-            JObject officialResult = null;
-            try
-            {
-                //尝试使用官方api获取信息
-                jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steam.SteamId + "&cc=cn&filters=price_overview");
-                officialResult = JObject.Parse(jsonContent);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,"Id:{id} 获取Steam官方API数据失败", steam.SteamId);
-            }
-
-            if (officialResult != null && officialResult[steam.SteamId.ToString()]["success"].ToObject<bool>() == true)
-            {
-                if (officialResult[steam.SteamId.ToString()]["data"].Count() != 0)
-                {
-                    var discount_percent = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
-                    var final = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
-                    var final_formatted = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
-
-                    steamNowJson = new SteamNowJson
-                    {
-                        price = int.Parse(final),
-                        cut = int.Parse(discount_percent),
-                        price_formatted = final_formatted
-                    };
-
-                }
-                else
-                {
-                    steamNowJson = new SteamNowJson
-                    {
-                        price = 0,
-                        cut = 0
-                    };
-                }
-            }
-            else
-            {
-                if (thirdResult["data"]["app/" + steam.SteamId]["price"].Count() != 0)
-                {
-                    steamNowJson = thirdResult["data"]["app/" + steam.SteamId]["price"].ToObject<SteamNowJson>();
-                    steamNowJson.price *= 100;
-                }
-            }
-
-            //修正无法获取价格的游戏状态
-            if (steamNowJson.price == 0 && steamLowestJson.price == -1)
-            {
-                steamNowJson = new SteamNowJson
-                {
-                    price = -1,
-                    cut = -1
-                };
-            }
-            //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
-
-            //当前价格
-            steam.PriceNow = steamNowJson.price;
-            if (steam.PriceNow == -1)
-            {
-                //判断是否 无法获取数据
-                if (steamLowestJson.price != -1)
-                {
-                    steam.PriceNow = -2;
-                    steam.CutNow = -2;
-
-                    steam.CutLowest = steamLowestJson.cut;
-                    steam.PriceLowest = steamLowestJson.price * 100;
-                    steam.PriceLowestString = "¥ " + ((double)steam.PriceLowest / 100).ToString("0.00");
-                    steam.LowestTime = ToolHelper.GetDateTimeFrom1970Ticks(steamLowestJson.recorded);
-
-                    //计算原价
-                    if (steam.CutLowest == 100)
-                    {
-                        steam.OriginalPrice = steam.PriceLowest;
-                    }
-                    steam.OriginalPrice = (int)(steam.PriceLowest / (1 - ((double)steam.CutLowest / 100)));
-
-
-                }
-                else
-                {
-                    steam.PriceNowString = "¥ 0";
-                    steam.CutNow = -1;
-                    steam.OriginalPrice = -1;
-
-                    steam.CutLowest = -1;
-                    steam.PriceLowest = -1;
-                    steam.PriceLowestString = "¥ 0";
-
-                    steam.LowestTime = DateTime.MinValue;
-                }
-            }
-            else
-            {
-                steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
-                steam.CutNow = steamNowJson.cut;
-
-                steam.LowestTime = ToolHelper.GetDateTimeFrom1970Ticks(steamLowestJson.recorded);
-                steam.CutLowest = steamLowestJson.cut;
-
-                //计算原价
-                //当前价格 = 原价 * （1 - 折扣）
-                //原价 = 当前价格 / （1 - 折扣）
-                if (steam.CutNow == 100)
-                {
-                    steam.OriginalPrice = steam.PriceNow;
-                }
-                steam.OriginalPrice = (int)(steam.PriceNow / (1 - ((double)steam.CutNow / 100)));
-
-                //计算史低价格
-                if (steamLowestJson.price != -1)
-                {
-                    steam.PriceLowest = steam.CutLowest >= 0 ? (int)(steam.OriginalPrice * (1 - ((double)steam.CutLowest / 100))) : steam.OriginalPrice;
-
-                    //比较是否偏差较大
-                    if (Math.Abs((steam.PriceLowest / 100) - steamLowestJson.price) > 2)
-                    {
-                        steam.PriceLowest = steamLowestJson.price * 100;
-                    }
-
-                    steam.PriceLowestString = "¥ " + ((double)steam.PriceLowest / 100).ToString("0.00");
-                }
-                else
-                {
-                    steam.PriceLowestString = "¥ 0";
-                    steam.PriceLowest = -1;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 更新Steam信息
-        /// </summary>
-        /// <param name="steamId"></param>
-        /// <param name="entryId"></param>
-        /// <returns></returns>
-        public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
-        {
-            //获取已存在的信息
-            var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            steam ??= new SteamInfor
-            {
-                EntryId = entryId,
-                SteamId = steamId,
-                OriginalPrice = -1
-            };
-
-            //判断是否下架
-            if (steam.PriceNow == -3)
-            {
-                return steam;
-            }
-            //判断是否为免费游戏
-            if (steam.OriginalPrice != 0)
-            {
-                await UpdateSteamInforByRemoteAPI(steam);
-            }
-
-
-            //获取附加信息
-            if (steam.PriceNow >= 0)
-            {
-                await GetSteamAdditionInformationAsync(steam);
-            }
-
-            //最后更新时间
-            steam.UpdateTime = DateTime.Now.ToCstTime();
-
-            if (steam.EntryId != 0)
-            {
-                _ = steam.Id == 0 ? await _steamInforRepository.InsertAsync(steam) : await _steamInforRepository.UpdateAsync(steam);
-                _logger.LogInformation("更新 Id:{SteamId} 的Steam信息，关联词条Id:{EntryId}", steam.SteamId, steam.EntryId);
-            }
-
-            return steam;
-        }
-
-
-        #endregion
-
         /// <summary>
         /// 更新用户Steam信息
         /// </summary>
@@ -399,7 +63,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"]+"IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item+ "&skip_unvetted_apps=0");
+                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item + "&skip_unvetted_apps=0");
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
@@ -467,13 +131,34 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return !isError;
         }
 
-        [Obsolete("已迁移用户Steam信息")]
+
+        public async Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids)
+        {
+            var model = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
+
+            foreach (var item in steamids)
+            {
+                //不存在则获取
+                if (model.Any(s => s.SteamId == item) == false)
+                {
+                    var temp = await UpdateSteamUserInfor(item);
+                    if (temp != null)
+                    {
+                        model.Add(temp);
+                    }
+                }
+            }
+
+            return model;
+        }
+
+
         public async Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId)
         {
             var steamUser = new SteamUserInforJson();
             try
             {
-                var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"]+"ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
+                var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }
@@ -498,25 +183,6 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return user;
         }
 
-        public async Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids)
-        {
-            var model = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
-
-            foreach (var item in steamids)
-            {
-                //不存在则获取
-                if (model.Any(s => s.SteamId == item) == false)
-                {
-                    var temp = await UpdateSteamUserInfor(item);
-                    if (temp != null)
-                    {
-                        model.Add(temp);
-                    }
-                }
-            }
-
-            return model;
-        }
-
     }
+    
 }

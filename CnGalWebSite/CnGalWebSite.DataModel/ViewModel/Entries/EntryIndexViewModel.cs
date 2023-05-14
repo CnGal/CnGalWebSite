@@ -223,20 +223,25 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 商店信息
         /// </summary>
-        public StoreInforViewModel StoreInfor { get; set; } = new StoreInforViewModel();
+        public StoreInfoViewModel StoreInfor { get; set; } = new StoreInfoViewModel();
 
         public string GetLink()
         {
-            return PublishPlatformType switch
+            return GetLink(PublishPlatformType, Link);
+        }
+
+        public static string GetLink(PublishPlatformType type,string link)
+        {
+            return type switch
             {
-                PublishPlatformType.Steam => "https://store.steampowered.com/app/" + Link,
-                PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + Link,
-                PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + Link,
-                PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" +Link,
-                PublishPlatformType.TapTap => "https://www.taptap.cn/app/" + Link,
-                PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + Link,
-                PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{Link}.html",
-                _ => Link
+                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? "https://store.steampowered.com/app/" + link : link,
+                PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + link,
+                PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + link,
+                PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" + link,
+                PublishPlatformType.TapTap => "https://www.taptap.cn/app/" + link,
+                PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + link,
+                PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{link}.html",
+                _ => link
             };
         }
     }

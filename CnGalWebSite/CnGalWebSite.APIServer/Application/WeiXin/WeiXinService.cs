@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -33,9 +34,10 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly ISearchHelper _searchHelper;
-        private readonly ISteamInforService _steamService;
+        private readonly IStoreInfoService _storeInfoService;
 
-        public WeiXinService(IConfiguration configuration, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IArticleService articleService, IAppHelper appHelper, ISteamInforService steamService, ISearchHelper searchHelper, IEntryService entryService,
+        public WeiXinService(IConfiguration configuration, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IArticleService articleService, IAppHelper appHelper, IStoreInfoService storeInfoService,
+            ISearchHelper searchHelper, IEntryService entryService,
             IRepository<RoleBirthday, long> roleBirthdayRepository)
         {
             _configuration = configuration;
@@ -43,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             _articleRepository = articleRepository;
             _articleService = articleService;
             _appHelper = appHelper;
-            _steamService = steamService;
+           _storeInfoService= storeInfoService;
             _searchHelper = searchHelper;
             _entryService = entryService;
             _roleBirthdayRepository = roleBirthdayRepository;
@@ -222,19 +224,19 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             if (model.Type == EntryType.Game)
             {
 
-                var steamIdStr = entry.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false)?.Link;
-                if (steamIdStr != null && int.TryParse(steamIdStr, out var steamId))
+                var release = entry.Releases.FirstOrDefault(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false);
+                if (release != null)
                 {
                     _ = sb.AppendLine();
 
-                    var steam = await _steamService.GetSteamInforAsync(steamId, model.Id);
+                    var steam = await _storeInfoService.Get(release.PublishPlatformType,release.PublishPlatformName,release.Link,release.Name, model.Id);
                     if (steam.PriceNow > 0)
                     {
-                        _ = sb.AppendLine($"当前价格：{steam.PriceNowString}{(steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
+                        _ = sb.AppendLine($"当前价格：¥ {steam.PriceNow:0.00}{(steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
 
                         if (steam.CutLowest > 0)
                         {
-                            _ = sb.AppendLine($"历史最低：{steam.PriceLowestString}");
+                            _ = sb.AppendLine($"历史最低：¥ {steam.PriceLowest:0.00}");
                         }
                     }
                     else if (steam.PriceNow == 0)
@@ -251,7 +253,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         if (steam.OriginalPrice > 0)
                         {
-                            _ = sb.AppendLine($"价格：¥ {(steam.OriginalPrice / 100.0).ToString("0.00")}（数据未更新）");
+                            _ = sb.AppendLine($"价格：¥ {steam.OriginalPrice:0.00}（数据未更新）");
                         }
                         else if (steam.OriginalPrice == 0)
                         {
@@ -276,11 +278,11 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         if (plainText)
                         {
-                            _ = sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
+                            _ = sb.AppendLine($"https://store.steampowered.com/app/{release.Link}");
                         }
                         else
                         {
-                            _ = sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
+                            _ = sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{release.Link}\">Steam商店页面</a>");
 
                         }
                     }
