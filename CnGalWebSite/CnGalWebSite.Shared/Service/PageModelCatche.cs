@@ -34,7 +34,7 @@ namespace CnGalWebSite.Shared.Service
         {
             _httpService = httpService;
             _serviceProvider = serviceProvider;
-            _token = Guid.NewGuid().ToString();
+            _token =typeof( TModel).ToString();
             _baseUrl = ToolHelper.WebApiPath;
 
             if (ToolHelper.IsSSR)

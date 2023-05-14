@@ -65,7 +65,11 @@
     font-weight: bold;
 }
 
-.latest-articles-card .content, .latest-articles-card .head {
+.latest-articles-card .content {
+    gap: .5rem;
+}
+
+.latest-articles-card .head {
     gap: .5rem;
 }
 /*最新视频*/
@@ -171,6 +175,10 @@
     .articles-group .name {
         -webkit-line-clamp: 2;
     }
+
+.evaluations-card .content {
+    font-size: inherit;
+}
 /*免费游戏*/
 .free-games-card .name {
     font-size: 1rem !important;

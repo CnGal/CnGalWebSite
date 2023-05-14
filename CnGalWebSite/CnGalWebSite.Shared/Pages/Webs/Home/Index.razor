@@ -3,74 +3,66 @@
 
 <TitleTip></TitleTip>
 
-@if (ToolHelper.IsSSR)
-{
-    <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
-}
-else
-{
+<style>
+    body {
+        background-color: #fff;
+    }
+</style>
 
-    <style>
-        body {
-            background-color: #fff;
-        }
-    </style>
+<style>
+    .variable.container {
+        max-width: none;
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
 
-    <style>
-        .variable.container {
-            max-width: none;
-        }
-
-        .load-footer {
-            display: none;
-        }
-    </style>
-    <div id="home-page">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CarouselsCard />
-        <div class="row">
-            <div class="left-content col-12 col-md-10">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.NewsCard />
-            </div>
-            <div class="right-content col-12 col-md-2">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.WeeklyNewsCard />
-            </div>
+    .load-footer {
+        display: none;
+    }
+</style>
+<div id="home-page">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CarouselsCard />
+    <div class="row">
+        <div class="left-content col-12 col-lg-10">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.NewsCard />
         </div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.PublishedGamesCard />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.UpcomingGamesCard />
-        <div class="row">
-            <div class="left-content col-12 col-md-9">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
-            </div>
-            <div class="right-content col-12 col-md-3">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
-
-            </div>
+        <div class="right-content col-12 col-lg-2">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.WeeklyNewsCard />
         </div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
-
-        <div class="row">
-            <div class="left-content col-12 col-xl-9">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
-            </div>
-            <div class="right-content col-12 col-xl-3">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard />
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard />
-            </div>
-        </div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.KanbanCard />
-
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard Lock="Lock"/>
     </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.PublishedGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.UpcomingGamesCard />
+    <div class="row">
+        <div class="left-content col-12 col-lg-9">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
+        </div>
+        <div class="right-content col-12 col-lg-3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
 
-}
+        </div>
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
 
+    <div class="row">
+        <div class="left-content col-12 col-lg-9">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
+        </div>
+        <div class="right-content col-12 col-lg-3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard />
+        </div>
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.KanbanCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard Lock="Lock" />
+</div>
 
 
 @code{

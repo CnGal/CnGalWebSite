@@ -4,9 +4,9 @@
 @inject IEventService _eventService
 
 
-<div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; " class="@(_dataCacheService.IsApp?"d-none":"")">
+<div style=" position: fixed; z-index: 4; bottom: 7rem; right: 2rem;" class="@(_dataCacheService.IsApp?"d-none":"")">
     <div style=" display: flex; flex-direction: column;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.BrithdayButton Class="mb-4" />
+        @*<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.BrithdayButton Class="mb-4" />*@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" />
         @if (showEntryStyle)
         {
