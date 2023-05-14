@@ -2,17 +2,18 @@
 
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
+@inject IPageModelCatche<List<ArticleInforTipViewModel>>  _pageModelCatche
 
 @if (isReady)
 {
     @if (_dataCacheService.IsApp)
     {
-        <CnGalWebSite.Shared.Pages.Apps.Home.About Index="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+        <CnGalWebSite.Shared.Pages.Apps.Home.About Index="@(_items.FirstOrDefault()?.Id??281)" />
 
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_items.FirstOrDefault()?.Id??281)" />
     }
 }
 
@@ -22,15 +23,14 @@
 
     bool isReady;
 
+    List<ArticleInforTipViewModel> _items;
+
     protected override async Task OnInitializedAsync()
     {
 
         try
         {
-            if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
-            {
-                _dataCacheService.WeeklyNewsOverviewCatche = await _httpService.GetAsync<List<ArticleInforTipViewModel>>("api/news/GetWeeklyNewsOverview");
-            }
+            _items = await _pageModelCatche.GetCache("api/news/GetWeeklyNewsOverview");
 
             isReady = true;
         }

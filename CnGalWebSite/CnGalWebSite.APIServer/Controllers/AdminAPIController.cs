@@ -84,6 +84,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<SteamInfor, long> _steamInforRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
@@ -137,7 +138,8 @@ namespace CnGalWebSite.APIServer.Controllers
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository,
+        IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository)
         {
             
             _entryRepository = entryRepository;
@@ -204,6 +206,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoService = videoService;
             _videoRepository = videoRepository;
             _perfectionOverviewRepository= perfectionOverviewRepository;
+            _storeInfoRepository = storeInfoRepository;
         }
 
         /// <summary>
@@ -656,32 +659,59 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var entries = await _entryRepository.GetAll()
-                    .Include(s => s.Information)
-                    .Include(s=>s.Outlinks)
-                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Information.Any(s => s.Modifier == "相关网站" || s.DisplayName == "官网"))
+                    .Include(s => s.Releases)
+                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false)
+                    .Where(s => s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam))
                     .ToListAsync();
 
                 foreach (var item in entries)
                 {
-                    foreach (var infor in item.Information.Where(s => s.Modifier == "相关网站" || s.DisplayName == "官网"))
+                    foreach (var infor in item.Releases.Where(s=>s.PublishPlatformType== PublishPlatformType.Steam))
                     {
-                        if (item.Outlinks.Any(s => s.Name.ToLower() == infor.DisplayName.ToLower()) == false)
+                        if(int.TryParse(infor.Link, out int steamId)==false)
                         {
-                            item.Outlinks.Add(new Outlink
-                            {
-                                Name = infor.DisplayName,
-                                Link = infor.DisplayValue,
-                            });
+                            continue;
                         }
+
+                        var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
+
+                        if(steam==null)
+                        {
+                            continue;
+                        }
+
+                        var store = await _storeInfoRepository.FirstOrDefaultAsync(s => s.PlatformType == infor.PublishPlatformType && s.PlatformName == infor.PublishPlatformName && s.Link == infor.Link && s.Name == infor.Name && s.EntryId == item.Id);
+
+                        if(store!=null)
+                        {
+                            continue;
+                        }
+
+                        await _storeInfoRepository.InsertAsync(new StoreInfo
+                        {
+                            State = steam.PriceNow == -3 ? StoreState.Takedown : steam.PriceNow == -1 ? StoreState.NotPublished : StoreState.OnSale,
+                            CurrencyCode = CurrencyCode.CNY,
+                            CutLowest = steam.CutLowest>=0 ? steam.CutLowest :null,
+                            CutNow = steam.CutNow >= 0 ? steam.CutNow : null,
+                            EntryId = item.Id,
+                            EstimationOwnersMax = steam.EstimationOwnersMax > 0 ? steam.EstimationOwnersMax : null,
+                            EstimationOwnersMin =   steam.EstimationOwnersMin > 0 ? steam.EstimationOwnersMin : null,
+                            EvaluationCount = steam.EvaluationCount > 0 ? steam.EvaluationCount : null,
+                            Link = steam.SteamId.ToString(),
+                            Name = infor.Name,
+                            OriginalPrice = steam.OriginalPrice >= 0 ? steam.OriginalPrice*0.01 : null,
+                            PlatformName = infor.PublishPlatformName,
+                            PlatformType = PublishPlatformType.Steam,
+                            PlayTime =(int)( steam.PlayTime*60),
+                            PriceLowest = steam.PriceLowest >= 0 ? steam.PriceLowest * 0.01 : null,
+                            PriceNow = steam.PriceNow >= 0 ? steam.PriceNow * 0.01 : null,
+                            RecommendationRate = steam.RecommendationRate > 0 ? steam.RecommendationRate : null,
+                            UpdateTime = steam.UpdateTime,
+                            UpdateType = StoreUpdateType.Automatic
+                        });
+
+                        _logger.LogInformation("迁移词条 - {name}({id}) 的Steam - {id} 信息", item.Name, item.Id, steam.SteamId);
                     }
-
-                    var informations = item.Information.ToList();
-                    informations.RemoveAll(s => s.Modifier == "相关网站" || s.DisplayName == "官网");
-                    item.Information = informations;
-
-                    await _entryRepository.UpdateAsync(item);
-
-                    _logger.LogInformation("更新词条 - {name}({id}) 的外部链接", item.Name, item.Id);
                 }
 
                 return new Result { Successful = true };

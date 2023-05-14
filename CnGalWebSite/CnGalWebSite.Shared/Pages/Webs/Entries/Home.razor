@@ -2,24 +2,41 @@
 
 <TitleTip Title="词条" Description="查看免费游戏，打折游戏，游戏CG预览，画师作品，角色展示等众多内容"></TitleTip>
 
-<div>
-    <div class="mb-4">
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.FreeGameGroup />
+<style>
+    body {
+        background-color: #fff;
+    }
+</style>
 
-    </div>
-    <div class="mb-4">
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.DiscountGameGroup />
+<style>
+    .variable.container {
+        max-width: none;
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
 
+    .load-footer {
+        display: none;
+    }
+</style>
+<div id="home-page">
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.PublishedGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.UpcomingGamesCard />
+    <div class="row">
+        <div class="left-content col-12 col-lg-9">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
+
+        </div>
+        <div class="right-content col-12 col-lg-3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
+        </div>
     </div>
-    <div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.CGSlideGroup />
-    </div>
-    <div class="mb-4">
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.GameRoleGroup />
-    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
 </div>
-
 @code {
-   
+
 }
 

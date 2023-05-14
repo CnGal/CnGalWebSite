@@ -97,11 +97,11 @@
             {
                 if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<SteamInforTipViewModel>>("api/steam/GetAllGameSteamInfors"));
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<StoreInfoCardModel>>("api/storeinfo/GetAllGameSteamInfors"));
 
                     try
                     {
-                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await _httpService.GetAsync<List<int>>("api/playedgame/GetUserInSteamGameIds");
+                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await _httpService.GetAsync<List<int>>("api/playedgame/GetUserGameIds");
                     }
                     catch
                     {

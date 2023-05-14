@@ -100,14 +100,6 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<TagIndexViewModel> TagIndexPageCatche { get; set; }
         /// <summary>
-        /// 主页动态数据缓存
-        /// </summary>
-        public IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
-        /// <summary>
-        /// 主页轮播图数据缓存
-        /// </summary>
-        public IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
-        /// <summary>
         /// 编辑总览页面数据缓存
         /// </summary>
         public IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
@@ -205,9 +197,9 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
-        /// 免费游戏列表
+        /// 随机标签
         /// </summary>
-        public List<EntryInforTipViewModel> FreeGamesCatche { get; set; } = new List<EntryInforTipViewModel>();
+        public List<RandomTagModel> RandomTagsCatche { get; set; } = new List<RandomTagModel>();
 
         /// <summary>
         /// 广场抽奖列表缓存
@@ -219,39 +211,9 @@ namespace CnGalWebSite.Shared.Service
         public List<VoteCardViewModel> VoteCardsCatche { get; set; } = new List<VoteCardViewModel>();
 
         /// <summary>
-        /// 文章主页 随机文章
-        /// </summary>
-        public List<RandomTagModel> RandomTagsCatche { get; set; } = new List<RandomTagModel>();
-
-        /// <summary>
-        /// 文章主页 随机文章
-        /// </summary>
-        public List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; } = new List<ArticleInforTipViewModel>();
-        /// <summary>
-        /// 文章主页 周报列表
-        /// </summary>
-        public List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; } = new List<ArticleInforTipViewModel>();
-        /// <summary>
-        /// 文章主页 游戏评测预览
-        /// </summary>
-        public List<GameEvaluationsModel> GameEvaluationsCatche { get; set; } = new List<GameEvaluationsModel>();
-
-        /// <summary>
-        /// 词条主页 CG预览列表
-        /// </summary>
-        public List<GameCGModel> GameCGsCatche { get; set; } = new List<GameCGModel>();
-        /// <summary>
-        /// 词条主页 角色预览列表
-        /// </summary>
-        public List<GameRoleModel> GameRolesCatche { get; set; } = new List<GameRoleModel>();
-        /// <summary>
         /// 折扣页面缓存辅助类
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
-        /// <summary>
-        /// 词条主页 随机折扣游戏
-        /// </summary>
-        public List<SteamInforTipViewModel> DiscountGamesCatche { get; set; } = new List<SteamInforTipViewModel>();
         /// <summary>
         /// 可评选游戏缓存
         /// </summary>
@@ -354,8 +316,6 @@ namespace CnGalWebSite.Shared.Service
             (HomeListCardsCache = homeListCardsCache).Init(nameof(HomeListCardsCache), ToolHelper.WebApiPath);
 
             (LineChartDataCatche = lineChartDataCatche).Init(nameof(LineChartDataCatche), "");
-            (HomePageNewsCatche = homePageNewsCatche).Init(nameof(HomePageNewsCatche), "");
-            (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
             (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
             (HeatMapDataCatche = heatMapDataCatche).Init(nameof(HeatMapDataCatche), ""); ;
         }

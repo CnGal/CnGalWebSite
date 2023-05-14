@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<HomeNewsAloneViewModel>>  _pageModelCatche
 
 <section class="news-card">
     <h2>最新动态</h2>
@@ -42,7 +43,7 @@
 
         try
         {
-            var items = await _dataCacheService.HomePageNewsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
+            var items = await _pageModelCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
 
             var i = 0;
             _items.Clear();

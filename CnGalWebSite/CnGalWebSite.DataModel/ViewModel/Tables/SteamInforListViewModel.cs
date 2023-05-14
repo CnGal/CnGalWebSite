@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
+    [Obsolete("迁移至StoreInfo")]
     public class SteamInforListViewModel
     {
         public List<SteamInforTableModel> SteamInfors { get; set; }
     }
 
+    [Obsolete("迁移至StoreInfo")]
     public class SteamInforTableModel
     {
         public long Id { get; set; }

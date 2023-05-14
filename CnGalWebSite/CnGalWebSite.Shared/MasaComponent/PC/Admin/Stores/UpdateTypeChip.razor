@@ -1,0 +1,27 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@Type.GetDisplayName()" />
+
+@code {
+    [Parameter]
+    public StoreUpdateType Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            StoreUpdateType.Automatic => "success",
+            StoreUpdateType.Manual => "info",
+            _ => "purple"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return Type switch
+        {
+            StoreUpdateType.Automatic => IconType.Automatic,
+            StoreUpdateType.Manual => IconType.Manual,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

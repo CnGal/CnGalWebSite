@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
@@ -32,18 +33,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
-        private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IRepository<Comment, long> _commentRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IHomeService _homeService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ILogger<HomeAPIController> _logger;
-        private readonly ISteamInforService _steamInforService;
+        private readonly IStoreInfoService _storeInfoService;
 
-        public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger,
-        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository,
-        IRepository<SteamInfor, long> steamInforRepository, IRepository<Comment, long> commentRepository)
+        public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger, IRepository<StoreInfo, long> storeInfoRepository,
+        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository,
+        IRepository<Comment, long> commentRepository)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -54,10 +55,10 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
-            _steamInforService = steamInforService;
             _tagRepository = tagRepository;
-            _steamInforRepository = steamInforRepository;
             _commentRepository = commentRepository;
+            _storeInfoService = storeInfoService;
+            _storeInfoRepository=storeInfoRepository;
         }
 
         /// <summary>
@@ -402,12 +403,8 @@ namespace CnGalWebSite.APIServer.Controllers
                             Time = release.Time,
                             TimeNote = release.TimeNote,
                             Type = release.Type,
+                            StoreInfor = await _storeInfoService.Get(release.PublishPlatformType, release.PublishPlatformName, release.Link,release.Name, item.Id)
                         };
-                        if (release.PublishPlatformType == PublishPlatformType.Steam && int.TryParse(release.Link, out int steamId))
-                        {
-                            infor.StoreInfor = await _steamInforService.GetSteamInforAsync(steamId, item.Id);
-                        }
-
                         temp.Release = infor;
                     }
                 }
@@ -456,10 +453,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<DiscountGameItemModel>>> ListDiscountGames()
         {
-            var entryIds = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).Select(s => s.Id).ToListAsync();
+            var entryIds = await _storeInfoRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s => s.PriceNow != null && s.CutNow != null && s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).Select(s => s.Id)
+                .ToListAsync();
+
             entryIds = entryIds.ToList().Random().Take(16).ToList();
 
-            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).AsNoTracking().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+            var games = await _storeInfoRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s => entryIds.Contains(s.Id))
+                .ToListAsync();
 
             var model = new List<DiscountGameItemModel>();
             foreach (var item in games)
@@ -472,8 +476,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     CommentCount = item.Entry.CommentCount,
                     ReadCount = item.Entry.ReaderCount,
                     BriefIntroduction = item.Entry.BriefIntroduction,
-                    Price = item.PriceNow * 0.01,
-                    Cut = item.CutNow
+                    Price = item.PriceNow.Value,
+                    Cut = item.CutNow.Value
                 };
 
                 model.Add(temp);

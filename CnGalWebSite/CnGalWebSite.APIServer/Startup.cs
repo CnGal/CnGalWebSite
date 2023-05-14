@@ -10,6 +10,7 @@ using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.APIServer.MessageHandlers;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DrawingBed.Helper.Services;
@@ -103,6 +104,8 @@ namespace CnGalWebSite.APIServer
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //添加文件上传服务
             services.AddScoped<IFileUploadService, FileUploadService>();
+            //添加Query
+            services.AddScoped<IQueryService, QueryService>();
 
             //注册Swagger生成器，定义一个或多个Swagger文件
             services.AddEndpointsApiExplorer();

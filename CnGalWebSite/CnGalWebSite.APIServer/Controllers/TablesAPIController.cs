@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Others;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +25,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<GroupInforTableModel, long> _groupInforTableModelRepository;
         private readonly IRepository<StaffInforTableModel, long> _staffInforTableModelRepository;
         private readonly IRepository<RoleInforTableModel, long> _roleInforTableModelRepository;
-        private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IRepository<MakerInforTableModel, long> _makerInforTableModelRepository;
         private readonly IRepository<GameScoreTableModel, long> _gameScoreTableRepository;
         private readonly ITableService _tableService;
         public TablesAPIController(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<GameScoreTableModel, long> gameScoreTableRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<GroupInforTableModel, long> groupInforTableModelRepository,
-            IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
+            IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, IRepository<StoreInfo, long> storeInfoRepository,
            IRepository<MakerInforTableModel, long> makerInforTableModelRepository, ITableService tableService)
         {
             _entryRepository = entryRepository;
@@ -40,7 +41,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _groupInforTableModelRepository = groupInforTableModelRepository;
             _staffInforTableModelRepository = staffInforTableModelRepository;
             _roleInforTableModelRepository = roleInforTableModelRepository;
-            _steamInforTableModelRepository = steamInforTableModelRepository;
+           _storeInfoRepository= storeInfoRepository;
             _makerInforTableModelRepository=makerInforTableModelRepository;
             _gameScoreTableRepository = gameScoreTableRepository;
             _tableService = tableService;
@@ -130,16 +131,33 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<SteamInforListViewModel>> GetSteamInforListAsync()
+        public async Task<ActionResult<List<StoreInfoViewModel>>> GetStoreInfoListAsync()
         {
-            var model = new SteamInforListViewModel { SteamInfors = new List<SteamInforTableModel>() };
-            var result = await _steamInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
-            {
-                model.SteamInfors = result;
-            }
+            var items = await _storeInfoRepository.GetAll().AsNoTracking()
+                .Where(s=>s.State != StoreState.None)
+                .ToListAsync();
 
-            return model;
+            return items.Select(s => new StoreInfoViewModel
+            {
+                State = s.State,
+                CurrencyCode = s.CurrencyCode,
+                CutLowest = s.CutLowest,
+                CutNow = s.CutNow,
+                EstimationOwnersMax = s.EstimationOwnersMax,
+                EstimationOwnersMin = s.EstimationOwnersMin,
+                EvaluationCount = s.EvaluationCount,
+                Link = s.Link,
+                OriginalPrice = s.OriginalPrice,
+                PlatformName = s.PlatformName,
+                PlatformType = s.PlatformType,
+                PlayTime = s.PlayTime,
+                PriceLowest = s.PriceLowest,
+                PriceNow = s.PriceNow,
+                RecommendationRate = s.RecommendationRate,
+                UpdateTime = s.UpdateTime,
+                UpdateType = s.UpdateType,
+                Name = s.Name,
+            }).ToList();
         }
 
         [HttpGet]

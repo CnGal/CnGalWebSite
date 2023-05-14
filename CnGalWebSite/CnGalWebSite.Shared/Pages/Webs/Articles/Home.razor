@@ -1,16 +1,45 @@
 ﻿
 
 <TitleTip Title="文章" Description="查看CnGal每周速报，游戏评测，制作组动态等众多内容"></TitleTip>
-<div class="mb-4">
-    <CnGalWebSite.Shared.MasaComponent.PC.Articles.Home.RandomArticleGroup />
-</div>
-<div class="mb-4">
-    <CnGalWebSite.Shared.MasaComponent.PC.Articles.Home.WeeklyNewsGroup />
+<style>
+    body {
+        background-color: #fff;
+    }
+</style>
 
+<style>
+    .variable.container {
+        max-width: none;
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
+
+    .load-footer {
+        display: none;
+    }
+</style>
+<div id="home-page">
+    <div class="row">
+        <div class="left-content col-12 col-lg-10">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.NewsCard />
+        </div>
+        <div class="right-content col-12 col-lg-2">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.WeeklyNewsCard />
+        </div>
+    </div>
+    <div class="row">
+        <div class="left-content col-12 col-lg-9">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
+
+        </div>
+        <div class="right-content col-12 col-lg-3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
+        </div>
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
 </div>
-<div>
-    <CnGalWebSite.Shared.MasaComponent.PC.Articles.Home.GameEvaluationGroup />
-</div>
+
 
 @code {
 

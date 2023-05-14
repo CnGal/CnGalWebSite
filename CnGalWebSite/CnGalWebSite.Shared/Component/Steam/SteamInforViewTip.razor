@@ -42,20 +42,20 @@
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowest.Value.ToString("¥ 0.00")+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
                                 </div>
                             }
 
                             @if (Model.PlayTime > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Played" Text="@($"平均游玩时长：{Model.PlayTime:0.0} 小时")" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Played" Text="@($"平均游玩时长：{Model.PlayTime/60.0:0.0} 小时")" />
                                 </div>
                             }
                         </div>
                         <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color);">
                             <span class="h4 m-0 fw-bold">
-                                @(Model.PriceNowString)
+                                @(Model.PriceNow.Value.ToString("¥ 0.00"))
                             </span>
 
                             @if (Model.CutNow > 0)
@@ -100,7 +100,7 @@
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowest.Value.ToString("¥ 0.00")+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
                                 </div>
                             }
                         </div>
@@ -108,7 +108,7 @@
                 </div>
                 <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color); ">
                     <span class="h5 m-0">
-                        @(Model.PriceNowString)
+                        @(Model.PriceNow.Value.ToString("¥ 0.00"))
                     </span>
 
                     @if (Model.CutNow > 0)
@@ -157,13 +157,13 @@
                                 @if (Model.CutLowest > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowest.Value.ToString("¥ 0.00")+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
                                     </div>
                                 }
                                 @if (Model.PlayTime > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Played" Text="@($"平均游玩时长：{Model.PlayTime:0.0} 小时")" />
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Played" Text="@($"平均游玩时长：{Model.PlayTime/60.0:0.0} 小时")" />
                                     </div>
                                 }
                             </div>
@@ -172,7 +172,7 @@
                     <div style=" display: flex; flex-direction: column; align-items: center; width: 180px; justify-content: center; color: var(--active-color);">
                         <span style="display: flex; align-items: center;">
                             <span class="h4 fw-bold">
-                                @(Model.PriceNowString)
+                                @(Model.PriceNow.Value.ToString("¥ 0.00"))
                             </span>
                             @if (Model.CutNow > 0)
                             {
@@ -200,7 +200,7 @@
 
 @code {
     [Parameter]
-    public SteamInforTipViewModel Model { get; set; }
+    public StoreInfoCardModel Model { get; set; }
     [Parameter]
     public SteamDisplayType Type { get; set; }
     [Parameter]

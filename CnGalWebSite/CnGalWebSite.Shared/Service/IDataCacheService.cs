@@ -60,10 +60,6 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<VideoViewModel> VideoIndexPageCatche { get; set; }
 
-        IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
-
-        IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
-
         IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
 
         IPageModelCatche<FavoriteFolderViewModel> FavoriteFolderIndexPageCatche { get; set; }
@@ -122,23 +118,9 @@ namespace CnGalWebSite.Shared.Service
 
         List<RandomTagModel> RandomTagsCatche { get; set; }
 
-        List<SteamInforTipViewModel> DiscountGamesCatche { get; set; }
-
-        List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; }
-
         List<VoteCardViewModel> VoteCardsCatche { get; set; }
 
         List<LotteryCardViewModel> LotteryCardsCatche { get; set; }
-
-        List<GameCGModel> GameCGsCatche { get; set; }
-
-        List<EntryInforTipViewModel> FreeGamesCatche { get; set; }
-
-        List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; }
-
-        List<GameEvaluationsModel> GameEvaluationsCatche { get; set; }
-
-        List<GameRoleModel> GameRolesCatche { get; set; }
 
         NewsSummaryCacheModel NewsSummaryCache { get; set; }
 
