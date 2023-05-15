@@ -105,12 +105,24 @@ else
 }
 else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
 {
-    <style>
-        .variable.container {
-            max-width: none;
-            padding: 1.5rem !important;
-        }
-    </style>
+    @if (_dataCacheService.IsApp)
+    {
+        <style>
+            .variable.container {
+                max-width: none;
+                padding: 1rem;
+            }
+        </style>
+    }
+    else
+    {
+        <style>
+            .variable.container {
+                max-width: none;
+                padding: 1.5rem;
+            }
+        </style>
+    }
 }
 else
 {

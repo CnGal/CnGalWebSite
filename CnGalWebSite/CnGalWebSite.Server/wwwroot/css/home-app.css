@@ -6,16 +6,21 @@
     margin-left: 1rem;
 }
 
-#home-page .right-content h2 {
-    font-size: 1.5rem !important;
-    margin-left: 1rem !important;
-    margin-top: 0;
+#home-page {
+    padding-left: .5rem;
+    padding-right: .5rem;
 }
 
-/*卡片间距*/
-#home-page .left-content, #home-page, .right-content, #home-page > .row {
-    gap: 3rem !important;
-}
+    #home-page .right-content h2 {
+        font-size: 1.5rem !important;
+        margin-left: 1rem !important;
+        margin-top: 0;
+    }
+
+    /*卡片间距*/
+    #home-page .left-content, #home-page, .right-content, #home-page > .row {
+        gap: 3rem !important;
+    }
 
 /*滚动卡片组*/
 .slide-group {

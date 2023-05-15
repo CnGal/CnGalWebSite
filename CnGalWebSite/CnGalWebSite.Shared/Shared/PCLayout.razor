@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
 
 <MAppBar App Class="shadow-sm  bg-opacity">
     <div style=" word-break: keep-all;" class="ms-4 me-8">
@@ -8,9 +9,9 @@
     </div>
     <MTabs>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">首页</MTab>
-        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/entries"))">词条</MTab>
+        <MTab OnClick="@(()=> JS.InvokeAsync<string>("navigateTo", $"/#evaluations-card"))">专题推荐</MTab>
+        <MTab OnClick="@(()=> JS.InvokeAsync<string>("navigateTo", $"/#recommends"))">随机推荐</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/cv"))">CV</MTab>
-        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/articles"))">文章</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/square"))">广场</MTab>
     </MTabs>
     <MSpacer></MSpacer>

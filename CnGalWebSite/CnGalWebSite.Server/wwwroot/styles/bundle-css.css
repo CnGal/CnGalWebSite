@@ -1584,11 +1584,15 @@ a .aspect-ratio + p > strong {
     --home-active-border-radius: 24px;
 }
 
-/*幻灯片组*/
-#home-page .m-slide-group__content {
-    gap: 1rem;
-    padding: .5rem 0;
+#home-page {
+    padding-left:6rem;
+    padding-right: 6rem;
 }
+    /*幻灯片组*/
+    #home-page .m-slide-group__content {
+        gap: 1rem;
+        padding: .5rem 0;
+    }
 
 /*字体*/
 #home-page {
@@ -1890,7 +1894,6 @@ a .aspect-ratio + p > strong {
 
 .recently-edited-games-card img {
     width: 8rem !important;
-    height: fit-content;
 }
 
 .recently-edited-games-card .name {
