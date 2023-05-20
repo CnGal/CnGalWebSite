@@ -97,7 +97,7 @@
             {
                 if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<StoreInfoCardModel>>("api/storeinfo/GetAllGameSteamInfors"));
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<StoreInfoCardModel>>("api/storeinfo/GetAllGameStoreInfo"));
 
                     try
                     {

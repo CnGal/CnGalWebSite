@@ -2,8 +2,8 @@
 
 @if (Model.StoreInfor.EvaluationCount > 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="success" Icon="IconType.ThumbsUp" Text="@($"{Model.StoreInfor.RecommendationRate}% 好评")" />
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="info" Icon="IconType.Article" Text="@($"{Model.StoreInfor.EvaluationCount:0}条评测")" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="success" Icon="IconType.ThumbsUp" Text="@($"{Model.StoreInfor.RecommendationRate:0}% 好评")" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="info" Icon="IconType.Article" Text="@($"{Model.StoreInfor.EvaluationCount}条评测")" />
 }
 
 @code {
