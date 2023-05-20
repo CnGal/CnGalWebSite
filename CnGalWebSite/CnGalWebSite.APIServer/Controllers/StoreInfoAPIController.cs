@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<StoreInfoCardModel>>> GetAllGameSteamInfors()
+        public async Task<ActionResult<List<StoreInfoCardModel>>> GetAllGameStoreInfo()
         {
             var games = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
@@ -86,6 +86,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PlatformType = item.PlatformType,
                     UpdateTime = item.UpdateTime,
                     UpdateType = item.UpdateType,
+                    Id=item.Entry.Id,
                 });
             }
 

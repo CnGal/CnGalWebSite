@@ -50,7 +50,7 @@ namespace CnGalWebSite.Shared.Service
             _useNewtonsoft = useNewtonsoft;
         }
 
-        string GetUrl(string apiUrl) => apiUrl.Contains("http://") ? apiUrl : _baseUrl + apiUrl;
+        string GetUrl(string apiUrl) => apiUrl.Contains("://") ? apiUrl : _baseUrl + apiUrl;
 
         private async Task<TModel> GetCacheFromMemory(string apiUrl)
         {
