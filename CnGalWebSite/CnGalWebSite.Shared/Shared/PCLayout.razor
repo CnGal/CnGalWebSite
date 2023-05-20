@@ -9,8 +9,8 @@
     </div>
     <MTabs>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">首页</MTab>
-        <MTab OnClick="@(()=> JS.InvokeAsync<string>("navigateTo", $"/#evaluations-card"))">专题推荐</MTab>
-        <MTab OnClick="@(()=> JS.InvokeAsync<string>("navigateTo", $"/#recommends"))">随机推荐</MTab>
+        <MTab OnClick="@(()=> Nav("/#evaluations-card"))">专题推荐</MTab>
+        <MTab OnClick="@(()=>  Nav("/#recommends"))">随机推荐</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/cv"))">CV</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/square"))">广场</MTab>
     </MTabs>
@@ -45,4 +45,15 @@
 
 @code {
 
+
+    public async Task Nav(string url)
+    {
+        var cur = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+        if (string.IsNullOrWhiteSpace(cur) == false && cur.StartsWith('#') == false)
+        {
+            NavigationManager.NavigateTo("/");
+            await Task.Delay(500);
+        }
+        await JS.InvokeAsync<string>("navigateTo", url);
+    }
 }
