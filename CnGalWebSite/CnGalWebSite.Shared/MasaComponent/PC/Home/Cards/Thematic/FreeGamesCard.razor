@@ -13,7 +13,7 @@
                 <div class="name text-truncate-1">@context.Name</div>
                 <div class="brief text-truncate-2">@context.BriefIntroduction</div>
                 <div class="tags">
-                    @foreach (var item in context.Tags.Random().Take(2))
+                    @foreach (var item in context.Tags.Random().Take(_dataCacheService.IsApp ? 1 : 2))
                     {
                         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.Tag" Text="@item" />
                     }

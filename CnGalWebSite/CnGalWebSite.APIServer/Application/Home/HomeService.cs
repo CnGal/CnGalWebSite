@@ -44,10 +44,10 @@ namespace CnGalWebSite.APIServer.Application.Home
             var model = new List<PublishedGameItemModel>();
 
             //获取近期新作
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
+            var tempDateTimeNow = DateTime.Now.ToCstTime().Date;
             var entry_result3 = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Tags)
-                .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true)
+                .Where(s => s.Type == EntryType.Game && s.PubulishTime != null && s.PubulishTime.Value.Date <= tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true)
                 .OrderByDescending(s => s.PubulishTime)
                 .Take(16)
                 .ToListAsync();

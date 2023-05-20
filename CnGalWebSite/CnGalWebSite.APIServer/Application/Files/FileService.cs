@@ -122,7 +122,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
-            entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Thumbnail.Contains("?") == false && s.Thumbnail.Contains("default") == false)
                .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
 

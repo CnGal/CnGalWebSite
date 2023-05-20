@@ -2490,9 +2490,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                 case "原作":
                                     model.Original = item.DisplayValue;
                                     break;
-                                case "官网":
-                                    model.OfficialWebsite = item.DisplayValue;
-                                    break;
                                 case "QQ群":
                                     model.QQgroupGame = item.DisplayValue;
                                     break;
@@ -2975,7 +2972,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     await SetStaffsFromString(newEntry, model.ProductionGroup, PositionGeneralType.ProductionGroup);
                     //添加基本信息
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
-                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
                     newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
                     break;
                 case EntryType.ProductionGroup:

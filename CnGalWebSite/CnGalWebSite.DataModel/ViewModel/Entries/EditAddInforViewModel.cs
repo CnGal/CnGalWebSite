@@ -21,8 +21,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string ProductionGroup { get; set; }
         [Display(Name = "发行商")]
         public string Publisher { get; set; }
-        [Display(Name = "官网")]
-        public string OfficialWebsite { get; set; }
         [Display(Name = "Steam平台Id")]
         public string SteamId { get; set; }
         [Display(Name = "QQ群")]
