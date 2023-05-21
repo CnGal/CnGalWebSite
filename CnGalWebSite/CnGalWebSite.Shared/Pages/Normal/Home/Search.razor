@@ -28,12 +28,7 @@
         }
         else
         {
-            @if (_dataCacheService.IsApp)
-            {
-                <CnGalWebSite.Shared.AppComponent.Pages.Home.Search.ListSearchResult Model="@DataModel.pagedResultDto.Data" />
-            }
-            else
-            {
+            
                 @foreach (var item in DataModel.pagedResultDto.Data)
                 {
                     <div class="mb-3">
@@ -58,7 +53,6 @@
                             <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip>
                         }
                     </div>
-                }
             }
 
 
