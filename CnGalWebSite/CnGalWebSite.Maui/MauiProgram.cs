@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.Maui.Services;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
@@ -73,7 +75,18 @@ namespace CnGalWebSite.Maui
             builder.Services.AddScoped<IStructuredDataService, StructuredDataService>();
 
             //MASA组件库
-            builder.Services.AddMasaBlazor();
+            builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
+             {
+                 if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
+                 {
+                     s.Themes.Light.Primary = "#4CAF50";
+                 }
+                 else
+                 {
+                     s.Themes.Light.Primary = "#f06292";
+                 }
+                 s.Themes.Dark.Primary = "#0078BF";
+             }));
 
             //弹窗服务类
             builder.Services.AddSingleton(typeof(IAlertService), typeof(AlertService));

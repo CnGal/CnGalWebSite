@@ -438,8 +438,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                     Name = item.DisplayName,
                     Url = "entries/index/" + item.Id,
-                    CommentCount = item.CommentCount,
-                    ReadCount = item.ReaderCount,
                     BriefIntroduction = item.BriefIntroduction,
                     Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false && s.Name.Contains("免费") == false && s.Name.Contains("界面") == false).Select(s => s.Name).ToList()
                 });
@@ -473,8 +471,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
                     Name = item.Entry.DisplayName,
                     Url = "entries/index/" + item.Entry.Id,
-                    CommentCount = item.Entry.CommentCount,
-                    ReadCount = item.Entry.ReaderCount,
                     BriefIntroduction = item.Entry.BriefIntroduction,
                     Price = item.PriceNow.Value,
                     Cut = item.CutNow.Value
@@ -517,8 +513,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Image = _appHelper.GetImagePath(item.Pictures.Any(s=>s.Priority!=0)? item.Pictures.OrderByDescending(s => s.Priority).First().Url : item.WebsiteAddInfor.Images.OrderByDescending(s=>s.Priority).ThenBy(s=>s.Type).ThenBy(s=>s.Size).First().Url, "app.png"),
                     Name = item.DisplayName,
                     Url = "entries/index/" + item.Id,
-                    CommentCount = item.CommentCount,
-                    ReadCount = item.ReaderCount,
                     Articles=item.Articles.OrderByDescending(s=>s.Priority).ThenByDescending(s=>s.Type).Take(4).Select(s=>new EvaluationArticleItemModel
                     {
                         Id = s.Id,
@@ -587,79 +581,5 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
-
-        #region 存档
-        /// <summary>
-        /// 获取即将发售游戏
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeNewestGameViewAsync()
-        {
-            return await _homeService.GetHomeNewestGameViewAsync();
-        }
-        /// <summary>
-        /// 获取近期编辑的游戏或制作组
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeRecentEditViewAsync()
-        {
-            return await _homeService.GetHomeRecentEditViewAsync();
-
-        }
-        /// <summary>
-        /// 获取近期发售的游戏
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeRecentIssuelGameViewAsync()
-        {
-            return await _homeService.GetHomeRecentIssuelGameViewAsync();
-
-        }
-
-        /// <summary>
-        /// 获取友情链接 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeFriendLinksViewAsync()
-        {
-            return await _homeService.GetHomeFriendLinksViewAsync();
-
-        }
-
-        /// <summary>
-        /// 获取通知
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeNoticesViewAsync()
-        {
-            return await _homeService.GetHomeNoticesViewAsync();
-
-        }
-        /// <summary>
-        /// 获取最近发布的文章
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeArticlesViewAsync()
-        {
-            return await _homeService.GetHomeArticlesViewAsync();
-
-        }
-        /// <summary>
-        /// 获取最近发布的视频
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<HomeItemModel>>> GetHomeVideosViewAsync()
-        {
-            return await _homeService.GetHomeVideosViewAsync();
-
-        }
-        #endregion
     }
 }
