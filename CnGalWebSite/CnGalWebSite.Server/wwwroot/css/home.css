@@ -8,7 +8,7 @@
 }
 
 #home-page {
-    padding-left:5rem;
+    padding-left: 5rem;
     padding-right: 5rem;
 }
     /*幻灯片组*/
@@ -426,6 +426,7 @@
     flex-wrap: wrap;
     justify-content: space-around;
     margin-left: 3.5rem;
+    margin-right: 3rem;
     gap: 1rem;
 }
 

@@ -6,6 +6,11 @@
     margin-left: 1rem;
 }
 
+#home-page {
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
     #home-page .right-content h2 {
         font-size: 1.5rem !important;
         margin-left: 1rem !important;
