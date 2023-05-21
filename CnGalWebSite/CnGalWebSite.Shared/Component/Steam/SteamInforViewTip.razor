@@ -29,7 +29,7 @@
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate:0}% 好评（{Model.EvaluationCount}条评测）")" />
                                 </div>
                             }
                             @if (Model.PublishTime != null)
@@ -94,7 +94,7 @@
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% ({Model.EvaluationCount})")" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate:0}% ({Model.EvaluationCount})")" />
                                 </div>
                             }
                             @if (Model.CutLowest > 0)
@@ -145,7 +145,7 @@
                                 @if (Model.EvaluationCount > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate:0}% 好评（{Model.EvaluationCount}条评测）")" />
                                     </div>
                                 }
                                 @if (Model.PublishTime != null)
