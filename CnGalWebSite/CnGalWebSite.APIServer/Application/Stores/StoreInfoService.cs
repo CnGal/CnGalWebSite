@@ -239,14 +239,6 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     };
 
                 }
-                else
-                {
-                    steamNowJson = new SteamNowJson
-                    {
-                        price = 0,
-                        cut = 0
-                    };
-                }
             }
             else
             {
@@ -256,15 +248,6 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 }
             }
 
-            //修正无法获取价格的游戏状态
-            if (steamNowJson.price == 0 && steamLowestJson.price == -1)
-            {
-                steamNowJson = new SteamNowJson
-                {
-                    price = null,
-                    cut = null
-                };
-            }
             //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
 
             //当前价格
