@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.WebAssembly
@@ -100,6 +101,7 @@ namespace CnGalWebSite.WebAssembly
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            ToolHelper.options.Converters.Add(new JsonStringEnumConverter());
 
             //添加空白MAUI服务 
             builder.Services.AddScoped<IMauiService, MauiService>();

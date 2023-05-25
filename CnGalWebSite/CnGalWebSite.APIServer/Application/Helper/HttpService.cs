@@ -12,6 +12,7 @@ using System.Security.Policy;
 using Microsoft.AspNetCore.Components.Authorization;
 using IdentityModel.Client;
 using CnGalWebSite.Core.Services;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {
@@ -29,6 +30,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public HttpService(HttpClient client)
         {
             _client = client;
+
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {

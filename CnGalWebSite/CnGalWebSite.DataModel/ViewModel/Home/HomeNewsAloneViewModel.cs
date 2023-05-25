@@ -20,7 +20,5 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public DateTime Time { get; set; }
 
         public string Link { get; set; }
-
-
     }
 }

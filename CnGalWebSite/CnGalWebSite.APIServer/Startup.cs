@@ -46,6 +46,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Typesense.Setup;
 
 namespace CnGalWebSite.APIServer
@@ -77,10 +78,14 @@ namespace CnGalWebSite.APIServer
                 {
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            ToolHelper.options.Converters.Add(new JsonStringEnumConverter());
+
             //自动注入服务到依赖注入容器
             services.RegisterAssemblyPublicNonGenericClasses()
                .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))

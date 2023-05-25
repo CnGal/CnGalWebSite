@@ -15,6 +15,7 @@ using IdentityModel.Client;
 using CnGalWebSite.Shared.Service;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Shared.Extentions;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.Server.Services
 {
@@ -42,6 +43,7 @@ namespace CnGalWebSite.Server.Services
 
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter());
 
         }
         public async Task<TValue> GetAsync<TValue>(string url)

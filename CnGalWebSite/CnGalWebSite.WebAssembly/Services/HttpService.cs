@@ -18,6 +18,7 @@ using CnGalWebSite.DataModel.Helper;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Shared.Extentions;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.WebAssembly.Services
 {
@@ -45,7 +46,7 @@ namespace CnGalWebSite.WebAssembly.Services
 
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
-
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
