@@ -423,7 +423,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     }
                 }
-                if (isSame == false)
+                if (isSame == false && infor.IsDelete == false)
                 {
                     var entryNew = await _entryRepository.FirstOrDefaultAsync(s => s.Id == infor.StaffId);
                     entry.EntryStaffFromEntryNavigation.Add(new EntryStaff
@@ -466,7 +466,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     }
                 }
-                if (isSame == false)
+                if (isSame == false&& infor.IsDelete == false)
                 {
                     entry.Releases.Add(new GameRelease
                     {
