@@ -31,6 +31,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.Server
@@ -66,11 +67,13 @@ namespace CnGalWebSite.Server
                 {
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            ToolHelper.options.Converters.Add(new JsonStringEnumConverter());
 
             _ = services.AddServerSideBlazor()
                 .AddHubOptions(options =>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.RobotClient.Services.Https
@@ -27,6 +28,7 @@ namespace CnGalWebSite.RobotClient.Services.Https
 
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
