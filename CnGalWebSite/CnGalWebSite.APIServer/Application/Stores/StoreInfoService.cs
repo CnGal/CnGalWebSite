@@ -81,6 +81,11 @@ namespace CnGalWebSite.APIServer.Application.Stores
         /// </summary>
         public async Task<StoreInfo> Update(PublishPlatformType platformType, string platformName, string link, string name, int entryId)
         {
+            if (entryId == 0)
+            {
+                return new StoreInfo();
+            }
+
             var storeInfo = await _storeInfoRepository.GetAll().FirstOrDefaultAsync(s => s.PlatformType == platformType && s.PlatformName == platformName && s.Link == link && s.Name == name&&s.EntryId==entryId);
 
             if (storeInfo == null)
