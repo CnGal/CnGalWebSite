@@ -38,7 +38,7 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// 获取最近发布的文章
         /// </summary>
         /// <returns></returns>
-        Task<List<LatastArticleItemModel>> ListLatastArticles();
+        Task<List<LatestArticleItemModel>> ListLatestArticles();
 
         /// <summary>
         /// 获取轮播图
@@ -51,6 +51,6 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// <returns></returns>
         Task<List<HomeNewsAloneViewModel>> GetHomeNewsViewAsync();
 
-        Task<List<LatastVideoItemModel>> ListLatastVideoes();
+        Task<List<LatestVideoItemModel>> ListLatestVideos();
     }
 }

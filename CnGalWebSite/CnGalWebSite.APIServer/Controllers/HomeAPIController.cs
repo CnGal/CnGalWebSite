@@ -62,7 +62,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取即将发售游戏
+        /// 获取近期发售的游戏
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -81,7 +81,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
         /// <summary>
-        /// 获取近期发售的游戏
+        /// 获取即将发售游戏
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -117,9 +117,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<LatastArticleItemModel>>> ListLatastArticles()
+        public async Task<ActionResult<List<LatestArticleItemModel>>> ListLatestArticles()
         {
-            return await _homeService.ListLatastArticles();
+            return await _homeService.ListLatestArticles();
 
         }
         /// <summary>
@@ -127,9 +127,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<LatastVideoItemModel>>> ListLatastVideoes()
+        public async Task<ActionResult<List<LatestVideoItemModel>>> ListLatestVideos()
         {
-            return await _homeService.ListLatastVideoes();
+            return await _homeService.ListLatestVideos();
 
         }
         /// <summary>

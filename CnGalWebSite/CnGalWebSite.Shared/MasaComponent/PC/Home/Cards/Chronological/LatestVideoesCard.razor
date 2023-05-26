@@ -2,7 +2,7 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject IPageModelCatche<List<LatastVideoItemModel>>  _pageModelCatche
+@inject IPageModelCatche<List<LatestVideoItemModel>>  _pageModelCatche
 
 <section class="latest-videoes-card">
     <h2>最新视频</h2>
@@ -30,7 +30,7 @@
 
 @code {
 
-    List<IEnumerable<LatastVideoItemModel>> _items { get; set; } = new List<IEnumerable<LatastVideoItemModel>>();
+    List<IEnumerable<LatestVideoItemModel>> _items { get; set; } = new List<IEnumerable<LatestVideoItemModel>>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -41,7 +41,7 @@
         try
         {
             //获取主页信息
-            var items = await _pageModelCatche.GetCache("api/home/ListLatastVideoes");
+            var items = await _pageModelCatche.GetCache("api/home/ListLatestVideos");
 
             var i = 0;
             _items.Clear();
