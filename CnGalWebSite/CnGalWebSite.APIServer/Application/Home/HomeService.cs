@@ -180,16 +180,17 @@ namespace CnGalWebSite.APIServer.Application.Home
                     Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
                     Name = item.DisplayName,
                     Url = "articles/index/" + item.Id,
-                    Priority = item.Priority
+                    Priority = item.Priority,
+                    BriefIntroduction = item.BriefIntroduction,
                 }) ;
             }
             return model;
 
         }
 
-        public async Task<List<LatastArticleItemModel>> ListLatastArticles()
+        public async Task<List<LatestArticleItemModel>> ListLatestArticles()
         {
-            var model = new List<LatastArticleItemModel>();
+            var model = new List<LatestArticleItemModel>();
 
             //获取近期发布的文章
             var article_result2 = await _articleRepository.GetAll().AsNoTracking()
@@ -200,7 +201,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in article_result2)
                 {
-                    var temp = new LatastArticleItemModel
+                    var temp = new LatestArticleItemModel
                     {
                         Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
                         Name = item.DisplayName,
@@ -234,9 +235,9 @@ namespace CnGalWebSite.APIServer.Application.Home
 
         }
 
-        public async Task<List<LatastVideoItemModel>> ListLatastVideoes()
+        public async Task<List<LatestVideoItemModel>> ListLatestVideos()
         {
-            var model = new List<LatastVideoItemModel>();
+            var model = new List<LatestVideoItemModel>();
 
             //获取近期发布的视频
 
@@ -248,7 +249,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in article_result2)
                 {
-                    model.Add(new LatastVideoItemModel
+                    model.Add(new LatestVideoItemModel
                     {
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                         Name = item.DisplayName,

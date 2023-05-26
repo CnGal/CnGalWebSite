@@ -26,12 +26,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
     public class AnnouncementItemModel : HomeItemModel
     {
         public int Priority { get; set; }
+        public string BriefIntroduction { get; set; }
     }
     public class FriendLinkItemModel : HomeItemModel
     {
 
     }
-    public class LatastArticleItemModel : HomeItemModel
+    public class LatestArticleItemModel : HomeItemModel
     {
         public string UserImage { get; set; }
         public string UserName { get; set; }
@@ -42,7 +43,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public string OriginalAuthor { get; set; }
     }
 
-    public class LatastVideoItemModel : HomeItemModel
+    public class LatestVideoItemModel : HomeItemModel
     {
         public string OriginalAuthor { get; set; }
 
