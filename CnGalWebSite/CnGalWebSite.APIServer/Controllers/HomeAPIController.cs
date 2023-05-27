@@ -530,7 +530,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<LatastCommentItemModel>>> ListLatastComments()
+        public async Task<ActionResult<List<LatestCommentItemModel>>> ListLatestComments()
         {
             var comments = await _commentRepository.GetAll().AsNoTracking()
                 .Include(s=>s.ApplicationUser)
@@ -539,11 +539,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Take(6)
                 .ToListAsync();
 
-            var model = new List<LatastCommentItemModel>();
+            var model = new List<LatestCommentItemModel>();
 
             foreach (var item in comments)
             {
-                model.Add(new LatastCommentItemModel
+                model.Add(new LatestCommentItemModel
                 {
                     Url = item.EntryId != null ? $"entries/index/{item.EntryId}" : item.ArticleId != null ? $"articles/index/{item.ArticleId}" : item.Periphery != null ? $"peripheries/index/{item.PeripheryId}" : item.LotteryId != null ? $"lotteries/index/{item.LotteryId}" : item.VoteId != null ? $"votes/index/{item.VoteId}" : item.VideoId != null ? $"videos/index/{item.VideoId}" : $"space/index/{item.ApplicationUserId}",
                     UserName = item.ApplicationUser.UserName,

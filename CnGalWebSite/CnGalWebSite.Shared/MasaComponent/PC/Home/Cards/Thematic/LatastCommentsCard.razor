@@ -1,6 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject IHttpService _httpService
-@inject IPageModelCatche<List<LatastCommentItemModel>> _pageModelCatche
+@inject IPageModelCatche<List<LatestCommentItemModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -27,7 +27,7 @@
 
 @code {
 
-    List<LatastCommentItemModel> _items { get; set; } = new List<LatastCommentItemModel>();
+    List<LatestCommentItemModel> _items { get; set; } = new List<LatestCommentItemModel>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -37,7 +37,7 @@
     {
         try
         {
-            _items = await _pageModelCatche.GetCache("api/home/ListLatastComments");
+            _items = await _pageModelCatche.GetCache("api/home/ListLatestComments");
             StateHasChanged();
         }
         catch (Exception ex)

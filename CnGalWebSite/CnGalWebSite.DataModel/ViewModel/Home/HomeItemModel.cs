@@ -97,7 +97,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public ArticleType Type { get; set; }
     }
 
-    public class LatastCommentItemModel : HomeItemModel
+    public class LatestCommentItemModel : HomeItemModel
     {
         public string UserImage { get; set; }
         public string UserName { get; set; }
