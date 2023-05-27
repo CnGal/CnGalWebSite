@@ -549,12 +549,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     UserName = item.ApplicationUser.UserName,
                     Time = item.CommentTime.ToTimeFromNowString(),
                     Content = _appHelper.MarkdownToHtml(item.Text),
-                    UserImage = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png")
+                    UserImage = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png"),
+                    UserId=item.ApplicationUserId
                 });
             }
 
             return model;
         }
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<HotTagItemModel>>> ListHotTags()
