@@ -8,6 +8,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
 {
     public enum IconType
     {
+        None,
         [Display(Name="词条")]
         Entry,
         Article,

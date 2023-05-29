@@ -1448,7 +1448,7 @@ a .aspect-ratio + p > strong {
 }
 
     .article-introduce #title .main-img {
-        width: 500px;
+        max-width: 500px;
     }
 
     .article-introduce #title .no-limit {

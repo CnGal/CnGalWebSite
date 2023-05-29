@@ -272,7 +272,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
                     if (steam.EvaluationCount > 0)
                     {
-                        _ = sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
+                        _ = sb.AppendLine($"{steam.RecommendationRate:0}% 好评（{steam.EvaluationCount}条评测）");
                     }
                     if (showOutlink)
                     {
