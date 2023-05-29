@@ -1598,6 +1598,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 }
             }
+            newsModel = newsModel.OrderByDescending(s => s.HappenedTime);
+
             //视频
             foreach (var item in entry.Videos.Where(s => s.IsHidden == false))
             {

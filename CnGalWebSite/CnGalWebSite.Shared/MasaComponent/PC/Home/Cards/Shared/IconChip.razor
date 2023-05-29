@@ -2,7 +2,10 @@
 
 
 <MChip Outlined="Outlined" Dark="!Outlined" XSmall="_dataCacheService.IsApp" Small="!_dataCacheService.IsApp" Color="@Color" Class=" ma-1">
-    <MIcon Left XSmall>@Icon.ToIconString() </MIcon>
+    @if (Icon != IconType.None)
+    {
+        <MIcon Left XSmall>@Icon.ToIconString() </MIcon>
+    }
     @Text
 </MChip>
 
