@@ -79,7 +79,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<ArticleViewModel>> GetArticleViewAsync(long id)
+        public async Task<ActionResult<ArticleViewModel>> GetArticleViewAsync(long id,[FromQuery] bool renderMarkdown=true)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -174,7 +174,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            model.UserInfor = await _userService.GetUserInforViewModel(createUser);
+            model.UserInfor = await _userService.GetUserInforViewModel(createUser, renderMarkdown);
 
             //判断是否有权限编辑
             if (user != null && _userService.CheckCurrentUserRole( "Editor") == true)

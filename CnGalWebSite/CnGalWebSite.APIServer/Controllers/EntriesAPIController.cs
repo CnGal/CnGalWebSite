@@ -85,7 +85,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<EntryIndexViewModel>> GetEntryViewAsync(int id)
+        public async Task<ActionResult<EntryIndexViewModel>> GetEntryViewAsync(int id, [FromQuery] bool renderMarkdown = true)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -184,7 +184,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //建立视图模型
-            var model = await _entryService.GetEntryIndexViewModelAsync(entry);
+            var model = await _entryService.GetEntryIndexViewModelAsync(entry, renderMarkdown);
 
             if (user != null)
             {

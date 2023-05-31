@@ -35,7 +35,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         Task<NewsModel> GetNewsModelAsync(Article article);
 
-        ArticleViewModel GetArticleViewModelAsync(Article article);
+        ArticleViewModel GetArticleViewModelAsync(Article article, bool renderMarkdown = true);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle);
 
