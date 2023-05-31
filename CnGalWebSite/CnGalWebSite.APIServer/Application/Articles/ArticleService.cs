@@ -623,7 +623,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return model;
         }
 
-        public ArticleViewModel GetArticleViewModelAsync(Article article)
+        public ArticleViewModel GetArticleViewModelAsync(Article article, bool renderMarkdown = true)
         {
             //建立视图模型
             var model = new ArticleViewModel
@@ -651,8 +651,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
             model.SmallBackgroundPicture = _appHelper.GetImagePath(article.SmallBackgroundPicture, "");
 
             //初始化主页Html代码
-           
-            model.MainPage = _appHelper.MarkdownToHtml(article.MainPage);
+
+            model.MainPage = renderMarkdown ? _appHelper.MarkdownToHtml(article.MainPage) : article.MainPage;
 
 
 

@@ -1202,7 +1202,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry)
+        public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true)
         {
             //建立视图模型
             var model = new EntryIndexViewModel
@@ -1236,7 +1236,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             //初始化主页Html代码
-            model.MainPage = _appHelper.MarkdownToHtml(entry.MainPage ?? "");
+            model.MainPage =renderMarkdown? _appHelper.MarkdownToHtml(entry.MainPage ?? ""):entry.MainPage;
 
             //读取词条信息
             //添加别称到附加信息
