@@ -530,7 +530,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<LatestCommentItemModel>>> ListLatestComments()
+        public async Task<ActionResult<List<LatestCommentItemModel>>> ListLatestComments([FromQuery]bool renderMarkdown=true)
         {
             var comments = await _commentRepository.GetAll().AsNoTracking()
                 .Include(s=>s.ApplicationUser)
@@ -548,7 +548,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Url = item.EntryId != null ? $"entries/index/{item.EntryId}" : item.ArticleId != null ? $"articles/index/{item.ArticleId}" : item.Periphery != null ? $"peripheries/index/{item.PeripheryId}" : item.LotteryId != null ? $"lotteries/index/{item.LotteryId}" : item.VoteId != null ? $"votes/index/{item.VoteId}" : item.VideoId != null ? $"videos/index/{item.VideoId}" : $"space/index/{item.ApplicationUserId}",
                     UserName = item.ApplicationUser.UserName,
                     Time = item.CommentTime.ToTimeFromNowString(),
-                    Content = _appHelper.MarkdownToHtml(item.Text),
+                    Content = renderMarkdown? _appHelper.MarkdownToHtml(item.Text): item.Text,
                     UserImage = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png"),
                     UserId=item.ApplicationUserId
                 });

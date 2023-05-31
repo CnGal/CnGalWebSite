@@ -147,7 +147,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //建立视图模型
-            var model = _articleService.GetArticleViewModelAsync(article);
+            var model = _articleService.GetArticleViewModelAsync(article,renderMarkdown);
             model.CommentCount = await _commentUpRepository.LongCountAsync(s => s.ArticleId == id);
 
             if (user != null)
