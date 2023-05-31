@@ -76,11 +76,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
         /// 发布时间 指转载前发布时间
         /// </summary>
         public DateTime PubishTime { get; set; }
-        /// <summary>
-        /// 创建视频的用户
-        /// </summary>
-        public ApplicationUser CreateUser { get; set; }
-        public string CreateUserId { get; set; }
 
         /// <summary>
         /// 阅读数

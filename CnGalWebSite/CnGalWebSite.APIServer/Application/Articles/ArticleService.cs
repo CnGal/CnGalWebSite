@@ -641,8 +641,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 ReaderCount = article.ReaderCount,
                 LastEditTime = article.LastEditTime,
                 CanComment = article.CanComment ?? true,
-                DisambigId = article.DisambigId ?? 0,
-                DisambigName = article.Disambig?.Name,
                 BriefIntroduction = article.BriefIntroduction,
                 IsHidden = article.IsHidden,
             };

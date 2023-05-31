@@ -62,10 +62,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         public string OriginalLink { get; set; }
         public DateTime? PubishTime { get; set; }
 
-        public int DisambigId { get; set; }
-
-        public string DisambigName { get; set; }
-
 
         public EditState MainState { get; set; }
         public EditState MainPageState { get; set; }
