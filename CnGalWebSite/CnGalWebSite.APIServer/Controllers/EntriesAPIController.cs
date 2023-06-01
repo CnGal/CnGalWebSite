@@ -1568,9 +1568,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<RoleBrithdayViewModel>>> GetRoleBirthdaysByTime([FromQuery] int month)
+        public async Task<ActionResult<List<RoleBrithdayViewModel>>> GetRoleBirthdaysByTime([FromQuery] int month,[FromQuery] int day)
         {
-            return await _entryService.GetBirthdayRoles(month);
+            return await _entryService.GetBirthdayRoles(month,day);
         }
 
         /// <summary>
