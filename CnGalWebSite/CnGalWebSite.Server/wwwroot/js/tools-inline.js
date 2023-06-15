@@ -39,7 +39,7 @@ function highlightAllCode() {
 }
 
 function trackEvent(event_name, type,objectName,objectId, userId,note) {
-    umami.trackEvent(event_name, {
+    umami.track(event_name, {
         type:type,
         objectName: objectName,
         objectId: objectId,
