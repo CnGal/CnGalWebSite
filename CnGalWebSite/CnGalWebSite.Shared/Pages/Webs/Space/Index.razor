@@ -111,11 +111,16 @@ else
                                 }
 
                                 <div class="row">
-                                    <div class="col-12 mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
+                                    <div class="col-12">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
+                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                       
                                     </div>
-                                    <div class="col-12 mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
+                                    <div class="col-12">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
+                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     </div>
 
                                 </div>
