@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using System.Linq;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -67,7 +68,8 @@ namespace CnGalWebSite.IdentityServer
 
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,,>), typeof(RepositoryBase<,,>));
-
+            //添加Query
+            services.AddScoped<IQueryService, QueryService>();
             //添加 MailKit 发送邮件
             services.AddMailKit(optionBuilder =>
             {
