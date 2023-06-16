@@ -23,9 +23,11 @@ body {
 .bg-opacity {
     background-color: rgba(36,36,36,0.9) !important;
 }
+
 .bg-theme {
-    background-color: #242424!important;
+    background-color: #242424 !important;
 }
+
 .card {
     border: 1px solid rgba(255,255,255,.125);
 }
@@ -56,7 +58,7 @@ body {
 
 
 .table-fixed-column .table .fixed {
-    background-color:var(--active-color);
+    background-color: var(--active-color);
 }
 
 .table {
@@ -343,16 +345,18 @@ body {
     background-color: var(--hover-color);
     border-color: var(--hover-color);
 }
+
 .btn-dark {
-    color:  white!important;
-    border-color:  var(--active-color);
-     background-color: var(--active-color);
+    color: white !important;
+    border-color: var(--active-color);
+    background-color: var(--active-color);
 }
-.btn-dark.disabled, .btn-dark:disabled {
-    color: #fff;
-    background-color:  var(--active-color);
-    border-color:  var(--active-color);
-}
+
+    .btn-dark.disabled, .btn-dark:disabled {
+        color: #fff;
+        background-color: var(--active-color);
+        border-color: var(--active-color);
+    }
 
 
 .article-tag-text-color-large {
@@ -374,8 +378,8 @@ body {
 .CodeMirror-sizer {
     color: white;
 }
-.CodeMirror
-{
+
+.CodeMirror {
     background: transparent;
 }
 
@@ -402,12 +406,15 @@ body {
 .ContributionCalendar-color-4 {
     background-color: #39D353
 }
+
 .layout.is-page .layout-side {
     box-shadow: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
 }
+
 .editormd .CodeMirror-sizer {
     color: #333333;
 }
+
 .editormd .CodeMirror-scroll {
     background-color: white;
 }
@@ -427,15 +434,15 @@ body {
     transition: all .6s ease;
 }
 
-.tab-color.active {
-    background-color: gray !important;
-    color: white !important;
-}
+    .tab-color.active {
+        background-color: gray !important;
+        color: white !important;
+    }
 
-.tab-color:hover {
-    background-color: gray !important;
-    color: white !important;
-}
+    .tab-color:hover {
+        background-color: gray !important;
+        color: white !important;
+    }
 
 .steam-infor-price {
     width: 50px;
@@ -467,9 +474,11 @@ body {
         border: 1px solid gray;
         color: gray;
     }
+
 .font-color {
     color: #c9d1d9 !important;
 }
+
 .a-font-color {
     color: #c9d1d9 !important;
     transition: all .6s ease;
@@ -493,10 +502,10 @@ body {
     color: white !important;
 }
 
-.form-control:focus {
-    background-color: transparent;
-    color: white !important;
-}
+    .form-control:focus {
+        background-color: transparent;
+        color: white !important;
+    }
 
 
 .div-shadow {
@@ -509,22 +518,28 @@ body {
     .div-shadow:hover {
         box-shadow: 0 1rem 3rem rgba(255, 255, 255, 0.15) !important;
     }
+
 .menu .nav .dropdown-menu .nav-link:not(.disabled):hover, .menu .nav .dropdown-menu .nav-link.active, .menu .submenu .nav-link.active, .menu .submenu .nav-link:not(.disabled):hover, .cascade .dropdown-item:not(.disabled):hover, .cascade .dropdown-item.active, .cascade .nav .nav-link:not(.disabled):hover, .cascade .nav .nav-link.active {
     background-color: gray;
     color: white;
 }
+
 .swal2-title {
     color: white;
 }
+
 .swal2-content {
     color: white;
 }
+
 .dropdown-menu.show {
     border: 0;
 }
+
 .accordion-item {
     background-color: #1F1F1F;
 }
+
 .btn:hover {
     color: white;
 }
@@ -533,103 +548,115 @@ body {
     background-color: #303030;
     color: #d3d3d3;
 }
-.accordion-button:not(.collapsed) {
-    color: white;
-    background-color: #1F1F1F;
-}
+
+    .accordion-button:not(.collapsed) {
+        color: white;
+        background-color: #1F1F1F;
+    }
 
 /*移动端界面样式*/
-.apps-headbar-layout{
-     background-color: #242424;
-     color:gray;
-}
-.apps-footer-layout{
-     background-color:#242424;
+.apps-headbar-layout {
+    background-color: #242424;
+    color: gray;
 }
 
-.links-icontext-text{
-    color:#d3d3d3;
+.apps-footer-layout {
+    background-color: #242424;
 }
-.links-icontext-i{
-    color:#d3d3d3;
+
+.links-icontext-text {
+    color: #d3d3d3;
 }
-input.form-control{
-    border: 1px solid var(--bs-secondary) !important;;
+
+.links-icontext-i {
+    color: #d3d3d3;
+}
+
+input.form-control {
+    border: 1px solid var(--bs-secondary) !important;
+    ;
 }
 
 /*Tab栏样式*/
 
 .tab-color {
     color: white !important;
-    background-color:transparent;
-    transition: all .6s ease;
-}
-
-.tab-color.active {
-    background-color: var(--main-color) !important;
-    color: white !important;
-}
-
-.tab-color:hover {
-    background-color:var(--main-color) !important;
-    color: white !important;
-}
-.tab-Bottom-color {
-    color:gray;
     background-color: transparent;
     transition: all .6s ease;
 }
 
-.tab-Bottom-color.active {
-    color:#d3d3d3 !important;
+    .tab-color.active {
+        background-color: var(--main-color) !important;
+        color: white !important;
+    }
+
+    .tab-color:hover {
+        background-color: var(--main-color) !important;
+        color: white !important;
+    }
+
+.tab-Bottom-color {
+    color: gray;
+    background-color: transparent;
+    transition: all .6s ease;
 }
 
-.tab-Bottom-color:hover {
-    color:#d3d3d3 !important; 
-}
+    .tab-Bottom-color.active {
+        color: #d3d3d3 !important;
+    }
+
+    .tab-Bottom-color:hover {
+        color: #d3d3d3 !important;
+    }
 
 
 .tab-Pivot-color {
-    color:gray !important;
+    color: gray !important;
     background-color: transparent;
     transition: all .6s ease;
 }
 
-.tab-Pivot-color.active {
-    color:#d3d3d3 !important;
-}
+    .tab-Pivot-color.active {
+        color: #d3d3d3 !important;
+    }
 
-.tab-Pivot-color:hover {
-    color:#d3d3d3 !important;
-}
-.tab-Pivot-color .line{
-    background-color: transparent;
-    transition: all .6s ease;
-}
-.tab-Pivot-color.active .line {
-    background-color:#d3d3d3 !important;
-}
-.tab-Pivot-color:hover .line{
-    background-color:#d3d3d3 !important;
-}
-.tab-Pivot-color.active {
-    color:#d3d3d3 !important;
-}
+    .tab-Pivot-color:hover {
+        color: #d3d3d3 !important;
+    }
 
-.tab-Badge-color .line{
+    .tab-Pivot-color .line {
+        background-color: transparent;
+        transition: all .6s ease;
+    }
+
+    .tab-Pivot-color.active .line {
+        background-color: #d3d3d3 !important;
+    }
+
+    .tab-Pivot-color:hover .line {
+        background-color: #d3d3d3 !important;
+    }
+
+    .tab-Pivot-color.active {
+        color: #d3d3d3 !important;
+    }
+
+.tab-Badge-color .line {
     border-radius: 5px;
     word-break: keep-all;
     background: #F0F0F0;
     color: gray !important;
     transition: all .6s ease;
 }
+
 .tab-Badge-color.active .line {
-    background-color:var(--main-color) !important;
-    color:white;
+    background-color: var(--main-color) !important;
+    color: white;
 }
-.tab-Badge-color:hover .line{
-    background-color:var(--main-color) !important;
-    color:white !important;
+
+.tab-Badge-color:hover .line {
+    background-color: var(--main-color) !important;
+    color: white !important;
 }
 
 
@@ -639,22 +666,25 @@ input.form-control{
 }
 
 .bg-context-main {
-    color:white  !important;
+    color: white !important;
     border-color: gray;
 }
 
 .bg-color-main {
     color: var(--main-color) !important;
 }
+
 .bg-main {
-    background-color:gray;
+    background-color: gray;
 }
-.nav-link{
-    color:white !important;
+
+.nav-link {
+    color: white !important;
 }
-.nav-link:hover{
-    color:gray !important;
-}
+
+    .nav-link:hover {
+        color: gray !important;
+    }
 
 .bg-title-color-pr {
     color: white !important;
@@ -678,59 +708,66 @@ input.form-control{
 /*修正Masa样式对Bootsharp的影响*/
 
 .markdown-body {
-    background-color: transparent; 
+    background-color: transparent;
 }
 
 .layout.is-page.color1 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color1 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
 
 .layout.is-page.color2 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color2 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
 
 .layout.is-page.color3 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color3 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
 
 .layout.is-page.color4 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color4 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
 
 .layout.is-page.color5 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color5 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
 
 .layout.is-page.color6 .layout-side .layout-banner {
-    background-color:#262626;
+    background-color: #262626;
 }
+
 .layout.is-page.color6 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
+
 .theme--dark.m-application {
     color: #c9d1d9;
-    background-color:transparent;
+    background-color: transparent;
 }
 
 /*评论回复*/
@@ -738,10 +775,12 @@ input.form-control{
     width: 100%;
     background-color: rgba(58,58,58,.7) !important;
 }
+
 .theme--dark.m-tabs-items {
     background-color: transparent;
 }
 /*专题页*/
 .official-website {
-    background-color:transparent; 
+    background-color: transparent;
 }
+
