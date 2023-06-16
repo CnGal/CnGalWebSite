@@ -167,6 +167,8 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 AllowedGrantTypes = client.AllowedGrantTypes.Select(s => s.GrantType).ToList(),
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(s => s.PostLogoutRedirectUri).ToList(),
                 RedirectUris = client.RedirectUris.Select(s => s.RedirectUri).ToList(),
+                RequirePkce=client.RequirePkce,
+                AllowAccessTokensViaBrowser=client.AllowAccessTokensViaBrowser,
             };
 
             return model;
@@ -281,7 +283,8 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
             //不需要检查权限
             client.Enabled = model.Enabled;
-
+            client.RequirePkce = model.RequirePkce;
+            client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
 
             //更新授权方式
             client.AllowedGrantTypes.RemoveAll(s => !model.AllowedGrantTypes.Contains(s.GrantType));
