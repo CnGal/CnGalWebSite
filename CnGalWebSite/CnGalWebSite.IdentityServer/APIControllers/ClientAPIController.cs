@@ -215,6 +215,15 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 _clientRepository.Clear();
             }
 
+            //检测所属
+            if(!User.IsInRole("Admin")&&client.Id!=0)
+            {
+                if (!await _userClientRepository.AnyAsync(s=>s.ApplicationUserId== user.Id&&s.ClientId==client.Id))
+                {
+                    return new Result { Success = false, Message = "当前用户没有客户端的所有权" };
+                }
+            }
+
             client = await _clientRepository.GetAll()
                 .Include(s => s.AllowedGrantTypes)
                 .Include(s => s.AllowedCorsOrigins)
@@ -255,6 +264,9 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 client.Description = model.Description;
                 client.RequireConsent = model.RequireConsent;
                 client.RequireClientSecret = model.RequireClientSecret;
+                client.RequirePkce = model.RequirePkce;
+                client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
+
                 await _userClientRepository.UpdateAsync(userClient);
             }
             else
@@ -283,8 +295,6 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
             //不需要检查权限
             client.Enabled = model.Enabled;
-            client.RequirePkce = model.RequirePkce;
-            client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
 
             //更新授权方式
             client.AllowedGrantTypes.RemoveAll(s => !model.AllowedGrantTypes.Contains(s.GrantType));
