@@ -21,5 +21,9 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Clients
         public string LogoUri { get; set; }
 
         public string Description { get; set; }
+
+        public bool RequirePkce { get; set; }
+
+        public bool AllowAccessTokensViaBrowser { get; set; }
     }
 }
