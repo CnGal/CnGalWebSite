@@ -5,6 +5,7 @@ using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
+using CnGalWebSite.APIServer.Application.Recommends;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Stores;
@@ -38,12 +39,14 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly ILotteryService _lotteryService;
         private readonly IFileService _fileService;
         private readonly IEntryService _entryService;
+        private readonly IRecommendService _recommendService;
         private readonly ILogger<TimedTaskService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
-        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService)
+        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService,
+        IRecommendService recommendService)
         {
             _timedTaskRepository = timedTaskRepository;
             _storeInfoService = storeInfoService;
@@ -57,6 +60,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _fileService = fileService;
             _logger = logger;
             _entryService = entryService;
+            _recommendService = recommendService;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -220,6 +224,9 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                             maxNum = 2;
                         }
                         await _entryService.PostAllBookingNotice(maxNum);
+                        break;
+                    case TimedTaskType.UpdateRecommend:
+                        await _recommendService.Update();
                         break;
                 }
                 //记录执行时间

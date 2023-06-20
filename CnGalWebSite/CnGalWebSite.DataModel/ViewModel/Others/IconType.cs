@@ -152,7 +152,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         OtherReleaseType,
         Automatic,
         Manual,
-        Store
+        Store,
+        Hide
     }
 
     public static class IconTypeHelper
@@ -161,6 +162,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Hide:
+                    return "mdi-eye-off";
                 case IconType.Store:
                     return "mdi-store";
                 case IconType.Automatic:

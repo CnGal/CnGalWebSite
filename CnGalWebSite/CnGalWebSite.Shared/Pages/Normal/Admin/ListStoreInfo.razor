@@ -6,72 +6,72 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-    <TitleTip Title="商店信息版块"></TitleTip>
+<TitleTip Title="商店信息版块"></TitleTip>
 
-    <DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
-        <ItemColContent>
-            @if (context.Header.Value == "actions")
+<DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            @if (context.Item.EntryId > 0)
             {
-                <MIcon Color="success"
+                <MIcon Color="info"
                        Class="mr-2"
-                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
-                @if (context.Item.EntryId > 0)
-                {
-                    <MIcon Color="info"
-                           Class="mr-2"
-                           OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
-                }
+                       OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+            }
 
-            }
-            else if (context.Header.Value == "State")
+        }
+        else if (context.Header.Value == "State")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.StateChip State="context.Item.State" />
+        }
+        else if (context.Header.Value == "UpdateType")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.UpdateTypeChip Type="context.Item.UpdateType" />
+        }
+        else if (context.Header.Value == "PlatformType")
+        {
+            @context.Item.PlatformType.GetDisplayName()
+        }
+        else if (context.Header.Value == "PriceNow")
+        {
+            @if (context.Item.PriceNow != null)
             {
-                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.StateChip State="context.Item.State" />
+                @context.Item.PriceNow.Value.ToString("¥ 0.00")
             }
-            else if (context.Header.Value == "UpdateType")
+        }
+        else if (context.Header.Value == "CutNow")
+        {
+            @if (context.Item.CutNow != null)
             {
-                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.UpdateTypeChip Type="context.Item.UpdateType" />
+                @($"{context.Item.CutNow.Value} %")
             }
-            else if (context.Header.Value == "PlatformType")
-            {
-                @context.Item.PlatformType.GetDisplayName()
-            }
-            else if (context.Header.Value == "PriceNow")
-            {
-                @if (context.Item.PriceNow != null)
-                {
-                    @context.Item.PriceNow.Value.ToString("¥ 0.00")
-                }
-            }
-            else if (context.Header.Value == "CutNow")
-            {
-                @if (context.Item.CutNow != null)
-                {
-                    @($"{context.Item.CutNow.Value} %")
-                }
-            }
-            else
-            {
-                @context.Value
-            }
-        </ItemColContent>
-    </DataTableCard>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
-    <MDialog @bind-Value="_editDialog"
-             MaxWidth="1200">
-        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
-    </MDialog>
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
 
-    @code {
-        private bool _editDialog;
-        private long _editedItemId;
-        private bool _detailDialog;
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
 
-        private string _baseUrl = "api/storeinfo/";
-        private string _name = "商店信息";
+    private string _baseUrl = "api/storeinfo/";
+    private string _name = "商店信息";
 
-        CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard editCard;
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard editCard;
 
-        private List<DataTableHeader<StoreInfoOverviewModel>> _headers = new List<DataTableHeader<StoreInfoOverviewModel>>
+    private List<DataTableHeader<StoreInfoOverviewModel>> _headers = new List<DataTableHeader<StoreInfoOverviewModel>>
 {
           new ()
           {
@@ -92,52 +92,51 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-        DataTableCard<StoreInfoOverviewModel> dataTableCard;
+    DataTableCard<StoreInfoOverviewModel> dataTableCard;
 
-        [CascadingParameter]
-        public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
 
-        protected override async Task OnInitializedAsync()
-        {
-
-        }
-
-        public async void EditItem(StoreInfoOverviewModel item)
-        {
-            _editedItemId = item.Id;
-            _editDialog = true;
-            StateHasChanged();
-            if (editCard != null)
-            {
-                await editCard.Refresh();
-            }
-        }
-
-        public void OnEdited()
-        {
-            _editDialog = false;
-            StateHasChanged();
-            if (dataTableCard != null)
-            {
-                dataTableCard.GetDataFromApi();
-            }
-        }
-
-        public async Task AddItem()
-        {
-            _editedItemId = 0;
-            _editDialog = true;
-            StateHasChanged();
-            if (editCard != null)
-            {
-                await editCard.Refresh();
-            }
-        }
-
-        public async Task DetailItem(StoreInfoOverviewModel item)
-        {
-            NavigationManager.NavigateTo("entries/index/" + item.EntryId);
-        }
+    protected override async Task OnInitializedAsync()
+    {
 
     }
+
+    public async void EditItem(StoreInfoOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void DetailItem(StoreInfoOverviewModel item)
+    {
+        NavigationManager.NavigateTo("entries/index/" + item.EntryId);
+    }
+}

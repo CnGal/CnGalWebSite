@@ -111,4 +111,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
     {
      
     }
+
+    public class HotRecommendItemModel : HomeItemModel
+    {
+        public string BriefIntroduction { get; set; }
+        public RecommendReason Reason { get; set; }
+    }
 }

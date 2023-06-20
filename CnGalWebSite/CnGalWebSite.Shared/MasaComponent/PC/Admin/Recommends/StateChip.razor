@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@(IsHidden?"隐藏":"展示")" />
+
+@code {
+    [Parameter]
+    public bool IsHidden { get; set; }
+
+    public string GetColor()
+    {
+        return IsHidden switch
+        {
+            false => "success",
+            true => "error"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsHidden switch
+        {
+            false => IconType.Read,
+            true => IconType.Hide,
+        };
+    }
+}

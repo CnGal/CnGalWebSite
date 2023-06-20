@@ -1,0 +1,118 @@
+﻿@page "/admin/listrecommends"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<TitleTip Title="推荐版块"></TitleTip>
+
+<DataTableCard TModel="RecommendOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            @if (context.Item.EntryId > 0)
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+            }
+        }
+        else if (context.Header.Value == "State")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == "reason")
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Item.Reason" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/recommends/";
+    private string _name = "推荐";
+
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.EditCard editCard;
+
+    private List<DataTableHeader<RecommendOverviewModel>> _headers = new List<DataTableHeader<RecommendOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RecommendOverviewModel.Id)
+          },
+          new (){ Text= "状态", Value= "State"},
+          new (){ Text= "游戏Id", Value= nameof(RecommendOverviewModel.EntryId)},
+          new (){ Text= "游戏名称", Value= nameof(RecommendOverviewModel.EntryName)},
+          new (){ Text= "理由", Value= "reason"},
+          new (){ Text= "更新时间", Value= nameof(RecommendOverviewModel.UpdateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<RecommendOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async void EditItem(RecommendOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void DetailItem(RecommendOverviewModel item)
+    {
+        NavigationManager.NavigateTo("entries/index/" + item.EntryId);
+    }
+}

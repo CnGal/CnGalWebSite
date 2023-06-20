@@ -35,6 +35,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<StoreInfo, long> _storeInfoRepository;
+        private readonly IRepository<Recommend, long> _recommendRepository;
         private readonly IHomeService _homeService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
@@ -43,7 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IStoreInfoService _storeInfoService;
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger, IRepository<StoreInfo, long> storeInfoRepository,
-        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository,
+        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository, IRepository<Recommend, long> recommendRepository,
         IRepository<Comment, long> commentRepository)
         {
             _searchHelper = searchHelper;
@@ -59,6 +60,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _commentRepository = commentRepository;
             _storeInfoService = storeInfoService;
             _storeInfoRepository=storeInfoRepository;
+            _recommendRepository = recommendRepository;
         }
 
         /// <summary>
@@ -583,5 +585,38 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<HotRecommendItemModel>>> ListHotRecommends()
+        {
+            var entryIds = await _recommendRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s => s.Entry != null && s.Entry.IsHidden == false && s.IsHidden == false)
+                .Select(s=>s.EntryId)
+                .ToListAsync();
+
+            entryIds = entryIds.ToList().Random().Take(16).ToList();
+
+            var entries = await _recommendRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Entry)
+                .Where(s => entryIds.Contains(s.EntryId)).ToListAsync();
+
+            var model = new List<HotRecommendItemModel>();
+            foreach (var item in entries)
+            {
+                model.Add(new HotRecommendItemModel
+                {
+                    Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    Name = item.Entry.DisplayName,
+                    Url = "entries/index/" + item.Id,
+                    BriefIntroduction = item.Entry.BriefIntroduction,
+                    Reason=item.Reason
+                });
+            }
+
+            return model;
+        }
+
     }
 }
