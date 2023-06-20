@@ -1,0 +1,33 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@Reason.GetDisplayName()" />
+
+@code {
+    [Parameter]
+    public RecommendReason Reason { get; set; }
+
+    public string GetColor()
+    {
+        return Reason switch
+        {
+            RecommendReason.Classics => "red",
+            RecommendReason.NewHistoryLow => "orange",
+            RecommendReason.UnpopularMasterpiece => "green",
+            RecommendReason.HighPraiseRate => "info",
+            RecommendReason.Popular => "blue",
+            _ => "purple"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return Reason switch
+        {
+            RecommendReason.Classics => IconType.Number1,
+            RecommendReason.NewHistoryLow => IconType.Number2,
+            RecommendReason.UnpopularMasterpiece => IconType.Number3,
+            RecommendReason.HighPraiseRate => IconType.Number4,
+            RecommendReason.Popular => IconType.Number5,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

@@ -96,7 +96,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<BookingUser> BookingUsers { get; set; }
         public DbSet<EntryWebsite> EntryWebsites { get; set; }
         public DbSet<StoreInfo> StoreInfo { get; set; }
-
+        public DbSet<Recommend> Recommends { get; set; }
+        
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
 
@@ -149,6 +150,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<GameScoreTableModel>().HasIndex(g => g.GameId).IsUnique();
             modelBuilder.Entity<SteamInfor>().HasIndex(g => g.SteamId).IsUnique();
             modelBuilder.Entity<SteamInforTableModel>().HasIndex(g => g.SteamId).IsUnique();
+            modelBuilder.Entity<Recommend>().HasIndex(g => g.EntryId).IsUnique();
 
             //设定默认值
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);

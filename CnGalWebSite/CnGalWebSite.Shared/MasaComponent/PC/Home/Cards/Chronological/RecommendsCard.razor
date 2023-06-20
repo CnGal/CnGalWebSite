@@ -1,0 +1,47 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<HotRecommendItemModel>> _pageModelCatche
+
+<section class="published-games-card">
+    <h2>随机推荐</h2>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)">
+        <a class="item" href="@context.Url">
+            <img src="@context.Image" alt="@context.Name" />
+            <div class="content">
+                <div>
+                    <div class="name text-truncate-1">@context.Name</div>
+                    <div class="brief text-truncate-3">@context.BriefIntroduction</div>
+                </div>
+                <div class="tags">
+                    @*<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="@IconType.Tag" Text="@context.Reason.GetDisplayName()" />*@
+                    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Reason"/>
+                </div>
+            </div>
+        </a>
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+</section>
+
+@code {
+
+    List<HotRecommendItemModel> _items { get; set; } = new List<HotRecommendItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await _pageModelCatche.GetCache("api/home/ListHotRecommends");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页游戏精选列表失败");
+        }
+    }
+
+}

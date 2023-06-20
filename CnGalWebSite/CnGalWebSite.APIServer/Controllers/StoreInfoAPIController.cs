@@ -93,12 +93,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-
-        /// <summary>
-        /// 列出所有客户端
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<StoreInfoOverviewModel>> List(QueryParameterModel model)
@@ -185,7 +179,6 @@ namespace CnGalWebSite.APIServer.Controllers
             item.PlatformName = model.PlatformName;
             item.PlatformType = model.PlatformType;
             item.PriceNow = model.PriceNow;
-            item.UpdateTime = model.UpdateTime;
             item.UpdateType = model.UpdateType;
             item.CutLowest = model.CutLowest;
             item.EstimationOwnersMax = model.EstimationOwnersMax;

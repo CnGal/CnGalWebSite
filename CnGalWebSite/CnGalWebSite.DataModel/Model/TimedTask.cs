@@ -75,7 +75,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "更新角色生日缓存")]
         UpdateRoleBrithdays,
         [Display(Name = "发送游戏发布通知")]
-        PostAllBookingNotice
+        PostAllBookingNotice,
+        [Display(Name = "更新游戏推荐列表")]
+        UpdateRecommend
     }
     public enum TimedTaskExecuteType
     {
