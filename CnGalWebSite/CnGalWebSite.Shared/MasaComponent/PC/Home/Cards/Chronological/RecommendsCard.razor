@@ -5,8 +5,7 @@
 @inject IPageModelCatche<List<HotRecommendItemModel>> _pageModelCatche
 
 <section class="published-games-card">
-    <h2>随机推荐</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="随机推荐" MoreText="换一批" MoreIcon="IconType.Refresh" ForceShowMore OnClickMore="OnClickMore" Items="_items.Take(_dataCacheService.IsApp?9:16)">
         <a class="item" href="@context.Url">
             <img src="@context.Image" alt="@context.Name" />
             <div class="content">
@@ -44,4 +43,18 @@
         }
     }
 
+
+    public async Task OnClickMore()
+    {
+        try
+        {
+             _pageModelCatche.Clean("api/home/ListHotRecommends");
+            _items = await _pageModelCatche.GetCache("api/home/ListHotRecommends");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页游戏精选列表失败");
+        }
+    }
 }

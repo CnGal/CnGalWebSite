@@ -1,6 +1,33 @@
 ﻿@typeparam TItem
 @inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
+
+@if (string.IsNullOrWhiteSpace(Title) == false)
+{
+    <div class="card-title">
+        <h2>@Title</h2>
+        @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
+        {
+            <div>
+                @if (_dataCacheService.IsApp)
+                {
+                    <MButton XSmall Text Block Color="primary" OnClick="OnClick">
+                        <MIcon Left>@MoreIcon.ToIconString()</MIcon>
+                        @MoreText
+                    </MButton>
+                }
+                else
+                {
+                    <MButton Text Block Color="primary" OnClick="OnClick">
+                        <MIcon Left>@MoreIcon.ToIconString()</MIcon>
+                        @MoreText
+                    </MButton>
+                }
+            </div>       
+        }
+    </div>
+}
 
 @if (_dataCacheService.IsApp)
 {
@@ -12,12 +39,12 @@
             </div>
 
         }
-        @if (string.IsNullOrWhiteSpace(MoreLink) == false)
+        @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
         {
             <div class="slide-item">
-                <a class="item more-link" href="@MoreLink">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
+                <a class="item more-link" @onclick="OnClick">
+                    <MIcon Large>@((MoreIcon== IconType.SeeDetails? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
+                    <div class="text">@MoreText</div>
                 </a>
             </div>
         }
@@ -34,12 +61,12 @@ else
 
         }
 
-        @if (string.IsNullOrWhiteSpace(MoreLink) == false)
+        @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
         {
             <MSlideItem>
-                <a class="item more-link" href="@MoreLink">
-                    <MIcon Large>@IconType.SeeMore.ToIconString()</MIcon>
-                    <div class="text">查看更多</div>
+                <a class="item more-link" @onclick="OnClick">
+                    <MIcon Large>@((MoreIcon== IconType.SeeDetails? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
+                    <div class="text">@MoreText</div>
                 </a>
             </MSlideItem>
         }
@@ -52,7 +79,30 @@ else
     public RenderFragment<TItem> ChildContent { get; set; }
     [Parameter]
     public IEnumerable<TItem> Items { get; set; }
+    [Parameter]
+    public EventCallback OnClickMore { get; set; }
 
     [Parameter]
     public string MoreLink { get; set; }
+    [Parameter]
+    public IconType MoreIcon { get; set; } = IconType.SeeDetails;
+    [Parameter]
+    public bool ForceShowMore { get; set; }
+    [Parameter]
+    public string MoreText { get; set; } = "查看更多";
+    [Parameter]
+    public string Title { get; set; }
+
+
+    public async Task OnClick()
+    {
+        if (string.IsNullOrWhiteSpace(MoreLink))
+        {
+            await OnClickMore.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo(MoreLink);
+        }
+    }
 }

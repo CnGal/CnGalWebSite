@@ -5,8 +5,7 @@
 @inject IPageModelCatche<List<LatestVideoItemModel>>  _pageModelCatche
 
 <section class="latest-videoes-card">
-    <h2>最新视频</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新视频" Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
         <div class="group">
             @foreach (var item in context)
             {
