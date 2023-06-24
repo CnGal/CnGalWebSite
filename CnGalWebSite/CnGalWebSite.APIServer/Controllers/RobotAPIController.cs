@@ -53,48 +53,9 @@ namespace CnGalWebSite.APIServer.Controllers
         
         
         private readonly IRepository<Entry, int> _entryRepository;
-        private readonly IRepository<Examine, long> _examineRepository;
-        private readonly IRepository<Tag, int> _tagRepository;
-        private readonly IRepository<Article, long> _articleRepository;
-        private readonly IRepository<FriendLink, int> _friendLinkRepository;
-        private readonly IRepository<Carousel, int> _carouselRepository;
-        private readonly IRepository<UserFile, int> _userFileRepository;
-        private readonly IRepository<Disambig, int> _disambigRepository;
-        private readonly IRepository<Message, long> _messageRepository;
-        private readonly IRepository<Comment, long> _commentRepository;
-        private readonly IRepository<ThumbsUp, long> _thumbsUpRepository;
-        private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
-        private readonly IRepository<UserOnlineInfor, long> _userOnlineInforRepository;
-        private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<SignInDay, long> _signInDayRepository;
-        private readonly IRepository<ErrorCount, long> _errorCountRepository;
-        private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
-        private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
-        private readonly IRepository<Rank, long> _rankRepository;
-        private readonly IRepository<Periphery, long> _peripheryRepository;
-        private readonly IRepository<Vote, long> _voteRepository;
-        private readonly IRepository<SteamInfor, long> _steamInforRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IUserService _userService;
-        private readonly IAppHelper _appHelper;
-        private readonly IExamineService _examineService;
-        private readonly IEntryService _entryService;
-        private readonly IArticleService _articleService;
-        private readonly ICommentService _commentService;
-        private readonly IMessageService _messageService;
-        private readonly IFileService _fileService;
-        private readonly IErrorCountService _errorCountService;
-        private readonly IFavoriteFolderService _favoriteFolderService;
-        private readonly IRankService _rankService;
-        private readonly IPeripheryService _peripheryService;
-        private readonly IVoteService _voteService;
-        private readonly ILotteryService _lotteryService;
         private readonly IWeiXinService _weiXinService;
-        private readonly IRepository<GameNews, long> _gameNewsRepository;
-        private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
-        private readonly IRepository<Lottery, long> _lotteryRepository;
-        private readonly IHistoryDataService _historyDataService;
-        private readonly ISearchHelper _searchHelper;
-        private readonly IConfiguration _configuration;
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<RobotGroup, long> _robotGroupRepository;
         private readonly IRepository<RobotEvent, long> _robotEventRepository;
@@ -102,62 +63,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRobotService _robotService;
         private readonly IChatGPTService _chatGPTService;
 
-        public RobotAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
-        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, IHistoryDataService historyDataService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<RobotFace, long> robotFaceRepository,
-         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
-        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, IChatGPTService chatGPTService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
-        IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRobotService robotService,
-        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotGroup, long> robotGroupRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, ISearchHelper searchHelper, IRepository<RobotReply, long> robotReplyRepository)
+        public RobotAPIController(IRepository<StoreInfo, long> storeInfoRepository,IWeiXinService weiXinService, IRepository<RobotFace, long> robotFaceRepository, IRepository<RobotEvent, long> robotEventRepository,
+         IUserService userService,  IChatGPTService chatGPTService,
+       IRepository<Entry, int> entryRepository, IRobotService robotService, IRepository<RobotGroup, long> robotGroupRepository,IRepository<RobotReply, long> robotReplyRepository)
         {
-            
+            _storeInfoRepository = storeInfoRepository;
             _entryRepository = entryRepository;
-            _examineRepository = examineRepository;
-            _tagRepository = tagRepository;
-            _appHelper = appHelper;
-            _articleRepository = articleRepository;
-            _examineService = examineService;
-            
             _userService = userService;
-            _entryService = entryService;
-            _articleService = articleService;
-            _friendLinkRepository = friendLinkRepository;
-            _carouselRepository = carouselRepositor;
-            _messageRepository = messageRepository;
-            _commentRepository = commentRepository;
-            _commentService = commentService;
-            _messageService = messageService;
-            _userRepository = userRepository;
-            _userFileRepository = userFileRepository;
-            _userOnlineInforRepository = userOnlineInforRepository;
-            _thumbsUpRepository = thumbsUpRepository;
-            _disambigRepository = disambigRepository;
-            _fileService = fileService;
-            _signInDayRepository = signInDayRepository;
-            _errorCountService = errorCountService;
-            _errorCountRepository = errorCountRepository;
-            _favoriteFolderRepository = favoriteFolderRepository;
-            _favoriteFolderService = favoriteFolderService;
-            _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
-            _favoriteObjectRepository = favoriteObjectRepository;
-            _rankRepository = rankRepository;
-            _rankService = rankService;
-            _peripheryRepository = peripheryRepository;
-            _peripheryService = peripheryService;
-            _gameNewsRepository = gameNewsRepository;
-            _weeklyNewsRepository = weeklyNewsRepository;
-            _historyDataService = historyDataService;
-            _voteService = voteService;
-            _voteRepository = voteRepository;
-            _configuration = configuration;
-            _steamInforRepository = steamInforRepository;
-            _lotteryRepository = lotteryRepository;
-            _lotteryService = lotteryService;
-            _searchHelper = searchHelper;
             _weiXinService = weiXinService;
             _robotEventRepository = robotEventRepository;
             _robotGroupRepository = robotGroupRepository;
@@ -769,7 +681,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (model.Name == "steamdiscount")
             {
-                var count = await _steamInforRepository.GetAll().Include(s => s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
+                var count = await _storeInfoRepository.GetAll().Include(s => s.Entry).CountAsync(s =>s.PlatformType== PublishPlatformType.Steam&& s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
 
                 return new Result { Successful = true, Error = $"今天有{count}款作品打折中：https://www.cngal.org/discount" };
             }
