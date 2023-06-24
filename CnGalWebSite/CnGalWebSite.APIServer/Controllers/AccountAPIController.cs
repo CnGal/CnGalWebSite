@@ -22,9 +22,10 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [AllowAnonymous]
+    
     [Route("api/account/[action]")]
     [ApiController]
+    [Authorize]
     public class AccountAPIController : ControllerBase
     {
         
@@ -57,6 +58,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<GeetestCodeModel>> GetGeetestCode()
         {
             var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault();
@@ -101,6 +103,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<string>> GetIp()
         {
             return _operationRecordService.GetIp(HttpContext, null);
@@ -116,6 +119,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </remarks>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<Result>> MakeUserOnlineAsync()
         {
             //获取当前用户ID
@@ -155,6 +159,18 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false };
             }
 
+        }
+
+        [HttpGet]   
+        public async Task <ActionResult<UserInfoModel>> GetUserInfo()
+        {
+           var user=await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            return new UserInfoModel
+            {
+                Email = user.Email,
+                Name = user.UserName,
+                Id = user.Id
+            };
         }
     }
 }

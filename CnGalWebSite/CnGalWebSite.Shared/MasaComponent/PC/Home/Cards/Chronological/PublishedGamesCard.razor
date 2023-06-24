@@ -5,8 +5,7 @@
 @inject IPageModelCatche< List < PublishedGameItemModel> > _pageModelCatche
 
 <section class="published-games-card">
-    <h2>近期新作</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="近期新作" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
         <a class="item" href="@context.Url">
             <img src="@context.Image" alt="@context.Name" />
             <div class="content">

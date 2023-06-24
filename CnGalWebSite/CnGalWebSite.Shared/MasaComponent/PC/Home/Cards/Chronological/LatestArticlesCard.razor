@@ -5,8 +5,7 @@
 @inject IPageModelCatche<List<LatestArticleItemModel>> _pageModelCatche
 
 <section class="latest-articles-card">
-    <h2>最新文章</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:12)" MoreLink="/articles">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新文章" Items="_items.Take(_dataCacheService.IsApp?9:12)" MoreLink="/articles">
         <a class="item" href="@context.Url">
             <img class="image" src="@context.Image" alt="@context.Name" />
             <div class="head">

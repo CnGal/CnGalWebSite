@@ -1594,6 +1594,12 @@ a .aspect-ratio + p > strong {
         padding: .5rem 0;
     }
 
+    #home-page .card-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
 /*字体*/
 #home-page {
     letter-spacing: .05rem;

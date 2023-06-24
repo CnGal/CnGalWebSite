@@ -5,8 +5,7 @@
 @inject IPageModelCatche<List<DiscountGameItemModel>> _pageModelCatche
 
 <section class="discount-games-card">
-    <h2>折扣中的游戏</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/discount">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="折扣中的游戏" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/discount">
         <a class="item" href="@context.Url">
             <img src="@context.Image" alt="@context.Name" />
             <div class="content">

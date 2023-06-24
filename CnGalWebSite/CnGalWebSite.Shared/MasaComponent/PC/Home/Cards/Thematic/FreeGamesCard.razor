@@ -5,8 +5,7 @@
 @inject IPageModelCatche<List<PublishedGameItemModel>> _pageModelCatche
 
 <section class="free-games-card">
-    <h2>免费游玩</h2>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/free">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="免费游玩" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/free">
         <a class="item" href="@context.Url">
             <img src="@context.Image" alt="@context.Name" />
             <div class="content">
