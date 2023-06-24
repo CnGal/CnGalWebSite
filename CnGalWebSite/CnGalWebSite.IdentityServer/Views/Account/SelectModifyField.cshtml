@@ -16,23 +16,27 @@
             <partial name="_ValidationSummary" />
 
             <div class="mdl-card__supporting-text">
-                <form asp-route="SelectModifyField" onsubmit="return callGeetest()">
-                    <input type="hidden" asp-for="ReturnUrl" />
 
-                    <!--极验-->
-                    <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
-                    <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
-                    <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
 
-                    <div id="captcha-box"></div>
-                    <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
-                    <!--极验-->
+                <div class="action">
+                    <form asp-route="SelectModifyField" onsubmit="return callGeetest()">
+                        <input type="hidden" asp-for="ReturnUrl" />
 
-                    <div class="action">
+                        <!--极验-->
+                        <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
+                        <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
+                        <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+
+                        <div id="captcha-box"></div>
+                        <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
+                        <!--极验-->
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">验证</button>
+                    </form>
+                    <form asp-route="SelectModifyField">
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" name="button" value="cancel">取消</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+
             </div>
         }
         else
