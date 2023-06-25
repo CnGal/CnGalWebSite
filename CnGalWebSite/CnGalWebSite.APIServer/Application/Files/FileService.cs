@@ -52,6 +52,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             {
                 if (string.IsNullOrWhiteSpace(url))
                 {
+                    _logger.LogError("转存图片失败，图片为空");
                     return null;
                 }
 
@@ -81,6 +82,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 }
                 else
                 {
+                    _logger.LogError("转存图片失败，接口返回代码：{code}，图片：{url}", result["code"].ToObject<int>(), url);
                     return null;
                 }
 
