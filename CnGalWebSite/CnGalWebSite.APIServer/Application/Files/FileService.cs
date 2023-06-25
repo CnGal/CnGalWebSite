@@ -82,7 +82,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 }
                 else
                 {
-                    _logger.LogError("转存图片失败，接口返回代码：{code}，图片：{url}", result["code"].ToObject<int>(), url);
+                    _logger.LogError("转存图片失败，接口返回代码：{code}，消息：{msg}，图片：{url}", result["code"].ToObject<int>(), result["msg"].ToObject<string>(), url);
                     return null;
                 }
 
