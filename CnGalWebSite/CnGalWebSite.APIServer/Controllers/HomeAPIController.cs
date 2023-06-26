@@ -609,7 +609,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
                     Name = item.Entry.DisplayName,
-                    Url = "entries/index/" + item.Id,
+                    Url = "entries/index/" + item.EntryId,
                     BriefIntroduction = item.Entry.BriefIntroduction,
                     Reason=item.Reason
                 });
