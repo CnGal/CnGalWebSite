@@ -65,7 +65,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
             var date = DateTime.Now.ToCstTime().Date;
 
             var steams = await _storeInfoRepository.GetAll().AsNoTracking()
-                .Where(s => s.UpdateTime.Date < date && s.State != StoreState.Takedown && s.UpdateType == StoreUpdateType.Automatic)
+                .Where(s => s.UpdateTime.Date < date && s.State != StoreState.Takedown && s.UpdateType == StoreUpdateType.Automatic && s.Entry.PubulishTime != null && s.Entry.PubulishTime < date)
                 .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
                 .Take(max)
                 .ToListAsync();
@@ -143,7 +143,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
             }
 
             //判断是否为免费游戏
-            if (storeInfo.OriginalPrice != 0)
+            //if (storeInfo.OriginalPrice != 0)
             {
                 await UpdateSteamInforByRemoteAPI(storeInfo);
             }
