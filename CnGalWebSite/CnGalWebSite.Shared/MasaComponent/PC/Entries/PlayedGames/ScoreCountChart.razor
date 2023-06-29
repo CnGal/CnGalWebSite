@@ -50,12 +50,12 @@
     PlayedGameScoreType type;
     PlayedGameCountScope scope;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        await Refresh();
+        Refresh();
     }
 
-    public async Task Refresh()
+    public void Refresh()
     {
         if (model.XAxis.Data.Any() == false)
         {
@@ -121,11 +121,14 @@
             data.Count(s=>s==10),
         });
 
-        if (echarts != null)
-        {
-            await echarts.DisposeECharts();
-        }
+
+
+        //if (echarts != null)
+        //{
+        //    await echarts.DisposeECharts();
+        //}
         isReady = true;
+        StateHasChanged();
     }
 
     public async Task TypeValueChanged(PlayedGameScoreType _type)
@@ -141,12 +144,12 @@
             return;
         }
         type = _type;
-        await Refresh();
+        Refresh();
 
     }
-    public async Task ScopeValueChanged(PlayedGameCountScope _scope)
+    public void ScopeValueChanged(PlayedGameCountScope _scope)
     {
         scope = _scope;
-        await Refresh();
+        Refresh();
     }
 }
