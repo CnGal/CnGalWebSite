@@ -26,13 +26,15 @@
             <CnGalWebSite.Shared.Pages.Webs.Home.Index Lock="_dataCacheService.HomeTabIndex!=0" />
         </div>
     </MTabItem>
-
     <MTabItem Value="1">
+        <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries />
+    </MTabItem>
+    <MTabItem Value="2">
         <div style=" padding: .1rem;">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.HomeCard />
         </div>
     </MTabItem>
-    <MTabItem Value="2">
+    <MTabItem Value="3">
         <AuthorizeView>
             <Authorized>
                 <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
@@ -48,18 +50,27 @@
 
 <MFooter Fixed Padless>
     <MBottomNavigation @bind-Value="_dataCacheService.HomeTabIndex" Shift Grow>
-        <MButton ActiveClass="font-color">
+        <MButton ActiveClass="font-color" Value="0">
             <span>主页</span>
 
             <MIcon>mdi-home-outline </MIcon>
         </MButton>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MButton ActiveClass="font-color" Value="1">
+                    <span>周年庆</span>
 
-        <MButton ActiveClass="font-color">
+                    <MIcon>mdi-cake</MIcon>
+                </MButton>
+            </Authorized>
+        </AuthorizeView>
+       
+        <MButton ActiveClass="font-color" Value="2">
             <span>专题</span>
 
             <MIcon>mdi-align-vertical-top </MIcon>
         </MButton>
-        <MButton ActiveClass="font-color">
+        <MButton ActiveClass="font-color" Value="3">
             <span>空间</span>
 
             <MIcon>mdi-account-outline</MIcon>

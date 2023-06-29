@@ -210,7 +210,7 @@ namespace CnGalWebSite.RobotClient.Services.Messages
                             {
                                 imageStr = "https:" + imageStr;
                             }
-                            messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
+                            messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/").Split('?').Last()));
                         }
                     }
                     else if (item.StartsWith("声音="))
@@ -270,7 +270,7 @@ namespace CnGalWebSite.RobotClient.Services.Messages
                         {
                             imageStr = "https:" + imageStr;
                         }
-                        messages.Add(new ImageMessage(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
+                        messages.Add(new ImageMessage(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/").Split('?').Last()));
                     }
                 }
                 else if (vaule.Contains("[声音="))

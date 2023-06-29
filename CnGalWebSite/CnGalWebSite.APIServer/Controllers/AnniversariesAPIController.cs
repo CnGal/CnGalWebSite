@@ -177,8 +177,8 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        static readonly DateTime before = new DateTime(2022, 5, 31);
-        static readonly DateTime after = new DateTime(2021, 5, 31);
+        static readonly DateTime before = new DateTime(2023, 5, 31);
+        static readonly DateTime after = new DateTime(2022, 5, 31);
 
         [HttpGet]
         public async Task<ActionResult<List<JudgableGameViewModel>>> GetAllJudgableGamesAsync()

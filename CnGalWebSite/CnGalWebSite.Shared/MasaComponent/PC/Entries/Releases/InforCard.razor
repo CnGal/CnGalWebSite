@@ -6,7 +6,7 @@
         <MIcon Color="primary" Class="me-4">@GetIcon()</MIcon>@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())
     </div>
 
-    @if (Model.StoreInfor.State != StoreState.None)
+    @if (Model.StoreInfor.State != StoreState.None&& Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
     {
         <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
             @if (Model.StoreInfor.PriceNow > 0)

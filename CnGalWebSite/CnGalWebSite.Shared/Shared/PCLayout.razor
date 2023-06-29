@@ -13,6 +13,11 @@
         <MTab OnClick="@(()=>  Nav("/#recommends"))">随机推荐</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/cv"))">CV</MTab>
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/square"))">广场</MTab>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MTab OnClick="@(()=>NavigationManager.NavigateTo("/8th"))">周年庆</MTab>
+            </Authorized>
+        </AuthorizeView>
     </MTabs>
     <MSpacer></MSpacer>
 
