@@ -1,0 +1,66 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+<IntroductionCard />
+<AuthorizeView>
+    <Authorized>
+        @if (Model != null)
+        {
+            <UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" />
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    public PersonalSpaceViewModel Model { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                string userId = userId = user.User.Claims.GetUserId();
+                //获取用户基本信息
+                Model = await _dataCacheService.PersonalSpaceDataCatche.GetCache(userId);
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            }
+        }
+    }
+
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
+}

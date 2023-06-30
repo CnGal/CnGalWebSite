@@ -1,6 +1,6 @@
 ﻿@page "/8th"
 @page "/Anniversaries"
-@page "/7th/{Type}"
+@page "/8th/{Type}"
 @page "/Anniversaries/{Type}"
 
 @inject IDataCacheService _dataCacheService
@@ -9,8 +9,7 @@
 
 <TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})"/>
 <div class="rounded  shadow-sm bg-opacity mb-4">
-    <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
-           >
+    <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive>
         <MTab Value="1">
             主页<MIcon>mdi-home</MIcon>
         </MTab>
@@ -18,9 +17,12 @@
             评选<MIcon>mdi-star</MIcon>
         </MTab>
         <MTab Value="3">
-            抽奖<MIcon>mdi-wallet-giftcard</MIcon>
+            晒出你的游戏库<MIcon>@IconType.Game.ToIconString()</MIcon>
         </MTab>
         <MTab Value="4">
+            抽奖<MIcon>mdi-wallet-giftcard</MIcon>
+        </MTab>
+        <MTab Value="5">
             活动介绍<MIcon>mdi-av-timer</MIcon>
         </MTab>
     </MTabs>
@@ -30,16 +32,18 @@
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.HomeCard />
     </MTabItem>
     <MTabItem Value="2">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.IntroductionCard/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.IntroductionCard />
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup />
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup />
     </MTabItem>
-
     <MTabItem Value="3">
-        <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="3" />
+       <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard/>
     </MTabItem>
     <MTabItem Value="4">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard/>
+        <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="3" />
+    </MTabItem>
+    <MTabItem Value="5">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard />
     </MTabItem>
 </MTabsItems>
 
@@ -49,7 +53,7 @@
     public string Type { get; set; }
 
     StringNumber index = 0;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
@@ -58,21 +62,22 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
         LocationChanged(null, null);
 
     }
 
-    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    public void LocationChanged(object sender, LocationChangedEventArgs args)
     {
         index = Type switch
         {
             "Home" => 1,
             "Rating" => 2,
-            "Lottery" => 3,
-            "Introduction" => 4,
+            "PlayedGames" => 3,
+            "Lottery" => 4,
+            "Introduction" => 5,
             _=>1
         };
         StateHasChanged();
@@ -101,8 +106,9 @@
         {
             1 => "Home",
             2 => "Rating",
-            3 => "Lottery",
-            4 => "Introduction",
+            3 => "PlayedGames",
+            4 => "Lottery",
+            5 => "Introduction",
             _ => ""
         }));
 

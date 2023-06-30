@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 
 <MDialog @bind-Value="Dialog"
@@ -11,8 +12,7 @@
             绑定Steam账号
         </MCardTitle>
         <MCardText>
-        
-            填写微博链接后点击保存，再到列表中找到创建的动态，点击编辑，在新的窗口中确认无误后发布
+            绑定后可以同步Steam库存
         </MCardText>
 
         <MCardText>
@@ -84,7 +84,7 @@
             {
                 await ToastService.Success("编辑用户Steam信息成功", "编辑用户Steam信息成功");
                 Dialog = false;
-                StateHasChanged(); 
+                StateHasChanged();
                 await OnChanged.InvokeAsync(Model.SteamId);
 
             }
@@ -97,15 +97,15 @@
 
     public void OnClickQuestion()
     {
-        NavigationManager.NavigateTo( "/articles/index/5");
-        
+        _eventService.OpenNewPage(NavigationManager.BaseUri + "articles/index/5");
+
     }
 
     public void Refresh(bool dialog)
     {
         Dialog = dialog;
         StateHasChanged();
-        
+
     }
 
 
