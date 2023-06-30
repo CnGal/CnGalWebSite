@@ -8,17 +8,17 @@
 
 
 @code {
-
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("1301");
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("1303");
         }
         catch (Exception exc)
         {
+
         }
 
     }

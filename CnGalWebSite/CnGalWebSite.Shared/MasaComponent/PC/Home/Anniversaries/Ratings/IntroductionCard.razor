@@ -9,10 +9,6 @@
 
 @code {
 
-    bool CanDeleted;
-    bool isReady;
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
 
     protected override async Task OnInitializedAsync()
@@ -20,13 +16,9 @@
         try
         {
             Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("1303");
-            isReady = true;
         }
         catch (Exception exc)
         {
-            //isNotFound = true;
-            //isReady = true;
-            //StateHasChanged();
         }
 
     }

@@ -16,20 +16,20 @@
         <MCardText Class="pb-0">
             @if (isReady)
             {
-                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
-                    <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay" Color="primary">
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;" Color="primary">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
                         想玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Playing" Color="primary">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Playing">
                         正在玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Played" Color="primary">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Played">
                         已玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested" Color="primary">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested" >
                         不感兴趣
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed" Color="primary">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed">
                         未玩
                     </MButton>
                 </MButtonGroup>
