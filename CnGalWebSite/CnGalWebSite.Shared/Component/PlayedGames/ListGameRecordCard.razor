@@ -44,10 +44,10 @@
     }
 </div>
 
-@*@if (_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.TotalPages > 1)
+@if (_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.TotalPages > 1)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.TotalPages" ValueChanged="OnPageClick" />
-}*@
+}
 @if (Model.Any(s => s.IsHidden) && IsCurrentUser)
 {
 
