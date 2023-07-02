@@ -1,0 +1,27 @@
+﻿
+/*分享库存*/
+.anniversary-page .user-steam-card {
+    gap: .5rem;
+}
+
+    .anniversary-page .user-steam-card .user-info {
+        gap: .5rem;
+    }
+
+        .anniversary-page .user-steam-card .user-info .image {
+            height: 4rem;
+        }
+
+        .anniversary-page .user-steam-card .user-info .name {
+            font-size: inherit;
+            font-weight: bold;
+        }
+
+    .anniversary-page .user-steam-card .goal .key {
+        font-size: inherit;
+    }
+
+    .anniversary-page .user-steam-card .goal .value {
+        font-size: large;
+        font-weight: bold;
+    }

@@ -2543,13 +2543,16 @@ a .aspect-ratio + p > strong {
         .anniversary-page .user-steam-card .user-info .name {
             font-size: large;
             font-weight: bold;
+            color: var(--main-color);
         }
 
     .anniversary-page .user-steam-card .goal .key {
         font-size: large;
+        color: var(--active-color);
     }
 
     .anniversary-page .user-steam-card .goal .value {
-        font-size: xxx-large;
+        font-size: 2.5rem;
         font-weight: bold;
+        color: var(--main-color);
     }

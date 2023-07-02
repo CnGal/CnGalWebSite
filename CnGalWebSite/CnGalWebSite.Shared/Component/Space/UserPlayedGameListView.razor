@@ -30,7 +30,7 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (isReady)
     {
-        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary"/>
+        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount"/>
         @if (GameRecords.Count == 0)
         {
             <div class="mb-3">
@@ -39,7 +39,7 @@
         }
         else
         {
-            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" />
+            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary"/>
         }
     }
     else
@@ -58,7 +58,8 @@
     public string UserId { get; set; }
     [Parameter]
     public bool IsAnniversary { get; set; }
-
+    [Parameter]
+    public int TotalCount { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

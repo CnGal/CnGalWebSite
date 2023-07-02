@@ -1,25 +1,50 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
 <IntroductionCard />
-<AuthorizeView>
-    <Authorized>
-        @if (Model != null)
-        {
-            <UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary/>
-        }
-    </Authorized>
-    <NotAuthorized>
-        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+@if (OverviewModel != null)
+{
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <HasMostGamesUsersCard Model="OverviewModel.HasMostGamesUsers" />
         </div>
-    </NotAuthorized>
-</AuthorizeView>
+        <div class="col-12 col-md-6">
+            <PossessionRateHighestGamesCard Model="OverviewModel.PossessionRateHighestGames" />
+        </div>
+    </div>
+    <AuthorizeView>
+        <Authorized>
+            @if (Model != null)
+            {
+                <div id="game-library-card">
+
+                    <UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary TotalCount="OverviewModel.Count" />
+
+                </div>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
+}
+
 
 
 @code {
 
     public PersonalSpaceViewModel Model { get; set; }
+
+    SteamGamesOverviewModel OverviewModel;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -42,6 +67,15 @@
             {
                 ErrorHandler.ProcessError(ex, "获取用户信息失败");
             }
+        }
+
+        try
+        {
+            OverviewModel = await _pageModelCatche.GetCache("api/steam/GetSteamGamesOverview");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
         }
     }
 

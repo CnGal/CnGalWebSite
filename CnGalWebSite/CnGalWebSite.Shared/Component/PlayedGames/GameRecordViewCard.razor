@@ -1,24 +1,150 @@
 ﻿@inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
 
-<div class="h-100" @onclick="OnClick">
-
-    <div class="div-shadow rounded  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
-
-        <div class="">
-            <div class="">
-                <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName">
+@if (IsAnniversary)
+{
+    @if (Type == PlayedGamesDisplayType.LargeCard)
+    {
+        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" @onclick="@(()=>OnClick())">
+            <div class="div-shadow rounded bg-opacity aticle-home-layout h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="">
+                    <div class="">
+                        <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName" crossOrigin="anonymous">
+                    </div>
+                    <div class="p-3">
+                        <header class="text-truncate-2 mb-2">
+                            <h5 class="fw-bold" style=" display: inline;">@Model.GameName</h5>
+                        </header>
+                        <div>
+                            <GameRecordTagCard Model="Model" />
+                        </div>
+                        <div class="text-truncate-4">
+                            @Model.GameBriefIntroduction
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="p-2 pb-0">
-                <header class="text-truncate-1 h6 mb-2">
-                    <span>@Model.GameName</span>
-                </header>
-                <div>
-                    <GameRecordTagCard Model="Model" />
+        </div>
+
+    }
+    else if (Type == PlayedGamesDisplayType.SmallCard)
+    {
+        @if (_dataCacheService.IsApp)
+        {
+
+            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4" @onclick="@(()=>OnClick())">
+                <div class="rounded h-100 div-shadow  bg-opacity" style="cursor: pointer ">
+                    <div>
+                        <img loading="lazy" src="@Model.GameImage" class="card-img-top" crossOrigin="anonymous" style="word-break: break-all;" alt="@Model.GameName" />
+                    </div>
+                    <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
+                        <span style="font-size: 15px;" class="home-card-name-text">@Model.GameName</span>
+                    </div>
+                    <div>
+                        <GameRecordTagCard Model="Model" />
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4" @onclick="@(()=>OnClick())">
+                <div class=" h-100 rounded h-100 div-shadow  bg-opacity">
+                    <img loading="lazy" src="@Model.GameImage" class="card-img-top" alt="@Model.GameName"  crossOrigin="anonymous"/>
+                    <div class="p-2 pb-1">
+                        <span class="home-card-name-text">@Model.GameName</span>
+                    </div>
+                    <div class="ms-2 me-2">
+                        <GameRecordTagCard Model="Model" />
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    }
+    else
+    {
+        @if (_dataCacheService.IsApp)
+        {
+            <div class="col-12  mb-4" @onclick="@(()=>OnClick())">
+                <div class="div-shadow rounded  bg-opacity h-100">
+                    <div style="display: flex; align-items: center;">
+                        <div>
+                            <img loading="lazy" style=" width: 160px; " src="@Model.GameImage" crossOrigin="anonymous">
+                        </div>
+                        <div class="ms-2 me-2 w-100">
+                            <span class="text-truncate-1">
+                                <span class="fw-bold" style=" display: inline;">@Model.GameName</span>
+                            </span>
+                            <div>
+                                <GameRecordTagCard Model="Model" />
+                            </div>
+                            <span class="text-truncate-2">
+                                @Model.GameBriefIntroduction
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+        else
+        {
+            <div class="col-12  mb-4" @onclick="@(()=>OnClick())">
+
+                <div class="div-shadow rounded  bg-opacity h-100">
+
+                    <div class="" style="display:flex;">
+                        <div class="">
+                            <img loading="lazy" style=" width: 285px; " src="@Model.GameImage" crossOrigin="anonymous">
+                        </div>
+                        <div class="p-3" style=" width: 100%;">
+                            <header class="text-truncate-1">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.GameName</h5>
+                            </header>
+                            <div class="mt-2">
+                                <GameRecordTagCard Model="Model" />
+                            </div>
+                            <span class="text-truncate-2">
+                                @Model.GameBriefIntroduction
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+}
+else
+{
+    <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
+        <div class="h-100" @onclick="OnClick">
+
+            <div class="div-shadow rounded  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+
+                <div class="">
+                    <div class="">
+                        <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName">
+                    </div>
+                    <div class="p-2 pb-0">
+                        <header class="text-truncate-1 h6 mb-2">
+                            <span>@Model.GameName</span>
+                        </header>
+                        <div>
+                            <GameRecordTagCard Model="Model" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+
+}
 
 
 @code {
@@ -26,11 +152,14 @@
     public GameRecordViewModel Model { get; set; }
     [Parameter]
     public EventCallback<GameRecordViewModel> OnShow { get; set; }
-
+    [Parameter]
+    public bool IsAnniversary { get; set; }
+    [Parameter]
+    public PlayedGamesDisplayType Type { get; set; }
 
     public async Task OnClick()
     {
-       await OnShow.InvokeAsync(Model);
+        await OnShow.InvokeAsync(Model);
     }
 
 }
