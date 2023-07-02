@@ -1,9 +1,9 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="拥有率排行榜" Icon="@IconType.Game.ToIconString()" Class="mb-4" Outline>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="拥有率排行榜" Icon="@IconType.Game.ToIconString()" Class="mb-4" Outline Collapable>
     @foreach (var item in Model)
     {
         <a href="@("/entries/index/"+item.Id)">
-            <div class="div-shadow rounded  bg-opacity w-100 mb-4">
+            <div class="shadow-sm rounded  bg-opacity w-100 mb-4">
                 <div class="a-font-color" style="display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: .5rem; padding: .5rem;">
                     <div style=" padding: 0 .5rem; font-size: 2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; color: var(--main-color) !important; ">
                         @(Model.IndexOf(item)+1)

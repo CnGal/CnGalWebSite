@@ -4,28 +4,31 @@
 {
     foreach (var item in SteamUserInfors)
     {
-        <div class="div-shadow rounded bg-opacity  p-3 mb-4 user-steam-card">
-            <div class="user-info">
-                <img src="@item.Image" alt="@item.Name" class="image"/>
-                <div class="name"> @item.Name</div>
+        <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
+
+            <div class="a-font-color shadow-sm rounded bg-opacity  p-3 mb-4 user-steam-card">
+                <div class="user-info">
+                    <img src="@item.Image" alt="@item.Name" class="image" />
+                    <div class="name"> @item.Name</div>
+                </div>
+                <div class="goal">
+                    <div class="value">@(GameRecords.Count)</div>
+                    <div class="key">总库存</div>
+                </div>
+                <div class="goal">
+                    <div class="value">@((GameRecords.Count*100.0/ TotalCount).ToString("0.0")+" %")</div>
+                    <div class="key">@($"收集率（站内总计 {TotalCount}）")</div>
+                </div>
+                <div class="goal">
+                    <div class="value">@((GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" h")</div>
+                    <div class="key">总时长</div>
+                </div>
+                <div class="goal">
+                    <div class="value">@(item.Price.ToString("0")+ " ¥")</div>
+                    <div class="key">总价格</div>
+                </div>
             </div>
-            <div class="goal">
-                <div class="value">@(GameRecords.Count)</div>
-                <div class="key">总库存</div>
-            </div>
-            <div class="goal">
-                <div class="value">@((GameRecords.Count*100.0/ TotalCount).ToString("0.0")+" %")</div>
-                <div class="key">@($"收集率（站内总计 {TotalCount}）")</div>
-            </div>
-            <div class="goal">
-                <div class="value">@((GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" h")</div>
-                <div class="key">总时长</div>
-            </div>
-            <div class="goal">
-                <div class="value">@(item.Price.ToString("0")+ " ¥")</div>
-                <div class="key">总价格</div>
-            </div>
-        </div>
+        </a>
     }
 
 }
