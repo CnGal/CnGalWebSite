@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="库存排行榜" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="库存排行榜" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline Collapable>
     @foreach (var item in Model)
     {
         <a href="@("/space/index/"+item.Id)">

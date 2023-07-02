@@ -156,7 +156,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             foreach (var item in steams)
             {
                 //计算总价格
-                var price = gameIds.Any() ? await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && s.OriginalPrice != null && s.EntryId != null && gameIds.Contains(s.EntryId.Value)).SumAsync(s => s.OriginalPrice.Value) : 0;
+                var price = gameIds.Any() ? await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && s.OriginalPrice != null && s.OriginalPrice >0&& s.EntryId != null && gameIds.Contains(s.EntryId.Value)).SumAsync(s => s.OriginalPrice.Value) : 0;
 
                 model.Add(new SteamUserInforModel
                 {
