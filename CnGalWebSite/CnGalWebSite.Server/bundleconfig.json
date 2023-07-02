@@ -39,7 +39,8 @@
   {
     "outputFileName": "wwwroot/styles/app.min.css",
     "inputFiles": [
-      "wwwroot/css/home-app.css"
+      "wwwroot/css/home-app.css",
+      "wwwroot/css/anniversary-app.css"
     ]
   },
   {

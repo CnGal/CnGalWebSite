@@ -89,7 +89,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public int Count { get; set; } 
 
-        public int TotalPages => (Count / MaxCount) + 1;
+        public int TotalPages => (Count - 1) / MaxCount + 1;
 
         public int CurrentPage { get; set; } = 1;
     }
@@ -106,7 +106,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public int Count { get; set; }
 
-        public int TotalPages => (Count / MaxCount) + 1;
+        public int TotalPages => (Count-1)/ MaxCount+1;
 
         public int CurrentPage { get; set; } = 1;
     }

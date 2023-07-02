@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Search;
+﻿using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
     {
         public int Count { get; set; }
 
-        public List<PossessionRateHighestGameModel> PossessionRateHighestGames { get; set; }
+        public List<PossessionRateHighestGameModel> PossessionRateHighestGames { get; set; }=new List<PossessionRateHighestGameModel>();
 
-        public List<HasMostGamesUserModel> HasMostGamesUsers { get; set; }
+        public List<HasMostGamesUserModel> HasMostGamesUsers { get; set; }=new List<HasMostGamesUserModel>();
     }
 
     public class PossessionRateHighestGameModel : EntryInforTipViewModel
@@ -23,6 +24,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
     public class HasMostGamesUserModel
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string Image { get; set; }
@@ -30,5 +33,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public int Count { get; set; }
 
         public string PersonalSignature { get; set; }
+
+        public List<RankViewModel> Ranks { get; set; }
     }
 }

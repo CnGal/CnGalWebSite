@@ -243,6 +243,37 @@ window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     anchorElement.remove();
     URL.revokeObjectURL(url);
 }
+
+function domToImageUrl(id,name) {
+    domtoimage.toBlob(document.getElementById(id))
+        .then(function (blob) {
+            window.saveAs(blob, name);
+        });
+}
+// 生成图片
+function domToImageUrl(id, name) {
+    const setup = {
+        useCORS: true, // 使用跨域
+    };
+    html2canvas(document.getElementById(id), {
+        useCORS: true,
+    }).then((canvas) => {
+        const link = canvas.toDataURL("image/jpg");
+        exportPicture(link, name);
+    });
+}
+
+// 导出图片
+function exportPicture(link, name) {
+    const file = document.createElement("a");
+    file.style.display = "none";
+    file.href = link;
+    file.download = decodeURI(name);
+    document.body.appendChild(file);
+    file.click();
+    document.body.removeChild(file);
+}
+
 /* var dotNetHelper;
 
 async function onWebsiteTemplateInit(helper)

@@ -1,0 +1,37 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="库存排行榜" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline>
+    @foreach (var item in Model)
+    {
+        <a href="@("/space/index/"+item.Id)">
+            <div style="display: flex;" class="rounded shadow-sm  bg-opacity w-100 mb-4">
+                <div class="a-font-color w-100" style="display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: .5rem; padding: .5rem;">
+                    <div style=" padding: 0 .5rem; font-size: 2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; color: var(--main-color) !important; ">
+                        @(Model.IndexOf(item)+1)
+                    </div>
+                    <div style="display:flex" class="w-100">
+                        <div style="display: flex;align-items: center;">
+                            <img class="shadow-sm" src="@item.Image" style="height: 45px;width: 45px;border-radius: 50%;" />
+                        </div>
+                        <div class="comment-tx-div" style=" justify-content: center;">
+                            <div class="new-row-warp no-margin">
+                                <div class="comment-username me-2">@item.Name</div>
+                                <RanksViewCard Model="item.Ranks" Outline />
+                            </div>
+                            <div class="comment-time text-truncate-2" style="color: gray;">@item.PersonalSignature</div>
+                        </div>
+                    </div>
+
+                    <div style=" font-weight: bold; color: var(--active-color); ">
+                        @item.Count
+                    </div>
+                </div>
+
+            </div>
+        </a>
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public List<HasMostGamesUserModel> Model { get; set; }
+}

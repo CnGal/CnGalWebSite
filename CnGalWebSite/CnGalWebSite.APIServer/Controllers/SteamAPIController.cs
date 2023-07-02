@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Services;
@@ -31,10 +32,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IHttpService _httpService;
         private readonly ISteamInforService _steamInforService;
+        private readonly IRankService _rankService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
         public SteamAPIController(IRepository<StoreInfo, long> storeInfoRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository, IHttpService httpService)
+        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService,
+        IRepository<ApplicationUser, string> userRepository, IHttpService httpService)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -44,6 +47,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _tagRepository = tagRepository;
             _httpService = httpService;
             _playedGameRepository = playedGameRepository;
+            _rankService = rankService;
         }
 
         [AllowAnonymous]
@@ -108,13 +112,25 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<SteamGamesOverviewModel>> GetSteamGamesOverview()
         {
-            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new HasMostGamesUserModel
+            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).ThenInclude(s=>s.UserRanks).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new 
             {
                 Count = s.Count(),
-                Name = s.First().ApplicationUser.UserName,
-                Image = s.First().ApplicationUser.PhotoPath,
-                PersonalSignature = s.First().ApplicationUser.PersonalSignature,
+                s.First().ApplicationUser
             }).OrderByDescending(s => s.Count).Take(10).ToListAsync();
+
+            var usersRe = new List<HasMostGamesUserModel>();
+            foreach (var item in users)
+            {
+                usersRe.Add(new HasMostGamesUserModel
+                {
+                    PersonalSignature = item.ApplicationUser.PersonalSignature,
+                    Count = item.Count,
+                    Id = item.ApplicationUser.Id,
+                    Image = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png"),
+                    Name = item.ApplicationUser.UserName,
+                    Ranks=await _rankService.GetUserRanks(item.ApplicationUser)
+                });
+            }
 
             var userCount = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).CountAsync();
 
@@ -137,7 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new SteamGamesOverviewModel
             {
                 Count = await _storeInfoRepository.GetAll().AsNoTracking().CountAsync(s => s.PlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false),
-                HasMostGamesUsers = users,
+                HasMostGamesUsers = usersRe,
                 PossessionRateHighestGames = highestGames
             };
         }
