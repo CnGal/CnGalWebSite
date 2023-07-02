@@ -13,32 +13,32 @@
     <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
 
         <div class="ps-4 pe-4" style=" display: flex; max-width: 400px; width: 100%; align-items: center;">
-            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" ValueChanged="SearchValueChanged"  OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
+            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SearchString" ValueChanged="SearchValueChanged"  OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
         </div>
         <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.SortType" ValueChanged="SortValueChanged" TValue="JudgableGamesSortType" Class="pt-0" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SortType" ValueChanged="SortValueChanged" TValue="JudgableGamesSortType" Class="pt-0" />
         </div>
         <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" ValueChanged="DisplayValueChanged" TValue="JudgableGamesDisplayType" Class="pt-0" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.DisplayType" ValueChanged="DisplayValueChanged" TValue="JudgableGamesDisplayType" Class="pt-0" />
         </div>
     </div>
 </div>
 
 <div class="row">
-    @foreach (var item in Items.Skip((_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage - 1) * _dataCacheService.ThemeSetting.AnniversariesSetting.MaxCount).Take(_dataCacheService.ThemeSetting.AnniversariesSetting.MaxCount))
+    @foreach (var item in Items.Skip((_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.CurrentPage - 1) * _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.MaxCount).Take(_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.MaxCount))
     {
-        <GameCard Model="item" Class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" Type="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" OnClick="OnClickMore" />
+        <GameCard Model="item"  Type="_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.DisplayType" OnClick="OnClickMore"/>
     }
 </div>
 
-@if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
+@if (_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages > 1)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages" ValueChanged="OnPageClick" />
 }
 
 @if (Items.Any() == false && isReady)
 {
-    <NotFoundJudgableCard GameName="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" />
+    <NotFoundJudgableCard GameName="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SearchString" />
 }
 
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewDialog ShowNav @ref="overviewDialog" />
@@ -74,7 +74,7 @@
                 _dataCacheService.JudgableGamesCatche = await _httpService.GetAsync<List<JudgableGameViewModel>>("api/anniversaries/GetAllJudgableGames");
             }
 
-            var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString;
+            var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SearchString;
             if (string.IsNullOrWhiteSpace(searchString))
             {
                 Items = _dataCacheService.JudgableGamesCatche;
@@ -87,7 +87,7 @@
             }
 
 
-            Items = _dataCacheService.ThemeSetting.AnniversariesSetting.SortType switch
+            Items = _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SortType switch
             {
                 JudgableGamesSortType.LastScoreTime => Items.OrderByDescending(s => s.LastScoreTime).ToList(),
                 JudgableGamesSortType.PublishTime => Items.OrderByDescending(s => s.PublishTime).ToList(),
@@ -98,7 +98,7 @@
                 _ => Items
             };
 
-            _dataCacheService.ThemeSetting.AnniversariesSetting.Count = Items.Count;
+            _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.Count = Items.Count;
         }
         catch (Exception ex)
         {
@@ -109,13 +109,13 @@
 
     public async Task SortValueChanged(JudgableGamesSortType type)
     {
-        _dataCacheService.ThemeSetting.AnniversariesSetting.SortType = type;
+        _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SortType = type;
         _eventService.OnSavaTheme();
         await Refresh();
     }
     public async Task DisplayValueChanged(JudgableGamesDisplayType type)
     {
-        _dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType = type;
+        _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.DisplayType = type;
         _eventService.OnSavaTheme();
         await Refresh();
     }
@@ -123,7 +123,7 @@
 
     public async Task SearchValueChanged(string str)
     {
-        _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString = str;
+        _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.SearchString = str;
         _eventService.OnSavaTheme();
         await Refresh();
     }
@@ -134,6 +134,14 @@
         {
             await Refresh();
         }
+    }
+
+    private void OnPageClick(int pageIndex)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.CurrentPage = pageIndex;
+        _eventService.OnSavaTheme();
+        StateHasChanged();
+
     }
 
     public async Task OnClickMore(JudgableGameViewModel model)
@@ -154,14 +162,6 @@
 
 
         }
-    }
-
-    private void OnPageClick(int pageIndex)
-    {
-        _dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage = pageIndex;
-        _eventService.OnSavaTheme();
-        StateHasChanged();
-        
     }
 
 }

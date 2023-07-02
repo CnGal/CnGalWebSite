@@ -23,7 +23,7 @@
     @if (Model == null)
     {
         <MCol Cols="12" Lg="6" Xl="4">
-            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Shared.ProgressingCard  Class="h-100"/>
+            <CnGalWebSite.IdentityServer.Admin.Shared.Components.Shared.ProgressingCard Class="h-100" />
         </MCol>
     }
     else
@@ -31,7 +31,7 @@
         @foreach (var item in Model)
         {
             <MCol Cols="12" Lg="6" Xl="4">
-                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card"  OnEdited="OnEdited"/>
+                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card" OnEdited="OnEdited" />
             </MCol>
         }
     }
@@ -40,7 +40,7 @@
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
-    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" AllowedScopes="_scopes" />
 </MDialog>
 
 @code {
@@ -53,10 +53,22 @@
     public ErrorHandler ErrorHandler { get; set; }
 
     CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard editCard;
+    List<KeyValuePair<string, string>> _scopes;
 
     protected override async Task OnInitializedAsync()
     {
-        await Refresh();
+        try
+        {
+            _scopes = (await _httpService.GetAsync<IEnumerable<KeyValuePair<string, string>>>("api/identityresources/all")).ToList();
+            _scopes.AddRange(await _httpService.GetAsync<IEnumerable<KeyValuePair<string, string>>>("api/apiscopes/all"));
+
+            await Refresh();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有用户角色失败");
+        }
+
     }
 
     public async Task Refresh()

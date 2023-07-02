@@ -4,9 +4,10 @@
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-file-text-o" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@IconType.Steam.ToIconString()" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
@@ -29,7 +30,7 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (isReady)
     {
-        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" />
+        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary"/>
         @if (GameRecords.Count == 0)
         {
             <div class="mb-3">
@@ -38,7 +39,7 @@
         }
         else
         {
-            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" IsCurrentUser="IsCurrentUser" />
+            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" />
         }
     }
     else
@@ -48,21 +49,22 @@
         </div>
     }
 </div>
-<CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged"/>
+
 @code {
 
     [Parameter]
     public string SteamId { get; set; }
     [Parameter]
     public string UserId { get; set; }
+    [Parameter]
+    public bool IsAnniversary { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
     public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
-    public List<SteamUserInfor> SteamUserInfors = new List<SteamUserInfor>();
+    public List<SteamUserInforModel> SteamUserInfors = new List<SteamUserInforModel>();
 
-    CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
     [Parameter]
     public bool IsCurrentUser { get; set; }
 
@@ -87,13 +89,9 @@
         }
     }
 
-    public void OnEditSteam()
+    public async void OnEditSteam()
     {
-        if(editUserSteamInforTip!=null)
-        {
-            editUserSteamInforTip.Refresh(true);
-        }
-
+        await _eventService.OpenNewPage("https://oauth2.cngal.org/External/Challenge?scheme=Steam");
     }
 
     public async Task OnChanged(string steamId)

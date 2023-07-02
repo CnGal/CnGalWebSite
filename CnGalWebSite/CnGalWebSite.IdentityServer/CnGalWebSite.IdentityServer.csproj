@@ -22,6 +22,7 @@
     <PackageReference Include="AspNet.Security.OAuth.Gitee" Version="7.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.QQ" Version="7.0.0" />
+    <PackageReference Include="AspNet.Security.OpenId.Steam" Version="7.0.0" />
     <PackageReference Include="Cnblogs.IdentityServer4.AspNetIdentity" Version="4.2.1" />
     <PackageReference Include="Cnblogs.IdentityServer4.EntityFramework" Version="4.2.1" />
     <PackageReference Include="Cnblogs.IdentityServer4.EntityFramework.Storage" Version="4.2.1" />

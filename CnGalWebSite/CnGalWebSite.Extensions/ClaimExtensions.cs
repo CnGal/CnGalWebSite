@@ -55,5 +55,10 @@ namespace CnGalWebSite.Extensions
         {
             return claims?.FirstOrDefault(s => s.Type == JwtClaimTypes.Subject || s.Type == ClaimTypes.NameIdentifier)?.Value;
         }
+
+        public static string GetUserSteamId(this IEnumerable<Claim> claims)
+        {
+            return claims?.FirstOrDefault(s => s.Type == "SteamId")?.Value;
+        }
     }
 }

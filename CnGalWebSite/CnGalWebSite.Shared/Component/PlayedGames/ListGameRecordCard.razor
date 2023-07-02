@@ -1,15 +1,44 @@
-﻿
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
 <EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
 <GameRecordViewTip @ref="gameRecordViewTip" IsCurrentUser="IsCurrentUser" OnEdit="OnEdit" OnChanged="OnChanged" />
 
+<style>
+    .m-rating .m-icon {
+        padding: 0.1rem;
+    }
+</style>
+<div class="rounded shadow-sm  bg-opacity mb-4">
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+        <div class="ps-4 pe-4" style=" display: flex; max-width: 400px; width: 100%; align-items: center;">
+            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SearchString" ValueChanged="SearchValueChanged" OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SortType" ValueChanged="SortValueChanged" TValue="PlayedGamesSortType" Class="pt-0" />
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.DisplayType" ValueChanged="DisplayValueChanged" TValue="PlayedGamesDisplayType" Class="pt-0" />
+        </div>
+    </div>
+</div>
+
 <div class="row">
-    @foreach (var item in Model.Where(s => s.IsHidden == false && (s.ShowPublicly || IsCurrentUser)))
+    @foreach (var item in Model.Where(s => s.IsHidden == false && (s.ShowPublicly || IsCurrentUser)).Skip((_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.CurrentPage - 1) * _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.MaxCount).Take(_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.MaxCount))
     {
         <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
             <GameRecordViewCard Model="item" OnShow="OnShow" />
         </div>
     }
 </div>
+
+@if (_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages > 1)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.TotalPages" ValueChanged="OnPageClick" />
+}
 @if (Model.Any(s => s.IsHidden) && IsCurrentUser)
 {
 
@@ -30,20 +59,21 @@
 
 @code {
     [Parameter]
-    public List<GameRecordViewModel> Model { get; set; }
+    public IEnumerable<GameRecordViewModel> Model { get; set; }
 
     [Parameter]
     public bool IsCurrentUser { get; set; }
 
     EditGameRecordTip editGameRecordTip;
     GameRecordViewTip gameRecordViewTip;
+    IEnumerable<GameRecordViewModel> Items { get; set; }
 
     public bool IsCollapsed { get; set; } = true;
 
     public void OnChanged()
     {
         StateHasChanged();
-        
+
     }
 
     public async Task OnShow(GameRecordViewModel model)
@@ -60,5 +90,71 @@
         {
             await editGameRecordTip.Refresh(true, model.GameId, model);
         }
+    }
+
+    public void Refresh()
+    {
+        Items = Model.Where(s => s.IsHidden == false && (s.ShowPublicly || IsCurrentUser));
+
+        var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SearchString;
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+            Items = Items;
+        }
+        else
+        {
+            Items = Items.Where(s => (s.GameName?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.GameName) == false && (searchString?.Contains(s.GameName) ?? false)) ||
+                      (s.GameBriefIntroduction?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.GameBriefIntroduction) == false && (searchString?.Contains(s.GameBriefIntroduction) ?? false)))
+                       .ToList();
+        }
+
+
+        Items = _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SortType switch
+        {
+            PlayedGamesSortType.Score => Items.OrderByDescending(s => s.TotalSocre).ToList(),
+            PlayedGamesSortType.Name => Items.OrderByDescending(s => s.GameName).ToList(),
+            PlayedGamesSortType.Type => Items.OrderByDescending(s => s.Type).ToList(),
+            PlayedGamesSortType.Time => Items.OrderByDescending(s => s.PlayDuration).ToList(),
+            _ => Items
+        };
+
+        _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.Count = Items.Count();
+    }
+
+    public void SortValueChanged(PlayedGamesSortType type)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SortType = type;
+        _eventService.OnSavaTheme();
+        Refresh();
+    }
+    public void DisplayValueChanged(PlayedGamesDisplayType type)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.DisplayType = type;
+        _eventService.OnSavaTheme();
+        Refresh();
+    }
+
+
+    public void SearchValueChanged(string str)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SearchString = str;
+        _eventService.OnSavaTheme();
+        Refresh();
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Refresh();
+        }
+    }
+
+    private void OnPageClick(int pageIndex)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.CurrentPage = pageIndex;
+        _eventService.OnSavaTheme();
+        StateHasChanged();
+
     }
 }

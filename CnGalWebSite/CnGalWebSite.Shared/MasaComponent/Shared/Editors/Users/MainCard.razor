@@ -6,32 +6,31 @@
         <div class="row">
 
             <div class="col-12  col-sm-6">
-                <MTextField @bind-Value="Model.UserName" Label="用户名"  />
+                <MTextField @bind-Value="Model.UserName" Label="用户名" />
             </div>
             <div class="col-12">
-                <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名"  />
+                <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
             </div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Birthday" Lable="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
             <div class="col-12  col-sm-6">
-                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）"  />
-            </div>
-
-            <div class="col-12 col-sm-6">
-                <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言"  />
+                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
             </div>
             <div class="col-12 col-sm-6">
-                <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录"  />
+                <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
+            </div>
+            <div class="col-12 col-sm-6">
+                <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录" />
             </div>
             <div class="col-12">
                 <MCardText Class="p-0">展示的头衔</MCardText>
                 <div style="display:flex;">
                     @foreach (var item in Model.Ranks)
                     {
-                        <MCheckbox @bind-Value="item.IsShow" Label="@item.Name"  Class="me-4 mt-2" />
+                        <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Class="me-4 mt-2" />
 
                     }
                 </div>
-            
+
             </div>
 
         </div>

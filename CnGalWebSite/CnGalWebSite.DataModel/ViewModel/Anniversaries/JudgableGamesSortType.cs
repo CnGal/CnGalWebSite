@@ -31,4 +31,26 @@ namespace CnGalWebSite.DataModel.ViewModel.Anniversaries
         [Display(Name = "条幅")]
         LongCard,
     }
+
+    public enum PlayedGamesSortType
+    {
+        [Display(Name = "游玩状态")]
+        Type,
+        [Display(Name = "游玩时间")]
+        Time,
+        [Display(Name = "我的评分")]
+        Score,
+        [Display(Name = "名称")]
+        Name,
+    }
+
+    public enum PlayedGamesDisplayType
+    {
+        [Display(Name = "大卡片")]
+        LargeCard,
+        [Display(Name = "预览图")]
+        SmallCard,
+        [Display(Name = "条幅")]
+        LongCard,
+    }
 }

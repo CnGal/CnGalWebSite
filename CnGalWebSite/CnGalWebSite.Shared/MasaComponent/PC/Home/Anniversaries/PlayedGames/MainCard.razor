@@ -6,7 +6,7 @@
     <Authorized>
         @if (Model != null)
         {
-            <UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" />
+            <UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary/>
         }
     </Authorized>
     <NotAuthorized>

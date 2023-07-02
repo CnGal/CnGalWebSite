@@ -150,7 +150,7 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 用户Steam信息缓存
         /// </summary>
-        public IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
+        public IPageModelCatche<List<SteamUserInforModel>> UserSteamInforDataCatche { get; set; }
         /// <summary>
         /// 用户文章列表缓存
         /// </summary>
@@ -272,7 +272,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<CommentCacheModel> commentDataCatche,
         IPageModelCatche<PersonalSpaceViewModel> personalSpaceDataCatche,
         IPageModelCatche<List<GameRecordViewModel>> userGameRecordDataCatche,
-        IPageModelCatche<List<SteamUserInfor>> userSteamInforDataCatche,
+        IPageModelCatche<List<SteamUserInforModel>> userSteamInforDataCatche,
         IPageModelCatche<UserArticleListModel> userArticleListDataCatche,
         IPageModelCatche<UserVideoListModel> userVideoListDataCatche,
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> userExaminesDataCatche,
