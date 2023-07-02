@@ -295,10 +295,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
             if (user != null)
             {
                 //是否更新SteamId
-                if (string.IsNullOrEmpty(user.SteamId) || user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
+                if (string.IsNullOrWhiteSpace(user.SteamId) || user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
                 {
-                    user.SteamId = context.User?.Claims?.GetUserSteamId();
-                    await _userRepository.UpdateAsync(user);
+                    var steamId = context.User?.Claims?.GetUserSteamId();
+                    if (string.IsNullOrWhiteSpace(steamId) == false)
+                    {
+                        user.SteamId = context.User?.Claims?.GetUserSteamId();
+                        await _userRepository.UpdateAsync(user);
+                    }
                 }
                 return user;
             }
