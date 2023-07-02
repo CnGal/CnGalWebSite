@@ -7,10 +7,10 @@
 {
     <div class="row">
         <div class="col-12 col-md-6">
-            <HasMostGamesUsersCard Model="OverviewModel.HasMostGamesUsers"/>
+            <HasMostGamesUsersCard Model="OverviewModel.HasMostGamesUsers" />
         </div>
         <div class="col-12 col-md-6">
-            <PossessionRateHighestGamesCard Model="OverviewModel.PossessionRateHighestGames"/>
+            <PossessionRateHighestGamesCard Model="OverviewModel.PossessionRateHighestGames" />
         </div>
     </div>
     <AuthorizeView>
@@ -30,6 +30,12 @@
             </div>
         </NotAuthorized>
     </AuthorizeView>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
 }
 
 
