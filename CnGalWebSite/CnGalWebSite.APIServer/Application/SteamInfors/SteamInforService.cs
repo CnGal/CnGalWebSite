@@ -18,7 +18,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 {
     public class SteamInforService : ISteamInforService
     {
-        private readonly IRepository<SteamInfor, long> _steamInforRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -27,11 +27,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         private readonly HttpClient _httpClient;
         private readonly ILogger<SteamInforService> _logger;
 
-        public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
+        public SteamInforService(IRepository<StoreInfo, long> storeInfoRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
         IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository, ILogger<SteamInforService> logger,
         HttpClient httpClient)
         {
-            _steamInforRepository = steamInforRepository;
+            _storeInfoRepository = storeInfoRepository;
             _userRepository = userRepository;
             _configuration = configuration;
             _playedGameRepository = playedGameRepository;
@@ -79,15 +79,15 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             //查找
             var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
-            var appids = steamGames.games.Select(s => s.appid).Distinct();
-            var steams = await _steamInforRepository.GetAll().AsNoTracking()
+            var appids = steamGames.games.Select(s => s.appid.ToString()).Distinct();
+            var steams = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
-                .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
-                .Where(s => appids.Contains(s.SteamId))
+                .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false && s.PlatformType == PublishPlatformType.Steam)
+                .Where(s => appids.Contains(s.Link))
                 .Select(s => new
                 {
                     s.EntryId,
-                    s.SteamId
+                    SteamId = s.Link
                 })
                 .ToListAsync();
 
@@ -98,7 +98,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 if (steamTemp != null)
                 {
                     item.IsInSteam = true;
-                    item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == steamTemp.SteamId)?.playtime_forever ?? 0;
+                    item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid.ToString() == steamTemp.SteamId)?.playtime_forever ?? 0;
                 }
                 else
                 {
@@ -120,9 +120,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 _ = await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     IsInSteam = true,
-                    PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
+                    PlayDuration = steamGames.games.FirstOrDefault(s => s.appid.ToString() == item.SteamId)?.playtime_forever ?? 0,
                     EntryId = item.EntryId,
-                    Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.UnPlayed,
+                    Type = ((steamGames.games.FirstOrDefault(s => s.appid.ToString() == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.UnPlayed,
                     ApplicationUserId = user.Id,
                     ShowPublicly = true,
                     LastEditTime = now
@@ -132,21 +132,40 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         }
 
 
-        public async Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids)
+        public async Task<List<SteamUserInforModel>> GetSteamUserInfors(List<string> steamids, ApplicationUser user)
         {
-            var model = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
+            var steams = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
 
             foreach (var item in steamids)
             {
                 //不存在则获取
-                if (model.Any(s => s.SteamId == item) == false)
+                if (steams.Any(s => s.SteamId == item) == false)
                 {
                     var temp = await UpdateSteamUserInfor(item);
                     if (temp != null)
                     {
-                        model.Add(temp);
+                        steams.Add(temp);
                     }
                 }
+            }
+
+            var model = new List<SteamUserInforModel>();
+
+            var gameIds = user == null ? new List<int>() : await _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id && s.IsInSteam && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
+
+            foreach (var item in steams)
+            {
+                //计算总价格
+                var price = gameIds.Any() ? await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && s.OriginalPrice != null && s.EntryId != null && gameIds.Contains(s.EntryId.Value)).SumAsync(s => s.OriginalPrice.Value) : 0;
+
+                model.Add(new SteamUserInforModel
+                {
+
+                    SteamId = item.SteamId,
+                    Image = item.Image,
+                    Name = item.Name,
+                    Price = price
+                });
             }
 
             return model;

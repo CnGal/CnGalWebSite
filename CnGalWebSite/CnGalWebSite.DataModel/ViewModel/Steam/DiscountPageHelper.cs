@@ -117,7 +117,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             //筛选价格区间
             if (maxOriginalPrice < MaxOriginalPriceLimit && maxOriginalPrice >= 0)
             {
-                Items = Items.Where(s => s.OriginalPrice <= maxOriginalPrice*100);
+                Items = Items.Where(s => s.OriginalPrice <= maxOriginalPrice);
             }
 
 

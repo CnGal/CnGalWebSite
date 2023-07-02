@@ -13,7 +13,7 @@ else
             @(Id==0? "添加应用" : "编辑应用")  @Model.ClientName
         </MCardTitle>
         <MCardText>
-           Id：@Model.Id
+            Id：@Model.Id
         </MCardText>
         <MCardText>
             <MRow>
@@ -92,13 +92,13 @@ else
 
 
 @code {
-        [Parameter]
-        public int Id { get; set; }
-        [Parameter]
-        public EventCallback<ClientEditModel> OnEdited { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public EventCallback<ClientEditModel> OnEdited { get; set; }
 
-        [Parameter]
-        public IEnumerable<KeyValuePair<string, string>> AllowedScopes  { get; set; }
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
 
     ClientEditModel Model;
 
@@ -113,12 +113,12 @@ else
 
 
     IEnumerable<KeyValuePair<string, string>> _allowedGrantTypes = new List<KeyValuePair<string, string>>
-    {
+{
         new KeyValuePair<string, string>("authorization_code","授权码"),
         new KeyValuePair<string, string>("password","密码")
     };
     IEnumerable<KeyValuePair<string, string>> _allowedScopes = new List<KeyValuePair<string, string>>
-    {
+{
         new KeyValuePair<string, string>("openid","查看OpenID"),
         new KeyValuePair<string, string>("profile","查看用户资料"),
         new KeyValuePair<string, string>("IdentityServerApi","管理开放平台"),

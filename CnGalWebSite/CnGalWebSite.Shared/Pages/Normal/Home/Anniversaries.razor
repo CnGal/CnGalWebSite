@@ -7,45 +7,48 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})"/>
-<div class="rounded  shadow-sm bg-opacity mb-4">
-    <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive>
-        <MTab Value="1">
-            主页<MIcon>mdi-home</MIcon>
-        </MTab>
-        <MTab Value="2">
-            评选<MIcon>mdi-star</MIcon>
-        </MTab>
-        <MTab Value="3">
-            晒出你的游戏库<MIcon>@IconType.Game.ToIconString()</MIcon>
-        </MTab>
-        <MTab Value="4">
-            抽奖<MIcon>mdi-wallet-giftcard</MIcon>
-        </MTab>
-        <MTab Value="5">
-            活动介绍<MIcon>mdi-av-timer</MIcon>
-        </MTab>
-    </MTabs>
+<div class="anniversary-page">
+    <TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})" />
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive>
+            <MTab Value="1">
+                主页<MIcon>mdi-home</MIcon>
+            </MTab>
+            <MTab Value="2">
+                评选<MIcon>mdi-star</MIcon>
+            </MTab>
+            <MTab Value="3">
+                晒出你的游戏库<MIcon>@IconType.Game.ToIconString()</MIcon>
+            </MTab>
+            <MTab Value="4">
+                抽奖<MIcon>mdi-wallet-giftcard</MIcon>
+            </MTab>
+            <MTab Value="5">
+                活动介绍<MIcon>mdi-av-timer</MIcon>
+            </MTab>
+        </MTabs>
+    </div>
+    <MTabsItems @bind-Value="index">
+        <MTabItem Value="1">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.HomeCard />
+        </MTabItem>
+        <MTabItem Value="2">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.IntroductionCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup />
+        </MTabItem>
+        <MTabItem Value="3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard />
+        </MTabItem>
+        <MTabItem Value="4">
+            <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="3" />
+        </MTabItem>
+        <MTabItem Value="5">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard />
+        </MTabItem>
+    </MTabsItems>
+
 </div>
-<MTabsItems @bind-Value="index">
-    <MTabItem Value="1">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.HomeCard />
-    </MTabItem>
-    <MTabItem Value="2">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.IntroductionCard />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup />
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup />
-    </MTabItem>
-    <MTabItem Value="3">
-       <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard/>
-    </MTabItem>
-    <MTabItem Value="4">
-        <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="3" />
-    </MTabItem>
-    <MTabItem Value="5">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard />
-    </MTabItem>
-</MTabsItems>
 
 
 @code {

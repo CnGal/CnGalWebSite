@@ -16,6 +16,7 @@ namespace CnGalWebSite.IdentityServer.Models.DataModels.Account
                     "GitHub" => "mdi mdi-github",
                     "Gitee" => "mdi mdi-alpha-g-circle",
                     "QQ" => "mdi mdi-qqchat",
+                    "Steam" => "mdi mdi-steam",
                     _ => "mdi mdi-link"
                 };
             }

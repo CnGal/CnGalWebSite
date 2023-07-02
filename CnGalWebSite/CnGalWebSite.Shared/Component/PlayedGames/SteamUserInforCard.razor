@@ -1,123 +1,174 @@
-﻿@if (SteamUserInfors.Count == 1&&IsSmallScreen==false)
+﻿@inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
+
+@if (IsAnniversary)
 {
     var item = SteamUserInfors[0];
-    <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
-        <div class="div-shadow rounded bg-opacity h-100 p-2 mb-3" style="display: flex; align-items: center;">
-            <img style=" height: 50px;border-radius:50%; " src="@item.Image" alt="@item.Name" />
-            <div class="ms-3" style=" display: flex; flex-direction: column; justify-content: space-between; ">
-                <div class="">
-                    @item.Name
-                </div>
-                <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
-                        <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
-                    </span>
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
-                        <span>@("总计："+GameRecords.Count)</span>
-
-                    </span>
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
-                        <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
-
-                    </span>
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
-                        <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
-
-                    </span>
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
-                        <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
-
-                    </span>
-                    <span  class="me-4 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
-                        <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
-
-                    </span>
-                    <span  class="d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
-                        <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
-
-                    </span>
-                </div>
-            </div>
+    <div class="div-shadow rounded bg-opacity  p-3 mb-4 user-steam-card">
+        <div class="user-info">
+            <img src="@item.Image" alt="@item.Name" class="image" />
+            <div class="name"> @item.Name</div>
         </div>
-    </a>
-
+            <div class="goal">
+                <div class="value">@(GameRecords.Count)</div>
+                <div class="key">总库存</div>
+            </div>
+            <div class="goal">
+                <div class="value">@((GameRecords.Count*100.0/ Model.Count).ToString("0.0")+" %")</div>
+                <div class="key">@($"收集率（站内总计 {Model.Count}）")</div>
+            </div>
+            <div class="goal">
+                <div class="value">@((GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" h")</div>
+                <div class="key">总时长</div>
+            </div>
+            <div class="goal">
+                <div class="value">@(item.Price.ToString("0")+ " ¥")</div>
+                <div class="key">总价格</div>
+            </div>
+    </div>
 }
 else
 {
-    <div class="row">
-        @foreach (var item in SteamUserInfors)
-        {
-            <div class="col-12 col-md-6 col-xxl-4 h-100">
-                <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
-                    <div class="div-shadow rounded bg-opacity p-2 mb-3" style="display: flex; align-items: center;">
-                        <img style=" height: 50px; border-radius: 50%; " src="@item.Image" alt="@item.Name" />
-                        <div class="ms-3" style=" display: flex; align-items: center; ">
-                            <span class="">
-                                @item.Name
-                            </span>
-                        </div>
+    @if (SteamUserInfors.Count == 1 && IsSmallScreen == false)
+    {
+        var item = SteamUserInfors[0];
+        <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
+            <div class="div-shadow rounded bg-opacity h-100 p-2 mb-3" style="display: flex; align-items: center;">
+                <img style=" height: 50px;border-radius:50%; " src="@item.Image" alt="@item.Name" />
+                <div class="ms-3" style=" display: flex; flex-direction: column; justify-content: space-between; ">
+                    <div class="">
+                        @item.Name
                     </div>
-                </a>
+                    <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
+                            <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
+                        </span>
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                            <span>@("总计："+GameRecords.Count)</span>
+
+                        </span>
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
+                            <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
+                        </span>
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
+                            <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
+
+                        </span>
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
+                            <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
+
+                        </span>
+                        <span class="me-4 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
+                            <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
+
+                        </span>
+                        <span class="d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
+                            <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
+
+                        </span>
+                    </div>
+                </div>
             </div>
+        </a>
+
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in SteamUserInfors)
+            {
+                <div class="col-12 col-md-6 col-xxl-4 h-100">
+                    <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
+                        <div class="div-shadow rounded bg-opacity p-2 mb-3" style="display: flex; align-items: center;">
+                            <img style=" height: 50px; border-radius: 50%; " src="@item.Image" alt="@item.Name" />
+                            <div class="ms-3" style=" display: flex; align-items: center; ">
+                                <span class="">
+                                    @item.Name
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
 
 
-        }
-    </div>
-
-
-    <div class="shadow-sm rounded bg-opacity h-100 p-2 mb-3" style="display:flex;">
-        <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
-                <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
-            </span>
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
-                <span>@("总计："+GameRecords.Count)</span>
-
-            </span>
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
-                <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
-
-            </span>
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
-                <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
-
-            </span>
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
-                <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
-
-            </span>
-            <span class="me-4 d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
-                <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
-
-            </span>
-            <span class="d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
-                <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
-
-            </span>
+            }
         </div>
-    </div>
+
+
+        <div class="shadow-sm rounded bg-opacity h-100 p-2 mb-3" style="display:flex;">
+            <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
+                    <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
+                </span>
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                    <span>@("总计："+GameRecords.Count)</span>
+
+                </span>
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
+                    <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
+
+                </span>
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
+                    <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
+
+                </span>
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
+                    <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
+
+                </span>
+                <span class="me-4 d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
+                    <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
+
+                </span>
+                <span class="d-flex">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
+                    <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
+
+                </span>
+            </div>
+        </div>
+    }
 }
+
 
 @code {
     [Parameter]
     public List<GameRecordViewModel> GameRecords { get; set; }
     [Parameter]
-    public List<SteamUserInfor> SteamUserInfors { get; set; }
+    public List<SteamUserInforModel> SteamUserInfors { get; set; }
     [Parameter]
     public bool IsSmallScreen { get; set; }
+    [Parameter]
+    public bool IsAnniversary { get; set; }
 
+    SteamGamesOverviewModel Model = new SteamGamesOverviewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            Model = await _pageModelCatche.GetCache("api/steam/GetSteamGamesOverview");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
+        }
+    }
 }

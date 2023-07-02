@@ -73,6 +73,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
     public class AnniversariesSetting
     {
+        public JudgableGamesSetting JudgableGamesSetting { get;set; }=new JudgableGamesSetting();
+        public PlayedGameSetting PlayedGameSetting { get; set; } = new PlayedGameSetting();
+    }
+
+    public class JudgableGamesSetting
+    {
         public string SearchString { get; set; }
         public JudgableGamesSortType SortType { get; set; }
         public JudgableGamesDisplayType DisplayType { get; set; }
@@ -82,6 +88,23 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public int MaxCount { get; set; } = 24;
 
         public int Count { get; set; } 
+
+        public int TotalPages => (Count / MaxCount) + 1;
+
+        public int CurrentPage { get; set; } = 1;
+    }
+
+    public class PlayedGameSetting
+    {
+        public string SearchString { get; set; }
+        public PlayedGamesSortType SortType { get; set; }
+        public PlayedGamesDisplayType DisplayType { get; set; }
+
+        public int TabIndex { get; set; } = 1;
+
+        public int MaxCount { get; set; } = 24;
+
+        public int Count { get; set; }
 
         public int TotalPages => (Count / MaxCount) + 1;
 

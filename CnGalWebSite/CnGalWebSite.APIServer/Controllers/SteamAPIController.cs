@@ -26,22 +26,24 @@ namespace CnGalWebSite.APIServer.Controllers
 
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
-        private readonly IRepository<SteamInfor, int> _steamInforRepository;
+        private readonly IRepository<StoreInfo, long> _storeInfoRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IAppHelper _appHelper;
         private readonly IHttpService _httpService;
         private readonly ISteamInforService _steamInforService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public SteamAPIController(IRepository<SteamInfor, int> steamInforRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository,
+        public SteamAPIController(IRepository<StoreInfo, long> storeInfoRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository, IHttpService httpService)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
-            _steamInforRepository = steamInforRepository;
+            _storeInfoRepository = storeInfoRepository;
             _steamInforService = steamInforService;
             _userRepository = userRepository;
             _tagRepository = tagRepository;
             _httpService = httpService;
+            _playedGameRepository = playedGameRepository;
         }
 
         [AllowAnonymous]
@@ -54,7 +56,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<SteamUserInfor>>> GetUserSteamInforAsync(string id)
+        public async Task<ActionResult<List<SteamUserInforModel>>> GetUserSteamInforAsync(string id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -68,12 +70,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
             if (string.IsNullOrWhiteSpace(objectUser.SteamId))
             {
-                return new List<SteamUserInfor>();
+                return new List<SteamUserInforModel>();
             }
 
             var steamids = objectUser.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
 
-            var model = await _steamInforService.GetSteamUserInfors(steamids.ToList());
+            var model = await _steamInforService.GetSteamUserInfors(steamids.ToList(),user);
 
             return model;
 
@@ -102,6 +104,43 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<SteamGamesOverviewModel>> GetSteamGamesOverview()
+        {
+            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new HasMostGamesUserModel
+            {
+                Count = s.Count(),
+                Name = s.First().ApplicationUser.UserName,
+                Image = s.First().ApplicationUser.PhotoPath,
+                PersonalSignature = s.First().ApplicationUser.PersonalSignature,
+            }).OrderByDescending(s => s.Count).Take(10).ToListAsync();
+
+            var userCount = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).CountAsync();
+
+            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.IsInSteam && s.Entry != null && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
+                .GroupBy(s => s.EntryId).Where(s => s.Any()).Select(s => new
+                {
+                    Rate = (double)s.Count() / userCount,
+                    s.First().Entry
+                }).OrderByDescending(s => s.Rate).Take(10).ToListAsync();
+
+            var highestGames = new List<PossessionRateHighestGameModel>();
+            foreach (var item in games)
+            {
+                var entry =new PossessionRateHighestGameModel();
+                entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(item.Entry));
+                entry.Rate = item.Rate;
+                highestGames.Add(entry);
+            }
+
+            return new SteamGamesOverviewModel
+            {
+                Count = await _storeInfoRepository.GetAll().AsNoTracking().CountAsync(s => s.PlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false),
+                HasMostGamesUsers = users,
+                PossessionRateHighestGames = highestGames
+            };
+        }
 
     }
 }

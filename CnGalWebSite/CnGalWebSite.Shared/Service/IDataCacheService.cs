@@ -88,7 +88,7 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<GameRecordViewModel>> UserGameRecordDataCatche { get; set; }
 
-        IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
+        IPageModelCatche<List<SteamUserInforModel>> UserSteamInforDataCatche { get; set; }
 
         IPageModelCatche<UserVideoListModel> UserVideoListDataCatche { get; set; }
 

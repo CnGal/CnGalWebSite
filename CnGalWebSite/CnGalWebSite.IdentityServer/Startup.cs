@@ -31,6 +31,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using System.Linq;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.IdentityServer.Services;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -147,7 +148,8 @@ namespace CnGalWebSite.IdentityServer
                 {
                     options.ConfigureDbContext = b => b.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]), sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
-                .AddAspNetIdentity<ApplicationUser>();
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddProfileService<ImplicitProfileService>();
 
             //设置证书
             if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
@@ -184,6 +186,10 @@ namespace CnGalWebSite.IdentityServer
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     options.ClientId = Configuration["GiteeClientId"];
                     options.ClientSecret = Configuration["GiteeClientSecret"];
+                })
+                .AddSteam(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 });
 
             //API终结点

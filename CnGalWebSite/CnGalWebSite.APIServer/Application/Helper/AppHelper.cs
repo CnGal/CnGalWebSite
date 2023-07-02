@@ -292,8 +292,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 return null;
             }
             var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
-            if(user!=null)
+            if (user != null)
             {
+                //是否更新SteamId
+                if (string.IsNullOrEmpty(user.SteamId) || user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
+                {
+                    user.SteamId = context.User?.Claims?.GetUserSteamId();
+                    await _userRepository.UpdateAsync(user);
+                }
                 return user;
             }
 
