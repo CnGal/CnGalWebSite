@@ -116,7 +116,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 Count = s.Count(),
                 s.First().ApplicationUser
-            }).OrderByDescending(s => s.Count).Take(10).ToListAsync();
+            }).OrderByDescending(s => s.Count).Take(15).ToListAsync();
 
             var usersRe = new List<HasMostGamesUserModel>();
             foreach (var item in users)
@@ -139,7 +139,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Rate = (double)s.Count() / userCount,
                     s.First().Entry
-                }).OrderByDescending(s => s.Rate).Take(10).ToListAsync();
+                }).OrderByDescending(s => s.Rate).Take(15).ToListAsync();
 
             var highestGames = new List<PossessionRateHighestGameModel>();
             foreach (var item in games)

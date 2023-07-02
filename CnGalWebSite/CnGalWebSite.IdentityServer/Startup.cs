@@ -186,11 +186,11 @@ namespace CnGalWebSite.IdentityServer
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     options.ClientId = Configuration["GiteeClientId"];
                     options.ClientSecret = Configuration["GiteeClientSecret"];
-                })
-                .AddSteam(options =>
-                {
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 });
+                //.AddSteam(options =>
+                //{
+                //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                //});
 
             //API终结点
             builder.Services.AddEndpointsApiExplorer();
