@@ -15,5 +15,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         Task<bool> UpdateUserSteam(ApplicationUser user);
 
         Task<List<SteamUserInforModel>> GetSteamUserInfors(List<string> steamids, ApplicationUser user);
+
+        Task BatchUpdateUserSteamInfo(int max);
     }
 }

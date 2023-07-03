@@ -39,13 +39,15 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly ILotteryService _lotteryService;
         private readonly IFileService _fileService;
         private readonly IEntryService _entryService;
+        private readonly ISteamInforService _steamService;
         private readonly IRecommendService _recommendService;
         private readonly ILogger<TimedTaskService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
-        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService,
+        IPerfectionService perfectionService, ISearchHelper searchHelper, ISteamInforService steamService,
+        INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService,
         IRecommendService recommendService)
         {
             _timedTaskRepository = timedTaskRepository;
@@ -60,6 +62,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _fileService = fileService;
             _logger = logger;
             _entryService = entryService;
+            _steamService = steamService;
             _recommendService = recommendService;
         }
 
@@ -163,7 +166,12 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _storeInfoService.BatchUpdate(maxNum);
                         break;
                     case TimedTaskType.UpdateUserSteamInfor:
-                        throw new Exception("不支持此任务");
+                        if (!int.TryParse(item.Parameter, out maxNum))
+                        {
+                            maxNum = 10;
+                        }
+                        await _steamService.BatchUpdateUserSteamInfo(maxNum);
+                        break;
                     case TimedTaskType.BackupEntry:
                         if (!int.TryParse(item.Parameter, out maxNum))
                         {

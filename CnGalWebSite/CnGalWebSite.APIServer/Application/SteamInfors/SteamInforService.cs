@@ -41,6 +41,29 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _logger = logger;
         }
 
+        public async  Task BatchUpdateUserSteamInfo(int max)
+        {
+            var now = DateTime.Now.ToCstTime();
+            var users = await _userRepository.GetAll()
+                .Where(s=>string.IsNullOrWhiteSpace(s.SteamId)==false)
+                .Where(s => now > s.LastUpdateSteamInfoTime.AddDays(7))
+                .OrderBy(s => s.LastUpdateSteamInfoTime)
+                .Take(max).ToListAsync();
+
+            foreach(var item in users)
+            {
+                var re =await UpdateUserSteam(item);
+                if(re)
+                {
+                    _logger.LogInformation("成功更新用户 - {name}({id}) 的Steam信息", item.UserName, item.Id);
+                }
+                else
+                {
+                    _logger.LogError("更新用户 - {name}({id}) 的Steam信息失败", item.UserName, item.Id);
+                }
+            }
+        }
+
         /// <summary>
         /// 更新用户Steam信息
         /// </summary>
@@ -53,6 +76,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             if (string.IsNullOrWhiteSpace(user.SteamId) == false)
             {
                 steamIds = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
+            }
+            //更新Steam缓存
+            foreach(var item in steamIds)
+            {
+             await   UpdateSteamUserInfor(item);
             }
             //获取最新列表
             //获取信息
@@ -128,6 +156,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     LastEditTime = now
                 });
             }
+
+            user.LastUpdateSteamInfoTime = DateTime.Now.ToCstTime();
+            await _userRepository.UpdateAsync(user);
             return !isError;
         }
 
