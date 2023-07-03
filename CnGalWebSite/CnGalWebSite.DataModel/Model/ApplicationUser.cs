@@ -48,6 +48,10 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public string SteamId { get; set; }
         /// <summary>
+        /// 上次更新steam信息时间
+        /// </summary>
+        public DateTime LastUpdateSteamInfoTime { get; set; }
+        /// <summary>
         /// 附加积分
         /// </summary>
         [Obsolete("此项已不计入积分统计，请在积分列表中添加")]
