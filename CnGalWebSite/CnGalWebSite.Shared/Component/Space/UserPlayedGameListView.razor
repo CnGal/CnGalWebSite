@@ -7,7 +7,7 @@
 @inject IEventService _eventService
 
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@IconType.Steam.ToIconString()" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.GameRecord: IconType.Steam).ToIconString())" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
@@ -30,7 +30,7 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (isReady)
     {
-        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" />
+        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel"/>
         @if (GameRecords.Count == 0)
         {
             <div class="mb-3">
@@ -61,6 +61,9 @@
     public bool IsAnniversary { get; set; }
     [Parameter]
     public int TotalCount { get; set; }
+    [Parameter]
+    public PersonalSpaceViewModel UserInfoModel { get; set; }
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
