@@ -113,7 +113,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => (s.PrepositionExamineId == null || s.PrepositionExamineId == -1) && s.IsPassed == true
             &&s.ApplicationUserId!= _configuration["ExamineAdminId"]&& s.ApplicationUserId != _configuration["NewsAdminId"]
-            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain && s.Operation != Operation.RequestUserCertification).OrderByDescending(s => s.Id).Take(12), true);
+            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain && s.Operation != Operation.RequestUserCertification && s.Operation != Operation.EditFavoriteFolderMain).OrderByDescending(s => s.Id).Take(12), true);
         }
 
         [AllowAnonymous]
