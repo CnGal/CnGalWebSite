@@ -7,7 +7,7 @@
 @inject IEventService _eventService
 
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.GameRecord: IconType.Steam).ToIconString())" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
