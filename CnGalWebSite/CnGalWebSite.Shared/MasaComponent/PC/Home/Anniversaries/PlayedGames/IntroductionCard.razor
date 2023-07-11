@@ -10,15 +10,18 @@
 @code {
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
 
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("1303");
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("2796");
         }
-        catch (Exception exc)
+        catch (Exception ex)
         {
-
+            ErrorHandler.ProcessError(ex, "获取获取周年庆分享游戏库介绍失败");
         }
 
     }

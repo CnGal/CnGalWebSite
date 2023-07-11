@@ -4,12 +4,9 @@
     @((MarkupString)Model.MainPage)
 </div>
 
-
-
 @if (isReady)
 {
-        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="1220" Type="CommentType.CommentArticle" />
-
+    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="1220" Type="CommentType.CommentArticle" />
 }
 
 @code {
@@ -19,6 +16,9 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,14 +30,12 @@
             {
                 CanDeleted = true;
             }
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("1220");
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("2795");
             isReady = true;
         }
-        catch (Exception exc)
+        catch (Exception ex)
         {
-            //isNotFound = true;
-            //isReady = true;
-            //StateHasChanged();
+            ErrorHandler.ProcessError(ex, "获取获取周年庆主页失败");
         }
 
     }

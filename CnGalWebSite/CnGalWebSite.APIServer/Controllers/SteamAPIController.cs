@@ -115,7 +115,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<SteamGamesOverviewModel>> GetSteamGamesOverview()
         {
-            if(_overviewModel!=null&&(DateTime.Now.ToCstTime()-_overviewModelUpdateTime).TotalMinutes<10)
+            var now = DateTime.Now.ToCstTime();
+
+            if (_overviewModel!=null&&(now - _overviewModelUpdateTime).TotalMinutes<10)
             {
                 return _overviewModel;
             }
@@ -142,6 +144,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var userCount = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).CountAsync();
 
+            var gameCount = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Releases)
+                .Where(s => s.PubulishTime != null && s.PubulishTime.Value < now && s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam && s.Time != null && s.Time.Value < now) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .CountAsync();
+
             var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.IsInSteam && s.Entry != null && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
                 .GroupBy(s => s.EntryId).Where(s => s.Any()).Select(s => new
                 {
@@ -160,11 +167,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
             _overviewModel= new SteamGamesOverviewModel
             {
-                Count = await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).GroupBy(s=>s.EntryId).CountAsync(),
+                Count = gameCount,
                 HasMostGamesUsers = usersRe,
                 PossessionRateHighestGames = highestGames
             };
-            _overviewModelUpdateTime = DateTime.Now.ToCstTime();
+            _overviewModelUpdateTime = now;
 
             return _overviewModel;
         }
