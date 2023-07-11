@@ -15,7 +15,7 @@
         {
             <span class="d-flex">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
-                <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("cngal")?"":"_blank")">
+                <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("http")?"_blank":"")">
                     @($"{Model.Name} {Model.Count}件")
                 </a>
             </span>
