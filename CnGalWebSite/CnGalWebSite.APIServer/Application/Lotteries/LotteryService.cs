@@ -280,15 +280,6 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
                 var users = lottery.Users.ToList();
 
-                foreach (var temp in lottery.Users)
-                {
-                    var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.ApplicationUserId);
-                    if (_userService.CheckCurrentUserRole( "Admin"))
-                    {
-                        temp.IsHidden = true;
-                    }
-                }
-
                 var result = await DrawLottery(lottery);
 
                 _lotteryRepository.Clear();

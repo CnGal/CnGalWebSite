@@ -97,7 +97,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Name = lottery.Name,
                     Id = lottery.Id,
-                    NotWinningUsers = lottery.Users.Select(s => new LotteryUserDataModel
+                    NotWinningUsers = lottery.Users.Where(s=>s.IsHidden==false).Select(s => new LotteryUserDataModel
                     {
                         Id = s.ApplicationUserId,
                         Name = s.ApplicationUser.UserName,
@@ -121,19 +121,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     });
                     model.NotWinningUsers.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id));
                 }
-
-                //排除管理员
-                var users = new List<LotteryUserDataModel>();
-
-                foreach (var temp in model.NotWinningUsers.Where(s => s.IsHidden == false))
-                {
-                    var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
-                    if (_userService.CheckCurrentUserRole( "Admin")==false)
-                    {
-                        users.Add(temp);
-                    }
-                }
-                model.NotWinningUsers = users;
 
                 return model;
             }
@@ -696,6 +683,11 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> ParticipateInLottery(ParticipateInLotteryModel model)
         {
+            if(_userService.CheckCurrentUserRole("Admin"))
+            {
+                return new Result { Successful = false, Error = "管理员不允许参与抽奖！"};
+            }
+
             var time = DateTime.Now.ToCstTime();
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)

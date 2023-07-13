@@ -1,0 +1,65 @@
+﻿@inject ToastService ToastService
+@inject DialogService DialogService
+@inject IHttpService _httpService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            添加自定义动态
+        </MCardTitle>
+        <MCardText>
+            填写完毕下方内容后点击保存，再到列表中找到创建的动态，点击编辑，在新的窗口中确认无误后发布
+        </MCardText>
+        <MCardText>
+            <MTextarea Rows="5" Label="导入的Json" @bind-Value="ImportString"/>
+
+        </MCardText>
+
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool Dialog { get; set; }
+
+    string ImportString { get; set; }
+
+    public async Task OnSave()
+    {
+        var model = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ManualLotteryModel>>(ImportString);
+
+        foreach(var item in model)
+        {
+            try
+            {
+                var obj = await _httpService.PostAsync<ManualLotteryModel, Result>("api/lotteries/DrawLottery", item);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("抽奖失败", obj.Error);
+                    //_logger.LogError("抽奖失败，{error}", obj.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "抽奖失败");
+                //_logger.LogError(ex, "抽奖失败");
+            }
+        }
+
+    }
+
+    public void Refresh()
+    {
+        Dialog = true;
+        StateHasChanged();
+    }
+}

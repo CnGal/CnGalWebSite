@@ -35,8 +35,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        private SteamGamesOverviewModel _overviewModel;
-        private DateTime _overviewModelUpdateTime;
+        private static SteamGamesOverviewModel _overviewModel;
+        private static DateTime _overviewModelUpdateTime;
 
         public SteamAPIController(IRepository<StoreInfo, long> storeInfoRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService,
