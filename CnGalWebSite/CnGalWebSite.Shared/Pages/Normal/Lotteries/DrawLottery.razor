@@ -8,8 +8,9 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject ILogger<DrawLottery> _logger
 
-<TitleTip Title="抽奖"/>
+<TitleTip Title="抽奖" />
 
 <div>
     @if (isReady)
@@ -110,10 +111,13 @@
 
     public LotteryAwardDataModel NextAward;
 
+    public List<ManualLotteryModel> LotteryResults = new List<ManualLotteryModel>();
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
     bool isReady = false;
+    bool isDrawing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,7 +135,13 @@
 
     public async Task OnDrawLottery()
     {
-        if(CurrentAward==null)
+        if (isDrawing)
+        {
+            return;
+        }
+        isDrawing = true;
+
+        if (CurrentAward == null)
         {
             await ToastService.Error("抽奖失败", "全部奖品已经抽完");
             return;
@@ -162,6 +172,12 @@
             UserId = LastWinningUser.Id
         };
 
+        //导出数据
+        LotteryResults.Add(model);
+        var exportString = Newtonsoft.Json.JsonConvert.SerializeObject(LotteryResults, Newtonsoft.Json.Formatting.Indented);
+        _logger.LogInformation(exportString);
+
+        //获取下一个奖品
         await GetAward();
         var task = Task.Run(async () =>
         {
@@ -172,28 +188,15 @@
                 if (obj.Successful == false)
                 {
                     await ToastService.Error("抽奖失败", obj.Error);
+                    _logger.LogError("抽奖失败，{error}", obj.Error);
                 }
             }
             catch (Exception ex)
             {
-                //var resulte = "";
-                //using (TextWriter text = new StringWriter())
-                //{
-                //    var serializer = new Newtonsoft.Json.JsonSerializer();
-                //    serializer.Serialize(text, model);
-                //    resulte = text.ToString();
-                //}
-
-                //_dataCacheService.DelayedTaskList.Add(new DelayedTask
-                //{
-                //    Context = resulte,
-                //    CreateTime = DateTime.Now.ToCstTime(),
-                //    Type = DelayedTaskType.DrawLottery
-                //});
-
-                //await _localStorage.SetItemAsync("DelayedTasks", _dataCacheService.DelayedTaskList);
+                _logger.LogError(ex, "抽奖失败");
             }
         });
+        isDrawing = false;
     }
 
     public async Task GetAward()
@@ -243,11 +246,13 @@
             if (obj.Successful == false)
             {
                 await ToastService.Error("结束抽奖失败", obj.Error);
+                _logger.LogError("结束抽奖失败，{error}", obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "结束抽奖失败");
+            // ErrorHandler.ProcessError(ex, "结束抽奖失败");
+            _logger.LogError(ex, "结束抽奖失败");
         }
     }
 }

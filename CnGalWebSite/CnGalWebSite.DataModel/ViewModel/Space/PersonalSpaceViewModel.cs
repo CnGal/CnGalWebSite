@@ -13,8 +13,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public DateTime? Birthday { get; set; }
 
-        public string Role { get; set; }
-
         public bool IsCurrentUser { get; set; }
 
         public int ContributionValue { get; set; }

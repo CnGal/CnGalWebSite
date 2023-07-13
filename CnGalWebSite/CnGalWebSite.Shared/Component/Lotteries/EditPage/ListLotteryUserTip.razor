@@ -4,10 +4,11 @@
 <div>
 
     <Table TItem="ListLotteryUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true ExtendButtonColumnWidth="80" 
-            ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+           ShowExtendButtons="true" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true ExtendButtonColumnWidth="80"
+           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Success" Icon="fa fa-fw fa-upload" Text="导出数据" OnClickCallback="OnExport" IsAsync="true" />
+            <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Success" Icon="fa fa-fw fa-download" Text="导入数据" OnClickCallback="OnImport" IsAsync="true" />
             <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
             <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
 
@@ -17,8 +18,8 @@
             <TableColumn @bind-Field="@context.Number" Sortable DefaultSort="true" Fixed="true" Width="60" />
             <TableColumn @bind-Field="@context.Name" Sortable Searchable="true" TextWrap="true" Width="200" />
             <TableColumn @bind-Field="@context.UserId" Sortable Searchable TextWrap="true" Width="400" />
-            <TableColumn @bind-Field="@context.Cookie"  TextWrap="true" Width="400" />
-            <TableColumn @bind-Field="@context.Ip"  TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.Cookie" TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.Ip" TextWrap="true" Width="400" />
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
         </TableColumns>
         <RowButtonTemplate>
@@ -37,7 +38,7 @@
                 导出抽奖数据
             </MCardTitle>
             <MCardText Style=" white-space: break-spaces;">
-                    @exportString
+                @exportString
             </MCardText>
             <MCardActions>
                 <MSpacer></MSpacer>
@@ -50,6 +51,9 @@
         </MCard>
     </MDialog>
 }
+
+<ImportCard @ref="importCard" />
+
 @code {
     [Parameter]
     public long Id { get; set; }
@@ -63,6 +67,8 @@
     public ListLotteryUsersViewModel ListModel { get; set; } = new ListLotteryUsersViewModel { LotteryUsers = new List<ListLotteryUserAloneModel>() };
 
     private ListLotteryUserAloneModel SearchModelArticle { get; set; } = new ListLotteryUserAloneModel();
+
+    ImportCard importCard;
 
     private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
     bool export;
@@ -150,13 +156,12 @@
     {
         try
         {
-
             var data = await _httpService.GetAsync<DrawLotteryDataModel>("api/lotteries/GetLotteryData/" + Id);
             var model = new ExportLotteryDataModel();
             var prizeId = 1;
             foreach (var item in data.Awards)
             {
-                for(var i =0;i<item.TotalCount;i++)
+                for (var i = 0; i < item.TotalCount; i++)
                 {
                     var prize = new ExportLotteryPrizeModel
                     {
@@ -166,7 +171,7 @@
                     };
                     model.prizes.Add(prize);
 
-                    if(item.WinningUsers.Count>i)
+                    if (item.WinningUsers.Count > i)
                     {
                         var ticket = new ExportLotteryTicketModel
                         {
@@ -183,7 +188,7 @@
                     }
                 }
             }
-            foreach(var item in data.NotWinningUsers)
+            foreach (var item in data.NotWinningUsers)
             {
                 model.tickets.Add(new ExportLotteryTicketModel
                 {
@@ -203,5 +208,12 @@
         }
         export = true;
         StateHasChanged();
+    }
+
+    public Task OnImport(IEnumerable<ListLotteryUserAloneModel> items)
+    {
+
+        importCard?.Refresh();
+        return Task.CompletedTask;
     }
 }

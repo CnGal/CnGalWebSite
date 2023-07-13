@@ -85,3 +85,8 @@ div.prizeTips {
         color: rgba(253,138,197,1);
         padding: 0 0.5em;
     }
+
+.slotMachine-box ul
+{
+    padding:0;
+}

@@ -14,6 +14,10 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Birthday" Lable="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
             <div class="col-12  col-sm-6">
                 <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
+
+            </div>
+            <div class="col-12  col-sm-6">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" Color="error" TextStyle />
             </div>
             <div class="col-12 col-sm-6">
                 <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
@@ -46,6 +50,11 @@
     protected override async Task OnInitializedAsync()
     {
 
+
+    }
+    public void OnClickQuestion()
+    {
+        _eventService.OpenNewPage(NavigationManager.BaseUri + "articles/index/5");
 
     }
 }

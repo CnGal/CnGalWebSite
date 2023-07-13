@@ -232,22 +232,6 @@ namespace CnGalWebSite.APIServer.Controllers
             model.EditEntryNum = examines.Count(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage));
             model.CreateArticleNum = _articleRepository.Count(s => s.CreateUserId == user.Id);
 
-            if (_userService.CheckCurrentUserRole( "Admin"))
-            {
-                model.Role = "Admin";
-            }
-            else
-            {
-                if (_userService.CheckCurrentUserRole( "Editor"))
-                {
-                    model.Role = "Editor";
-                }
-                else
-                {
-                    model.Role = "User";
-                }
-            }
-
             return model;
         }
 
