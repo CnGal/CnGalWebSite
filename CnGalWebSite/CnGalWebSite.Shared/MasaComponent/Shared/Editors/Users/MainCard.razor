@@ -13,12 +13,14 @@
                 <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
             </div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Birthday" Lable="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
-            <div class="col-12  col-sm-6">
-                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
 
+            <div class="col-12">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                    点击查看<a @onclick="OnClickQuestion" class="info--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             </div>
             <div class="col-12  col-sm-6">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" Color="error" TextStyle />
+                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
             </div>
             <div class="col-12 col-sm-6">
                 <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
