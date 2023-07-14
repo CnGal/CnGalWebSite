@@ -4,27 +4,23 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
-<style>
-    .lottery-button button {
-        height: 250px;
-        width: 250px;
-        border-radius: 50%;
-        font-size: x-large !important;
-    }
-</style>
-<div class="rounded shadow-sm  bg-opacity mb-4 p-4">
-    <div class="lottery-button" style=" display: flex; flex-direction: column; align-items: center; ">
+
+<div class="rounded shadow-sm  bg-opacity mb-4 pt-4">
+    <div style=" display: flex; flex-direction: column; align-items: center; ">
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2"/>
         @if (isReady)
         {
             @if (StateModel == null)
             {
                 @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
                 {
-                    <Button IsDisabled="true" Color="Color.Dark" Text="未参与" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                        没有参与这个抽奖哦，下次再来吧
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else
                 {
-                    <Button Color="Color.Dark" Text="登入后参与抽奖" OnClick="OnLogin" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后参与抽奖" Icon="@IconType.Login.ToIconString()" OnClick="OnLogin" Class="mt-3 mb-4" />
                 }
             }
             else
@@ -33,98 +29,80 @@
                 {
                     @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
                     {
-                        <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未参与" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                            没有参与这个抽奖哦，下次再来吧
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
                     else
                     {
-                        <Button Color="Color.Dark" Text="参与抽奖" IsAsync="true" OnClick="OnParticipateInLottery" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync Class="mt-4 mb-4"/>
                     }
                 }
                 else if (StateModel.State == UserLotteryState.NoCondition)
                 {
-                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未满足条件" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                        没有满足抽奖条件哦，看看旁边的说明吧
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.NotWin)
                 {
-                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未中奖" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                        没有中奖欸，呜~~~
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
                 else if (StateModel.State == UserLotteryState.WaitingDraw)
                 {
-                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true">
-                        <div style="display: flex; flex-direction: column;">
-                            <span>等待开奖</span>
-                            <span>你的号码：@StateModel.Number</span>
-                        </div>
-                    </Button>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                        给，这是你的号码：<strong> @StateModel.Number</strong>，记得来看结果哦~
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
                 }
                 else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
                 {
                     @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
                     {
-                        <Button Color="Color.Dark" OnClick="OnLookPrize">
-                            <div style="display: flex; flex-direction: column;">
-                                <span>恭喜中奖</span>
-                                <span>查看激活码</span>
-                            </div>
-                        </Button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                            欸欸欸，中奖了欸，来 <a @onclick="OnLookPrize" class="success--text fw-bold">看看激活码吧</a><br />
+                            你的奖品是：<strong> @StateModel.Award.Name</strong>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
                     else if (StateModel.Award.Type == LotteryAwardType.Integral)
                     {
-                        <Button Color="Color.Dark">
-                            <div style="display: flex; flex-direction: column;">
-                                <span>恭喜中奖</span>
-                                <span>已发放积分</span>
-                            </div>
-                        </Button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                            恭喜你中奖了，已经把积分打到你的账户里了哦<br />
+                            你的奖品是：<strong> @StateModel.Award.Name</strong>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
                 }
                 else if (StateModel.State == UserLotteryState.WaitAddress)
                 {
-                    <Button Color="Color.Dark" OnClick="EditUserAddress">
-                        <div style="display: flex; flex-direction: column;">
-                            <span>恭喜中奖</span>
-                            <span>填写收货地址</span>
-                        </div>
-                    </Button>
-
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                        中奖啦，快点 <a @onclick="EditUserAddress" class="success--text fw-bold">填写收货地址</a> 吧<br />
+                        你的奖品是：<strong> @StateModel.Award.Name</strong>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.WaitShipments)
                 {
-                    <Button Color="Color.Dark" OnClick="EditUserAddress">
-                        <div style="display: flex; flex-direction: column;">
-                            <span>恭喜中奖</span>
-                            <span>等待发货</span>
-                        </div>
-                    </Button>
-
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                        看板娘正在努力发货中，还可以 <a @onclick="EditUserAddress" class="success--text fw-bold">修改地址</a> 哦<br />
+                        你的奖品是：<strong> @StateModel.Award.Name</strong>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.Shipped)
                 {
-                    <Button Color="Color.Dark" OnClick="OnLookPrize">
-                        <div style="display: flex; flex-direction: column;">
-                            <span>恭喜中奖</span>
-                            <span>查看单号</span>
-                        </div>
-                    </Button>
-                }
-                @if (StateModel.Award != null)
-                {
-                    <p class="h5 fw-bold mt-3 font-color">
-                        @("已中奖："+StateModel.Award.Name)
-                    </p>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                        发货啦，记得给五星好评哦<br />
+                        你的奖品是：<strong> @StateModel.Award.Name</strong>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
             }
 
         }
-        else
-        {
-            <Button Color="Color.Dark" Icon="fa-spinner fa-spin" />
-        }
-
     </div>
 
 </div>
+
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
