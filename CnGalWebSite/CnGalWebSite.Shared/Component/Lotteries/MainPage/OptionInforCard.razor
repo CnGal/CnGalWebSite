@@ -7,7 +7,7 @@
 
 <div class="rounded shadow-sm  bg-opacity mb-4 pt-4">
     <div style=" display: flex; flex-direction: column; align-items: center; ">
-        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2"/>
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2" />
         @if (isReady)
         {
             @if (StateModel == null)
@@ -33,9 +33,15 @@
                             没有参与这个抽奖哦，下次再来吧
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
+                    else if (ViewModel.BeginTime > DateTime.Now.ToCstTime())
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                            抽奖还没有开始呢，再等一会吧
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                    }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync Class="mt-4 mb-4"/>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync Class="mt-4 mb-4" />
                     }
                 }
                 else if (StateModel.State == UserLotteryState.NoCondition)

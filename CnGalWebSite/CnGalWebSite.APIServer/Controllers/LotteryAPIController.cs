@@ -691,10 +691,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var time = DateTime.Now.ToCstTime();
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)
-                .FirstOrDefaultAsync(s => s.Id == model.Id && s.EndTime > time);
+                .FirstOrDefaultAsync(s => s.Id == model.Id && s.EndTime > time && s.BeginTime < time);
             if (lottery == null)
             {
-                return new Result { Successful = false, Error = "未找到该抽奖或抽奖已结束" };
+                return new Result { Successful = false, Error = "这个时间不能参与抽奖哦~" };
             }
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
