@@ -3,7 +3,7 @@
 @inject IEventService _eventService
 @inject IStructuredDataService _structuredDataService
 @inject IPageModelCatche<List<CarouselViewModel>>  _pageModelCatche
-
+@inject NavigationManager NavigationManager
 
 <section class="carousels-card">
     <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick"></BootstrapBlazor.Components.Carousel>
@@ -48,7 +48,7 @@
         }
     }
 
-   
+
     private async Task OnClick(string imageUrl)
     {
         //查找图片对应的Link
@@ -57,8 +57,15 @@
         {
             return;
         }
+        if(item.Link.Contains("http"))
+        {
+            await _eventService.OpenNewPage(item.Link);
+        }
+        else
+        {
+            NavigationManager.NavigateTo(item.Link);
+        }
 
-        await _eventService.OpenNewPage(item.Link);
         await trackEven?.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, item.Id.ToString(), item.Note);
 
     }
