@@ -33,10 +33,10 @@
         <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
         @if (GameRecords.Count == 0)
         {
-            @if (IsAnniversary)
+            @if (IsAnniversary&& string.IsNullOrWhiteSpace(SteamId)&& IsCurrentUser)
             {
                 <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
                 </div>
             }
             else
