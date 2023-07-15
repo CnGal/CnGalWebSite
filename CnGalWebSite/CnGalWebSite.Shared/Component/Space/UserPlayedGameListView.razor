@@ -30,12 +30,22 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (isReady)
     {
-        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel"/>
+        <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
         @if (GameRecords.Count == 0)
         {
-            <div class="mb-3">
-                <NotFoundTip IsNeedLayput="true" />
-            </div>
+            @if (IsAnniversary&& string.IsNullOrWhiteSpace(SteamId)&& IsCurrentUser)
+            {
+                <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <NotFoundTip IsNeedLayput="true" />
+                </div>
+            }
+
         }
         else
         {
