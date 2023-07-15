@@ -2,6 +2,11 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
+<style>
+    .markdown-body img {
+        max-width: 50%;
+    }
+</style>
 <IntroductionCard />
 @if (OverviewModel != null)
 {
