@@ -60,7 +60,7 @@
                 else if (StateModel.State == UserLotteryState.WaitingDraw)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
-                        给，这是你的号码：<strong> @StateModel.Number</strong>，记得来看结果哦~
+                        给，这是你的号码，记得来看结果哦~
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
@@ -108,6 +108,17 @@
     </div>
 
 </div>
+
+@if (isReady && StateModel != null && StateModel.State == UserLotteryState.WaitingDraw)
+{
+    <div class="rounded shadow-sm  bg-opacity mb-4 p-4">
+        <div style="display: flex;align-items: center;">
+            <div class="swal2-icon m-0 me-1 border-success" style="height: 10em; width: 10em; display: flex; align-items: center; border: .5em solid transparent;">
+                <div class="text-success" style=" font-size: 3rem; ">@StateModel.Number</div>
+            </div>
+        </div>
+    </div>
+}
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
@@ -227,7 +238,7 @@
             Title = "编辑收货地址",
             Model = model,
             Items = items,
-            Size= Size.Large,
+            Size = Size.Large,
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
