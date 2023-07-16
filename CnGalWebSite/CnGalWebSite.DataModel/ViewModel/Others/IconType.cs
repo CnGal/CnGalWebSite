@@ -154,7 +154,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Manual,
         Store,
         Hide,
-        Refresh
+        Refresh,
+        Prize
     }
 
     public static class IconTypeHelper
@@ -163,6 +164,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Prize:
+                    return "mdi-seal-variant";
                 case IconType.Refresh:
                     return "mdi-refresh";
                 case IconType.Hide:
@@ -270,7 +273,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.State:
                     return "mdi-sign-real-estate ";
                 case IconType.Sponsor:
-                    return "mdi-store-outline ";
+                    return "mdi-bullhorn-variant-outline";
                 case IconType.Duration:
                     return "mdi-timer-outline";
                 case IconType.Copyright:

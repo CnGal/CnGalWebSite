@@ -36,6 +36,8 @@
     [Parameter]
     public string ObjectId { get; set; }
     [Parameter]
+    public bool Desc { get; set; }
+    [Parameter]
     public CommentType Type { get; set; }
 
     [CascadingParameter]
@@ -71,6 +73,11 @@
         try
         {
             Model = await _dataCacheService.CommentDataCatche.GetCache((int)Type + "/" + ObjectId);
+            if(Desc)
+            {
+                //逆序
+                Model.Items = Model.Items.OrderByDescending(s => s.CommentTime).ToList();
+            }
             StateHasChanged();
         }
         catch (Exception ex)

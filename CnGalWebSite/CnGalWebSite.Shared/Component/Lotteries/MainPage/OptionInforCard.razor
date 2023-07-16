@@ -14,7 +14,7 @@
             {
                 @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100">
                         没有参与这个抽奖哦，下次再来吧
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
@@ -29,13 +29,13 @@
                 {
                     @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100">
                             没有参与这个抽奖哦，下次再来吧
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
                     else if (ViewModel.BeginTime > DateTime.Now.ToCstTime())
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100">
                             抽奖还没有开始呢，再等一会吧
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
@@ -46,20 +46,20 @@
                 }
                 else if (StateModel.State == UserLotteryState.NoCondition)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100">
                         没有满足抽奖条件哦，看看旁边的说明吧
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.NotWin)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="w-100">
                         没有中奖欸，呜~~~
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
                 else if (StateModel.State == UserLotteryState.WaitingDraw)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="w-100">
                         给，这是你的号码，记得来看结果哦~
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
@@ -68,14 +68,14 @@
                 {
                     @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
                             欸欸欸，中奖了欸，来 <a @onclick="OnLookPrize" class="success--text fw-bold">看看激活码吧</a><br />
                             你的奖品是：<strong> @StateModel.Award.Name</strong>
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                     }
                     else if (StateModel.Award.Type == LotteryAwardType.Integral)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
                             恭喜你中奖了，已经把积分打到你的账户里了哦<br />
                             你的奖品是：<strong> @StateModel.Award.Name</strong>
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
@@ -83,21 +83,21 @@
                 }
                 else if (StateModel.State == UserLotteryState.WaitAddress)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
                         中奖啦，快点 <a @onclick="EditUserAddress" class="success--text fw-bold">填写收货地址</a> 吧<br />
                         你的奖品是：<strong> @StateModel.Award.Name</strong>
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.WaitShipments)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
                         看板娘正在努力发货中，还可以 <a @onclick="EditUserAddress" class="success--text fw-bold">修改地址</a> 哦<br />
                         你的奖品是：<strong> @StateModel.Award.Name</strong>
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
                 else if (StateModel.State == UserLotteryState.Shipped)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
                         发货啦，记得给五星好评哦<br />
                         你的奖品是：<strong> @StateModel.Award.Name</strong>
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>

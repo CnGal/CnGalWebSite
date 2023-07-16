@@ -4,36 +4,52 @@
     <div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
         @if (string.IsNullOrWhiteSpace(Model.Link))
         {
-            <span class="d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
-                <span>
-                    @($"{Model.Name} {Model.Count}件")
-                </span>
-            </span>
+            <div class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Lottery" />
+                <div style="display:inline">
+                    <span class="fw-bold">
+                        @($"{Model.Name}")
+                    </span>
+                    <span>
+                        @($"{Model.Count}件")
+                    </span>
+                </div>
+
+            </div>
         }
         else
         {
-            <span class="d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
-                <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("http")?"_blank":"")">
-                    @($"{Model.Name} {Model.Count}件")
-                </a>
-            </span>
+            <div class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Lottery" />
+                <div style="display:inline">
+                    <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("http")?"_blank":"")" class="fw-bold">
+                        @($"{Model.Name}")
+                    </a>
+                    <span>
+                        @($"{Model.Count}件")
+                    </span>
+                </div>
+
+            </div>
         }
 
         @if (string.IsNullOrWhiteSpace(Model.Sponsor) == false)
         {
-            <span class="d-flex">
+            <div class="d-flex">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Sponsor" />
-                <span>
-                    赞助商：@Model.Sponsor
-                </span>
-            </span>
-
+                <div style="display:inline">
+                    <span>
+                        赞助商：
+                    </span>
+                    <span class="fw-bold">
+                        @Model.Sponsor
+                    </span>
+                </div>
+            </div>
         }
+
     </div>
 </div>
-
 @code {
     [Parameter]
     public LotteryAwardViewModel Model { get; set; }
