@@ -313,9 +313,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 email = null;
             }
-            if(await _userRepository.AnyAsync(s=>s.UserName==name))
+            while(await _userRepository.AnyAsync(s=>s.UserName==name))
             {
-                name = Guid.NewGuid().ToString();
+                name = "用户_"+new Random().Next(0,99999).ToString();
             }
             user = new ApplicationUser
             {

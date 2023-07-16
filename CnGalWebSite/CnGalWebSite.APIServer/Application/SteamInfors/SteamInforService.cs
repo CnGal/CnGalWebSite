@@ -78,9 +78,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steamIds = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
             }
             //更新Steam缓存
-            foreach(var item in steamIds)
+            foreach (var item in steamIds)
             {
-             await   UpdateSteamUserInfor(item);
+                await UpdateSteamUserInfor(item);
             }
             //获取最新列表
             //获取信息
@@ -108,14 +108,13 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             //查找
             var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
             var appids = steamGames.games.Select(s => s.appid.ToString()).Distinct();
-            var steams = await _storeInfoRepository.GetAll().AsNoTracking()
-                .Include(s => s.Entry)
-                .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false && s.PlatformType == PublishPlatformType.Steam)
-                .Where(s => appids.Contains(s.Link))
+            var steams = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Releases)
+                .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link)))
                 .Select(s => new
                 {
-                    s.EntryId,
-                    SteamId = s.Link
+                    EntryId = s.Id,
+                    SteamId = s.Releases.First(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link)).Link
                 })
                 .ToListAsync();
 

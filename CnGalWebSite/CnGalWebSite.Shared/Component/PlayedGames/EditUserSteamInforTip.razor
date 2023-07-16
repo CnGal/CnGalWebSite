@@ -80,7 +80,7 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑用户Steam信息失败", obj.Error);
+                await ToastService.Error("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
             }
             else
             {

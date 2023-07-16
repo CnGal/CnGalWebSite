@@ -81,7 +81,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
             {
                 if (item.Type == LotteryAwardType.ActivationCode && item.Count != item.Prizes.Count)
                 {
-                    return new Result { Error = "激活码的数量需要对应实际数量" };
+                    return new Result { Error = $"{item.Name} 的激活码数量需要对应实际数量" };
                 }
             }
             return new Result { Successful = true };
