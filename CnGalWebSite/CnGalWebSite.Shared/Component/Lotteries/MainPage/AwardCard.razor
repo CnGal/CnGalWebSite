@@ -6,12 +6,12 @@
         {
             <div class="d-flex">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Lottery" />
-                <div style="display:inline">
+                <div style="display: inline; word-break: break-word;">
                     <span class="fw-bold">
                         @($"{Model.Name}")
                     </span>
                     <span>
-                        @($"{Model.Count}件")
+                        @($"x{Model.Count}")
                     </span>
                 </div>
 
@@ -21,12 +21,12 @@
         {
             <div class="d-flex">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Lottery" />
-                <div style="display:inline">
+                <div style="display: inline; word-break: break-word;">
                     <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("http")?"_blank":"")" class="fw-bold">
                         @($"{Model.Name}")
                     </a>
                     <span>
-                        @($"{Model.Count}件")
+                        @($"x{Model.Count}")
                     </span>
                 </div>
 
@@ -37,7 +37,7 @@
         {
             <div class="d-flex">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Sponsor" />
-                <div style="display:inline">
+                <div style="display: inline; word-break: break-word;">
                     <span>
                         赞助商：
                     </span>

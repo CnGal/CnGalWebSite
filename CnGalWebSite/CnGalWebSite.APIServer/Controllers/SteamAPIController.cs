@@ -144,12 +144,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var userCount = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).CountAsync();
 
-            var gameCount = await _entryRepository.GetAll().AsNoTracking()
+            var gameIds = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Releases)
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value < now && s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam && s.Time != null && s.Time.Value < now) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .CountAsync();
+                .Select(s=>s.Id)
+                .ToListAsync();
 
-            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.IsInSteam && s.Entry != null && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
+            var games = await _playedGameRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s => s.IsInSteam && s.Entry != null && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
+                .Where(s => gameIds.Contains(s.EntryId.Value))
                 .GroupBy(s => s.EntryId).Where(s => s.Any()).Select(s => new
                 {
                     Rate = (double)s.Count() / userCount,
@@ -167,7 +171,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             _overviewModel= new SteamGamesOverviewModel
             {
-                Count = gameCount,
+                Count = gameIds.Count,
                 HasMostGamesUsers = usersRe,
                 PossessionRateHighestGames = highestGames
             };

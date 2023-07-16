@@ -42,12 +42,13 @@ else
         <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
     </div>
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-    晒出的你的游戏库吧
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
 
 @if (isReady)
 {
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
+    晒出的你的游戏库吧
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc/>
 }
 
