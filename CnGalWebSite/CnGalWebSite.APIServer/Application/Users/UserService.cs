@@ -427,7 +427,12 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public bool CheckCurrentUserRole(string role)
         {
-            var id = _accessor.HttpContext.User?.Claims?.GetUserId();
+            if(_accessor.HttpContext==null)
+            {
+                //无法获取http上下文即为内部调用 默认拥有全部权限
+                return true;
+            }
+            var id = _accessor.HttpContext?.User?.Claims?.GetUserId();
             if (string.IsNullOrWhiteSpace(id))
             {
                 return false;
