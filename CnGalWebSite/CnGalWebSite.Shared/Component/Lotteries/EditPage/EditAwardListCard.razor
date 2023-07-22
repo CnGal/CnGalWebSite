@@ -11,7 +11,7 @@
 
     </div>
 
-    @foreach (var item in Awards)
+    @foreach (var item in Awards.OrderByDescending(s=>s.Priority))
     {
         <div class="mb-3">
             <div class="card p-3 w-100" style="background-color:transparent">
