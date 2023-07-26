@@ -716,7 +716,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> DrawLotteryAsync(ManualLotteryModel model)
         {
             var time = DateTime.Now.ToCstTime();
-            if (await _lotteryRepository.GetAll().AnyAsync(s => s.Id == model.LotteryId && s.EndTime < time) == false)
+            if (await _lotteryRepository.GetAll().AnyAsync(s => s.Id == model.LotteryId /*&& s.EndTime < time*/) == false)
             {
                 return new Result { Successful = false, Error = "未找到该抽奖或抽奖未结束" };
             }

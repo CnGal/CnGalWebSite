@@ -4,7 +4,7 @@
 
 
 <div style="display: flex; justify-content: center;">
-    @if (Model.Type == LotteryType.Manual && Model.IsEnd == false&& Model.EndTime < DateTime.Now.ToCstTime())
+    @if (Model.Type == LotteryType.Manual && Model.IsEnd == false)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-wallet-giftcard " Tooltip="抽奖" OnClick="OnDraw" Color="info" Class="me-3"/>
     }
