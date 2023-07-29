@@ -577,7 +577,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         break;
                     }
                 }
-                if (isAdd == false && item.IsDelete == false)
+                if (isAdd == false && item.IsDelete == false && entry.Pictures.Any(s => s.Url == item.Url) == false)
                 {
                     pictures.Add(new EntryPicture
                     {

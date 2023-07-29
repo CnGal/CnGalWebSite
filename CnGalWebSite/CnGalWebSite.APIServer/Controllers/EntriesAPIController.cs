@@ -184,6 +184,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //建立视图模型
+            _entryRepository.Clear();
             var model = await _entryService.GetEntryIndexViewModelAsync(entry, renderMarkdown);
 
             if (user != null)
