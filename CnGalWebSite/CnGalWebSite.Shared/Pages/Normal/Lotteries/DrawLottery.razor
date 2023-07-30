@@ -17,7 +17,7 @@
     {
         <CnGalWebSite.Shared.Component.Lotteries.DrawPage.LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnDrawLottery" />
 
-        <div class=" p-4" style=" display: flex; flex-direction: column; align-items: center; font-size: large;">
+        <div class=" p-4" style=" display: flex; flex-direction: column; align-items: center; font-size: x-large;">
 
             @if (CurrentAward == null)
             {
@@ -70,6 +70,12 @@
                 }
 
             }
+
+            @if(CurrentAward!=null)
+                {
+
+                <img src="@CurrentAward.Image" alt="@CurrentAward.Name" style="max-width:200px;width:100%;margin-top:30px;"/>
+                }
 
 
         </div>
