@@ -7,7 +7,7 @@
     <section class="latast-comments-card">
         <h2>近期留言</h2>
         <div class="group">
-            @foreach (var item in _items.Take(3))
+            @foreach (var item in _items.Take(6))
             {
                 <a class="item" href="@item.Url">
                     <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
