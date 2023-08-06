@@ -3956,7 +3956,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         // Rank = "系统",
                         Text = "在你的空间下留言『\n" + examine.Text + "\n』",
                         Link = "space/index/" + comment.UserSpaceCommentManager.ApplicationUserId,
-                        LinkTitle = comment.ApplicationUser.UserName,
+                        LinkTitle = comment.UserSpaceCommentManager.ApplicationUser.UserName,
                         Type = MessageType.SpaceReply,
                         ApplicationUserId = comment.UserSpaceCommentManager.ApplicationUserId,
                         AdditionalInfor = comment.Id.ToString()
