@@ -321,7 +321,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 Id = id,
                 UserName = name,
+                NormalizedUserName = name.ToUpper(),
                 Email = email,
+                NormalizedEmail = email.ToUpper(),
                 RegistTime = DateTime.Now.ToCstTime(),
                 LastOnlineTime = DateTime.Now.ToCstTime()
             };
