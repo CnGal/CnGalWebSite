@@ -20,8 +20,10 @@ namespace CnGalWebSite.APIServer.Application.GPT
     {
         private readonly IHttpService _httpService;
         private readonly IConfiguration _configuration;
-        private readonly List<DateTime> _record = new List<DateTime>();
+       
         private readonly ILogger<ChatGPTService> _logger;
+
+ private static List<DateTime> _record = new List<DateTime>();
 
         private readonly JsonSerializerOptions _jsonOptions = new()
         {

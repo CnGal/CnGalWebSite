@@ -1,0 +1,115 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<PageTitle>CnGal资料站 - 开放平台</PageTitle>
+<MApp>
+    <MMain Class="main-content">
+        <div Class="overflow-hidden">
+            <MAppBar Absolute Color="primary" Class="app-bar"
+                     Dark
+                     ShrinkOnScroll
+                     Prominent
+                     Src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/game_head.png"
+                     FadeImgOnScroll
+                     ScrollTarget="#main-sheet">
+                <ImgContent>
+                    <MImage Gradient="to top right, rgb(240 98 146 / 50%), rgb(240 98 146 / 50%)" @attributes="@context"></MImage>
+                </ImgContent>
+
+                <ChildContent>
+                    <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
+                    <MAppBarTitle>CnGal资料站 - 开放平台</MAppBarTitle>
+                    <MSpacer></MSpacer>
+                </ChildContent>
+                <ExtensionContent>
+                    <MTabs AlignWithTitle>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">个人信息</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">应用列表</MTab>
+
+                        <AuthorizeView Roles="Admin">
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">用户列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">角色列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">客户端列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">API范围列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">身份资源列表</MTab>
+                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">操作记录列表</MTab>
+                        </AuthorizeView>
+
+                    </MTabs>
+                </ExtensionContent>
+            </MAppBar>
+            <MSheet Class="overflow-y-auto" Id="main-sheet">
+                <MContainer Style=" margin-top: 250px;">
+                    <ErrorHandler IsSSR="true">
+                        @Body
+                    </ErrorHandler>
+                </MContainer>
+            </MSheet>
+        </div>
+    </MMain>
+    <MNavigationDrawer @bind-Value="_drawer" Absolute Temporary>
+        <div class="nav-drawer">
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/"))">
+                <MIcon Left>mdi-home</MIcon>
+                主页
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">
+                <MIcon Left>mdi-account</MIcon>
+                个人信息
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">
+                <MIcon Left>mdi-application-outline</MIcon>
+                应用列表
+            </MButton>
+            <AuthorizeView Roles="Admin">
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">
+                    <MIcon Left>mdi-account-group</MIcon>
+                    用户列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">
+                    <MIcon Left>mdi-account-lock</MIcon>
+                    角色列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">
+                    <MIcon Left>mdi-application</MIcon>
+                    客户端列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">
+                    <MIcon Left>mdi-bell-outline</MIcon>
+                    审核列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">
+                    <MIcon Left>mdi-lock</MIcon>
+                    API范围列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">
+                    <MIcon Left>mdi-forest</MIcon>
+                    身份资源列表
+                </MButton>
+                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">
+                    <MIcon Left>mdi-record</MIcon>
+                    操作记录列表
+                </MButton>
+            </AuthorizeView>
+
+        </div>
+    </MNavigationDrawer>
+    <MFooter App Absolute>
+        &copy; 2023 - CnGal资料站
+    </MFooter>
+</MApp>
+
+
+
+@code {
+    private bool _drawer = false;
+    private StringNumber _value = default;
+
+    void ValueChanged(StringNumber value)
+    {
+        _value = value;
+        _drawer = false;
+    }
+}

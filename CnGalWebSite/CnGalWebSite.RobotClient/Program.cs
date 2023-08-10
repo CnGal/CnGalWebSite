@@ -39,7 +39,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
             BaseAddress = new Uri(builder.Configuration["WebApiPath"])
         });
         services.AddSingleton<IHttpService, HttpService>();
-
+        //自动依赖注入
         services.RegisterAssemblyPublicNonGenericClasses()
           .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
           .AsPublicImplementedInterfaces(ServiceLifetime.Singleton);
