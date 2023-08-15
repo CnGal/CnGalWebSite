@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /CnGalWebSite/CnGalWebSite.APIServer/App_Data/WeChat_OfficialAccount
 /CnGalWebSite/CnGalWebSite.IdentityServer/tempkey.jwk
 /CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/Data
+/CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/SensitiveWords
