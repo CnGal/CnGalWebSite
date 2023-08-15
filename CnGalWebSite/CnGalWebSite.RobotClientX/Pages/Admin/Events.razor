@@ -1,0 +1,136 @@
+﻿@page "/admin/events"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotEvent> _robotEventRepository
+
+<DataTableCard TModel="RobotEvent" Headers="_headers" DataSource="_robotEventRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == nameof(RobotEvent.Time))
+        {
+            @context.Item.Time.ToString("HH:mm:ss")
+        }
+        else if (context.Header.Value == nameof(RobotEvent.IsHidden))
+        {
+            <CnGalWebSite.RobotClientX.Components.Replies.EnableChip Enabled="!context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(RobotEvent.Type))
+        {
+            <CnGalWebSite.RobotClientX.Components.Events.TypeChip Type="context.Item.Type" />
+        }
+        else if (context.Header.Value == nameof(RobotEvent.Text))
+        {
+            <div class=" text-truncate-2">
+                @context.Item.Text
+            </div>
+        }
+        else if (context.Header.Value == nameof(RobotEvent.Probability))
+        {
+            @if (context.Item.Type == RobotEventType.PreTime)
+            {
+                @context.Item.Probability.ToString("0.0")
+            }
+            else
+            {
+                @("无")
+            }
+
+        }
+        else if (context.Header.Value == nameof(RobotEvent.DelaySecond))
+        {
+            @if (context.Item.Type == RobotEventType.PreTime)
+            {
+                @context.Item.DelaySecond
+            }
+            else
+            {
+                @("无")
+            }
+
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.RobotClientX.Components.Events.EditCard Id="_editedItemId" AllowedScopes="_scopes" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _name = "事件";
+
+    CnGalWebSite.RobotClientX.Components.Events.EditCard editCard;
+
+    private List<DataTableHeader<RobotEvent>> _headers = new List<DataTableHeader<RobotEvent>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RobotEvent.Id)
+          },
+            new (){ Text= "备注", Value= nameof(RobotEvent.Note)},
+            new (){ Text= "消息", Value= nameof(RobotEvent.Text)},
+            new (){ Text= "触发方式", Value= nameof(RobotEvent.Type)},
+            new (){ Text= "开始触发时间", Value= nameof(RobotEvent.Time)},
+            new (){ Text= "有效时长（秒）", Value= nameof(RobotEvent.DelaySecond)},
+            new (){ Text= "概率", Value= nameof(RobotEvent.Probability)},
+            new (){ Text= "状态", Value= nameof(RobotEvent.IsHidden)},
+            new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    List<KeyValuePair<string, string>> _scopes;
+
+    DataTableCard<RobotEvent> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public void EditItem(RobotEvent item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+    public void OnEdited(RobotEvent model)
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+}

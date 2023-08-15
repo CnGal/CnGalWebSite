@@ -16,29 +16,28 @@ namespace CnGalWebSite.RobotClientX.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            await new TaskFactory().StartNew(async () =>
             {
-                await new TaskFactory().StartNew(() =>
-                {using var scope = Services.CreateScope();
-                        var provider = scope.ServiceProvider;
-                        var _logger = provider.GetRequiredService<ILogger<BackgroundTaskService>>();
-                    try
-                    {
-                        _logger.LogInformation("启动后台任务");
+                using var scope = Services.CreateScope();
+                var provider = scope.ServiceProvider;
+                var _logger = provider.GetRequiredService<ILogger<BackgroundTaskService>>();
+                try
+                {
+                    _logger.LogInformation("启动后台任务");
 
-                        var _QQClientService = provider.GetRequiredService<IQQClientService>();
-                        _QQClientService.Init().Wait();
-                        while (true) ;
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.LogError(ex, "后台任务异常");
-                        //关闭
-                        _applicationLifetime.StopApplication();
-                        //错误处理
-                    }
-                }, stoppingToken);
-            }
+                    var _QQClientService = provider.GetRequiredService<IQQClientService>();
+                    await _QQClientService.Init();
+                    while (true)
+                        await Task.Delay(100);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "后台任务异常");
+                    //关闭
+                    _applicationLifetime.StopApplication();
+                    //错误处理
+                }
+            }, stoppingToken);
         }
     }
 }

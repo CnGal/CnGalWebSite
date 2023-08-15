@@ -30,7 +30,7 @@ namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
 
         public void Load()
         {
-            var path =Path.Combine("Data", _webHostEnvironment.WebRootPath);
+            var path =Path.Combine( _webHostEnvironment.WebRootPath,"SensitiveWords");
             try
             {
                

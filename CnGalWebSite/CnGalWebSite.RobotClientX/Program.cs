@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using CnGalWebSite.RobotClientX.Services;
 using NetCore.AutoRegisterDi;
 using CnGalWebSite.RobotClientX.DataRepositories;
+using CnGalWebSite.Core.Services.Query;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +19,7 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 //设置主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
 {
-    s.Themes.Light.Primary = "#f06292";
-    s.Themes.Dark.Primary = "#2196F3";
+    s.Themes.Light.Primary =builder.Configuration["WebSiteTheme"];
 }));
 //添加状态检查
 builder.Services.AddHealthChecks();
@@ -37,6 +37,9 @@ builder.Services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.RegisterAssemblyPublicNonGenericClasses()
   .Where(c => (c.Name.EndsWith("Service") || c.Name.EndsWith("Provider")) && c.Name.StartsWith("Background")==false)
   .AsPublicImplementedInterfaces(ServiceLifetime.Singleton);
+//添加Query
+builder.Services.AddScoped<IQueryService, QueryService>();
+
 var app = builder.Build();
 
 

@@ -1,0 +1,95 @@
+﻿@page "/admin/faces"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotFace> _robotFaceRepository
+
+<DataTableCard TModel="RobotFace" Headers="_headers" DataSource="_robotFaceRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == nameof(RobotEvent.IsHidden))
+        {
+            <CnGalWebSite.RobotClientX.Components.Replies.EnableChip Enabled="!context.Item.IsHidden" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.RobotClientX.Components.Faces.EditCard Id="_editedItemId" AllowedScopes="_scopes" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _name = "表情";
+
+    CnGalWebSite.RobotClientX.Components.Faces.EditCard editCard;
+
+    private List<DataTableHeader<RobotFace>> _headers = new List<DataTableHeader<RobotFace>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RobotFace.Id)
+          },
+            new (){ Text= "备注", Value= nameof(RobotFace.Note)},
+            new (){ Text= "匹配关键字", Value= nameof(RobotFace.Key)},
+            new (){ Text= "消息", Value= nameof(RobotFace.Value)},
+            new (){ Text= "状态", Value= nameof(RobotFace.IsHidden)},
+            new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    List<KeyValuePair<string, string>> _scopes;
+
+    DataTableCard<RobotFace> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public void EditItem(RobotFace item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+    public void OnEdited(RobotFace model)
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+}

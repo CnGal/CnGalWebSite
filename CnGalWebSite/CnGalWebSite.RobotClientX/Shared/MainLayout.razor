@@ -1,7 +1,10 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject IConfiguration _configuration
 
-<PageTitle>CnGal资料站 - 开放平台</PageTitle>
+<PageTitle>
+    @_configuration["WebSiteName"]
+</PageTitle>
 <MApp>
     <MMain Class="main-content">
         <div Class="overflow-hidden">
@@ -9,7 +12,7 @@
                      Dark
                      ShrinkOnScroll
                      Prominent
-                     Src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/game_head.png"
+                     Src="@_configuration["WebSiteImage"]"
                      FadeImgOnScroll
                      ScrollTarget="#main-sheet">
                 <ImgContent>
@@ -18,34 +21,27 @@
 
                 <ChildContent>
                     <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
-                    <MAppBarTitle>CnGal资料站 - 开放平台</MAppBarTitle>
+                    <MAppBarTitle>
+                        @_configuration["WebSiteName"]
+                    </MAppBarTitle>
                     <MSpacer></MSpacer>
                 </ChildContent>
                 <ExtensionContent>
                     <MTabs AlignWithTitle>
                         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
-                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">个人信息</MTab>
-                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">应用列表</MTab>
-
-                        <AuthorizeView Roles="Admin">
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">用户列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">角色列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">客户端列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">API范围列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">身份资源列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">操作记录列表</MTab>
-                        </AuthorizeView>
-
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/replies"))">自动回复</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/events"))">事件</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/faces"))">表情</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/groups"))">QQ群</MTab>
                     </MTabs>
                 </ExtensionContent>
             </MAppBar>
             <MSheet Class="overflow-y-auto" Id="main-sheet">
-                <MContainer Style=" margin-top: 250px;">
+                <div class="app-container">
                     <ErrorHandler IsSSR="true">
                         @Body
                     </ErrorHandler>
-                </MContainer>
+                </div>
             </MSheet>
         </div>
     </MMain>
@@ -55,45 +51,22 @@
                 <MIcon Left>mdi-home</MIcon>
                 主页
             </MButton>
-            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">
-                <MIcon Left>mdi-account</MIcon>
-                个人信息
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/replies"))">
+                <MIcon Left>mdi-message-reply-text</MIcon>
+                自动回复
             </MButton>
-            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">
-                <MIcon Left>mdi-application-outline</MIcon>
-                应用列表
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/events"))">
+                <MIcon Left>mdi-calendar</MIcon>
+                事件
             </MButton>
-            <AuthorizeView Roles="Admin">
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">
-                    <MIcon Left>mdi-account-group</MIcon>
-                    用户列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">
-                    <MIcon Left>mdi-account-lock</MIcon>
-                    角色列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">
-                    <MIcon Left>mdi-application</MIcon>
-                    客户端列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">
-                    <MIcon Left>mdi-bell-outline</MIcon>
-                    审核列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">
-                    <MIcon Left>mdi-lock</MIcon>
-                    API范围列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">
-                    <MIcon Left>mdi-forest</MIcon>
-                    身份资源列表
-                </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">
-                    <MIcon Left>mdi-record</MIcon>
-                    操作记录列表
-                </MButton>
-            </AuthorizeView>
-
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/faces"))">
+                <MIcon Left>mdi-emoticon-excited-outline</MIcon>
+                表情
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/groups"))">
+                <MIcon Left>mdi-qqchat</MIcon>
+                QQ群
+            </MButton>
         </div>
     </MNavigationDrawer>
     <MFooter App Absolute>

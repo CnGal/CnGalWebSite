@@ -17,6 +17,7 @@ using CnGalWebSite.Core.Services;
 using CnGalWebSite.RobotClientX.Models.Robots;
 using CnGalWebSite.RobotClientX.DataModels;
 using Result = CnGalWebSite.RobotClientX.Models.Messages.Result;
+using CnGalWebSite.RobotClientX.Services.GPT;
 
 namespace CnGalWebSite.RobotClientX.Services.Messages
 {
@@ -29,8 +30,9 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         private readonly ILogger<MessageService> _logger;
         private readonly IExternalDataService _externalDataService;
         private readonly IHttpService _httpService;
+        private readonly IChatGPTService _chatGPTService;
 
-        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService,
+        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService, IChatGPTService chatGPTService,
         ILogger<MessageService> logger,
         IConfiguration configuration,
             ISensitiveWordService sensitiveWordService)
@@ -42,6 +44,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             _robotFaceRepository = robotFaceRepository;
             _externalDataService = externalDataService;
             _httpService = httpService;
+            _chatGPTService = chatGPTService;
         }
 
         /// <summary>
@@ -378,6 +381,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                     "sender" => name,
                     "n" => "\n",
                     "r" => "\r",
+                    "chatgpt"=>await _chatGPTService.GetReply(message),
                     "facelist" => "该功能暂未实装",
                     _ => await GetArgValue(argument, message, qq)
                 };
