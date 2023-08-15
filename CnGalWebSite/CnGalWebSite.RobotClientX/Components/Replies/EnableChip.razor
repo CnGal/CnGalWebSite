@@ -1,0 +1,8 @@
+﻿<MChip Small Color="@(Enabled?"success":"error")" Outlined Class=" ma-1">
+    <MIcon Left Small>@(Enabled? "mdi-check-bold" : "mdi-alert-circle")</MIcon>
+    @(Enabled?"启用":"未启用")
+</MChip>
+@code {
+    [Parameter]
+    public bool Enabled { get; set; }
+}

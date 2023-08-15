@@ -1,0 +1,106 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotGroup> _robotGroupRepository
+
+@if (Model == null)
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard />
+}
+else
+{
+    <MCard>
+        <MCardTitle>
+            @(Id==0? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.GroupId" Label="群号" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Note" Label="备注" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.ForceMatch" Label="严格匹配" TValue="bool" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.IsHidden" Label="是否隐藏" TValue="bool" HideDetails="true" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+
+    </MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback<RobotGroup> OnEdited { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
+
+    RobotGroup Model;
+
+    private string _name = "QQ群";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new RobotGroup() : _robotGroupRepository.GetAll().FirstOrDefault(s => s.Id == Id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            _robotGroupRepository.GetAll().RemoveAll(s => s.Id == Model.Id);
+            if (Model.Id == 0)
+            {
+                Model.Id = _robotGroupRepository.GetAll().Max(s => s.Id) + 1;
+            }
+            _robotGroupRepository.Insert(Model);
+            await OnEdited.InvokeAsync(Model);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+}

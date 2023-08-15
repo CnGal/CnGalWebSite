@@ -1,0 +1,124 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotEvent> _robotEventRepository
+
+@if (Model == null)
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard />
+}
+else
+{
+    <MCard>
+        <MCardTitle>
+            @(Id==0? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Text" Label="消息" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Note" Label="备注" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" Label="类型" TValue="RobotEventType" />
+                </MCol>
+
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.Time" ShowDate="false" Label="开始触发时间" />
+                </MCol>
+
+                @if (Model.Type == RobotEventType.PreTime)
+                {
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.DelaySecond" Label="有效时间" HideDetails="true" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.Probability" Label="概率" HideDetails="true" />
+                    </MCol>
+                }
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.IsHidden" Label="是否隐藏" TValue="bool" HideDetails="true" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+
+    </MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback<RobotEvent> OnEdited { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
+
+    RobotEvent Model;
+
+    private string _name = "事件";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new RobotEvent() : _robotEventRepository.GetAll().FirstOrDefault(s => s.Id == Id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            _robotEventRepository.GetAll().RemoveAll(s => s.Id == Model.Id);
+            if (Model.Id == 0)
+            {
+                Model.Id = _robotEventRepository.GetAll().Max(s => s.Id) + 1;
+            }
+            if(Model.Type== RobotEventType.FixedTime)
+            {
+                Model.DelaySecond = 300;
+            }
+            _robotEventRepository.Insert(Model);
+            await OnEdited.InvokeAsync(Model);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+}

@@ -1,7 +1,8 @@
 ﻿@typeparam TModel where TModel : class, new()
 
 @inject IHttpService _httpService
-    @using OneOf;
+@inject IQueryService _queryService
+@using OneOf;
 
 <MDataTable Headers="Headers"
             Items="_items"
@@ -42,65 +43,75 @@
     </ItemColContent>
 </MDataTable>
 
-    @code {
-        [Parameter]
-        public List<DataTableHeader<TModel>> Headers { get; set; }
-        [Parameter]
-        public string ApiUrl { get; set; }
-        [Parameter]
-        public string Title { get; set; }
-        [Parameter]
-        public bool ShowAddButton { get; set; } = true;
-        [Parameter]
-        public string Class { get; set; } = "elevation-1";
-        [Parameter]
-        public RenderFragment<ItemColProps<TModel>> ItemColContent { get; set; }
-        [Parameter]
-        public EventCallback OnClickAdd { get; set; }
+@code {
+    [Parameter]
+    public List<DataTableHeader<TModel>> Headers { get; set; }
+    [Parameter]
+    public string ApiUrl { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public bool ShowAddButton { get; set; } = true;
+    [Parameter]
+    public string Class { get; set; } = "elevation-1";
+    [Parameter]
+    public RenderFragment<ItemColProps<TModel>> ItemColContent { get; set; }
+    [Parameter]
+    public EventCallback OnClickAdd { get; set; }
+    [Parameter]
+    public Expression<Func<TModel, bool>> Predicate { get; set; }
+    [Parameter]
+    public List<TModel> DataSource { get; set; }
 
-        private int _totalDesserts = 0;
-        private IEnumerable<TModel> _items = new List<TModel>();
-        private bool _loading = true;
-        private string _search;
-        private QueryResultModel<TModel> Data = new QueryResultModel<TModel>();
+    private int _totalDesserts = 0;
+    private IEnumerable<TModel> _items = new List<TModel>();
+    private bool _loading = true;
+    public string _search;
+    private QueryResultModel<TModel> Data = new QueryResultModel<TModel>();
 
-        [CascadingParameter]
-        public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
-        public void HandleOnOptionsUpdate(DataOptions options)
+    public void HandleOnOptionsUpdate(DataOptions options)
+    {
+        CopyOptions(Data.Parameter, options);
+        GetDataFromApi();
+    }
+
+    protected override void OnInitialized()
+    {
+        //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
+        GetDataFromApi();
+    }
+
+    public void GetDataFromApi()
+    {
+        _loading = true;
+        GetDataAsync().ContinueWith(task =>
         {
-            CopyOptions(Data.Parameter, options);
-            GetDataFromApi();
-        }
+            var data = task.Result;
+            _items = data.items;
+            _totalDesserts = data.total;
+            _loading = false;
 
-        protected override void OnInitialized()
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void OnSearch(string text)
+    {
+        _search= Data.Parameter.SearchText = text;
+        StateHasChanged();
+        GetDataFromApi();
+    }
+
+    public async Task<(IEnumerable<TModel> items, int total)> GetDataAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ApiUrl))
         {
-            //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
-            GetDataFromApi();
+            return await _queryService.QueryAsync<TModel, string>(DataSource.AsQueryable(), Data.Parameter,Predicate==null?s=>true:Predicate);
         }
-
-        public void GetDataFromApi()
-        {
-            _loading = true;
-            GetDataAsync().ContinueWith(task =>
-            {
-                var data = task.Result;
-                _items = data.items;
-                _totalDesserts = data.total;
-                _loading = false;
-
-                InvokeAsync(StateHasChanged);
-            });
-        }
-
-        public void OnSearch(string text)
-        {
-            Data.Parameter.SearchText = text;
-            StateHasChanged();
-            GetDataFromApi();
-        }
-
-        public async Task<(IEnumerable<TModel> items, int total)> GetDataAsync()
+        else
         {
             try
             {
@@ -114,15 +125,17 @@
             }
         }
 
-        public void CopyOptions(QueryParameterModel parameter, DataOptions options)
-        {
-            parameter.SortBy = options.SortBy;
-            parameter.SortDesc = options.SortDesc;
-            parameter.MultiSort = options.MultiSort;
-            parameter.MustSort = options.MustSort;
-            parameter.GroupBy = options.GroupBy;
-            parameter.GroupDesc = options.GroupDesc;
-            parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
-            parameter.Page = options.Page == 0 ? 1 : options.Page;
-        }
     }
+
+    public void CopyOptions(QueryParameterModel parameter, DataOptions options)
+    {
+        parameter.SortBy = options.SortBy;
+        parameter.SortDesc = options.SortDesc;
+        parameter.MultiSort = options.MultiSort;
+        parameter.MustSort = options.MustSort;
+        parameter.GroupBy = options.GroupBy;
+        parameter.GroupDesc = options.GroupDesc;
+        parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
+        parameter.Page = options.Page == 0 ? 1 : options.Page;
+    }
+}

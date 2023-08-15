@@ -1,0 +1,8 @@
+﻿<MChip Small Color="@(ForceMatch?"success":"info")" Outlined Class=" ma-1">
+    <MIcon Left Small>@(ForceMatch ? "mdi-check-bold" : "mdi-alert-circle")</MIcon>
+    @(ForceMatch ? "严格":"宽松")
+</MChip>
+@code {
+    [Parameter]
+    public bool ForceMatch { get; set; }
+}

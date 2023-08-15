@@ -1,0 +1,88 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IConfiguration _configuration
+
+<PageTitle>
+    @_configuration["WebSiteName"]
+</PageTitle>
+<MApp>
+    <MMain Class="main-content">
+        <div Class="overflow-hidden">
+            <MAppBar Absolute Color="primary" Class="app-bar"
+                     Dark
+                     ShrinkOnScroll
+                     Prominent
+                     Src="@_configuration["WebSiteImage"]"
+                     FadeImgOnScroll
+                     ScrollTarget="#main-sheet">
+                <ImgContent>
+                    <MImage Gradient="to top right, rgb(240 98 146 / 50%), rgb(240 98 146 / 50%)" @attributes="@context"></MImage>
+                </ImgContent>
+
+                <ChildContent>
+                    <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
+                    <MAppBarTitle>
+                        @_configuration["WebSiteName"]
+                    </MAppBarTitle>
+                    <MSpacer></MSpacer>
+                </ChildContent>
+                <ExtensionContent>
+                    <MTabs AlignWithTitle>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/replies"))">自动回复</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/events"))">事件</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/faces"))">表情</MTab>
+                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/groups"))">QQ群</MTab>
+                    </MTabs>
+                </ExtensionContent>
+            </MAppBar>
+            <MSheet Class="overflow-y-auto" Id="main-sheet">
+                <div class="app-container">
+                    <ErrorHandler IsSSR="true">
+                        @Body
+                    </ErrorHandler>
+                </div>
+            </MSheet>
+        </div>
+    </MMain>
+    <MNavigationDrawer @bind-Value="_drawer" Absolute Temporary>
+        <div class="nav-drawer">
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/"))">
+                <MIcon Left>mdi-home</MIcon>
+                主页
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/replies"))">
+                <MIcon Left>mdi-message-reply-text</MIcon>
+                自动回复
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/events"))">
+                <MIcon Left>mdi-calendar</MIcon>
+                事件
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/faces"))">
+                <MIcon Left>mdi-emoticon-excited-outline</MIcon>
+                表情
+            </MButton>
+            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/groups"))">
+                <MIcon Left>mdi-qqchat</MIcon>
+                QQ群
+            </MButton>
+        </div>
+    </MNavigationDrawer>
+    <MFooter App Absolute>
+        &copy; 2023 - CnGal资料站
+    </MFooter>
+</MApp>
+
+
+
+@code {
+    private bool _drawer = false;
+    private StringNumber _value = default;
+
+    void ValueChanged(StringNumber value)
+    {
+        _value = value;
+        _drawer = false;
+    }
+}

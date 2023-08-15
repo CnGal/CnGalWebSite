@@ -1,0 +1,130 @@
+﻿@page "/admin/replies"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotReply> _robotReplyRepository
+
+<DataTableCard TModel="RobotReply" Headers="_headers" DataSource="_robotReplyRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Key.Contains(dataTableCard._search) || s.Value.Contains(dataTableCard._search))">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == "AfterTime")
+        {
+            @context.Item.AfterTime.ToString("HH:mm:ss")
+        }
+        else if (context.Header.Value == "BeforeTime")
+        {
+            @context.Item.BeforeTime.ToString("HH:mm:ss")
+        }
+        else if (context.Header.Value == "IsHidden")
+        {
+            <CnGalWebSite.RobotClientX.Components.Replies.EnableChip Enabled="!context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == "Range")
+        {
+            <CnGalWebSite.RobotClientX.Components.Replies.RangeChip Type="context.Item.Range" />
+        }
+        else if (context.Header.Value == "value")
+        {
+            <div class="text-truncate-2">
+                @context.Item.Value
+            </div>
+        }
+        else if (context.Header.Value == "key")
+        {
+            <div class="text-truncate-2">
+                @context.Item.Key
+            </div>
+        }
+        else if (context.Header.Value == nameof(RobotReply.UpdateTime))
+        {
+            
+                @context.Item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+          
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.RobotClientX.Components.Replies.EditCard Id="_editedItemId" AllowedScopes="_scopes" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _name = "自动回复";
+
+    CnGalWebSite.RobotClientX.Components.Replies.EditCard editCard;
+
+    private List<DataTableHeader<RobotReply>> _headers = new List<DataTableHeader<RobotReply>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RobotReply.Id)
+          },
+          new (){ Text= "匹配表达式",  Value= "key"},
+          new (){ Text= "回复",  Value= "value"},
+          new (){ Text= "优先级", Value= nameof(RobotReply.Priority)},
+          new (){ Text= "范围", Value= "Range"},
+          new (){ Text= "时间之后", Value= "AfterTime"},
+          new (){ Text= "时间之前",  Value= "BeforeTime" },
+          new (){ Text= "更新时间",  Value= nameof(RobotReply.UpdateTime) },
+          new (){ Text= "状态",Value= "IsHidden"},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    List<KeyValuePair<string, string>> _scopes;
+
+    DataTableCard<RobotReply> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public void EditItem(RobotReply item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+    public void OnEdited(RobotReply model)
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh();
+        }
+    }
+
+}

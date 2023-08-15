@@ -1,0 +1,106 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotFace> _robotFaceRepository
+
+@if (Model == null)
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard />
+}
+else
+{
+    <MCard>
+        <MCardTitle>
+            @(Id==0? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Key" Label="匹配关键字" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Value" Label="消息" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Note" Label="备注" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.IsHidden" Label="是否隐藏" TValue="bool" HideDetails="true" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+
+    </MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback<RobotFace> OnEdited { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
+
+    RobotFace Model;
+
+    private string _name = "表情";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new RobotFace() : _robotFaceRepository.GetAll().FirstOrDefault(s => s.Id == Id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            _robotFaceRepository.GetAll().RemoveAll(s => s.Id == Model.Id);
+            if (Model.Id == 0)
+            {
+                Model.Id = _robotFaceRepository.GetAll().Max(s => s.Id) + 1;
+            }
+            _robotFaceRepository.Insert(Model);
+            await OnEdited.InvokeAsync(Model);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+}

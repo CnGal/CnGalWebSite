@@ -1,0 +1,33 @@
+﻿<MChip Small
+       Color="@GetColor()"
+       Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @Type.GetDisplayName()
+</MChip>
+
+@code {
+    [Parameter]
+    public RobotEventType Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            RobotEventType.FixedTime => "green",
+            RobotEventType.PreTime => "info",
+            _ => "purple"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return Type switch
+        {
+            RobotEventType.FixedTime => "mdi-timelapse",
+            RobotEventType.PreTime => "mdi-cube",
+            _ => "mdi-lightbulb-question"
+        };
+    }
+}

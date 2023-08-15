@@ -1,0 +1,82 @@
+﻿@page "/index"
+@page "/home"
+@page "/"
+
+@inject IConfiguration _configuration
+@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Hosting
+
+@inject IServiceProvider _serviceProvider
+
+<MCard>
+    <MCardText Class="pb-0">
+        <MAlert Color="primary" Class="mb-0"
+                Shaped
+            Outlined
+                Icon="@("mdi-information")">
+            请在根目录下的 <strong>appsettings.json</strong> 文件内编辑设置参数，重启后生效
+        </MAlert>
+    </MCardText>
+    
+    <MCardText>
+        <dl>
+            @{ var model = _configuration.AsEnumerable().ToList();}
+            @foreach (var item in _selfConfigurations)
+            {
+
+                if (!model.Any(s => s.Key == item.Item1))
+                {
+                    continue;
+                }
+                var info = model.Find(s => s.Key == item.Item1);
+                <div>
+                    <dt>@($"{item.Item2} ( {item.Item1} )")</dt>
+                    <dd>@(item.Item3?info.Value.ReplaceWithSpecialChar(): info.Value)</dd>
+                </div>
+            }
+        </dl>
+    </MCardText>
+    <MCardActions>
+        <MSpacer />
+        <MButton Color="primary" OnClick="Reboot">
+            <MIcon Left Dark>
+                mdi-refresh
+            </MIcon>
+            重启
+        </MButton>
+    </MCardActions>
+</MCard>
+
+@code {
+
+
+    private List<(string, string, bool)> _selfConfigurations = new List<(string, string, bool)>
+    {
+            ("QQ","账号",false),
+            ("RobotName","称呼",false),
+            ("WarningQQGroup","接收预警的QQ群",false),
+            ("MiraiUrl","Mirai IP",false),
+            ("NormalVerifyKey","Mirai 验证密匙",true),
+            ("ChannelToken","QQ频道 Token",true),
+            ("ChannelAppKey","QQ频道 AppKey",true),
+            ("ChatGPTLimit","GPT对话上限每分钟",false),
+            ("ChatGPTApiUrl","GPT API",false),
+            ("ChatGPTApiKey","GPT Key",true),
+            ("ChatGPT_SystemMessageTemplate","GPT 提示词",false),
+            ("ChatGPT_UserMessageTemplate","GPT 消息模板",false),
+            ("WebApiPath","CnGal资料站 API",false),
+            ("WebSiteName","网站名称",false),
+            ("WebSiteImage","网站背景图",false),
+            ("WebSiteTheme","网站主题颜色",false),
+        };
+
+    public async Task Reboot()
+    {
+        IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
+        if (_applicationLifetime != null)
+        {
+            _applicationLifetime.StopApplication();
+        }
+    }
+
+}

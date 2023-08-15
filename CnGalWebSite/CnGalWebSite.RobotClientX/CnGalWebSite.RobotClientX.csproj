@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>23d9b39f-fa62-45d4-9356-f5adee0ee8ba</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Electronicute.MeowMiraiLib" Version="7.1.0" />
+    <PackageReference Include="Masuda.Net" Version="6.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="NetCore.AutoRegisterDi" Version="2.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Components\CnGalWebSite.Components.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.RobotClientX.Models\CnGalWebSite.RobotClientX.Models.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Using Include="CnGalWebSite.Extensions" />
+  </ItemGroup>
+
+</Project>

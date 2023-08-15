@@ -1,0 +1,37 @@
+﻿<MChip Small
+       Color="@GetColor()"
+       Outlined Class=" ma-1">
+    <MIcon Left Small>
+        @GetIcon()
+    </MIcon>
+    @Type.GetDisplayName()
+</MChip>
+
+@code {
+    [Parameter]
+    public RobotReplyRange Type { get; set; }
+
+    public string GetColor()
+    {
+        return Type switch
+        {
+            RobotReplyRange.All => "green",
+            RobotReplyRange.Group => "info",
+            RobotReplyRange.Channel => "orange",
+            RobotReplyRange.Friend => "red",
+            _ => "purple"
+        };
+    }
+
+    public string GetIcon()
+    {
+        return Type switch
+        {
+            RobotReplyRange.All => "mdi-application",
+            RobotReplyRange.Group => "mdi-account-group",
+            RobotReplyRange.Channel => "mdi-bullhorn-variant",
+            RobotReplyRange.Friend => "mdi-account",
+            _ => "mdi-lightbulb-question"
+        };
+    }
+}

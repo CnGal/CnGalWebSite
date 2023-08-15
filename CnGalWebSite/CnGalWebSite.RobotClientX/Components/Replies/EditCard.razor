@@ -1,0 +1,120 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IRepository<RobotReply> _robotReplyRepository
+
+@if (Model == null)
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard />
+}
+else
+{
+    <MCard>
+        <MCardTitle>
+            @(Id==0? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Key" Label="匹配表达式" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Value" Label="回复" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Priority" Label="优先级" HideDetails="true" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Range" Label="回复范围" TValue="RobotReplyRange" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.AfterTime" ShowDate="false" Label="时间之后" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.BeforeTime" ShowDate="false" Label="时间之前" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.IsHidden" Label="是否隐藏" TValue="bool" HideDetails="true" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+
+    </MCard>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback<RobotReply> OnEdited { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
+
+    RobotReply Model;
+
+    private string _name = "自动回复";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override void  OnInitialized()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new RobotReply() : _robotReplyRepository.GetAll().FirstOrDefault(s=>s.Id==Id);
+            if(Model.Id==0)
+            {
+                Model.BeforeTime = new DateTime(1, 1, 1, 23, 59, 59);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            _robotReplyRepository.GetAll().RemoveAll(s => s.Id == Model.Id);
+            if(Model.Id==0)
+            {
+                Model.Id = _robotReplyRepository.GetAll().Max(s => s.Id) + 1;
+            }
+            Model.UpdateTime = DateTime.Now;
+            _robotReplyRepository.Insert(Model);
+            await OnEdited.InvokeAsync(Model);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+
+    }
+}
