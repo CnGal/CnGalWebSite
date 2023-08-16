@@ -6,8 +6,14 @@ using CnGalWebSite.RobotClientX.Services;
 using NetCore.AutoRegisterDi;
 using CnGalWebSite.RobotClientX.DataRepositories;
 using CnGalWebSite.Core.Services.Query;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+
 
 var builder = WebApplication.CreateBuilder(args);
+//自动重置配置
+builder.Configuration.AddJsonFile("appsettings.json", true, reloadOnChange: true);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -39,6 +45,36 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses()
   .AsPublicImplementedInterfaces(ServiceLifetime.Singleton);
 //添加Query
 builder.Services.AddScoped<IQueryService, QueryService>();
+//API终结点
+builder.Services.AddEndpointsApiExplorer();
+//注册Swagger生成器，定义一个或多个Swagger文件
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "CnGal资料站 - 看板娘 API",
+        Description = "这里是看板娘哦~",
+        Contact = new OpenApiContact
+        {
+            Name = "CnGal",
+            Email = "help@cngal.org"
+        },
+        Version = "v1"
+    });
+    c.OperationFilter<SecurityRequirementsOperationFilter>();
+    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
+//添加控制器
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -55,12 +91,17 @@ _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 app.UseStaticFiles();
-
+//启用中间件Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");
+});
 //添加状态检查终结点
 app.UseHealthChecks("/healthz");
 
 app.UseRouting();
-
+app.MapDefaultControllerRoute();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

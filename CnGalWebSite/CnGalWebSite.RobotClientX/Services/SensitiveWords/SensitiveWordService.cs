@@ -75,5 +75,10 @@ namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
         {
             return text.FindStringListInText(SensitiveWords);
         }
+
+        public int Count()
+        {
+            return SensitiveWords.Count;
+        }
     }
 }

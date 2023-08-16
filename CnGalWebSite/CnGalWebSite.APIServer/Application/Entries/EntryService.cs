@@ -1201,6 +1201,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         /// 获取视图模型数据
         /// </summary>
         /// <param name="entry"></param>
+        /// <param name="renderMarkdown"></param>
         /// <returns></returns>
         public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true)
         {

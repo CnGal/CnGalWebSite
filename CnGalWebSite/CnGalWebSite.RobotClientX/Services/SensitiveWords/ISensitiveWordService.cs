@@ -11,5 +11,7 @@ namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
         List<string> Check(List<string> texts);
 
         List<string> Check(string text);
+
+        int Count();
     }
 }
