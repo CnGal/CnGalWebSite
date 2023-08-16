@@ -53,6 +53,7 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             question = question.Replace(_configuration["RobotName"], "").Replace($"[@{_configuration["QQ"]}]", "");
 
             //填充消息模板
+            sys = sys.Replace("{time}", datetime.ToString("HH:mm:ss"));
             sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
             user = user.Replace("{question}", question);
 

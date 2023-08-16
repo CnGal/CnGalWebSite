@@ -98,7 +98,8 @@
                 else if (StateModel.State == UserLotteryState.Shipped)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100">
-                        发货啦，记得给五星好评哦<br />
+                        发货啦，记得给五星好评哦~<br />
+                        <a @onclick="OnLookPrize" class="success--text fw-bold">快递单号在这里呢</a><br />
                         你的奖品是：<strong> @StateModel.Award.Name</strong>
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
@@ -112,9 +113,9 @@
 @if (isReady && StateModel != null && StateModel.State == UserLotteryState.WaitingDraw)
 {
     <div class="rounded shadow-sm  bg-opacity mb-4 p-4" style="display: flex; align-items: center; justify-content: center;">
-            <div class="swal2-icon m-0 me-1 border-primary" style="height: 10em; width: 10em; display: flex; align-items: center; border: .5em solid transparent;">
-                <div class="text-primary" style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
-            </div>
+        <div class="swal2-icon m-0 me-1 border-primary" style="height: 10em; width: 10em; display: flex; align-items: center; border: .5em solid transparent;">
+            <div class="text-primary" style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
+        </div>
     </div>
 }
 
