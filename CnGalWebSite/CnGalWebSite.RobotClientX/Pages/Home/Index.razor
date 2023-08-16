@@ -6,20 +6,28 @@
 @using Microsoft.Extensions.Logging
 @using Microsoft.Extensions.Hosting
 
-@inject IServiceProvider _serviceProvider
+@inject IHostApplicationLifetime _applicationLifetime
+@inject ISensitiveWordService _sensitiveWordService
 
-<MCard>
+<MCard Class="mb-4">
     <MCardText Class="pb-0">
         <MAlert Color="primary" Class="mb-0"
                 Shaped
-            Outlined
+                Outlined
                 Icon="@("mdi-information")">
-            请在根目录下的 <strong>appsettings.json</strong> 文件内编辑设置参数，重启后生效
+            请在根目录下的 <strong>appsettings.json</strong> 文件内编辑配置，部分配置需要重启后生效
         </MAlert>
     </MCardText>
-    
     <MCardText>
         <dl>
+            <div>
+                <dt>Swagger 文档</dt>
+                <dd><a href="/swagger">/swagger</a></dd>
+            </div>
+            <div>
+                <dt>敏感词总数</dt>
+                <dd>@_sensitiveWordService.Count()</dd>
+            </div>
             @{ var model = _configuration.AsEnumerable().ToList();}
             @foreach (var item in _selfConfigurations)
             {
@@ -38,11 +46,11 @@
     </MCardText>
     <MCardActions>
         <MSpacer />
-        <MButton Color="primary" OnClick="Reboot">
+        <MButton Color="error" OnClick="Reboot">
             <MIcon Left Dark>
                 mdi-refresh
             </MIcon>
-            重启
+            重新启动
         </MButton>
     </MCardActions>
 </MCard>
@@ -51,7 +59,7 @@
 
 
     private List<(string, string, bool)> _selfConfigurations = new List<(string, string, bool)>
-    {
+{
             ("QQ","账号",false),
             ("RobotName","称呼",false),
             ("WarningQQGroup","接收预警的QQ群",false),
@@ -70,13 +78,8 @@
             ("WebSiteTheme","网站主题颜色",false),
         };
 
-    public async Task Reboot()
+    public void Reboot()
     {
-        IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
-        if (_applicationLifetime != null)
-        {
-            _applicationLifetime.StopApplication();
-        }
+        _applicationLifetime.StopApplication();
     }
-
 }

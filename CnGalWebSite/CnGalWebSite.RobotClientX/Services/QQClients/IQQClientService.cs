@@ -14,8 +14,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 {
     public interface IQQClientService
     {
-
-         Task SendMessage(SendMessageModel model, Masuda.Net.Models.Message msg = null);
+        Task SendMessage(SendMessageModel model, Masuda.Net.Models.Message msg = null);
 
         Task ReplyFromGroupAsync(GroupMessageSender s, MeowMiraiLib.Msg.Type.Message[] e);
 
@@ -24,5 +23,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         Task SendMessage(RobotReplyRange range, long id, string text, Masuda.Net.Models.Message msg = null);
 
         Task Init();
+
+        string GetMiraiSession();
     }
 }

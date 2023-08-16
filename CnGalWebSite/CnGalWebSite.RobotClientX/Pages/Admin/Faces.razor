@@ -4,7 +4,8 @@
 @inject IPopupService PopupService
 @inject IRepository<RobotFace> _robotFaceRepository
 
-<DataTableCard TModel="RobotFace" Headers="_headers" DataSource="_robotFaceRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="RobotFace" Headers="_headers" DataSource="_robotFaceRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Note.Contains(dataTableCard._search)|| (s.Key.Contains(dataTableCard._search)|| (s.Value.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {

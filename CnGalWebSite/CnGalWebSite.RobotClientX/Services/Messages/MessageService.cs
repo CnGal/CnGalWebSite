@@ -437,7 +437,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         {
 
             //若本地没有 则请求服务器
-            var result = await _httpService.PostAsync<GetArgValueModel, Result>( "api/robot/GetArgValue", new GetArgValueModel
+            var result = await _httpService.PostAsync<GetArgValueModel, Result>(_configuration["WebApiPath"] + "api/robot/GetArgValue", new GetArgValueModel
             {
                 Infor = infor,
                 Name = name,

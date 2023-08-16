@@ -25,6 +25,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private readonly ILogger<QQClientService> _logger;
         public MasudaBot MasudaClient { get; set; }
         public Client MiraiClient { get; set; }
+        private string _miraiSession;
 
         System.Timers.Timer t = new(1000 * 60);
         System.Timers.Timer t2 = new(1000 * 60);
@@ -50,7 +51,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             }
             try
             {
-                MasudaClient = new MasudaBot(appId, _configuration["ChannelAppKey"], _configuration["ChannelToken"], BotType.Private).LogTo(Console.WriteLine);
+                MasudaClient = new MasudaBot(appId, _configuration["ChannelAppKey"], _configuration["ChannelToken"], BotType.Private);
              
                 _logger.LogInformation("成功初始化 Masuda 客户端");
             }
@@ -64,7 +65,8 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         {
             try
             {
-                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}",true);
+                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
+                MiraiClient._OnServeiceConnected += MiraiClient__OnServeiceConnected; ;
                 if(await MiraiClient.ConnectAsync())
                 {
                     _logger.LogInformation("成功初始化 Mirai 客户端");
@@ -80,6 +82,22 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 _logger.LogError(ex, "初始化 Mirai 客户端失败");
             }
 
+        }
+
+        private void MiraiClient__OnServeiceConnected(string e)
+        {
+           
+            if(string.IsNullOrWhiteSpace(e))
+            {
+                return;
+            }
+            var session = e.MidStrEx("\"session\": \"", "\"");
+            if (string.IsNullOrWhiteSpace(session))
+            {
+                return;
+            }
+            _miraiSession= session;
+            _logger.LogInformation("成功连接Mirai服务器，Session：{Session}", session);
         }
 
         public async Task Init()
@@ -198,7 +216,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                  };
             }
 
-            _logger.LogInformation("CnGal资料站 看板娘 v3.3.40");
+            _logger.LogInformation("CnGal资料站 看板娘 v3.4.3");
 
         }
 
@@ -468,6 +486,11 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 t2.Dispose();
                 t2 = null;
             }
+        }
+
+        public string GetMiraiSession()
+        {
+            return _miraiSession;
         }
     }
 }

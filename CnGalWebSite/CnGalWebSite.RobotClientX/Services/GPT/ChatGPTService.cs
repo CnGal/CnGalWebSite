@@ -80,10 +80,11 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
 
             if(!response.IsSuccessStatusCode)
             {
+                _logger.LogError("请求ChatGPT回复失败，正文：{msg}",await response.Content.ReadAsStringAsync());
                 return null;
             }
 
-            string jsonContent = response.Content.ReadAsStringAsync().Result;
+            string jsonContent =await response.Content.ReadAsStringAsync();
             var result= JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
 
             var reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
