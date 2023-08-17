@@ -103,7 +103,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             List<KeyValuePair<string, string>> args = new();
             try
             {
-                await ProcMessageArgument(reply, message, qq, name, args);
+                await ProcMessageArgument(reply, message, regex, qq, name, args);
                 ProcMessageReplaceInput(reply, message, regex, args);
                 ProcMessageFace(reply, args);
             }
@@ -362,12 +362,11 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// <param name="name"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public async Task ProcMessageArgument(string reply, string message, long qq, string name, List<KeyValuePair<string, string>> args)
+        public async Task ProcMessageArgument(string reply, string message, string regex, long qq, string name, List<KeyValuePair<string, string>> args)
         {
             while (true)
             {
                 string argument = reply.MidStrEx("$(", ")");
-
                 if (string.IsNullOrWhiteSpace(argument))
                 {
                     break;
@@ -382,6 +381,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                     "n" => "\n",
                     "r" => "\r",
                     "chatgpt"=>await _chatGPTService.GetReply(message),
+                    "introduce" => await GetArgValue(argument, Regex.Split(message, regex).FirstOrDefault(s=>!string.IsNullOrWhiteSpace(s)), qq),
                     "facelist" => "该功能暂未实装",
                     _ => await GetArgValue(argument, message, qq)
                 };
