@@ -637,13 +637,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 if (entry == null)
                 {
-                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘找不到这个词条" };
+                    return new Result { Successful = false, Error = "呜呜呜~~~ 找不到这个词条" };
                 }
                 else
                 {
                     if (entry.DisplayName != entryName && entry.DisplayName != entryName)
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true,model.SenderId!=0)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true,model.SenderId!=0)).DeleteHtmlLinks() + "\n（不太确定是不是这个词条哦~" };
                     }
                     else
                     {
