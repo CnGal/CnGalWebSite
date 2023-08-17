@@ -622,11 +622,11 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (model.Name == "introduce")
             {
-                var entryName = model.Infor.Replace("看板娘介绍一下", "").Replace("看板娘介绍", "").Trim();
+                var entryName = model.Infor.Trim();
 
                 if(string.IsNullOrWhiteSpace(entryName))
                 {
-                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘找不到这个词条" };
+                    return new Result { Successful = false, Error = "呜呜呜~~~ 找不到这个词条" };
                 }
 
                 var entry = await _entryRepository.GetAll().AsNoTracking()
