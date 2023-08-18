@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.DrawingBed.Helper.Services;
@@ -127,7 +128,8 @@ namespace CnGalWebSite.WebAssembly
 
             //注册匿名的HttpClient
             builder.Services.AddHttpClient("AnonymousAPI");
-
+            //添加Query
+            builder.Services.AddScoped<IQueryService, QueryService>();
             var host = builder.Build();
 
             await host.RunAsync();
