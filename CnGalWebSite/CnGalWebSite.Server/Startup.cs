@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.DrawingBed.Helper.Services;
@@ -138,6 +139,8 @@ namespace CnGalWebSite.Server
             //自定义服务
             services.AddScoped<IHttpService, HttpService>();
             services.AddSingleton<ITokenStoreService, TokenStoreService>();
+            //添加Query
+            services.AddScoped<IQueryService, QueryService>();
             //使用 IdentityModel 管理刷新令牌
             services.AddAccessTokenManagement();
 
