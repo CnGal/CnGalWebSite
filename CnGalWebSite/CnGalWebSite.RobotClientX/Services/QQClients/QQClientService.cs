@@ -18,6 +18,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
     public class QQClientService : IQQClientService, IDisposable
     {
         private readonly IRepository<RobotGroup> _robotGroupRepository;
+        private readonly IRepository<RobotEvent> _robotEventRepository;
         private readonly IRepository<PostLog> _postLogRepository;
         private readonly IConfiguration _configuration;
         private readonly IMessageService _messageService;
@@ -32,7 +33,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
         public QQClientService(IRepository<RobotGroup> robotGroupRepository, IRepository<PostLog> postLogRepository,
             IConfiguration configuration, ILogger<QQClientService> logger, IEventService eventService,
-        IMessageService messageService)
+        IMessageService messageService, IRepository<RobotEvent> robotEventRepository)
         {
             _robotGroupRepository = robotGroupRepository;
             _configuration = configuration;
@@ -40,6 +41,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             _postLogRepository = postLogRepository;
             _logger = logger;
             _eventService = eventService;
+            _robotEventRepository = robotEventRepository;
         }
 
         public void InitMasuda()
@@ -216,7 +218,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                  };
             }
 
-            _logger.LogInformation("CnGal资料站 看板娘 v3.4.5");
+            _logger.LogInformation("CnGal资料站 看板娘 v3.4.6");
 
         }
 
@@ -382,13 +384,16 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             //检查上限
             if (singleCount == singleLimit)
             {
-                await SendMessage(range, sendto, $"[image=https://image.cngal.org/kanbanFace/hhzywx.png][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", msg);
+                SendMessageModel result = await _messageService.ProcMessageAsync(range, _robotEventRepository.GetAll().FirstOrDefault(s => s.Note == "消息上限警告")?.Text ?? $"[image=https://image.cngal.org/kanbanFace/hhzywx.png][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, memberId, memberName);
+                result.SendTo = sendto;
+                await SendMessage(result, msg);
                 return true;
             }
             
             if (totalCount == totalLimit)
             {
                 SendMessageModel result = await _messageService.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName);
+                result.SendTo = sendto;
                 await SendMessage(result, msg);
                 return true;
             }

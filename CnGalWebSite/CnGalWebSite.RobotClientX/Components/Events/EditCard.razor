@@ -26,10 +26,13 @@ else
                 <MCol Cols="12" Md="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" Label="类型" TValue="RobotEventType" />
                 </MCol>
+                @if (Model.Type != RobotEventType.ConditionalTriggering)
+                {
+                    <MCol Cols="12" Md="6">
+                        <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.Time" ShowDate="false" Label="开始触发时间" />
+                    </MCol>
+                }
 
-                <MCol Cols="12" Md="6">
-                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.Time" ShowDate="false" Label="开始触发时间" />
-                </MCol>
 
                 @if (Model.Type == RobotEventType.PreTime)
                 {

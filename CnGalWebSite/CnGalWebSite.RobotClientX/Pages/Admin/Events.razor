@@ -15,7 +15,15 @@
         }
         else if (context.Header.Value == nameof(RobotEvent.Time))
         {
-            @context.Item.Time.ToString("HH:mm:ss")
+            @if (context.Item.Type == RobotEventType.ConditionalTriggering)
+            {
+                @("无")
+            }
+            else
+            {
+                @context.Item.Time.ToString("HH:mm:ss")
+            }
+
         }
         else if (context.Header.Value == nameof(RobotEvent.IsHidden))
         {
