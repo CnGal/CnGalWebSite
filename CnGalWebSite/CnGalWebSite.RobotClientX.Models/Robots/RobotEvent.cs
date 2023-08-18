@@ -33,6 +33,8 @@ namespace CnGalWebSite.RobotClientX.Models.Robots
         [Display(Name = "固定时间")]
         FixedTime,
         [Display(Name = "概率触发")]
-        PreTime
+        PreTime,
+        [Display(Name = "条件触发")]
+        ConditionalTriggering
     }
 }
