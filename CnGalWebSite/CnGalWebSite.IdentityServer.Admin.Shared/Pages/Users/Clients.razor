@@ -31,7 +31,7 @@
         @foreach (var item in Model)
         {
             <MCol Cols="12" Lg="6" Xl="4">
-                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card" OnEdited="OnEdited" />
+                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card" OnEdited="OnEdited" AllowedScopes="_scopes"/>
             </MCol>
         }
     }

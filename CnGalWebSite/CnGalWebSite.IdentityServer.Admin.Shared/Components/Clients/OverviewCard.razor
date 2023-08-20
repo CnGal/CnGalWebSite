@@ -30,13 +30,15 @@
 </MCard>
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
-    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="Model.Id" OnEdited="Edited" @ref="editCard" />
+    <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="Model.Id" OnEdited="Edited" @ref="editCard" AllowedScopes="AllowedScopes"/>
 </MDialog>
 @code {
     [Parameter]
     public UserClientOverviewModel Model { get; set; }
     [Parameter]
     public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> AllowedScopes { get; set; }
 
     [Parameter]
     public string Class { get; set; }
@@ -59,7 +61,7 @@
     {
         _editDialog = false;
         StateHasChanged();
-       await OnEdited.InvokeAsync();
+        await OnEdited.InvokeAsync();
     }
 }
 

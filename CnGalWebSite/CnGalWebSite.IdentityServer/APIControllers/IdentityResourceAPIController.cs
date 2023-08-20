@@ -50,7 +50,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         [HttpGet]
         public async Task<IEnumerable<KeyValuePair<string, string>>> All()
         {
-            return await _identityResourceRepository.GetAll().Select(s => new KeyValuePair<string, string>(s.Name, s.DisplayName)).ToListAsync();
+            return await _identityResourceRepository.GetAll().Where(s=>s.Enabled).Select(s => new KeyValuePair<string, string>(s.Name, s.DisplayName)).ToListAsync();
         }
 
 
