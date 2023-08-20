@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Admin.Shared;
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
@@ -32,6 +33,8 @@ builder.Services.AddHttpClient("AnonymousAPI");
 //注入自定义服务
 builder.Services.AddScoped<INavigationService, NavigationService>();
 builder.Services.AddScoped<IHttpService, HttpService>();
+//添加Query
+builder.Services.AddScoped<IQueryService, QueryService>();
 //修改Masa主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
 {

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
 using CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
@@ -28,6 +29,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddSingleton<ITokenStoreService, TokenStoreService>();
 builder.Services.AddScoped<INavigationService, NavigationService> ();
+//添加Query
+builder.Services.AddScoped<IQueryService, QueryService>();
 //设置主题
 builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
 {
