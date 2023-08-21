@@ -218,11 +218,11 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await PopupService.ToastAsync("撤销审核请求失败", AlertTypes.Error);
+                await PopupService.EnqueueSnackbarAsync("撤销审核请求失败", AlertTypes.Error);
             }
             else
             {
-                await PopupService.ToastAsync("撤销审核请求成功", AlertTypes.Success);
+                await PopupService.EnqueueSnackbarAsync("撤销审核请求成功", AlertTypes.Success);
                 //修改各部分编辑状态
                 switch (operation)
                 {
@@ -292,7 +292,7 @@ else
             index = 1;
         }
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("style", index));
-        await PopupService.ToastAsync($"应用“{((EntryStyleTemplate)index).GetDisplayName()}”样式", AlertTypes.Success);
+        await PopupService.EnqueueSnackbarAsync($"应用“{((EntryStyleTemplate)index).GetDisplayName()}”样式", AlertTypes.Success);
     }
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)

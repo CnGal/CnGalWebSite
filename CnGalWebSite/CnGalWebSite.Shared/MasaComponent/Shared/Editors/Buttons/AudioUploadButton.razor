@@ -52,7 +52,7 @@
         var files = args.GetMultipleFiles(maxAllowedFiles);
         if(files.Count>maxAllowedFiles)
         {
-            await PopupService.ToastAsync($"单次最多上传{maxAllowedFiles}个文件哦~", AlertTypes.Info);
+            await PopupService.EnqueueSnackbarAsync($"单次最多上传{maxAllowedFiles}个文件哦~", AlertTypes.Info);
         }
 
         foreach (var item in files)
@@ -66,7 +66,7 @@
                 }
                 else
                 {
-                    await PopupService.ToastAsync($"音频上传失败", AlertTypes.Error);
+                    await PopupService.EnqueueSnackbarAsync($"音频上传失败", AlertTypes.Error);
 
                 }
             }

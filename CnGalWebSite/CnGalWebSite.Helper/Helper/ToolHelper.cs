@@ -1241,27 +1241,7 @@ namespace CnGalWebSite.DataModel.Helper
         }
 
     }
-    public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
-    {
-        /// <summary>
-        /// 隐式转换
-        /// </summary>
-        /// <param name="cat"></param>
-        public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
-        {
-            return new QueryPageOptionsHelper
-            {
-                SearchText = cat.SearchText,
-                SortName = cat.SortName,
-                SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
-                SearchModel = cat.SearchModel,
-                PageIndex = cat.PageIndex,
-                StartIndex = cat.StartIndex,
-                PageItems = cat.PageItems,
-                IsPage = cat.IsPage,
-            };
-        }
-    }
+
 
     public static class IDConvUtil
     {
