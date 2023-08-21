@@ -10,10 +10,10 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 
-
 var builder = WebApplication.CreateBuilder(args);
 //自动重置配置
 builder.Configuration.AddJsonFile("appsettings.json", true, reloadOnChange: true);
+builder.Configuration.AddJsonFile(Path.Combine(builder.Environment.WebRootPath,"Data","Setting.json"), true, reloadOnChange: true);
 
 // Add services to the container.
 builder.Services.AddRazorPages();

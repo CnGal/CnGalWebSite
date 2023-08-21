@@ -54,6 +54,7 @@
         </MButton>
     </MCardActions>
 </MCard>
+<CnGalWebSite.RobotClientX.Components.Home.EditCard ConfigurationChanged="ConfigurationChanged"/>
 
 @code {
 
@@ -81,5 +82,10 @@
     public void Reboot()
     {
         _applicationLifetime.StopApplication();
+    }
+
+    public void ConfigurationChanged()
+    {
+        StateHasChanged();
     }
 }
