@@ -140,7 +140,7 @@
             }
             else
             {
-                await PopupService.ToastAsync($"图片上传失败，{obj.Error ?? "网络异常"}", AlertTypes.Error);
+                await PopupService.EnqueueSnackbarAsync($"图片上传失败，{obj.Error ?? "网络异常"}", AlertTypes.Error);
             }
         }
         catch (Exception ex)

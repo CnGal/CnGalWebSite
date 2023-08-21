@@ -41,8 +41,8 @@
         }
     </div>
 </div>
-<PToast @ref="_toast" MaxCount="3">
-</PToast>
+<PEnqueuedSnackbars @ref="_toast" MaxCount="3">
+</PEnqueuedSnackbars>
 
 @code {
     [Parameter]
@@ -52,7 +52,7 @@
     public long CommentId { get; set; }
 
     private bool IsReplying { get; set; }
-    PToast _toast;
+    PEnqueuedSnackbars _toast;
 
     public void OnReplyClick()
     {
@@ -66,15 +66,15 @@
         StateHasChanged();
     }
 
-    public async Task OnRely()
+    public void OnRely()
     {
         IsReplying = false;
         StateHasChanged();
-        await _toast.AddToast(new ToastConfig
+        _toast?.EnqueueSnackbar(new SnackbarOptions
         {
             Type = AlertTypes.Success,
             Title = "回复成功",
-            Duration = 4000
+            Timeout = 4000
         });
     }
 

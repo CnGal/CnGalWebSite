@@ -62,7 +62,7 @@
     {
         if (Items.Count(s => s.Name == Model.Name)>1)
         {
-            await PopupService.ToastAsync("名称冲突", AlertTypes.Error);
+            await PopupService.EnqueueSnackbarAsync("名称冲突", AlertTypes.Error);
             return;
         }
 

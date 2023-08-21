@@ -74,7 +74,7 @@
 
         if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
         {
-            await PopupService.ToastAsync($"已存在【{item.Modifier}{item.PositionOfficial}：{item.Name}】", AlertTypes.Error);
+            await PopupService.EnqueueSnackbarAsync($"已存在【{item.Modifier}{item.PositionOfficial}：{item.Name}】", AlertTypes.Error);
             return false;
         }
 
