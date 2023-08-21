@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -27,7 +30,7 @@ namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
             Load();
         }
 
-
+        
         public void Load()
         {
             var path =Path.Combine( _webHostEnvironment.WebRootPath,"SensitiveWords");

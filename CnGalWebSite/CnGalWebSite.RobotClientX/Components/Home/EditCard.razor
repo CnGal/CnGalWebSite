@@ -1,0 +1,44 @@
+﻿@inject IConfigurationService _configurationService
+
+<MCard Class="mb-4">
+    <MCardTitle>
+        编辑配置
+    </MCardTitle>
+    <MCardText>
+        <MRow>
+            <MCol Cols="12">
+                <MTextarea Rows="3" @bind-Value="_configurationModel.ChatGPT_SystemMessageTemplate" Label="GPT 提示词" Outlined HideDetails="true"/>
+            </MCol>
+            <MCol Cols="12">
+                <MTextarea Rows="3" @bind-Value="_configurationModel.ChatGPT_UserMessageTemplate" Label="GPT 消息模板" Outlined HideDetails="true"/>
+            </MCol>
+        </MRow>
+
+    </MCardText>
+    <MCardActions Class="pb-6">
+        <MSpacer></MSpacer>
+        <MButton Color="primary"
+                 OnClick="SaveEdit">
+            <MIcon Left>mdi-check</MIcon>
+            保存
+        </MButton>
+    </MCardActions>
+
+</MCard>
+@code {
+    [Parameter]
+    public EventCallback ConfigurationChanged { get; set; }
+
+    ConfigurationModel _configurationModel = new ConfigurationModel();
+
+    protected override void OnInitialized()
+    {
+        _configurationModel = _configurationService.GetConfiguration();
+    }
+
+    public async Task SaveEdit()
+    {
+        _configurationService.Save();
+       await ConfigurationChanged.InvokeAsync();
+    }
+}
