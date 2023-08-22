@@ -10,6 +10,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
 
         public long Id { get; set; }
 
-        public List<DocumentViewModel> Children { get; set; } = new List<DocumentViewModel>();
+        public List<DocumentViewModel> Children { get; set; }
     }
 }
