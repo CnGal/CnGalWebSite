@@ -491,7 +491,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                 .Include(s=>s.Pictures)
-                .Where(s => s.Articles.Count >= 6 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
+                .Where(s => s.Articles.Count >= 3 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s=>s.Id)
                 .ToListAsync();
