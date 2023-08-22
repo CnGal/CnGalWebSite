@@ -104,8 +104,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     //查找基本信息
                     foreach (var item in infor.Information)
                     {
-                        if (item.Modifier == "基本信息")
-                        {
+                       
                             switch (item.DisplayName)
                             {
                                 case "原作":
@@ -115,7 +114,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                     tableModel.QQgroupGame = item.DisplayValue;
                                     break;
                             }
-                        }
                     }
 
                     if (infor.Releases.Any())
@@ -228,15 +226,12 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 };
                 foreach (var item in infor.Information)
                 {
-                    if (item.Modifier == "基本信息")
-                    {
                         switch (item.DisplayName)
                         {
                             case "QQ群":
                                 tableModel.QQgroupGroup = item.DisplayValue;
                                 break;
                         }
-                    }
                 }
                 foreach (var item in infor.Outlinks)
                 {
@@ -466,8 +461,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 };
                 foreach (var item in infor.Information)
                 {
-                    if (item.Modifier == "基本信息")
-                    {
+                    
                         switch (item.DisplayName)
                         {
                             case "声优":
@@ -528,7 +522,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 tableModel.RoleTaste = item.DisplayValue;
                                 break;
                         }
-                    }
+                    
 
 
                 }

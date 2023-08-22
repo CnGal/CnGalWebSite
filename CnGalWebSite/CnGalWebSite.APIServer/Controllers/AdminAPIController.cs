@@ -118,6 +118,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IRepository<RankUser, long> _rankUsersRepository;
         private readonly IRepository<EntryStaff, long> _entryStaffRepository;
+        private readonly IRepository<EntryInformationType, long> _entryInformationTypeRepository;
+        private readonly IRepository<BasicEntryInformation, long> _basicEntryInformationRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
@@ -139,7 +141,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository,
-        IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository)
+        IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository, IRepository<EntryInformationType, long> entryInformationTypeRepository, IRepository<BasicEntryInformation, long> basicEntryInformationRepository)
         {
             
             _entryRepository = entryRepository;
@@ -207,6 +209,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _perfectionOverviewRepository= perfectionOverviewRepository;
             _storeInfoRepository = storeInfoRepository;
+            _entryInformationTypeRepository = entryInformationTypeRepository;
+            _basicEntryInformationRepository = basicEntryInformationRepository;
         }
 
         /// <summary>
@@ -658,61 +662,115 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var entries = await _entryRepository.GetAll()
-                    .Include(s => s.Releases)
-                    .Where(s => string.IsNullOrWhiteSpace(s.Name) == false)
-                    .Where(s => s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam))
-                    .ToListAsync();
-
-                foreach (var item in entries)
+                var types = new List<EntryInformationType>
                 {
-                    foreach (var infor in item.Releases.Where(s=>s.PublishPlatformType== PublishPlatformType.Steam))
+                    new EntryInformationType
                     {
-                        if(int.TryParse(infor.Link, out int steamId)==false)
-                        {
-                            continue;
-                        }
+                        Name = "原作",
+                        Icon = "mdi-script-text",
+                        Types = new EntryType[] { EntryType.Game }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "QQ群",
+                        Icon = "mdi-qqchat",
+                        Types = new EntryType[] { EntryType.Game, EntryType.ProductionGroup }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "性别",
+                        Icon = "mdi-gender-male-female",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "身材数据",
+                        Icon = "mdi-database",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "身材(主观)",
+                        Icon = "mdi-human-handsup",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "生日",
+                        Icon = "mdi-cake-variant",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "发色",
+                        Icon = "mdi-face-man-profile",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "瞳色",
+                        Icon = "mdi-eye",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "服饰",
+                        Icon = "mdi-hanger",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "性格",
+                        Icon = "mdi-account-outline",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "角色身份",
+                        Icon = "mdi-account",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "血型",
+                        Icon = "mdi-water",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "身高",
+                        Icon = "mdi-human-male-height-variant",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "兴趣",
+                        Icon = "mdi-heart-multiple",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "年龄",
+                        Icon = "mdi-forest",
+                        Types = new EntryType[] { EntryType.Role }
+                    },
+                    new EntryInformationType
+                    {
+                        Name = "姓名",
+                        Icon = "mdi-card-account-details-star",
+                        Types = new EntryType[] { EntryType.Staff }
+                    }
+                };
 
-                        var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-
-                        if(steam==null)
-                        {
-                            continue;
-                        }
-
-                        var store = await _storeInfoRepository.FirstOrDefaultAsync(s => s.PlatformType == infor.PublishPlatformType && s.PlatformName == infor.PublishPlatformName && s.Link == infor.Link && s.Name == infor.Name && s.EntryId == item.Id);
-
-                        if(store!=null)
-                        {
-                            continue;
-                        }
-
-                        await _storeInfoRepository.InsertAsync(new StoreInfo
-                        {
-                            State = steam.PriceNow == -3 ? StoreState.Takedown : steam.PriceNow == -1 ? StoreState.NotPublished : StoreState.OnSale,
-                            CurrencyCode = CurrencyCode.CNY,
-                            CutLowest = steam.CutLowest>=0 ? steam.CutLowest :null,
-                            CutNow = steam.CutNow >= 0 ? steam.CutNow : null,
-                            EntryId = item.Id,
-                            EstimationOwnersMax = steam.EstimationOwnersMax > 0 ? steam.EstimationOwnersMax : null,
-                            EstimationOwnersMin =   steam.EstimationOwnersMin > 0 ? steam.EstimationOwnersMin : null,
-                            EvaluationCount = steam.EvaluationCount > 0 ? steam.EvaluationCount : null,
-                            Link = steam.SteamId.ToString(),
-                            Name = infor.Name,
-                            OriginalPrice = steam.OriginalPrice >= 0 ? steam.OriginalPrice*0.01 : null,
-                            PlatformName = infor.PublishPlatformName,
-                            PlatformType = PublishPlatformType.Steam,
-                            PlayTime =(int)( steam.PlayTime*60),
-                            PriceLowest = steam.PriceLowest >= 0 ? steam.PriceLowest * 0.01 : null,
-                            PriceNow = steam.PriceNow >= 0 ? steam.PriceNow * 0.01 : null,
-                            RecommendationRate = steam.RecommendationRate > 0 ? steam.RecommendationRate : null,
-                            UpdateTime = steam.UpdateTime,
-                            UpdateType = StoreUpdateType.Automatic
-                        });
-
-                        _logger.LogInformation("迁移词条 - {name}({id}) 的Steam - {id} 信息", item.Name, item.Id, steam.SteamId);
+                foreach (var item in types)
+                {
+                    if(await _entryInformationTypeRepository.GetAll().AnyAsync(s=>s.Name==item.Name)==false)
+                    {
+                        await _entryInformationTypeRepository.InsertAsync(item);
                     }
                 }
+
+                await _basicEntryInformationRepository.GetAll().Where(s => s.DisplayName == "性别").ExecuteUpdateAsync(s => s.SetProperty(a => a.DisplayValue, b => b.DisplayValue == "None"? "保密" : b.DisplayValue == "Man" ? "男" : b.DisplayValue == "Women" ? "女" :  "其他"));
 
                 return new Result { Successful = true };
             }

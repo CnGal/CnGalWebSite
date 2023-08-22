@@ -1,0 +1,59 @@
+﻿
+
+@foreach (var item in Informations)
+{
+    if (item.Name == "生日")
+    {
+        <div class="form-group col-12  col-sm-6">
+            <DateTimePicker Value="@Birthday" ValueChanged="BirthdayChanged" TValue="DateTime?" DisplayText="生日" ShowLabel="true" />
+        </div>
+    }
+    else if (item.Name == "性别")
+    {
+        <div class="form-group col-12  col-sm-6">
+            <Select Value="Gender" ValueChanged="GenderChanged" TValue="GenderType" DisplayText="性别" ShowLabel="true" />
+        </div>
+    }
+    else
+    {
+        <div class="form-group col-12  col-sm-6">
+            <BootstrapInput @bind-Value="item.Value" DisplayText="@item.Name" ShowLabel="true" />
+        </div>
+    }
+
+}
+
+@code {
+    [Parameter]
+    public List<EditInformationModel> Informations { get; set; }
+
+    GenderType Gender;
+    DateTime? Birthday;
+
+    protected override void OnInitialized()
+    {
+        Gender = Informations.First(s => s.Name == "性别").Value.ToEnumValue<GenderType>();
+
+        var text = Informations.First(s => s.Name == "生日").Value;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            Birthday = null;
+        }
+        else
+        {
+            Birthday = DateTime.ParseExact(text, "M月d日", null);
+        }
+    }
+
+    public void GenderChanged(GenderType value)
+    {
+        Gender = value;
+        Informations.First(s => s.Name == "性别").Value = value.GetDisplayName();
+    }
+
+    public void BirthdayChanged(DateTime? value)
+    {
+        Birthday = value;
+        Informations.First(s => s.Name == "生日").Value = value?.ToString("M月d日");
+    }
+}

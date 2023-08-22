@@ -28,5 +28,25 @@ namespace CnGalWebSite.Extensions
                 return string.Empty;
             }
         }
+
+
+        /// <summary>
+        /// 将 字符串 转换为枚举
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static T ToEnumValue<T>(this string text) where T : Enum
+        {
+            foreach (var item in Enum.GetValues(typeof(T)))
+            {
+                var temp = (T)item;
+                if (text == temp.GetDisplayName()|| text == temp.ToString())
+                {
+                    return temp;
+                }
+            }
+            return default;
+        }
     }
 }

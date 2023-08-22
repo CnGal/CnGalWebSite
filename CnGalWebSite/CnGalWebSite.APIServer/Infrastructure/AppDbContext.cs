@@ -97,7 +97,10 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<EntryWebsite> EntryWebsites { get; set; }
         public DbSet<StoreInfo> StoreInfo { get; set; }
         public DbSet<Recommend> Recommends { get; set; }
-        
+        public DbSet<EntryInformationType> EntryInformationTypes { get; set; }
+        public DbSet<BasicEntryInformation> BasicEntryInformation { get; set; }
+
+
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
 
@@ -144,6 +147,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Video>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<EntryInformationType>().HasIndex(g => g.Name).IsUnique();
 
             //限定外键唯一
             modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();
@@ -243,6 +247,15 @@ namespace CnGalWebSite.APIServer.Infrastructure
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                     v => JsonSerializer.Deserialize<GamePlatformType[]>(v, (JsonSerializerOptions)null),
                     new ValueComparer<GamePlatformType[]>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToArray()));
+            modelBuilder.Entity<EntryInformationType>()
+                .Property(e => e.Types)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<EntryType[]>(v, (JsonSerializerOptions)null),
+                    new ValueComparer<EntryType[]>(
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c.ToArray()));

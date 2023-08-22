@@ -20,7 +20,7 @@
                 </ImgContent>
 
                 <ChildContent>
-                    <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
+                    <MAppBarNavIcon @onclick="() => _drawer = true"></MAppBarNavIcon>
                     <MAppBarTitle>
                         @_configuration["WebSiteName"]
                     </MAppBarTitle>
@@ -77,7 +77,7 @@
 
 
 @code {
-    private bool _drawer = false;
+    private bool? _drawer = false;
     private StringNumber _value = default;
 
     void ValueChanged(StringNumber value)

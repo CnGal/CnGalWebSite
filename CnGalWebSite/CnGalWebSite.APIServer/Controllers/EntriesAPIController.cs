@@ -7,7 +7,8 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -45,6 +46,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<EntryInformationType, long> _entryInformationTypeRepository;
         private readonly IAppHelper _appHelper;
         private readonly IEntryService _entryService;
         private readonly IArticleService _articleService;
@@ -54,10 +56,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly ILogger<EntriesAPIController> _logger;
         private readonly IUserService _userService;
+        private readonly IQueryService _queryService;
 
         public EntriesAPIController( IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
         IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger, IUserService userService,
-        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository)
+        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository, IQueryService queryService,
+        IRepository<EntryInformationType, long> entryInformationTypeRepository)
         {
             
             _entryRepository = entryRepository;
@@ -76,6 +80,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _lotteryRepository = lotteryRepository;
             _userService = userService;
+            _queryService = queryService;
+            _entryInformationTypeRepository = entryInformationTypeRepository;
         }
 
         /// <summary>
@@ -1619,6 +1625,113 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// 列出所有词条基础信息类型
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<EntryInformationTypeOverviewModel>> ListEntryInformationTypes(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<EntryInformationType, long>(_entryInformationTypeRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.Name.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+
+            return new QueryResultModel<EntryInformationTypeOverviewModel>
+            {
+                Items = await items.Select(s => new EntryInformationTypeOverviewModel
+                {
+                    Icon= s.Icon,
+                    IsHidden= s.IsHidden,
+                    Name= s.Name,
+                    Types = s.Types.ToList(),
+                    Description = s.Description,
+                    Id = s.Id,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        /// <summary>
+        /// 获取词条基础信息类型编辑模型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<EntryInformationTypeEditModel>> EditEntryInformationType(long id)
+        {
+            var item = await _entryInformationTypeRepository.GetAll()
+              .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (item == null)
+            {
+                return NotFound("找不到目标词条基础信息类型");
+            }
+
+            var model = new EntryInformationTypeEditModel
+            {
+                Icon = item.Icon,
+                IsHidden = item.IsHidden,
+                Name = item.Name,
+                Types = item.Types.ToList(),
+                Description = item.Description,
+                Id = item.Id,
+            };
+
+            return model;
+        }
+
+        /// <summary>
+        /// 编辑词条基础信息类型
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<Result> EditEntryInformationType(EntryInformationTypeEditModel model)
+        {
+
+            EntryInformationType item = null;
+            if (model.Id == 0)
+            {
+                item = await _entryInformationTypeRepository.InsertAsync(new EntryInformationType
+                {
+                    Icon = item.Icon,
+                    IsHidden = item.IsHidden,
+                    Name = item.Name,
+                    Types = item.Types,
+                    Description = item.Description,
+                });
+                model.Id = item.Id;
+                _entryInformationTypeRepository.Clear();
+            }
+
+            item = await _entryInformationTypeRepository.GetAll()
+                .FirstOrDefaultAsync(s => s.Id == model.Id);
+
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "目标不存在" };
+            }
+
+
+
+            //基本信息
+
+            item.Name = model.Name;
+            item.Icon = model.Icon;
+            item.Description = model.Description;
+            item.IsHidden = model.IsHidden;
+            item.Types = model.Types.ToArray();
+
+            //保存
+            await _entryInformationTypeRepository.UpdateAsync(item);
+
+
+            return new Result { Successful = true };
         }
     }
 }

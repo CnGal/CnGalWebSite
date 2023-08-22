@@ -1,4 +1,4 @@
-﻿@if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")) || Model.ProductionGroups.Any() || Model.Publishers.Any() || Model.Tags.Any())
+﻿@if (Model.Information.Any() || Model.ProductionGroups.Any() || Model.Publishers.Any() || Model.Tags.Any())
 {
     <section id="information">
         @if (Model.InforState == EditState.Preview)
@@ -36,13 +36,13 @@
                     }
                 </div>
             }
-            @if (Model.Information.Any(s => s.Modifier == "基本信息"))
+            @if (Model.Information.Any())
             {
-                @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Where(s => s.DisplayName != "官网"))
+                @foreach (var item in Model.Information)
                 {
                     <div>
-                        <dt>@item.DisplayName</dt>
-                        <dd>@item.DisplayValue</dd>
+                        <dt>@item.Name</dt>
+                        <dd>@item.Value</dd>
                     </div>
                 }
             }
@@ -64,47 +64,6 @@
     </section>
 }
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    @if (Model.IsHideOutlink == false && (Model.Information.Any(s => s.Modifier == "相关网站") || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))))
-    {
-        <section id="websites">
-            <h2>相关网站</h2>
-            <dl class="links">
-                @if (Model.Information.Any(s => s.Modifier == "相关网站"))
-                {
-                    @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "相关网站").Informations)
-                    {
-                        <div>
-                            <dt>@item.DisplayName</dt>
-                            <dd>
-                                <a href="@item.DisplayValue" target="_blank">
-                                    @item.DisplayValue
-                                </a>
-                            </dd>
-                        </div>
-                    }
-                }
-
-                @if (Model.Information.Any(s => s.Modifier == "基本信息"))
-                {
-                    @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
-                    {
-                        var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
-                        <div>
-                            <dt>@item.DisplayName</dt>
-                            <dd>
-                                <a href="@item.DisplayValue" target="_blank">
-                                    @item.DisplayValue
-                                </a>
-                            </dd>
-                        </div>
-                    }
-                }
-            </dl>
-        </section>
-    }
-
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 
 @code {

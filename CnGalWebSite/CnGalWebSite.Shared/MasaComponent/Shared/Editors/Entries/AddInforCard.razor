@@ -1,91 +1,39 @@
 ﻿
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="附加信息" Class="@Class" Collapable>
-    @switch (Model.Type)
-    {
-        case EntryType.Game:
-            <div class="row">
+    <div class="row">
+        @switch (Model.Type)
+        {
+            case EntryType.Game:
+
                 <div class="form-group col-12  col-sm-6">
                     <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12  col-sm-6">
                     <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.Publisher" ShowLabel="true" />
                 </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.QQgroupGame" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Original" ShowLabel="true" />
-                </div>
-            </div>
-            <InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
-            <InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
-            <InputRelevanceListTitle Title="STAFF" Text="参与制作的成员" />
-            <StaffEditorChartListTip Staffs="Model.Staffs" />
-            break;
-        case EntryType.ProductionGroup:
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.QQgroupGroup" ShowLabel="true" />
-                </div>
-            </div>
-            break;
-        case EntryType.Role:
-            <div class="row">
+
+
+                break;
+            case EntryType.Role:
                 <div class="form-group col-12  col-sm-6">
                     <AutoComplete Items="@EntryStaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.CV" ShowLabel="true" />
                 </div>
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Gender" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.FigureData" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.FigureSubjective" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <DateTimePicker @bind-Value="@Model.Birthday" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Haircolor" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Pupilcolor" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.ClothesAccessories" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Character" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.RoleIdentity" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.BloodType" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.RoleHeight" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.RoleTaste" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.RoleAge" ShowLabel="true" />
-                </div>
 
-            </div>
-            break;
-        case EntryType.Staff:
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.RealName" ShowLabel="true" />
-                </div>
-            </div>
-            break;
+                break;
+        }
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditInformationsCard Informations="Model.Informations" />
+
+    </div>
+
+    @if (Model.Type == EntryType.Game)
+    {
+        <InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
+        <InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
+        <InputRelevanceListTitle Title="STAFF" Text="参与制作的成员" />
+        <StaffEditorChartListTip Staffs="Model.Staffs" />
     }
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

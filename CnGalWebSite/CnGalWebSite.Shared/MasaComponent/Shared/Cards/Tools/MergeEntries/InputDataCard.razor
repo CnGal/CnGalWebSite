@@ -8,10 +8,10 @@
         <div class="pb-2" style="display: flex; justify-content: center;">被合并的词条 -> 合并到的词条</div>
         <div class="row mb-4">
             <div class="col-12 col-sm-6 mb-4">
-                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.SubName" placeholder="被合并的词条" />
+                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.SubName" PlaceHolder="被合并的词条" />
             </div>
             <div class="col-12 col-sm-6 mb-4">
-                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.HostName" placeholder="合并到的词条" />
+                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.HostName" PlaceHolder="合并到的词条" />
             </div>
             <div class="col-12 col-sm-6 mb-2">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
