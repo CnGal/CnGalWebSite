@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.IdentityServer.Admin.SSR.Models;
 using IdentityModel.Client;
-using static Masa.Blazor.Presets.Message;
 using System.Security.Policy;
 using System.Text.Json;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Tokens;
