@@ -4,7 +4,7 @@
 @inject ToastService ToastService
 
 
-<MNavigationDrawer App Temporary>
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
     <MList Nav Class="mt-4"
            Dense>
         <AuthorizeView>
@@ -41,7 +41,7 @@
 }
 @code {
     [Parameter]
-    public bool Drawer { get; set; }
+    public bool? Drawer { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
     bool isOpen;

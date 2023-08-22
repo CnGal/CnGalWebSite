@@ -241,9 +241,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.Goal:
                     return "mdi-flag-checkered";
                 case IconType.Collapsed:
-                    return "fa fa-chevron-right";
+                    return "mdi-chevron-right";
                 case IconType.UnCollapsed:
-                    return "fa fa-chevron-down";
+                    return "mdi-chevron-down";
                 case IconType.CloudUpload:
                     return "mdi-cloud-upload";
                 case IconType.Loading:
