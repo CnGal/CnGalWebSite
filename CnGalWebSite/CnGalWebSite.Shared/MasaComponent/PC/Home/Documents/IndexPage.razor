@@ -49,9 +49,12 @@
     public void AddItem(DocumentViewModel model)
     {
         MainItems.Add(model);
-        foreach (var item in model.Children)
+        if(model.Children!=null)
         {
-            AddItem(item);
+            foreach (var item in model.Children)
+            {
+                AddItem(item);
+            }
         }
 
 

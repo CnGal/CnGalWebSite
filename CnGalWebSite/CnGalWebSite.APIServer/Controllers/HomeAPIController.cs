@@ -253,7 +253,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //公告
             articles = await _articleRepository.GetAll().AsNoTracking()
-              .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") == false && s.Id != 150 && s.Id != 225 && s.Id != 767 && s.Id != 766)
+              .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") == false && s.Name.Contains("th") == false && s.Id != 150 && s.Id != 225 && s.Id != 767 && s.Id != 766)
               .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName })
               .ToListAsync();
 
