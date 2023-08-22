@@ -1,5 +1,6 @@
 ﻿@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 <div class="shadow-sm rounded  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity">
     <div style="display: flex; flex-direction: column;">
@@ -20,17 +21,17 @@
         <div class="col-12 p-0 pt-2" style="display: flex; justify-content: flex-end;">
             @if (string.IsNullOrWhiteSpace(Model.Link) == false)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall />
             }
             @if (CommentId != 0)
             {
                 @if (IsReplying)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall  Class="ms-3" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall Class="ms-3" />
                 }
                 else
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" XSmall  Class="ms-3" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" XSmall Class="ms-3" />
                 }
             }
 
@@ -41,8 +42,6 @@
         }
     </div>
 </div>
-<PEnqueuedSnackbars @ref="_toast" MaxCount="3">
-</PEnqueuedSnackbars>
 
 @code {
     [Parameter]
@@ -52,7 +51,6 @@
     public long CommentId { get; set; }
 
     private bool IsReplying { get; set; }
-    PEnqueuedSnackbars _toast;
 
     public void OnReplyClick()
     {
@@ -66,11 +64,11 @@
         StateHasChanged();
     }
 
-    public void OnRely()
+    public async Task OnRely()
     {
         IsReplying = false;
         StateHasChanged();
-        _toast?.EnqueueSnackbar(new SnackbarOptions
+        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
         {
             Type = AlertTypes.Success,
             Title = "回复成功",

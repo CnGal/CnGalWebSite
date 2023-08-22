@@ -343,6 +343,14 @@ input.te-image-file-input {
     color: var(--main-color);
 }
 /*步骤条*/
-.m-stepper__wrapper.active{
-    height:auto !important;
+.m-stepper__wrapper.active {
+    height: auto !important;
+}
+/*Toast*/
+.m-enqueued-snackbars .error {
+    height: unset !important;
+}
+
+.m-snack__content > div {
+    white-space: pre-line;
 }
