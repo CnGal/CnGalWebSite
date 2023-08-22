@@ -214,6 +214,36 @@ namespace CnGalWebSite.DataModel.Model
 
     }
 
+    public class EntryInformationType
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 支持的词条类型
+        /// </summary>
+        public EntryType[] Types { get; set; } = Array.Empty<EntryType>();
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 介绍
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public string Icon { get; set; }
+
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool IsHidden { get; set; }
+    }
+
     /// <summary>
     /// 词条官方网站补充信息
     /// </summary>
@@ -402,7 +432,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 游戏平台
         /// </summary>
-        public GamePlatformType[] GamePlatformTypes { get; set; } = new GamePlatformType[0];
+        public GamePlatformType[] GamePlatformTypes { get; set; } = Array.Empty<GamePlatformType>();
 
         /// <summary>
         /// 发行时间
@@ -471,6 +501,8 @@ namespace CnGalWebSite.DataModel.Model
     public class BasicEntryInformation
     {
         public long Id { get; set; }
+
+        [Obsolete("目前所有分类都是“基本信息”，将忽略这个字段")]
         public string Modifier { get; set; }
 
         public string DisplayName { get; set; }
@@ -478,6 +510,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string DisplayValue { get; set; }
 
+        [Obsolete("目前所有词条都没有二级信息，将忽略这个列表")]
         public ICollection<BasicEntryInformationAdditional> Additional { get; set; } = new List<BasicEntryInformationAdditional>();
     }
 

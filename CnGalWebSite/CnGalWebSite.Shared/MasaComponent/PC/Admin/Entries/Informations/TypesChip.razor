@@ -1,0 +1,35 @@
+﻿
+@foreach (var item in Types)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor(item)" Icon="@GetIcon(item)" Text="@item.GetDisplayName()" />
+
+}
+
+@code {
+    [Parameter]
+    public List<EntryType> Types { get; set; }
+
+    public string GetColor(EntryType type)
+    {
+        return type switch
+        {
+            EntryType.Game => "success",
+            EntryType.ProductionGroup => "info",
+            EntryType.Role => "warning",
+            EntryType.Staff => "error",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(EntryType type)
+    {
+        return type switch
+        {
+            EntryType.Game => IconType.Game,
+            EntryType.ProductionGroup => IconType.Group,
+            EntryType.Role => IconType.Role,
+            EntryType.Staff => IconType.Staff,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

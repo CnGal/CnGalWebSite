@@ -1,0 +1,109 @@
+﻿@page "/admin/apiscopes"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<DataTableCard TModel="EntryInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == nameof(EntryInformationTypeOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(EntryInformationTypeOverviewModel.Icon))
+        {
+            <MIcon>@context.Item.Icon</MIcon>
+        }
+        else if (context.Header.Value == nameof(EntryInformationTypeOverviewModel.Types))
+        {
+            <TypesChip Types="context.Item.Types"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/entries/ListEntryInformationTypes";
+    private string _name = "基础信息类型";
+
+    EditCard editCard;
+
+    private List<DataTableHeader<EntryInformationTypeOverviewModel>> _headers = new List<DataTableHeader<EntryInformationTypeOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(EntryInformationTypeOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(EntryInformationTypeOverviewModel.Name)},
+          new (){ Text= "描述", Value= nameof(EntryInformationTypeOverviewModel.Description)},
+          new (){ Text= "图标", Value= nameof(EntryInformationTypeOverviewModel.Icon)},
+          new (){ Text= "支持的类型", Value= nameof(EntryInformationTypeOverviewModel.Types)},
+          new (){ Text= "状态", Value= nameof(EntryInformationTypeOverviewModel.IsHidden)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<EntryInformationTypeOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async void EditItem(EntryInformationTypeOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+}

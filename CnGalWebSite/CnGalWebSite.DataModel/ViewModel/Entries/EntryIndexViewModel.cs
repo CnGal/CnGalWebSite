@@ -106,7 +106,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 附加信息列表
         /// </summary>
-        public List<InformationsModel> Information { get; set; } = new List<InformationsModel>();
+        public List<EntryInformationModel> Information { get; set; } = new List<EntryInformationModel>();
         /// <summary>
         /// Staff信息 
         /// </summary>
@@ -438,6 +438,15 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string DisplayName { get; set; }
 
         public int Id { get; set; }
+    }
+
+    public class EntryInformationModel
+    {
+        public string Name { get; set; }
+
+        public string Value { get; set; }
+
+        public string Icon { get; set; }
     }
 
     public class InformationsModel

@@ -43,7 +43,7 @@
 
     protected override void OnInitialized()
     {
-        publishTime = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息")?.Informations?.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
+        publishTime = Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null && s.Time < DateTime.Now.ToCstTime())?.Time.Value.ToString("yyyy年M月d日");
         group = string.Join("、", Model.ProductionGroups.Select(s => s.DisplayName));
         publisher = string.Join("、", Model.Publishers.Select(s => s.DisplayName));
     }

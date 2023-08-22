@@ -1,10 +1,12 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<MIcon Small="Large==false&&XSmall==false" Large="Large" XSmall="XSmall" Color="@Color" Class="@Class">@Type.ToIconString()</MIcon>
+<MIcon Small="Large==false&&XSmall==false" Large="Large" XSmall="XSmall" Color="@Color" Class="@Class">@(string.IsNullOrWhiteSpace(IconString)?Type.ToIconString(): IconString)</MIcon>
 
 @code {
     [Parameter]
     public IconType Type { get; set; }
+    [Parameter]
+    public string IconString { get; set; }
     [Parameter]
     public bool Large { get; set; }
     [Parameter]

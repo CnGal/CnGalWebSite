@@ -6,14 +6,16 @@
 <TitleTip Title="词条版块"></TitleTip>
 <div>
     <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-               >
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive>
 
             <MTab Value="1">
                 词条<MIcon>mdi-archive</MIcon>
             </MTab>
             <MTab Value="2">
                 游玩记录<MIcon>mdi-star</MIcon>
+            </MTab>
+            <MTab Value="3">
+                基础信息类型<MIcon>@IconType.Tag.ToIconString()</MIcon>
             </MTab>
         </MTabs>
     </div>
@@ -30,6 +32,9 @@
                 <CnGalWebSite.Shared.Component.Admin.Entries.ListPlayedGames />
             </div>
 
+        </MTabItem>
+        <MTabItem Value="3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.Informations.ListCard />
         </MTabItem>
     </MTabsItems>
 </div>
