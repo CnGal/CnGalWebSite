@@ -16,6 +16,8 @@ using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Extentions;
 using CnGalWebSite.Shared.Service;
 using IdentityModel.AspNetCore.AccessTokenManagement;
+using Masa.Blazor.Presets;
+using Masa.Blazor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -92,18 +94,33 @@ namespace CnGalWebSite.Server
                 .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
                 .AddScoped<IDataCacheService, DataCatcheService>()
                 .AddScoped(x => new ImagesLargeViewService())
-                .AddMasaBlazor(s => s.ConfigureTheme(s =>
-                {
-                    if(DateTime.Now.ToCstTime().Day==1&& DateTime.Now.ToCstTime().Month == 4)
+                .AddMasaBlazor(options => {
+                    //消息队列
+                    options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
                     {
-                        s.Themes.Light.Primary = "#4CAF50";
-                    }
-                    else
+                        {
+                            PopupComponents.SNACKBAR, new Dictionary<string, object?>()
+                            {
+                                { nameof(PEnqueuedSnackbars.Outlined), true },
+                                { nameof(PEnqueuedSnackbars.Closeable), true },
+                                { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
+                            }
+                        }
+                    };
+                    //主题
+                    options.ConfigureTheme(s =>
                     {
-                        s.Themes.Light.Primary = "#f06292";
-                    }        
-                    s.Themes.Dark.Primary = "#0078BF";
-                }));
+                        if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
+                        {
+                            s.Themes.Light.Primary = "#4CAF50";
+                        }
+                        else
+                        {
+                            s.Themes.Light.Primary = "#f06292";
+                        }
+                        s.Themes.Dark.Primary = "#0078BF";
+                    });
+                });
 
             //添加状态检查
             services.AddHealthChecks();

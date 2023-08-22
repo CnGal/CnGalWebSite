@@ -1,4 +1,6 @@
-﻿@if (isReady)
+﻿@inject IPopupService PopupService
+
+@if (isReady)
 {
     <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")">
         @if (Model.UserScores.Any(s => s.Socres.IsScored))
@@ -30,8 +32,6 @@
     </div>
 }
 
-<PEnqueuedSnackbars @ref="_toast" MaxCount="3">
-</PEnqueuedSnackbars>
 
 
 @code {
@@ -40,7 +40,6 @@
 
     [Parameter]
     public PlayedGameOverviewModel Model { get; set; }
-    PEnqueuedSnackbars _toast;
 
     EChartsOptionModel model = new EChartsOptionModel();
 
@@ -108,7 +107,7 @@
 
 
         series.AddRange(new List<double>
-    {
+{
             data.Count(s=>s==1),
             data.Count(s=>s==2),
             data.Count(s=>s==3),
@@ -135,7 +134,7 @@
     {
         if (Model.IsDubbing == false && _type == PlayedGameScoreType.CV)
         {
-            _toast.EnqueueSnackbar(new SnackbarOptions
+            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
             {
                 Type = AlertTypes.Error,
                 Title = "这个游戏没有配音哦~",

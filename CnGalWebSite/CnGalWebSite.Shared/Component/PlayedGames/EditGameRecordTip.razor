@@ -2,6 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 
 <MDialog @bind-Value="Dialog"
          MaxWidth="550">
@@ -79,8 +80,6 @@
         </MCardActions>
     </MCard>
 </MDialog>
-<PEnqueuedSnackbars @ref="_toast" MaxCount="3">
-</PEnqueuedSnackbars>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
@@ -89,7 +88,6 @@
     public EventCallback OnChanged { get; set; }
 
     public int Id { get; set; }
-    PEnqueuedSnackbars _toast;
 
     public GameRecordViewModel ViewModel { get; set; }
 
@@ -143,7 +141,7 @@
             {
                 if (Model.ScriptSocre + Model.MusicSocre + Model.PaintSocre + Model.ShowSocre + Model.TotalSocre + Model.SystemSocre + Model.CVSocre != 0)
                 {
-                     _toast.EnqueueSnackbar(new SnackbarOptions
+                    await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                     {
                         Type = AlertTypes.Error,
                         Title = "请填写所有项目的评分",
@@ -160,7 +158,7 @@
                     if (_dataCacheService.ThemeSetting.PlayedGameInforCount >= 0)
                     {
 
-                         _toast.EnqueueSnackbar(new SnackbarOptions
+                        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                         {
                             Type = AlertTypes.Info,
                             Title = "提示",
@@ -186,7 +184,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-                 _toast.EnqueueSnackbar(new SnackbarOptions
+                await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                 {
                     Type = AlertTypes.Error,
                     Title = obj.Error ?? "编辑游玩记录失败~",
