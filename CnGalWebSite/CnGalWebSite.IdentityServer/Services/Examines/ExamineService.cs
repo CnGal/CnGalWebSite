@@ -35,9 +35,10 @@ namespace CnGalWebSite.IdentityServer.Services.Examines
 
             //同步内容
             cur.ApplyTime = DateTime.UtcNow;
+            cur.UserClientId = examine.UserClientId;
 
             //保存
-            await _examineRepository.UpdateAsync(examine);
+            await _examineRepository.UpdateAsync(cur);
         }
     }
 }
