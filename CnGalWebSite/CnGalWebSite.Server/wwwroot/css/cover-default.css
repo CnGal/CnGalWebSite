@@ -354,3 +354,7 @@ input.te-image-file-input {
 .m-snack__content > div {
     white-space: pre-line;
 }
+/*页面跳转Alert*/
+.nav-loading .m-snack__content {
+    padding: 0; 
+}
