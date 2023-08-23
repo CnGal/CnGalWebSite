@@ -52,7 +52,15 @@ else
             _dataCacheService.ThemeSetting.IsTransparent = true;
             if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Color) == false)
             {
-                _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;
+                if(Model.WebsiteAddInfor.Color=="black")
+                {
+                    _dataCacheService.ThemeSetting.IsDark = true;
+                }
+                else
+                {
+                    _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;
+                }
+
             }
             _eventService.OnTempEffectTheme();
         }
