@@ -1,0 +1,72 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+
+@if (isReady)
+{
+    <div>
+        @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false && _dataCacheService.UserPendingDataCatche.Items.Any()==false)
+        {
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div style="width: 100%;">
+                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+                        <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                            貌似没有待办事项，可以一起快乐摸鱼了呢
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEntriesCard Model="_dataCacheService.UserContentCenterCatche.UnReviewEntries" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEditRecordsCard Model="_dataCacheService.UserContentCenterCatche.UnReviewExamines" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListPendingExaminesCard Model="_dataCacheService.UserContentCenterCatche.PendingExamines" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard Model="_dataCacheService.UserPendingDataCatche.Items" />
+    </div>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
+    </div>
+
+}
+
+
+
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    bool isReady;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                if (_dataCacheService.UserContentCenterCatche == null)
+                {
+                    _dataCacheService.UserContentCenterCatche = await _httpService.GetAsync<UserContentCenterViewModel>("api/examines/GetUserContentCenterView");
+                }
+                if (_dataCacheService.UserPendingDataCatche.Items.Any() == false)
+                {
+                    _dataCacheService.UserPendingDataCatche.Items = (await _httpService.GetAsync<List<UserPendingDataModel>>("api/space/GetUserPendingData")).OrderByDescending(s => s.DisplayMode).ToList();
+                }
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+            }
+        }
+    }
+}
+

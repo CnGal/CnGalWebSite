@@ -1,0 +1,20 @@
+﻿<a href="@("/space/index/"+Model.UserId)">
+    <div style="display: flex;" class="rounded shadow-sm  bg-opacity p-2 w-100">
+        <div style="display: flex;align-items: center;">
+            <img class="shadow-sm" src="@Model.Image" style="height: 45px;width: 45px;border-radius: 50%;" />
+        </div>
+        <div class="comment-tx-div" style=" justify-content: center;">
+            <div class="new-row-warp no-margin">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" Outline/>
+                <div class="comment-username a-font-color me-2">@Model.UserName</div>
+            </div>
+            <div class="comment-time text-truncate-2" style="color: gray;">@Model.PersonalSignature</div>
+        </div>
+
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public LotteryUserViewModel Model { get; set; }
+}

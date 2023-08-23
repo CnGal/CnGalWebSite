@@ -1,0 +1,146 @@
+﻿@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
+        <ButtonContent>
+            @if (IsCurrentUser)
+            {
+                @if (string.IsNullOrWhiteSpace(SteamId))
+                {
+                    <MButton Text Block Color="primary" OnClick="OnEditSteam">
+                        <MIcon Left>mdi-steam </MIcon>
+                        绑定Steam账号
+                    </MButton>
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
+
+                }
+            }
+
+
+        </ButtonContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    @if (isReady)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
+        @if (GameRecords.Count == 0)
+        {
+            @if (IsAnniversary&& string.IsNullOrWhiteSpace(SteamId)&& IsCurrentUser)
+            {
+                <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+                </div>
+            }
+
+        }
+        else
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary" />
+        }
+    }
+    else
+    {
+        <div style="height:300px">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
+        </div>
+    }
+</div>
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
+
+@code {
+
+    [Parameter]
+    public string SteamId { get; set; }
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public bool IsAnniversary { get; set; }
+    [Parameter]
+    public int TotalCount { get; set; }
+    [Parameter]
+    public PersonalSpaceViewModel UserInfoModel { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
+    public List<SteamUserInforModel> SteamUserInfors = new List<SteamUserInforModel>();
+   CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
+
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            GameRecords = await _dataCacheService.UserGameRecordDataCatche.GetCache(UserId);
+            SteamUserInfors = await _dataCacheService.UserSteamInforDataCatche.GetCache(UserId);
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
+        }
+    }
+
+    public void OnEditSteam()
+    {
+        //await _eventService.OpenNewPage("https://oauth2.cngal.org/External/Challenge?scheme=Steam");
+        if (editUserSteamInforTip != null)
+        {
+            editUserSteamInforTip.Refresh(true);
+        }
+    }
+
+    public async Task OnChanged(string steamId)
+    {
+        SteamId = steamId;
+        await OnRefresh();
+    }
+
+    public async Task OnRefresh()
+    {
+        try
+        {
+            var model = await _httpService.GetAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor");
+            if (model.Successful)
+            {
+                _dataCacheService.UserGameRecordDataCatche.Clean(UserId);
+                _dataCacheService.UserSteamInforDataCatche.Clean(UserId);
+                await Refresh();
+                await ToastService.Success("刷新成功", "刷新成功");
+                StateHasChanged();
+            }
+            else
+            {
+                await ToastService.Error("刷新失败", "刷新失败");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
+        }
+    }
+}

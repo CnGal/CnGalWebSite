@@ -1,0 +1,54 @@
+﻿@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+
+<PageTitle>@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))</PageTitle>
+<HeadContent>
+    <meta name="description" content="@(string.IsNullOrWhiteSpace(Description)?"CnGal资料站的建站目的是收集，索引国产gal及中文化galgame资料、文章、攻略，为galgame同好们提供方便。":Description)">
+    <meta itemprop="name" content="@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))" />
+    <meta itemprop="image" content="@(string.IsNullOrWhiteSpace(Title)?"https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png":Image)" />
+    @if (NoIndex)
+    {
+        <meta name="robots" content="noindex">
+    }
+    @if (_dataCacheService.IsApp)
+    {
+        <meta name="applicable-device" content="mobile">
+    }
+    else
+    {
+        <meta name="applicable-device" content="pc">
+    }
+</HeadContent>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public bool NoIndex { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+    [Parameter]
+    public string StructuredData { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _eventService.OnChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
+
+        if (string.IsNullOrWhiteSpace(StructuredData) == false)
+        {
+            try
+            {
+                await JS.InvokeAsync<string>("setStructuredData", StructuredData);
+            }
+            catch
+            {
+
+            }
+        }
+    }
+}

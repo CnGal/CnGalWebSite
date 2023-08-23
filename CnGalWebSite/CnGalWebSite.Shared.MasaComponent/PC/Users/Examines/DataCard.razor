@@ -1,0 +1,75 @@
+﻿@inject NavigationManager NavigationManager
+<a href="@url" class="a-font-color">
+    <div class="rounded shadow-sm bg-opacity h-100">
+
+        @if (Model.DisplayMode == UserPendingDataDisplayMode.Main)
+        {
+            <img src="@Model.MainPicture" alt="@Model.Name" class="w-100">
+            <div class="p-2">
+                <div class="mb-1  text-truncate-2">
+                    <span class="comment-tag bg-main">@Model.Type.GetDisplayName()</span>
+                    <span class="fw-bold">  @Model.Name</span>
+
+                </div>
+                <div class="text-truncate-2" style="color: gray">
+                    @Model.BriefIntroduction
+                </div>
+            </div>
+
+
+
+
+        }
+        else if (Model.DisplayMode == UserPendingDataDisplayMode.Thum)
+        {
+            <div class="p-2" style=" display: flex; flex-direction: column; align-items: center; ">
+                <img src="@Model.Thumbnail" alt="@Model.Name" style="border-radius: 50%; height: 100px; width: 100px;">
+                <div class="mt-2 text-truncate-2 fw-bold">
+                    @Model.Name
+                </div>
+                <div class="text-truncate-2" style="color: gray">
+                    @Model.BriefIntroduction
+                </div>
+            </div>
+        }
+        else if (Model.DisplayMode == UserPendingDataDisplayMode.Text)
+        {
+            <div class=" p-4 pt-2 pb-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(Model.BriefIntroduction)" />
+                <div class="mt-2 " style="color:gray;">@Model.Name</div>
+            </div>
+
+
+
+        }
+    </div>
+
+</a>
+@code {
+    [Parameter]
+    public UserPendingDataModel Model { get; set; }
+
+    public string url { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        url = Model.Type switch
+        {
+            ExaminedNormalListModelType.Entry => $"/entries/index/{Model.Id}",
+            ExaminedNormalListModelType.Article => $"/articles/index/{Model.Id}",
+            ExaminedNormalListModelType.Periphery => $"/peripheries/index/{Model.Id}",
+            ExaminedNormalListModelType.Tag => $"/tags/index/{Model.Id}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{Model.Id}",
+            ExaminedNormalListModelType.PlayedGame => Model.Link,
+            ExaminedNormalListModelType.Comment => Model.Link,
+            _ => ""
+        };
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            url = NavigationManager.Uri;
+        }
+
+    }
+
+}

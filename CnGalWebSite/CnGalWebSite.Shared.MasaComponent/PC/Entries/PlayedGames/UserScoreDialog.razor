@@ -1,0 +1,91 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<MDialog @bind-Value="Dialog"
+         MaxWidth="440">
+    <MCard>
+
+        <MCardText Class="pt-6">
+            <div style="display: flex; justify-content: space-between;">
+                <a class="d-flex mb-2 a-font-color" style=" align-items: center;" href="@("/space/index/"+@Model.User.Id)">
+                    <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
+                    <div class="comment-tx-div">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard  Model="Model.User.Ranks" NoLeftPandding/>
+                        <div class="a-font-color text-truncate-1">@Model.User.Name</div>
+                    </div>
+                </a>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.BadgesViewCard Model="Model.User.Ranks" />
+            </div>
+
+
+            @if (Model.Socres.IsScored)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" />
+                <div style="color:gray;" class="pb-2">
+                    @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+((isDubbing && Model.Socres.CVSocre > 0) ? $",配音{Model.Socres.CVSocre}分" : ""))
+                </div>
+            }
+
+            @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
+            {
+                <div class=" a-font-color" style="word-break: break-all; white-space: break-spaces;">评语：@Model.PlayImpressions</div>
+            }
+        </MCardText>
+
+        @if (string.IsNullOrWhiteSpace(gameName) == false)
+        {
+            <MCardText Class="pb-2">
+                @($"《{gameName}》")
+            </MCardText>
+        }
+        <MCardText Class="@(gameId!=0?"pb-0":"")">
+            @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
+        </MCardText>
+
+        @if (gameId != 0)
+        {
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="@(()=>OnNav("/entries/index/" + gameId))" Icon="mdi-share-all-outline" TextStyle />
+            </MCardActions>
+        }
+
+    </MCard>
+</MDialog>
+
+
+@code {
+
+    public PlayedGameUserScoreModel Model { get; set; }
+
+    bool Dialog { get; set; }
+
+    int gameId = 0;
+    string gameName;
+    bool isDubbing;
+
+    public void Refresh(bool dialog, PlayedGameUserScoreModel model, string _gameName = null, int _gameId = 0, bool _isDubbing = true)
+    {
+        gameId = _gameId;
+        gameName = _gameName;
+        Dialog = dialog;
+        Model = model;
+        isDubbing = _isDubbing;
+
+        StateHasChanged();
+        
+    }
+
+
+    public async Task OnNav(string url)
+    {
+        Dialog = false;
+        await Task.Delay(1);
+        NavigationManager.NavigateTo(url);
+    }
+
+
+}

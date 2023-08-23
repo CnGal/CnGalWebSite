@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Shared.Common\CnGalWebSite.Shared.Common.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Shared.Extentions\CnGalWebSite.Shared.Extentions.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Shared.Models\CnGalWebSite.Shared.Models.csproj" />
+  </ItemGroup>
+
+</Project>

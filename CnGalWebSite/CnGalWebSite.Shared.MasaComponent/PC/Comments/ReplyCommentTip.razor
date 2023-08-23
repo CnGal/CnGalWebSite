@@ -1,0 +1,101 @@
+﻿@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<div class=" ps-4 pe-4 pb-3 mb-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded ">
+    @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.Id) == false)
+    {
+        <div class="pt-3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard UserId="@_dataCacheService.UserInfor.Id" UserName="@_dataCacheService.UserInfor.Name" Image="@_dataCacheService.UserInfor.PhotoPath" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"/>
+        </div>
+    }
+
+    @if (_dataCacheService.ThemeSetting.IsCommentUseMarkdown)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MasaMarkdown @bind-Context="@Text" Mode="MarkdownEditorMode.wysiwyg" Class="mb-4 mt-4" />
+    }
+    else
+    {
+        <MTextarea Rows="3"  Placeholder="请在留言板中友善发言，理性讨论"
+                   @bind-Value="Text">
+        </MTextarea>
+    }
+
+    <div style="display: flex !important; flex-wrap: wrap; gap: 1rem;">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发表评论" IsAsync="true" OnClick="OnComment" Icon="mdi-check" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换编辑器" OnClick="OnSwitch" Icon="mdi-circle-edit-outline "/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Text="上传图片" OnImageUploaded="OnImageUploaded" ShowPreview="false"/>
+    </div>
+</div>
+@code {
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public CommentType Type { get; set; }
+
+    [Parameter]
+    public string ObjectId { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+
+    string image = "";
+    string userId = "";
+    string userName = "";
+
+    public string Text { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
+
+    public async void OnComment()
+    {
+        //上传
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Text))
+            {
+                await ToastService.Error("发表评论失败", "你还什么都没说呢，我们不能发表空的评论哦");
+                return;
+            }
+            var obj = await _httpService.PostAsync<PublishCommentModel, Result>("api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type });
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("发表评论失败", obj.Error);
+            }
+            else
+            {
+                Text = "";
+                await ToastService.Success("发表评论成功", "我们需要对你的评论进行审核，在通过审核之前，你的评论仅自己可见");
+                await OnRefresh.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "发表评论失败");
+        }
+    }
+
+
+    public void OnSwitch()
+    {
+        _dataCacheService.ThemeSetting.IsCommentUseMarkdown = !_dataCacheService.ThemeSetting.IsCommentUseMarkdown;
+        _eventService.OnSavaTheme();
+
+        StateHasChanged();
+        
+    }
+
+    public void OnImageUploaded(string path)
+    {
+        Text +=$"![]({path})" ;
+        StateHasChanged();
+    }
+}

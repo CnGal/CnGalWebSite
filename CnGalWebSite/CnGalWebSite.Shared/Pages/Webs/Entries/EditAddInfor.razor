@@ -8,11 +8,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("编辑 " + Model.Name)"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 
 }
 
@@ -74,10 +74,6 @@ else
     private List<string> GamePlatformsValue { get; set; } = new List<string>();
     private bool isReady = false;
 
-
-    [NotNull]
-    private StaffEditorChartListTip? staffEditor { get; set; }
-
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditAddInforViewModel> autoSave { get; set; }
@@ -124,7 +120,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("保存成功", "保存词条附加信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");

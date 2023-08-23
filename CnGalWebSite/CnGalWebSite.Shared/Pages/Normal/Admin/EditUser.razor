@@ -9,7 +9,7 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<TitleTip  Title="编辑用户信息"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip  Title="编辑用户信息"/>
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -128,7 +128,7 @@
 
                 @if (isReady == true)
                 {
-                    <MarkdownEditorTip @bind-Context="@Model.MainPageContext" @ref="markdownEditorTip"></MarkdownEditorTip>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.MainPageContext"/>
                 }
 
 
@@ -163,9 +163,6 @@
     private List<string> UseRolesValue { get; set; } = new List<string>();
     private bool isReady = false;
     bool isSuper = false;
-
-    [NotNull]
-    private MarkdownEditorTip? markdownEditorTip;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }

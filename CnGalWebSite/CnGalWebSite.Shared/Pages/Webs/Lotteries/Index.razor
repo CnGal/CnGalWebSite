@@ -9,11 +9,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 }
 
 @if (_dataCacheService.ThemeSetting.IsTransparent)

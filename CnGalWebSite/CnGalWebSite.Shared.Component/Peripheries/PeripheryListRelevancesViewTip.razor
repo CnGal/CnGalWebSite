@@ -1,0 +1,46 @@
+﻿
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Collapable Outline>
+        <div class="mt-3">
+            <div>
+                @foreach (var item in Model.Entries)
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item"  BigCardStyle/>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    @if ((Model.Peripheries.Count > 0 && Model.Type != PeripheryType.Set))
+    {
+        <div class="mt-3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Periphery.ToIconString()" Title="相关周边" Collapable Outline>
+                <div class="mt-3">
+
+                    @if (Model.Type != PeripheryType.Set)
+                    {
+                        @foreach (var item in Model.Peripheries)
+                        {
+                            <div class="mb-3">
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item" BigCardStyle ShowAddInfors="false"/>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </div>
+    }
+
+
+</div>
+
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; }
+
+}

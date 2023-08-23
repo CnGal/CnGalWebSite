@@ -2,7 +2,7 @@
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="发布视频"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="发布视频"/>
 
 <AutoSaveTip TItem="CreateVideoViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
@@ -52,9 +52,6 @@
     private List<string> EntryStaffItems { get; set; } = new List<string>();
     private List<string> ArticleItems { get; set; } = new List<string>();
     private List<string> VideoItems { get; set; } = new List<string>();
-
-    [NotNull]
-    private MarkdownEditorTip? markdownEditorTip;
 
     private bool IsOnlyNeedPublishTime { get; set; } = true;
 

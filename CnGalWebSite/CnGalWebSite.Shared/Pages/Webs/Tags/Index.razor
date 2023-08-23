@@ -11,11 +11,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@Model.Name" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@Model.Name" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
 }
 else
 {
-    <TitleTip />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 <div>
     @if (_dataCatcheService.TagIndexPageCatche.Check(Id) || isReady)

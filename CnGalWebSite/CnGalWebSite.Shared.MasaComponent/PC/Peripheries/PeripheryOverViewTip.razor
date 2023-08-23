@@ -1,0 +1,177 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCatcheService
+
+
+@if (isReady)
+{
+
+    @if (Model.Peripheries.Count != 0)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
+
+            <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity " +Class)">
+                <a class="a-font-color" @onclick="OnClick">
+                    <div class="row m-0">
+                        @if (Model.IsThumbnail)
+                        {
+                            <div class="col-auto  ps-3 pt-3 pe-0" style=" display: flex; align-items: center;">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 1/1; height: 75px; border-radius: 50%;" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-md-flex d-none col-auto  ps-3 pt-3 pe-0">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; height: 75px;" />
+                            </div>
+                            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; width: 100%;" />
+                            </div>
+                        }
+                        <div class="ps-3 pt-3 pe-4 col">
+                            <div style=" display: flex; flex-wrap: wrap; flex-direction: column; justify-content: center;" class="w-100 h-100">
+                                <div style="display: flex; align-items: flex-end; justify-content: flex-start; flex-wrap: wrap;" class="mb-2">
+                                    <div class="h5 fw-bold m-0 me-2">@Model.Name</div>
+
+                                    <div style="color: gray;">@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
+                                </div>
+                                <div class=" text-truncate-2">@Model.BriefIntroduction</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <div class="ms-3 me-3 mb-1 mt-1 pt-2">
+                    <MProgressLinear Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" BufferValue="0" Stream />
+                </div>
+                <MSlideGroup ShowArrows="true" Class="ms-2 me-2 pb-2">
+                    <ChildContent>
+                        @foreach (var item in Model.Peripheries)
+                        {
+                            <MSlideItem>
+                                <MCard Width="150" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                                       OnClick="@context.Toggle"
+                                       RefBack="@context.Ref">
+                                    <PeripheryOverviewAloneTip Model="item" />
+                                </MCard>
+                            </MSlideItem>
+                        }
+                    </ChildContent>
+
+                </MSlideGroup>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+    else
+    {
+        if (IsGameView)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4 ">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        }
+    }
+
+}
+
+@code {
+    [Parameter]
+    public int EntryId { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool IsGameView { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool OnlyShowContext { get; set; }
+
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [Parameter]
+    public GameOverviewPeripheriesModel Model { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (EntryId > 0)
+        {
+            try
+            {
+                Model = await _httpService.GetAsync<GameOverviewPeripheriesModel>("api/peripheries/GetEntryOverviewPeripheries/" + EntryId);
+                isReady = true;
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
+            }
+        }
+        else
+        {
+            isReady = true;
+        }
+
+
+    }
+
+    public void OnClick()
+    {
+        string url = null;
+        if (Model.Type == PeripheryOverviewType.Entry)
+        {
+            url = "/entries/index/" + Model.ObjectId;
+        }
+        else if (Model.Type == PeripheryOverviewType.Periphery)
+        {
+            url = "/peripheries/index/" + Model.ObjectId;
+        }
+        else if (Model.Type == PeripheryOverviewType.User)
+        {
+            url = string.IsNullOrWhiteSpace(Model.ObjectId) ? null : ("/space/index/" + Model.ObjectId + "?TabIndex=11");
+        }
+
+        if(string.IsNullOrWhiteSpace(url))
+        {
+            OnLogin();
+        }
+        else
+        {
+            NavigationManager.NavigateTo(url);
+        }
+    }
+
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
+}

@@ -1,0 +1,129 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+
+@if (isReady)
+{
+    @if (Large)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
+            <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="10" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
+            <TotalScoreCard Model="Model" Outline />
+            <div>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <MButton Text Block OnClick="OnClickEditGameRecored" Color="primary">
+                            <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
+                            @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
+                        </MButton>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MButton Text Block OnClick="OnLogin" Color="primary">
+                            <MIcon Left>mdi-login</MIcon>
+                            登入后添加游玩记录
+                        </MButton>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+
+    @if (Model.GameTotalScores.IsScored)
+    {
+        <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+            <meta itemprop="ratingValue" content="@Model.GameTotalScores.TotalSocre" />
+            <meta itemprop="worstRating" content="1">
+            <meta itemprop="bestRating" content="10" />
+            <meta itemprop="ratingCount" content="@Model.UserScores.Count" />
+        </div>
+
+    }
+
+
+}
+<EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
+<OverviewDialog ShowBlankAction @ref="overviewDialog" />
+
+
+@code {
+    [Parameter]
+    public PlayedGameOverviewModel Model { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool Large { get; set; }
+
+    EditGameRecordTip editGameRecordTip;
+    OverviewDialog overviewDialog;
+
+    bool isReady;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCache(Id.ToString());
+            Model.UserScores.Random();
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
+        }
+    }
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
+    public async Task OnClickEditGameRecored()
+    {
+        if (editGameRecordTip != null)
+        {
+            await editGameRecordTip.Refresh(true, Id, null, Model.IsDubbing);
+        }
+    }
+
+    public async Task OnChanged()
+    {
+        _dataCacheService.PlayedGameOverviewDataCatche.Clean(Id.ToString());
+        await Refresh();
+    }
+
+    public async Task OnClickMore()
+    {
+        if (overviewDialog != null)
+        {
+            await overviewDialog.Refresh(true, Model);
+        }
+    }
+}

@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 
 
-    <TitleTip Title="创建标签"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建标签"/>
 
 <AutoSaveTip TItem="CreateTagViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
@@ -44,14 +44,14 @@
 </div>
 
 @code {
-        [Parameter]
-        public string Id { get; set; }
+    [Parameter]
+    public string Id { get; set; }
 
     private CreateTagViewModel Model { get; set; } = new CreateTagViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> TagItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryItems { get; set; } = new string[1] { "" };
+    private List<string> TagItems { get; set; } = new List<string>();
+    private List<string> EntryItems { get; set; } = new List<string>();
 
     [NotNull]
     private ValidateForm? ComplexForm { get; set; }

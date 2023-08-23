@@ -1,0 +1,55 @@
+﻿
+@if (Model.RelatedEntriesState == EditState.Preview)
+{
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditRelatedEntries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnRevoke"/>
+    </div>
+}
+@if (Model.RelatedPeripheriesState == EditState.Preview)
+{
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditRelatedPeripheries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedPeripheries" OnClickRevoke="OnRevoke"/>
+    </div>
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边合集" Icon="@IconType.Periphery.ToIconString()" Outline>
+    @foreach (var item in Model.PeripheryOverviewModels)
+    {
+        <div class="mb-4">
+            <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip Model="item" OnlyShowContext/>
+        </div>
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; } = new PeripheryViewModel();
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+    public void CollectionChanged(bool collected, long id)
+    {
+        foreach (var item in Model.PeripheryOverviewModels)
+        {
+            foreach (var infor in item.Peripheries)
+            {
+                if (infor.Id == id)
+                {
+                    infor.IsCollected = collected;
+                    if (collected)
+                    {
+                        infor.CollectedCount++;
+                    }
+                    else
+                    {
+                        infor.CollectedCount--;
+                    }
+                }
+            }
+        }
+
+        StateHasChanged();
+
+        
+    }
+}

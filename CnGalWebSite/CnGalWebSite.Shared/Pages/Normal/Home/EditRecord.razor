@@ -17,7 +17,7 @@
 
 @if (isReady)
 {
-    <TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"/>
 }
 
 @if (isReady)

@@ -1,0 +1,65 @@
+﻿@inject IHttpService _httpService
+
+@if (is404 == true)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+}
+
+<div>
+    
+    <Virtualize  ItemsProvider="@LoadArticles" @ref="virtualize">
+        <div class="mb-3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="context" />
+
+        </div>
+    </Virtualize>
+</div>
+   
+
+
+@code {
+    [Parameter]
+    public PagedSortedAndFilterInput Input { get; set; }
+    [NotNull]
+    public Virtualize<ArticleInforTipViewModel>? virtualize { get; set; }
+
+    private bool is404 = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task<PagedResultDto<ArticleInforTipViewModel>> OnGetNewItems()
+    {
+        try
+        {
+            return await _httpService.PostAsync<PagedSortedAndFilterInput, PagedResultDto<ArticleInforTipViewModel>>("api/articles/GetArticleHomeList", Input);
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取文章列表");
+            return new PagedResultDto<ArticleInforTipViewModel> { Data=new List<ArticleInforTipViewModel>()};
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<ArticleInforTipViewModel>> LoadArticles(ItemsProviderRequest request)
+    {
+        Input.CurrentPage = request.StartIndex;
+        Input.MaxResultCount = request.Count;
+        var articles = await OnGetNewItems();
+
+        if (is404 != (articles.TotalCount == 0))
+        {
+            is404 = (articles.TotalCount == 0);
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<ArticleInforTipViewModel>(articles.Data, articles.TotalCount);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        await virtualize.RefreshDataAsync();
+    }
+
+
+}

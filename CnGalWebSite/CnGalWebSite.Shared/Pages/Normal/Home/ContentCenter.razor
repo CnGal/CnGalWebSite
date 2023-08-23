@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<TitleTip Title="@("内容中心"+Tab switch {"monitor"=>" - 监视列表","review"=> " - 审阅记录列表","editrecord" =>" - 审核",_=>""})" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("内容中心"+Tab switch {"monitor"=>" - 监视列表","review"=> " - 审阅记录列表","editrecord" =>" - 审核",_=>""})" />
 
 <div class="rounded  shadow-sm bg-opacity mb-4">
     <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive

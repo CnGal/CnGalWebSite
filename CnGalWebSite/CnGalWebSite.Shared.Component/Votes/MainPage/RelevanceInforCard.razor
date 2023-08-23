@@ -1,0 +1,33 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关推荐" Icon="fa fa-fw fa-codepen" Outline Collapable>
+    <div>
+        @foreach (var item in Model.Entries)
+        {
+            <div class="mt-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" />
+
+            </div>
+        }
+    </div>
+    <div>
+        @foreach (var item in Model.Artciles)
+        {<div class="mt-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" />
+
+            </div>
+        }
+    </div>
+    <div>
+        @foreach (var item in Model.Peripheries)
+        {
+            <div class="mt-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item" />
+
+            </div>
+        }
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+}

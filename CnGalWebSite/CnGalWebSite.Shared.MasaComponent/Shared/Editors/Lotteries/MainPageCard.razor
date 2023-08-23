@@ -1,0 +1,11 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-file-text-o" Title="介绍" Class="@Class" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.MainPage" />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+@code {
+    [Parameter]
+    public EditLotteryModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

@@ -6,7 +6,7 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="编辑友情链接"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="编辑友情链接"/>
 
 <div>
     @if (isReady == false)
@@ -31,7 +31,7 @@
     else
     {
         <div class=" rounded shadow-sm  bg-opacity p-4">
-            <ImagesListEditorViewTip Model="Model.FriendLinks" TValue="FriendLinkModel"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard Model="Model.FriendLinks" TValue="FriendLinkModel"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="success" Class="mt-4" />
         </div>
 

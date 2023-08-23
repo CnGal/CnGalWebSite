@@ -1,0 +1,208 @@
+﻿@inject IDataCacheService _dataCacheService
+
+@if (Model.Objects.Any())
+{
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow Class="rounded" CenterActive
+               >
+            @if (Model.Objects.Any(s => s.entry != null))
+            {
+                <MTab Value="1">
+                    @($"词条{(Model.Objects.Count(s => s.entry != null)>4?$" ({Model.Objects.Count(s => s.entry != null)})":"")}")<MIcon>mdi-archive </MIcon>
+                </MTab>
+            }
+            @if (Model.Objects.Any(s => s.article != null))
+            {
+                <MTab Value="2">
+                    @($"文章{(Model.Objects.Count(s => s.article != null)>4?$" ({Model.Objects.Count(s => s.article != null)})":"")}")<MIcon>mdi-script-text </MIcon>
+                </MTab>
+            }
+            @if (Model.Objects.Any(s => s.Tag != null))
+            {
+                <MTab Value="3">
+                    @($"标签{(Model.Objects.Count(s => s.Tag != null)>4?$" ({Model.Objects.Count(s => s.Tag != null)})":"")}")<MIcon>mdi-tag</MIcon>
+                </MTab>
+            }
+            @if (Model.Objects.Any(s => s.periphery != null))
+            {
+                <MTab Value="4">
+                    @($"周边{(Model.Objects.Count(s => s.periphery != null)>4?$" ({Model.Objects.Count(s => s.periphery != null)})":"")}")<MIcon>mdi-basket</MIcon>
+                </MTab>
+            }
+            @if (Model.Objects.Any(s => s.Video != null))
+            {
+                <MTab Value="5">
+                    @($"视频{(Model.Objects.Count(s => s.Video != null)>4?$" ({Model.Objects.Count(s => s.Video != null)})":"")}")<MIcon>mdi-animation-play </MIcon>
+                </MTab>
+            }
+        </MTabs>
+    </div>
+    <MTabsItems @bind-Value="TabIndex">
+        @if (Model.Objects.Any(s => s.entry != null))
+        {
+            var entries = Model.Objects.Where(s => s.entry != null).Select(s => s.entry);
+            <MTabItem Value="1">
+                @if (entries.Any(s => s.Type == EntryType.Game))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Game.ToIconString()" Title="@("游戏"+(entries.Count(s => s.Type == EntryType.Game)>4?$" ({entries.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
+                        <div class="mt-3">
+                            @foreach (var item in entries.Where(s => s.Type == EntryType.Game))
+                            {
+                                <div class="mb-3">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
+                                </div>
+                            }
+                        </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                }
+                @if (entries.Any(s => s.Type == EntryType.ProductionGroup))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Group.ToIconString()" Title="@("制作组"+(entries.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({entries.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
+                        <div class="mt-3">
+                            @foreach (var item in entries.Where(s => s.Type == EntryType.ProductionGroup))
+                            {
+                                <div class="mb-3">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
+                                </div>
+                            }
+                        </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                }
+                @if (entries.Any(s => s.Type == EntryType.Staff))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="@("STAFF"+(entries.Count(s => s.Type == EntryType.Staff)>4?$" ({entries.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
+                        <div class="mt-3">
+                            @foreach (var item in entries.Where(s => s.Type == EntryType.Staff))
+                            {
+                                <div class="mb-3">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
+                                </div>
+                            }
+                        </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                }
+                @if (entries.Any(s => s.Type == EntryType.Role))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Role.ToIconString()" Title="@("角色"+(entries.Count(s => s.Type == EntryType.Role)>4?$" ({entries.Count(s => s.Type == EntryType.Role)})":""))" Outline Collapable>
+                        <div class="mt-3">
+                            @foreach (var item in entries.Where(s => s.Type == EntryType.Role))
+                            {
+                                <div class="mb-3">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
+                                </div>
+                            }
+                        </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                }
+
+            </MTabItem>
+        }
+        @if (Model.Objects.Any(s => s.article != null))
+        {
+            <MTabItem Value="2">
+
+                @foreach (var item in Model.Objects.Where(s => s.article != null).Select(s => s.article))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" />
+                    </div>
+                }
+
+            </MTabItem>
+
+        }
+        @if (Model.Objects.Any(s => s.Tag != null))
+        {
+            <MTabItem Value="3">
+
+                @foreach (var item in Model.Objects.Where(s => s.Tag != null).Select(s => s.Tag))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item" />
+                    </div>
+                }
+
+            </MTabItem>
+        }
+        @if (Model.Objects.Any(s => s.periphery != null))
+        {
+            <MTabItem Value="4">
+
+                @foreach (var item in Model.Objects.Where(s => s.periphery != null).Select(s => s.periphery))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item" />
+                    </div>
+                }
+
+            </MTabItem>
+        }
+        @if (Model.Objects.Any(s => s.Video != null))
+        {
+            <MTabItem Value="5">
+                @foreach (var item in Model.Objects.Where(s => s.Video != null).Select(s => s.Video))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item" />
+                    </div>
+                }
+
+            </MTabItem>
+        }
+    </MTabsItems>
+
+
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+}
+
+
+
+@code {
+    [Parameter]
+    public FavoriteFolderViewModel Model { get; set; }
+    public StringNumber TabIndex { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Model.TabIndex == 0)
+        {
+            if (Model.Objects.Any(s => s.entry != null))
+            {
+                Model.TabIndex = 1;
+            }
+            else if (Model.Objects.Any(s => s.article != null))
+            {
+                Model.TabIndex = 2;
+            }
+            else if (Model.Objects.Any(s => s.Tag != null))
+            {
+                Model.TabIndex = 3;
+            }
+            else if (Model.Objects.Any(s => s.periphery != null))
+            {
+                Model.TabIndex = 4;
+            }
+            else if (Model.Objects.Any(s => s.Video != null))
+            {
+                Model.TabIndex = 5;
+            }
+        }
+
+        TabIndex = Model.TabIndex;
+
+        StateHasChanged();
+
+    }
+
+    public void ValueChanged(StringNumber index)
+    {
+        Model.TabIndex = index.ToInt32();
+        TabIndex = index;
+        StateHasChanged();
+        
+    }
+}

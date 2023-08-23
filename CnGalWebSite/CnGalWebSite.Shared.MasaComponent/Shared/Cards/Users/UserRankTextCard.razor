@@ -1,0 +1,103 @@
+﻿@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCatcheService
+
+<div style="display: flex; justify-content: space-between;">
+    @if (IsRight)
+    {
+        <div style="display: flex; justify-content: flex-end; align-items: center; ">
+
+            <div class="comment-tx-div">
+                <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
+                    @if (Time != null)
+                    {
+                        <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
+                    }
+                    <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Ranks" Outline  ForceDisplayBadge="ForceBadgeShowText"/>
+                </div>
+                <span class="me-2">@Text</span>
+
+            </div>
+            <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
+                <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+            </a>
+        </div>
+    }
+    else
+    {
+        <div style="display: flex; align-items: center;">
+            <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
+                <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+            </a>
+            <div class="comment-tx-div">
+                <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Ranks" Outline ForceDisplayBadge="ForceBadgeShowText" />
+                    <div class="comment-username a-font-color me-2">@UserName</div>
+                    @if (Time != null)
+                    {
+                        <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
+                    }
+                </a>
+                <span>@Text</span>
+            </div>
+        </div>
+    }
+    @if (_dataCatcheService.IsApp == false&& ForceBadgeShowText==false)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.BadgesViewCard Model="Ranks" />
+
+    }
+</div>
+@if (_dataCatcheService.IsApp&& ForceBadgeShowText==false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.BadgesViewCard Model="Ranks" Class="mt-4" Styles=" display: flex;justify-content: flex-end;" />
+
+}
+
+
+
+
+@code {
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public string UserName { get; set; }
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public bool IsRight { get; set; }
+    [Parameter]
+    public DateTime? Time { get; set; }
+    [Parameter]
+    public bool ForceBadgeShowText { get; set; }
+
+    [Parameter]
+    public List<RankViewModel> Ranks { get; set; } = new List<RankViewModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Ranks.Count != 0)
+        {
+            return;
+        }
+        try
+        {
+            if (string.IsNullOrWhiteSpace(UserId))
+            {
+                return;
+            }
+            var model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + UserId);
+            Ranks = model.Ranks;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户信息失败");
+        }
+    }
+}
