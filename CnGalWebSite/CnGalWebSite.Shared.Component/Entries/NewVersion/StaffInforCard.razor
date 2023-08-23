@@ -22,11 +22,11 @@
                         @foreach (var infor in item.StaffList)
                         {
                             <div style=" display: flex; flex-wrap: wrap; ">
-                                <OutlineButton IsTitile="true" Text="@infor.Modifier" Color="@ColorExtensions.GetGradientColor(index)" />
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@infor.Modifier" Color="@ColorExtensions.GetGradientColor(index)" />
 
                                 @foreach (var temp in infor.Names)
                                 {
-                                    <OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="@temp.Id" Color="@ColorExtensions.GetGradientColor(index)" />
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="@temp.Id" Color="@ColorExtensions.GetGradientColor(index)" />
                                 }
                             </div>
                             index++;
