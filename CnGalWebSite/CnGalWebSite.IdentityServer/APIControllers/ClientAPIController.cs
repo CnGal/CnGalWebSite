@@ -142,7 +142,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             //查找待审核记录
             var user = await FindLoginUserAsync();
             var userClient = await _userClientRepository.GetAll().AsNoTracking()
-                .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null);
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null && s.ClientId == client.Id);
             if(userClient != null)
             {
                 client.LogoUri = userClient.LogoUri;
@@ -191,6 +191,16 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
             Client client = null;
             string secret = null;
+
+            //检测所属
+            if(!User.IsInRole("Admin")&& model.Id!=0)
+            {
+                if (!await _userClientRepository.AnyAsync(s=>s.ApplicationUserId== user.Id&&s.ClientId== model.Id))
+                {
+                    return new Result { Success = false, Message = "当前用户没有客户端的所有权" };
+                }
+            }
+
             if (model.Id == 0)
             {
                 //检查用户客户端上限
@@ -215,14 +225,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 _clientRepository.Clear();
             }
 
-            //检测所属
-            if(!User.IsInRole("Admin")&&client.Id!=0)
-            {
-                if (!await _userClientRepository.AnyAsync(s=>s.ApplicationUserId== user.Id&&s.ClientId==client.Id))
-                {
-                    return new Result { Success = false, Message = "当前用户没有客户端的所有权" };
-                }
-            }
+         
 
             client = await _clientRepository.GetAll()
                 .Include(s => s.AllowedGrantTypes)

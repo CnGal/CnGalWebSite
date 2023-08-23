@@ -71,8 +71,9 @@ else
             </dl>
         </MCardText>
     }
-
-    <MCardActions>
+    @if(Model.IsPassed==null)
+        {
+                    <MCardActions>
         <MButton Color="error"
                  Text
                  OnClick="@(()=>SaveEdit(false))">
@@ -87,6 +88,8 @@ else
             通过
         </MButton>
     </MCardActions>
+        }
+
 
 </MCard>
 
