@@ -6,6 +6,8 @@ using CnGalWebSite.IdentityServer.Admin.SSR.Plumbing;
 using CnGalWebSite.IdentityServer.Admin.SSR.Services;
 using IdentityModel.AspNetCore.AccessTokenManagement;
 using IdentityModel.Client;
+using Masa.Blazor;
+using Masa.Blazor.Presets;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -32,11 +34,34 @@ builder.Services.AddScoped<INavigationService, NavigationService> ();
 //添加Query
 builder.Services.AddScoped<IQueryService, QueryService>();
 //设置主题
-builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
+builder.Services.AddMasaBlazor(options =>
 {
-    s.Themes.Light.Primary = "#f06292";
-    s.Themes.Dark.Primary = "#2196F3";
-}));
+    //消息队列
+    options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
+    {
+        {
+            PopupComponents.SNACKBAR, new Dictionary<string, object?>()
+            {
+                { nameof(PEnqueuedSnackbars.Outlined), true },
+                { nameof(PEnqueuedSnackbars.Closeable), true },
+                { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
+            }
+        }
+    };
+    //主题
+    options.ConfigureTheme(s =>
+    {
+        if (DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
+        {
+            s.Themes.Light.Primary = "#4CAF50";
+        }
+        else
+        {
+            s.Themes.Light.Primary = "#f06292";
+        }
+        s.Themes.Dark.Primary = "#0078BF";
+    });
+});
 //使用 IdentityModel 管理刷新令牌
 builder.Services.AddAccessTokenManagement();
 
