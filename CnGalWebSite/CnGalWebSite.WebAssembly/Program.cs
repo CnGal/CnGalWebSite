@@ -13,6 +13,8 @@ using CnGalWebSite.Shared.Extentions;
 using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
 using CnGalWebSite.Shared.Service;
 using CnGalWebSite.WebAssembly.Services;
+using Masa.Blazor.Presets;
+using Masa.Blazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -20,6 +22,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -69,21 +72,36 @@ namespace CnGalWebSite.WebAssembly
 
             builder.Services.AddScoped(x => new ImagesLargeViewService());
 
-            builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
+            builder.Services.AddMasaBlazor(options =>
             {
-                if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
+                //消息队列
+                options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
+                    {
+                        {
+                            PopupComponents.SNACKBAR, new Dictionary<string, object?>()
+                            {
+                                { nameof(PEnqueuedSnackbars.Outlined), true },
+                                { nameof(PEnqueuedSnackbars.Closeable), true },
+                                { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
+                            }
+                        }
+                    };
+                //主题
+                options.ConfigureTheme(s =>
                 {
-                    s.Themes.Light.Primary = "#4CAF50";
-                }
-                else
-                {
-                    s.Themes.Light.Primary = "#f06292";
-                }
-                s.Themes.Dark.Primary = "#0078BF";
-            }));
-
-            //添加工具箱
-            _ = builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
+                    if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
+                    {
+                        s.Themes.Light.Primary = "#4CAF50";
+                    }
+                    else
+                    {
+                        s.Themes.Light.Primary = "#f06292";
+                    }
+                    s.Themes.Dark.Primary = "#0078BF";
+                });
+            });
+                //添加工具箱
+                _ = builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
                 .AddScoped<IEntryService, EntryService>()
                 .AddScoped<IArticleService, ArticleService>()
                 .AddScoped<IImageService, ImageService>()
