@@ -1,0 +1,25 @@
+﻿@if (Model.MainPageState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditMainPage/" + Model.Id)" ExamineType="Operation.EditVideoMainPage" OnClickRevoke="OnRevoke" />
+}
+
+
+@if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+{
+    <div class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="介绍" Icon="@IconType.MainPage.ToIconString()">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+           
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public VideoViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+}

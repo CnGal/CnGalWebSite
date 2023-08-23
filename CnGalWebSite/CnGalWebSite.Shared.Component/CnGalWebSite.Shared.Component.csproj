@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entries\Tags\**" />
+    <Content Remove="Entries\Tags\**" />
+    <EmbeddedResource Remove="Entries\Tags\**" />
+    <None Remove="Entries\Tags\**" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Shared.Common\CnGalWebSite.Shared.Common.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Shared.MasaComponent\CnGalWebSite.Shared.MasaComponent.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Shared.Service\CnGalWebSite.Shared.Service.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Space\Messages\" />
+  </ItemGroup>
+
+</Project>

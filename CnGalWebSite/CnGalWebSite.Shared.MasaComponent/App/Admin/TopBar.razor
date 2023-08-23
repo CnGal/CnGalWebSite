@@ -1,0 +1,59 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IEventService _eventService
+@implements IDisposable
+
+
+<MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
+    <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+
+    <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
+    <MSpacer></MSpacer>
+
+    <MButton Icon OnClick="OnClickSearch">
+        <MIcon>mdi-magnify</MIcon>
+    </MButton>
+</MAppBar>
+<CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton Drawer="drawer" @ref="navButton" />
+
+@code {
+    bool drawer { get; set; }
+    CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;
+    CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton navButton;
+
+    public void ChangeTitle(string title)
+    {
+        if (homeTitleCard != null)
+        {
+            homeTitleCard.ChangeTitle(title);
+        }
+    }
+    public void OnClickSearch()
+    {
+        NavigationManager.NavigateTo("/search");
+        
+    }
+
+    public void SetDrawer()
+    {
+        if (navButton != null)
+        {
+            navButton.SetDrawer(true);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _eventService.ChangeTitle -= ChangeTitle;
+        _eventService.ChangeTitle += ChangeTitle;
+    }
+
+
+    #region 释放实例
+    public void Dispose()
+    {
+        _eventService.ChangeTitle -= ChangeTitle;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

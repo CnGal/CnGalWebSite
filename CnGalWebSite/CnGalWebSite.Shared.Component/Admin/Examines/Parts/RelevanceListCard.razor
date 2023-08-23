@@ -1,0 +1,33 @@
+﻿<div>
+    @foreach (var item in Model)
+    {
+        <div class="mb-4">
+            @if (item.entry != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip>
+            }
+            else if (item.article != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip>
+            }
+            else if (item.periphery != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip>
+            }
+            else if (item.tag != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip>
+            }
+            else if (item.video != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip>
+            }
+
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<SearchAloneModel> Model { get; set; } = new List<SearchAloneModel>();
+}

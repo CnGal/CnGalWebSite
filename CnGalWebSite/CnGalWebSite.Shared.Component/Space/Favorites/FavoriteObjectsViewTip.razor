@@ -1,0 +1,105 @@
+﻿@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+    <ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
+    </ButtonContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+
+<div>
+    @foreach (var item in pagedResultDto.Data)
+    {
+        <div class="mb-3">
+            @if (item.entry != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item.entry" />
+
+            }
+            else if (item.article != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item.article" />
+            }
+            else if (item.periphery != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item.periphery" />
+            }
+            else if (item.Video != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item.Video" />
+            }
+            else if (item.Tag != null)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item.Tag" />
+            }
+        </div>
+
+    }
+
+
+</div>
+
+@if (pagedResultDto.TotalPages > 1)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@pagedResultDto.CurrentPage"  Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
+}
+@if (pagedResultDto.Data.Count == 0&&isReady)
+{
+    <div class="mb-3">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+    </div>
+
+}
+@code {
+
+    public PagedResultDto<FavoriteObjectAloneViewModel> pagedResultDto { get; set; } = new PagedResultDto<FavoriteObjectAloneViewModel>();
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+    bool isReady;
+
+    [Parameter]
+    public EventCallback OnReturn { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_dataCacheService.SpaceViewCache.PageFavoriteFolderId != Id)
+        {
+            _dataCacheService.SpaceViewCache.PageFavoriteFolderId = Id;
+            _dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage = 1;
+        }
+        //获取审核列表
+        await OnPageClick(_dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage);
+        isReady = true;
+    }
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        _dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage = pageIndex;
+        try
+        {
+            pagedResultDto = await _dataCacheService.UserFavoriteObjectsDataCatche.GetCache($"?maxResultCount={10}&currentPage={pageIndex}&folderId={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取收藏夹内容");
+        }
+    }
+
+    public void OnManage()
+    {
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects/" + Id );
+        
+    }
+}

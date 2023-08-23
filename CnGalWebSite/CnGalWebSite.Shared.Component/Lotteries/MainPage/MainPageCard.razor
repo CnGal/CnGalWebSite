@@ -1,0 +1,18 @@
+﻿
+
+@if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+{
+    <div class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="介绍" Icon="@IconType.MainPage.ToIconString()">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public LotteryViewModel Model { get; set; }
+
+}

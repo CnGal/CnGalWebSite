@@ -1,0 +1,16 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    可以在这里上传周边相关图片；仍在售卖的设定集，画册请只上传宣传图
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-image" Title="相册" Class="@Class" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard Model="Model.Images" TValue="EditImageAloneModel"/>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditPeripheryImagesViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

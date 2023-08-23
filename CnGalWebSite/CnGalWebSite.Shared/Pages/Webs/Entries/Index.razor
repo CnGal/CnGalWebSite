@@ -10,11 +10,11 @@
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
 {
-    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 }
 
 

@@ -1,0 +1,99 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.IsApp)
+{
+    <a  href="@("/peripheries/index/" + Model.Id)"  class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity h-100">
+            <div style="display: flex; align-items: center;">
+                <div>
+                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
+                </div>
+                <div class="me-2 ms-2">
+                    <header class="text-truncate-1">
+                        <span class="app-card-tag">周边</span>
+                        <span class="fw-bold" style=" display: inline;">@Model.Name</span>
+                    </header>
+                    <span class="text-truncate-2">
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </a>
+}
+else
+{
+    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 pb-3 h-100">
+        <div style="@((BigCardStyle?"flex-direction: column;":"")+"display:flex;")">
+            <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color pt-3 pb-3">
+                <img loading="lazy" style="@(BigCardStyle?" width:100%;":" width: 250px;") " src="@Model.MainImage" alt="@Model.Name">
+            </a>
+
+            <div class="@(BigCardStyle?"pb-2":"pt-3 ps-3")" style=" width: 100%;">
+                <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2" style=" display: flex; align-items: center;">
+                    <div class="article-home-tag">@(Model.Type== PeripheryType.None?(string.IsNullOrWhiteSpace(Model.Category) ?"周边":Model.Category) :Model.Type.GetDisplayName())</div>
+                    <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                </a>
+
+                <a href="@("/peripheries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0&&ShowAddInfors  ? "text-truncate-2" : "text-truncate-4"))">
+                    @Model.BriefIntroduction
+                </a>
+
+
+                @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
+                {
+                    <div class="d-none d-sm-flex row">
+                        @foreach (var item in Model.AddInfors)
+                        {
+                            <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
+                                <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@item.Modifier" />
+                                    @foreach (var infor in item.Contents)
+                                    {
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+        </div>
+        <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color">
+            <span style="color: gray; flex-wrap: wrap;" class="d-flex">
+                <span>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
+                    <span class="me-4">@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
+                </span>
+
+                <span>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
+                    <span class="me-4">@(Model.CommentCount)条评论</span>
+                </span>
+
+                <span>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
+                    <span>@(Model.ReaderCount)次阅读</span>
+                </span>
+
+            </span>
+        </a>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public PeripheryInforTipViewModel Model { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+    /// <summary>
+    /// 强制大卡片样式
+    /// </summary>
+    [Parameter]
+    public bool BigCardStyle { get; set; }
+    [Parameter]
+    public bool ShowAddInfors { get; set; } = true;
+}

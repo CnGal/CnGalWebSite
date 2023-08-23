@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 
-<TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序"/>
 
 <style>
     .row {
@@ -71,7 +71,7 @@
         }
         @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count() == 0)
         {
-            <NotFoundTip IsNeedLayput="true" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
         }
     }
 </div>

@@ -4,7 +4,7 @@
 @inject IStructuredDataService _structuredDataService
 @inject NavigationManager NavigationManager
 @inject IMauiService _mauiService
-<TitleTip></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 
 <div itemscope itemtype="https://schema.org/WebSite" style="display:none;">
     <meta itemprop="url" content="https://m.cngal.com/" />
@@ -20,7 +20,7 @@
         color: var(--main-color) !important;
     }
 </style>
-<MTabsItems @bind-Value="_dataCacheService.HomeTabIndex" Class="pb-12">
+<MTabsItems Value="_dataCacheService.HomeTabIndex"Class="pb-12">
     <MTabItem Value="0">
         <div style=" padding: .1rem;">
             <CnGalWebSite.Shared.Pages.Webs.Home.Index Lock="_dataCacheService.HomeTabIndex!=0" />
@@ -49,7 +49,7 @@
 </MTabsItems>
 
 <MFooter Fixed Padless>
-    <MBottomNavigation @bind-Value="_dataCacheService.HomeTabIndex" Shift Grow>
+    <MBottomNavigation Value="_dataCacheService.HomeTabIndex"  ValueChanged="ValueChanged" Shift Grow>
         <MButton ActiveClass="font-color" Value="0">
             <span>主页</span>
 
@@ -109,5 +109,8 @@
             NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
     }
-
+    public void ValueChanged(StringNumber value)
+    {
+        _dataCacheService.NewsSummaryCache.TabIndex = value.ToInt32();
+    }
 }

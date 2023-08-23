@@ -5,9 +5,10 @@
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<EditInformationModel>> _pageModelCatche
 
 
-<TitleTip Title="创建词条"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建词条"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip>
 
 <AutoSaveTip TItem="EstablishEntryViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 <div>
@@ -91,6 +92,7 @@
         {
             try
             {
+                Model.AddInfor.Informations = await _pageModelCatche.GetCache($"api/entries/GetEditInformationModelList?type={(int)Model.Type}");
                 Model.Main.Name = Model.Main.DisplayName = Name;
                 //获取所有词条
                 EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
@@ -144,8 +146,9 @@
         StateHasChanged();
     }
 
-    public void TypeChanged(EntryType type)
+    public async Task TypeChanged(EntryType type)
     {
+        Model.AddInfor.Informations =await _pageModelCatche.GetCache($"api/entries/GetEditInformationModelList?type={(int)type}");
         Model.Type= Model.AddInfor.Type = Model.Relevances.Type = type;
         StateHasChanged();
 

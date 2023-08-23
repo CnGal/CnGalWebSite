@@ -1,0 +1,22 @@
+﻿
+@if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+{
+    <section id="story">
+        @if (Model.MainPageState == EditState.Preview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditMainPage/" + Model.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke" Class="m-0"/>
+        }
+
+        <h2>介绍</h2>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+    </section>
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+}

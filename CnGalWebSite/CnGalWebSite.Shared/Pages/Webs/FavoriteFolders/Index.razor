@@ -10,11 +10,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@("目录 - "+Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("目录 - "+Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 }
 
 @if (isNotFound)

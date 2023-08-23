@@ -1733,5 +1733,25 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        /// <summary>
+        /// 获取对应类型词条的基础信息类型列表
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<List<EditInformationModel>> GetEditInformationModelList(int type)
+        {
+            return (await _entryInformationTypeRepository.GetAll()
+                             .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                             .ToListAsync())
+                             .Where(s => s.Types.Contains((EntryType)type))
+                             .Select(s => new EditInformationModel
+                             {
+                                 Description = s.Description,
+                                 Icon = s.Icon,
+                                 Name = s.Name,
+                             }).ToList();
+        }
     }
 }

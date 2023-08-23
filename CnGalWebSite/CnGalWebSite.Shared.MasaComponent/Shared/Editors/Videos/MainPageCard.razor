@@ -1,0 +1,12 @@
+﻿
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-file-text-o" Title="正文" Class="@Class" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.Context" />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+@code {
+    [Parameter]
+    public EditVideoMainPageViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

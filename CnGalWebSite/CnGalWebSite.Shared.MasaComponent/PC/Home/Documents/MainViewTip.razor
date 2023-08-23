@@ -1,0 +1,80 @@
+﻿@inject IHttpService _httpService
+
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+
+@inject DialogService DialogService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+}
+
+    <div>
+        @if (isReady == false)
+        {
+                <div class=" @(Outline?"":"rounded shadow-sm bg-opacity p-4 mb-4")">
+                    <SkeletonParagraph />
+                    <hr class="m-2" />
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+        }
+        else
+        {
+
+            <div class="@(Outline?"":"rounded shadow-sm bg-opacity mb-4 pb-4")">
+                <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model"  HiddenImage HiddenTitle="HiddenTitle" Outline="Outline" HiddenCatalog/>
+            </div>
+
+        }
+    </div>
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool HiddenTitle { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+
+    bool isReady;
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = false;
+            //获取文章信息
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache(Id.ToString());
+           
+            isReady = true;
+            StateHasChanged();
+
+        }
+        catch (Exception exc)
+        {
+            isReady = false;
+            StateHasChanged();
+        }
+
+    }
+
+}

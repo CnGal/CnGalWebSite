@@ -1,0 +1,195 @@
+﻿@inject IHttpService _httpService
+@inject ToastService? ToastService
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCatcheService
+
+@if (PlainText)
+{
+    <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="OnClickStar">
+        <MIcon Small="_dataCatcheService.IsApp" Left>@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())</MIcon>
+        @(IsUserFavorited?"取消收藏":"收藏")
+    </MButton>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Favorites.ChooseFavoriteFolderTip @ref="chooseFavoriteFolderTip" ObjectId="Id" Type="Type" OnFavorited="@(() => {  IsUserFavorited = true; StateHasChanged();})" />
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [Parameter]
+    public FavoriteObjectType Type { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool PlainText { get; set; }
+
+    public bool IsUserFavorited { get; set; }
+    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Favorites.ChooseFavoriteFolderTip chooseFavoriteFolderTip;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var user = await authenticationStateTask;
+
+            string userId = "";
+            if (user.User.Identity.IsAuthenticated)
+            {
+                userId = user.User.Claims.GetUserId();
+
+                await GetUserIsFavorited();
+                await GetUserFavoriteInfor(userId);
+            }
+        }
+    }
+
+
+    private async Task OnClickStar()
+    {
+        //判断用户是否登录
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            if (IsUserFavorited)
+            {
+                await OnUnFavoriteClick();
+            }
+            else
+            {
+                await OnFavoriteClick();
+
+            }
+        }
+        else
+        {
+            OnLogin();
+        }
+
+    }
+
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+        {
+            Interaction = InteractionType.SignIn,
+            ReturnUrl = NavigationManager.Uri,
+        };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
+
+    public async Task GetUserIsFavorited()
+    {
+        try
+        {
+            var userFavoriteInfor = await _httpService.GetAsync<IsObjectInUserFavoriteFolderResult>("api/favorites/IsObjectInUserFavoriteFolder/" + Id + "/" + Type);
+
+            if (userFavoriteInfor != null)
+            {
+                IsUserFavorited = userFavoriteInfor.Result;
+
+                StateHasChanged();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "判断是否被收藏失败");
+        }
+    }
+    public async Task GetUserFavoriteInfor(string id)
+    {
+        try
+        {
+            UserFavoriteInfor = await _httpService.GetAsync<FavoriteFoldersViewModel>("api/favorites/GetUserFavoriteFolders/" + id);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
+        }
+    }
+
+    private async Task OnFavoriteClick()
+    {
+        //检查是否存在默认收藏夹
+        if (UserFavoriteInfor == null || UserFavoriteInfor.Favorites == null || UserFavoriteInfor.Favorites.Count == 0)
+        {
+            await ToastService.Error("收藏失败", "无法获取收藏夹信息");
+        }
+
+        var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
+        if (favoriteFolderIds.Length == 0)
+        {
+            if (chooseFavoriteFolderTip != null)
+            {
+                chooseFavoriteFolderTip.Refresh(UserFavoriteInfor);
+            }
+        }
+        else
+        {
+            //直接添加到默认收藏夹
+            try
+            {
+                var obj = await _httpService.PostAsync<AddFavoriteObjectViewModel, Result>("api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = Id, Type = Type });
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("收藏失败", obj.Error);
+                }
+                else
+                {
+                    IsUserFavorited = true;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "收藏失败");
+            }
+        }
+    }
+    private async Task OnUnFavoriteClick()
+    {
+
+        try
+        {
+            var obj = await _httpService.PostAsync<UnFavoriteObjectsModel, Result>("api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = Id, Type = Type });
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("取消收藏失败", obj.Error);
+            }
+            else
+            {
+                IsUserFavorited = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "取消收藏失败");
+        }
+
+    }
+}

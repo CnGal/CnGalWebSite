@@ -939,3 +939,46 @@
 .hot-tags-card .item:hover i {
     color: var(--active-color);
 }
+/*CV专题页*/
+/*动态*/
+.cv-news .item {
+    display: flex;
+    width: 28rem;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.cv-news .group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cv-news img {
+    width: 3rem;
+    border-radius: 50%;
+}
+
+.cv-news .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cv-news .head {
+    display: flex;
+    gap: .5rem;
+}
+
+.cv-news .name {
+    color: var( --home-text-color);
+    font-weight: bold;
+}
+
+.cv-news .time {
+    color: var( --home-subtle-color);
+}
+
+.cv-news .text {
+    color: var( --home-text-color);
+}

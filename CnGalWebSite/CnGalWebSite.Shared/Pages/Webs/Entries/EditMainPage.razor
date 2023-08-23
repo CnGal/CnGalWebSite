@@ -9,11 +9,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("编辑 " + Model.Name)"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 
 }
 
@@ -70,8 +70,6 @@ else
     public EditMainPageViewModel Model { get; set; } = new EditMainPageViewModel();
 
     bool isReady = false;
-    [NotNull]
-    private MarkdownEditorTip? markdownEditorTip;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -114,7 +112,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("保存成功", "保存词条主页成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");

@@ -5,7 +5,7 @@
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 
-<TitleTip Title="搜索"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="搜索"/>
 
 
 <div class="search-view">
@@ -23,7 +23,7 @@
         @if (isReady == false)
         {
             <div style="height:300px">
-                <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
             </div>
         }
         else
@@ -34,23 +34,23 @@
                     <div class="mb-3">
                         @if (item.entry != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip>
                         }
                         else if (item.article != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip>
                         }
                         else if (item.periphery != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip>
                         }
                         else if (item.tag != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip>
                         }
                         else if (item.video != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip>
                         }
                     </div>
             }

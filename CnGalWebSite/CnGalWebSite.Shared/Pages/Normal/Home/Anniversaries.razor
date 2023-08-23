@@ -8,7 +8,7 @@
 @implements IDisposable
 
 <div class="anniversary-page">
-    <TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})" />
     <div class="rounded  shadow-sm bg-opacity mb-4">
         <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive>
             <MTab Value="1">

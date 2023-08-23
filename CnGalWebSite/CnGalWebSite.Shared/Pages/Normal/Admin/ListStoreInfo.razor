@@ -6,7 +6,7 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="商店信息版块"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="商店信息版块"/>
 
 <DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>

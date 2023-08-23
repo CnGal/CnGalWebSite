@@ -6,7 +6,7 @@
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="收藏夹板块"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="收藏夹板块"/>
 
 <div class=" rounded shadow-sm p-4 bg-opacity">
     <Table TItem="ListFavoriteFolderAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"

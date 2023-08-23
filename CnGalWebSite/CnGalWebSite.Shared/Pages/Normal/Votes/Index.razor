@@ -2,14 +2,9 @@
 
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Votes.Index Id="@Id" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Votes.Index Id="@Id" />
-}
+
 @code{
     [Parameter]
     public string Id { get; set; }

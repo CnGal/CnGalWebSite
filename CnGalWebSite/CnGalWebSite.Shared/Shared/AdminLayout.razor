@@ -35,7 +35,7 @@
                                 <CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar @ref="topBar" />
                             </div>
                             <div style="margin-top: 85px;" class="me-4">
-                                <ErrorHandler>
+                            <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
                                     @Body
                                 </ErrorHandler>
 
@@ -45,7 +45,7 @@
                     else
                     {
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
-                            <ErrorHandler>
+                            <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
                                 @Body
                             </ErrorHandler>
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
@@ -55,7 +55,7 @@
     </Authorized>
     <NotAuthorized>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
-            <NotFoundError />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
     </NotAuthorized>
 </AuthorizeView>

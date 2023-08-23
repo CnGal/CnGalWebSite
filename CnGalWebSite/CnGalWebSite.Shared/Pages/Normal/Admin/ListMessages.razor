@@ -8,7 +8,7 @@
 @inject IJSRuntime JS
 
 
-<TitleTip Title="消息版块"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="消息版块"/>
 
 <div class=" rounded shadow-sm -lg p-4 bg-opacity">
     <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"

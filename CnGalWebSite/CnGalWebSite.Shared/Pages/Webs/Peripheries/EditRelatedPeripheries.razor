@@ -8,7 +8,7 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("编辑 " + Model.Name)"/>
 }
 <AutoSaveTip TItem="EditPeripheryRelatedPeripheriesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 

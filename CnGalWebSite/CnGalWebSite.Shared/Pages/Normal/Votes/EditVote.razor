@@ -12,11 +12,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("编辑 " + Model.Name)"/>
 }
 else
 {
-    <TitleTip />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
@@ -117,7 +117,7 @@ else
 
                 @if (isReady == true)
                 {
-                    <MarkdownEditorTip @ref="markdownEditorTip" @bind-Context="@Model.MainPage"></MarkdownEditorTip>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.MainPage"/>
                 }
 
 
@@ -142,17 +142,17 @@ else
                     添加关联信息
                 </h3>
                 <hr />
-                <InputRelevancesListTip AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
                 <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.Articles" Title="文章"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.Articles" Title="文章"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
                 <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
                 <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
                 <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
                 <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></InputRelevancesListTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
             </div>
             <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
                 当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
@@ -194,8 +194,7 @@ else
     private bool IsOnlyNeedPublishTime { get; set; } = true;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    [NotNull]
-    private MarkdownEditorTip? markdownEditorTip;
+
     [NotNull]
     private CnGalWebSite.Shared.Component.Votes.Options.OptionEditorChartTip? optionEditor { get; set; }
 

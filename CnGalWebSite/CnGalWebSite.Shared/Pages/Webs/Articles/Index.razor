@@ -10,11 +10,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
 }
 else
 {
-    <TitleTip></TitleTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 }
 @if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
@@ -48,7 +48,7 @@ else
                 }
 
                 <div class="rounded shadow-sm bg-opacity mb-4 pb-4">
-                    <CnGalWebSite.Shared.Component.Articles.NewVersion.MainInforCard Model="Model" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model" OnRevoke="OnRevoke" />
 
                     <div class="ps-4 pe-4 pt-4">
                         <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />

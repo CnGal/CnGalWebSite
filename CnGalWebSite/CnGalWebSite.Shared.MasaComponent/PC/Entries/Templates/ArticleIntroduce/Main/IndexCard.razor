@@ -1,0 +1,67 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
+{
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
+}
+
+<div class="rounded shadow-sm bg-opacity rounded p-4 mb-4">
+    <div class="article-introduce">
+        <TitleCard Model="Model" OnRevoke="OnRevoke" />
+        <OperationCard Model="Model" />
+        <InformationCard Model="Model" OnRevoke="OnRevoke" />
+        <ReleaseCard Model="Model" />
+        <StoryCard Model="Model" OnRevoke="OnRevoke" />
+        <CharacterCard Model="Model" OnRevoke="OnRevoke" />
+        <GalleryCard Model="Model" OnRevoke="OnRevoke" />
+        <StaffCard Model="Model" OnRevoke="OnRevoke" />
+        <RelevanceCard Model="Model" OnRevoke="OnRevoke" />
+    </div>
+</div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (Model.Audio.Any())
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+            <div class="mb-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="Model" OnRevoke="OnRevoke"/>
+            </div>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    }
+    @if (Model.Booking != null && Model.Booking.Goals.Any())
+    {
+        <div class="mb-4">
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="Model"/>
+        </div>
+    }
+    @if (Model.Type == EntryType.Game)
+    {
+
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="Model.Id" Class="mb-4" Large />
+
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="Model.Id" IsEdit="Model.IsEdit" Class="mb-4" IsGameView="Model.Type == EntryType.Game" />
+<div>
+    @if (Model.CanComment)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentEntries" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool CanDeleted { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+}

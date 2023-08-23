@@ -1,0 +1,38 @@
+﻿@inject ToastService ToastService
+@inject IHttpService _httpService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑记录
+        </MCardTitle>
+        <MCardText>
+            点击头像可查看对应用户空间，点击卡片可查看编辑记录详情
+        </MCardText>
+
+        <Scroll style="max-height:500px" class="ps-4 pe-4">
+            <div>
+              
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.ExaminesInforCard Model="Model" />
+             
+            </div>
+        </Scroll>
+    </MCard>
+</MDialog>
+
+@code {
+
+    [Parameter]
+    public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
+
+    bool Dialog;
+
+    public void Refresh(List<ExaminedNormalListModel>  model)
+    {
+        Model = model;
+        Dialog = true;
+
+        StateHasChanged();
+    }
+}

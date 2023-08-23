@@ -3,9 +3,9 @@
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="动态汇总"></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="动态汇总"/>
 
-<MTabs @bind-Value="@_dataCacheService.NewsSummaryCache.TabIndex" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded mb-4"
+<MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded mb-4"
        >
 
     <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
@@ -32,7 +32,7 @@
             }
             @if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
             {
-                <NotFoundTip IsNeedLayput="true" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
             }
         </div>
         @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
@@ -43,7 +43,7 @@
     }
     else
     {
-        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip />
     }
 </div>
 
@@ -57,7 +57,7 @@
     {
         _dataCacheService.NewsSummaryCache.CurrentPage = pageIndex;
         StateHasChanged();
-        
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -85,6 +85,11 @@
         {
             ErrorHandler.ProcessError(ex, "获取动态分类汇总列表失败");
         }
+    }
+
+    public void ValueChanged(StringNumber value )
+    {
+        _dataCacheService.NewsSummaryCache.TabIndex = value.ToInt32();
     }
 }
 

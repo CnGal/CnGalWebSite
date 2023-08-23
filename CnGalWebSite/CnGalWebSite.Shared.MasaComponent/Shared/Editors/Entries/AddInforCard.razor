@@ -1,0 +1,51 @@
+﻿
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="附加信息" Class="@Class" Collapable>
+    <div class="row">
+        @switch (Model.Type)
+        {
+            case EntryType.Game:
+
+                <div class="form-group col-12  col-sm-6">
+                    <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.Publisher" ShowLabel="true" />
+                </div>
+
+
+                break;
+            case EntryType.Role:
+                <div class="form-group col-12  col-sm-6">
+                    <AutoComplete Items="@EntryStaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.CV" ShowLabel="true" />
+                </div>
+
+                break;
+        }
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditInformationsCard Informations="Model.Informations" />
+
+    </div>
+
+    @if (Model.Type == EntryType.Game)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="STAFF" Text="参与制作的成员" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Staffs.StaffEditorChartListTip Staffs="Model.Staffs" />
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditAddInforViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public IEnumerable<string> EntryGroupItems { get; set; }
+    [Parameter]
+    public IEnumerable<string> EntryStaffItems { get; set; }
+    [Parameter]
+    public IEnumerable<string> LotteryItems { get; set; }
+}

@@ -1,0 +1,22 @@
+﻿using CnGalWebSite.DataModel.ViewModel.Space;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CnGalWebSite.Shared.Models.Users
+{
+    public class UserPendingDataCacheModel
+    {
+        public int TabIndex { get; set; } = 1;
+
+        public int MaxCount { get; set; } = 12;
+
+        public int TotalPages => ((Items.Count - 1) / MaxCount) + 1;
+
+        public int CurrentPage { get; set; } = 1;
+
+        public List<UserPendingDataModel> Items { get; set; } = new List<UserPendingDataModel>();
+    }
+}

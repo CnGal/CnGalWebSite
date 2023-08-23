@@ -23,7 +23,7 @@ namespace CnGalWebSite.Shared.DataRepositories
         {
             _localStorage = localStorage;
 
-            Load();
+            _ = Load();
         }
 
         private async Task Load()

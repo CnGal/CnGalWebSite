@@ -10,13 +10,14 @@
 @inject IMauiService _mauiService
 
 @using BlazorComponent.I18n
+@using CnGalWebSite.Shared.Layout;
 
 <MApp>
     <BootstrapBlazorRoot>
         <CascadingValue Value="connectionInfo" IsFixed="true">
             <CascadingAuthenticationState>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-                    <Router AppAssembly="@typeof(AdminLayout).Assembly" PreferExactMatches="@true">
+                    <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
                             @if (ToolHelper.IsSSR)
                             {
@@ -37,7 +38,7 @@
                         </Found>
                         <NotFound>
                             <LayoutView Layout="LayoutType">
-                                <NotFoundError></NotFoundError>
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError/>
                             </LayoutView>
                         </NotFound>
                     </Router>
