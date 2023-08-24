@@ -75,9 +75,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared.Compone
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared.Common", "CnGalWebSite\CnGalWebSite.Shared.Common\CnGalWebSite.Shared.Common.csproj", "{D72D30B3-2259-42B8-8FD8-EF251BFD745E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Shared.Layout", "CnGalWebSite\CnGalWebSite.Shared.Layout\CnGalWebSite.Shared.Layout.csproj", "{D8D33FAD-8343-425C-A90A-1864B915D902}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared.Layout", "CnGalWebSite\CnGalWebSite.Shared.Layout\CnGalWebSite.Shared.Layout.csproj", "{D8D33FAD-8343-425C-A90A-1864B915D902}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.Shared.MasaComponent", "CnGalWebSite\CnGalWebSite.Shared.MasaComponent\CnGalWebSite.Shared.MasaComponent.csproj", "{6E9423B2-284C-416C-86B1-01BBF8689F0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared.MasaComponent", "CnGalWebSite\CnGalWebSite.Shared.MasaComponent\CnGalWebSite.Shared.MasaComponent.csproj", "{6E9423B2-284C-416C-86B1-01BBF8689F0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "测试", "测试", "{A6CEAA1A-85A3-4760-A958-37B1A92D840D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.UnitTest", "CnGalWebSite\CnGalWebSite.UnitTest\CnGalWebSite.UnitTest.csproj", "{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -653,6 +657,26 @@ Global
 		{6E9423B2-284C-416C-86B1-01BBF8689F0B}.Release|x64.Build.0 = Release|Any CPU
 		{6E9423B2-284C-416C-86B1-01BBF8689F0B}.Release|x86.ActiveCfg = Release|Any CPU
 		{6E9423B2-284C-416C-86B1-01BBF8689F0B}.Release|x86.Build.0 = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|x64.Build.0 = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Debug|x86.Build.0 = Debug|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|ARM.Build.0 = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|ARM64.Build.0 = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|x64.ActiveCfg = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|x64.Build.0 = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|x86.ActiveCfg = Release|Any CPU
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -691,6 +715,8 @@ Global
 		{D72D30B3-2259-42B8-8FD8-EF251BFD745E} = {AB061EFA-363F-430A-BBF5-B8668F081868}
 		{D8D33FAD-8343-425C-A90A-1864B915D902} = {AB061EFA-363F-430A-BBF5-B8668F081868}
 		{6E9423B2-284C-416C-86B1-01BBF8689F0B} = {AB061EFA-363F-430A-BBF5-B8668F081868}
+		{A6CEAA1A-85A3-4760-A958-37B1A92D840D} = {97040347-AE2C-4854-AC26-01B4CCDA8527}
+		{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4} = {A6CEAA1A-85A3-4760-A958-37B1A92D840D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {10135AC3-E570-42BD-A319-B0268E299C9D}
