@@ -1,0 +1,28 @@
+﻿<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(State)" Icon="@GetIcon(State)" Text="@State.GetDisplayName()" />
+
+ @code {
+    [Parameter]
+    public GameNewsState State { get; set; }
+
+    public string GetColor(GameNewsState state)
+    {
+        return state switch
+        {
+            GameNewsState.Edit => "info",
+            GameNewsState.Publish => "success",
+            GameNewsState.Ignore => "warning",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(GameNewsState state)
+    {
+        return state switch
+        {
+            GameNewsState.Edit => IconType.Edit,
+            GameNewsState.Publish => IconType.Check,
+            GameNewsState.Ignore => IconType.Hide,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

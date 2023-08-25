@@ -79,10 +79,10 @@
         }
     }
 
-    public async Task Refresh(bool dialog, EditGameNewsModel model)
+    public void Refresh()
     {
-        Dialog = dialog;
-        Model = model;
+        Dialog = true;
+        Model = new EditGameNewsModel();
 
         Model.Type = ArticleType.News;
         Model.PublishTime = DateTime.Now.ToCstTime();

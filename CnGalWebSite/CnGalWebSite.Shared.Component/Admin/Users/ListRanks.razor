@@ -50,7 +50,6 @@
     private Table<ListRankAloneModel>? TableRows { get; set; }
     private List<ListRankAloneModel> SelectedRows { get; set; } = new();
 
-    public ListRanksInforViewModel InforModel { get; set; } = new ListRanksInforViewModel();
     public ListRanksViewModel ListModel { get; set; } = new ListRanksViewModel { Ranks = new List<ListRankAloneModel>() };
 
     private ListRankAloneModel SearchModelUser { get; set; } = new ListRankAloneModel();
@@ -59,19 +58,6 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            InforModel = await _httpService.GetAsync<ListRanksInforViewModel>("api/admin/listranks");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取消息数据");
-        }
-
-    }
 
     private async Task<QueryData<ListRankAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
     {

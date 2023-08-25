@@ -9,6 +9,9 @@ using CnGalWebSite.Core.Services.Query;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
+using BlazorComponent;
+using Masa.Blazor.Presets;
+using Masa.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 //自动重置配置
@@ -22,12 +25,36 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton(sp => new HttpClient());
 //自定义服务
 builder.Services.AddScoped<IHttpService, HttpService>();
-//设置主题
-builder.Services.AddMasaBlazor(s => s.ConfigureTheme(s =>
+//修改Masa主题
+builder.Services.AddMasaBlazor(options =>
 {
-    s.Themes.Light.Primary =builder.Configuration["WebSiteTheme"];
-}));
-//添加状态检查
+    //消息队列
+    options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
+    {
+        {
+            PopupComponents.SNACKBAR, new Dictionary<string, object?>()
+            {
+                { nameof(PEnqueuedSnackbars.Text), true },
+                { nameof(PEnqueuedSnackbars.Elevation), new StringNumber(3) },
+                { nameof(PEnqueuedSnackbars.Closeable), true },
+                { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
+            }
+        }
+    };
+    //主题
+    options.ConfigureTheme(s =>
+    {
+        if (DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
+        {
+            s.Themes.Light.Primary = "#4CAF50";
+        }
+        else
+        {
+            s.Themes.Light.Primary = "#f06292";
+        }
+        s.Themes.Dark.Primary = "#0078BF";
+    });
+});//添加状态检查
 builder.Services.AddHealthChecks();
 //添加真实IP
 builder.Services.Configure<ForwardedHeadersOptions>(options =>

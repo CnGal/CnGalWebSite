@@ -158,7 +158,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Prize,
         Look,
         UnRead,
-        Execute
+        Execute,
+        Up,
+        Down,
     }
 
     public static class IconTypeHelper
@@ -167,6 +169,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Down:
+                    return "mdi-arrow-down";
+                case IconType.Up:
+                    return "mdi-arrow-up";
                 case IconType.Execute:
                     return "mdi-send";
                 case IconType.UnRead:

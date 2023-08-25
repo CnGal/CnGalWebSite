@@ -4,7 +4,8 @@ using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Helper;
@@ -13,18 +14,21 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -47,8 +51,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IEditRecordService _editRecordService;
+        private readonly IQueryService _queryService;
 
-        public CommentsAPIController( IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository,
+        public CommentsAPIController( IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository, IQueryService queryService,
         IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
@@ -67,6 +72,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository = examineRepository;
             _editRecordService = editRecordService;
             _videoRepository = videoRepository;
+            _queryService = queryService;
         }
 
         [AllowAnonymous]
@@ -426,11 +432,37 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListCommentAloneModel>>> GetCommentListNormalAsync(CommentsPagesInfor input)
+        public async Task<QueryResultModel<CommentOverviewModel>> List(QueryParameterModel model)
         {
-            var dtos = await _commentService.GetPaginatedResult(input.Options, input.SearchModel, input.Type, input.ObjectId);
+            var (items, total) = await _queryService.QueryAsync<Comment, long>(_commentRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Text)==false)
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.Entry)
+                .Include(s => s.Article)
+                .Include(s => s.Periphery)
+                .Include(s => s.UserSpaceCommentManager).ThenInclude(s=>s.ApplicationUser)
+                .Include(s => s.Vote)
+                .Include(s => s.Lottery)
+                .Include(s => s.ParentCodeNavigation), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ((s.Text.Contains(model.SearchText))));
 
-            return dtos;
+            return new QueryResultModel<CommentOverviewModel>
+            {
+                Items = await items.Select(s => new CommentOverviewModel
+                {
+                    Id = s.Id,
+                    Type = s.Type,
+                    CommentTime = s.CommentTime,
+                    Text = s.Text,
+                    UserId=s.ApplicationUser.Id,
+                    UserName=s.ApplicationUser.UserName,
+                    IsHidden = s.IsHidden,
+                    Priority = s.Priority,
+                    ObjectId = s.Entry != null ? s.Entry.Id.ToString() : s.Article != null ? s.Article.Id.ToString() : s.Periphery != null ? s.Periphery.Id.ToString() : s.Video != null ? s.Video.Id.ToString() : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.Id : s.Vote != null ? s.Vote.Id.ToString() : s.Lottery != null ? s.Lottery.Id.ToString() : null,
+                    ObjectName =s.Entry!=null?s.Entry.Name: s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.UserName : s.Vote != null ? s.Vote.Name : s.Lottery != null ? s.Lottery.Name : s.ParentCodeNavigation != null ? "回复：Id"+s.ParentCodeNavigation.Id : null
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         [HttpPost]

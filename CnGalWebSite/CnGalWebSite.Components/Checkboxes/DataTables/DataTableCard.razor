@@ -30,8 +30,9 @@
                      <MIcon Left>mdi-plus</MIcon>
                  添加
              </MButton>
+                
             }
-
+            @ButtonContent
             <MTextField Value="_search" ValueChanged="OnSearch" TValue="string"
                         AppendIcon="mdi-magnify"
                         Label="搜索"
@@ -64,6 +65,8 @@
     public string Class { get; set; } = "elevation-1";
     [Parameter]
     public RenderFragment<ItemColProps<TModel>> ItemColContent { get; set; }
+    [Parameter]
+    public RenderFragment ButtonContent { get; set; }
     [Parameter]
     public EventCallback OnClickAdd { get; set; }
     [Parameter]

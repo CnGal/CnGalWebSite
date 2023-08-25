@@ -27,6 +27,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using BlazorComponent;
 
 namespace CnGalWebSite.WebAssembly
 {
@@ -80,7 +81,8 @@ namespace CnGalWebSite.WebAssembly
                         {
                             PopupComponents.SNACKBAR, new Dictionary<string, object?>()
                             {
-                                { nameof(PEnqueuedSnackbars.Outlined), true },
+                                { nameof(PEnqueuedSnackbars.Text), true },
+                                { nameof(PEnqueuedSnackbars.Elevation), new StringNumber(3) },
                                 { nameof(PEnqueuedSnackbars.Closeable), true },
                                 { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
                             }

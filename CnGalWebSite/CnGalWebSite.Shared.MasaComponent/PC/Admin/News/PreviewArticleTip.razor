@@ -21,7 +21,10 @@
                 </div>
             </div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" />
-            <CnGalWebSite.Shared.AppComponent.Pages.Articles.ListTagCard Relevances="Model.Relevances" />
+            @foreach(var item in Model.RelatedEntries)
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="@item.Name"/>
+            }
         </MCardText>
            
 

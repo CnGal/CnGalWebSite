@@ -1,6 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.News;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.News
@@ -29,8 +29,5 @@ namespace CnGalWebSite.APIServer.Application.News
 
         Task AddGameMewsFromWeibo(long id, string keyword);
 
-        Task<QueryData<ListGameNewAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListGameNewAloneModel searchModel);
-
-        Task<QueryData<ListWeeklyNewAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListWeeklyNewAloneModel searchModel);
     }
 }

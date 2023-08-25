@@ -2,206 +2,137 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="评论版块"/>
-
-
-
-<div class=" rounded shadow-sm -lg p-4 bg-opacity">
-    <Table TItem="ListCommentAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="320" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-        <TableToolbarTemplate>
-            <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
-            <TableColumn @bind-Field="@context.CommentTime" Sortable="true" Width="200" />
-            <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="400" />
-
-            <TableColumn @bind-Field="@context.ApplicationUserId" Searchable="true" Sortable="true" Width="300" />
-            <TableColumn @bind-Field="@context.ParentCodeNavigationId" Searchable="true" Sortable="true" Width="110" />
-
-            <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="110" />
-            <TableColumn @bind-Field="@context.ArticleId" Sortable="true" Width="130" TextWrap="true" />
-            <TableColumn @bind-Field="@context.UserSpaceCommentManagerId" Sortable="true" Width="160" />
-            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookComment( context.ArticleId,context.EntryId,context.UserSpaceCommentManagerId,context?.Type??CommentType.None))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
-        </RowButtonTemplate>
-    </Table>
-</div>
+<DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 100px;">
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                @if (context.Item.IsHidden)
+                {
+                    <MIcon Color="warning"
+                           Class="mr-2"
+                    OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                }
+            </div>
+        }
+        else if (context.Header.Value == nameof(CommentOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(CommentOverviewModel.ObjectName))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Comments.ObjectChip Id="@context.Item.ObjectId" Name="@context.Item.ObjectName" Type="context.Item.Type" />
+        }
+        else if (context.Header.Value == nameof(CommentOverviewModel.UserName))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+        }
+        else if (context.Header.Value == nameof(CommentOverviewModel.CommentTime))
+        {
+            @context.Item.CommentTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(CommentOverviewModel.Text))
+        {
+            <div style="white-space: pre-line;width: 300px;word-break: break-all;">
+                @context.Item.Text
+            </div>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
 @code {
-    [NotNull]
-    private Table<ListCommentAloneModel>? TableRows { get; set; }
-    private List<ListCommentAloneModel> SelectedRows { get; set; } = new();
+    private string _baseUrl = "api/comments/List";
+    private string _name = "评论";
 
-    public ListCommentsViewModel ListModel { get; set; } = new ListCommentsViewModel { Comments = new List<ListCommentAloneModel>() };
+    private List<DataTableHeader<CommentOverviewModel>> _headers = new List<DataTableHeader<CommentOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(CommentOverviewModel.Id)
+          },
+          new (){ Text= "时间", Value= nameof(CommentOverviewModel.CommentTime)},
+          new (){ Text= "用户", Value= nameof(CommentOverviewModel.UserName)},
+          new (){ Text= "内容", Value= nameof(CommentOverviewModel.Text)},
+          new (){ Text= "目标", Value= nameof(CommentOverviewModel.ObjectName)},
+          new (){ Text= "状态", Value= nameof(CommentOverviewModel.IsHidden)},
+          new (){ Text= "优先级", Value= nameof(CommentOverviewModel.Priority)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
 
-    private ListCommentAloneModel searchModel { get; set; } = new ListCommentAloneModel();
+    DataTableCard<CommentOverviewModel> dataTableCard;
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
+    public async Task EditItemPriority(CommentOverviewModel model, bool up)
     {
-
-    }
-
-    private async Task<QueryData<ListCommentAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
-    {
+        string operationName = up ? "增权重" : "降权重";
         try
         {
-            return await _httpService.PostAsync<CommentsPagesInfor, QueryData<ListCommentAloneModel>>("api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取评论列表");
-            return new QueryData<ListCommentAloneModel>();
-        }
-    }
-
-    private void LookComment(long? articleId, int? entryId, long? spaceId, CommentType type)
-    {
-        switch (type)
-        {
-            case CommentType.CommentArticle:
-                NavigationManager.NavigateTo(Provider, "/articles/index/" + articleId, "查看评论", "fa fa-comments-o");
-                break;
-            case CommentType.CommentEntries:
-                NavigationManager.NavigateTo(Provider, "/entries/index/" + entryId, "查看评论", "fa fa-comments-o");
-                break;
-        }
-
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="item"></param>
-    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
-    {
-        string tempString = isHidden == true ? "隐藏" : "显示";
-        //调用API
-        try
-        {
-            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/HiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
-
-
+            var obj = await _httpService.PostAsync<EditCommentPriorityViewModel, Result>("api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = new long[]{model.Id}, PlusPriority = up?1:-1 });
 
             if (obj.Successful == false)
             {
-                await ToastService.Error(tempString + "评论失败", obj.Error);
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
             }
             else
             {
-                if (showMessage)
-                {
-                    await ToastService.Success(tempString + "评论成功", tempString + "评论成功");
-                    await TableRows.QueryAsync();
-                }
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, tempString + "评论失败");
+            ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 
-    private async Task OnHiddenClick(IEnumerable<ListCommentAloneModel> items)
+    public async Task HideItem(CommentOverviewModel model, bool isHidden)
     {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改评论显示状态", "请选中评论");
-            return;
-        }
-
-        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
-
-        await ToastService.Success("隐藏评论成功", "隐藏评论成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnUnHiddenClick(IEnumerable<ListCommentAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改评论显示状态", "请选中评论");
-            return;
-        }
-
-        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
-
-        await ToastService.Success("显示评论成功", "显示评论成功");
-        await TableRows.QueryAsync();
-    }
-
-    private async Task OnRowEditPriorityClick(long[] ids, int plusPriority, bool showMessage)
-    {
-        //调用API
+        string operationName = isHidden ? "隐藏评论" : "显示评论";
         try
         {
-            var obj = await _httpService.PostAsync<EditCommentPriorityViewModel, Result>("api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
+            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/HiddenComment", new HiddenCommentModel { Ids = new long[] { model.Id }, IsHidden = isHidden });
+
             if (obj.Successful == false)
             {
-                await ToastService.Error("修改评论权重失败", obj.Error);
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
             }
             else
             {
-                if (showMessage)
-                {
-                    await ToastService.Success("修改评论权重成功", "修改评论权重成功");
-                    await TableRows.QueryAsync();
-                }
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
 
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "修改评论权重失败");
+            ErrorHandler.ProcessError(ex, operationName + "失败");
         }
-
-    }
-
-
-    private async Task OnPriorityUpClick(IEnumerable<ListCommentAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改评论权重", "请选中评论");
-            return;
-        }
-
-        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), 1, false);
-        await ToastService.Success("修改评论权重成功", "修改评论权重成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnPriorityDownClick(IEnumerable<ListCommentAloneModel> items)
-    {
-
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改评论权重", "请选中评论");
-            return;
-        }
-
-        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), -1, false);
-
-        await ToastService.Success("修改评论权重成功", "修改评论权重成功");
-        await TableRows.QueryAsync();
     }
 }

@@ -73,10 +73,10 @@
             //ErrorHandler.ProcessError(ex, "保存动态数据失败");
         }
     }
-    public async Task Refresh(bool dialog, AddWeiboNewsModel model)
+    public void Refresh()
     {
-        Dialog = dialog;
-        Model = model;
+        Dialog = true;
+        Model = new AddWeiboNewsModel();
 
         StateHasChanged();
     }
