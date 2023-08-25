@@ -155,7 +155,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Store,
         Hide,
         Refresh,
-        Prize
+        Prize,
+        Look
     }
 
     public static class IconTypeHelper
@@ -333,6 +334,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.Nature:
                     return "mdi-nature-people ";
                 case IconType.Pupil:
+                    return "mdi-eye ";
+                case IconType.Look:
                     return "mdi-eye ";
                 case IconType.Clothes:
                     return "mdi-hanger ";

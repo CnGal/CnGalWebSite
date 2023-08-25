@@ -57,7 +57,7 @@
     {
         try
         {
-            var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/exaines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
+            var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
             {
                 State = EditRecordReviewState.Reviewed,
                 ExamineIds = Model.Select(s => s.Id).ToArray()

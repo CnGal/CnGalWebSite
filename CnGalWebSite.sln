@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared.MasaCom
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "测试", "测试", "{A6CEAA1A-85A3-4760-A958-37B1A92D840D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.UnitTest", "CnGalWebSite\CnGalWebSite.UnitTest\CnGalWebSite.UnitTest.csproj", "{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.UnitTest", "CnGalWebSite\CnGalWebSite.UnitTest\CnGalWebSite.UnitTest.csproj", "{4012E05C-ADF4-43A6-B7CC-5DF56BBDC9E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

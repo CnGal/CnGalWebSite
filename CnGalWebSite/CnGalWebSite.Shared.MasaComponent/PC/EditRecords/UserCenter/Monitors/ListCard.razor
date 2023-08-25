@@ -1,0 +1,88 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="UserMonitorOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            <MIcon Color="error"
+                   Class="mr-2"
+                   OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+        }
+        else if (context.Header.Value == nameof(UserMonitorOverviewModel.Type))
+        {
+            <TypeChip Type="context.Item.Type" />
+        }
+        else if (context.Header.Value == nameof(UserMonitorOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/examines/ListUserMonitors";
+    private string _name = "关注的词条";
+
+    private List<DataTableHeader<UserMonitorOverviewModel>> _headers = new List<DataTableHeader<UserMonitorOverviewModel>>
+    {
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserMonitorOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(UserMonitorOverviewModel.EntryName)},
+          new (){ Text= "类型", Value= nameof(UserMonitorOverviewModel.Type)},
+          new (){ Text= "添加时间", Value= nameof(UserMonitorOverviewModel.CreateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<UserMonitorOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void LookItem(UserMonitorOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/entries/index/{model.Id}");
+    }
+
+    public async Task DeleteItem(UserMonitorOverviewModel model)
+    {
+        const string operationName = "取消关注词条";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditUserMonitorsModel, Result>("api/examines/EditUserMonitors", new EditUserMonitorsModel { Ids = new int[] { model.EntryId }, InMonitor = false });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}
