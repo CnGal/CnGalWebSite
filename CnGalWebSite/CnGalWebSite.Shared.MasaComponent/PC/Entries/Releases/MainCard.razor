@@ -1,0 +1,19 @@
+﻿
+@if (Model.Releases.Any() && Model.IsHideOutlink == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发行列表" Icon="@IconType.Publisher.ToIconString()" Class="mb-4" Outline Collapable>
+            @foreach (var item in Model.Releases.OrderByDescending(s=>s.Time))
+            {
+                <InforCard Model="item" />
+            }
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

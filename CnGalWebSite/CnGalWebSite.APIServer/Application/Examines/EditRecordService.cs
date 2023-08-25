@@ -41,55 +41,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _examineService = examineService;
         }
 
-        public async Task<QueryData<ListUserMonitorAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserMonitorAloneModel searchModel, string userId)
-        {
-            var items = _userMonitorsRepository.GetAll().Include(s => s.Entry).Where(s => s.EntryId != null && s.ApplicationUserId == userId).AsNoTracking();
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.Id.ToString().Contains(options.SearchText)
-                             || item.EntryId.ToString().Contains(options.SearchText));
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var list = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListUserMonitorAloneModel>();
-            foreach (var item in list)
-            {
-                resultItems.Add(new ListUserMonitorAloneModel
-                {
-                    Id = item.Id,
-                    CreateTime = item.CreateTime,
-                    EntryId = item.Entry.Id,
-                    EntryName = item.Entry.DisplayName,
-                    Type = item.Entry.Type
-                });
-            }
-
-            return new QueryData<ListUserMonitorAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
-        }
-
         public async Task<QueryData<ListUserReviewEditRecordAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserReviewEditRecordAloneModel searchModel, string userId)
         {
             var items = _userReviewEditRecordRepository.GetAll().AsNoTracking()
@@ -131,7 +82,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     EntryName = item.Examine.Entry.DisplayName,
                     Operation = item.Examine.Operation,
                     UserId = item.Examine.ApplicationUserId,
-                    UserName = item.Examine.ApplicationUser.UserName
+                    UserName = item.Examine.ApplicationUser.UserName,
+                    ReviewedTime=item.ReviewedTime
                 });
             }
 

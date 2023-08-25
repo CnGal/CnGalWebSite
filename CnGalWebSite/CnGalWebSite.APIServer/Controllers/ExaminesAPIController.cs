@@ -33,6 +33,10 @@ using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.Core.Services.Query;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -62,11 +66,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
         private readonly IEditRecordService _editRecordService;
         private readonly IUserService _userService;
-
+        private readonly IQueryService _queryService;
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
-         IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository,
+         IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository, IQueryService queryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
             
@@ -90,6 +94,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _videoRepository = videoRepository;
             _favoriteFolderRepository = favoriteFolderRepository;
+            _queryService = queryService;
         }
 
 
@@ -718,6 +723,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.ApplicationUserId == user.Id && s.ExamineId != null && model.ExamineIds.Contains(s.ExamineId.Value))
                 .ExecuteUpdateAsync(s => s.SetProperty(s => s.State, b => model.State));
 
+            var now = DateTime.Now.ToCstTime();
+            await _userReviewEditRecordRepository.GetAll()
+               .Where(s => s.ApplicationUserId == user.Id && s.ExamineId != null && model.ExamineIds.Contains(s.ExamineId.Value))
+               .ExecuteUpdateAsync(s => s.SetProperty(s => s.ReviewedTime, b => now));
 
             return new Result { Successful = true };
 
@@ -787,22 +796,28 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <summary>
         /// 获取用户所有监视列表
         /// </summary>
-        /// <param name="input"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserMonitorAloneModel>>> GetUserMonitorListAsync(UserMonitorsPagesInfor input)
+        public async Task<QueryResultModel<UserMonitorOverviewModel>> ListUserMonitors(QueryParameterModel model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            var (items, total) = await _queryService.QueryAsync<UserMonitor, long>(_userMonitorsRepository.GetAll().Include(s=>s.Entry).AsSingleQuery().Where(s=>s.Entry!=null).Where(s=>s.ApplicationUserId== user.Id), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)));
 
-            if (user == null)
+            return new QueryResultModel<UserMonitorOverviewModel>
             {
-                return NotFound();
-            }
-
-            var dtos = await _editRecordService.GetPaginatedResult(input.Options, input.SearchModel, user.Id);
-
-            return dtos;
+                Items = await items.Select(s => new UserMonitorOverviewModel
+                {
+                    CreateTime = s.CreateTime,
+                    EntryId=s.Entry.Id,
+                    EntryName=s.Entry.Name,
+                    Type=s.Entry.Type,
+                    Id = s.Id,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         /// <summary>

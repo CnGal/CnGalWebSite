@@ -1,8 +1,4 @@
-﻿@page "/admin/apiscopes"
-
-@attribute [Authorize(Roles = "Admin")]
-
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject IPopupService PopupService
 
 <DataTableCard TModel="EntryInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
