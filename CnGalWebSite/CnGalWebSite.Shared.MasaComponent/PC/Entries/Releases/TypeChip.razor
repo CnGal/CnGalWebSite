@@ -1,0 +1,29 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetColor()" Icon="@GetIcon()" Text="@Model.Type.GetDisplayName()" />
+
+@code {
+    [Parameter]
+    public GameReleaseViewModel Model { get; set; }
+
+    public string GetColor()
+    {
+        return Model.Type switch
+        {
+            GameReleaseType.Official => "green",
+            GameReleaseType.Demo => "info",
+            GameReleaseType.EA => "purple",
+            _ => "purple"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return Model.Type switch
+        {
+            GameReleaseType.Official => IconType.Official,
+            GameReleaseType.Demo =>IconType.Demo,
+            GameReleaseType.EA => IconType.EA,
+            _ => IconType.OtherReleaseType
+        };
+    }
+}
