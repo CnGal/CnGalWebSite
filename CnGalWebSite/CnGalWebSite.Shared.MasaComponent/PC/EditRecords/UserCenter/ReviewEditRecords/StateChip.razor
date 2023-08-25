@@ -1,0 +1,28 @@
+﻿<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(State)" Icon="@GetIcon(State)" Text="@State.GetDisplayName()" />
+
+@code {
+    [Parameter]
+    public EditRecordReviewState State { get; set; }
+
+    public string GetColor(EditRecordReviewState state)
+    {
+        return state switch
+        {
+            EditRecordReviewState.UnRead => "info",
+            EditRecordReviewState.Reviewed => "success",
+            EditRecordReviewState.Ignored => "warning",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(EditRecordReviewState state)
+    {
+        return state switch
+        {
+            EditRecordReviewState.UnRead => IconType.UnRead,
+            EditRecordReviewState.Reviewed => IconType.Check,
+            EditRecordReviewState.Ignored => IconType.Hide,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

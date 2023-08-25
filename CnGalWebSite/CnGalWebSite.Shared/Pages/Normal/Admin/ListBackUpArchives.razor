@@ -2,114 +2,91 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 
+<DataTableCard TModel="BackUpArchiveOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>ExecuteItem(context.Item)">@IconType.Execute.ToIconString()</MIcon>
+        }
+        else if (context.Header.Value == nameof(BackUpArchiveOverviewModel.Type))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.BackUpArchives.TypeChip Type="context.Item.Type" Name="@context.Item.ObjectName" Id="@context.Item.ObjectId"/>
+        }
+        else if (context.Header.Value == nameof(BackUpArchiveOverviewModel.IsLastFail))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.BackUpArchives.ResultChip IsLastFail="context.Item.IsLastFail" />
+        }
+        else if (context.Header.Value == nameof(BackUpArchiveOverviewModel.LastBackUpTime))
+        {
+            @context.Item.LastBackUpTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(BackUpArchiveOverviewModel.LastTimeUsed))
+        {
+            @context.Item.LastTimeUsed.ToString("0.0 秒")
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="互联网档案馆备份版块"/>
-
-
-<div class=" rounded shadow-sm -lg p-4 bg-opacity">
-    <Table TItem="ListBackUpArchiveAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true IsAutoRefresh="@IsAutoRefresh"
-           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-        <TableToolbarTemplate>
-            <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" OnClickCallback="OnRunClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Primary" Icon="fa fa-spin fa-spinner fa-fw" Text="切换自动刷新" OnClickCallback="ClickIsAutoRefresh" />
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.LastBackUpTime" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.LastTimeUsed" Sortable="true" Width="100" TextWrap="true" FormatString="0.0" />
-            <TableColumn @bind-Field="@context.IsLastFail" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-            <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="150" />
-
-            <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="150" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickWithoutRender="@(() => OnRowRunClick( new long[] { context.Id } ,true))" />
-        </RowButtonTemplate>
-    </Table>
-</div>
 
 @code {
-    [NotNull]
-    private Table<ListBackUpArchiveAloneModel>? TableRows { get; set; }
-    private List<ListBackUpArchiveAloneModel> SelectedRows { get; set; } = new();
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
 
-    public ListBackUpArchivesViewModel ListModel { get; set; } = new ListBackUpArchivesViewModel { BackUpArchives = new List<ListBackUpArchiveAloneModel>() };
+    private string _baseUrl = "api/backuparchives/list";
+    private string _name = "备份";
 
-    private ListBackUpArchiveAloneModel searchModel { get; set; } = new ListBackUpArchiveAloneModel();
+    private List<DataTableHeader<BackUpArchiveOverviewModel>> _headers = new List<DataTableHeader<BackUpArchiveOverviewModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(EntryInformationTypeOverviewModel.Id)
+          },
+          new (){ Text= "执行时间", Value= nameof(BackUpArchiveOverviewModel.LastBackUpTime)},
+          new (){ Text= "用时", Value= nameof(BackUpArchiveOverviewModel.LastTimeUsed)},
+          new (){ Text= "目标", Value= nameof(BackUpArchiveOverviewModel.Type),Sortable=false},        
+          new (){ Text= "状态", Value= nameof(BackUpArchiveOverviewModel.IsLastFail)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
-    private bool IsAutoRefresh { get; set; } = true;
+    DataTableCard<BackUpArchiveOverviewModel> dataTableCard;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
 
-    }
-
-    private async Task<QueryData<ListBackUpArchiveAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    public async Task ExecuteItem(BackUpArchiveOverviewModel model)
     {
+        const string operationName = "执行备份";
         try
         {
-            return await _httpService.PostAsync<BackUpArchivesPagesInfor, QueryData<ListBackUpArchiveAloneModel>>("api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取互联网档案馆备份信息列表");
-            return new QueryData<ListBackUpArchiveAloneModel>();
-        }
-    }
-
-    private async Task OnRowRunClick(long[] ids, bool showMessage)
-    {
-        //调用API
-        try
-        {
-            var obj = await _httpService.PostAsync<RunBackUpArchiveModel, Result>("api/BackUpArchives/RunBackUpArchive", new RunBackUpArchiveModel { Ids = ids });
-
+            var obj = await _httpService.PostAsync<RunBackUpArchiveModel, Result>("api/BackUpArchives/RunBackUpArchive", new RunBackUpArchiveModel { Ids = new long[]{model.Id} });
             if (obj.Successful == false)
             {
-                await ToastService.Error("执行备份失败", obj.Error);
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
             }
             else
             {
-                if (showMessage)
-                {
-                    await ToastService.Success("执行备份成功", "执行备份成功");
-                    await TableRows.QueryAsync();
-                }
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "执行备份失败");
+            ErrorHandler.ProcessError(ex, operationName + "失败");
         }
-    }
-
-    private async Task OnRunClick(IEnumerable<ListBackUpArchiveAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有执行备份", "请选中备份");
-            return;
-        }
-
-        await OnRowRunClick(items.Select(s => s.Id).ToArray(), false);
-
-        await ToastService.Success("执行备份成功", "执行备份成功");
-        await TableRows.QueryAsync();
-    }
-
-    private Task ClickIsAutoRefresh(IEnumerable<ListBackUpArchiveAloneModel> items)
-    {
-        IsAutoRefresh = !IsAutoRefresh;
-        StateHasChanged();
-        return Task.CompletedTask;
     }
 }

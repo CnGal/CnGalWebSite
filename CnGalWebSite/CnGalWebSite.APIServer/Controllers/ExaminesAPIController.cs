@@ -823,40 +823,79 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <summary>
         /// 获取所有审阅列表
         /// </summary>
-        /// <param name="input"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserReviewEditRecordAloneModel>>> GetUserReviewEditRecordListAsync(UserReviewEditRecordsPagesInfor input)
+        public async Task<QueryResultModel<UserReviewEditRecordOverviewModel>> ListUserReviewEditRecords(QueryParameterModel model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            var (items, total) = await _queryService.QueryAsync<UserReviewEditRecord, long>(_userReviewEditRecordRepository.GetAll().AsSingleQuery()
+                .Include(s => s.Examine).ThenInclude(s => s.Entry)
+                .Include(s => s.Examine).ThenInclude(s => s.ApplicationUser)
+                .Where(s => s.ExamineId != null &&s.Examine!=null&&s.Examine.Entry!=null && s.ApplicationUserId == user.Id), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Examine.Entry.Name.Contains(model.SearchText)|| s.Examine.ApplicationUser.UserName.Contains(model.SearchText)));
 
-            if (user == null)
+            return new QueryResultModel<UserReviewEditRecordOverviewModel>
             {
-                return NotFound();
-            }
-
-            var dtos = await _editRecordService.GetPaginatedResult(input.Options, input.SearchModel, user.Id);
-
-            return dtos;
+                Items = await items.Select(s => new UserReviewEditRecordOverviewModel
+                {
+                    ExamineId = s.ExamineId.Value,
+                    State = s.State,
+                    EntryId = s.Examine.Entry.Id,
+                    EntryName = s.Examine.Entry.DisplayName,
+                    Operation = s.Examine.Operation,
+                    UserId = s.Examine.ApplicationUserId,
+                    UserName = s.Examine.ApplicationUser.UserName,
+                    ReviewedTime = s.ReviewedTime
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
-
         /// <summary>
         /// 获取用户有权限查看的所有审核记录
         /// </summary>
-        /// <param name="input"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListExamineAloneModel>>> GetExamineListAsync(ExaminesPagesInfor input)
+        public async Task<QueryResultModel<ExamineOverviewModel>> ListExamines(QueryParameterModel model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            var _query = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
 
-            var dtos = await _examineService.GetPaginatedResult(input.Options, input.SearchModel, user);
+            //若不是管理员 则检查认证词条
+            if (_userService.CheckCurrentUserRole("Admin") == false)
+            {
+                var userCertification = await _userCertificationRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null);
+                if (userCertification == null)
+                {
+                    _query = _query.Where(s => false);
+                }
+                else
+                {
+                    _query = _query.Where(s => s.EntryId == userCertification.EntryId);
+                }
+            }
+            var (items, total) = await _queryService.QueryAsync<Examine, long>(_query.AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Comments.Contains(model.SearchText) || s.PassedAdminName.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<ExamineOverviewModel>
+            {
+                Items = await items.Select(s => new ExamineOverviewModel
+                {
+                    Id = s.Id,
+                    Operation = s.Operation,
+                    IsPassed = s.IsPassed,
+                    PassedTime = s.PassedTime,
+                    ApplyTime = s.ApplyTime,
+                    Comments = s.Comments,
+                    ApplicationUserId = s.ApplicationUserId,
+                    UserName = s.ApplicationUser.UserName,
+                    PassedAdminName = s.PassedAdminName,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
-
-
     }
 }

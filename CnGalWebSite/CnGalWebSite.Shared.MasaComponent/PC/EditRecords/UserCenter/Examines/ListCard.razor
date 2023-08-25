@@ -1,0 +1,113 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(ExamineOverviewModel.PassedTime)" @ref="dataTableCard"
+    LoadingText="找不到数据欸......可以尝试申请用户认证哦~">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            @if (context.Item.IsPassed == null)
+            {
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>ProcItem(context.Item, true)">@IconType.Check.ToIconString()</MIcon>
+                <MIcon Color="error"
+                       Class="mr-2"
+                       OnClick="()=>ProcItem(context.Item, false)">@IconType.Close.ToIconString()</MIcon>
+
+            }
+        }
+        else if (context.Header.Value == nameof(ExamineOverviewModel.IsPassed))
+        {
+            <StateChip IsPassed="context.Item.IsPassed" />
+        }
+        else if (context.Header.Value == nameof(ExamineOverviewModel.Operation))
+        {
+            @context.Item.Operation.GetDisplayName()
+        }
+        else if (context.Header.Value == nameof(ExamineOverviewModel.PassedTime))
+        {
+            @context.Item.PassedTime?.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(ExamineOverviewModel.ApplyTime))
+        {
+            @context.Item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(ExamineOverviewModel.UserName))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.ApplicationUserId" Name="@context.Item.UserName" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    
+</DataTableCard>
+
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/examines/ListExamines";
+    private string _name = "审核";
+
+    private List<DataTableHeader<ExamineOverviewModel>> _headers = new List<DataTableHeader<ExamineOverviewModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExamineOverviewModel.Id)
+          },
+        new (){ Text= "操作", Value= nameof(ExamineOverviewModel.Operation)},
+        new (){ Text= "状态", Value= nameof(ExamineOverviewModel.IsPassed)},
+        new (){ Text= "处理时间", Value= nameof(ExamineOverviewModel.PassedTime)},
+        new (){ Text= "申请时间", Value= nameof(ExamineOverviewModel.ApplyTime)},
+        new (){ Text= "申请人", Value= nameof(ExamineOverviewModel.UserName)},
+        new (){ Text= "处理人", Value= nameof(ExamineOverviewModel.PassedAdminName)},
+        new (){ Text= "批注", Value= nameof(ExamineOverviewModel.Comments)},
+        new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<ExamineOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void LookItem(ExamineOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/examine?Id={model.Id}");
+    }
+
+    public async Task ProcItem(ExamineOverviewModel model, bool isPassed)
+    {
+        string operationName = isPassed ? "通过审核" : "驳回审核";
+        try
+        {
+            var obj = await _httpService.PostAsync<ExamineProcModel, Result>("api/examines/proc", new ExamineProcModel { Id = model.Id, IsPassed = isPassed, Comments = "" });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

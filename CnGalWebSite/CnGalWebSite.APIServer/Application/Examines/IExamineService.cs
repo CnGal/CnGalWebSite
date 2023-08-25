@@ -14,9 +14,6 @@ namespace CnGalWebSite.APIServer.ExamineX
     public interface IExamineService
     {
         Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "");
-
-        Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel, ApplicationUser user);
-
         /// <summary>
         /// 将审核列表优化成精简模式以减少流量消耗
         /// </summary>

@@ -2,8 +2,7 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Articles;
-using CnGalWebSite.DataModel.ViewModel.HistoryData;
-using CnGalWebSite.DataModel.ViewModel.PostTools;
+using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.PublicToolbox.DataRepositories;

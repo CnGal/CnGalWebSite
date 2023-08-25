@@ -5,13 +5,5 @@
         public int[] Ids { get; set; }
 
         public int PlusPriority { get; set; }
-
-        public EditEntryPriorityOperation Operation { get; set; }
-    }
-
-    public enum EditEntryPriorityOperation
-    {
-        None,
-        ClearAllGame
     }
 }

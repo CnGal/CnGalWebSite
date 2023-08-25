@@ -1,7 +1,7 @@
 ﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.PostTools;
+using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.PublicToolbox.DataRepositories;

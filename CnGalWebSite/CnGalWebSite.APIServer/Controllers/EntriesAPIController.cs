@@ -1281,17 +1281,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryPriorityAsync(EditEntryPriorityViewModel model)
         {
-            //判断是否为特殊词条
-            if (model.Operation == EditEntryPriorityOperation.ClearAllGame)
-            {
-                await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => 0));
-            }
-            else if (model.Operation == EditEntryPriorityOperation.None)
-            {
-                await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
-            }
-
-
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
             return new Result { Successful = true };
         }
 

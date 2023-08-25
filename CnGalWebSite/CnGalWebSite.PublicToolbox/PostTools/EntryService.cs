@@ -8,7 +8,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using CnGalWebSite.PublicToolbox.DataRepositories;
-using CnGalWebSite.DataModel.ViewModel.PostTools;
+using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Logging;

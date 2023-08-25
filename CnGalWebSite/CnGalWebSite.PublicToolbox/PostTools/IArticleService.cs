@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.PostTools;
+using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.Helper.Helper;
 using System;
 using System.Collections.Generic;

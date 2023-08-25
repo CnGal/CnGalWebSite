@@ -12,27 +12,6 @@
 <div class="">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
-            <AdminToolTip Title="置顶最新发行的游戏" OnToolClick="OnMakeNewestGameTop"
-                          BriefIntroduction="将会查找所有词条数据，序列化游戏的发行日期并排序，自动取前六个依次修改权重为16、15、14......不会修改其他游戏权重">
-            </AdminToolTip>
-        </div>
-
-        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4  pb-3">
-            <AdminToolTip Title="清空所有游戏权重" OnToolClick="OnClearAllGamePriorityTop"
-                          BriefIntroduction="将会修改所有游戏权重为默认值0">
-            </AdminToolTip>
-        </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4  pb-3">
-            <AdminToolTip Title="获取所有游戏的SteamId" OnToolClick="OnGetAllEntriesSteamInfor"
-                          BriefIntroduction="将会从词条的附加信息列表中查找SteamId，并更新到数据库缓存中，一般只有在批量导入数据后需要执行此任务">
-            </AdminToolTip>
-        </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
-            <AdminToolTip Title="更新所有游戏Steam信息" OnToolClick="OnUpdateAllSteaminfor"
-                          BriefIntroduction="将会更新数据库缓存的Steam信息">
-            </AdminToolTip>
-        </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
             <AdminToolTip Title="刷新搜索缓存" OnToolClick="OnRefreshSearchData"
                           BriefIntroduction="将会删除ES数据并重新设置，建议重启ES后执行">
             </AdminToolTip>
@@ -50,90 +29,6 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public async Task OnMakeNewestGameTop()
-    {
-        try
-        {
-            await ToastService.Success("正在置顶最新发行的游戏", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await _httpService.GetAsync<Result>("api/admin/MakeNewestGamesTop");
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("置顶最新发行的游戏失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("成功置顶最新发行的游戏", "成功置顶最新发行的游戏，请前往主页查看效果");
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "置顶最新发行的游戏失败");
-        }
-    }
-    public async Task OnClearAllGamePriorityTop()
-    {
-        try
-        {
-            await ToastService.Success("正在清空所有游戏权重", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await _httpService.PostAsync<EditEntryPriorityViewModel, Result>("api/entries/EditEntryPriority", new EditEntryPriorityViewModel { Operation = EditEntryPriorityOperation.ClearAllGame });
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("清空所有游戏权重失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("成功清空所有游戏权重", "成功清空所有游戏权重，请前往主页查看效果");
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "清空所有游戏权重失败");
-        }
-    }
-    public async Task OnGetAllEntriesSteamInfor()
-    {
-        try
-        {
-            await ToastService.Success("正在获取所有游戏的SteamId", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await _httpService.GetAsync<Result>("api/steam/GetAllEntriesSteam");
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("获取所有游戏的SteamId失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("成功获取所有游戏的SteamId", "成功获取所有游戏的SteamId");
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有游戏的SteamId失败");
-        }
-    }
-    public async Task OnUpdateAllSteaminfor()
-    {
-        try
-        {
-            await ToastService.Success("正在更新所有游戏Steam信息", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await _httpService.GetAsync<Result>("api/steam/UpdateAllSteamInfor");
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("更新所有游戏Steam信息失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("成功更新所有游戏Steam信息", "成功更新所有游戏Steam信息");
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "更新所有游戏Steam信息失败");
-        }
-    }
     public async Task OnRefreshSearchData()
     {
         try

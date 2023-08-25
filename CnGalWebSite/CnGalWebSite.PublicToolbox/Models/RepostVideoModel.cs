@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CnGalWebSite.DataModel.ViewModel.PostTools
+namespace CnGalWebSite.PublicToolbox.Models
 {
     public class RepostVideoModel : ToolTaskBase
     {

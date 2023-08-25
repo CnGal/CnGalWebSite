@@ -41,61 +41,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _examineService = examineService;
         }
 
-        public async Task<QueryData<ListUserReviewEditRecordAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserReviewEditRecordAloneModel searchModel, string userId)
-        {
-            var items = _userReviewEditRecordRepository.GetAll().AsNoTracking()
-                .Include(s => s.Examine).ThenInclude(s => s.Entry)
-                .Include(s => s.Examine).ThenInclude(s => s.ApplicationUser)
-                .Where(s => s.ExamineId != null && s.ApplicationUserId == userId);
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.Id.ToString().Contains(options.SearchText)
-                             || item.ExamineId.ToString().Contains(options.SearchText));
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var list =await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListUserReviewEditRecordAloneModel>();
-            foreach (var item in list)
-            {
-                resultItems.Add(new ListUserReviewEditRecordAloneModel
-                {
-                    ExamineId = item.ExamineId.Value,
-                    State = item.State,
-                    EntryId = item.Examine.Entry.Id,
-                    EntryName = item.Examine.Entry.DisplayName,
-                    Operation = item.Examine.Operation,
-                    UserId = item.Examine.ApplicationUserId,
-                    UserName = item.Examine.ApplicationUser.UserName,
-                    ReviewedTime=item.ReviewedTime
-                });
-            }
-
-            return new QueryData<ListUserReviewEditRecordAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
-        }
-
         /// <summary>
         /// 用于保存审核记录时检查权限
         /// </summary>

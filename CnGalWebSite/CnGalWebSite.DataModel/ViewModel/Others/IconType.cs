@@ -156,7 +156,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Hide,
         Refresh,
         Prize,
-        Look
+        Look,
+        UnRead,
+        Execute
     }
 
     public static class IconTypeHelper
@@ -165,6 +167,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Execute:
+                    return "mdi-send";
+                case IconType.UnRead:
+                    return "mdi-read";
                 case IconType.Prize:
                     return "mdi-seal-variant";
                 case IconType.Refresh:

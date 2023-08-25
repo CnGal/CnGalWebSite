@@ -1,0 +1,100 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="UserReviewEditRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)" @ref="dataTableCard"
+               LoadingText="找不到数据欸......可以前往词条页面关注一些词条，点击编辑按钮就能看到入口哦~">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            @if (context.Item.ReviewedTime == null)
+            {
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>ReadItem(context.Item, EditRecordReviewState.UnRead)">@IconType.UnRead.ToIconString()</MIcon>
+                <MIcon Color="warning"
+                       Class="mr-2"
+                       OnClick="()=>ReadItem(context.Item, EditRecordReviewState.Ignored)">@IconType.Hide.ToIconString()</MIcon>
+
+            }
+        }
+        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.State))
+        {
+            <StateChip State="context.Item.State" />
+        }
+        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.Operation))
+        {
+            @context.Item.Operation.GetDisplayName()
+        }
+        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
+        {
+            @context.Item.ReviewedTime?.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
+        {
+            <UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/examines/ListUserReviewEditRecords";
+    private string _name = "审阅记录";
+
+    private List<DataTableHeader<UserReviewEditRecordOverviewModel>> _headers = new List<DataTableHeader<UserReviewEditRecordOverviewModel>>
+    {
+        new (){ Text= "审阅时间", Value= nameof(UserReviewEditRecordOverviewModel.ReviewedTime)},
+        new (){ Text= "词条名称", Value= nameof(UserReviewEditRecordOverviewModel.EntryName),Sortable=false},
+        new (){ Text= "操作", Value= nameof(UserReviewEditRecordOverviewModel.Operation),Sortable=false},
+        new (){ Text= "状态", Value= nameof(UserReviewEditRecordOverviewModel.State),Sortable=false},
+        new (){ Text= "编辑者", Value= nameof(UserReviewEditRecordOverviewModel.UserName),Sortable=false},
+        new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<UserReviewEditRecordOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void LookItem(UserReviewEditRecordOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/examine?Id={model.ExamineId}");
+    }
+
+    public async Task ReadItem(UserReviewEditRecordOverviewModel model, EditRecordReviewState state)
+    {
+        string operationName = state == EditRecordReviewState.Reviewed ? "审阅" : "忽略";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel { ExamineIds = new long[] { model.ExamineId }, State = state });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

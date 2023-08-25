@@ -1,0 +1,37 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="info" Icon="IconType.User" Text="@Name" Outlined OnClick="OnClick" />
+
+ @code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+
+    public string GetColor(EditRecordReviewState state)
+    {
+        return state switch
+        {
+            EditRecordReviewState.UnRead => "info",
+            EditRecordReviewState.Reviewed => "success",
+            EditRecordReviewState.Ignored => "warning",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(EditRecordReviewState state)
+    {
+        return state switch
+        {
+            EditRecordReviewState.UnRead => IconType.UnRead,
+            EditRecordReviewState.Reviewed => IconType.Check,
+            EditRecordReviewState.Ignored => IconType.Hide,
+            _ => IconType.UnknowTime,
+        };
+    }
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo($"/space/index/{Id}");
+    }
+}
