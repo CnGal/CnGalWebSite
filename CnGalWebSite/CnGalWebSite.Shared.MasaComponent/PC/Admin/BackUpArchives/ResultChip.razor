@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(IsLastFail?"失败":"成功")" />
+
+ @code {
+    [Parameter]
+    public bool IsLastFail { get; set; }
+
+    public string GetColor()
+    {
+        return IsLastFail switch
+        {
+            false => "success",
+            true => "error"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsLastFail switch
+        {
+            true => IconType.Close,
+            false => IconType.Check,
+        };
+    }
+}
