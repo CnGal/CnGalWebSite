@@ -30,9 +30,11 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
 using HtmlAgilityPack;
@@ -281,32 +283,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        /// <summary>
-        /// 获取文章列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListArticleAloneModel>>> GetArticleListAsync(ArticlesPagesInfor input)
-        {
-            var dtos = await _articleService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        /// <summary>
-        /// 获取视频列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVideoAloneModel>>> GetVideoListAsync(VideosPagesInfor input)
-        {
-            var dtos = await _videoService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListMessageAloneModel>>> GetMessageListAsync(MessagesPagesInfor input)
         {
@@ -327,14 +303,6 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
         {
             var dtos = await _favoriteFolderService.GetPaginatedResult(input.Options, input.SearchModel, null);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPeripheryAloneModel>>> GetPeripheryListAsync(PeripheriesPagesInfor input)
-        {
-            var dtos = await _peripheryService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }

@@ -7,7 +7,7 @@
 <section class="upcoming-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="即将发布" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
         <a class="item" href="@context.Url">
-            <img src="@context.Image" alt="@context.Name" />
+            <img src="@context.Image" alt="@context.Name" loading="lazy" />
             <div class="content">
                 <div>
                     <div class="name text-truncate-1">@context.Name</div>

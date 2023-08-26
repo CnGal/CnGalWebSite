@@ -127,7 +127,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         /// <summary>
         /// 关联周边合集
         /// </summary>
-        public List<GameOverviewPeripheriesModel> PeripheryOverviewModels { get; set; } = new List<GameOverviewPeripheriesModel>();
+        public List<GameOverviewPeripheryListModel> PeripheryOverviewModels { get; set; } = new List<GameOverviewPeripheryListModel>();
 
         /// <summary>
         /// 图片列表

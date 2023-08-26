@@ -92,7 +92,7 @@
         {
             try
             {
-                Model.AddInfor.Informations = await _pageModelCatche.GetCache($"api/entries/GetEditInformationModelList?type={(int)Model.Type}");
+                GetInformation();
                 Model.Main.Name = Model.Main.DisplayName = Name;
                 //获取所有词条
                 EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
@@ -116,6 +116,17 @@
             }
         }
     }
+
+    public async Task GetInformation()
+    {
+        Model.AddInfor.Informations = await _pageModelCatche.GetCache($"api/entries/GetEditInformationModelList?type={(int)Model.Type}");
+        foreach(var item in Model.AddInfor.Informations)
+        {
+            item.Value = null;
+        }
+    }
+
+
     private async Task OnSubmit()
     {
         try
@@ -148,8 +159,8 @@
 
     public async Task TypeChanged(EntryType type)
     {
-        Model.AddInfor.Informations =await _pageModelCatche.GetCache($"api/entries/GetEditInformationModelList?type={(int)type}");
         Model.Type= Model.AddInfor.Type = Model.Relevances.Type = type;
+        GetInformation();
         StateHasChanged();
 
     }

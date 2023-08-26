@@ -24,7 +24,7 @@
     [Parameter]
     public string UserId { get; set; }
 
-    public List<GameOverviewPeripheriesModel> Model { get; set; }
+    public List<GameOverviewPeripheryListModel> Model { get; set; }
 
     bool isReady = false;
     [CascadingParameter]
@@ -35,7 +35,7 @@
 
         try
         {
-            Model = await _httpService.GetAsync<List<GameOverviewPeripheriesModel>>("api/peripheries/GetUserOverviewPeripheries/" + UserId);
+            Model = await _httpService.GetAsync<List<GameOverviewPeripheryListModel>>("api/peripheries/GetUserOverviewPeripheries/" + UserId);
             isReady = true;
         }
         catch(Exception ex)

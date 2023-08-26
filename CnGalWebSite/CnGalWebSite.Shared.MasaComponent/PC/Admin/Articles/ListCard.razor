@@ -1,0 +1,171 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="ArticleOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 170px;">
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                @if (context.Item.CanComment)
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,false)">@IconType.DisableComment.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,true)">@IconType.Comment.ToIconString()</MIcon>
+                }
+                @if (context.Item.IsHidden)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                }
+               
+            </div>
+        }
+        else if (context.Header.Value == nameof(ArticleOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(ArticleOverviewModel.Name))
+        {
+            <ArticleChip Id="@context.Item.Id" Name="@context.Item.Name" Type="context.Item.Type" />
+        }
+        else if (context.Header.Value == nameof(ArticleOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(ArticleOverviewModel.LastEditTime))
+        {
+            @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(ArticleOverviewModel.CanComment))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.CanCommentChip CanComment="context.Item.CanComment"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+@code {
+    private string _baseUrl = "api/articles/List";
+    private string _name = "文章";
+
+    private List<DataTableHeader<ArticleOverviewModel>> _headers = new List<DataTableHeader<ArticleOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ArticleOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(ArticleOverviewModel.Name)},
+          new (){ Text= "创建时间", Value= nameof(ArticleOverviewModel.CreateTime)},
+          new (){ Text= "最后编辑时间", Value= nameof(ArticleOverviewModel.LastEditTime)},
+          new (){ Text= "优先级", Value= nameof(ArticleOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(ArticleOverviewModel.IsHidden)},
+          new (){ Text= "留言板", Value= nameof(ArticleOverviewModel.CanComment)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<ArticleOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public async Task EditItemPriority(ArticleOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditArticlePriorityViewModel, Result>("api/articles/EditPriority", new EditArticlePriorityViewModel { Ids = new long[] { model.Id }, PlusPriority = up?1:-1 });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(ArticleOverviewModel model, bool isHidden)
+    {
+        string operationName = (isHidden ? "隐藏" : "显示") + _name;
+        try
+        {
+            var obj = await _httpService.PostAsync<HiddenArticleModel, Result>("api/articles/Hide", new HiddenArticleModel { Ids = new long[] { model.Id }, IsHidden = isHidden });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task EditItemCanComment(ArticleOverviewModel model, bool canComment)
+    {
+        string operationName = canComment ? "开启留言板" : "关闭留言板";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditArticleCanCommentModel, Result>("api/comments/EditArticleCanComment", new EditArticleCanCommentModel { Ids = new long[] { model.Id }, CanComment = canComment });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

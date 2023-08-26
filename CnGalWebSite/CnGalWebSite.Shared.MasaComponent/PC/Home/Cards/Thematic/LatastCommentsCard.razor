@@ -10,7 +10,7 @@
             @foreach (var item in _items.Take(6))
             {
                 <a class="item" href="@item.Url">
-                    <img class="user-image" src="@item.UserImage" alt="@item.UserName" />
+                    <img class="user-image" src="@item.UserImage" alt="@item.UserName" loading="lazy" />
                     <div class="content">
                         <div class="name">@item.UserName</div>
                         <div class="text">

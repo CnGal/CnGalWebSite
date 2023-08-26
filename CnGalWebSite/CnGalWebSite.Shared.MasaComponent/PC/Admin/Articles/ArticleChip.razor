@@ -1,0 +1,47 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public ArticleType Type { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public string GetColor(ArticleType type)
+    {
+        return type switch
+        {
+            ArticleType.News => "pink",
+            ArticleType.Fan => "blue",
+            ArticleType.Strategy => "green",
+            ArticleType.Interview => "indigo",
+            ArticleType.Evaluation => "teal",
+            ArticleType.Tought => "cyan",
+            ArticleType.Notice => "orange",
+            ArticleType.Peripheral => "brown",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(ArticleType type)
+    {
+        return type switch
+        {
+            ArticleType.News => IconType.New,
+            ArticleType.Notice => IconType.Notice,
+            ArticleType.Peripheral => IconType.Periphery,
+            _ => IconType.Article,
+        };
+    }
+
+    public void OnClick()
+    {
+
+        NavigationManager.NavigateTo($"/articles/index/{Id}");
+
+    }
+}

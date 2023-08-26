@@ -5,6 +5,8 @@ using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -22,6 +24,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -42,9 +45,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEntryService _entryService;
         private readonly IEditRecordService _editRecordService;
         private readonly IUserService _userService;
+        private readonly IQueryService _queryService;
 
-        public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService,
-         IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository, IUserService userService, IRepository<ApplicationUser, string> userRepository,
+        public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService, IQueryService queryService,
+        IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository, IUserService userService, IRepository<ApplicationUser, string> userRepository,
         IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
         {
             
@@ -59,6 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _userService = userService;
             _userRepository = userRepository;
+            _queryService = queryService;
         }
 
 
@@ -174,19 +179,19 @@ namespace CnGalWebSite.APIServer.Controllers
             //根据关联词条初始化周边集合
             foreach (var item in entries)
             {
-                model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverViewPeripheriesModel(user, item, ownedPeripheries, false));
+                model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverviewPeripheryListModel(user, item, ownedPeripheries, false));
             }
             //根据关联周边初始化周边集合
             if (periphery.Type != PeripheryType.Set)
             {
                 foreach (var item in peripheries)
                 {
-                    model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverViewPeripheriesModel(user, item, ownedPeripheries, false));
+                    model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverviewPeripheryListModel(user, item, ownedPeripheries, false));
                 }
             }
             else
             {
-                model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverViewPeripheriesModel(user, periphery, ownedPeripheries, false));
+                model.PeripheryOverviewModels.Add(_peripheryService.GetGameOverviewPeripheryListModel(user, periphery, ownedPeripheries, false));
             }
 
 
@@ -825,7 +830,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameOverviewPeripheriesModel>> GetEntryOverviewPeripheries(int id)
+        public async Task<ActionResult<GameOverviewPeripheryListModel>> GetEntryOverviewPeripheries(int id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -840,7 +845,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 ownedPeripheries = await _userOwnedPeripheryRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Periphery.IsHidden == false).Select(s => s.PeripheryId).ToListAsync();
             }
-            return _peripheryService.GetGameOverViewPeripheriesModel(user, entry, ownedPeripheries, true);
+            return _peripheryService.GetGameOverviewPeripheryListModel(user, entry, ownedPeripheries, true);
         }
 
         [HttpGet("{id}")]
@@ -933,7 +938,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<GameOverviewPeripheriesModel>>> GetUserOverviewPeripheries(string id)
+        public async Task<ActionResult<List<GameOverviewPeripheryListModel>>> GetUserOverviewPeripheries(string id)
         {
             //获取当前用户ID
             var user = await _userRepository.FirstOrDefaultAsync(s=>s.Id== id);
@@ -966,10 +971,10 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            var model = new List<GameOverviewPeripheriesModel>();
+            var model = new List<GameOverviewPeripheryListModel>();
             foreach (var item in entries)
             {
-                model.Add(_peripheryService.GetGameOverViewPeripheriesModel(user, item, ownedPeripheries, false));
+                model.Add(_peripheryService.GetGameOverviewPeripheryListModel(user, item, ownedPeripheries, false));
             }
 
             return model;
@@ -1090,6 +1095,30 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<PeripheryOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Periphery, long>(_peripheryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<PeripheryOverviewModel>
+            {
+                Items = await items.Select(s => new PeripheryOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    Priority = s.Priority,
+                    LastEditTime = s.LastEditTime,
+                    CanComment = s.CanComment ?? true,
+                    Type = s.Type,
+                    Category=s.Category
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
     }

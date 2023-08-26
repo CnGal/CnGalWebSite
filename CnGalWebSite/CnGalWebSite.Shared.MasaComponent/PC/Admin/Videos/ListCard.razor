@@ -1,0 +1,172 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="VideoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 170px;">
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                @if (context.Item.CanComment)
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,false)">@IconType.DisableComment.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,true)">@IconType.Comment.ToIconString()</MIcon>
+                }
+                @if (context.Item.IsHidden)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                }
+               
+            </div>
+        }
+        else if (context.Header.Value == nameof(VideoOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(VideoOverviewModel.Name))
+        {
+            <VideoChip Id="@context.Item.Id" Name="@context.Item.Name"/>
+        }
+        else if (context.Header.Value == nameof(VideoOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(VideoOverviewModel.LastEditTime))
+        {
+            @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(VideoOverviewModel.CanComment))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.CanCommentChip CanComment="context.Item.CanComment"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+@code {
+    private string _baseUrl = "api/videos/List";
+    private string _name = "视频";
+
+    private List<DataTableHeader<VideoOverviewModel>> _headers = new List<DataTableHeader<VideoOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(VideoOverviewModel.Id)
+          },
+          new (){ Text= "类型", Value= nameof(VideoOverviewModel.Type)},
+          new (){ Text= "名称", Value= nameof(VideoOverviewModel.Name)},
+          new (){ Text= "创建时间", Value= nameof(VideoOverviewModel.CreateTime)},
+          new (){ Text= "最后编辑时间", Value= nameof(VideoOverviewModel.LastEditTime)},
+          new (){ Text= "优先级", Value= nameof(VideoOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(VideoOverviewModel.IsHidden)},
+          new (){ Text= "留言板", Value= nameof(VideoOverviewModel.CanComment)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<VideoOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public async Task EditItemPriority(VideoOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditArticlePriorityViewModel, Result>("api/videos/EditPriority", new EditArticlePriorityViewModel { Ids = new long[] { model.Id }, PlusPriority = up?1:-1 });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(VideoOverviewModel model, bool isHidden)
+    {
+        string operationName = (isHidden ? "隐藏" : "显示") + _name;
+        try
+        {
+            var obj = await _httpService.PostAsync<HiddenArticleModel, Result>("api/videos/Hide", new HiddenArticleModel { Ids = new long[] { model.Id }, IsHidden = isHidden });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task EditItemCanComment(VideoOverviewModel model, bool canComment)
+    {
+        string operationName = canComment ? "开启留言板" : "关闭留言板";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditArticleCanCommentModel, Result>("api/comments/EditVideoCanComment", new EditArticleCanCommentModel { Ids = new long[] { model.Id }, CanComment = canComment });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

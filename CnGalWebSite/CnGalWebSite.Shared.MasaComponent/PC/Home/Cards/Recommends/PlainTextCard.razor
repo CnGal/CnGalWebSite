@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
 <a class="plain-text-card item" href="@($"entries/index/{Model.Id}")">
-    <img src="@Model.MainPicture" alt="@Model.Name" />
+    <img src="@Model.MainPicture" alt="@Model.Name" loading="lazy" />
     <div class="content">
         <div class="name text-truncate-1">@Model.Name</div>
         <div class="tags">

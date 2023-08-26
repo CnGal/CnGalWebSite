@@ -6,7 +6,8 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -29,6 +30,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -53,11 +55,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IVideoService _videoService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEditRecordService _editRecordService;
+        private readonly IQueryService _queryService;
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, IVideoService videoService, IRepository<Video, long> videoRepository,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
          IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
-        IRepository<Entry, int> entryRepository)
+        IRepository<Entry, int> entryRepository, IQueryService queryService)
         {
             
             _entryRepository = entryRepository;
@@ -75,6 +78,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _videoRepository = videoRepository;
             _videoService = videoService;
+            _queryService = queryService;
         }
 
         [AllowAnonymous]
@@ -958,24 +962,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _articleService.GetPaginatedResult(input);
         }
 
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult<GetArticleCountModel>> GetArticleCountAsync()
-        {
-            var model = new GetArticleCountModel
-            {
-                All = await _articleRepository.CountAsync(),
-                Toughts = await _articleRepository.CountAsync(x => x.Type == ArticleType.Tought),
-                Interviews = await _articleRepository.CountAsync(x => x.Type == ArticleType.Interview),
-                Strategies = await _articleRepository.CountAsync(x => x.Type == ArticleType.Strategy),
-                News = await _articleRepository.CountAsync(x => x.Type == ArticleType.News),
-                Others = await _articleRepository.CountAsync(x => x.Type == ArticleType.None),
-                Hiddens = await _articleRepository.CountAsync(x => x.IsHidden == true)
-            };
-
-            return model;
-        }
-
         /// <summary>
         /// 获取输入提示
         /// </summary>
@@ -1292,6 +1278,31 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+
+        [HttpPost]
+        public async Task<QueryResultModel<ArticleOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Article, long>(_articleRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<ArticleOverviewModel>
+            {
+                Items = await items.Select(s => new ArticleOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment ?? true,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    CreateTime=s.CreateTime,
+                    LastEditTime=s.LastEditTime
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

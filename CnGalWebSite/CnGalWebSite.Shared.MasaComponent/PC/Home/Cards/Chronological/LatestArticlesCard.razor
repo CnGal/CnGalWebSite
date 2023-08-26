@@ -17,7 +17,7 @@
                     <div class="author">
                         @if (string.IsNullOrWhiteSpace(context.OriginalAuthor))
                         {
-                            <img class="user-image" src="@context.UserImage" alt="@context.UserName" />
+                            <img class="user-image" src="@context.UserImage" alt="@context.UserName" loading="lazy" />
                             <div class="name">@context.UserName</div>
                         }
                         else

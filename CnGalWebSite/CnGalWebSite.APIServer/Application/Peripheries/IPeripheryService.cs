@@ -2,7 +2,6 @@
 using CnGalWebSite.DataModel.ExamineModel.Peripheries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,8 +10,6 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 {
     public interface IPeripheryService
     {
-        Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel);
-
         void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain_1_0 examine);
 
         void UpdatePeripheryDataMain(Periphery periphery, ExamineMain examine);
@@ -25,9 +22,9 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         Task UpdatePeripheryDataRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine);
 
-        GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Entry entry, List<long> ownedPeripheries, bool showUserPhoto);
+        GameOverviewPeripheryListModel GetGameOverviewPeripheryListModel(ApplicationUser user, Entry entry, List<long> ownedPeripheries, bool showUserPhoto);
 
-        GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Periphery periphery, List<long> ownedPeripheries, bool showUserPhoto);
+        GameOverviewPeripheryListModel GetGameOverviewPeripheryListModel(ApplicationUser user, Periphery periphery, List<long> ownedPeripheries, bool showUserPhoto);
 
         Task<PeripheryEditState> GetPeripheryEditState(ApplicationUser user, long peripheryId);
 

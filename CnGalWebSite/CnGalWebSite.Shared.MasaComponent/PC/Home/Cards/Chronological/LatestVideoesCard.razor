@@ -10,7 +10,7 @@
             @foreach (var item in context)
             {
                 <a class="item" href="@item.Url">
-                    <img class="image" src="@item.Image" alt="@item.Name" />
+                    <img class="image" src="@item.Image" alt="@item.Name" loading="lazy" />
                     <div class="head">
                         <div class="content">
                             <div class="name text-truncate-2">@item.Name</div>

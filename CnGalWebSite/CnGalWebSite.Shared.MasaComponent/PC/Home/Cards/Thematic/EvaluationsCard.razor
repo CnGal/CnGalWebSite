@@ -34,7 +34,7 @@
                     @foreach (var infor in item.Articles)
                     {
                             <a class="item" href="@($"/articles/index/{infor.Id}")">
-                                <img class="image" src="@infor.Image" alt="@infor.Name" />
+                            <img class="image" src="@infor.Image" alt="@infor.Name" loading="lazy" />
                                 <div class="head">
                                     <div class="content">
                                         <div class="name text-truncate-1">@infor.Name</div>

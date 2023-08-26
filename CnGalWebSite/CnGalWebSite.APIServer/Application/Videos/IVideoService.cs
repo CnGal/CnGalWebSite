@@ -50,7 +50,5 @@ namespace CnGalWebSite.APIServer.Application.Videos
         ExaminePreDataModel GetExamineViewRelevances(Video item);
 
         ExaminePreDataModel GetExamineViewImages(Video item);
-
-        Task<QueryData<ListVideoAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListVideoAloneModel searchModel);
     }
 }

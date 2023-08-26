@@ -22,7 +22,7 @@
             @foreach (var item in Model)
             {
                 <a class="item" href="@($"/entries/index/{item.Id}")">
-                    <img src="@item.MainImage" alt="@item.Name" />
+                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" />
                     <div class="content">
                         <div class="head">
                             <div class="name text-truncate-1"> @item.Name </div>

@@ -6,10 +6,13 @@ using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -27,6 +30,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -48,8 +52,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IArticleService _articleService;
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IUserService _userService;
+        private readonly IQueryService _queryService;
 
-        public TagsAPIController( IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository, IUserService userService,
+        public TagsAPIController( IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository, IUserService userService, IQueryService queryService,
         IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService, IRepository<Carousel, int> carouselRepository, IArticleService articleService)
         {
             
@@ -65,6 +70,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _articleService = articleService;
             _userService = userService;
+            _queryService = queryService;
         }
 
         [AllowAnonymous]
@@ -689,27 +695,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListTagAloneModel>>> GetTagListAsync(TagsPagesInfor input)
-        {
-            var dtos = await _tagService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ListTagsInforViewModel>> ListTagsAsync()
-        {
-            var model = new ListTagsInforViewModel
-            {
-                All = await _tagRepository.CountAsync(),
-                Hiddens = await _tagRepository.CountAsync(s => s.IsHidden == true)
-            };
-
-            return model;
-        }
-
-
-        [HttpPost]
         public async Task<ActionResult<Result>> RevokeExamine(RevokeExamineModel model)
         {
             //获取当前用户ID
@@ -1050,5 +1035,24 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<QueryResultModel<TagOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Tag, int>(_tagRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<TagOverviewModel>
+            {
+                Items = await items.Select(s => new TagOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    LastEditTime = s.LastEditTime
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
     }
 }

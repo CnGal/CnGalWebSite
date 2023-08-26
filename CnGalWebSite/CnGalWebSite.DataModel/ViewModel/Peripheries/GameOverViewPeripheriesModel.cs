@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {
-    public class GameOverviewPeripheriesModel
+    public class GameOverviewPeripheryListModel
     {
         public string ObjectId { get; set; }
 
@@ -16,10 +16,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         public PeripheryOverviewType Type { get; set; }
 
 
-        public List<PeripheryOverviewModel> Peripheries { get; set; } = new List<PeripheryOverviewModel>();
+        public List<GameOverviewPeripheryModel> Peripheries { get; set; } = new List<GameOverviewPeripheryModel>();
     }
 
-    public class PeripheryOverviewModel
+    public class GameOverviewPeripheryModel
     {
         public long Id { get; set; }
 

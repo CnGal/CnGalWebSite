@@ -7,7 +7,7 @@
 <section class="published-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="随机推荐" MoreText="换一批" MoreIcon="IconType.Refresh" ForceShowMore OnClickMore="OnClickMore" Items="_items.Take(_dataCacheService.IsApp?9:16)">
         <a class="item" href="@context.Url">
-            <img src="@context.Image" alt="@context.Name" />
+             <img src="@context.Image" alt="@context.Name" loading="lazy" />
             <div class="content">
                 <div>
                     <div class="name text-truncate-1">@context.Name</div>

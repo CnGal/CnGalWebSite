@@ -1,0 +1,18 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="info" Icon="@IconType.Tag" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public void OnClick()
+    {
+
+        NavigationManager.NavigateTo($"/videos/index/{Id}");
+
+    }
+}
