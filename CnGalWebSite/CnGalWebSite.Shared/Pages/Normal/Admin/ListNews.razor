@@ -3,11 +3,10 @@
 
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="动态版块"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="动态版块" />
 <div>
     <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-               >
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive>
 
             <MTab Value="1">
                 动态<MIcon>mdi-newspaper-variant</MIcon>
@@ -19,17 +18,11 @@
     </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.News.ListGameNewsTip />
-
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.News.GameNews.ListCard />
 
         </MTabItem>
         <MTabItem Value="2">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.News.ListWeeklyNewsTip />
-
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.News.WeeklyNews.ListCard />
 
         </MTabItem>
     </MTabsItems>
@@ -41,7 +34,7 @@
 
 
     protected override async Task OnInitializedAsync()
-    { 
+    {
 
     }
 

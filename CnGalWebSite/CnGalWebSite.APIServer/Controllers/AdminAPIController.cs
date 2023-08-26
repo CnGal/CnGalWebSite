@@ -7,7 +7,6 @@ using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.News;
@@ -31,6 +30,8 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
@@ -105,7 +106,6 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
-        private readonly IHistoryDataService _historyDataService;
         private readonly ISearchHelper _searchHelper;
         private readonly IConfiguration _configuration;
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
@@ -130,7 +130,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, 
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
          IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
@@ -180,7 +180,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _newsService = newsService;
             _gameNewsRepository = gameNewsRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
-            _historyDataService = historyDataService;
             _voteService = voteService;
             _voteRepository = voteRepository;
             _configuration = configuration;
@@ -211,19 +210,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _storeInfoRepository = storeInfoRepository;
             _entryInformationTypeRepository = entryInformationTypeRepository;
             _basicEntryInformationRepository = basicEntryInformationRepository;
-        }
-
-        /// <summary>
-        /// 获取用户列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserAloneModel>>> GetUserListAsync(UsersPagesInfor input)
-        {
-            var dtos = await _userService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
         }
 
         /// <summary>
@@ -295,21 +281,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-
-        /// <summary>
-        /// 获取词条列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListEntryAloneModel>>> GetEntryListAsync(EntriesPagesInfor input)
-        {
-            var dtos = await _entryService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-
         /// <summary>
         /// 获取文章列表
         /// </summary>
@@ -332,14 +303,6 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVideoAloneModel>>> GetVideoListAsync(VideosPagesInfor input)
         {
             var dtos = await _videoService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListCommentAloneModel>>> GetCommentListAsync(CommentsPagesInfor input)
-        {
-            var dtos = await _commentService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }
@@ -369,14 +332,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRankAloneModel>>> GetRankListAsync(RanksPagesInfor input)
-        {
-            var dtos = await _rankService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPeripheryAloneModel>>> GetPeripheryListAsync(PeripheriesPagesInfor input)
         {
             var dtos = await _peripheryService.GetPaginatedResult(input.Options, input.SearchModel);
@@ -396,22 +351,6 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryAloneModel>>> GetLotteryListAsync(LotteriesPagesInfor input)
         {
             var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListOperationRecordAloneModel>>> GetOperationRecordListAsync(OperationRecordsPagesInfor input)
-        {
-            var dtos = await _operationRecordService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserCertificationAloneModel>>> GetUserCertificationListAsync(UserCertificationsPagesInfor input)
-        {
-            var dtos = await _userService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }
@@ -561,71 +500,6 @@ namespace CnGalWebSite.APIServer.Controllers
                         Link = item.Link,
                         Priority = item.Priority
                     });
-                }
-            }
-            return new Result { Successful = true };
-        }
-
-        /// <summary>
-        /// 置顶最新发行的游戏
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<Result>> MakeNewestGamesTop()
-        {
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            //获取所有游戏
-            var entriesList = _entryRepository.GetAll().Include(s => s.Information).Where(s => s.Type == EntryType.Game);
-
-            //获取游戏发行时间
-            var gameTimes = new Dictionary<int, DateTime>();
-            foreach (var item in entriesList)
-            {
-                foreach (var temp in item.Information)
-                {
-
-                    if (temp.Modifier == "基本信息" && temp.DisplayName == "发行时间")
-                    {
-                        try
-                        {
-                            gameTimes.Add(item.Id, DateTime.ParseExact(temp.DisplayValue, "yyyy年M月d日", null));
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                gameTimes.Add(item.Id, DateTime.ParseExact(temp.DisplayValue, "yyyy/M/d", null));
-                            }
-                            catch
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            //对其进行排序
-            var gameTimes_Sorted = gameTimes.OrderByDescending(p => p.Value).ToDictionary(p => p.Key, o => o.Value);
-            //取前几个修改权重 从10开始
-            var num = 6;
-            foreach (var item in gameTimes_Sorted)
-            {
-                //获取词条
-                var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == item.Key);
-                if (entry != null)
-                {
-                    entry.Priority = 10 + num;
-                    _ = await _entryRepository.UpdateAsync(entry);
-                    num--;
-                }
-                else
-                {
-                    return NotFound();
-                }
-                if (num < 1)
-                {
-                    break;
                 }
             }
             return new Result { Successful = true };

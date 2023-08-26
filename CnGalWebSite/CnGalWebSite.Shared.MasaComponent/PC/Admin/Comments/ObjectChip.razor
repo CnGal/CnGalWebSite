@@ -1,0 +1,73 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public CommentType Type { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+
+    public string GetColor(CommentType type)
+    {
+        return type switch
+        {
+            CommentType.CommentArticle => "orange",
+            CommentType.CommentEntries => "pink",
+            CommentType.CommentVote => "indigo",
+            CommentType.CommentLottery => "blue",
+            CommentType.CommentPeriphery => "light-blue",
+            CommentType.CommentUser => "cyan",
+            CommentType.CommentVideo => "teal",
+            CommentType.ReplyComment => "green",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(CommentType type)
+    {
+        return type switch
+        {
+            CommentType.CommentArticle => IconType.Article,
+            CommentType.CommentEntries => IconType.Entry,
+            CommentType.CommentVote => IconType.Vote,
+            CommentType.CommentLottery => IconType.Lottery,
+            CommentType.CommentPeriphery => IconType.Periphery,
+            CommentType.CommentUser => IconType.User,
+            CommentType.CommentVideo => IconType.Video,
+            CommentType.ReplyComment => IconType.Comment,
+            _ => IconType.UnknowTime,
+        };
+    }
+
+    public void OnClick()
+    {
+        switch (Type)
+        {
+            case CommentType.CommentEntries:
+                NavigationManager.NavigateTo($"/entries/index/{Id}");
+                break;
+            case CommentType.CommentArticle:
+                NavigationManager.NavigateTo($"/articles/index/{Id}");
+                break;
+            case CommentType.CommentVote:
+                NavigationManager.NavigateTo($"/votes/index/{Id}");
+                break;
+            case CommentType.CommentLottery:
+                NavigationManager.NavigateTo($"/lotteries/index/{Id}");
+                break;
+            case CommentType.CommentPeriphery:
+                NavigationManager.NavigateTo($"/comments/index/{Id}");
+                break;
+            case CommentType.CommentUser:
+                NavigationManager.NavigateTo($"/users/index/{Id}");
+                break;
+            case CommentType.CommentVideo:
+                NavigationManager.NavigateTo($"/videos/index/{Id}");
+                break;
+        }
+    }
+}

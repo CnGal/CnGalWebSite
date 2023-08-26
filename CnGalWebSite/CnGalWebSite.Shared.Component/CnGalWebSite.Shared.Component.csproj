@@ -27,5 +27,9 @@
     <ProjectReference Include="..\CnGalWebSite.Shared.MasaComponent\CnGalWebSite.Shared.MasaComponent.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Service\CnGalWebSite.Shared.Service.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Admin\News\" />
+  </ItemGroup>
 
 </Project>

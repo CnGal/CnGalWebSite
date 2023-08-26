@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<MChip Outlined="Outlined" Dark="!Outlined" XSmall="_dataCacheService.IsApp" Small="!_dataCacheService.IsApp" Color="@Color" Class=" ma-1">
+<MChip Outlined="Outlined" Dark="!Outlined" XSmall="_dataCacheService.IsApp" Small="!_dataCacheService.IsApp" Color="@Color" Class=" ma-1" OnClick="OnClick">
     @if (Icon != IconType.None)
     {
         <MIcon Left XSmall>@Icon.ToIconString() </MIcon>
@@ -10,6 +10,8 @@
 </MChip>
 
 @code {
+    [Parameter]
+    public EventCallback OnClick{ get; set; }
     [Parameter]
     public IconType Icon { get; set; }
     [Parameter]

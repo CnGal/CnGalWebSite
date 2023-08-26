@@ -30,32 +30,16 @@
     </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Users.ListUsers />
-
-            </div>
-
+           <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.ListCard/>
         </MTabItem>
         <MTabItem Value="2">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Users.ListRanks />
-
-            </div>
-
+           <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ListCard/>
         </MTabItem>
         <MTabItem Value="3">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Users.ListUserCertifications />
-
-            </div>
-
+         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.ListCard/>
         </MTabItem>
         <MTabItem Value="4">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <CnGalWebSite.Shared.Component.Admin.Users.ListOperationRecords />
-
-            </div>
-
+          <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.OperationRecords.ListCard/>
         </MTabItem>
     </MTabsItems>
 </div>

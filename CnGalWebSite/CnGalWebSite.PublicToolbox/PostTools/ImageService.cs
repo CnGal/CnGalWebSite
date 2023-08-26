@@ -1,9 +1,9 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
-using CnGalWebSite.DataModel.ViewModel.HistoryData;
 using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.PublicToolbox.DataRepositories;
+using CnGalWebSite.PublicToolbox.Models;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 

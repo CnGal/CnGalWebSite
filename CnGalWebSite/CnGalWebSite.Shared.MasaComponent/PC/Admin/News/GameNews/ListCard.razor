@@ -1,0 +1,143 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="GameNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" SortByItem="@nameof(GameNewsOverviewModel.State)" SortDesc="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 100px;">
+                <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+            @if (context.Item.ArticleId > 0)
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            }
+            @if (context.Item.State != GameNewsState.Ignore)
+            {
+                <MIcon Color="error"
+                       Class="mr-2"
+                       OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+            }
+            else
+            {
+                <MIcon Color="warning"
+                       Class="mr-2"
+                       OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+            }
+</div>
+            
+        }
+        else if (context.Header.Value == nameof(GameNewsOverviewModel.State))
+        {
+            <StateChip State="context.Item.State" />
+        }
+        else if (context.Header.Value == nameof(GameNewsOverviewModel.PublishTime))
+        {
+            @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
+        {
+            <div style="white-space: pre-line;">
+                @context.Item.BriefIntroduction
+            </div>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加自定义动态" Icon="@IconType.Create.ToIconString()" OnClick="AddCustomNews" Class="me-2" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加微博动态" Icon="@IconType.Weibo.ToIconString()" OnClick="AddWeiboNews" Class="me-2"/>
+    </ButtonContent>
+</DataTableCard>
+
+<AddCustomNewsTip @ref="addCustomNewsTip" OnRefreshTable="RefreshTable" />
+<AddWeiboNewsTip @ref="addWeiboNewsTip" OnRefreshTable="RefreshTable" />
+<EditGameNewsTip @ref="editGameNewsTip" OnRefreshTable="RefreshTable" />
+
+@code {
+    private string _baseUrl = "api/news/ListGameNews";
+    private string _name = "动态";
+
+    AddCustomNewsTip addCustomNewsTip;
+    AddWeiboNewsTip addWeiboNewsTip;
+    EditGameNewsTip editGameNewsTip;
+
+    private List<DataTableHeader<GameNewsOverviewModel>> _headers = new List<DataTableHeader<GameNewsOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(GameNewsOverviewModel.Id)
+          },
+          new (){ Text= "状态", Value= nameof(GameNewsOverviewModel.State)},
+          new (){ Text= "作者", Value= nameof(GameNewsOverviewModel.Author)},
+          new (){ Text= "标题", Value= nameof(GameNewsOverviewModel.Title)},
+          new (){ Text= "简介", Value= nameof(GameNewsOverviewModel.BriefIntroduction)},
+          new (){ Text= "时间", Value= nameof(GameNewsOverviewModel.PublishTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<GameNewsOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private void RefreshTable()
+    {
+        dataTableCard.GetDataFromApi();
+    }
+
+    public void LookItem(GameNewsOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/articles/index/{model.ArticleId}");
+    }
+
+
+    public async Task EditItem(GameNewsOverviewModel item)
+    {
+        await editGameNewsTip?.Refresh(item.Id);
+    }
+
+    public void AddCustomNews()
+    {
+         addCustomNewsTip?.Refresh();
+    }
+
+   public void AddWeiboNews()
+    {
+        addWeiboNewsTip?.Refresh();
+    }
+
+    public async Task HideItem(GameNewsOverviewModel model, bool hide)
+    {
+        string operationName = hide ? "隐藏动态" : "显示动态";
+        try
+        {
+            var obj = await _httpService.PostAsync<IgnoreGameNewsModel, Result>("api/news/IgnoreGameNews", new IgnoreGameNewsModel { Ids = new long[] { model.Id }, IsIgnore = hide });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+}

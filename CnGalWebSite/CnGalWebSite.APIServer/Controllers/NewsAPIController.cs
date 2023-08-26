@@ -3,6 +3,8 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -15,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +41,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-
+        private readonly IQueryService _queryService;
 
         public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository,  IArticleService articleService, IUserService userService, INewsService newsService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<ApplicationUser, string> userRepository,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<ApplicationUser, string> userRepository, IQueryService queryService,
         IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             
@@ -54,6 +57,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _weeklyNewsRepository = weeklyNewsRepository;
             _weiboUserInforRepository = weiboUserInforRepository;
             _userRepository = userRepository;
+            _queryService = queryService;
         }
 
         [HttpPost]
@@ -536,37 +540,51 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListGameNewsInforViewModel>> ListGameNewsAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<GameNewsOverviewModel>> ListGameNews(QueryParameterModel model)
         {
-            var model = new ListGameNewsInforViewModel
+            var (items, total) = await _queryService.QueryAsync<GameNews, long>(_gameNewsRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.Author.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+
+            return new QueryResultModel<GameNewsOverviewModel>
             {
-                All = await _gameNewsRepository.LongCountAsync() + await _weeklyNewsRepository.LongCountAsync(),
-                GameNews = await _gameNewsRepository.LongCountAsync(),
-                PublishedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Publish),
-                DeletedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Ignore),
-                WeelyNews = await _weeklyNewsRepository.LongCountAsync()
+                Items = await items.Select(s => new GameNewsOverviewModel
+                {
+                    Id = s.Id,
+                    State = s.State,
+                    Author = s.Author,
+                    BriefIntroduction = s.BriefIntroduction,
+                    PublishTime = s.PublishTime,
+                    Title = s.Title,
+                    ArticleId = s.ArticleId??0,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
             };
-
-            return model;
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListGameNewAloneModel>>> GetGameNewListAsync(GameNewsPagesInfor input)
+        public async Task<QueryResultModel<WeeklyNewsOverviewModel>> ListWeeklyNews(QueryParameterModel model)
         {
-            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
+            var (items, total) = await _queryService.QueryAsync<WeeklyNews, long>(_weeklyNewsRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<WeeklyNewsOverviewModel>
+            {
+                Items = await items.Select(s => new WeeklyNewsOverviewModel
+                {
+                    Id = s.Id,
+                    State = s.State,
+                    BriefIntroduction = s.BriefIntroduction,
+                    PublishTime = s.PublishTime,
+                    Title = s.Title,
+                    ArticleId = s.ArticleId??0,
+                    CreateTime= s.CreateTime,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListWeeklyNewAloneModel>>> GetWeeklyNewListAsync(WeeklyNewsPagesInfor input)
-        {
-            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
         [HttpPost]
         public async Task<ActionResult<Result>> AddWeiboNewsAsync(AddWeiboNewsModel model)
         {

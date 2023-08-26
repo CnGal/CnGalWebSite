@@ -1,0 +1,42 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="UserCertificationOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(UserCertificationOverviewModel.EntryName))
+        {
+            <EntryChip Name="@context.Item.EntryName" Id="@context.Item.EntryId" Type="@context.Item.EntryType" />
+        }
+        else if (context.Header.Value == nameof(UserCertificationOverviewModel.UserName))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+        }
+        else if (context.Header.Value == nameof(UserCertificationOverviewModel.CertificationTime))
+        {
+            @context.Item.CertificationTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+@code {
+    private string _baseUrl = "api/account/ListUserCertifications";
+    private string _name = "用户";
+
+    private List<DataTableHeader<UserCertificationOverviewModel>> _headers = new List<DataTableHeader<UserCertificationOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserCertificationOverviewModel.Id)
+          },
+          new (){ Text= "用户", Value= nameof(UserCertificationOverviewModel.UserName)},
+          new (){ Text= "词条", Value= nameof(UserCertificationOverviewModel.EntryName)},
+          new (){ Text= "时间", Value= nameof(UserCertificationOverviewModel.CertificationTime)},
+    };
+}

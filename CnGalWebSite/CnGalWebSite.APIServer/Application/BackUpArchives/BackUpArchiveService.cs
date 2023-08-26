@@ -50,73 +50,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             _peripheryRepository = peripheryRepository;
         }
 
-        public Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListBackUpArchiveAloneModel searchModel)
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-
-            IEnumerable<BackUpArchive> items = _backUpArchiveRepository.GetAll().AsNoTracking().Where(s => s.LastBackUpTime > tempDateTimeNow.AddYears(-10));
-            // 处理高级搜索
-            if (searchModel.EntryId != null)
-            {
-                items = items.Where(item => item.EntryId == searchModel.EntryId);
-            }
-            if (searchModel.ArticleId != null)
-            {
-                items = items.Where(item => item.ArticleId == searchModel.ArticleId);
-            }
-
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                // items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(BackUpArchive), key => LambdaExtensions.GetSortLambda<BackUpArchive>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListBackUpArchiveAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListBackUpArchiveAloneModel
-                {
-                    Id = item.Id,
-                    LastBackUpTime = item.LastBackUpTime,
-                    EntryId = item.EntryId,
-                    ArticleId = item.ArticleId,
-                    IsLastFail = item.IsLastFail,
-                    LastTimeUsed = item.LastTimeUsed
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListBackUpArchiveAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
-        }
-
-
-
-
+      
         public async Task BackUpArticle(BackUpArchive backUpArchive)
         {
             var BeginTime = DateTime.Now.ToCstTime();

@@ -1,0 +1,91 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="WeeklyNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 70px;">
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+            @if (context.Item.ArticleId > 0)
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            }
+            </div>
+        }
+        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.State))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.News.GameNews.StateChip State="context.Item.State" />
+        }
+        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.PublishTime))
+        {
+            @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
+        {
+            <div style="white-space: pre-line;">
+                @context.Item.BriefIntroduction
+            </div>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+<EditWeeklyNewsTip @ref="editWeeklyNewsTip" OnRefreshTable="RefreshTable" />
+
+@code {
+    private string _baseUrl = "api/news/ListWeeklyNews";
+    private string _name = "周报";
+
+    EditWeeklyNewsTip editWeeklyNewsTip;
+
+    private List<DataTableHeader<WeeklyNewsOverviewModel>> _headers = new List<DataTableHeader<WeeklyNewsOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(WeeklyNewsOverviewModel.Id)
+          },
+          new (){ Text= "状态", Value= nameof(WeeklyNewsOverviewModel.State)},
+          new (){ Text= "标题", Value= nameof(WeeklyNewsOverviewModel.Title)},
+          new (){ Text= "简介", Value= nameof(WeeklyNewsOverviewModel.BriefIntroduction)},
+          new (){ Text= "创建时间", Value= nameof(WeeklyNewsOverviewModel.CreateTime)},
+          new (){ Text= "发布时间", Value= nameof(WeeklyNewsOverviewModel.PublishTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<WeeklyNewsOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private void RefreshTable()
+    {
+        dataTableCard.GetDataFromApi();
+    }
+
+    public void LookItem(WeeklyNewsOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/articles/index/{model.ArticleId}");
+    }
+
+
+    public async Task EditItem(WeeklyNewsOverviewModel item)
+    {
+        await editWeeklyNewsTip?.Refresh(item.Id);
+    }
+
+}

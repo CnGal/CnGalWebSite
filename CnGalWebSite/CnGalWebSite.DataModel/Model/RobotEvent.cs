@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.DataModel.Model
 {
+    [Obsolete("已从主站拆分")]
     public class RobotEvent
     {
         public long Id { get; set; }
@@ -27,7 +28,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public bool IsHidden { get; set; }
     }
-
+    [Obsolete("已从主站拆分")]
     public enum RobotEventType
     {
         [Display(Name = "固定时间")]

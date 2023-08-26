@@ -1,0 +1,28 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()"/>
+
+
+ @code {
+    [Parameter]
+    public RankType Type { get; set; }
+
+    public string GetColor(RankType type)
+    {
+        return type switch
+        {
+            RankType.Badge => "success",
+            RankType.Rank => "info",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(RankType type)
+    {
+        return type switch
+        {
+            RankType.Badge => IconType.Badge,
+            RankType.Rank => IconType.Name,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

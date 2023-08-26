@@ -1,0 +1,199 @@
+﻿@inject ToastService ToastService
+@inject DialogService DialogService
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑动态
+        </MCardTitle>
+        <MCardText>
+            如果动态已发布会同步修改对应文章信息，但关联部分除外
+        </MCardText>
+        <MCardText>
+            @if (isReady)
+            {
+                <GameNewsEditorCard Model="Model" />
+
+            }
+            else
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+            }
+        </MCardText>
+       
+
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            @if (isReady)
+            {
+                @if (Model.State == GameNewsState.Edit)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" TextStyle />
+                }
+                else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" TextStyle/>
+
+                }
+            }
+            <MSpacer></MSpacer>
+            @if (Model.State == GameNewsState.Edit)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" TextStyle />
+
+            }
+
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle/>
+        </MCardActions>
+    </MCard>
+</MDialog>
+<PreviewArticleTip @ref="previewArticleTip" />
+
+@code {
+    [Parameter]
+    public EventCallback OnRefreshTable { get; set; }
+
+    private long Id { get; set; }
+
+    private EditGameNewsModel Model { get; set; } = new EditGameNewsModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady = false;
+    bool Dialog { get; set; }
+
+    PreviewArticleTip previewArticleTip;
+
+    private async Task Init()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<EditGameNewsModel>("api/news/EditGameNews/" + Id);
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+        }
+    }
+    public async Task DataChanged()
+    {
+        isReady = false;
+        StateHasChanged();
+        await Init();
+        await OnRefreshTable.InvokeAsync();
+
+    }
+    public async Task OnSave()
+    {
+        //上传
+        try
+        {
+            //处理数据
+            long temp = 0;
+            if (string.IsNullOrWhiteSpace(Model.WeiboId) == false && long.TryParse(Model.WeiboId, out temp) == false)
+            {
+                await ToastService.Error("保存动态数据失败", "微博Id无效");
+                return;
+            }
+
+
+            var obj = await _httpService.PostAsync<EditGameNewsModel, Result>("api/news/EditGameNews", Model);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存动态数据失败", obj.Error);
+            }
+            else
+            {
+                await DataChanged();
+
+                await ToastService.Success("保存动态数据成功", "保存动态数据成功");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ToastService.Error("保存动态数据失败", "保存动态数据失败");
+            //ErrorHandler.ProcessError(ex, "保存动态数据失败");
+        }
+    }
+
+
+    public async Task OnPublish()
+    {
+        //先保存
+        await OnSave();
+        try
+        {
+            var result = await _httpService.GetAsync<Result>("api/news/PublishGameNews/" + Id);
+            if (result.Successful)
+            {
+                await OnRefreshTable.InvokeAsync();
+
+                await ToastService.Success("发布动态成功", "发布动态成功");
+                Dialog = false;
+            }
+            else
+            {
+                await ToastService.Error("发布动态失败", result.Error);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            //await ToastService.Error("发布动态失败", "发布动态失败");
+            ErrorHandler.ProcessError(ex, "发布动态失败");
+        }
+
+    }
+
+
+    public async Task OnPreview()
+    {
+
+        try
+        {
+            ArticleViewModel model = await _httpService.GetAsync<ArticleViewModel>("api/news/GetGameNewsPreview/" + Id);
+
+            if (previewArticleTip != null)
+            {
+                previewArticleTip.Refresh(true, model);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            //await ToastService.Error("获取动态预览数据失败", "获取动态预览数据失败");
+            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+        }
+
+    }
+
+    private void OnLook()
+    {
+        Dialog = false;
+        NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
+
+    }
+
+    public async Task Refresh( long id)
+    {
+        Dialog = true;
+        Id = id;
+        isReady = false;
+
+        StateHasChanged();
+
+        await Init();
+
+        StateHasChanged();
+    }
+}

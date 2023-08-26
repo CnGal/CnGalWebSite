@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.Core.Services;
+﻿using BlazorComponent;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Admin.Shared.Options;
 using CnGalWebSite.IdentityServer.Admin.Shared.Services;
@@ -42,7 +43,8 @@ builder.Services.AddMasaBlazor(options =>
         {
             PopupComponents.SNACKBAR, new Dictionary<string, object?>()
             {
-                { nameof(PEnqueuedSnackbars.Outlined), true },
+                { nameof(PEnqueuedSnackbars.Text), true },
+                { nameof(PEnqueuedSnackbars.Elevation), new StringNumber(3) },
                 { nameof(PEnqueuedSnackbars.Closeable), true },
                 { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
             }

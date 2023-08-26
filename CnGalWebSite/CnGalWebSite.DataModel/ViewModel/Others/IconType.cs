@@ -156,7 +156,15 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Hide,
         Refresh,
         Prize,
-        Look
+        Look,
+        UnRead,
+        Execute,
+        Up,
+        Down,
+        DisableComment,
+        Badge,
+        Score,
+        UnLink
     }
 
     public static class IconTypeHelper
@@ -165,6 +173,22 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.UnLink:
+                    return "mdi-link-off";
+                case IconType.Score:
+                    return "mdi-star";
+                case IconType.Badge:
+                    return "mdi-medal-outline";
+                case IconType.DisableComment:
+                    return "mdi-comment-off";
+                case IconType.Down:
+                    return "mdi-arrow-down";
+                case IconType.Up:
+                    return "mdi-arrow-up";
+                case IconType.Execute:
+                    return "mdi-send";
+                case IconType.UnRead:
+                    return "mdi-read";
                 case IconType.Prize:
                     return "mdi-seal-variant";
                 case IconType.Refresh:
@@ -424,7 +448,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                 case IconType.Export:
                     return "mdi-database-export";
                 case IconType.Comment:
-                    return "mdi-message-reply-text ";
+                    return "mdi-comment-text";
                 case IconType.Login:
                     return "mdi-login";
                 case IconType.Create:

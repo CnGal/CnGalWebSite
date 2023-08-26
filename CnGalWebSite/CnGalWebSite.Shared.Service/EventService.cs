@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.ViewModel.PostTools;
+using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;

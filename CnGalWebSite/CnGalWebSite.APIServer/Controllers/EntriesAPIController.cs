@@ -13,7 +13,9 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -1281,17 +1283,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryPriorityAsync(EditEntryPriorityViewModel model)
         {
-            //判断是否为特殊词条
-            if (model.Operation == EditEntryPriorityOperation.ClearAllGame)
-            {
-                await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => 0));
-            }
-            else if (model.Operation == EditEntryPriorityOperation.None)
-            {
-                await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
-            }
-
-
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
             return new Result { Successful = true };
         }
 
@@ -1752,6 +1744,29 @@ namespace CnGalWebSite.APIServer.Controllers
                                  Icon = s.Icon,
                                  Name = s.Name,
                              }).ToList();
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<EntryOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Entry, int>(_entryRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<EntryOverviewModel>
+            {
+                Items = await items.Select(s => new EntryOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment ?? true,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    IsHideOutlink = s.IsHideOutlink,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

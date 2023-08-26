@@ -1,0 +1,46 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public BackUpArchiveType Type { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public string GetColor(BackUpArchiveType type)
+    {
+        return type switch
+        {
+            BackUpArchiveType.Article => "success",
+            BackUpArchiveType.Entry => "info",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(BackUpArchiveType type)
+    {
+        return type switch
+        {
+            BackUpArchiveType.Article => IconType.Article,
+            BackUpArchiveType.Entry => IconType.Entry,
+            _ => IconType.UnknowTime,
+        };
+    }
+
+    public void OnClick()
+    {
+        switch(Type)
+        {
+            case BackUpArchiveType.Entry:
+                NavigationManager.NavigateTo($"/entries/index/{Id}");
+                break;
+            case BackUpArchiveType.Article:
+                NavigationManager.NavigateTo($"/articles/index/{Id}");
+                break;
+        }
+    }
+}

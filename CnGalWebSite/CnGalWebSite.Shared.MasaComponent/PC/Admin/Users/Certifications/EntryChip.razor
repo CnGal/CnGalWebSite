@@ -1,0 +1,44 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public EntryType Type { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public string GetColor(EntryType type)
+    {
+        return type switch
+        {
+            EntryType.Game => "pink",
+            EntryType.Role => "blue",
+            EntryType.Staff => "green",
+            EntryType.ProductionGroup => "purple",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(EntryType type)
+    {
+        return type switch
+        {
+            EntryType.Game => IconType.Game,
+            EntryType.Role => IconType.Role,
+            EntryType.Staff => IconType.Staff,
+            EntryType.ProductionGroup => IconType.Group,
+            _ => IconType.UnknowTime,
+        };
+    }
+
+    public void OnClick()
+    {
+       
+                NavigationManager.NavigateTo($"/entries/index/{Id}");
+              
+    }
+}
