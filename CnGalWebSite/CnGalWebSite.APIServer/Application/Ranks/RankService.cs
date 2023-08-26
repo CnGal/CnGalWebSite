@@ -2,7 +2,6 @@
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using Microsoft.EntityFrameworkCore;
@@ -32,80 +31,6 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             _rankRepository = rankRepository;
             _examineRepository = examineRepository;
             _userRepository = userRepository;
-        }
-
-        public Task<QueryData<ListRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankAloneModel searchModel)
-        {
-            IEnumerable<Rank> items = _rankRepository.GetAll().Include(s => s.RankUsers).Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.Name))
-            {
-                items = items.Where(item => item.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchModel.CSS))
-            {
-                items = items.Where(item => item.CSS?.Contains(searchModel.CSS, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchModel.Styles))
-            {
-                items = items.Where(item => item.Styles?.Contains(searchModel.Styles, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                || (item.CSS?.Contains(options.SearchText) ?? false)
-                || (item.Styles?.Contains(options.SearchText) ?? false));
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheRank.GetOrAdd(typeof(Rank), key => LambdaExtensions.GetSortLambda<Rank>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListRankAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListRankAloneModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    IsHidden = item.IsHidden,
-                    CreateTime = item.CreateTime,
-                    Styles = item.Styles,
-                    CSS = item.CSS,
-                    LastEditTime = item.LastEditTime,
-                    Text = item.Text,
-                    Priority = item.Priority,
-                    Count = item.RankUsers.Count,
-                    Type=item.Type,
-                    Image=item.Image,
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListRankAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
         }
 
         public Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId)

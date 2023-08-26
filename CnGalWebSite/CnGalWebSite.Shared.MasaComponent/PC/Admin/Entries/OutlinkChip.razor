@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(IsHideOutlink?"关闭":"开启")" />
+
+ @code {
+    [Parameter]
+    public bool IsHideOutlink { get; set; }
+
+    public string GetColor()
+    {
+        return IsHideOutlink switch
+        {
+            true => "error",
+            false => "success"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsHideOutlink switch
+        {
+            false => IconType.Link,
+            true => IconType.UnLink,
+        };
+    }
+}

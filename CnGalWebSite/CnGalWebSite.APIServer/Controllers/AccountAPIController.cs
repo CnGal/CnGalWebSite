@@ -2,10 +2,15 @@
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -33,15 +39,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IRepository<UserOnlineInfor, long> _userOnlineInforRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
-        private readonly IRepository<ApplicationUser, int> _userRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IUserService _userService;
         private readonly IOperationRecordService _operationRecordService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountAPIController> _logger;
+        private readonly IQueryService _queryService;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
+        private readonly IRepository<OperationRecord, long> _operationRecordRepository;
 
 
-        public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository,  IAppHelper appHelper, IRepository<ApplicationUser, int> userRepository,
-            IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService)
+        public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository,  IAppHelper appHelper, IRepository<ApplicationUser, string> userRepository, IQueryService queryService, IRepository<UserCertification, long> userCertificationRepository,
+        IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService, IRepository<OperationRecord, long> operationRecordRepository)
         {
             _appHelper = appHelper;
             _userOnlineInforRepository = userOnlineInforRepository;
@@ -51,6 +60,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _configuration = configuration;
             _logger = logger;
             _operationRecordService = operationRecordService;
+            _queryService = queryService;
+            _userCertificationRepository = userCertificationRepository;
+            _operationRecordRepository = operationRecordRepository;
         }
 
         /// <summary>
@@ -95,7 +107,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Success = obj["success"].ToString(),
                 Gt = obj["gt"].ToString()
             };
-            return model;
+            return await Task.FromResult(model);
         }
 
         /// <summary>
@@ -106,7 +118,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<string>> GetIp()
         {
-            return _operationRecordService.GetIp(HttpContext, null);
+            return await Task.FromResult(_operationRecordService.GetIp(HttpContext, null));
         }
 
         /// <summary>
@@ -170,6 +182,79 @@ namespace CnGalWebSite.APIServer.Controllers
                 Email = user.Email,
                 Name = user.UserName,
                 Id = user.Id
+            };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<UserOverviewModel>> ListUsers(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText) || s.PersonalSignature.Contains(model.SearchText)));
+
+            return new QueryResultModel<UserOverviewModel>
+            {
+                Items = await items.Select(s => new UserOverviewModel
+                {
+                    Id = s.Id,
+                    PersonalSignature = s.PersonalSignature,
+                    CanComment=s.CanComment??false,
+                    DisplayContributionValue=s.DisplayContributionValue,
+                    DisplayIntegral = s.DisplayIntegral,
+                    Email = s.Email,
+                    LastOnlineTime = s.LastOnlineTime,
+                    OnlineTime = s.OnlineTime,
+                    RegistTime=s.RegistTime,
+                    UserName = s.UserName,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<UserCertificationOverviewModel>> ListUserCertifications(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<UserCertification, long>(_userCertificationRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s=>s.Entry).Where(s=>s.ApplicationUser!=null&&s.Entry!=null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Entry.Name.Contains(model.SearchText) ));
+
+            return new QueryResultModel<UserCertificationOverviewModel>
+            {
+                Items = await items.Select(s => new UserCertificationOverviewModel
+                {
+                    Id = s.Id,
+                    UserName = s.ApplicationUser.UserName,
+                    UserId = s.ApplicationUserId,
+                    CertificationTime = s.CertificationTime,
+                    EntryId = s.Entry.Id,
+                    EntryName = s.Entry.Name,
+                    EntryType=s.Entry.Type
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<OperationRecordOverviewModel>> ListOperationRecords(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<OperationRecord, long>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s => s.ApplicationUser != null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
+
+            return new QueryResultModel<OperationRecordOverviewModel>
+            {
+                Items = await items.Select(s => new OperationRecordOverviewModel
+                {
+                    Id = s.Id,
+                    UserName = s.ApplicationUser.UserName,
+                    UserId = s.ApplicationUserId,
+                    Cookie = s.Cookie,
+                    Ip = s.Ip,
+                    ObjectId = s.ObjectId,
+                    Type = s.Type,
+                    OperationTime = s.OperationTime,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
             };
         }
     }

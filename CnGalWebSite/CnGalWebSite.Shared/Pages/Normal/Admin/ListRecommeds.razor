@@ -26,6 +26,10 @@
         {
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
         }
+        else if (context.Header.Value == nameof(RecommendOverviewModel.EntryName))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@context.Item.EntryId" Name="@context.Item.EntryName" />
+        }
         else if (context.Header.Value == "reason")
         {
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Item.Reason" Outlined/>
@@ -61,8 +65,7 @@
             Value= nameof(RecommendOverviewModel.Id)
           },
           new (){ Text= "状态", Value= "State"},
-          new (){ Text= "游戏Id", Value= nameof(RecommendOverviewModel.EntryId)},
-          new (){ Text= "游戏名称", Value= nameof(RecommendOverviewModel.EntryName)},
+          new (){ Text= "游戏", Value= nameof(RecommendOverviewModel.EntryName)},
           new (){ Text= "理由", Value= "reason"},
           new (){ Text= "更新时间", Value= nameof(RecommendOverviewModel.UpdateTime)},
           new (){ Text= "操作", Value= "actions",Sortable=false }

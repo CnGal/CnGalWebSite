@@ -34,6 +34,10 @@
         {
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.UpdateTypeChip Type="context.Item.UpdateType" />
         }
+        else if (context.Header.Value == nameof(StoreInfoOverviewModel.Name))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@(context.Item.EntryId??0)" Name="@context.Item.Name" />
+        }
         else if (context.Header.Value == "PlatformType")
         {
             @context.Item.PlatformType.GetDisplayName()
@@ -85,9 +89,8 @@
           new (){ Text= "状态", Value= "State"},
           new (){ Text= "平台类型", Value= "PlatformType"},
           new (){ Text= "平台名称", Value= nameof(StoreInfoOverviewModel.PlatformName)},
-          new (){ Text= "名称", Value= nameof(StoreInfoOverviewModel.Name)},
+          new (){ Text= "目标", Value= nameof(StoreInfoOverviewModel.Name)},
           new (){ Text= "链接", Value= nameof(StoreInfoOverviewModel.Link)},
-          new (){ Text= "词条Id", Value= nameof(StoreInfoOverviewModel.EntryId)},
           new (){ Text= "现价", Value= "PriceNow"},
           new (){ Text= "折扣", Value= "CutNow"},
           new (){ Text= "更新方式", Value= "UpdateType" },

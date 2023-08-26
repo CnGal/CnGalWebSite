@@ -5,6 +5,8 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="评论版块" />
+
 <DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")

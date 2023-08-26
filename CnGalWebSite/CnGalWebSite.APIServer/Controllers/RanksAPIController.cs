@@ -1,5 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
@@ -10,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -22,40 +25,16 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<RankUser, long> _rankUserRepository;
         private readonly IRankService _rankService;
+        private readonly IQueryService _queryService;
 
-        public RanksAPIController(IRepository<Rank, long> rankRepository, IRepository<RankUser, long> rankUserRepository, IRankService rankService,
+        public RanksAPIController(IRepository<Rank, long> rankRepository, IRepository<RankUser, long> rankUserRepository, IRankService rankService, IQueryService queryService,
             IRepository<ApplicationUser, string> userRepository)
         {
             _rankRepository = rankRepository;
             _rankUserRepository = rankUserRepository;
             _rankService = rankService;
             _userRepository = userRepository;
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<ActionResult<Result>> CreateRankAsync(CreateRankModel model)
-        {
-            //查看名称是否冲突
-            if (await _rankRepository.GetAll().AnyAsync(s => s.Name == model.Name))
-            {
-                return new Result { Successful = false, Error = "已经存在该名称的头衔" };
-            }
-
-            var rank = new Rank
-            {
-                Styles = model.Styles,
-                CSS = model.CSS,
-                CreateTime = DateTime.Now.ToCstTime(),
-                LastEditTime = DateTime.Now.ToCstTime(),
-                Name = model.Name,
-                Text = model.Text,
-                Type = model.Type,
-                Image = model.Image
-            };
-            await _rankRepository.InsertAsync(rank);
-
-            return new Result { Successful = true };
+            _queryService = queryService;
         }
 
         [HttpPost]
@@ -69,8 +48,8 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<EditRankViewModel>> EditRankAsync(long id)
+        [HttpGet]
+        public async Task<ActionResult<RankEditModel>> EditAsync(long id)
         {
             var rank = await _rankRepository.FirstOrDefaultAsync(s => s.Id == id);
             if (rank == null)
@@ -78,7 +57,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound("无法找到该头衔");
             }
 
-            var model = new EditRankViewModel
+            var model = new RankEditModel
             {
                 CSS = rank.CSS,
                 Styles = rank.Styles,
@@ -86,7 +65,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 Text = rank.Text,
                 Id = rank.Id,
                 Type=rank.Type,
-                Image=rank.Image
+                Image=rank.Image,
+                Priority=rank.Priority,
             };
 
             return model;
@@ -94,28 +74,46 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Result>> EditRankAsync(EditRankViewModel model)
+        public async Task<ActionResult<Result>> EditAsync(RankEditModel model)
         {
-            var rank = await _rankRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (rank == null)
+            Rank item = null;
+            if (model.Id == 0)
             {
-                return NotFound("无法找到该头衔");
-            }
-            if (rank.Name != model.Name)
-            {
-                if (await _rankRepository.GetAll().AnyAsync(s => s.Name == model.Name))
+                item = await _rankRepository.InsertAsync(new Rank
                 {
-                    return new Result { Successful = false, Error = "已经存在该名称的头衔" };
-                }
+                    CSS = model.CSS,
+                    Styles = model.Styles,
+                    Name = model.Name,
+                    Text = model.Text,
+                    Id = model.Id,
+                    Type = model.Type,
+                    Image = model.Image,
+                    Priority = model.Priority,
+                    CreateTime=DateTime.Now.ToCstTime()
+                });
+                model.Id = item.Id;
+                _rankRepository.Clear();
             }
-            rank.Name = model.Name;
-            rank.CSS = model.CSS;
-            rank.Styles = model.Styles;
-            rank.Text = model.Text;
-            rank.Type = model.Type;
-            rank.Image = model.Image;
 
-            await _rankRepository.UpdateAsync(rank);
+            item = await _rankRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
+
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "项目不存在" };
+            }
+
+            item.Name = model.Name;
+            item.CSS = model.CSS;
+            item.Styles = model.Styles;
+            item.Text = model.Text;
+            item.Type = model.Type;
+            item.Image = model.Image;
+            item.Priority = model.Priority;
+
+            item.LastEditTime = DateTime.Now.ToCstTime();
+
+            await _rankRepository.UpdateAsync(item);
 
             return new Result { Successful = true };
         }
@@ -187,6 +185,34 @@ namespace CnGalWebSite.APIServer.Controllers
             });
 
             return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<RankOverviewModel>> ListRanks(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Rank, long>(_rankRepository.GetAll().AsSingleQuery().Include(s=>s.RankUsers), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Styles.Contains(model.SearchText) || s.CSS.Contains(model.SearchText) || s.Name.Contains(model.SearchText) || s.Text.Contains(model.SearchText)));
+
+            return new QueryResultModel<RankOverviewModel>
+            {
+                Items = await items.Select(s => new RankOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CreateTime = s.CreateTime,
+                    Styles = s.Styles,
+                    CSS = s.CSS,
+                    LastEditTime = s.LastEditTime,
+                    Text = s.Text,
+                    Priority = s.Priority,
+                    Count = s.RankUsers.Count,
+                    Type = s.Type,
+                    Image = s.Image,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

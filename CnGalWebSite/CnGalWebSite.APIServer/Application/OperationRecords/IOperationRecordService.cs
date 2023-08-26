@@ -8,8 +8,6 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 {
     public interface IOperationRecordService
     {
-        Task<QueryData<ListOperationRecordAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListOperationRecordAloneModel searchModel);
-
         Task AddOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context);
 
         Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context);

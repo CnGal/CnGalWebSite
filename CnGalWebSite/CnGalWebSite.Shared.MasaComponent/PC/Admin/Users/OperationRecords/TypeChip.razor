@@ -1,0 +1,32 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()" />
+
+
+ @code {
+    [Parameter]
+    public OperationRecordType Type { get; set; }
+
+    public string GetColor(OperationRecordType type)
+    {
+        return type switch
+        {
+            OperationRecordType.Booking => "purple",
+            OperationRecordType.Lottery => "info",
+            OperationRecordType.Score => "success",
+            OperationRecordType.Vote => "pink",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(OperationRecordType type)
+    {
+        return type switch
+        {
+            OperationRecordType.Booking => IconType.Booking,
+            OperationRecordType.Lottery => IconType.Lottery,
+            OperationRecordType.Score => IconType.Score,
+            OperationRecordType.Vote => IconType.Vote,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

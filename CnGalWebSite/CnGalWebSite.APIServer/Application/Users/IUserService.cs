@@ -4,7 +4,6 @@ using CnGalWebSite.APIServer.Application.Users.Dtos;
 
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System.Collections.Generic;
@@ -15,8 +14,6 @@ namespace CnGalWebSite.APIServer.Application.Users
     public interface IUserService
     {
         Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input);
-
-        Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel);
 
         Task UpdateUserDataMain(ApplicationUser user, UserMain examine);
 
@@ -42,8 +39,6 @@ namespace CnGalWebSite.APIServer.Application.Users
         Task UpdateUserIntegral(ApplicationUser user);
 
         Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null);
-
-        Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel);
 
         bool CheckCurrentUserRole( string role);
 

@@ -30,6 +30,8 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
@@ -211,19 +213,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取用户列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserAloneModel>>> GetUserListAsync(UsersPagesInfor input)
-        {
-            var dtos = await _userService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        /// <summary>
         /// 获取编辑用户视图模型 管理员模式
         /// </summary>
         /// <param name="id"></param>
@@ -292,21 +281,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-
-        /// <summary>
-        /// 获取词条列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListEntryAloneModel>>> GetEntryListAsync(EntriesPagesInfor input)
-        {
-            var dtos = await _entryService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-
         /// <summary>
         /// 获取文章列表
         /// </summary>
@@ -358,14 +332,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRankAloneModel>>> GetRankListAsync(RanksPagesInfor input)
-        {
-            var dtos = await _rankService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPeripheryAloneModel>>> GetPeripheryListAsync(PeripheriesPagesInfor input)
         {
             var dtos = await _peripheryService.GetPaginatedResult(input.Options, input.SearchModel);
@@ -385,22 +351,6 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryAloneModel>>> GetLotteryListAsync(LotteriesPagesInfor input)
         {
             var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListOperationRecordAloneModel>>> GetOperationRecordListAsync(OperationRecordsPagesInfor input)
-        {
-            var dtos = await _operationRecordService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserCertificationAloneModel>>> GetUserCertificationListAsync(UserCertificationsPagesInfor input)
-        {
-            var dtos = await _userService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }

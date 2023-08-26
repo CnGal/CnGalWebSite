@@ -7,7 +7,6 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using IdentityModel;
@@ -113,82 +112,6 @@ namespace CnGalWebSite.APIServer.Application.Users
             };
 
             return dtos;
-        }
-
-        public async Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel)
-        {
-            var items = _userRepository.GetAll().AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
-            {
-                items = items.Where(item => item.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase) );
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchModel.PersonalSignature))
-            {
-                items = items.Where(item => item.PersonalSignature.Contains(searchModel.PersonalSignature, StringComparison.OrdinalIgnoreCase) );
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.Email))
-            {
-                items = items.Where(item => item.Email.Contains(searchModel.Email, StringComparison.OrdinalIgnoreCase) );
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.Id))
-            {
-                items = items.Where(item => item.Id.Contains(searchModel.Id, StringComparison.OrdinalIgnoreCase) );
-            }
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.UserName !=null&& item.UserName.Contains(options.SearchText) )
-                             || (item.PersonalSignature != null && item.PersonalSignature.Contains(options.SearchText))
-                              || (item.Email != null && item.Email.Contains(options.SearchText))
-                               || (item.Id != null && item.Id.Contains(options.SearchText))); 
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListUserAloneModel>();
-            foreach (var item in itemsReal)
-            {
-                resultItems.Add(new ListUserAloneModel
-                {
-                    Id = item.Id,
-                    UserName = item.UserName,
-                    Email = item.Email,
-                    PersonalSignature = item.PersonalSignature,
-                    Birthday = item.Birthday,
-                    RegistTime = item.RegistTime,
-                    CanComment = item.CanComment ?? true,
-                    OnlineTime = (double)item.OnlineTime / (60 * 60),
-                    LastOnlineTime = item.LastOnlineTime,
-                    UnsealTime = item.UnsealTime,
-                    DisplayIntegral = item.DisplayIntegral,
-                    DisplayContributionValue = item.DisplayContributionValue,
-                    IsPassedVerification = item.IsPassedVerification,
-                    IsShowFavotites = item.IsShowFavotites
-                });
-            }
-
-            return new QueryData<ListUserAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
         }
 
         public Task UpdateUserDataMain(ApplicationUser user, UserMain examine)
@@ -442,73 +365,6 @@ namespace CnGalWebSite.APIServer.Application.Users
         }
 
         #region 用户认证
-
-        public async Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel)
-        {
-            var items = _userCertificationRepository.GetAll()
-                .Include(s => s.ApplicationUser)
-                .Include(s => s.Entry)
-                .Where(s => s.EntryId != null && s.EntryId != 0)
-                .AsNoTracking();
-
-            // 处理高级搜索
-
-            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
-            {
-                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
-            {
-                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase));
-            }
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.ApplicationUserId.Contains(options.SearchText));
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListUserCertificationAloneModel>();
-            foreach (var item in itemsReal)
-            {
-                resultItems.Add(new ListUserCertificationAloneModel
-                {
-                    Id = item.Id,
-                    UserName = item.ApplicationUser?.UserName,
-                    UserId = item.ApplicationUserId,
-                    CertificationTime = item.CertificationTime,
-                    EntryId = item.Entry.Id,
-                    EntryName = item.Entry.Name
-                });
-            }
-
-            return new QueryData<ListUserCertificationAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
-        }
-
 
         public async Task UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
         {

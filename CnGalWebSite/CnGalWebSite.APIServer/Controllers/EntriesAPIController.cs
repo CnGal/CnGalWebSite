@@ -13,7 +13,9 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -1742,6 +1744,29 @@ namespace CnGalWebSite.APIServer.Controllers
                                  Icon = s.Icon,
                                  Name = s.Name,
                              }).ToList();
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<EntryOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Entry, int>(_entryRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<EntryOverviewModel>
+            {
+                Items = await items.Select(s => new EntryOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment ?? true,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    IsHideOutlink = s.IsHideOutlink,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }
