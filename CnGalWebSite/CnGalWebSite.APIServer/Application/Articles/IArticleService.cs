@@ -18,8 +18,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
     {
         Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input);
 
-        Task<QueryData<ListArticleAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListArticleAloneModel searchModel);
-
         Task<PagedResultDto<ArticleInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
 
         void UpdateArticleDataMain(Article article, ExamineMain examine);

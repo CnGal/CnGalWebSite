@@ -13,7 +13,7 @@
             {
                 <div class="item">
                     <a href="@($"/entries/index/{item.GroupId}")">
-                        <img src="@item.Image" alt="@item.Title" />
+                        <img src="@item.Image" alt="@item.Title" loading="lazy" />
                     </a>
                     <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
                         <div class="head">

@@ -6,7 +6,6 @@ using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -40,80 +39,6 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             _peripheryRelevanceEntryRepository = peripheryRelevanceEntryRepository;
             _peripheryRelationRepository = peripheryRelationRepository;
             _entryRepository = entryRepository;
-        }
-
-        public Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel)
-        {
-            IEnumerable<Periphery> items = _peripheryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.Name))
-            {
-                items = items.Where(item => item.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.BriefIntroduction))
-            {
-                items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.Category))
-            {
-                items = items.Where(item => item.Category?.Contains(searchModel.Category, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
-                             || (item.Author?.Contains(options.SearchText) ?? false)
-                             || (item.Material?.Contains(options.SearchText) ?? false));
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCachePeriphery.GetOrAdd(typeof(Periphery), key => LambdaExtensions.GetSortLambda<Periphery>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListPeripheryAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListPeripheryAloneModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    IsHidden = item.IsHidden,
-                    BriefIntroduction = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20),
-                    Priority = item.Priority,
-                    LastEditTime = item.LastEditTime,
-                    ReaderCount = item.ReaderCount,
-                    CanComment = item.CanComment ?? true,
-                    Type = item.Type,
-                    CollectedCount = item.CollectedCount,
-                    CommentCount = item.CommentCount,
-                    Category = item.Category,
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListPeripheryAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
         }
 
         public async Task<List<long>> GetPeripheryIdsFromNames(List<string> names)
@@ -401,13 +326,13 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             }
         }
 
-        public GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Entry entry, List<long> ownedPeripheries, bool showUserPhoto)
+        public GameOverviewPeripheryListModel GetGameOverviewPeripheryListModel(ApplicationUser user, Entry entry, List<long> ownedPeripheries, bool showUserPhoto)
         {
-            var model = new GameOverviewPeripheriesModel();
+            var model = new GameOverviewPeripheryListModel();
             //获取周边列表
             foreach (var item in entry.RelatedPeripheries.Where(s => s.IsHidden == false))
             {
-                model.Peripheries.Add(new PeripheryOverviewModel
+                model.Peripheries.Add(new GameOverviewPeripheryModel
                 {
                     Id = item.Id,
                     Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
@@ -456,13 +381,13 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             return model;
         }
 
-        public GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Periphery periphery, List<long> ownedPeripheries, bool showUserPhoto)
+        public GameOverviewPeripheryListModel GetGameOverviewPeripheryListModel(ApplicationUser user, Periphery periphery, List<long> ownedPeripheries, bool showUserPhoto)
         {
-            var model = new GameOverviewPeripheriesModel();
+            var model = new GameOverviewPeripheryListModel();
             //获取周边列表
             foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation).Where(s => s.IsHidden == false))
             {
-                model.Peripheries.Add(new PeripheryOverviewModel
+                model.Peripheries.Add(new GameOverviewPeripheryModel
                 {
                     Id = item.Id,
                     Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),

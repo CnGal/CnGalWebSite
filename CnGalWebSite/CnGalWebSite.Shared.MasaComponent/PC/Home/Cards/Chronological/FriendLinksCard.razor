@@ -11,7 +11,7 @@
         @foreach (var item in _items)
         {
             <a class="item" href="@item.Url" target="_blank">
-                <img src="@item.Image" alt="@item.Name" />
+                <img src="@item.Image" alt="@item.Name" loading="lazy" />
                 <div class="content">
                     <div class="name">@item.Name</div>
                 </div>

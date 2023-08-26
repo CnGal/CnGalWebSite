@@ -6,9 +6,12 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Videos;
@@ -18,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -43,11 +47,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEditRecordService _editRecordService;
         private readonly ILogger<VideoAPIController> _logger;
+        private readonly IQueryService _queryService;
 
         public VideoAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, ILogger<VideoAPIController> logger,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
          IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository, IVideoService videoService,
-        IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository)
+        IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository, IQueryService queryService)
         {
             
             _entryRepository = entryRepository;
@@ -66,6 +71,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _videoService = videoService;
             _logger = logger;
+            _queryService = queryService;
         }
 
         [AllowAnonymous]
@@ -784,7 +790,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+            await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
             foreach (var item in model.Ids)
             {
                 _logger.LogInformation("管理员 - {name}({id}) 修改视频 - Id:{entryId} 优先级为：{PlusPriority}", user.UserName, user.Id,item, model.PlusPriority);
@@ -923,6 +929,30 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "找不到目标审核记录" };
             }
 
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<VideoOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Video, long>(_videoRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<VideoOverviewModel>
+            {
+                Items = await items.Select(s => new VideoOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    CreateTime = s.CreateTime,
+                    LastEditTime = s.LastEditTime
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

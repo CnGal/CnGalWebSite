@@ -106,7 +106,7 @@
     public ErrorHandler ErrorHandler { get; set; }
 
     [Parameter]
-    public GameOverviewPeripheriesModel Model { get; set; }
+    public GameOverviewPeripheryListModel Model { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -114,7 +114,7 @@
         {
             try
             {
-                Model = await _httpService.GetAsync<GameOverviewPeripheriesModel>("api/peripheries/GetEntryOverviewPeripheries/" + EntryId);
+                Model = await _httpService.GetAsync<GameOverviewPeripheryListModel>("api/peripheries/GetEntryOverviewPeripheries/" + EntryId);
                 isReady = true;
             }
             catch (Exception ex)
