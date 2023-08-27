@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DrawingBed.Helper.Services;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
@@ -50,39 +51,15 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(url))
+                var result = await _httpService.GetAsync<UploadResult>(_configuration["ImageApiPath"]+ "api/files/TransferDepositToTucangCC?url=" + url);
+                
+                if (result.Uploaded)
                 {
-                    _logger.LogError("转存图片失败，图片为空");
-                    return null;
-                }
-
-                if (url.Contains("http") == false)
-                {
-                    url = "https:" + url;
-                }
-
-                var client = await _httpService.GetClientAsync();
-                using var content = new MultipartFormDataContent();
-                using var fileContent = new StreamContent(await client.GetStreamAsync(url));
-
-                content.Add(
-                    content: fileContent,
-                    name: "file",
-                    fileName: "test.png");
-                content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
-
-                var response = await client.PostAsync(_configuration["TucangCCAPIUrl"], content);
-
-                var newUploadResults = await response.Content.ReadAsStringAsync();
-                var result = JObject.Parse(newUploadResults);
-
-                if (result["code"].ToObject<int>() == 200)
-                {
-                    return $"{_configuration["CustomTucangCCUrl"]}{result["data"]["url"].ToObject<string>().Split('/').LastOrDefault()}?{url}";
+                    return $"{result.Url}?{url}";
                 }
                 else
                 {
-                    _logger.LogError("转存图片失败，接口返回代码：{code}，消息：{msg}，图片：{url}", result["code"].ToObject<int>(), result["msg"].ToObject<string>(), url);
+                    _logger.LogError("转存图片({img})失败，{msg}",url,result.Error);
                     return null;
                 }
 

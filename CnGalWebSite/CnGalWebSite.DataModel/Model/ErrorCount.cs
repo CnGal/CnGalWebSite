@@ -1,6 +1,7 @@
 ﻿using System;
 namespace CnGalWebSite.DataModel.Model
 {
+    [Obsolete("已移除")]
     public class ErrorCount
     {
         public long Id { get; set; }

@@ -5,5 +5,7 @@
         Task<string> UploadToTencentOSS(string filePath, string shar1);
 
         Task<string> UploadToAliyunOSS(string filePath, string shar1);
+
+        Task<string> UploadToTucangCC(string filePath);
     }
 }

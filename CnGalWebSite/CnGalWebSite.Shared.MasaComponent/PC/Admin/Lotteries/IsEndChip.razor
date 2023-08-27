@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(IsEnd?"已结束":"进行中")" />
+
+ @code {
+    [Parameter]
+    public bool IsEnd { get; set; }
+
+    public string GetColor()
+    {
+        return IsEnd switch
+        {
+            true => "success",
+            false => "info"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsEnd switch
+        {
+            false => IconType.State,
+            true => IconType.Check,
+        };
+    }
+}

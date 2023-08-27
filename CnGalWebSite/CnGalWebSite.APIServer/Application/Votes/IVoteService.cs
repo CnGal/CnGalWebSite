@@ -6,6 +6,6 @@ namespace CnGalWebSite.APIServer.Application.Votes
 {
     public interface IVoteService
     {
-        Task<QueryData<ListVoteAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListVoteAloneModel searchModel);
+
     }
 }

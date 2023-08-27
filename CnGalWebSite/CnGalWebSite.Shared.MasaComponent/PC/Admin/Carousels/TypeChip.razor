@@ -1,0 +1,28 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()" />
+
+
+ @code {
+    [Parameter]
+    public CarouselType Type { get; set; }
+
+    public string GetColor(CarouselType type)
+    {
+        return type switch
+        {
+            CarouselType.Home => "success",
+            CarouselType.ThematicPage => "info",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(CarouselType type)
+    {
+        return type switch
+        {
+            CarouselType.Home => IconType.Home,
+            CarouselType.ThematicPage => IconType.Dub,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

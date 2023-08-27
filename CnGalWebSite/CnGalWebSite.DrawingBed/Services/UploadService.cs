@@ -7,6 +7,7 @@ using COSXML.Transfer;
 using System.Security.AccessControl;
 using System.Security.Policy;
 using Aliyun.OSS;
+using Newtonsoft.Json.Linq;
 
 namespace CnGalWebSite.DrawingBed.Services
 {
@@ -14,16 +15,18 @@ namespace CnGalWebSite.DrawingBed.Services
     {
         private readonly ILogger<UploadService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
 
         private string _aliyunBucketName;
 
         private CosXml _tencentCosXml;
         private OssClient _aliyunOssClient;
 
-        public UploadService(ILogger<UploadService> logger, IConfiguration configuration)
+        public UploadService(ILogger<UploadService> logger, IConfiguration configuration, HttpClient httpClient)
         {
             _logger = logger;
             _configuration = configuration;
+            _httpClient = httpClient;
 
             InitTencentOSS();
             InitAliyunOSS();
@@ -111,6 +114,50 @@ namespace CnGalWebSite.DrawingBed.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "上传图片到OSS失败：{filePath}", filePath);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 转存图片到公共图床
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> UploadToTucangCC(string filePath)
+        {
+            try
+            {
+                using var content = new MultipartFormDataContent();
+                using var fileContent = new StreamContent(File.OpenRead(filePath));
+
+                content.Add(
+                    content: fileContent,
+                    name: "file",
+                    fileName: "test.png");
+                content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
+
+                var response = await _httpClient.PostAsync(_configuration["TucangCCAPIUrl"], content);
+
+                var newUploadResults = await response.Content.ReadAsStringAsync();
+                var result = JObject.Parse(newUploadResults);
+
+                if (result["code"].ToObject<int>() == 200)
+                {
+
+                    var url= $"{_configuration["CustomTucangCCUrl"]}{result["data"]["url"].ToObject<string>().Split('/').LastOrDefault()}";
+                    await _httpClient.GetAsync(url);
+                    _logger.LogInformation("成功上传图片到TucangCC：{url}", url);
+                    return url;
+                }
+                else
+                {
+                    _logger.LogError("转存图片失败，接口返回代码：{code}，消息：{msg}，图片：{filePath}", result["code"].ToObject<int>(), result["msg"].ToObject<string>(), filePath);
+                    throw new Exception("转存图片失败");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "转存图片失败：{filePath}", filePath);
                 throw;
             }
         }

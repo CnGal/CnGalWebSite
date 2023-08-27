@@ -1097,6 +1097,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<PeripheryOverviewModel>> List(QueryParameterModel model)
         {

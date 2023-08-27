@@ -187,6 +187,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<RankOverviewModel>> ListRanks(QueryParameterModel model)
         {

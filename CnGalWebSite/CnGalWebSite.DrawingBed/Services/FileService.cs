@@ -5,6 +5,7 @@ using COSXML;
 using COSXML.Auth;
 using FFmpeg.NET;
 using MediaInfo;
+using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Policy;
@@ -17,7 +18,7 @@ namespace CnGalWebSite.DrawingBed.Services
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _imageTempPath = "";
         private readonly string _audioTempPath = "";
         private readonly string _fileTempPath = "";
@@ -25,9 +26,9 @@ namespace CnGalWebSite.DrawingBed.Services
         private readonly IUploadService _uploadService;
         private readonly IRecordService _recordService;
 
-        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService, IRecordService recordService)
+        public FileService(IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService, IRecordService recordService)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _logger = logger;
@@ -43,7 +44,7 @@ namespace CnGalWebSite.DrawingBed.Services
             Directory.CreateDirectory(_audioTempPath);
         }
 
-        public async Task<UploadResult> TransferDepositFile(string url, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
+        public async Task<UploadResult> TransferDepositFile(string url,bool gallery , double x = 0, double y = 0, UploadFileType type = UploadFileType.Image )
         {
             string pathSaveFile = null;
             string pathCutFile = null;
@@ -87,7 +88,7 @@ namespace CnGalWebSite.DrawingBed.Services
                     }
                     else
                     {
-                        model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type);
+                        model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type, gallery);
                         //添加文件上传记录
                         await _recordService.Add(model);
                     }
@@ -108,7 +109,7 @@ namespace CnGalWebSite.DrawingBed.Services
             }
         }
 
-        public async Task<UploadResult> UploadFormFile(IFormFile file, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
+        public async Task<UploadResult> UploadFormFile(IFormFile file,bool gallery,  double x = 0, double y = 0,UploadFileType type = UploadFileType.Image )
         {
             string pathSaveFile = null;
             string pathCompressFile = null;
@@ -117,7 +118,7 @@ namespace CnGalWebSite.DrawingBed.Services
             try
             {
 
-                pathSaveFile = SaveFormFile(file, type);
+                pathSaveFile =await SaveFormFile(file, type);
 
                 if (type == UploadFileType.Image)
                 {
@@ -145,7 +146,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 if (string.IsNullOrWhiteSpace(model.Url))
                 {
-                    model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type);
+                    model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type,gallery);
                     //添加文件上传记录
                     await _recordService.Add(model);
                 }
@@ -168,20 +169,25 @@ namespace CnGalWebSite.DrawingBed.Services
 
 
         #region 上传文件
-        private async Task<string> UploadLocalFileToServer(string filePath,string shar1, UploadFileType type)
+        private async Task<string> UploadLocalFileToServer(string filePath,string shar1, UploadFileType type, bool gallery)
         {
-            return type switch
+            var url= type switch
             {
                 UploadFileType.Audio => await _uploadService.UploadToAliyunOSS(filePath, shar1),
-                UploadFileType.Image => await _uploadService.UploadToTencentOSS(filePath, shar1),
+                UploadFileType.Image =>await _uploadService.UploadToTencentOSS(filePath, shar1),
                 _ => null
-
             };
+
+            if(gallery&&type== UploadFileType.Image)
+            {
+                url = await _uploadService.UploadToTucangCC(filePath)+"?"+ url;
+            }
+
+            return url;
         }
-
-
-
         #endregion
+
+
 
         #region 处理文件
         private static string GetFileSuffixName(string path, UploadFileType type)
@@ -192,13 +198,14 @@ namespace CnGalWebSite.DrawingBed.Services
             return Suffix.Length > 4 ? defaultName : Suffix;
         }
 
-        private string SaveFormFile(IFormFile file, UploadFileType type)
+        private async Task<string> SaveFormFile(IFormFile file, UploadFileType type)
         {
 
-            var tempName = Guid.NewGuid().ToString() + "." + GetFileSuffixName(file.FileName, type);
+            var tempName = new Random().Next() + "." + GetFileSuffixName(file.FileName, type);
             //保存图片到本地
             var newPath = Path.Combine(type switch { UploadFileType.Image => _imageTempPath, UploadFileType.Audio => _audioTempPath, _ => _fileTempPath }, tempName);
-            SaveFile(file, newPath);
+            using var steam = file.OpenReadStream();
+            await SaveFile(steam, newPath);
 
             _logger.LogInformation("保存客户端传输的文件：{file}" ,file.FileName);
 
@@ -207,49 +214,22 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public async Task<string> SaveFileFromUrl(string url, UploadFileType type)
         {
-            var Bytes = await _httpClient.GetByteArrayAsync(url);
+            if (url.Contains("http") == false)
+            {
+                url = "https:" + url;
+            }
 
-
-            using Stream stream = new MemoryStream(Bytes);
-            IFormFile image = new FormFile(stream, 0, stream.Length, ".png", "测试.png");
-
-            var tempName = Guid.NewGuid().ToString() + "." + GetFileSuffixName(url,type);
+            var response = await _httpClientFactory.CreateClient().GetAsync(url);
+            using var stream =await response.Content.ReadAsStreamAsync();
+            var tempName =new Random().Next() + "." + GetFileSuffixName(url,type);
 
             //保存图片到本地
             var newPath = Path.Combine(type switch { UploadFileType.Image => _imageTempPath, UploadFileType.Audio => _audioTempPath, _ => _fileTempPath }, tempName);
-            SaveFile(image, newPath);
+            await SaveFile(stream, newPath);
 
             _logger.LogInformation( "下载远程链接里的文件：{file}" ,url);
 
             return newPath;
-        }
-
-
-        private static string GetFileBase64(string path)
-        {
-            using var fsForRead = new FileStream(path, FileMode.Open);
-            string base64Str;
-            try
-            {
-                //读入一个字节
-                //读写指针移到距开头10个字节处
-                _ = fsForRead.Seek(0, SeekOrigin.Begin);
-                var bs = new byte[fsForRead.Length];
-                var log = Convert.ToInt32(fsForRead.Length);
-                //从文件中读取10个字节放到数组bs中
-                _ = fsForRead.Read(bs, 0, log);
-                base64Str = Convert.ToBase64String(bs);
-
-                return base64Str;
-            }
-            catch
-            {
-            }
-            finally
-            {
-                fsForRead.Close();
-            }
-            return "";
         }
 
         private string GetSHA1(string path)
@@ -275,20 +255,12 @@ namespace CnGalWebSite.DrawingBed.Services
             }
         }
 
-        private static void SaveFile(IFormFile sourceFile, string destinationPath)
+        private static async Task SaveFile(Stream file, string destinationPath)
         {
-            using var stmMemory = new MemoryStream();
-            using var stream = sourceFile.OpenReadStream();
-            var buffer = new byte[stream.Length];
-            int i;
-            //将字节逐个放入到Byte中
-            while ((i = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                stmMemory.Write(buffer, 0, i);
-            }
-
-            using var fs = new FileStream(destinationPath, FileMode.OpenOrCreate);
-            stmMemory.WriteTo(fs);
+          using  var fs = File.Create(destinationPath);
+            await file.CopyToAsync(fs);
+            file.Close();
+            fs.Close();
         }
 
         #endregion
@@ -440,7 +412,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
 
         }
-        private void DeleteFile(string path)
+        public void DeleteFile(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

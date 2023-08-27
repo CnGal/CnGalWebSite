@@ -931,6 +931,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<VideoOverviewModel>> List(QueryParameterModel model)
         {

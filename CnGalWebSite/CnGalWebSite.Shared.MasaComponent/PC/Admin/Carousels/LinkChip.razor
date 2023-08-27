@@ -1,0 +1,14 @@
+﻿@inject IEventService _eventService
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="info" Icon="@IconType.Link" Text="@Link" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public string Link { get; set; }
+
+    public void OnClick()
+    {
+        _eventService.OpenNewPage(Link);
+    }
+}

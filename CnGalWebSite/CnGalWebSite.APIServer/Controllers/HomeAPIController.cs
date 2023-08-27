@@ -5,11 +5,17 @@ using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Votes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +26,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [AllowAnonymous]
+    [Authorize]
     [ApiController]
     [Route("api/home/[action]")]
     public class HomeAPIController : ControllerBase
@@ -42,10 +49,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ILogger<HomeAPIController> _logger;
         private readonly IStoreInfoService _storeInfoService;
+        private readonly IRepository<Carousel, int> _carouselRepository;
+        private readonly IQueryService _queryService;
+        private readonly IRepository<FriendLink, int> _friendLinkRepository;
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger, IRepository<StoreInfo, long> storeInfoRepository,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository, IRepository<Recommend, long> recommendRepository,
-        IRepository<Comment, long> commentRepository)
+        IRepository<Comment, long> commentRepository, IRepository<Carousel, int> carouselRepository, IQueryService queryService, IRepository<FriendLink, int> friendLinkRepository)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -59,33 +69,41 @@ namespace CnGalWebSite.APIServer.Controllers
             _tagRepository = tagRepository;
             _commentRepository = commentRepository;
             _storeInfoService = storeInfoService;
-            _storeInfoRepository=storeInfoRepository;
+            _storeInfoRepository = storeInfoRepository;
             _recommendRepository = recommendRepository;
+            _carouselRepository = carouselRepository;
+            _queryService = queryService;
+            _friendLinkRepository = friendLinkRepository;
         }
 
         /// <summary>
         /// 获取近期发售的游戏
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<PublishedGameItemModel>>> ListPublishedGames()
         {
             return await _homeService.ListPublishedGames();
         }
+
         /// <summary>
         /// 获取近期编辑的游戏或制作组
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<RecentlyEditedGameItemModel>>> ListRecentlyEditedGames()
         {
             return await _homeService.ListRecentlyEditedGames();
 
         }
+
         /// <summary>
         /// 获取即将发售游戏
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<UpcomingGameItemModel>>> ListUpcomingGames()
         {
@@ -97,6 +115,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 获取友情链接 
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<FriendLinkItemModel>>> ListFriendLinks()
         {
@@ -108,46 +127,55 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 获取通知
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<AnnouncementItemModel>>> ListAnnouncements()
         {
             return await _homeService.ListAnnouncements();
 
         }
+
         /// <summary>
         /// 获取最近发布的文章
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<LatestArticleItemModel>>> ListLatestArticles()
         {
             return await _homeService.ListLatestArticles();
 
         }
+
         /// <summary>
         /// 获取最近发布的视频
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<LatestVideoItemModel>>> ListLatestVideos()
         {
             return await _homeService.ListLatestVideos();
 
         }
+
         /// <summary>
         /// 获取最近发布的动态
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<HomeNewsAloneViewModel>>> GetHomeNewsViewAsync()
         {
             return await _homeService.GetHomeNewsViewAsync();
 
         }
+
         /// <summary>
         /// 获取轮播图
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<CarouselViewModel>>> GetHomeCarouselsViewAsync()
         {
@@ -172,6 +200,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="Sort"></param>
         /// <param name="Page"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<SearchViewModel>> SearchAsync([FromQuery] string[] Types, [FromQuery] string[] Times, [FromQuery] string Text, [FromQuery] string Sort, [FromQuery] int Page)
         {
@@ -188,16 +217,19 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound(ex.Message);
             }
         }
+
         /// <summary>
         /// 获取搜索提示
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<string>>> GetSearchTipListAsync()
         {
             return await _entryRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().Select(s => s.Name).Where(s => string.IsNullOrWhiteSpace(s) == false).ToArrayAsync();
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<DocumentViewModel>>> GetDocumentsAsync()
         {
@@ -283,10 +315,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<List<PersonalRecommendModel>> GetPersonalizedRecommendations(IEnumerable<int> ids)
         {
-            var model =new List<PersonalRecommendModel>();
+            var model = new List<PersonalRecommendModel>();
 
             //上限
             if (ids.Count() > 100)
@@ -301,12 +334,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Select(s => s.Id)
                 .ToListAsync();
 
-            entryIds = entryIds.Random().Take(10).ToList() ;
+            entryIds = entryIds.Random().Take(10).ToList();
 
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Releases)
                 .Include(s => s.Pictures)
-                .Include(s=>s.Tags)
+                .Include(s => s.Tags)
                 .Where(s => entryIds.Contains(s.Id))
                 .ToListAsync();
 
@@ -314,12 +347,12 @@ namespace CnGalWebSite.APIServer.Controllers
             var random = new Random();
 
             //图墙
-            if(entries.Count(s=>s.Pictures.Any())>=5)
+            if (entries.Count(s => s.Pictures.Any()) >= 5)
             {
-               
+
                 var imageEntries = new List<Entry>();
 
-                foreach(var item in entries.Where(s => s.Pictures.Any()).Take(5))
+                foreach (var item in entries.Where(s => s.Pictures.Any()).Take(5))
                 {
                     imageEntries.Add(item);
                 }
@@ -337,7 +370,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     temp.ImageCards.Add(new PersonalRecommendImageCardModel
                     {
                         Id = item.Id,
-                        Name=item.DisplayName,
+                        Name = item.DisplayName,
                         Image = item.Pictures.ToList().Random().OrderBy(s => s.Priority).FirstOrDefault()?.Url
                     });
                 }
@@ -364,7 +397,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     };
                     if (string.IsNullOrWhiteSpace(item.MainPicture) == false)
                     {
-                        temp.Images.Insert(0,item.MainPicture);
+                        temp.Images.Insert(0, item.MainPicture);
                     }
 
                     model.Add(temp);
@@ -405,7 +438,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             Time = release.Time,
                             TimeNote = release.TimeNote,
                             Type = release.Type,
-                            StoreInfor = await _storeInfoService.Get(release.PublishPlatformType, release.PublishPlatformName, release.Link,release.Name, item.Id)
+                            StoreInfor = await _storeInfoService.Get(release.PublishPlatformType, release.PublishPlatformName, release.Link, release.Name, item.Id)
                         };
                         temp.Release = infor;
                     }
@@ -490,10 +523,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
-                .Include(s=>s.Pictures)
+                .Include(s => s.Pictures)
                 .Where(s => s.Articles.Count >= 3 && s.WebsiteAddInfor != null && s.WebsiteAddInfor.Images.Any())
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .Select(s=>s.Id)
+                .Select(s => s.Id)
                 .ToListAsync();
 
             entryIds = entryIds.ToList().Random().Take(4).ToList();
@@ -512,14 +545,14 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 model.Add(new EvaluationItemModel
                 {
-                    Image = _appHelper.GetImagePath(item.Pictures.Any(s=>s.Priority!=0)? item.Pictures.OrderByDescending(s => s.Priority).First().Url : item.WebsiteAddInfor.Images.OrderByDescending(s=>s.Priority).ThenBy(s=>s.Type).ThenBy(s=>s.Size).First().Url, "app.png"),
+                    Image = _appHelper.GetImagePath(item.Pictures.Any(s => s.Priority != 0) ? item.Pictures.OrderByDescending(s => s.Priority).First().Url : item.WebsiteAddInfor.Images.OrderByDescending(s => s.Priority).ThenBy(s => s.Type).ThenBy(s => s.Size).First().Url, "app.png"),
                     Name = item.DisplayName,
                     Url = "entries/index/" + item.Id,
-                    Articles=item.Articles.OrderByDescending(s=>s.Priority).ThenByDescending(s=>s.Type).Take(4).Select(s=>new EvaluationArticleItemModel
+                    Articles = item.Articles.OrderByDescending(s => s.Priority).ThenByDescending(s => s.Type).Take(4).Select(s => new EvaluationArticleItemModel
                     {
                         Id = s.Id,
                         Image = _appHelper.GetImagePath(s.MainPicture, "app.png"),
-                        Name=s.Name,
+                        Name = s.Name,
                         OriginalAuthor = string.IsNullOrWhiteSpace(s.OriginalAuthor) ? s.CreateUser.UserName : s.OriginalAuthor,
                         Type = s.Type,
                     }).ToList()
@@ -532,11 +565,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<LatestCommentItemModel>>> ListLatestComments([FromQuery]bool renderMarkdown=true)
+        public async Task<ActionResult<List<LatestCommentItemModel>>> ListLatestComments([FromQuery] bool renderMarkdown = true)
         {
             var comments = await _commentRepository.GetAll().AsNoTracking()
-                .Include(s=>s.ApplicationUser)
-                .Where(s => s.IsHidden == false&&string.IsNullOrWhiteSpace(s.Text)==false)
+                .Include(s => s.ApplicationUser)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Text) == false)
                 .OrderByDescending(s => s.CommentTime)
                 .Take(6)
                 .ToListAsync();
@@ -550,9 +583,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     Url = item.EntryId != null ? $"entries/index/{item.EntryId}" : item.ArticleId != null ? $"articles/index/{item.ArticleId}" : item.Periphery != null ? $"peripheries/index/{item.PeripheryId}" : item.LotteryId != null ? $"lotteries/index/{item.LotteryId}" : item.VoteId != null ? $"votes/index/{item.VoteId}" : item.VideoId != null ? $"videos/index/{item.VideoId}" : $"space/index/{item.ApplicationUserId}",
                     UserName = item.ApplicationUser.UserName,
                     Time = item.CommentTime.ToTimeFromNowString(),
-                    Content = renderMarkdown? _appHelper.MarkdownToHtml(item.Text): item.Text,
+                    Content = renderMarkdown ? _appHelper.MarkdownToHtml(item.Text) : item.Text,
                     UserImage = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png"),
-                    UserId=item.ApplicationUserId
+                    UserId = item.ApplicationUserId
                 });
             }
 
@@ -564,11 +597,11 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<HotTagItemModel>>> ListHotTags()
         {
             var entries = await _tagRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Entries)
-                .Where(s => s.Entries.Count >= 6 )
+                .Include(s => s.Entries)
+                .Where(s => s.Entries.Count >= 6)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .Where(s=>s.Name.Contains("STAFF")==false&& s.Name.Contains("配音") == false && s.Name.Contains("城市群") == false && s.Name.Contains("声线") == false && s.Name.Contains("字幕") == false)
-                .OrderByDescending(s => s.Priority).ThenByDescending(s=>s.Entries.Count)
+                .Where(s => s.Name.Contains("STAFF") == false && s.Name.Contains("配音") == false && s.Name.Contains("城市群") == false && s.Name.Contains("声线") == false && s.Name.Contains("字幕") == false)
+                .OrderByDescending(s => s.Priority).ThenByDescending(s => s.Entries.Count)
                 .Take(15)
                 .ToListAsync();
 
@@ -593,13 +626,13 @@ namespace CnGalWebSite.APIServer.Controllers
             var entryIds = await _recommendRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
                 .Where(s => s.Entry != null && s.Entry.IsHidden == false && s.IsHidden == false)
-                .Select(s=>s.EntryId)
+                .Select(s => s.EntryId)
                 .ToListAsync();
 
             entryIds = entryIds.ToList().Random().Take(16).ToList();
 
             var entries = await _recommendRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Entry)
+                .Include(s => s.Entry)
                 .Where(s => entryIds.Contains(s.EntryId)).ToListAsync();
 
             var model = new List<HotRecommendItemModel>();
@@ -611,12 +644,197 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Entry.DisplayName,
                     Url = "entries/index/" + item.EntryId,
                     BriefIntroduction = item.Entry.BriefIntroduction,
-                    Reason=item.Reason
+                    Reason = item.Reason
                 });
             }
 
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<CarouselOverviewModel>> ListCarousels(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Carousel, long>(_carouselRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)));
+
+            return new QueryResultModel<CarouselOverviewModel>
+            {
+                Items = await items.Select(s => new CarouselOverviewModel
+                {
+                    Id = s.Id,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    Image = s.Image,
+                    Link = s.Link,
+                    Note = s.Note
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<CarouselEditModel>> EditCarouselAsync(int id)
+        {
+            var item = await _carouselRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if (item == null)
+            {
+                return NotFound("无法找到目标");
+            }
+
+            var model = new CarouselEditModel
+            {
+                Id = item.Id,
+                Priority = item.Priority,
+                Type = item.Type,
+                Image = item.Image,
+                Link = item.Link,
+                Note = item.Note
+            };
+
+            return model;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditCarouselAsync(CarouselEditModel model)
+        {
+            Carousel item = null;
+            if (model.Id == 0)
+            {
+                item = await _carouselRepository.InsertAsync(new Carousel
+                {
+                    Id = model.Id,
+                    Priority = model.Priority,
+                    Type = model.Type,
+                    Image = model.Image,
+                    Link = model.Link,
+                    Note = model.Note
+                });
+                model.Id = item.Id;
+                _carouselRepository.Clear();
+            }
+
+            item = await _carouselRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
+
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "项目不存在" };
+            }
+
+            item.Id = model.Id;
+            item.Priority = model.Priority;
+            item.Type = model.Type;
+            item.Image = model.Image;
+            item.Link = model.Link;
+            item.Note = model.Note;
+
+            await _carouselRepository.UpdateAsync(item);
+
+            return new Result { Successful = true };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditCarouselPriorityAsync(EditEntryPriorityViewModel model)
+        {
+            await _carouselRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Successful = true };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<FriendLinkOverviewModel>> ListFriendLinks(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<FriendLink, int>(_friendLinkRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<FriendLinkOverviewModel>
+            {
+                Items = await items.Select(s => new FriendLinkOverviewModel
+                {
+                    Id = s.Id,
+                    Priority = s.Priority,
+                    Image = s.Image,
+                    Link = s.Link,
+                    Name=s.Name,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<FriendLinkEditModel>> EditFriendLinkAsync(int id)
+        {
+            var item = await _friendLinkRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if (item == null)
+            {
+                return NotFound("无法找到目标");
+            }
+
+            var model = new FriendLinkEditModel
+            {
+                Id = item.Id,
+                Priority = item.Priority,
+                Name = item.Name,
+                Image = item.Image,
+                Link = item.Link,
+            };
+
+            return model;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditFriendLinkAsync(FriendLinkEditModel model)
+        {
+            FriendLink item = null;
+            if (model.Id == 0)
+            {
+                item = await _friendLinkRepository.InsertAsync(new FriendLink
+                {
+                    Id = model.Id,
+                    Priority = model.Priority,
+                    Name = model.Name,
+                    Image = model.Image,
+                    Link = model.Link,
+                });
+                model.Id = item.Id;
+                _friendLinkRepository.Clear();
+            }
+
+            item = await _friendLinkRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
+
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "项目不存在" };
+            }
+
+            item.Id = model.Id;
+            item.Priority = model.Priority;
+            item.Name = model.Name;
+            item.Image = model.Image;
+            item.Link = model.Link;
+
+            await _friendLinkRepository.UpdateAsync(item);
+
+            return new Result { Successful = true };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditFriendLinkPriorityAsync(EditEntryPriorityViewModel model)
+        {
+            await _friendLinkRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Successful = true };
+        }
     }
 }

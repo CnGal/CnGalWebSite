@@ -21,111 +21,19 @@
             <MTab Value="2">
                 友情链接<MIcon>mdi-link</MIcon>
             </MTab>
-            <MTab Value="3">
-                错误记录<MIcon>mdi-alert-circle</MIcon>
-            </MTab>
-            <MTab Value="4">
-                默认图片<MIcon>mdi-cursor-default</MIcon>
-            </MTab>
-
         </MTabs>
     </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
-            <div>
-                <div class="rounded shadow-sm bg-opacity p-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="编辑" OnClick="@(() => ToUrl("admin/EditCarousels"))" Icon="mdi-pencil" />
-
-                </div>
-
-
-                <div class="row">
-                    @foreach (var item in Model.Carousels.OrderByDescending(s=>s.Priority))
-                    {
-                        <div class="col-12 col-lg-6 col-xxl-4 mb-4">
-                            <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Note" />
-                        </div>
-                    }
-                </div>
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Carousels.ListCard/>
         </MTabItem>
         <MTabItem Value="2">
-            <div>
-                <div class="rounded shadow-sm bg-opacity p-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="编辑" OnClick="@(() => ToUrl("admin/EditFriendLinks"))" Icon="mdi-pencil" />
-
-                </div>
-
-                <div class="row">
-                    @foreach (var item in Model.Links.OrderByDescending(s => s.Priority))
-                    {
-                        <div class="col-12 col-lg-6 col-xxl-4 mb-4">
-                            <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Name" />
-                        </div>
-                    }
-
-                </div>
-            </div>
-        </MTabItem>
-        <MTabItem Value="3">
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <ErrorCountChartListView></ErrorCountChartListView>
-            </div>
-        </MTabItem>
-        <MTabItem Value="4">
-            <div>
-                <div class="row">
-                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.AppImage"  Name="词条主图" />
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.CertificateImage" Name="文章主图" />
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.UserImage" Name="头像" />
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.UserBackgroundImage"  Name="用户信息卡片背景图" />
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.BackgroundImage" Name="网站背景图" />
-                    </div>
-                </div>
-            </div>
-        </MTabItem>
+         <CnGalWebSite.Shared.MasaComponent.PC.Admin.FriendLinks.ListCard/>
+        </MTabItem> 
     </MTabsItems>
 </div>
 
 @code {
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
     public StringNumber TabIndex { get; set; } = 1;
-
-    public ManageHomeViewModel Model { get; set; } = new ManageHomeViewModel
-    {
-        Carousels = new List<CnGalWebSite.DataModel.Model.Carousel>(),
-        Links = new List<FriendLink>()
-    };
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            Model = await _httpService.GetAsync<ManageHomeViewModel>("api/admin/managehome");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取网站主页设置相关信息");
-        }
-
-    }
-
-
-    private void ToUrl(string url)
-    {
-        NavigationManager.NavigateTo(url);
-    }
-
 }

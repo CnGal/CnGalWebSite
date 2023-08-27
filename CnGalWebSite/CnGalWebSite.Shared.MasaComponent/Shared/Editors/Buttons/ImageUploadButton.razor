@@ -67,7 +67,7 @@
 </div>
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImageCropperViewTip OnUploadedImage="OnCropperUploaded" @ref="imageCropperViewTip" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImageCropperViewTip OnUploadedImage="OnCropperUploaded" @ref="imageCropperViewTip" Gallery="Gallery" />
 
 @code {
     [Parameter]
@@ -90,6 +90,8 @@
     public IconType Icon { get; set; } = IconType.Upload;
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Gallery { get; set; }
 
     private readonly string Id = "input" + new Random().Next();
     bool isUploading;
@@ -133,7 +135,7 @@
     {
         try
         {
-            var obj = await _fileUploadService.UploadImagesAsync(file, Type);
+            var obj = await _fileUploadService.UploadImagesAsync(file, Type,Gallery);
             if (obj.Uploaded == true)
             {
                 await ChangeImageUrl(obj.Url);

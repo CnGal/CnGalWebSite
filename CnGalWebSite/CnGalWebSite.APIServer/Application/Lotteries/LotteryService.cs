@@ -5,7 +5,6 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using Microsoft.AspNetCore.Http;
@@ -54,74 +53,6 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _operationRecordService=operationRecordService;
             _playedGameRepository = playedGameRepository;
             _logger = logger;
-        }
-        public Task<QueryData<ListLotteryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryAloneModel searchModel)
-        {
-            var items = _lotteryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.Name))
-            {
-                items = items.Where(item => item.Name.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.BriefIntroduction))
-            {
-                items = items.Where(item => item.BriefIntroduction.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase));
-            }
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.Name.Contains(options.SearchText)
-                             || item.BriefIntroduction.Contains(options.SearchText));
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var list = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListLotteryAloneModel>();
-            foreach (var item in list)
-            {
-                resultItems.Add(new ListLotteryAloneModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    IsHidden = item.IsHidden,
-                    BriefIntroduction = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20),
-                    Priority = item.Priority,
-                    LastEditTime = item.LastEditTime,
-                    ReaderCount = item.ReaderCount,
-                    CanComment = item.CanComment ?? true,
-                    CommentCount = item.CommentCount,
-                    BeginTime = item.BeginTime,
-                    EndTime = item.EndTime,
-                    Type = item.Type,
-                    IsEnd = item.IsEnd,
-                    LotteryTime = item.LotteryTime,
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListLotteryAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
         }
 
         public Task<QueryData<ListLotteryUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryUserAloneModel searchModel, long lotteryId)

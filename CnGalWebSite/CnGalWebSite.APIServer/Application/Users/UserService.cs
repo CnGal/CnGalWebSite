@@ -271,7 +271,6 @@ namespace CnGalWebSite.APIServer.Application.Users
             var userId = ToolHelper.Base64DecodeString(await _appHelper.GetUserFromLoginKeyAsync(code));
             if (string.IsNullOrWhiteSpace(userId))
             {
-                await _appHelper.AddErrorCount(groupQQ.ToString());
                 return new Result { Successful = false, Error = $"身份验证失败" };
             }
             var user  = await _userRepository.FirstOrDefaultAsync(s=>s.Id==userId);

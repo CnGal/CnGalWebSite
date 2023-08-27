@@ -1,0 +1,198 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="LotteryOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <div style="width: 170px;">
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                @if (context.Item.CanComment)
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,false)">@IconType.DisableComment.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItemCanComment(context.Item,true)">@IconType.Comment.ToIconString()</MIcon>
+                }
+                @if (context.Item.IsHidden)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                }
+               
+            </div>
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.Name))
+        {
+            <LotteryChip Id="@context.Item.Id" Name="@context.Item.Name"/>
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.IsEnd))
+        {
+            <IsEndChip IsEnd="context.Item.IsEnd"/>
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.Type))
+        {
+            @context.Item.Type.GetDisplayName()
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.LotteryTime))
+        {
+            @if(context.Item.LotteryTime.Year==1)
+            {
+                @("无")
+            }
+            else
+            {
+                @context.Item.LotteryTime.ToString("yyyy-MM-dd HH:mm")
+            }          
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.BeginTime))
+        {
+            @context.Item.BeginTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.EndTime))
+        {
+            @context.Item.EndTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.LastEditTime))
+        {
+            @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(LotteryOverviewModel.CanComment))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.CanCommentChip CanComment="context.Item.CanComment"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
+@code {
+    private string _baseUrl = "api/lotteries/List";
+    private string _name = "抽奖";
+
+    private List<DataTableHeader<LotteryOverviewModel>> _headers = new List<DataTableHeader<LotteryOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(LotteryOverviewModel.Id)
+          },
+          new (){ Text= "类型", Value= nameof(LotteryOverviewModel.Type)},
+          new (){ Text= "名称", Value= nameof(LotteryOverviewModel.Name)},
+          new (){ Text= "抽奖时间", Value= nameof(LotteryOverviewModel.LotteryTime)},
+          new (){ Text= "开始时间", Value= nameof(LotteryOverviewModel.BeginTime)},
+          new (){ Text= "结束时间", Value= nameof(LotteryOverviewModel.EndTime)},
+          new (){ Text= "最后编辑时间", Value= nameof(LotteryOverviewModel.LastEditTime)},
+          new (){ Text= "优先级", Value= nameof(LotteryOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(LotteryOverviewModel.IsEnd)},
+          new (){ Text= "状态", Value= nameof(LotteryOverviewModel.IsHidden)},
+          new (){ Text= "留言板", Value= nameof(LotteryOverviewModel.CanComment)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<LotteryOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public async Task EditItemPriority(LotteryOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditLotteryPriorityViewModel, Result>("api/Lotteries/EditLotteryPriority", new EditLotteryPriorityViewModel { Ids = new long[] { model.Id }, PlusPriority = up?1:-1 });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(LotteryOverviewModel model, bool isHidden)
+    {
+        string operationName = (isHidden ? "隐藏" : "显示") + _name;
+        try
+        {
+            var obj = await _httpService.PostAsync<HiddenLotteryModel, Result>("api/Lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { model.Id }, IsHidden = isHidden });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task EditItemCanComment(LotteryOverviewModel model, bool canComment)
+    {
+        string operationName = canComment ? "开启留言板" : "关闭留言板";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditLotteryCanCommentModel, Result>("api/comments/EditLotteryCanComment", new EditLotteryCanCommentModel { Ids = new long[] { model.Id }, CanComment = canComment });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

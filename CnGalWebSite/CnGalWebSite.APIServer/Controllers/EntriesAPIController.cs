@@ -111,7 +111,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
-                    .Include(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.Information)
                     .Include(s => s.Tags)
                     .Include(s => s.Pictures)
                     .Include(s=>s.Releases)
@@ -435,7 +435,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取词条
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Booking).ThenInclude(s=>s.Goals)
-                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.Information)
                 .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                 .Include(s=>s.Releases)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
@@ -484,14 +484,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //查找词条
             var currentEntry = await _entryRepository.GetAll()
                 .Include(s => s.Booking).ThenInclude(s => s.Goals)
-                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.Information)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.Releases)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Booking).ThenInclude(s => s.Goals)
-                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.Information)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.Releases)
@@ -1746,6 +1746,7 @@ namespace CnGalWebSite.APIServer.Controllers
                              }).ToList();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<EntryOverviewModel>> List(QueryParameterModel model)
         {

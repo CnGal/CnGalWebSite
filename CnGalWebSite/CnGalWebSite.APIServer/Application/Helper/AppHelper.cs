@@ -51,7 +51,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
-        private readonly IRepository<ErrorCount, long> _errorCountRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<BackUpArchive, long> _backUpArchiveRepository;
         private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
@@ -68,7 +67,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly HttpClient _httpClient;
 
         public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository,
-            IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
+            IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
             IRepository<Comment, long> commentRepository, IConfiguration configuration,  IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
@@ -89,7 +88,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _commentRepository = commentRepository;
             _examineRepository = examineRepository;
             _historyUserRepository = historyUserRepository;
-            _errorCountRepository = errorCountRepository;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
             _backUpArchiveRepository = backUpArchiveRepository;
             _userFileRepository = userFileRepository;
@@ -443,33 +441,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
             await _commentRepository.DeleteAsync(comment);
             return;
-        }
-
-        public async Task<bool> IsExceedMaxErrorCount(string text, int limit, int maxMinutes)
-        {
-            var timeNow = DateTime.Now.ToCstTime();
-            var errors = await _errorCountRepository.GetAll().CountAsync(s => s.Text == text && s.LastUpdateTime.AddMinutes(maxMinutes) > timeNow);
-            return errors >= limit;
-        }
-
-        public async Task AddErrorCount(string text)
-        {
-            _ = await _errorCountRepository.InsertAsync(new ErrorCount
-            {
-                LastUpdateTime = DateTime.Now.ToCstTime(),
-                Text = text
-            });
-        }
-
-        public async Task RemoveErrorCount(string text)
-        {
-            //查找是否存在计数器
-            var error = await _errorCountRepository.FirstOrDefaultAsync(s => s.Text == text);
-            if (error != null)
-            {
-                await _errorCountRepository.DeleteAsync(error);
-                return;
-            }
         }
 
         public async Task<bool> IsExceedMaxSendCount(string mail, int limit, int maxMinutes)
@@ -1085,49 +1056,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         {
             await _backUpArchiveDetailRepository.GetAll().Where(s => true).ExecuteDeleteAsync();
             await _backUpArchiveRepository.GetAll().Where(s => true).ExecuteDeleteAsync();
-        }
-
-        public async Task<string> CheckStringCompliance(string text, string ip)
-        {
-            try
-            {
-                //检查是否超过上限
-                if (await IsExceedMaxErrorCount(ip, 5, 1))
-                {
-                    return "请求验证用户名合规次数达到上限";
-                }
-
-                //初始化
-                var API_KEY = _configuration["BaiduAPIKey"];
-                var SECRET_KEY = _configuration["BaiduSecretKey"];
-
-                //获取令牌
-                var client = _clientFactory.CreateClient();
-                var jsonContent = await client.GetStringAsync("https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=" + API_KEY + "&client_secret=" + SECRET_KEY + "&");
-                var obj = JObject.Parse(jsonContent);
-                var access_token = obj["access_token"].ToString();
-
-
-                var token = access_token;
-                var host = "https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined?access_token=" + token + "&text=" + text;
-
-                jsonContent = await client.GetStringAsync(host);
-                obj = JObject.Parse(jsonContent);
-
-                var conclusion = obj["conclusion"].ToString();
-
-
-
-                //增加审核次数
-                await AddErrorCount(ip);
-
-                return conclusion == "合规" ? null : "文本存在敏感词";
-            }
-            catch (Exception)
-            {
-                return "请求审核文本失败";
-            }
-
         }
     }
 }

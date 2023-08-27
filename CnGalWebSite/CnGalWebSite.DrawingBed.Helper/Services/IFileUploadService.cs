@@ -12,9 +12,9 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
 {
     public interface IFileUploadService
     {
-        Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type);
+        Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type, bool gallery);
 
-        Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type);
+        Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type, bool gallery);
 
         Task<UploadResult> UploadAudioAsync(IBrowserFile file);
 
