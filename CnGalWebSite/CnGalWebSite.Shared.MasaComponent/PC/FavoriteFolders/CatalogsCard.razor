@@ -1,5 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
+@inject IPageModelCatche<List<FavoriteFolderAloneModel>> _pageModelCatche
 
 @if (Model.Any())
 {
@@ -62,18 +63,20 @@
     public long Id { get; set; }
 
     public List<FavoriteFolderAloneModel> Model = new List<FavoriteFolderAloneModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
         try
         {
-            Model = await _httpService.GetAsync<List<FavoriteFolderAloneModel>>("{ToolHelper.WebApiPath}api/favorites/GetRelateFavoriteFolders?type={(int)Type}&id={Id}");
+            Model = await _pageModelCatche.GetCache($"api/favorites/GetRelateFavoriteFolders?type={(int)Type}&id={Id}");
 
             StateHasChanged();
         }
-        catch (Exception exc)
+        catch (Exception ex)
         {
-
+            ErrorHandler.ProcessError(ex, "获取目录失败");
             StateHasChanged();
         }
 
