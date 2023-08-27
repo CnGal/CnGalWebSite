@@ -120,26 +120,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <returns></returns>
         Task DeleteComment(long id);
         /// <summary>
-        /// 判断用户错误次数是否超过上限
-        /// </summary>
-        /// <param name="text">唯一标识符</param>
-        /// <param name="limit">限制次数</param>
-        /// <param name="maxMinutes">限制时间</param>
-        /// <returns></returns>
-        Task<bool> IsExceedMaxErrorCount(string text, int limit, int maxMinutes);
-        /// <summary>
-        /// 增加错误次数
-        /// </summary>
-        /// <param name="text">唯一标识符</param>
-        /// <returns></returns>
-        Task AddErrorCount(string text);
-        /// <summary>
-        /// 移除计数器
-        /// </summary>
-        /// <param name="text">唯一标识符</param>
-        /// <returns></returns>
-        Task RemoveErrorCount(string text);
-        /// <summary>
         /// 判断是否通过人机验证
         /// </summary>
         /// <param name="challenge"></param>
@@ -243,13 +223,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// </summary>
         /// <returns></returns>
         Task DeleteAllBackupInfor();
-        /// <summary>
-        /// 检查文本是否合规
-        /// </summary>
-        /// <param name="text">文本</param>
-        /// <param name="ip">请求的ip</param>
-        /// <returns></returns>
-        Task<string> CheckStringCompliance(string text, string ip);
         /// <summary>
         /// 将markdown转化为html
         /// </summary>

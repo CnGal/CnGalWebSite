@@ -7,6 +7,7 @@ using CnGalWebSite.DrawingBed.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Text;
 
 namespace CnGalWebSite.DrawingBed.Controllers
@@ -20,10 +21,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IFileService _fileService;
+        private readonly IUploadService _uploadService;
         private readonly IQueryService _queryService;
         private readonly IRepository<UploadRecord, long> _uploadRecordRepository;
 
-        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository)
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository, IUploadService uploadService)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
@@ -31,18 +33,16 @@ namespace CnGalWebSite.DrawingBed.Controllers
             _fileService = fileService;
             _queryService = queryService;
             _uploadRecordRepository = uploadRecordRepository;
+            _uploadService = uploadService;
         }
 
         /// <summary>
         /// 上传图片
         /// </summary>
-        /// <param name="files"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
+        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery=false)
         {
             if (files.Count == 0)
             {
@@ -53,7 +53,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             {
                 try
                 {
-                    model.Add(await _fileService.UploadFormFile(item, x, y, type));
+                    model.Add(await _fileService.UploadFormFile(item,gallery, x, y, type));
                 }
                 catch (Exception ex)
                 {
@@ -73,11 +73,10 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <summary>
         /// 转存图片
         /// </summary>
-        /// <param name="url"></param>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
+        public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -102,12 +101,48 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-               var result= await _fileService.TransferDepositFile(url, x, y, type);
+               var result= await _fileService.TransferDepositFile(url,gallery, x, y, type);
 
                 return result;
             }
             catch (Exception ex)
             {
+                return new UploadResult
+                {
+                    Uploaded = false,
+                    OriginalUrl = url,
+                    Error = ex.Message
+                };
+            }
+
+        }
+
+
+        /// <summary>
+        /// 转存图片到TucangCC
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<UploadResult>> TransferDepositToTucangCCAsync([FromQuery] string url)
+        {
+            string path="";
+            try
+            {
+                path = await _fileService.SaveFileFromUrl(url, UploadFileType.Image);
+                var result = await _uploadService.UploadToTucangCC(path);
+                _fileService.DeleteFile(path);
+
+                return new UploadResult
+                {
+                    Url = result,
+                    OriginalUrl = url,
+                    Uploaded=true
+                };
+            }
+            catch (Exception ex)
+            {
+                _fileService.DeleteFile(path);
                 return new UploadResult
                 {
                     Uploaded = false,

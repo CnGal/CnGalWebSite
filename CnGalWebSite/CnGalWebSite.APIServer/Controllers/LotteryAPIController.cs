@@ -4,8 +4,11 @@ using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Markdig;
@@ -53,10 +56,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ILogger<LotteryAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
         private readonly IUserService _userService;
+        private readonly IQueryService _queryService;
 
         public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService, IUserService userService,
         IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
-         IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository, IRepository<Booking, long> bookingRepository,
+         IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository, IRepository<Booking, long> bookingRepository, IQueryService queryService,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
              IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, int> entryRepository, IRepository<BookingUser, long> bookingUserRepository)
         {
@@ -80,6 +84,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryRepository = entryRepository;
             _bookingRepository = bookingRepository;
             _userService = userService;
+            _queryService = queryService;
         }
 
 
@@ -905,6 +910,35 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Name).ToArrayAsync();
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<LotteryOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Lottery, long>(_lotteryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<LotteryOverviewModel>
+            {
+                Items = await items.Select(s => new LotteryOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment ?? true,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    LastEditTime = s.LastEditTime,
+                    BeginTime = s.BeginTime,
+                    EndTime = s.EndTime,
+                    IsEnd = s.IsEnd,
+                    LotteryTime = s.LotteryTime,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
 
     }
 }

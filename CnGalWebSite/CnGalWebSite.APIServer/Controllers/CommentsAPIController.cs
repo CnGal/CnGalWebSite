@@ -431,6 +431,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<CommentOverviewModel>> List(QueryParameterModel model)
         {

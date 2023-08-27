@@ -1035,6 +1035,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<TagOverviewModel>> List(QueryParameterModel model)
         {

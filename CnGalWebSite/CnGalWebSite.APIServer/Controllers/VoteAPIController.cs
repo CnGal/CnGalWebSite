@@ -5,9 +5,12 @@ using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,9 +46,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<VoteUser, long> _voteUserRepository;
         private readonly ILogger<VoteAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
+        private readonly IQueryService _queryService;
 
         public VoteAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IOperationRecordService operationRecordService,
-        IRepository<ApplicationUser, string> userRepository, IEntryService entryService, IArticleService articleService, IRankService rankService, ILogger<VoteAPIController> logger,
+        IRepository<ApplicationUser, string> userRepository, IEntryService entryService, IArticleService articleService, IRankService rankService, ILogger<VoteAPIController> logger, IQueryService queryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IPeripheryService peripheryService)
         {
             _entryRepository = entryRepository;
@@ -62,6 +66,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _voteUserRepository = voteUserRepository;
             _logger = logger;
             _operationRecordService = operationRecordService;
+            _queryService = queryService;
         }
 
         [AllowAnonymous]
@@ -73,7 +78,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.Entries).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Include(s => s.Entries).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.Entries).ThenInclude(s => s.Information)
                 .Include(s => s.Peripheries)
                .Include(s => s.VoteUsers).ThenInclude(s => s.SeletedOptions)
                .Include(s => s.VoteOptions)
@@ -941,5 +946,32 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<VoteOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Vote, long>(_voteRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<VoteOverviewModel>
+            {
+                Items = await items.Select(s => new VoteOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsHidden = s.IsHidden,
+                    CanComment = s.CanComment ?? true,
+                    Priority = s.Priority,
+                    Type = s.Type,
+                    LastEditTime = s.LastEditTime,
+                    BeginTime = s.BeginTime,
+                    EndTime = s.EndTime,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
     }
 }

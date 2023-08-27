@@ -34,20 +34,20 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
             _baseUrl = configuration["ImageApiPath"];
         }
 
-        public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type)
+        public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type,bool gallery)
         {
             using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
-            return await UploadImagesAsync(fileContent, file.Name, type, file.Size);
+            return await UploadImagesAsync(fileContent, file.Name, type,  gallery);
         }
 
-        public async Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type)
+        public async Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type, bool gallery)
         {
             //复制数据
             using var fileContent = new StreamContent(new MemoryStream(bytes));
-            return await UploadImagesAsync(fileContent, fileName, type, bytes.LongLength);
+            return await UploadImagesAsync(fileContent, fileName, type, gallery);
         }
 
-        public async Task<UploadResult> UploadImagesAsync(StreamContent steam, string fileName, ImageAspectType type, long size)
+        public async Task<UploadResult> UploadImagesAsync(StreamContent steam, string fileName, ImageAspectType type, bool gallery)
         {
             using var content = new MultipartFormDataContent();
 
@@ -81,7 +81,7 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
                     break;
             }
             var client = await _httpService.GetClientAsync();
-            var response = await client.PostAsync($"{_baseUrl}api/files/Upload?x={x}&y={y}", content);
+            var response = await client.PostAsync($"{_baseUrl}api/files/Upload?x={x}&y={y}&gallery={gallery}", content);
 
             var newUploadResults = await response.Content
                 .ReadFromJsonAsync<List<UploadResult>>();

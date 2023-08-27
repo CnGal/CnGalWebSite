@@ -2,7 +2,6 @@
 using CnGalWebSite.APIServer.Application.Charts;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Entries;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
@@ -28,6 +27,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
@@ -80,7 +80,6 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<UserOnlineInfor, long> _userOnlineInforRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<SignInDay, long> _signInDayRepository;
-        private readonly IRepository<ErrorCount, long> _errorCountRepository;
         private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Rank, long> _rankRepository;
@@ -96,7 +95,6 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ICommentService _commentService;
         private readonly IMessageService _messageService;
         private readonly IFileService _fileService;
-        private readonly IErrorCountService _errorCountService;
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IRankService _rankService;
         private readonly IPeripheryService _peripheryService;
@@ -131,10 +129,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
-        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, 
+        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, 
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
+        IRepository<Message, long> messageRepository,IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment,
          IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
@@ -169,8 +167,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _disambigRepository = disambigRepository;
             _fileService = fileService;
             _signInDayRepository = signInDayRepository;
-            _errorCountService = errorCountService;
-            _errorCountRepository = errorCountRepository;
             _favoriteFolderRepository = favoriteFolderRepository;
             _favoriteFolderService = favoriteFolderService;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
@@ -292,185 +288,11 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListErrorCountAloneModel>>> GetErrorCountListAsync(ErrorCountsPagesInfor input)
-        {
-            var dtos = await _errorCountService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
         {
             var dtos = await _favoriteFolderService.GetPaginatedResult(input.Options, input.SearchModel, null);
 
             return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVoteAloneModel>>> GetVoteListAsync(VotesPagesInfor input)
-        {
-            var dtos = await _voteService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryAloneModel>>> GetLotteryListAsync(LotteriesPagesInfor input)
-        {
-            var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-
-        /// <summary>
-        /// 管理主页 包括友情链接 轮播图
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<ManageHomeViewModel>> ManageHomeAsync()
-        {
-            var model = new ManageHomeViewModel
-            {
-                Links = await _friendLinkRepository.GetAll().OrderByDescending(s => s.Priority).ToListAsync()
-            };
-            foreach (var item in model.Links)
-            {
-                item.Image = _appHelper.GetImagePath(item.Image, "");
-            }
-            model.Carousels = await _carouselRepository.GetAll().OrderByDescending(s => s.Priority).ToListAsync();
-            foreach (var item in model.Carousels)
-            {
-                item.Image = _appHelper.GetImagePath(item.Image, "");
-            }
-
-
-            model.AppImage = _appHelper.GetImagePath("", "app.png");
-            model.UserImage = _appHelper.GetImagePath("", "user.png");
-            model.UserBackgroundImage = _appHelper.GetImagePath("", "userbackground.jpg");
-            model.CertificateImage = _appHelper.GetImagePath("", "certificate.png");
-            model.BackgroundImage = _appHelper.GetImagePath("", "background.png");
-
-            return model;
-        }
-
-        /// <summary>
-        /// 编辑轮播图 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<EditCarouselsViewModel>> EditCarouselsAsync()
-        {
-            //根据类别生成首个视图模型
-            var model = new EditCarouselsViewModel();
-            var carousels = await _carouselRepository.GetAll().OrderByDescending(s => s.Priority).ToListAsync();
-            foreach (var item in carousels)
-            {
-                model.Carousels.Add(new CarouselModel
-                {
-                    Link = item.Link,
-                    Priority = item.Priority,
-                    Note = item.Note,
-                    Image = _appHelper.GetImagePath(item.Image, ""),
-                    Type=item.Type,
-                });
-
-            }
-
-            return model;
-        }
-
-        /// <summary>
-        /// 编辑轮播图
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<Result>> EditCarouselsAsync(EditCarouselsViewModel model)
-        {
-            //先把删除当前所有图片
-            var carousels = await _carouselRepository.GetAll().ToListAsync();
-            foreach (var item in carousels)
-            {
-                //_appHelper.DeleteImage(item.Image);
-                await _carouselRepository.DeleteAsync(item);
-            }
-            //循环添加视图中的图片
-            if (model.Carousels != null)
-            {
-                foreach (var item in model.Carousels)
-                {
-                    _ = await _carouselRepository.InsertAsync(new Carousel
-                    {
-                        Image = item.Image,
-                        Link = item.Link,
-                        Priority = item.Priority,
-                        Note = item.Note,
-                        Type=item.Type
-                    });
-                }
-            }
-            return new Result { Successful = true };
-        }
-
-        /// <summary>
-        /// 编辑友情链接
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<EditFriendLinksViewModel>> EditFriendLinksAsync()
-        {
-            //根据类别生成首个视图模型
-            var model = new EditFriendLinksViewModel
-            {
-                FriendLinks = new List<FriendLinkModel>()
-            };
-            var friendLinks = await _friendLinkRepository.GetAll().OrderByDescending(s => s.Priority).ToListAsync();
-            foreach (var item in friendLinks)
-            {
-                model.FriendLinks.Add(new FriendLinkModel
-                {
-                    Link = item.Link,
-                    Name = item.Name,
-                    Priority = item.Priority,
-                    Image = _appHelper.GetImagePath(item.Image, "app.png")
-                });
-            }
-            return model;
-        }
-
-        /// <summary>
-        /// 编辑友情链接
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<Result>> EditFriendLinksAsync(EditFriendLinksViewModel model)
-        {
-
-            //先把删除当前所有图片
-            var friendLinks = await _friendLinkRepository.GetAll().ToListAsync();
-            foreach (var item in friendLinks)
-            {
-                //_appHelper.DeleteImage(item.Image);
-                await _friendLinkRepository.DeleteAsync(item);
-            }
-            //循环添加视图中的图片
-            if (model.FriendLinks != null)
-            {
-                foreach (var item in model.FriendLinks)
-                {
-                    _ = await _friendLinkRepository.InsertAsync(new FriendLink
-                    {
-                        Image = item.Image,
-                        Name = item.Name,
-                        Link = item.Link,
-                        Priority = item.Priority
-                    });
-                }
-            }
-            return new Result { Successful = true };
         }
 
         /// <summary>
