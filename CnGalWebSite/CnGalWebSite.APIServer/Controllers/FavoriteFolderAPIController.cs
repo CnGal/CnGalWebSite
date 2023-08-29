@@ -975,6 +975,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<FavoriteFolderAloneModel>>> GetRelateFavoriteFolders([FromQuery] FavoriteObjectType type, [FromQuery] long id)
         {

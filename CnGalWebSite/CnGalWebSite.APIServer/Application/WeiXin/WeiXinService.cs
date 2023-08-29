@@ -467,7 +467,6 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var dateTime = DateTime.Now.ToCstTime();
                 //获取即将发售
                 var games = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s => s.Information)
                     .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true && s.PubulishTime <= dateTime)
                     .OrderByDescending(s => s.PubulishTime).Take(6).ToListAsync();
 
@@ -506,14 +505,14 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var dateTime = DateTime.Now.ToCstTime();
                 //获取即将发售
                 var games = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s => s.Information)
+                    .Include(s => s.Releases)
                     .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true && s.PubulishTime > dateTime)
                     .OrderBy(s => s.PubulishTime).Take(6).ToListAsync();
 
                 var sb = new StringBuilder();
                 foreach (var item in games)
                 {
-                    var publishStr = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)?.DisplayValue;
+                    var publishStr = item.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Type == GameReleaseType.Official && string.IsNullOrWhiteSpace(s.TimeNote) == false)?.TimeNote;
                     if (string.IsNullOrWhiteSpace(publishStr))
                     {
                         publishStr = item.PubulishTime?.ToString("M月d日");
