@@ -78,7 +78,7 @@
 
     protected override void OnInitialized()
     {
-        var release = Model.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) == false);
+        var release = Model.Releases.Where(s=>s.Type== GameReleaseType.Official).OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) == false);
         if(release==null)
         {
             publishTime = null;
