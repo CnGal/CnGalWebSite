@@ -59,7 +59,7 @@
     {
         if (Model.Audio.Any(s => s.Url == result.Url))
         {
-            await PopupService.EnqueueSnackbarAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
+            await PopupService.ToastAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
             return;
         }
 

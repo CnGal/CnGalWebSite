@@ -122,11 +122,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await PopupService.EnqueueSnackbarAsync($"取消预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error)?null:obj.Error)}", AlertTypes.Error);
+                await PopupService.ToastAsync($"取消预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error)?null:obj.Error)}", AlertTypes.Error);
             }
             else
             {
-                await PopupService.EnqueueSnackbarAsync($"成功取消预约游戏", AlertTypes.Success);
+                await PopupService.ToastAsync($"成功取消预约游戏", AlertTypes.Success);
                 isBooking = false;
                 StateHasChanged();
             }
@@ -144,11 +144,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await PopupService.EnqueueSnackbarAsync($"预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error) ? null : obj.Error)}", AlertTypes.Error);
+                await PopupService.ToastAsync($"预约游戏失败{(string.IsNullOrWhiteSpace(obj.Error) ? null : obj.Error)}", AlertTypes.Error);
             }
             else
             {
-                await PopupService.EnqueueSnackbarAsync($"成功预约游戏", AlertTypes.Success);
+                await PopupService.ToastAsync($"成功预约游戏", AlertTypes.Success);
                 isBooking = true;
                 StateHasChanged();
             }

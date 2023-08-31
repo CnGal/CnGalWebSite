@@ -93,14 +93,14 @@ else
             {
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
-                    await PopupService.EnqueueSnackbarAsync(result.Error, AlertTypes.Success);
+                    await PopupService.ToastAsync(result.Error, AlertTypes.Success);
                 }
                 await OnEdited.InvokeAsync(Model);
                 StateHasChanged();
             }
             else
             {
-                await PopupService.EnqueueSnackbarAsync(result.Error ?? "操作失败", AlertTypes.Error);
+                await PopupService.ToastAsync(result.Error ?? "操作失败", AlertTypes.Error);
             }
         }
         catch (Exception ex)

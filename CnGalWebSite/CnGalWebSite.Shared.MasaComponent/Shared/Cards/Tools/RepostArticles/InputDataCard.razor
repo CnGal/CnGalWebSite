@@ -116,17 +116,17 @@
 
         if (string.IsNullOrWhiteSpace(model.Url))
         {
-            await PopupService.EnqueueSnackbarAsync("先填写文章链接哦", AlertTypes.Error);
+            await PopupService.ToastAsync("先填写文章链接哦", AlertTypes.Error);
             return;
         }
         if (!model.Url.Contains("zhuanlan.zhihu.com") && !model.Url.Contains("www.bilibili.com"))
         {
-            await PopupService.EnqueueSnackbarAsync("链接格式不正确", AlertTypes.Error);
+            await PopupService.ToastAsync("链接格式不正确", AlertTypes.Error);
             return;
         }
         if (Model.Any(s => s.Url == model.Url))
         {
-            await PopupService.EnqueueSnackbarAsync("文章链接添加一次就够了哦", AlertTypes.Error);
+            await PopupService.ToastAsync("文章链接添加一次就够了哦", AlertTypes.Error);
             return;
         }
 
@@ -143,7 +143,7 @@
     {
         if (Model.Count == 0)
         {
-            await PopupService.EnqueueSnackbarAsync("你还没有添加需要转载的文章链接哦", AlertTypes.Error);
+            await PopupService.ToastAsync("你还没有添加需要转载的文章链接哦", AlertTypes.Error);
             return;
         }
         await OnFinshInput.InvokeAsync();

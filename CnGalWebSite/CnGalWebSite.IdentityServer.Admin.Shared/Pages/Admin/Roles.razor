@@ -116,7 +116,7 @@
             {
                 if (!string.IsNullOrWhiteSpace(result.Message))
                 {
-                    await PopupService.EnqueueSnackbarAsync(result.Message, AlertTypes.Success);
+                    await PopupService.ToastAsync(result.Message, AlertTypes.Success);
                 }
                 SynchronizationProperties(_editedItem, _tempItem);
                 _editDialog = false;
@@ -124,7 +124,7 @@
             }
             else
             {
-                await PopupService.EnqueueSnackbarAsync(result.Message ?? "操作失败", AlertTypes.Error);
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
             }
         }
         catch (Exception ex)

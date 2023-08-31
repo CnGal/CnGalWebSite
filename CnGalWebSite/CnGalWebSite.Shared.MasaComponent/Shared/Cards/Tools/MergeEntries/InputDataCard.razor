@@ -90,17 +90,17 @@ else
     {
         if (string.IsNullOrWhiteSpace(model.SubName) || string.IsNullOrWhiteSpace(model.HostName))
         {
-            await PopupService.EnqueueSnackbarAsync("先填写词条名称哦", AlertTypes.Error);
+            await PopupService.ToastAsync("先填写词条名称哦", AlertTypes.Error);
             return;
         }
         if (Model.Any(s => s.SubName == model.SubName))
         {
-            await PopupService.EnqueueSnackbarAsync("被合并的词条只能添加一次", AlertTypes.Error);
+            await PopupService.ToastAsync("被合并的词条只能添加一次", AlertTypes.Error);
             return;
         }
         if (model.SubName == model.HostName)
         {
-            await PopupService.EnqueueSnackbarAsync("不能合并同一个词条哦", AlertTypes.Error);
+            await PopupService.ToastAsync("不能合并同一个词条哦", AlertTypes.Error);
             return;
         }
         Model.Add(model);
@@ -117,7 +117,7 @@ else
     {
         if (Model.Count == 0)
         {
-            await PopupService.EnqueueSnackbarAsync("你还没有填写合并的词条哦", AlertTypes.Error);
+            await PopupService.ToastAsync("你还没有填写合并的词条哦", AlertTypes.Error);
             return;
         }
         Model.ForEach(s => s.CompleteTaskCount = 0);

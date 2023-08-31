@@ -53,12 +53,12 @@
     {
         if (string.IsNullOrWhiteSpace(_item))
         {
-            await PopupService.EnqueueSnackbarAsync("项目不能为空", AlertTypes.Error);
+            await PopupService.ToastAsync("项目不能为空", AlertTypes.Error);
             return;
         }
         if (Items.Any(s => s == _item))
         {
-            await PopupService.EnqueueSnackbarAsync("不能重复添加同一项目", AlertTypes.Error);
+            await PopupService.ToastAsync("不能重复添加同一项目", AlertTypes.Error);
             return;
         }
         Items.Add(_item);

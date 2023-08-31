@@ -41,19 +41,6 @@ builder.Services.AddScoped<IQueryService, QueryService>();
 //修改Masa主题
 builder.Services.AddMasaBlazor(options =>
 {
-    //消息队列
-    options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
-    {
-        {
-            PopupComponents.SNACKBAR, new Dictionary<string, object?>()
-            {
-                { nameof(PEnqueuedSnackbars.Text), true },
-                { nameof(PEnqueuedSnackbars.Elevation), new StringNumber(3) },
-                { nameof(PEnqueuedSnackbars.Closeable), true },
-                { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight }
-            }
-        }
-    };
     //主题
     options.ConfigureTheme(s =>
     {

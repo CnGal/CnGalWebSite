@@ -130,12 +130,12 @@
 
             if (obj.Successful == false)
             {
-                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
             }
             else
             {
 
-                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
                 dataTableCard.GetDataFromApi();
 
             }
@@ -155,12 +155,12 @@
 
             if (obj.Successful == false)
             {
-                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
             }
             else
             {
 
-                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
                 dataTableCard.GetDataFromApi();
 
             }
@@ -180,12 +180,12 @@
 
             if (obj.Successful == false)
             {
-                await PopupService.EnqueueSnackbarAsync(operationName + "失败", obj.Error, AlertTypes.Error);
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
             }
             else
             {
 
-                await PopupService.EnqueueSnackbarAsync(operationName + "成功", AlertTypes.Success);
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
                 dataTableCard.GetDataFromApi();
 
             }
