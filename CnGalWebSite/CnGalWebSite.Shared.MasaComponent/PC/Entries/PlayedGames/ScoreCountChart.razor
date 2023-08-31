@@ -134,11 +134,11 @@
     {
         if (Model.IsDubbing == false && _type == PlayedGameScoreType.CV)
         {
-            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
+            await PopupService.ToastAsync(new ToastConfig
             {
                 Type = AlertTypes.Error,
                 Title = "这个游戏没有配音哦~",
-                Timeout = 4000
+                    Duration = 4000
             });
             return;
         }

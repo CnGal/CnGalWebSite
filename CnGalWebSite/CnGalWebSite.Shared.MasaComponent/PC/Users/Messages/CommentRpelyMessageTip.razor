@@ -68,11 +68,11 @@
     {
         IsReplying = false;
         StateHasChanged();
-        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
+        await PopupService.ToastAsync(new ToastConfig
         {
             Type = AlertTypes.Success,
             Title = "回复成功",
-            Timeout = 4000
+                Duration = 4000
         });
     }
 

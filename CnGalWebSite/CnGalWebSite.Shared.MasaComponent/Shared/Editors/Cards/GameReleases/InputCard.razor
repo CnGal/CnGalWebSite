@@ -88,12 +88,12 @@
     {
         if (string.IsNullOrWhiteSpace(Model.Name))
         {
-            await PopupService.EnqueueSnackbarAsync("请填写游戏发行名称", AlertTypes.Error);
+            await PopupService.ToastAsync("请填写游戏发行名称", AlertTypes.Error);
             return;
         }
         if (Items.Any(s => s != _model && s.PublishPlatformType == Model.PublishPlatformType && s.PublishPlatformName == Model.PublishPlatformName && s.Link == Model.Link && s.Name == Model.Name))
         {
-            await PopupService.EnqueueSnackbarAsync("平台和链接必须保持唯一", AlertTypes.Error);
+            await PopupService.ToastAsync("平台和链接必须保持唯一", AlertTypes.Error);
             return;
         }
         if (Items.Any(s => s == _model) == false)
