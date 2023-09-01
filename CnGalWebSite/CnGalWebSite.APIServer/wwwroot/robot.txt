@@ -6,4 +6,4 @@ Disallow: /home/editrecord
 Disallow: /account/
 Disallow: /admin/
 
-Sitemap: https://www.cngal.org/site.txt
+Sitemap: https://www.cngal.org/sitemap.xml
