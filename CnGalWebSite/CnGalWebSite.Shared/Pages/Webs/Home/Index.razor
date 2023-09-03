@@ -33,14 +33,20 @@
         <div class="left-content col-12 col-lg-9">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
+            @if (_dataCacheService.IsApp)
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
+            }
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
         </div>
         <div class="right-content col-12 col-lg-3">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
-
+            @if(_dataCacheService.IsApp==false)
+            {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
+            }
         </div>
     </div>
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
