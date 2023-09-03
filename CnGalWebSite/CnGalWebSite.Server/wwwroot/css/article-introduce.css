@@ -49,6 +49,10 @@
         margin: 0;
     }
 
+        .article-introduce dd a {
+            word-break: break-all;
+        }
+
     .article-introduce dt {
         font-weight: inherit;
     }
@@ -80,8 +84,8 @@
     }
 
     .article-introduce #character img {
-        height: 500px;
-        width: fit-content;
+        width: 250px;
+        max-width: 100%;
     }
 
     .article-introduce #character > div {

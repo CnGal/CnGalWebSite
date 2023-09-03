@@ -313,7 +313,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
             while(await _userRepository.AnyAsync(s=>s.UserName==name))
             {
-                name = "用户_"+new Random().Next(0,99999).ToString();
+                name = "用户_"+new Random(DateTime.Now.Millisecond).Next(0,99999).ToString();
             }
             user = new ApplicationUser
             {
