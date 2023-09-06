@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.RobotClientX.Models.GPT;
+using CnGalWebSite.RobotClientX.Services.ExternalDatas;
 using System.Text.Json;
 
 namespace CnGalWebSite.RobotClientX.Services.GPT
@@ -8,7 +9,7 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
     {
         private readonly IHttpService _httpService;
         private readonly IConfiguration _configuration;
-       
+        private readonly IExternalDataService _externalDataService;
         private readonly ILogger<ChatGPTService> _logger;
 
  private static List<DateTime> _record = new List<DateTime>();
@@ -19,11 +20,12 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             PropertyNameCaseInsensitive = true,
         };
 
-        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger)
+        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IExternalDataService externalDataService)
         {
             _httpService = httpService;
             _configuration = configuration;
             _logger = logger;
+            _externalDataService = externalDataService;
 
             _httpClient = _httpService.GetClientAsync().GetAwaiter().GetResult();
             _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
@@ -95,6 +97,31 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             }
 
             _logger.LogInformation("收到ChatGPT的回复：{reply}", reply);
+
+
+
+            return await ProcReply(reply);
+        }
+
+        public async Task<string> ProcReply(string reply)
+        {
+            var list = new List<string>();
+            while (true)
+            {
+                var name = reply.MidStrEx("【", "】");
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    break;
+                }
+
+                list.Add(await _externalDataService.GetArgValue("introduce", name, -1, null));
+                reply= reply.Replace($"【{name}】", "");
+            }
+
+            if (list.Any())
+            {
+                return string.Join("", list);
+            }
 
             return reply;
         }

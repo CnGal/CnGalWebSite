@@ -381,7 +381,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                     "n" => "\n",
                     "r" => "\r",
                     "chatgpt"=>await _chatGPTService.GetReply(message),
-                    "introduce" => await GetArgValue(argument, Regex.Split(message, regex).FirstOrDefault(s=>!string.IsNullOrWhiteSpace(s)), qq),
+                    "introduce" => await GetArgValue(argument, Regex.Split(message, regex).LastOrDefault(s => !string.IsNullOrWhiteSpace(s)).Replace("一下",""), qq),
                     "facelist" => "该功能暂未实装",
                     _ => await GetArgValue(argument, message, qq)
                 };
@@ -430,31 +430,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// <returns></returns>
         public async Task<string> GetArgValue(string name, string infor, long qq)
         {
-            return await GetArgValue(name, infor, qq, new Dictionary<string, string>());
-        }
-
-        public async Task<string> GetArgValue(string name, string infor, long qq, Dictionary<string, string> adds)
-        {
-
-            //若本地没有 则请求服务器
-            var result = await _httpService.PostAsync<GetArgValueModel, Result>(_configuration["WebApiPath"] + "api/robot/GetArgValue", new GetArgValueModel
-            {
-                Infor = infor,
-                Name = name,
-                AdditionalInformations = adds,
-                SenderId=qq,
-                
-            });
-
-            //判断结果
-            if (result.Successful == false)
-            {
-                throw new ArgError(result.Error);
-            }
-            else
-            {
-                return result.Error;
-            }
+            return await _externalDataService.GetArgValue(name, infor, qq, new Dictionary<string, string>());
         }
     }
 }
