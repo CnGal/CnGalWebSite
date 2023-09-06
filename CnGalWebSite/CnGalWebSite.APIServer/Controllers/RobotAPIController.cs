@@ -36,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -121,7 +122,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 if (entry == null)
                 {
-                    return new Result { Successful = false, Error = "呜呜呜~~~ 找不到这个词条" };
+                    return new Result { Successful = false, Error = $"呜呜呜~~~ 找不到这个词条，你可以亲自创建这个词条哦~\nhttps://app.cngal.org/entries/establishentry?Name={UrlEncoder.Default.Encode(entryName)}" };
                 }
                 else
                 {
