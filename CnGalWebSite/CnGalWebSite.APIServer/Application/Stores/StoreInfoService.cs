@@ -3,6 +3,7 @@ using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
@@ -155,6 +156,32 @@ namespace CnGalWebSite.APIServer.Application.Stores
             }
         }
 
+        public async Task<SteamEvaluation> GetSteamEvaluationAsync(string id)
+        {
+
+            var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + id);
+
+            var document = new HtmlDocument();
+            document.LoadHtml(content);
+
+            var node = document.GetElementbyId("userReviews");
+            var text = node.ChildNodes.Count > 3
+                ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
+                : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
+            var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
+            var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
+
+            int.TryParse(countStr, out int evaluationCount);
+            int.TryParse(rateStr, out int recommendationRate);
+
+            return new SteamEvaluation
+            {
+                EvaluationCount = evaluationCount,
+                RecommendationRate = recommendationRate,
+            };
+        }
+
+
         /// <summary>
         /// 获取Steam附加信息
         /// </summary>
@@ -168,6 +195,12 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 var json = JObject.Parse(content);
 
                 steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
+                //if (steam.EvaluationCount == 0)
+                {
+                    var re = await GetSteamEvaluationAsync(steam.Link);
+                    steam.EvaluationCount = re.EvaluationCount;
+                    steam.RecommendationRate = re.RecommendationRate;
+                }
                 if (steam.EvaluationCount != 0)
                 {
                     steam.RecommendationRate = json["positive"].ToObject<int>() * 100.0 / steam.EvaluationCount;
