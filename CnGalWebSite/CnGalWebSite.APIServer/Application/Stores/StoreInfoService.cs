@@ -195,7 +195,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 var json = JObject.Parse(content);
 
                 steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
-                //if (steam.EvaluationCount == 0)
+                if (steam.EvaluationCount == 0)
                 {
                     var re = await GetSteamEvaluationAsync(steam.Link);
                     steam.EvaluationCount = re.EvaluationCount;
