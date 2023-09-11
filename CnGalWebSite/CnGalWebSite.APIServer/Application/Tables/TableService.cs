@@ -19,20 +19,17 @@ namespace CnGalWebSite.APIServer.Application.Tables
     public class TableService : ITableService
     {
         private readonly IRepository<Entry, int> _entryRepository;
-        private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IRepository<BasicInforTableModel, long> _basicInforTableModelRepository;
         private readonly IRepository<GroupInforTableModel, long> _groupInforTableModelRepository;
         private readonly IRepository<MakerInforTableModel, long> _makerInforTableModelRepository;
         private readonly IRepository<StaffInforTableModel, long> _staffInforTableModelRepository;
         private readonly IRepository<RoleInforTableModel, long> _roleInforTableModelRepository;
-        private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IPlayedGameService _playedGameService;
         private readonly ILogger<TableService> _logger;
 
         public TableService(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<Entry, int> entryRepository, IPlayedGameService playedGameService,
         IRepository<GroupInforTableModel, long> groupInforTableModelRepository, IRepository<MakerInforTableModel, long> makerInforTableModelRepository,
-        IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, ILogger<TableService> logger,
-        IRepository<SteamInforTableModel, long> steamInforTableModelRepository, IRepository<SteamInfor, long> steamInforRepository)
+        IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, ILogger<TableService> logger)
         {
             _entryRepository = entryRepository;
             _basicInforTableModelRepository = basicInforTableModelRepository;
@@ -40,8 +37,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
             _makerInforTableModelRepository = makerInforTableModelRepository;
             _staffInforTableModelRepository = staffInforTableModelRepository;
             _roleInforTableModelRepository = roleInforTableModelRepository;
-            _steamInforTableModelRepository = steamInforTableModelRepository;
-            _steamInforRepository = steamInforRepository;
             _playedGameService = playedGameService;
             _logger = logger;
         }
@@ -468,14 +463,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 tableModel.CV = item.DisplayValue;
                                 break;
                             case "性别":
-                                if (Enum.TryParse(typeof(GenderType), item.DisplayValue, true, out object gender))
-                                {
-                                    tableModel.Gender = (GenderType)gender;
-                                }
-                                else
-                                {
-                                    _logger.LogWarning("角色 - {name}({id}) 性别（{gender}）无法识别", infor.Name, infor.Id, item.DisplayValue);
-                                }
+                                tableModel.Gender = item.DisplayValue.ToEnumValue<GenderType>();
                                 break;
                             case "身材数据":
                                 tableModel.FigureData = item.DisplayValue;
