@@ -1,0 +1,47 @@
+version: "3"
+services:
+  blazorserver:
+    image: littlefishtentears/cngalwebsitedrawingbed:latest
+    container_name: drawingbed
+    environment:
+      - TZ=${TZ}
+      # Ids 地址
+      - Authority=${Authority}
+      # 阿里云OSS相关
+      - OSSEndpoint=${OSSEndpoint}
+      - OSSBucketName=${OSSBucketName}
+      - OSSAccessKeyId=${OSSAccessKeyId}
+      - OSSAccessKeySecret=${OSSAccessKeySecret}
+      # 图床
+      - SliotsImageAPIToken=${SliotsImageAPIToken}
+      # 数据库连接字符串
+      - DefaultDBConnection=${DefaultDBConnection}
+      # 腾讯云COS
+      - Tencent_COS_REGION=${Tencent_COS_REGION}
+      - Tencent_SECRET_ID=${Tencent_SECRET_ID}
+      - Tencent_SECRET_KEY=${Tencent_SECRET_KEY}
+      - Tencent_BucketName=${Tencent_BucketName}
+      # 图仓
+      - TucangCCAPIToken=${TucangCCAPIToken}
+      - TucangCCAPIUrl=${TucangCCAPIUrl}
+      - CustomTucangCCUrl=${CustomTucangCCUrl}
+      # FFmpeg
+      - FFmpegPath=${FFmpegPath}
+      # 音频 baseUrl
+      - AudioUrl=${AudioUrl}
+      # 图片 baseUrl
+      - ImagesUrl=${ImagesUrl}
+    hostname: drawingbed
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+    ports:
+      - "2003:80"

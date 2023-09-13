@@ -372,9 +372,9 @@ namespace CnGalWebSite.DataModel.Helper
                     var type = GetGeneralType(PositionGeneral ?? Position);
                     result.Add(new StaffModel
                     {
-                        Name = infor.Replace($"({roleName})", ""),
-                        PositionOfficial = Position,
-                        Modifier = Subcategory,
+                        Name = infor.Replace($"({roleName})", "").Trim(),
+                        PositionOfficial = Position.Trim(),
+                        Modifier = Subcategory.Trim(),
                         SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
                         PositionGeneral = type
                     });
