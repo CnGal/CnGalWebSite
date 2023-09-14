@@ -90,6 +90,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 通过Id获取为页面显示优化后的词条信息
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="renderMarkdown">渲染Markdown</param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [AllowAnonymous]
@@ -107,6 +108,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Audio)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Outlinks)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)                  
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Videos).ThenInclude(s => s.CreateUser)

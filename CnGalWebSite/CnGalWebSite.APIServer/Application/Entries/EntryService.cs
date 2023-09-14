@@ -1204,6 +1204,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
 
             }
+            
 
             var informationTypes = await _entryInformationTypeRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
             foreach (var item in entry.Information)
@@ -1219,7 +1220,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     });
                 }
             }
-
+            //添加制作组发行商QQ群
+            if (entry.Type == EntryType.Game)
+            {
+                var qqIcon = informationTypes.FirstOrDefault(s => s.Name== "QQ群").Icon;
+                foreach (var item in entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation).Where(s => s.Type == EntryType.ProductionGroup&&s.Information.Any(s=>s.DisplayName=="QQ群"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false)))
+                {
+                    model.Information.Add(new EntryInformationModel
+                    {
+                        Name= "QQ群",
+                        Icon= qqIcon,
+                        Value =$"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
+                    });
+                }
+            }
             //添加发行列表
             foreach (var item in entry.Releases)
             {
@@ -1551,6 +1565,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
 
+            //外部链接
             foreach (var item in entry.Outlinks)
             {
                 relevanceOther.Add(new RelevancesKeyValueModel
@@ -1559,6 +1574,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     DisplayValue = item.BriefIntroduction,
                     Link = item.Link,
                 });
+            }
+            //查找发行商制作组的信息
+            if(entry.Type == EntryType.Game)
+            {
+                foreach (var item in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.ProductionGroup).Select(s=>s.ToEntryNavigation))
+                {
+                    relevanceOther.AddRange(item.Outlinks.Select(s => new RelevancesKeyValueModel
+                    {
+                        DisplayName = s.Name,
+                        DisplayValue = item.DisplayName + (string.IsNullOrWhiteSpace(s.BriefIntroduction) ? "" : " - ") + s.BriefIntroduction,
+                        Link = s.Link
+                    }));
+                }
             }
 
             //官网补充信息
@@ -1588,7 +1616,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.Pictures = picturesViewModels;
             model.ArticleRelevances = relevanceArticle;
             model.EntryRelevances = relevancesEntry;
-            model.OtherRelevances = relevanceOther;
+            model.OtherRelevances = relevanceOther.OrderBy(s=>s.DisplayName).ToList();
             model.Tags = tags;
             model.Roles = roleInforModel;
             model.StaffGames = staffGames;
