@@ -326,115 +326,57 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var types = new List<EntryInformationType>
-                {
-                    new EntryInformationType
-                    {
-                        Name = "原作",
-                        Icon = "mdi-script-text",
-                        Types = new EntryType[] { EntryType.Game }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "QQ群",
-                        Icon = "mdi-qqchat",
-                        Types = new EntryType[] { EntryType.Game, EntryType.ProductionGroup }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "性别",
-                        Icon = "mdi-gender-male-female",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "身材数据",
-                        Icon = "mdi-database",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "身材(主观)",
-                        Icon = "mdi-human-handsup",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "生日",
-                        Icon = "mdi-cake-variant",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "发色",
-                        Icon = "mdi-face-man-profile",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "瞳色",
-                        Icon = "mdi-eye",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "服饰",
-                        Icon = "mdi-hanger",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "性格",
-                        Icon = "mdi-account-outline",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "角色身份",
-                        Icon = "mdi-account",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "血型",
-                        Icon = "mdi-water",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "身高",
-                        Icon = "mdi-human-male-height-variant",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "兴趣",
-                        Icon = "mdi-heart-multiple",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "年龄",
-                        Icon = "mdi-forest",
-                        Types = new EntryType[] { EntryType.Role }
-                    },
-                    new EntryInformationType
-                    {
-                        Name = "姓名",
-                        Icon = "mdi-card-account-details-star",
-                        Types = new EntryType[] { EntryType.Staff }
-                    }
-                };
+                var entries = await _entryRepository.GetAll()
+                    .Include(s=>s.Information)
+                    .Include(s=>s.Outlinks)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Outlinks)
+                    .Where(s => s.Type == EntryType.Game&&string.IsNullOrWhiteSpace(s.Name)==false)
+                    .ToListAsync();
 
-                foreach (var item in types)
+                foreach (var item in entries)
                 {
-                    if(await _entryInformationTypeRepository.GetAll().AnyAsync(s=>s.Name==item.Name)==false)
+                    var flag = false;
+                    foreach (var info in item.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.ProductionGroup).Select(s => s.ToEntryNavigation))
                     {
-                        await _entryInformationTypeRepository.InsertAsync(item);
+                        var qq = info.Information.FirstOrDefault(s => s.DisplayName == "QQ群")?.DisplayValue;
+                        if (string.IsNullOrWhiteSpace(qq) == false)
+                        {
+                            var list = item.Information.ToList();
+                            if (list.RemoveAll(s => s.DisplayValue == qq) > 0)
+                            {
+                                flag = true;
+                            }
+                            item.Information = list;
+
+                        }
+
+                        if (item.Outlinks.Any())
+                        {
+                            var outlinks = item.Outlinks.ToList();
+
+                            foreach (var temp in info.Outlinks)
+                            {
+                                if (outlinks.RemoveAll(s => s.Link == temp.Link) > 0)
+                                {
+                                    flag = true;
+                                }
+                            }
+                            item.Outlinks = outlinks;
+
+                        }
+
                     }
+
+                    if (flag)
+                    {
+                        await _entryRepository.UpdateAsync(item);
+                    }
+
+
+
+                    _logger.LogInformation("词条 {name}(Id:{id}) 处理成功", item.Name, item.Id);
                 }
-
-                await _basicEntryInformationRepository.GetAll().Where(s => s.DisplayName == "性别").ExecuteUpdateAsync(s => s.SetProperty(a => a.DisplayValue, b => b.DisplayValue == "None"? "保密" : b.DisplayValue == "Man" ? "男" : b.DisplayValue == "Women" ? "女" :  "其他"));
 
                 return new Result { Successful = true };
             }
