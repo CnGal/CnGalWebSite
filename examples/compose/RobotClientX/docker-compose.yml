@@ -1,0 +1,53 @@
+version: "3"
+services:
+  robotclientx:
+    image: littlefishtentears/cngalwebsiterobotclientx:latest
+    container_name: robotclientx
+    environment:
+      - TZ=${TZ}
+      # 账号
+      - QQ=${QQ}
+      # 称呼
+      - RobotName=${RobotName}
+      # 接收预警的QQ群
+      - WarningQQGroup=${WarningQQGroup}
+      # Mirai Url
+      - MiraiUrl=${MiraiUrl}
+      # Mirai 验证密匙
+      - NormalVerifyKey=${NormalVerifyKey}
+      # QQ频道 Token
+      - ChannelToken=${ChannelToken}
+      # QQ频道 AppKey
+      - ChannelAppKey=${ChannelAppKey}
+      # GPT对话上限每分钟
+      - ChatGPTLimit=${ChatGPTLimit}
+      # GPT API Url
+      - ChatGPTApiUrl=${ChatGPTApiUrl}
+      # GPT Key
+      - ChatGPTApiKey=${ChatGPTApiKey}
+      # GPT 提示词
+      - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
+      # GPT 消息模板
+      - ChatGPT_UserMessageTemplate=${ChatGPT_UserMessageTemplate}
+      # CnGal资料站 API
+      - WebApiPath=${WebApiPath}
+      # 网站名称
+      - WebSiteName=${WebSiteName}
+      # 网站背景图
+      - WebSiteImage=${WebSiteImage}
+      # 网站主题颜色
+      - WebSiteTheme=${WebSiteTheme}
+    hostname: robotclientx
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+    ports:
+      - "2004:80"
