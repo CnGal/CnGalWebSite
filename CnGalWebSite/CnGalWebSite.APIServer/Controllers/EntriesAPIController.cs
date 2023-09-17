@@ -1692,11 +1692,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 item = await _entryInformationTypeRepository.InsertAsync(new EntryInformationType
                 {
-                    Icon = item.Icon,
-                    IsHidden = item.IsHidden,
-                    Name = item.Name,
-                    Types = item.Types,
-                    Description = item.Description,
+                    Icon = model.Icon,
+                    IsHidden = model.IsHidden,
+                    Name = model.Name,
+                    Types = model.Types.ToArray(),
+                    Description = model.Description,
                 });
                 model.Id = item.Id;
                 _entryInformationTypeRepository.Clear();
