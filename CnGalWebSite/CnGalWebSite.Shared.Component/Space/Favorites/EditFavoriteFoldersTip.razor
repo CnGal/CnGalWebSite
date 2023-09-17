@@ -1,7 +1,6 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
     创建或编辑 <strong>公开</strong> 的收藏夹后，我们需要进行审核
@@ -9,83 +8,97 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
     审核通过前，修改的内容仅在  <strong>编辑收藏夹</strong> 页面展示
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑收藏夹列表" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
-    <div class=" rounded shadow-sm  p-4 bg-opacity">
-        <Table TItem="ListFavoriteFolderAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="120" IsStriped=true
-               ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-            <TableToolbarTemplate>
-                <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Success" Icon="fa fa-fw fa-plus" Text="创建收藏夹" OnClickCallback="AddFavoriteFolder" IsAsync="true" />
-            </TableToolbarTemplate>
-            <TableColumns>
-                <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc" />
-                <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="150" />
-                <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="200" TextWrap="true" />
-                <TableColumn @bind-Field="@context.Count" Sortable Searchable="true" TextWrap="true" Width="80" />
-                <TableColumn @bind-Field="@context.CreateTime" TextWrap="true" Width="120" FormatString="yyyy-MM-dd HH:mm" />
-                <TableColumn @bind-Field="@context.ShowPublicly" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
-                <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
-                <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
-            </TableColumns>
-            <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(async () => OnRowManageClick(context.Id))" />
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () =>  OnRowLookClick(context.Id,context.Name))" />
-            </RowButtonTemplate>
-        </Table>
-    </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-<CreateFavoriteFolderCard @ref="createFavoriteFolderCard" UserId="@Id" OnCreated="@(async ()=>await TableRows.QueryAsync())" />
+<DataTableCard TModel="FavoriteFolderOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" OnClickAdd="AddFavoriteFolder" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.MainImage))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.MainImage" />
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.UserId))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsHidden))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden=@context.Item.IsHidden />
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.ShowPublicly))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.PlayedGames.ShowPubilcChip ShowPublicly=@context.Item.ShowPublicly />
+        }
+        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsDefault))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Folders.StateChip IsDefault=@context.Item.IsDefault />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+<CreateFavoriteFolderCard @ref="createFavoriteFolderCard" UserId="@Id" OnCreated="@(()=> dataTableCard.GetDataFromApi())" />
 
 @code {
     [Parameter]
     public string Id { get; set; }
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    private string _baseUrl = "api/Favorites/ListUserFavoriteFolders?userId=";
+    private string _name = "收藏夹";
+
+    private List<DataTableHeader<FavoriteFolderOverviewModel>> _headers = new List<DataTableHeader<FavoriteFolderOverviewModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(FavoriteFolderOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(FavoriteFolderOverviewModel.Name)},
+          new (){ Text= "图片", Value= nameof(FavoriteFolderOverviewModel.MainImage)},
+          new (){ Text= "用户", Value= nameof(FavoriteFolderOverviewModel.UserId)},
+          new (){ Text= "创建时间", Value= nameof(FavoriteFolderOverviewModel.CreateTime)},
+          new (){ Text= "数量", Value= nameof(FavoriteFolderOverviewModel.Count)},
+          new (){ Text= "状态", Value= nameof(FavoriteFolderOverviewModel.IsHidden)},
+          new (){ Text= "公开", Value= nameof(FavoriteFolderOverviewModel.ShowPublicly)},
+          new (){ Text= "默认", Value= nameof(FavoriteFolderOverviewModel.IsDefault)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<FavoriteFolderOverviewModel> dataTableCard;
 
     CreateFavoriteFolderCard createFavoriteFolderCard;
 
-    [NotNull]
-    private Table<ListFavoriteFolderAloneModel>? TableRows { get; set; }
-    private List<ListFavoriteFolderAloneModel> SelectedRows { get; set; } = new();
-
-    public ListFavoriteFoldersInforViewModel InforModel { get; set; } = new ListFavoriteFoldersInforViewModel();
-    public ListFavoriteFoldersViewModel ListModel { get; set; } = new ListFavoriteFoldersViewModel { FavoriteFolders = new List<ListFavoriteFolderAloneModel>() };
-
-    private ListFavoriteFolderAloneModel searchModel { get; set; } = new ListFavoriteFolderAloneModel();
-
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private async Task<QueryData<ListFavoriteFolderAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+
+    public void LookItem(FavoriteFolderOverviewModel model)
     {
-        try
-        {
-            return await _httpService.PostAsync<FavoriteFoldersPagesInfor, QueryData<ListFavoriteFolderAloneModel>>("api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, UserId = Id });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取收藏夹列表");
-            return new QueryData<ListFavoriteFolderAloneModel>();
-        }
+        NavigationManager.NavigateTo("/favoritefolders/index/" + model.Id);
     }
 
-    private void OnRowManageClick(long id)
+    public void EditItem(FavoriteFolderOverviewModel model)
     {
-        NavigationManager.NavigateTo($"/space/EditSpaceFavoriteObjects?UserId={Id}&FolderId={id}");
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects?UserId=" + model.UserId + "&FolderId=" + model.Id);
 
     }
 
-    private void OnRowLookClick(long id, string name)
-    {
-        NavigationManager.NavigateTo($"/favoritefolders/index/{id}");
-
-    }
-
-
-    public async Task AddFavoriteFolder(IEnumerable<ListFavoriteFolderAloneModel> e)
+    public void AddFavoriteFolder()
     {
         if (createFavoriteFolderCard != null)
         {

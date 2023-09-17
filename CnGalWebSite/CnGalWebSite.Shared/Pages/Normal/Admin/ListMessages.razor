@@ -2,188 +2,80 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 
+<DataTableCard TModel="MessageOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+        }
+        else if (context.Header.Value == nameof(MessageOverviewModel.IsReaded))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Messages.StateChip IsReaded="@context.Item.IsReaded"/>
+        }
+        else if (context.Header.Value == nameof(MessageOverviewModel.UserId))
+        {
+           <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName"/>
+        }
+        else if (context.Header.Value == nameof(MessageOverviewModel.PostTime))
+        {
+            @context.Item.PostTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else if (context.Header.Value == nameof(MessageOverviewModel.Type))
+        {
+            @context.Item.Type.GetDisplayName()
+        }
+        else if (context.Header.Value == nameof(MessageOverviewModel.Text))
+        {
+            <div style="white-space: pre-line;width: 300px;word-break: break-all;">
+                @context.Item.Text
+            </div>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="消息版块"/>
-
-<div class=" rounded shadow-sm -lg p-4 bg-opacity">
-    <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-        <TableToolbarTemplate>
-            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="未读" OnClickCallback="OnNotReadedClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
-            <TableColumn @bind-Field="@context.Title" Sortable="true" Searchable="true" Width="200" />
-            <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="300" />
-
-            <TableColumn @bind-Field="@context.PostTime" Sortable="true" TextWrap="true" Width="120" />
-            <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-            <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" TextWrap="true" Width="100" />
-            <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-            <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" TextWrap="true" />
-            <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-            <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-            <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookLink( context.Link , context.LinkTitle))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
-        </RowButtonTemplate>
-    </Table>
-</div>
 
 @code {
-    [NotNull]
-    private Table<ListMessageAloneModel>? TableRows { get; set; }
-    private List<ListMessageAloneModel> SelectedRows { get; set; } = new();
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
 
-    public ListMessagesViewModel ListModel { get; set; } = new ListMessagesViewModel { Messages = new List<ListMessageAloneModel>() };
+    private string _baseUrl = "api/space/ListMessages";
+    private string _name = "消息";
 
-    private ListMessageAloneModel SearchModelUser { get; set; } = new ListMessageAloneModel();
+    private List<DataTableHeader<MessageOverviewModel>> _headers = new List<DataTableHeader<MessageOverviewModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(FavoriteFolderOverviewModel.Id)
+          },
+          new (){ Text= "类型", Value= nameof(MessageOverviewModel.Type)},
+          new (){ Text= "发送时间", Value= nameof(MessageOverviewModel.PostTime)},
+          new (){ Text= "标题", Value= nameof(MessageOverviewModel.Title)},
+          new (){ Text= "内容", Value= nameof(MessageOverviewModel.Text)},
+          new (){ Text= "目标", Value= nameof(MessageOverviewModel.UserId)},
+          new (){ Text= "是否已读", Value= nameof(MessageOverviewModel.IsReaded)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    DataTableCard<MessageOverviewModel> dataTableCard;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
 
-
-
-    protected override async Task OnInitializedAsync()
+    public void LookItem(MessageOverviewModel model)
     {
-
-    }
-
-    private async Task<QueryData<ListMessageAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
-    {
-        try
-        {
-            return await _httpService.PostAsync<MessagesPagesInfor, QueryData<ListMessageAloneModel>>("api/admin/GetMessageList", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取消息列表");
-            return new QueryData<ListMessageAloneModel>();
-        }
-    }
-
-    private void LookLink(string link, string name)
-    {
-        if (string.IsNullOrWhiteSpace(link) == false)
-        {
-            NavigationManager.NavigateTo(Provider, link, name, "fa fa-star-o");
-        }
-
-
-    }
-
-    private async Task OnRowEditIsReadedClick(long[] ids, bool isReaded, bool showMessage)
-    {
-        string tempString = isReaded == true ? "设置用户消息已读" : "设置用户消息未读";
-        //调用API
-        try
-        {
-            var obj = await _httpService.PostAsync<EditMessageIsReadedModel, Result>("api/space/EditMessageIsReaded", new EditMessageIsReadedModel { Ids = ids, IsReaded = isReaded });
-
-
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error(tempString + "失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success(tempString + "成功", tempString + "成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, tempString + "失败");
-        }
-    }
-
-    private async Task OnReadedClick(IEnumerable<ListMessageAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户留言状态", "请选中用户");
-            return;
-        }
-
-        await OnRowEditIsReadedClick(items.Select(s => s.Id).ToArray(), true, false);
-
-        await ToastService.Success("开启用户评论成功", "开启用户评论成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnNotReadedClick(IEnumerable<ListMessageAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户留言状态", "请选中用户");
-            return;
-        }
-
-        await OnRowEditIsReadedClick(items.Select(s => s.Id).ToArray(), false, false);
-
-        await ToastService.Success("关闭用户评论成功", "关闭用户评论成功");
-        await TableRows.QueryAsync();
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="item"></param>
-    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
-    {
-        //调用API
-        try
-        {
-            var obj = await _httpService.PostAsync<DeleteMessagesModel, Result>("api/space/DeleteMessages", new DeleteMessagesModel { Ids = ids });
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("删除消息失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success("删除消息成功", "删除消息成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "删除消息失败");
-        }
-    }
-
-    private async Task OnDeleteClick(IEnumerable<ListMessageAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有删除消息", "请选中消息");
-            return;
-        }
-
-        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
-
-        await ToastService.Success("删除消息成功", "删除消息成功");
-        await TableRows.QueryAsync();
+        NavigationManager.NavigateTo(model.Link);
     }
 }

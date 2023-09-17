@@ -4,10 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
-    public class StaffInforListViewModel
-    {
-        public List<StaffInforTableModel> StaffInfors { get; set; }
-    }
 
     public class StaffInforTableModel
     {

@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
-@inject IPageModelCatche<List<FavoriteFolderAloneModel>> _pageModelCatche
+@inject IPageModelCatche<List<FavoriteFolderOverviewModel>> _pageModelCatche
 
 @if (Model.Any())
 {
@@ -62,7 +62,7 @@
     [Parameter]
     public long Id { get; set; }
 
-    public List<FavoriteFolderAloneModel> Model = new List<FavoriteFolderAloneModel>();
+    public List<FavoriteFolderOverviewModel> Model = new List<FavoriteFolderOverviewModel>();
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

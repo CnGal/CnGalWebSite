@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(ShowPublicly?"公开":"私密")" />
+
+ @code {
+    [Parameter]
+    public bool ShowPublicly { get; set; }
+
+    public string GetColor()
+    {
+        return ShowPublicly switch
+        {
+            true => "success",
+            false => "info"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return ShowPublicly switch
+        {
+            true => IconType.Read,
+            false => IconType.Hide,
+        };
+    }
+}

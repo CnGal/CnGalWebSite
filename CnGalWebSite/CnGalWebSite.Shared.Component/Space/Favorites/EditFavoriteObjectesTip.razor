@@ -1,179 +1,70 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏列表" Icon="fa fa-fw fa-list" Class="mb-4">
 
-        <Table TItem="ListFavoriteObjectAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="150" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-               ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-            <TableToolbarTemplate>
-                <TableToolbarButton TItem="ListFavoriteObjectAloneModel" Color="Color.Primary" Icon="fa fa-exchange" Text="移动" OnClickCallback="OnMoveClick" IsAsync="true" />
-                <TableToolbarButton TItem="ListFavoriteObjectAloneModel" Color="Color.Danger" Icon="fa fa-trash" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-            </TableToolbarTemplate>
-            <TableColumns>
-                <TableColumn @bind-Field="@context.Type" Width="100" TextWrap="true" />
-                <TableColumn @bind-Field="@context.Name" Width="200" TextWrap/>
-                <TableColumn @bind-Field="@context.CreateTime" TextWrap="true" Sortable="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
-            </TableColumns>
-            <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.ObjectId,context.Type))" />
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-exchange" Text="移动" IsAsync="true" OnClickWithoutRender="@(() => OnRowMoveClick(context.ObjectId,context.Type))" />
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id } ,true))" />
-            </RowButtonTemplate>
-        </Table>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-
-<MoveFavoriteFolderTip Id="Id"  OnMoved="@(async () => {await TableRows.QueryAsync(); })" @ref="moveFavoriteFolderTip"/>
-
+<DataTableCard TModel="FavoriteObjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>MoveItem(context.Item)">@IconType.Move.ToIconString()</MIcon>
+            <MIcon Color="error"
+                   Class="mr-2"
+                   OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+        }
+        else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.Type))
+        {
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Objects.ObjectChip Name=@context.Item.ObjectName Id="@context.Item.ObjectId" Type="@context.Item.Type" />
+        }
+        else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.CreateTime))
+        {
+            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+<MoveFavoriteFolderTip Id="Id" OnMoved="@( () => { dataTableCard.GetDataFromApi(); })" @ref="moveFavoriteFolderTip" />
 @code {
     [Parameter]
     public long Id { get; set; }
 
-    [NotNull]
-    private Table<ListFavoriteObjectAloneModel>? TableRows { get; set; }
-    private List<ListFavoriteObjectAloneModel> SelectedRows { get; set; } = new();
+    private string _baseUrl = "api/Favorites/ListUserFavoriteObjects?folderId=";
+    private string _name = "收藏夹";
 
-    public ListFavoriteObjectsInforViewModel InforModel { get; set; } = new ListFavoriteObjectsInforViewModel();
-    public ListFavoriteObjectsViewModel ListModel { get; set; } = new ListFavoriteObjectsViewModel { FavoriteObjects = new List<ListFavoriteObjectAloneModel>() };
+    public List<FavoriteFolderOverviewModel> UserFavoriteInfor { get; set; }
 
-    private ListFavoriteObjectAloneModel searchModel { get; set; } = new ListFavoriteObjectAloneModel();
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
-    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
+    private List<DataTableHeader<FavoriteObjectOverviewModel>> _headers = new List<DataTableHeader<FavoriteObjectOverviewModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(FavoriteObjectOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(FavoriteObjectOverviewModel.Type)},
+          new (){ Text= "时间", Value= nameof(FavoriteObjectOverviewModel.CreateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
 
+    DataTableCard<FavoriteObjectOverviewModel> dataTableCard;
     MoveFavoriteFolderTip moveFavoriteFolderTip;
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
-        if (firstRender)
-        {
-            await GetUserFavoriteInforFromFolderId(Id);
-        }
-    }
-
-    private async Task<QueryData<ListFavoriteObjectAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    protected override async Task OnInitializedAsync()
     {
         try
         {
-            return await _httpService.PostAsync<FavoriteObjectsPagesInfor, QueryData<ListFavoriteObjectAloneModel>>("api/favorites/GetFavoriteObjectList", new FavoriteObjectsPagesInfor { Options = (QueryPageOptionsHelper)options, SearchModel = searchModel, FavoriteFolderId = Id });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取收藏夹数据");
-            return new QueryData<ListFavoriteObjectAloneModel>();
-        }
-    }
-
-    private async Task OnRowLookClick(long id, FavoriteObjectType type)
-    {
-        if (type == FavoriteObjectType.Entry)
-        {
-            NavigationManager.NavigateTo($"/entries/index/{id}");
-        }
-        else if (type == FavoriteObjectType.Video)
-        {
-            NavigationManager.NavigateTo($"/videos/index/{id}");
-        }
-        else if (type == FavoriteObjectType.Article)
-        {
-            NavigationManager.NavigateTo($"/articles/index/{id}");
-        }
-        else if (type == FavoriteObjectType.Tag)
-        {
-            NavigationManager.NavigateTo($"/tags/index/{id}");
-        }
-        else if (type == FavoriteObjectType.Periphery)
-        {
-            NavigationManager.NavigateTo($"/peripheries/index/{id}");
-        }
-    }
-
-
-
-    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
-    {
-        //调用API
-        try
-        {
-            var obj = await _httpService.PostAsync<DeleteFavoriteObjectsModel, Result>("api/favorites/UserDeleteFavoriteObject", new DeleteFavoriteObjectsModel { FavorieFolderId = Id, Ids = ids });
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("删除收藏失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success("删除收藏成功", "删除收藏成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "删除收藏失败");
-        }
-    }
-
-    private async Task OnDeleteClick(IEnumerable<ListFavoriteObjectAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有删除收藏", "请选中收藏");
-            return;
-        }
-
-        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
-
-        await ToastService.Success("删除收藏成功", "删除收藏成功");
-        await TableRows.QueryAsync();
-    }
-
-    private async Task OnMoveClick(IEnumerable<ListFavoriteObjectAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有移动收藏", "请选中收藏");
-            return;
-        }
-        List<KeyValuePair<FavoriteObjectType, long>> ObjectIds = new List<KeyValuePair<FavoriteObjectType, long>>();
-        foreach (var item in items)
-        {
-            ObjectIds.Add(new KeyValuePair<FavoriteObjectType, long>(item.Type, item.ObjectId));
-        }
-
-        if (moveFavoriteFolderTip!=null)
-        {
-            moveFavoriteFolderTip.Refresh(ObjectIds,UserFavoriteInfor);
-        }
-
-    }
-
-    private async Task OnRowMoveClick(long id, FavoriteObjectType type)
-    {
-        List<KeyValuePair<FavoriteObjectType, long>> temp = new List<KeyValuePair<FavoriteObjectType, long>>();
-        temp.Add(new KeyValuePair<FavoriteObjectType, long>(type, id));
-        if (moveFavoriteFolderTip != null)
-        {
-            moveFavoriteFolderTip.Refresh(temp, UserFavoriteInfor);
-        }
-    }
-
-    public async Task GetUserFavoriteInforFromFolderId(long id)
-    {
-        try
-        {
-            UserFavoriteInfor = await _httpService.GetAsync<FavoriteFoldersViewModel>("api/favorites/GetUserFavoriteInforFromFolderId/" + id);
+            UserFavoriteInfor = await _httpService.GetAsync<List<FavoriteFolderOverviewModel>>("api/favorites/GetUserFavoriteInforFromFolderId/" + Id);
         }
         catch (Exception ex)
         {
@@ -181,5 +72,42 @@
         }
     }
 
+    public void MoveItem(FavoriteObjectOverviewModel model)
+    {
+        List<KeyValuePair<FavoriteObjectType, long>> ObjectIds = new List<KeyValuePair<FavoriteObjectType, long>>();
+        ObjectIds.Add(new KeyValuePair<FavoriteObjectType, long>(model.Type, model.ObjectId));
+
+
+        if (moveFavoriteFolderTip != null)
+        {
+            moveFavoriteFolderTip.Refresh(ObjectIds, UserFavoriteInfor);
+        }
+
+    }
+
+    public async Task DeleteItem(FavoriteObjectOverviewModel model)
+    {
+        string operationName ="删除"+_name;
+        try
+        {
+            var obj = await _httpService.PostAsync<DeleteFavoriteObjectsModel, Result>("api/favorites/UserDeleteFavoriteObject", new DeleteFavoriteObjectsModel { FavorieFolderId = Id, Ids = new long[] { model.Id} });
+
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
 
 }

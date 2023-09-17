@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
-    public class MakerInforListViewModel
-    {
-        public List<MakerInforTableModel> MakerInfors { get; set; }
-    }
     public class MakerInforTableModel
     {
         public long Id { get; set; }

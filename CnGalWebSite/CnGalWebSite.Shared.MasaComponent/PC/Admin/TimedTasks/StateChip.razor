@@ -1,0 +1,23 @@
+﻿
+@if(IsLastFail)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="error" Icon="IconType.Error" Text="上次失败" />
+}
+@if (IsPause)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="warning" Icon="IconType.Stop" Text="已暂停" />
+}
+@if (IsRuning)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="info" Icon="IconType.Run" Text="正在执行" />
+}
+
+
+ @code {
+    [Parameter]
+    public bool IsLastFail { get; set; }
+    [Parameter]
+    public bool IsPause { get; set; }
+    [Parameter]
+    public bool IsRuning { get; set; }
+}

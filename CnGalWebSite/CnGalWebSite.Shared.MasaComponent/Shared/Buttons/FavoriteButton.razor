@@ -30,7 +30,7 @@ else
     public bool PlainText { get; set; }
 
     public bool IsUserFavorited { get; set; }
-    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
+    public List<FavoriteFolderOverviewModel> UserFavoriteInfor { get; set; } = new List<FavoriteFolderOverviewModel>();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -122,7 +122,7 @@ else
     {
         try
         {
-            UserFavoriteInfor = await _httpService.GetAsync<FavoriteFoldersViewModel>("api/favorites/GetUserFavoriteFolders/" + id);
+            UserFavoriteInfor = await _httpService.GetAsync<List<FavoriteFolderOverviewModel>>("api/favorites/GetUserFavoriteFolders/" + id);
         }
         catch (Exception ex)
         {
@@ -133,12 +133,12 @@ else
     private async Task OnFavoriteClick()
     {
         //检查是否存在默认收藏夹
-        if (UserFavoriteInfor == null || UserFavoriteInfor.Favorites == null || UserFavoriteInfor.Favorites.Count == 0)
+        if (UserFavoriteInfor.Any()==false)
         {
             await ToastService.Error("收藏失败", "无法获取收藏夹信息");
         }
 
-        var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
+        var favoriteFolderIds = UserFavoriteInfor.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
         if (favoriteFolderIds.Length == 0)
         {
             if (chooseFavoriteFolderTip != null)

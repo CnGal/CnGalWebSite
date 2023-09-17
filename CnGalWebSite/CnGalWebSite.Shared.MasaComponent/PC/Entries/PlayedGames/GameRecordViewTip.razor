@@ -114,7 +114,7 @@
     {
         try
         {
-            var obj = await _httpService.PostAsync<HiddenGameRecordModel, Result>("api/playedgame/HiddenGameRecord", new HiddenGameRecordModel { IsHidden = !Model.IsHidden, Ids = new int?[] { Model.GameId } });
+            var obj = await _httpService.PostAsync<HiddenGameRecordModel, Result>("api/playedgame/HiddenGameRecord", new HiddenGameRecordModel { IsHidden = !Model.IsHidden, GameIds = new int?[] { Model.GameId } });
             //判断结果
             if (obj.Successful == false)
             {

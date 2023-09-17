@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
-    public class BasicInforListViewModel
-    {
-        public List<BasicInforTableModel> BasicInfors { get; set; }
-    }
-
     public class BasicInforTableModel
     {
         public long Id { get; set; }

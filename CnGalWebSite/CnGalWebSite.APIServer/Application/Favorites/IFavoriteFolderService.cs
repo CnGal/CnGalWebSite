@@ -9,8 +9,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
 {
     public interface IFavoriteFolderService
     {
-        Task<QueryData<ListFavoriteFolderAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteFolderAloneModel searchModel, string userId = "");
-
       void  UpdateMain(FavoriteFolder favoriteFolder, FavoriteFolderMain examine);
 
        void UpdateData(FavoriteFolder favoriteFolder, Examine examine);

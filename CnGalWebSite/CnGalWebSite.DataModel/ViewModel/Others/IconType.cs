@@ -164,7 +164,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         DisableComment,
         Badge,
         Score,
-        UnLink
+        UnLink,
+        Run,
+        Runing,
+        Stop,
+        Error,
+        Default,
+        Other,
+        Move
     }
 
     public static class IconTypeHelper
@@ -173,6 +180,20 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Move:
+                    return "mdi-file-move";
+                case IconType.Default:
+                    return "mdi-star";
+                case IconType.Other:
+                    return " mdi-star-shooting-outline";
+                case IconType.Error:
+                    return "mdi-close-circle";
+                case IconType.Runing:
+                    return "mdi-play-circle-outline";
+                case IconType.Run:
+                    return "mdi-play";
+                case IconType.Stop:
+                    return "mdi-pause";
                 case IconType.UnLink:
                     return "mdi-link-off";
                 case IconType.Score:

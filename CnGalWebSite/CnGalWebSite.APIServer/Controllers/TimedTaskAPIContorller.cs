@@ -1,14 +1,19 @@
 ﻿using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -20,136 +25,114 @@ namespace CnGalWebSite.APIServer.Controllers
     {
         private readonly IRepository<TimedTask, int> _timedTaskRepository;
         private readonly ITimedTaskService _timedTaskService;
+        private readonly IQueryService _queryService;
 
-        public TimedTaskAPIContorller(ITimedTaskService timedTaskService, IRepository<TimedTask, int> timedTaskRepository)
+        public TimedTaskAPIContorller(ITimedTaskService timedTaskService, IRepository<TimedTask, int> timedTaskRepository, IQueryService queryService)
         {
             _timedTaskRepository = timedTaskRepository;
             _timedTaskService = timedTaskService;
+            _queryService = queryService;
         }
 
-
-        [HttpGet]
-        public async Task<ActionResult<ListTimedTasksInforViewModel>> ListTimedTasksAsync()
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<TimedTaskOverviewModel>> List(QueryParameterModel model)
         {
-            var model = new ListTimedTasksInforViewModel
+            var (items, total) = await _queryService.QueryAsync<TimedTask, int>(_timedTaskRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<TimedTaskOverviewModel>
             {
-                All = await _timedTaskRepository.CountAsync(),
-                IsLastFail = await _timedTaskRepository.CountAsync(s => s.IsLastFail == true),
-                IsPasue = await _timedTaskRepository.CountAsync(s => s.IsPause == true),
-                IsRuning = await _timedTaskRepository.CountAsync(s => s.IsRuning == true),
+                Items = await items.Select(s => new TimedTaskOverviewModel
+                {
+                    Id = s.Id,
+                    Type = s.Type,
+                    ExecuteType = s.ExecuteType,
+                    IntervalTime = s.IntervalTime,
+                    EveryTime = s.EveryTime,
+                    LastExecutedTime = s.LastExecutedTime,
+                    Parameter = s.Parameter,
+                    IsPause = s.IsPause,
+                    IsRuning = s.IsRuning,
+                    IsLastFail = s.IsLastFail
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<TimedTaskEditModel>> EditAsync(long id)
+        {
+            var item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if (item == null)
+            {
+                return NotFound("无法找到该目标");
+            }
+
+            var model = new TimedTaskEditModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Type = item.Type,
+                ExecuteType = item.ExecuteType,
+                IntervalTime = item.IntervalTime,
+                EveryTime = item.EveryTime,
+                LastExecutedTime = item.LastExecutedTime,
+                Parameter = item.Parameter,
+                IsPause = item.IsPause,
+                IsRuning = item.IsRuning,
+                IsLastFail = item.IsLastFail
             };
 
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListTimedTaskAloneModel>>> GetTimedTaskListAsync(TimedTasksPagesInfor input)
+        public async Task<ActionResult<Result>> EditAsync(TimedTaskEditModel model)
         {
-            var dtos = await _timedTaskService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Result>> UpdateTimedTaskDataAsync(ListTimedTaskAloneModel model)
-        {
-            //查找定时任务
-            var timedTask = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (timedTask == null)
+            TimedTask item = null;
+            if (model.Id == 0)
             {
-                return new Result { Successful = false, Error = $"未找到Id：{model.Id}的定时任务" };
-            }
-            //检查数据合理性
-            if (model.ExecuteType == TimedTaskExecuteType.EveryDay && model.EveryTime == null)
-            {
-                return new Result { Successful = false, Error = "每天固定时间执行的任务，其时间不能为空" };
-            }
-            if (model.ExecuteType == TimedTaskExecuteType.IntervalTime && model.IntervalTime < 10)
-            {
-                return new Result { Successful = false, Error = "间隔固定时间的任务，间隔时间不能小于10分钟" };
-            }
-            if (model.Type == null)
-            {
-                model.Type = TimedTaskType.UpdateGameSteamInfor;
-            }
-            if (model.ExecuteType == null)
-            {
-                model.ExecuteType = TimedTaskExecuteType.IntervalTime;
-            }
-            //修改数据
-            timedTask.Name = model.Name;
-            timedTask.Type = model.Type.Value;
-            timedTask.ExecuteType = model.ExecuteType.Value;
-            timedTask.IntervalTime = model.IntervalTime;
-            if (model.ExecuteType == TimedTaskExecuteType.EveryDay && string.IsNullOrWhiteSpace(model.EveryTime) == false)
-            {
-                try
+                item = await _timedTaskRepository.InsertAsync(new TimedTask
                 {
-                    timedTask.EveryTime = DateTime.ParseExact(model.EveryTime, "yyyy-MM-dd HH:mm", null);
-                }
-                catch
-                {
-                    return new Result { Successful = false, Error = "固定时间格式不正确，应为 yyyy-MM-dd HH:mm" };
-                }
+                    Name = model.Name,
+                    Type = model.Type,
+                    ExecuteType = model.ExecuteType,
+                    IntervalTime = model.IntervalTime,
+                    EveryTime = model.EveryTime,
+                    LastExecutedTime = model.LastExecutedTime,
+                    Parameter = model.Parameter,
+                    IsPause = model.IsPause,
+                    IsRuning = model.IsRuning,
+                    IsLastFail = model.IsLastFail
+                });
+                model.Id = item.Id;
+                _timedTaskRepository.Clear();
             }
-            timedTask.LastExecutedTime = model.LastExecutedTime;
-            timedTask.Parameter = model.Parameter;
-            timedTask.IsPause = model.IsPause;
-            timedTask.IsRuning = model.IsRuning;
-            timedTask.IsLastFail = model.IsLastFail;
-            //保存
-            await _timedTaskRepository.UpdateAsync(timedTask);
 
-            return new Result { Successful = true };
-        }
+            item = await _timedTaskRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
 
-        [HttpPost]
-        public async Task<ActionResult<Result>> AddTimedTaskAsync(ListTimedTaskAloneModel model)
-        {
-            //检查数据合理性
-            if (model.ExecuteType == TimedTaskExecuteType.EveryDay && model.EveryTime == null)
-            {
-                return new Result { Successful = false, Error = "每天固定时间执行的任务，其时间不能为空" };
-            }
-            if (model.ExecuteType == TimedTaskExecuteType.IntervalTime && model.IntervalTime < 10)
-            {
-                return new Result { Successful = false, Error = "间隔固定时间的任务，间隔时间不能小于10分钟" };
-            }
-            if (model.Type == null)
-            {
-                model.Type = TimedTaskType.UpdateGameSteamInfor;
-            }
-            if (model.ExecuteType == null)
-            {
-                model.ExecuteType = TimedTaskExecuteType.IntervalTime;
-            }
-            //修改数据
-            var timedTask = new TimedTask
-            {
-                Name = model.Name,
-                Type = model.Type.Value,
-                ExecuteType = model.ExecuteType.Value,
-                IntervalTime = model.IntervalTime
-            };
-            if (model.ExecuteType == TimedTaskExecuteType.EveryDay && string.IsNullOrWhiteSpace(model.EveryTime) == false)
-            {
-                try
-                {
-                    timedTask.EveryTime = DateTime.ParseExact(model.EveryTime, "yyyy-MM-dd HH:mm", null);
-                }
-                catch
-                {
-                    return new Result { Successful = false, Error = "固定时间格式不正确，应为 yyyy-MM-dd HH:mm" };
-                }
-            }
-            timedTask.LastExecutedTime = model.LastExecutedTime;
-            timedTask.Parameter = model.Parameter;
-            timedTask.IsPause = model.IsPause;
-            timedTask.IsRuning = model.IsRuning;
-            timedTask.IsLastFail = model.IsLastFail;
 
-            //保存
-            await _timedTaskRepository.InsertAsync(timedTask);
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "项目不存在" };
+            }
+
+            item.Name = model.Name;
+            item.Type = model.Type;
+            item.ExecuteType = model.ExecuteType;
+            item.IntervalTime = model.IntervalTime;
+            item.EveryTime = model.EveryTime;
+            item.LastExecutedTime = model.LastExecutedTime;
+            item.Parameter = model.Parameter;
+            item.IsPause = model.IsPause;
+            item.IsRuning = model.IsRuning;
+            item.IsLastFail = model.IsLastFail;
+
+            await _timedTaskRepository.UpdateAsync(item);
 
             return new Result { Successful = true };
         }

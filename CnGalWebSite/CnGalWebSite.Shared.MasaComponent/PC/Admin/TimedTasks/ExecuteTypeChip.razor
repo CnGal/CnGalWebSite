@@ -1,0 +1,28 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()" />
+
+
+ @code {
+    [Parameter]
+    public TimedTaskExecuteType Type { get; set; }
+
+    public string GetColor(TimedTaskExecuteType type)
+    {
+        return type switch
+        {
+            TimedTaskExecuteType.EveryDay => "success",
+            TimedTaskExecuteType.IntervalTime => "info",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(TimedTaskExecuteType type)
+    {
+        return type switch
+        {
+            TimedTaskExecuteType.EveryDay => IconType.IndeterminateTime,
+            TimedTaskExecuteType.IntervalTime => IconType.DeterminedTime,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

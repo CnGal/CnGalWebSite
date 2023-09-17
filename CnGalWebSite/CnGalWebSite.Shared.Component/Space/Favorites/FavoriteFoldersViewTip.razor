@@ -1,8 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-
+@inject IPageModelCatche<List<FavoriteFolderOverviewModel>> _pageModelCatche
 
 @if (_dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId != 0)
 {
@@ -19,9 +18,9 @@ else
             }
         </ButtonContent>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    @if (Model != null && Model.Favorites != null)
+    @if (Model.Any())
     {
-        foreach (var item in Model.Favorites)
+        foreach (var item in Model)
         {
             <FavoriteFolderInforViewTip Model="item" OnClickLayout="OnClickFolder"></FavoriteFolderInforViewTip>
         }
@@ -29,8 +28,7 @@ else
 }
 
 @code {
-
-    public FavoriteFoldersViewModel Model { get; set; }
+    public List<FavoriteFolderOverviewModel> Model { get; set; } = new List<FavoriteFolderOverviewModel>();
 
     public PagedSortedAndFilterInput FavoriteObjectInput { get; set; } = new PagedSortedAndFilterInput();
 
@@ -62,7 +60,7 @@ else
             {
                 return;
             }
-            Model = await _dataCacheService.UserFavoriteFoldersDataCatche.GetCache(UserId);
+            Model = await _pageModelCatche.GetCache("api/favorites/GetUserFavoriteFolders/"+UserId);
 
             StateHasChanged();
         }
@@ -72,7 +70,7 @@ else
         }
     }
 
-    public void OnClickFolder(FavoriteFolderAloneModel model)
+    public void OnClickFolder(FavoriteFolderOverviewModel model)
     {
         _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = model.Id;
         _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderName = model.Name;

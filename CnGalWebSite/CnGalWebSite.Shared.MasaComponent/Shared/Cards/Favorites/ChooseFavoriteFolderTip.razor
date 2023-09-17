@@ -14,12 +14,11 @@
         </MCardText>
         <MCardText Class="pb-0">
             <div style="display:flex;">
-                @foreach (var item in UserFavoriteInfor.Favorites)
+                @foreach (var item in UserFavoriteInfor)
                 {
                     <MCheckbox Value="SelectedItemIds.Contains( item.Id)" TValue="bool" ValueChanged="@((e) => { if (e) SelectedItemIds.Add(item.Id); else SelectedItemIds.RemoveAll(s => s == item.Id); })"
                                Label="@item.Name" Class="m-0 me-4"
-                               HideDetails="true"
-                                />
+                               HideDetails="true"/>
                 }
 
             </div>
@@ -44,7 +43,7 @@
     public FavoriteObjectType Type { get; set; }
 
 
-    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; } = new FavoriteFoldersViewModel();
+    public List<FavoriteFolderOverviewModel> UserFavoriteInfor { get; set; } = new List<FavoriteFolderOverviewModel>();
 
 
     List<long> SelectedItemIds = new List<long>();
@@ -54,7 +53,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public void Refresh( FavoriteFoldersViewModel userFavoriteInfor)
+    public void Refresh(List< FavoriteFolderOverviewModel> userFavoriteInfor)
     {
         if (SelectedItemIds.Any())
         {

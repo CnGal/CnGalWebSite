@@ -1,169 +1,64 @@
 ﻿@inject IHttpService _httpService
-@inject NavigationManager NavigationManager
+@inject IPopupService PopupService
+@inject IEventService _eventService
 
-@if (!isReady)
-{
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-}
-else
-{
-<Table TItem="GameScoreTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-       OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelScores" ShowSearch="true" ShowLoading="true"
-       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-       ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-    <TableToolbarTemplate>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="GameScoreTableModel" Columns="table.Columns" Items="ModelScores.GameScores" Name="游戏汇总表" />
-    </TableToolbarTemplate>
-    <TableColumns>
-        <TableColumn @bind-Field="@context.GameId" Filterable Sortable Width="100" TextWrap Fixed />
-        <TableColumn @bind-Field="@context.GameName" Filterable Sortable Searchable Width="200" TextWrap />
+<DataTableCard TModel="GameScoreTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
-        <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable FormatString="0.00000" Width="150" />
-        <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" Formatter="CVRateFormatter" />
-        <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-
-        <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable FormatString="0.00000" Width="180" />
-        <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" Formatter="CVRateFormatter" />
-        <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-        <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.GameId))" />
-    </RowButtonTemplate>
-
-</Table>
-}
 
 @code {
-    Table<GameScoreTableModel> table;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/tables/ListGameScores";
+    private string _name = "评分";
+
+    private List<DataTableHeader<GameScoreTableModel>> _headers = new List<DataTableHeader<GameScoreTableModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(GameScoreTableModel.GameId)
+          },
+          new (){ Text= "游戏名", Value= nameof(GameScoreTableModel.GameName)},
+          new (){ Text= "配音", Value= nameof(GameScoreTableModel.AllCVSocre)},
+          new (){ Text= "程序", Value= nameof(GameScoreTableModel.AllSystemSocre)},
+          new (){ Text= "演出", Value= nameof(GameScoreTableModel.AllShowSocre)},
+          new (){ Text= "美术", Value= nameof(GameScoreTableModel.AllPaintSocre)},
+          new (){ Text= "剧本", Value= nameof(GameScoreTableModel.AllScriptSocre)},
+          new (){ Text= "音乐", Value= nameof(GameScoreTableModel.AllMusicSocre)},
+          new (){ Text= "总分（所有）", Value= nameof(GameScoreTableModel.AllTotalSocre)},
+          new (){ Text= "配音", Value= nameof(GameScoreTableModel.FilterCVSocre)},
+          new (){ Text= "程序", Value= nameof(GameScoreTableModel.FilterSystemSocre)},
+          new (){ Text= "演出", Value= nameof(GameScoreTableModel.FilterShowSocre)},
+          new (){ Text= "美术", Value= nameof(GameScoreTableModel.FilterPaintSocre)},
+          new (){ Text= "剧本", Value= nameof(GameScoreTableModel.FilterScriptSocre)},
+          new (){ Text= "音乐", Value= nameof(GameScoreTableModel.FilterMusicSocre)},
+          new (){ Text= "总分（过滤后）", Value= nameof(GameScoreTableModel.FilterTotalSocre)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<GameScoreTableModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
-    public GameScoreListViewModel ModelScores { get; set; } = new GameScoreListViewModel();
-
-    private bool isReady = false;
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GameScoreTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<GameScoreTableModel>>> SortLambdaCacheBasic = new();
-    private GameScoreTableModel SearchModelScores { get; set; } = new GameScoreTableModel();
-
-    protected override async Task OnInitializedAsync()
+    public async Task LookItem(GameScoreTableModel model)
     {
-        try
-        {
-            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelScores = await _httpService.GetAsync<GameScoreListViewModel>("api/tables/GetGameScoreList");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取评分信息汇总表格");
-        }
-    }
-
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
-
-    public void OnLook(long id)
-    {
-        NavigationManager.NavigateTo("/entries/index/" + id);
-        
-
-    }
-
-    public async Task<string> CVRateFormatter(object cut)
-    {
-        double model = 0;
-        if (cut is double)
-        {
-            model = (double)cut;
-        }
-        else
-        {
-            model = (double)(cut as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.GameScoreTableModel, System.Object>).Value;
-        }
-
-        string res = model.ToString("0.00000");
-        if (res == "-1.00000")
-        {
-            res = "无配音";
-        }
-
-
-        return res;
-    }
-
-    private Task<QueryData<GameScoreTableModel>> OnQueryBasicAsync(QueryPageOptions options)
-    {
-        IEnumerable<GameScoreTableModel> items = ModelScores.GameScores;
-        // 处理高级搜索
-        if (!string.IsNullOrWhiteSpace(SearchModelScores.GameName))
-        {
-            items = items.Where(item => item.GameName?.Contains(SearchModelScores.GameName, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-
-
-        // 处理 Searchable=true 列与 SeachText 模糊搜索
-        if (options.Searchs.Any())
-        {
-            items = items.Where(options.Searchs.GetFilterFunc<GameScoreTableModel>(FilterLogic.Or));
-        }
-        else
-        {
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.GameName?.Contains(options.SearchText) ?? false)
-                             || item.GameId.ToString().Contains(options.SearchText));
-            }
-        }
-        // 过滤
-        var isFiltered = false;
-        if (options.Filters.Any())
-        {
-            items = items.Where(options.Filters.GetFilterFunc<GameScoreTableModel>());
-            isFiltered = true;
-        }
-
-        // 排序
-        var isSorted = false;
-        if (!string.IsNullOrWhiteSpace(options.SortName))
-        {
-            // 外部未进行排序，内部自动进行排序处理
-            var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(GameScoreTableModel), key => LambdaExtensions.GetSortLambda<GameScoreTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-            isSorted = true;
-        }
-
-        // 设置记录总数
-        var total = items.Count();
-
-        // 内存分页
-        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-        return Task.FromResult(new QueryData<GameScoreTableModel>()
-        {
-            Items = items,
-            TotalCount = total,
-            IsSorted = isSorted,
-            IsFiltered = isFiltered
-        });
+        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + model.GameId);
     }
 }

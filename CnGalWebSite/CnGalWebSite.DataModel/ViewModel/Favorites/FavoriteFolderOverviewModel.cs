@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Favorites
 {
-    public class FavoriteFoldersViewModel
-    {
-        public List<FavoriteFolderAloneModel> Favorites { get; set; }=new List<FavoriteFolderAloneModel>();
-    }
-    public class FavoriteFolderAloneModel
+    public class FavoriteFolderOverviewModel
     {
         public long Id { get; set; }
 
@@ -23,7 +19,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
         /// </summary>
         public bool IsHidden { get; set; }
 
-
         public string MainImage { get; set; }
 
         public string BriefIntroduction { get; set; }
@@ -31,6 +26,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
         public DateTime CreateTime { get; set; }
 
         public long Count { get; set; }
+
+        public string UserId { get; set; }
+
+        public string UserName { get; set; }
     }
 
 }

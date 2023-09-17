@@ -3,7 +3,6 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,83 +29,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _entryRepository = entryRepository;
-        }
-
-        public async Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0)
-        {
-            IQueryable<FavoriteObject> items;
-
-            //是否限定用户
-            if (favoriteFolderId != 0)
-            {
-                items = _favoriteObjectRepository.GetAll().AsNoTracking()
-                    .Include(s=>s.Entry)
-                    .Include(s=>s.Article)
-                    .Include(s=>s.Periphery)
-                    .Include(s=>s.Video)
-                    .Include(s=>s.Tag)
-                    .Where(s => s.FavoriteFolderId == favoriteFolderId);
-            }
-            else
-            {
-                items = _favoriteObjectRepository.GetAll().AsNoTracking()
-                    .Include(s => s.Entry)
-                    .Include(s => s.Article)
-                    .Include(s => s.Periphery)
-                    .Include(s => s.Video)
-                    .Include(s => s.Tag);
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListFavoriteObjectAloneModel>();
-            foreach (var item in itemsReal)
-            {
-                resultItems.Add(new ListFavoriteObjectAloneModel
-                {
-                    Id = item.Id,
-                    Name = item.Type switch
-                    {
-                        FavoriteObjectType.Entry=>item.Entry.DisplayName,
-                        FavoriteObjectType.Article => item.Article.DisplayName,
-                        FavoriteObjectType.Periphery => item.Periphery.DisplayName,
-                        FavoriteObjectType.Video => item.Video.DisplayName,
-                        FavoriteObjectType.Tag => item.Tag.Name,
-                        _=>null
-                    },
-                    Type = item.Type,
-                    ObjectId = item.Type switch
-                    {
-                        FavoriteObjectType.Entry => item.Entry.Id,
-                        FavoriteObjectType.Article => item.Article.Id,
-                        FavoriteObjectType.Periphery => item.Periphery.Id,
-                        FavoriteObjectType.Video => item.Video.Id,
-                        FavoriteObjectType.Tag => item.Tag.Id,
-                        _ => 0
-                    },
-                    CreateTime = item.CreateTime
-                });
-            }
-
-            return new QueryData<ListFavoriteObjectAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
         }
 
         public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input, long favoriteFolderId)

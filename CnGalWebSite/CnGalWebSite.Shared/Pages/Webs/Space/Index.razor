@@ -316,9 +316,9 @@ else
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
     {
-        if (Id != Model.Id.ToString())
+        if (Id != Model.Id)
         {
-            if (_dataCacheService.VideoIndexPageCatche.Check(Id) == false)
+            if (_dataCacheService.PersonalSpaceDataCatche.Check(Id) == false)
             {
                 isLoading = true;
                 StateHasChanged();

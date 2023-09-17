@@ -96,8 +96,6 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
 
-        IPageModelCatche<FavoriteFoldersViewModel> UserFavoriteFoldersDataCatche { get; set; }
-
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
 
         IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }

@@ -1,204 +1,66 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 @inject IEventService _eventService
 
-@if (!isReady)
-{
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-}
-else
-{
-    <Table TItem="RoleInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQueryRoleAsync" SearchModel="@SearchModelRole" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-        <TableToolbarTemplate>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="RoleInforTableModel" Columns="table.Columns" Items="ModelRole.RoleInfors" Name="角色汇总表" />
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.CV" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.AnotherNameRole" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Gender" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Birthday" Filterable="true" Sortable="true" FormatString="MM-dd" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Haircolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Pupilcolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
-            <TableColumn @bind-Field="@context.FigureData" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.FigureSubjective" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.ClothesAccessories" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Character" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleIdentity" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.BloodType" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleHeight" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleAge" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
-        </RowButtonTemplate>
-
-    </Table>
-}
-
+<DataTableCard TModel="RoleInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
 
 @code {
-    Table<RoleInforTableModel> table;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/tables/ListRoles";
+    private string _name = "角色";
+
+    private List<DataTableHeader<RoleInforTableModel>> _headers = new List<DataTableHeader<RoleInforTableModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(RoleInforTableModel.RealId)
+          },
+          new (){ Text= "名称", Value= nameof(RoleInforTableModel.Name)},
+          new (){ Text= "声优", Value= nameof(RoleInforTableModel.CV)},
+          new (){ Text= "别称", Value= nameof(RoleInforTableModel.AnotherNameRole)},
+          new (){ Text= "性别", Value= nameof(RoleInforTableModel.Gender)},
+          new (){ Text= "身材数据", Value= nameof(RoleInforTableModel.FigureData)},
+          new (){ Text= "身材(主观)", Value= nameof(RoleInforTableModel.FigureSubjective)},
+          new (){ Text= "生日", Value= nameof(RoleInforTableModel.Birthday)},
+          new (){ Text= "发色", Value= nameof(RoleInforTableModel.Haircolor)},
+          new (){ Text= "瞳色", Value= nameof(RoleInforTableModel.Pupilcolor)},
+          new (){ Text= "服饰", Value= nameof(RoleInforTableModel.ClothesAccessories)},
+          new (){ Text= "性格", Value= nameof(RoleInforTableModel.Character)},
+          new (){ Text= "角色身份", Value= nameof(RoleInforTableModel.RoleIdentity)},
+          new (){ Text= "血型", Value= nameof(RoleInforTableModel.BloodType)},
+          new (){ Text= "身高", Value= nameof(RoleInforTableModel.RoleHeight)},
+          new (){ Text= "兴趣", Value= nameof(RoleInforTableModel.RoleTaste)},
+          new (){ Text= "年龄", Value= nameof(RoleInforTableModel.RoleAge)},
+          new (){ Text= "登场游戏", Value= nameof(RoleInforTableModel.GameName)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<RoleInforTableModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
-
-    private bool isReady = false;
-
-    public RoleInforListViewModel ModelRole { get; set; } = new RoleInforListViewModel
+    public async Task LookItem(RoleInforTableModel model)
     {
-        RoleInfors = new List<RoleInforTableModel>()
-    };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RoleInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<RoleInforTableModel>>> SortLambdaCacheRole = new();
-    private RoleInforTableModel SearchModelRole { get; set; } = new RoleInforTableModel();
-
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
-
-    public async Task OnLook(long id)
-    {
-        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + id);
-
-
+        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + model.RealId);
     }
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelRole = await _httpService.GetAsync<RoleInforListViewModel>("api/tables/GetRoleInforList");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取角色信息汇总表格");
-        }
-    }
-    private Task<QueryData<RoleInforTableModel>> OnQueryRoleAsync(QueryPageOptions options)
-    {
-        IEnumerable<RoleInforTableModel> items = ModelRole.RoleInfors;
-        // 处理高级搜索
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.Name))
-        {
-            items = items.Where(item => item.Name?.Contains(SearchModelRole.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.CV))
-        {
-            items = items.Where(item => item.CV?.Contains(SearchModelRole.CV, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.AnotherNameRole))
-        {
-            items = items.Where(item => item.AnotherNameRole?.Contains(SearchModelRole.AnotherNameRole, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.FigureData))
-        {
-            items = items.Where(item => item.FigureData?.Contains(SearchModelRole.FigureData, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.FigureSubjective))
-        {
-            items = items.Where(item => item.FigureSubjective?.Contains(SearchModelRole.FigureSubjective, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.Haircolor))
-        {
-            items = items.Where(item => item.Haircolor?.Contains(SearchModelRole.Haircolor, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.Pupilcolor))
-        {
-            items = items.Where(item => item.Pupilcolor?.Contains(SearchModelRole.Pupilcolor, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.ClothesAccessories))
-        {
-            items = items.Where(item => item.ClothesAccessories?.Contains(SearchModelRole.ClothesAccessories, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.Character))
-        {
-            items = items.Where(item => item.Character?.Contains(SearchModelRole.Character, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelRole.RoleIdentity))
-        {
-            items = items.Where(item => item.RoleIdentity?.Contains(SearchModelRole.RoleIdentity, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        // 处理 Searchable=true 列与 SeachText 模糊搜索
-        if (options.Searchs.Any())
-        {
-            items = items.Where(options.Searchs.GetFilterFunc<RoleInforTableModel>(FilterLogic.Or));
-        }
-        else
-        {
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                             || (item.CV?.Contains(options.SearchText) ?? false)
-                             || (item.AnotherNameRole?.Contains(options.SearchText) ?? false)
-                             || (item.FigureData?.Contains(options.SearchText) ?? false)
-                             || (item.FigureSubjective?.Contains(options.SearchText) ?? false)
-                             || (item.Haircolor?.Contains(options.SearchText) ?? false)
-                             || (item.Pupilcolor?.Contains(options.SearchText) ?? false)
-                             || (item.ClothesAccessories?.Contains(options.SearchText) ?? false)
-                             || (item.Character?.Contains(options.SearchText) ?? false)
-                             || (item.RoleIdentity?.Contains(options.SearchText) ?? false));
-            }
-        }
-        // 过滤
-        var isFiltered = false;
-        if (options.Filters.Any())
-        {
-            items = items.Where(options.Filters.GetFilterFunc<RoleInforTableModel>());
-            isFiltered = true;
-        }
-
-        // 排序
-        var isSorted = false;
-        if (!string.IsNullOrWhiteSpace(options.SortName))
-        {
-            // 外部未进行排序，内部自动进行排序处理
-            var invoker = SortLambdaCacheRole.GetOrAdd(typeof(RoleInforTableModel), key => LambdaExtensions.GetSortLambda<RoleInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-            isSorted = true;
-        }
-
-        // 设置记录总数
-        var total = items.Count();
-
-        // 内存分页
-        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-        return Task.FromResult(new QueryData<RoleInforTableModel>()
-        {
-            Items = items,
-            TotalCount = total,
-            IsSorted = isSorted,
-            IsFiltered = isFiltered
-        });
-    } }
+}

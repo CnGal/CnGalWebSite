@@ -6,11 +6,12 @@ using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -46,9 +48,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ILogger<PlayedGamesAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
         private readonly IEditRecordService _editRecordService;
+        private readonly IQueryService _queryService;
 
         public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, 
-            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService,
+            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService, IQueryService queryService,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
             _entryRepository = entryRepository;
@@ -64,6 +67,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _logger = logger;
             _operationRecordService = operationRecordService;
             _editRecordService = editRecordService;
+            _queryService = queryService;
         }
 
         /// <summary>
@@ -234,12 +238,22 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenGameRecord(HiddenGameRecordModel model)
         {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (_userService.CheckCurrentUserRole("Admin"))
+            {
+                await _playedGameRepository.GetAll().Where(s => model.PlayedGameIds.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsHidden, b => model.IsHidden));
+            }
+            else
+            {
+                //获取当前用户ID
+                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
+                await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.GameIds.Contains(s.EntryId)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsHidden, b => model.IsHidden));
+               
+
+            }
             return new Result { Successful = true };
         }
+
         /// <summary>
         /// 公开游戏记录
         /// </summary>
@@ -248,10 +262,18 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> ShowPubliclyGameRecord(HiddenGameRecordModel model)
         {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (_userService.CheckCurrentUserRole("Admin"))
+            {
+                await _playedGameRepository.GetAll().Where(s => model.PlayedGameIds.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.ShowPublicly, b => model.IsHidden));
+            }
+            else
+            {
+                //获取当前用户ID
+                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ShowPublicly, b => model.IsHidden));
+                await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.GameIds.Contains(s.EntryId)).ExecuteUpdateAsync(s => s.SetProperty(s => s.ShowPublicly, b => model.IsHidden));
+              
+            }
             return new Result { Successful = true };
         }
 
@@ -481,20 +503,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        /// <summary>
-        /// 获取词条列表
-        /// </summary>
-        /// <param name="input">分页信息</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPlayedGameAloneModel>>> GetEntryListAsync(PlayedGamesPagesInfor input)
-        {
-            var dtos = await _playedGameService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<PlayedGameUserScoreRandomModel>>> GetRandomUserScoresAsync()
@@ -536,6 +544,35 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<GameRecordOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<PlayedGame, long>(_playedGameRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s => s.Entry).Where(s=>s.Entry!=null&&s.ApplicationUser!=null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PlayImpressions.Contains(model.SearchText)));
+
+            return new QueryResultModel<GameRecordOverviewModel>
+            {
+                Items = await items.Select(s => new GameRecordOverviewModel
+                {
+                    Id = s.Id,
+                    ShowPublicly = s.ShowPublicly,
+                    TotalSocre = s.TotalSocre,
+                    IsHidden = s.IsHidden,
+                    LastEditTime = s.LastEditTime,
+                    PlayImpressions = s.PlayImpressions,
+                    Type = s.Type,
+                    GameId = s.Entry.Id,
+                    GameName = s.Entry.Name,
+                    UserName = s.ApplicationUser.UserName,
+                    UserId = s.ApplicationUser.Id,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
 
     }
 }

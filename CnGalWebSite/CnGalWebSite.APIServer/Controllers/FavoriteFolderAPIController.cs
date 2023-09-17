@@ -3,15 +3,16 @@ using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
 using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -44,11 +46,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IFavoriteObjectService _favoriteObjectService;
         private readonly IEditRecordService _editRecordService;
         private readonly IUserService _userService;
-
+        private readonly IQueryService _queryService;
 
         public FavoriteFolderAPIController(IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Video, long> videoRepository, IRepository<Tag, long> tagRepository,
         IRepository<ApplicationUser, string> userRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<Examine, long> examineRepository,
-         IFavoriteObjectService favoriteObjectService, IEditRecordService editRecordService, IUserService userService,
+         IFavoriteObjectService favoriteObjectService, IEditRecordService editRecordService, IUserService userService, IQueryService queryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService)
         {
             
@@ -66,6 +68,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository = examineRepository;
             _editRecordService= editRecordService;
             _userService = userService;
+            _queryService = queryService;
         }
 
         [HttpGet("{id}")]
@@ -470,12 +473,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{userId}")]
         [AllowAnonymous]
-        private async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteFolders(string userId)
+        private async Task<ActionResult<List<FavoriteFolderOverviewModel>>> GetUserFavoriteFolders(string userId)
         {
-            var model = new FavoriteFoldersViewModel
-            {
-                Favorites = new List<FavoriteFolderAloneModel>()
-            };
+            var model = new List<FavoriteFolderOverviewModel>();
             //获取当前用户ID
             var currentUser = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             if(currentUser==null)
@@ -514,7 +514,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var item in user.FavoriteFolders.Where(s => s.IsHidden == false && (currentUser.Id == userId || s.ShowPublicly)))
             {
-                model.Favorites.Add(new FavoriteFolderAloneModel
+                model.Add(new FavoriteFolderOverviewModel
                 {
                     Id = item.Id,
                     BriefIntroduction = item.BriefIntroduction,
@@ -536,7 +536,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteFoldersAsync(string id)
+        public async Task<ActionResult<List<FavoriteFolderOverviewModel>>> GetUserFavoriteFoldersAsync(string id)
         {
             return await GetUserFavoriteFolders(id);
         }
@@ -548,7 +548,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteInforFromFolderIdAsync(string id)
+        public async Task<ActionResult<List<FavoriteFolderOverviewModel>>> GetUserFavoriteInforFromFolderIdAsync(string id)
         {
             //获取关联用户Id
             var currentUserId = (await _favoriteFolderRepository.GetAll().FirstOrDefaultAsync(s => s.Id.ToString() == id))?.ApplicationUserId;
@@ -626,54 +626,6 @@ namespace CnGalWebSite.APIServer.Controllers
             await _favoriteFolderRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsDefault, b => model.IsDefault));
 
             return new Result { Successful = true };
-        }
-
-
-        /// <summary>
-        /// 获取收藏夹列表
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
-        {
-            //检查 目标用户id与当前用户id不一致 必须要求管理员身份
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            //判断是否为管理员
-            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
-            //判断是否为当前用户
-            if (isAdmin == false && input.UserId != user.Id)
-            {
-                return NotFound();
-            }
-
-            var dtos = await _favoriteFolderService.GetPaginatedResult(input.Options, input.SearchModel, input.UserId);
-
-            return dtos;
-        }
-
-        /// <summary>
-        /// 获取收藏对象列表
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteObjectAloneModel>>> GetFavoriteObjectListAsync(FavoriteObjectsPagesInfor input)
-        {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            //判断是否为管理员
-            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
-            //判断是否为当前用户
-            if (isAdmin == false && await _favoriteFolderRepository.GetAll().AnyAsync(s => s.Id == input.FavoriteFolderId && s.ApplicationUserId == user.Id) == false)
-            {
-                return NotFound();
-            }
-
-            var dtos = await _favoriteObjectService.GetPaginatedResult(input.Options, input.SearchModel, input.FavoriteFolderId);
-
-            return dtos;
         }
 
         /// <summary>
@@ -977,7 +929,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<FavoriteFolderAloneModel>>> GetRelateFavoriteFolders([FromQuery] FavoriteObjectType type, [FromQuery] long id)
+        public async Task<ActionResult<List<FavoriteFolderOverviewModel>>> GetRelateFavoriteFolders([FromQuery] FavoriteObjectType type, [FromQuery] long id)
         {
             var folders = type switch
             {
@@ -991,14 +943,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
             if (folders == null|| folders.Any()==false)
             {
-                return new List<FavoriteFolderAloneModel>();
+                return new List<FavoriteFolderOverviewModel>();
             }
 
-            var model =new List<FavoriteFolderAloneModel>();
+            var model =new List<FavoriteFolderOverviewModel>();
 
             foreach(var item in folders)
             {
-                model.Add(new FavoriteFolderAloneModel
+                model.Add(new FavoriteFolderOverviewModel
                 {
                     Id = item.Id,
                     ShowPublicly = item.ShowPublicly,
@@ -1015,5 +967,113 @@ namespace CnGalWebSite.APIServer.Controllers
             return  model;
 
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<FavoriteFolderOverviewModel>> ListFavoriteFolders(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, long>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s=>s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+
+            return new QueryResultModel<FavoriteFolderOverviewModel>
+            {
+                Items = await items.Select(s => new FavoriteFolderOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsDefault = s.IsDefault,
+                    BriefIntroduction = s.BriefIntroduction,
+                    Count = s.Count,
+                    CreateTime = s.CreateTime,
+                    UserId = s.ApplicationUser.Id,
+                    UserName = s.ApplicationUser.UserName,
+                    ShowPublicly = s.ShowPublicly,
+                    IsHidden = s.IsHidden,
+                    MainImage=s.MainImage,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<QueryResultModel<FavoriteFolderOverviewModel>>> ListUserFavoriteFolders(QueryParameterModel model, [FromQuery] string userId)
+        {
+            if (!await _userRepository.AnyAsync(s => s.Id == userId))
+            {
+                return NotFound();
+            }
+            //检查 目标用户id与当前用户id不一致 必须要求管理员身份
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //判断是否为管理员
+            var isAdmin = _userService.CheckCurrentUserRole("Admin");
+            //判断是否为当前用户
+            if (isAdmin == false && userId != user.Id)
+            {
+                return NotFound();
+            }
+
+            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, long>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s=>s.ApplicationUserId==userId), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+
+            return new QueryResultModel<FavoriteFolderOverviewModel>
+            {
+                Items = await items.Select(s => new FavoriteFolderOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    IsDefault = s.IsDefault,
+                    BriefIntroduction = s.BriefIntroduction,
+                    Count = s.Count,
+                    CreateTime = s.CreateTime,
+                    UserId = s.ApplicationUser.Id,
+                    UserName = s.ApplicationUser.UserName,
+                    ShowPublicly = s.ShowPublicly,
+                    IsHidden = s.IsHidden,
+                    MainImage = s.MainImage,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<QueryResultModel<FavoriteObjectOverviewModel>>> ListUserFavoriteObjects(QueryParameterModel model, [FromQuery] long folderId)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //判断是否为管理员
+            var isAdmin = _userService.CheckCurrentUserRole("Admin");
+            //判断是否为当前用户
+            if (isAdmin == false && await _favoriteFolderRepository.GetAll().AnyAsync(s => s.Id == folderId && s.ApplicationUserId == user.Id) == false)
+            {
+                return NotFound();
+            }
+
+
+            var (items, total) = await _queryService.QueryAsync<FavoriteObject, long>(_favoriteObjectRepository.GetAll().AsSingleQuery().Where(s => s.FavoriteFolderId== folderId)
+                .Include(s => s.Entry)
+                .Include(s => s.Article)
+                .Include(s => s.Periphery)
+                .Include(s => s.Video)
+                .Include(s => s.Tag), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText));
+
+            return new QueryResultModel<FavoriteObjectOverviewModel>
+            {
+                Items = await items.Select(s => new FavoriteObjectOverviewModel
+                {
+                    Id = s.Id,
+                    CreateTime = s.CreateTime,
+                    ObjectId = s.Entry != null ? s.Entry.Id : s.Article != null ? s.Article.Id : s.Periphery != null ? s.Periphery.Id: s.Video != null ? s.Video.Id:s.Tag != null ? s.Tag.Id: 0,
+                    ObjectName = s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.Tag != null ? s.Tag.Name  : null,
+                    Type=s.Type
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
     }
 }

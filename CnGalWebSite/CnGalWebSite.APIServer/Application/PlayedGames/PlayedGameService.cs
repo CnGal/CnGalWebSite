@@ -5,7 +5,6 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tables;
@@ -37,101 +36,6 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             _appHelper = appHelper;
             _gameScoreTableRepository = gameScoreTableRepository;
             _entryRepository = entryRepository;
-        }
-
-        public async Task<QueryData<ListPlayedGameAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListPlayedGameAloneModel searchModel)
-        {
-            var items = _playedGameRepository.GetAll()
-                .Include(s => s.ApplicationUser)
-                .Include(s => s.Entry).AsNoTracking();
-
-            // 处理高级搜索
-            if (searchModel.GameId != 0)
-            {
-                items = items.Where(item => item.EntryId.ToString().Contains(searchModel.GameId.ToString(), StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
-            {
-                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
-            {
-                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.GameName))
-            {
-                items = items.Where(item => item.Entry.Name.Contains(searchModel.GameName, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.PlayImpressions))
-            {
-                items = items.Where(item => item.PlayImpressions.Contains(searchModel.PlayImpressions, StringComparison.OrdinalIgnoreCase));
-            }
-            if (searchModel.Type != null)
-            {
-                items = items.Where(item => item.Type == searchModel.Type);
-            }
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.EntryId.ToString().Contains(options.SearchText)
-                             || item.ApplicationUserId.Contains(options.SearchText)
-                             || item.PlayImpressions.Contains(options.SearchText));
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
-
-            //复制数据
-            var resultItems = new List<ListPlayedGameAloneModel>();
-            foreach (var item in itemsReal)
-            {
-                resultItems.Add(new ListPlayedGameAloneModel
-                {
-                    Id = item.Id,
-                    ScriptSocre = item.ScriptSocre,
-                    ShowPublicly = item.ShowPublicly,
-                    ShowSocre = item.ShowSocre,
-                    SystemSocre = item.SystemSocre,
-                    CVSocre = item.CVSocre,
-                    IsInSteam = item.IsInSteam,
-                    MusicSocre = item.MusicSocre,
-                    PaintSocre = item.PaintSocre,
-                    TotalSocre = item.TotalSocre,
-                    IsHidden = item.IsHidden,
-                    LastEditTime = item.LastEditTime,
-                    PlayDuration = item.PlayDuration,
-                    PlayImpressions = item.PlayImpressions,
-                    Type = item.Type,
-                    GameId = item.EntryId ?? 0,
-                    GameName = item.Entry?.Name,
-                    UserName = item.ApplicationUser?.UserName,
-                    UserId = item.ApplicationUserId
-                });
-            }
-
-            return new QueryData<ListPlayedGameAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            };
         }
 
         public void UpdatePlayedGameDataMain(PlayedGame playedGame, PlayedGameMain examine)
