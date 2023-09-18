@@ -1,0 +1,58 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+@if(Model!=null)
+{
+    <MCard>
+        <MCardTitle>
+        @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="Model.Context" Label="内容" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                  Text
+                       OnClick="SaveEdit">
+                  <MIcon Left>mdi-check</MIcon>
+             保存
+         </MButton>
+     </MCardActions>
+
+ </MCard>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public List<EditLotteryPrizeModel> Prizes { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public EditLotteryPrizeModel Model { get; set; }
+
+    private string _name = "激活码";
+    [Parameter]
+    public bool IsAdd { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task SaveEdit()
+    {
+        if (IsAdd)
+            {
+                Prizes.Add(Model);
+            }
+            await OnEdited.InvokeAsync();
+        
+    }
+}

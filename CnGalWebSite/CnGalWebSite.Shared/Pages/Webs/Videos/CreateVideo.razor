@@ -43,7 +43,13 @@
 </div>
 
 @code {
-    private CreateVideoViewModel Model { get; set; } = new CreateVideoViewModel();
+    private CreateVideoViewModel Model { get; set; } = new CreateVideoViewModel
+        {
+            Main = new EditVideoMainViewModel
+            {
+                PubishTime = DateTime.Now.ToCstTime()
+            }
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();

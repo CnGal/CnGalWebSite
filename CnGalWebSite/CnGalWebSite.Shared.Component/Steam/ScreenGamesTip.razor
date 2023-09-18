@@ -23,22 +23,22 @@
     <div class="d-flex">
         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4 w-100">
             <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Lable="折扣" />
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Label="折扣" />
             </div>
             <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.OrderType" ValueChanged="OnOrderTypeChanged" TValue="SteamSortType" Class="pt-0" Lable="排序" />
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.OrderType" ValueChanged="OnOrderTypeChanged" TValue="SteamSortType" Class="pt-0" Label="排序" />
             </div>
 
             @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions || _dataCacheService.IsApp == false)
             {
                 <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.PurchasedType" ValueChanged="OnPurchasedTypeChanged" TValue="PurchasedSteamType" Class="pt-0" Lable="库存（请先前往个人空间绑定Steam账号）" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.PurchasedType" ValueChanged="OnPurchasedTypeChanged" TValue="PurchasedSteamType" Class="pt-0" Label="库存（请先前往个人空间绑定Steam账号）" />
                 </div>
             }
             @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions)
             {
                 <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" ValueChanged="OnDisplayTypeChanged" TValue="SteamDisplayType" Class="pt-0" Lable="样式" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" ValueChanged="OnDisplayTypeChanged" TValue="SteamDisplayType" Class="pt-0" Label="样式" />
                 </div>
                 <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
                     <MCheckbox Class="mt-0" Value="_dataCacheService.DiscountPageCatcheHelper.ShowNoDiscountGames" TValue="bool" ValueChanged="ShowNoDiscountGamesChanged" Label="显示无折扣的游戏" />

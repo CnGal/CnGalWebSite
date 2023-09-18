@@ -65,9 +65,9 @@ else
     [Parameter]
     public string Id { get; set; }
     public EditAddInforViewModel Model { get; set; } = new EditAddInforViewModel();
-    private IEnumerable<string> EntryGroupItems { get; set; }
-    private IEnumerable<string> EntryStaffItems { get; set; }
-    private IEnumerable<string> LotteryItems { get; set; }
+    private List<string> EntryGroupItems { get; set; }
+    private List<string> EntryStaffItems { get; set; }
+    private List<string> LotteryItems { get; set; }
 
     List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem>();
 

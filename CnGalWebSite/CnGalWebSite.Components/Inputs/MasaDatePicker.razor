@@ -10,7 +10,7 @@
                        OffsetY
                        MinWidth="@("auto")">
                     <ActivatorContent>
-                        <MTextField @bind-Value="_date" HideDetails="true"
+                         <MTextField @bind-Value="_date" HideDetails="true" Disabled="Disabled"
                                     Label="@Label"
                                     PrependIcon="mdi-calendar"
                                     Readonly
@@ -38,7 +38,7 @@
                        MaxWidth="290"
                        MinWidth="290">
                     <ActivatorContent>
-                        <MTextField @bind-Value="_time" HideDetails="true"
+                         <MTextField @bind-Value="_time" HideDetails="true" Disabled="Disabled"
                                     Label="@Label"
                                     PrependIcon="mdi-clock-time-four-outline"
                                     Readonly
@@ -78,6 +78,8 @@
     public string Label { get; set; }
     [Parameter]
     public bool Nullable { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
 
     private DatePickerType _activePicker = DatePickerType.Year;
     private DateOnly? _date;
@@ -87,7 +89,7 @@
     private bool _menu2;
     private bool _modal2;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         if(Nullable)
         {

@@ -1,16 +1,15 @@
 ﻿
-<div class="row">
+<MRow>
     @foreach (var item in Enum.GetValues(typeof(OutlinkType)))
     {
         var type = (OutlinkType)item;
         var id = (int)item;
-
-        <div class="form-group col-12  col-sm-6">
-            <BootstrapInput Value="_values[id]" ShowLabel="true" DisplayText="@type.GetDisplayName()" ValueChanged="@((s)=>ValueChanged(type,id,s))" TValue="string" />
-        </div>
+           <MCol Cols="12" Md="6">
+            <MTextField Value="_values[id]" TValue="string" ValueChanged="@((s)=>ValueChanged(type,id,s))" Label="@type.GetDisplayName()" />
+    </MCol>
+ 
     }
-</div>
-
+</MRow>
 @code {
     [Parameter]
     public EditRelevancesViewModel Model { get; set; }

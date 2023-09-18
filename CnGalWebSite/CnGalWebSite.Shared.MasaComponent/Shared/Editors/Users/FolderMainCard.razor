@@ -2,33 +2,29 @@
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
-    <ValidateForm Model="@Model">
-        <div class="row">
-            <div class=" col-6 col-md-4 col-lg-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Text="上传主图" Type="ImageAspectType._16_9"/>
-            </div>
-        </div>
-
-        <div class="row  mt-4">
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Name" />
-            </div>
-
-            <div class="form-group col-12">
-                <Textarea @bind-Value="Model.BriefIntroduction" rows="3"/>
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.ShowPublicly" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.IsHidden" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.IsDefault" />
-            </div>
-        </div>
-    </ValidateForm>
-       
+     <MRow>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Text="上传主图" Type="ImageAspectType._16_9" />
+         </MCol>
+         <MCol Cols="12">
+             <MDivider />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Name" Label="唯一名称" />
+         </MCol>
+         <MCol Cols="12">
+             <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+         </MCol>
+         <MCol Cols="12" Md="4">
+             <MCheckbox @bind-Value="Model.ShowPublicly" Label="公开" TValue="bool" />
+         </MCol>
+         <MCol Cols="12" Md="4">
+             <MCheckbox @bind-Value="Model.IsHidden" Label="不展示在个人主页中" TValue="bool" />
+         </MCol>
+         <MCol Cols="12" Md="4">
+             <MCheckbox @bind-Value="Model.IsDefault" Label="默认收藏夹" TValue="bool" />
+         </MCol>
+     </MRow>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {

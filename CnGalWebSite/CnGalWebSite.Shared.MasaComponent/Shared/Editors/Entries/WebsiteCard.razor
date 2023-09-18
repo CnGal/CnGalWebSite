@@ -3,24 +3,23 @@
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Style.ToIconString()" Title="专题页样式补充信息" Class="@Class" Collapable @bind-IsCollapsed="IsCollapsed">
-        <div class="row mb-4">
-            <div class="form-group col-12 col-md-6  col-lg-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Logo" Type="ImageAspectType.None" Text="上传Logo" />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.SubTitle" ShowLabel="true" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Impressions" ShowLabel="true" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Color" ShowLabel="true" />
-            </div>
-        </div>
-
+     <MRow>
+         <MCol Cols="12" Md="6" Lg="4">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Logo" Type="ImageAspectType.None" Text="上传Logo" />
+         </MCol>
+         <MCol Cols="12">
+             <MDivider />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.SubTitle" Label="副标题" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Impressions" Label="主题语句" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Color" Label="主题颜色" />
+         </MCol>
+     </MRow>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="图片" Text="包括轮播图和背景图" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard Model="Model.Images" TValue="EditWebsiteImageModel"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard>
 

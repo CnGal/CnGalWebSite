@@ -14,13 +14,13 @@
         <MCardText Class="pb-0">
             <div class="row">
                 <div class="col-12  col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.Type" TValue="GameReleaseType" Lable="类型" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="GameReleaseType" Label="类型" />
                 </div>
                 <div class="col-12  col-sm-6">
                     <MTextField @bind-Value="Model.Name" Label="游戏发行名称" />
                 </div>
                 <div class="col-12  col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.PublishPlatformType" TValue="PublishPlatformType" Lable="发行平台类型" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.PublishPlatformType" TValue="PublishPlatformType" Label="发行平台类型" />
                 </div>
                 @if (Model.PublishPlatformType == PublishPlatformType.Other)
                 {
@@ -35,7 +35,7 @@
                     <CnGalWebSite.Components.Checkboxes.InputEnumCheckboxList Items="Model.GamePlatformTypes" TValue="GamePlatformType" Label="游戏平台" />
                 </div>
                 <div class="col-12  col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Time" Nullable Lable="发行时间" ShowDate ShowTime="false" />
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-NullableValue="Model.Time" Nullable Label="发行时间" ShowDate ShowTime="false" />
                 </div>
                 <div class="col-12  col-sm-6">
                     <MTextField @bind-Value="Model.TimeNote" Label="发行时间备注" />

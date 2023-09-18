@@ -1734,6 +1734,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<List<EditInformationModel>> GetEditInformationModelList(int type)
         {
             return (await _entryInformationTypeRepository.GetAll()

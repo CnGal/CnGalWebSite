@@ -5,7 +5,9 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-volume-up" Title="音频试听" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
-    <MSimpleTable Class="mb-4">
+    @if(Model.Audio.Any())
+    {
+            <MSimpleTable Class="mb-4">
         <thead>
             <tr>
                 <th class="text-left">
@@ -44,6 +46,8 @@
             }
         </tbody>
     </MSimpleTable>
+
+    }
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard @ref="editAudioCard" OnChanged="OnChanged" />

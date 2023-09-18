@@ -3,31 +3,70 @@
 
 <div class="@Class">
     <InputRelevanceListTitle Title="自定义链接" />
-    <div class="row">
-        @foreach (var item in Model.Where(s=> Check(s.DisplayName) ))
-        {
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
-                <div class="card p-3" style="background-color:transparent">
-                    <div class="row">
-                        <div class="col mt-2">
-                            <p class="text-truncate text-center">
-                                @item.DisplayName：@(string.IsNullOrWhiteSpace(item.DisPlayValue)? item.Link : item.DisPlayValue)
-                            </p>
-                        </div>
-                        <div class="col-12 d-flex" style="justify-content: space-between;">
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(item))" Text="删除"></Button>
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(item))" Text="编辑" class="ms-1"></Button>
-                        </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="AddOther" Icon="@IconType.Create.ToIconString()" Class="mb-4" />
 
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="AddOther" Icon="mdi-plus" />
+    @if (Model.Any(s => Check(s.DisplayName)))
+    {
+            <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                    唯一名称
+                </th>
+                <th class="text-left">
+                    链接
+                </th>
+                <th class="text-left">
+                    简介
+                </th>
+                <th class="text-left">
+                    操作
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(s => Check(s.DisplayName)))
+            {
+                <tr @key="item.DisplayName+item.DisPlayValue+item.Link">
+                    <td style="min-width: 50px; ">@item.DisplayName</td>
+                    <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.Link</td>
+                    <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.DisPlayValue</td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>EditOther(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>DeleteOther(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
 
+    }
 </div>
+@if (_model != null)
+{
+    <MDialog @bind-Value="_editDialog"
+             MaxWidth="800">
+        <MCard>
+            <MCardTitle>
+                编辑外部链接
+            </MCardTitle>
+            <MCardText>
+                <MRow>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="_model.DisplayName" Label="唯一名称" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="_model.Link" Label="链接" />
+                    </MCol>
+                    <MCol Cols="12">
+                        <MTextField @bind-Value="_model.DisPlayValue" Label="简介" />
+                    </MCol>
+                </MRow>
 
+            </MCardText>
+        </MCard>
+    </MDialog>
+}
 @code {
     [Parameter]
     public List<RelevancesModel> Model { get; set; }
@@ -36,8 +75,15 @@
     [Parameter]
     public string Class { get; set; }
 
+    private bool _editDialog;
+    RelevancesModel _model;
+
     public bool Check(string name)
     {
+        if(string.IsNullOrWhiteSpace(name))
+        {
+            return true;
+        }
         var items = Enum.GetValues(typeof(OutlinkType));
         foreach(var item in Enum.GetValues(typeof(OutlinkType)))
         {
@@ -49,57 +95,23 @@
         return true;
     }
 
-    public async Task DeleteOther(RelevancesModel item)
+    public void DeleteOther(RelevancesModel item)
     {
         Model.Remove(item);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除自定义链接");
     }
-    public async Task EditOther(RelevancesModel item)
+    public void EditOther(RelevancesModel item)
     {
-        var items = Utility.GenerateEditorItems<RelevancesModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<RelevancesModel>()
-        {
-            Title = "编辑自定义链接",
-            Model = item,
-            Items = items,
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                Model[Model.IndexOf(item)] = (RelevancesModel)context.Model;
-                StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改自定义链接");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        _model=item;
+        _editDialog=true;
+        StateHasChanged();
     }
-    public async Task AddOther()
+
+    public void AddOther()
     {
-        RelevancesModel model = new RelevancesModel();
-        var items = Utility.GenerateEditorItems<RelevancesModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<RelevancesModel>()
-        {
-            Title = "添加自定义链接",
-            Model = model,
-            Items = items,
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                Model.Add((RelevancesModel)context.Model);
-                StateHasChanged();
-                await ToastService.Success("添加成功", "成功添加自定义链接");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        _model = new RelevancesModel();
+        Model.Add(_model);
+        _editDialog = true;
+        StateHasChanged();
     }
 }

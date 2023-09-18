@@ -1,38 +1,37 @@
 ﻿
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@(ShowTagSearch?"mb-4":Class)" Collapable>
-        <div class="row mb-4">
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"/>
-            </div>
-        </div>
+     <MRow>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" />
+         </MCol>
+         <MCol Cols="12">
+             <MDivider />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Name" Label="唯一名称" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.ParentTagName" Label="父标签" AutoCompleteItems="TagItems" />
+         </MCol>
 
-
-        <div class="row">
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Name" ShowLabel="true" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <AutoComplete Items="@TagItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ParentTagName" ShowLabel="true" />
-            </div>
-            <div class="form-group col-12">
-                <BootstrapInput @bind-Value="Model.BriefIntroduction" ShowLabel="true" />
-            </div>
-        </div>
-
+         <MCol Cols="12">
+             <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+         </MCol>
+    </MRow>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @if (ShowTagSearch)
 {
-    <SearchTagsViewTip Class="@Class" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.SearchTagsCard Class="@Class" />
 }
 
 @code {
@@ -43,6 +42,6 @@
     [Parameter]
     public bool ShowTagSearch { get; set; }
     [Parameter]
-    public IEnumerable<string> TagItems { get; set; }
+    public List<string> TagItems { get; set; }
 
 }

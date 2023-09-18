@@ -5,15 +5,14 @@
 @inject IServiceProvider Provider
 
 <div class="@Class">
-    <div class="row">
-        @for (int i = 0; i < Model.Count; i++)
+    <MRow>
+        @foreach(var item in Model)
         {
-            int temp = i;
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-2">
-                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" Value="@Model[temp].DisplayName" placeholder="标签" OnValueChanged="@((s)=>OnValueChanged(temp,s))"/>
-            </div>
+            <MCol Cols="12" Md="6" Lg="4">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@item.DisplayName" Label="标签" AutoCompleteItems="AutoCompleteItems" />
+            </MCol>
         }
-    </div>
+</MRow>
     <div>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAdd" Icon="mdi-plus" Color="info"/>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建" OnClick="OnCreate" Icon="mdi-creation" Class="ms-2" Color="success"/>
@@ -24,7 +23,7 @@
     [Parameter]
     public List<RelevancesModel> Model { get; set; }
     [Parameter]
-    public IEnumerable<string> AutoCompleteItems { get; set; }
+    public List<string> AutoCompleteItems { get; set; }
     [Parameter]
     public string Class { get; set; }
     [Parameter]

@@ -30,11 +30,11 @@
     </ButtonContent>
 </DataTableCard>
 <MDialog @bind-Value="_editDialog"
-         MaxWidth="1200">
+         MaxWidth="800">
     <EditCard Staffs="Staffs" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 <MDialog @bind-Value="_batchDialog"
-         MaxWidth="1200">
+         MaxWidth="800">
     <BatchCard OnBatched="OnBatched" @ref="batchCard" />
 </MDialog>
 @code {

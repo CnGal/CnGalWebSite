@@ -5,15 +5,14 @@
     {
        <InputRelevanceListTitle Title="@Title"/>
     }
-    <div class="row">
-        @for (int i = 0; i < Model.Count; i++)
+    <MRow>
+        @foreach(var item in Model)
         {
-            int temp = i;
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-2">
-                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model[temp].DisplayName" placeholder="唯一名称" />
-            </div>
+            <MCol Cols="12" Md="6" Lg="4">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@item.DisplayName" Label="唯一名称" AutoCompleteItems="AutoCompleteItems" />
+            </MCol>
         }
-    </div>
+    </MRow>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAddinfor" Icon="mdi-plus"/>
 </div>
 
@@ -31,8 +30,7 @@
 
     private void OnAddinfor()
     {
-        Model.Add(new RelevancesModel());
-        
+        Model.Add(new RelevancesModel());   
     }
 
 }

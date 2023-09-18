@@ -21,17 +21,17 @@
         <MCardText Class="pb-2">
             @if (Model.IsScored)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.MusicSocre" Lable="音乐" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.PaintSocre" Lable="美术" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Lable="剧本" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Lable="演出" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Lable="程序" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.MusicSocre" Label="音乐" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.PaintSocre" Label="美术" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Label="剧本" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Label="演出" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Label="程序" />
                 @if (Model.CVSocre > 0 && Model.IsDubbing)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Lable="配音" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Label="配音" />
 
                 }
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Lable="总评" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Label="总评" />
 
 
             }

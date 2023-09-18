@@ -1,0 +1,39 @@
+﻿<MAutocomplete Value="Value" ValueChanged="ValueChanged"
+               Loading="_loading"
+               Items="_items"
+               OnSearchInputUpdate="QuerySelections"
+                Class="mx-4"
+                ItemValue="r=>r"
+                ItemText="r=>r"
+                Label="@Label"></MAutocomplete>
+ @code {
+    [Parameter]
+    public List<string> AutoCompleteItems { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    private bool _loading;
+    private List<string> _items = new List<string>();
+
+    protected override void OnParametersSet()
+    {
+        QuerySelections(Value);
+    }
+
+    private void QuerySelections(string v)
+    {
+        if (string.IsNullOrWhiteSpace(v))
+        {
+            _items = AutoCompleteItems.TakeLast(10).ToList();
+            return;
+        }
+
+        _loading = true;
+        _items = AutoCompleteItems.Where(e => e.ToLowerInvariant().IndexOf(v.ToLowerInvariant()) > -1).ToList();
+        _loading = false;
+    }
+}

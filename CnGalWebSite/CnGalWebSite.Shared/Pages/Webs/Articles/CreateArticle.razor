@@ -33,7 +33,7 @@
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发表文章" Icon="fa fa-fw  fa-newspaper-o" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainCard Model="Model.Main" Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model.Relevances" Class="mb-4"  EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems"/>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model.Relevances" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" VideoItems="VideoItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainPageCard Model="Model.MainPage" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -42,7 +42,13 @@
 </div>
 
 @code {
-    private CreateArticleViewModel Model { get; set; } = new CreateArticleViewModel();
+    private CreateArticleViewModel Model { get; set; } = new CreateArticleViewModel
+        {
+            Main = new EditArticleMainViewModel
+            {
+                PubishTime = DateTime.Now.ToCstTime()
+            }
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();

@@ -53,7 +53,7 @@ else
     private EditTagMainViewModel Model { get; set; } = new EditTagMainViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> TagItems { get; set; } = new string[1] { "" };
+    private List<string> TagItems { get; set; } = new List<string>();
 
     [NotNull]
     private ValidateForm? ComplexForm { get; set; }

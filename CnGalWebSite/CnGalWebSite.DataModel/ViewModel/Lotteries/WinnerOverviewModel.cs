@@ -6,30 +6,50 @@ using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {
-    public class WinnerDataModel
+    public class WinnerOverviewModel
     {
         public string UserId { get; set; }
-        [Display(Name = "号码")]
+        /// <summary>
+        /// 号码
+        /// </summary>
         public int Number { get; set; }
-        [Display(Name = "用户名")]
+        /// <summary>
+        /// 用户名
+        /// </summary>
         public string UserName { get; set; }
-        [Display(Name = "电子邮箱")]
+        /// <summary>
+        /// 电子邮箱
+        /// </summary>
         public string Email { get; set; }
-        [Display(Name = "奖品")]
+        /// <summary>
+        /// 奖品
+        /// </summary>
         public string AwardName { get; set; }
-        [Display(Name = "类型")]
+        /// <summary>
+        /// 类型
+        /// </summary>
         public LotteryAwardType AwardType { get; set; }
 
         public long AwardId { get; set; }
-        [Display(Name = "激活码")]
+        /// <summary>
+        /// 激活码
+        /// </summary>
         public string ActivationCode { get; set; }
-        [Display(Name = "快递单号")]
+        /// <summary>
+        /// 快递单号
+        /// </summary>
         public string TrackingNumber { get; set; }
-        [Display(Name = "真实姓名")]
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
         public string RealName { get; set; }
-        [Display(Name = "地址")]
+        /// <summary>
+        /// 地址
+        /// </summary>
         public string Address { get; set; }
-        [Display(Name = "电话号码")]
+        /// <summary>
+        /// 电话号码
+        /// </summary>
         public string Phone { get; set; }
 
         public long PrizeId { get; set; }

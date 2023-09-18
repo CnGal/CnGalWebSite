@@ -1,24 +1,26 @@
 ﻿@inject IPopupService PopupService
 
-<div class="row">
-    <div class="form-group col-12  col-sm-6">
-        <Switch @bind-Value="Model.Open" ShowLabel="true" />
-    </div>
+<MRow>
+    <MCol Cols="12" Md="6">
+        <MCheckbox @bind-Value="Model.Open" Label="开启预约" TValue="bool" />
+    </MCol>
     @if (Model.Open)
     {
-        <div class="form-group col-12  col-sm-6">
-            <Switch @bind-Value="Model.IsNeedNotification" ShowLabel="true" />
-        </div>
-        <div class="form-group col-12  col-sm-6">
-            <AutoComplete Items="@LotteryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.LotteryName" ShowLabel="true" />
-        </div>
-    }
+        <MCol Cols="12" Md="6">
+            <MCheckbox @bind-Value="Model.IsNeedNotification" Label="上线后通知预约用户" TValue="bool" />
+        </MCol>
+        <MCol Cols="12" Md="6">
+            <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.LotteryName" Label="关联抽奖" AutoCompleteItems="LotteryItems" />
+        </MCol>
 
-</div>
+    }
+</MRow>
 @if (Model.Open)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加目标" OnClick="OnClickInput" Icon="@IconType.Goal.ToIconString()" Class="mb-4" />
-    <MSimpleTable Class="mb-4">
+    @if(Model.Goals.Any())
+    {
+            <MSimpleTable Class="mb-4">
         <thead>
             <tr>
                 <th class="text-left">
@@ -47,14 +49,16 @@
         </tbody>
     </MSimpleTable>
 
-    <BookingGoalInputDialog @ref="bookingGoalInputDialog" OnChanged="OnChanged" Items="Model.Goals"/>
+    }
+
+    <BookingGoalInputDialog @ref="bookingGoalInputDialog" OnChanged="OnChanged" Items="Model.Goals" />
 }
 
 @code {
     [Parameter]
     public EditBookingModel Model { get; set; }
     [Parameter]
-    public IEnumerable<string> LotteryItems { get; set; }
+    public List<string> LotteryItems { get; set; }
 
 
     BookingGoalInputDialog bookingGoalInputDialog;

@@ -25,11 +25,17 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 基础信息
         /// </summary>
         public List<EditInformationModel> Informations { get; set; } = new List<EditInformationModel>();
-        [Display(Name = "制作组")]
+        /// <summary>
+        /// 制作组
+        /// </summary>
         public string ProductionGroup { get; set; }
-        [Display(Name = "发行商")]
+        /// <summary>
+        /// 发行商
+        /// </summary>
         public string Publisher { get; set; }
-        [Display(Name = "声优")]
+        /// <summary>
+        /// 声优
+        /// </summary>
         public string CV { get; set; }
 
         public override Result Validate()

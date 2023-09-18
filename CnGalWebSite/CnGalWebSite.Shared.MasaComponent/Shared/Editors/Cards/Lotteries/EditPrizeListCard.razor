@@ -4,130 +4,109 @@
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 
-<InputRelevanceListTitle Title="激活码列表" Text="奖品的激活码，也可用占位符替代"/>
-
-<div class="row">
-    @foreach (var item in Prizes)
-    {
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
-            <div class="card p-3" style="background-color:transparent">
-                <div>
-                    <div class="mt-2">
-                        <p class="text-truncate text-center">
-                            @item.Context
-                        </p>
-                    </div>
-                    <div class="d-flex" style="justify-content: space-between;">
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeletePrize(item))" Text="删除"></Button>
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditPrize(item))" Text="编辑" class="ms-1"></Button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    }
-
-    <div class="col-12 mt-2">
-        <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddPrize())" Text="添加" Icon="fa fa-plus"></Button>
-        <Button Color="Color.Success" IsOutline="true" class="ms-2" style="width:100px" @onclick="@OnImportClick" Text="导入" Icon="fa fa-upload"></Button>
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="激活码列表" Text="奖品的激活码，也可用占位符替代" />
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="AddPrize" Icon="@IconType.Create.ToIconString()" Color="info" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" OnClick="BatchItems" Icon="@IconType.Import.ToIconString()" Class="ms-2" Color="success" />
 </div>
+@if (Prizes.Any())
+{
+    <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                   内容
+                </th>
+                <th class="text-left">
+                    操作
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Prizes)
+            {
+                <tr @key="Prizes.IndexOf(item)">
+                    <td style="min-width: 50px; ">@item.Context</td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>EditPrize(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>DeletePrize(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
+}
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.EditCard Prizes="Prizes" OnEdited="OnEdited" @ref="editCard" Model="_editedItem" IsAdd="_isAdd"/>
+</MDialog>
+<MDialog @bind-Value="_batchDialog"
+         MaxWidth="800">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.BatchCard OnBatched="OnBatched" @ref="batchCard" Title="激活码" />
+</MDialog>
 
 @code {
     [Parameter]
     public List<EditLotteryPrizeModel> Prizes { get; set; }
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _isAdd;
+    private EditLotteryPrizeModel _editedItem;
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.BatchCard batchCard;
+    private bool _batchDialog;
+
     public async Task DeletePrize(EditLotteryPrizeModel item)
     {
         Prizes.Remove(item);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除激活码");
     }
-    public async Task EditPrize(EditLotteryPrizeModel item)
+    public void EditPrize(EditLotteryPrizeModel item)
     {
-        int i = Prizes.IndexOf(item);
-
-        var items = Utility.GenerateEditorItems<EditLotteryPrizeModel>();
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditLotteryPrizeModel.Id));
-        editItem.Readonly = true;
-
-        var option = new EditDialogOption<EditLotteryPrizeModel>()
-        {
-            Title = "编辑激活码",
-            Model = Prizes[i],
-            Items = items,
-            Size = Size.Medium,
-            OnEditAsync = async context =>
-            {
-            // Trace.Log("保存按钮被点击");
-                var item = (EditLotteryPrizeModel)context.Model;
-
-                Prizes[i] = item;
-                StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改激活码");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        _editDialog=true;
+        _editedItem = item;
+        _isAdd = false;
+        StateHasChanged();
     }
-    public async Task AddPrize()
+
+    public void OnEdited()
     {
-        EditLotteryPrizeModel model = new EditLotteryPrizeModel();
-
-        var items = Utility.GenerateEditorItems<EditLotteryPrizeModel>();
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditLotteryPrizeModel.Id));
-        editItem.Readonly = true;
-
-        var option = new EditDialogOption<EditLotteryPrizeModel>()
-        {
-            Title = "添加激活码",
-            Model = model,
-            Items = items,
-            Size = Size.Medium,
-            OnEditAsync = async context =>
-            {
-            // Trace.Log("保存按钮被点击");
-                var item = (EditLotteryPrizeModel)context.Model;
-
-                Prizes.Add(item);
-                StateHasChanged();
-                await ToastService.Success("添加成功", "成功添加激活码");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        _editDialog = false;
+        StateHasChanged();
     }
 
-    public async Task OnImportClick()
+
+    public void AddPrize()
     {
-        var option = new DialogOption()
-        {
-            Title = "批量导入激活码",
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImportPrizeTip>(new Dictionary<string, object>
-        {
-            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, (model) => OnImported(model)),
-            [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(BatchImportPrizeTip.Title)] = "激活码"
+        _editDialog = true;
+        _editedItem = new EditLotteryPrizeModel();
+        _isAdd = true;
 
-        }).Render();
-        await DialogService.Show(option);
+        StateHasChanged();
     }
 
-    public void OnImported(List<string> model)
+    public void BatchItems()
+    {
+        _batchDialog = true;
+        StateHasChanged();
+    }
+
+
+    public void OnBatched(List<string> model)
     {
         //检查是否符合要求
         foreach (var item in model)
         {
             Prizes.Add(new EditLotteryPrizeModel
-            {
-                Context = item
-            });
+                {
+                    Context = item
+        });
+            
         }
+        _batchDialog = false;
         StateHasChanged();
-        
     }
 }

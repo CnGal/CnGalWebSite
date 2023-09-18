@@ -92,7 +92,7 @@
         {
             try
             {
-                GetInformation();
+                await GetInformation();
                 Model.Main.Name = Model.Main.DisplayName = Name;
                 //获取所有词条
                 EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
@@ -160,7 +160,7 @@
     public async Task TypeChanged(EntryType type)
     {
         Model.Type= Model.AddInfor.Type = Model.Relevances.Type = type;
-        GetInformation();
+        await GetInformation();
         StateHasChanged();
 
     }

@@ -1,53 +1,52 @@
 ﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@Class" Collapable>
-        <div class="row">
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"/>
-            </div>
-        </div>
+    <MRow>
+        <MCol Cols="12" Md="6" Lg="4" Xl="3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="4" Xl="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="4" Xl="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="4" Xl="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" />
+         </MCol>
+         <MCol Cols="12">
+             <MDivider />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="LotteryType" Label="类型" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.ConditionType" TValue="LotteryConditionType" Label="参加抽奖的条件" />
+         </MCol>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+         @if (Model.ConditionType == LotteryConditionType.BookingGame)
+        {
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.GameName" Label="关联游戏" AutoCompleteItems="EntryGameItems" />
+            </MCol>
+        }
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
 
-        <div class="form-group mt-4">
-            <div class="row">
+        <MCol Cols="12">
+            <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+        </MCol>
+        <MCol Cols="12" Md="6">
+            <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.BeginTime" ShowDate ShowTime Nullable="false" Label="开始时间" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.EndTime" ShowDate ShowTime Nullable="false" Label="结束时间" />
+         </MCol>
+         @if (Model.Type == LotteryType.Automatic)
+        {
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.LotteryTime" ShowDate ShowTime Nullable="false" Label="抽奖时间" />
+             </MCol>
+        }
 
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.ConditionType" ShowLabel="true" />
-                </div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
-                @if (Model.ConditionType == LotteryConditionType.BookingGame)
-                {
-                    <div class="form-group col-12  col-sm-6">
-                        <AutoComplete Items="@EntryGameItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.GameName" ShowLabel="true" />
-                    </div>
-                }
-                <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12 col-sm-6">
-                    <DateTimePicker @bind-Value="@Model.BeginTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12 col-sm-6">
-                    <DateTimePicker @bind-Value="@Model.EndTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
-                </div>
-                @if (Model.Type == LotteryType.Automatic)
-                {
-                    <div class="form-group col-12 col-sm-6">
-                        <DateTimePicker @bind-Value="@Model.LotteryTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
-                    </div>
-                }
-
-            </div>
-        </div>
+    </MRow>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -56,6 +55,6 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
-    public IEnumerable<string> EntryGameItems { get; set; }
+    public List<string> EntryGameItems { get; set; }
 
 }

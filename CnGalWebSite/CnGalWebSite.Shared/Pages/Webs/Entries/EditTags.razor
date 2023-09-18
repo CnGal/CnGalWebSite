@@ -62,7 +62,7 @@ else
     public EditEntryTagViewModel Model { get; set; } = new EditEntryTagViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> TagItems { get; set; } = new string[1] { "" };
+    private List<string> TagItems { get; set; } = new List<string>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

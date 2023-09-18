@@ -22,16 +22,14 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@VideoItems" Model="Model.videos" Title="视频"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputOtherLinkListTip Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputOtherLinkListTip>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip Title="外部链接" />
-    <ValidateForm Model="@Model">
-        <div class="row">
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.BilibiliId" DisplayText="B站视频Id（bvid/aid）" ShowLabel="true" />
-            </div>
-        </div>
-    </ValidateForm>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="外部链接" />
+    <MRow>
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.BilibiliId" Label="B站视频Id（bvid/aid）" />
+        </MCol>
+    </MRow>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
