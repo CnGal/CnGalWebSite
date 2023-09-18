@@ -21,6 +21,7 @@
             <MToolbarTitle> @Title</MToolbarTitle>
             <MDivider Class="mx-4" Inset Vertical />
              <MSpacer></MSpacer>
+             @ButtonContent
              @if (ShowAddButton)
             {
                 <MButton Color="primary"
@@ -32,7 +33,7 @@
              </MButton>
                 
             }
-            @ButtonContent
+           
             <MTextField Value="_search" ValueChanged="OnSearch" TValue="string"
                         AppendIcon="mdi-magnify"
                         Label="搜索"

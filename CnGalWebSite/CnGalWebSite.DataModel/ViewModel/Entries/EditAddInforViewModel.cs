@@ -129,6 +129,18 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         [Display(Name = "隶属组织")]
         public string SubordinateOrganization { get; set; }
+
+        public Result Validate(List<StaffModel> staffs)
+        {
+            if (staffs.Where(s => s.Id != Id).Any(s => s.Name == Name && s.Modifier == Modifier && s.PositionOfficial == PositionOfficial))
+            {
+                return new Result { Error = $"已存在【{Modifier}{PositionOfficial}：{Name}】" };
+            }
+            else
+            {
+                return new Result { Successful = true };
+            }
+        }
     }
 
     public class SocialPlatform

@@ -107,7 +107,7 @@ else
                 {
                     await PopupService.ToastAsync(result.Error, AlertTypes.Success);
                 }
-                await OnEdited.InvokeAsync(Model);
+                await OnEdited.InvokeAsync();
                 StateHasChanged();
             }
             else

@@ -171,7 +171,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Error,
         Default,
         Other,
-        Move
+        Move,
+        Import
     }
 
     public static class IconTypeHelper
@@ -180,6 +181,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Import:
+                    return "mdi-import";
                 case IconType.Move:
                     return "mdi-file-move";
                 case IconType.Default:
