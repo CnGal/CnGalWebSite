@@ -1,5 +1,5 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 
@@ -162,7 +162,7 @@
             count++;
             if (count < 2)
             {
-                await ToastService.Error("你确定要删除这条评论吗？", "确认删除请再次点击删除按钮");
+                await PopupService.ToastAsync("你确定要删除这条评论吗？确认删除请再次点击删除按钮", AlertTypes.Info);
                 return;
             }
 
@@ -170,12 +170,12 @@
 
             if (obj.Successful == false)
             {
-                await ToastService.Error("删除评论失败", obj.Error);
+                await PopupService.ToastAsync("删除评论失败", AlertTypes.Info);
             }
             else
             {
 
-                await ToastService.Success("删除评论成功", "删除评论成功");
+                await PopupService.ToastAsync("删除评论成功", AlertTypes.Success);
                 await OnRefresh.InvokeAsync();
             }
         }

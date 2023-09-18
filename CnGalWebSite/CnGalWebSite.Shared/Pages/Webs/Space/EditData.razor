@@ -1,7 +1,8 @@
 ﻿@inject IHttpService _httpService
 
-@inject SwalService SwalService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
+
+
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -104,7 +105,6 @@
         //上传
         try
         {
-
             var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/edituserdata", Model);
             //判断结果
             if (obj.Successful == false)
@@ -115,29 +115,7 @@
             {
                 await autoSave.Clean();
 
-                SwalOption op= new SwalOption()
-                {
-                    Category = SwalCategory.Success,
-                    Title = "修改个人资料成功",
-                    Content = "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见",
-                    ShowClose = false
-                };
-
-                op.ButtonTemplate = new RenderFragment(builder =>
-                {
-                    builder.OpenComponent<Button>(0);
-                    builder.AddAttribute(1, nameof(Button.Text), "我知道了");
-                    builder.AddAttribute(2, nameof(Button.Icon), "fa fa-check");
-                    builder.AddAttribute(3, nameof(Button.Color), Color.Success);
-                    builder.AddAttribute(4, nameof(Button.IsOutline), true);
-                    builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
-                    {
-                        await op.Close();
-                        NavigationManager.NavigateTo(Provider, "/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
-                    }));
-                    builder.CloseComponent();
-                });
-                await SwalService.Show(op);
+                var ret = await PopupService.ConfirmAsync("修改个人资料成功", "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见");
             }
         }
         catch (Exception ex)

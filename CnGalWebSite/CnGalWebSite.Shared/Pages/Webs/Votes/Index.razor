@@ -1,10 +1,10 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
-@inject DialogService DialogService
+
 @implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)

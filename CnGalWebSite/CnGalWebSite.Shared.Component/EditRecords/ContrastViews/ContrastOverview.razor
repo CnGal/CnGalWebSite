@@ -1,11 +1,14 @@
-﻿
+﻿@using static CnGalWebSite.Components.Inputs.MasaTextSelect;
+
 <div class="row">
     <div class="col-12 col-xl-6">
         <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-key"></i>&nbsp;&nbsp;对比的版本</h2>
             </div>
-                    <Select Items="ContrastItems" OnSelectedItemChanged="OnContrastChanged" @bind-Value="ContrastItem" style="width:220px"></Select>
+            <div style="width:220px">
+                <CnGalWebSite.Components.Inputs.MasaTextSelect Items="ContrastItems" ValueChanged="OnContrastChanged" Value="CurrentItem" />
+            </div>
 
         </div>
         <CascadingValue Value=this>
@@ -17,7 +20,9 @@
             <div>
                 <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-lock"></i>&nbsp;&nbsp;当前的版本</h2>
             </div>
-            <Select Items="CurrentItems" OnSelectedItemChanged="OnCurrentChanged" @bind-Value="CurrentItem" style="width:220px"></Select>
+            <div style="width:220px">
+                <CnGalWebSite.Components.Inputs.MasaTextSelect Items="CurrentItems" ValueChanged="OnCurrentChanged" Value="CurrentItem"/>
+            </div>
 
         </div>
         <CascadingValue Value=this>
@@ -72,8 +77,7 @@
                 ContrastItems.Add(new SelectedItem
                 {
                     Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                    Value = item.Id.ToString(),
-                    Active = item.IsSelected
+                    Value = item.Id.ToString()
                 });
                 if(item.IsSelected)
                 {
@@ -93,8 +97,7 @@
                 CurrentItems.Add(new SelectedItem
                 {
                     Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                    Value = item.Id.ToString(),
-                    Active = CurrentItem== item.Id.ToString()
+                    Value = item.Id.ToString()
                 });
                 if (CurrentItem == item.Id.ToString())
                 {
@@ -108,8 +111,7 @@
             CurrentItems.Add(new SelectedItem
             {
                 Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                Value = item.Id.ToString(),
-                Active = CurrentItem == item.Id.ToString()
+                Value = item.Id.ToString()
             });
             if(CurrentItem == item.Id.ToString())
             {

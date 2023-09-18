@@ -1,5 +1,5 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="发布视频"/>
@@ -11,23 +11,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Video" Class="mb-3" Creating />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page/>
     }
     else
     {
@@ -125,6 +109,4 @@
         StateHasChanged();
         
     }
-
-
 }

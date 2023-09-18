@@ -87,7 +87,6 @@ namespace CnGalWebSite.Server
 
             //本地化
             services.AddLocalization()
-                .AddBootstrapBlazor()
                 .AddBlazoredLocalStorage()
                 .AddBlazoredSessionStorage()
                 .AddAuthorizationCore()

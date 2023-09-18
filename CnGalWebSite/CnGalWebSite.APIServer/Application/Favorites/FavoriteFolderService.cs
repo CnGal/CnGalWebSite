@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
@@ -20,8 +20,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
     {
         private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IAppHelper _appHelper;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<FavoriteFolder>, string, SortOrder, IEnumerable<FavoriteFolder>>> SortLambdaCache = new();
        
 
         public FavoriteFolderService(IRepository<FavoriteFolder, long> favoriteFolderRepository, IAppHelper appHelper)

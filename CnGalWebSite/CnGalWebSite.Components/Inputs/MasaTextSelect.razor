@@ -1,0 +1,24 @@
+﻿<MSelect Items="Items"
+         Value="@Value"
+         ValueChanged="ValueChanged"
+         ItemText="u => u.Text"
+         ItemValue="u => u.Value"
+         Label="@Label"
+         Dense></MSelect>
+
+ @code {
+    [Parameter]
+    public List<SelectedItem> Items { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    public class SelectedItem
+    {
+        public string Text{ get; set; }
+        public string Value { get; set; }
+    }
+}

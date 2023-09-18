@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Services;
@@ -14,7 +14,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using SortOrder = BootstrapBlazor.Components.SortOrder;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {

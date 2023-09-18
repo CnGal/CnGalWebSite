@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.Peripheries;
@@ -27,8 +27,6 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Entry, long> _entryRepository;
         private readonly IAppHelper _appHelper;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Periphery>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Periphery>>> SortLambdaCachePeriphery = new();
 
         public PeripheryService(IAppHelper appHelper, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Entry, long> entryRepository,
         IRepository<PeripheryRelevanceEntry, long> peripheryRelevanceEntryRepository, IRepository<PeripheryRelation, long> peripheryRelationRepository)

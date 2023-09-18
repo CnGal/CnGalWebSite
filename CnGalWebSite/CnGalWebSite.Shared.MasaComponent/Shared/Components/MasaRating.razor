@@ -3,7 +3,7 @@
 <div class="@Class">
     <div style="display: flex; align-items: center;">
         <div style=" word-break: keep-all;width:60px ">
-            @($"{Lable}({Value})")
+            @($"{Label}({Value})")
         </div>
         <MRating Value="_rating" ValueChanged="OnValueChanged" Length="Length" HalfIncrements  BackgroundColor="primary" Large="Large" Style="flex-wrap: wrap; display: flex; "></MRating>
 
@@ -19,7 +19,7 @@
     [Parameter]
     public int Length { get; set; } = 5;
     [Parameter]
-    public string Lable { get; set; }
+    public string Label { get; set; }
     [Parameter]
     public bool Large { get; set; }
     [Parameter]
@@ -29,7 +29,7 @@
 
     private double _rating = 0;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         _rating = Value/2.0;
     }

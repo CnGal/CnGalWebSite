@@ -274,7 +274,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateVoteAsync(CreateVoteModel model)
+        public async Task<ActionResult<Result>> CreateVoteAsync(EditVoteModel model)
         {
             if (await _voteRepository.GetAll().AnyAsync(s => s.Name == model.Name))
             {

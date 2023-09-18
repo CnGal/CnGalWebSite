@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.BackUpArchives;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Files;
@@ -42,8 +42,6 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly ISteamInforService _steamService;
         private readonly IRecommendService _recommendService;
         private readonly ILogger<TimedTaskService> _logger;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
         IPerfectionService perfectionService, ISearchHelper searchHelper, ISteamInforService steamService,

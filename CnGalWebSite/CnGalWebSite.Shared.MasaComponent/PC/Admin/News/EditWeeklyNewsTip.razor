@@ -1,5 +1,5 @@
-﻿@inject ToastService ToastService
-@inject DialogService DialogService
+﻿
+
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -112,7 +112,6 @@
     bool isReady = false;
     bool Dialog { get; set; }
 
-    List<SelectedItem> GameNewsItems { get; set; } = new List<SelectedItem>();
     private List<string> GameNewsValue { get; set; } = new List<string>();
 
     PreviewArticleTip previewArticleTip;

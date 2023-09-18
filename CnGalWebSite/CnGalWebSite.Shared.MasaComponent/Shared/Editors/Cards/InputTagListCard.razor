@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
-@inject SwalService SwalService
-@inject ToastService ToastService
+@inject IPopupService PopupService
+
 @inject IServiceProvider Provider
 
 <div class="@Class">
@@ -50,7 +50,7 @@
         }
         catch
         {
-            await ToastService.Error("添加标签失败", "发生了未预料的异常，请联系开发人员");
+            await PopupService.ToastAsync("添加标签失败", AlertTypes.Error);
         }
     }
 
@@ -70,20 +70,13 @@
 
     public async Task OnCreate()
     {
-        //确认
-        var op = new SwalOption()
-        {
-            Title = "确认跳转标签创建页面",
-            Content = "跳转后当前页面数据不会保存，请确保备份编辑数据后跳转",
+        var ret = await PopupService.ConfirmAsync("确认跳转标签创建页面", "跳转后当前页面数据不会保存，请确保备份编辑数据后跳转");
 
-            Category = SwalCategory.Warning,
-        };
-        var ret = await SwalService.ShowModal(op);
         if (ret == false)
         {
             return;
         }
-        NavigationManager.NavigateTo(Provider, "/tags/createtag", "创建标签", "fa fa-pencil");
+        NavigationManager.NavigateTo( "/tags/createtag");
     }
 
 }

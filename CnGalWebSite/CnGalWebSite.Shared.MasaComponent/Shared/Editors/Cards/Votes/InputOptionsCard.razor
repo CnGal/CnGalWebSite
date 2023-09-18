@@ -1,0 +1,135 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<DataTableCard TModel="EditVoteOptionModel" Headers="_headers" DataSource="Options" SortByItem="@nameof(StaffModel.PositionOfficial)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Name!=null&&s.Name.Contains(dataTableCard._search))|| (s.CustomName!=null&&s.CustomName.Contains(dataTableCard._search))|| (s.SubordinateOrganization!=null&&s.SubordinateOrganization.Contains(dataTableCard._search))|| (s.PositionOfficial!=null&&s.PositionOfficial.Contains(dataTableCard._search))">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+                <div style="width: 140px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+                </div>
+        }
+        else if (context.Header.Value == nameof(EditVoteOptionModel.Type))
+        {
+        <TypeChip Type="@context.Item.Type"/>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="批量导入" Icon="@IconType.Import.ToIconString()" OnClick="BatchItems" Class="me-4" />
+    </ButtonContent>
+</DataTableCard>
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <EditCard Options="Options" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+<MDialog @bind-Value="_batchDialog"
+         MaxWidth="800">
+    <BatchCard OnBatched="OnBatched" @ref="batchCard" />
+</MDialog>
+@code {
+
+    [Parameter]
+    public List<EditVoteOptionModel> Options { get; set; }
+
+    private string _name = "选项";
+
+    private List<DataTableHeader<EditVoteOptionModel>> _headers = new List<DataTableHeader<EditVoteOptionModel>>
+{
+          new ()
+          {
+            Text= "文本",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(EditVoteOptionModel.Text)
+          },
+          new (){ Text= "类型", Value= nameof(EditVoteOptionModel.Type)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<StaffModel> dataTableCard;
+
+    EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+
+    BatchCard batchCard;
+    private bool _batchDialog;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void EditItem(StaffModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh(item);
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            editCard.Refresh(new EditVoteOptionModel());
+        }
+    }
+
+    public void BatchItems()
+    {
+        _batchDialog = true;
+        StateHasChanged();
+    }
+
+
+    public async Task OnBatched(List<EditVoteOptionModel> model)
+    {
+        //检查是否符合要求
+        foreach (var item in model)
+        {
+            var result = item.Validate(Options);
+            if (result.Successful == false)
+            {
+                await PopupService.ToastAsync(result.Error, AlertTypes.Error);
+            }
+            else
+            {
+                Staffs.Add(item);
+            }
+        }
+        _batchDialog = false;
+        StateHasChanged();
+        dataTableCard.GetDataFromApi();
+    }
+
+    public void DeleteItem(EditVoteOptionModel model)
+    {
+        Options.Remove(model);
+        dataTableCard.GetDataFromApi();
+    }
+}

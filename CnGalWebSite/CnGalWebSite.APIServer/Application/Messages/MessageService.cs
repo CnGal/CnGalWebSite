@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 
@@ -17,7 +17,6 @@ namespace CnGalWebSite.APIServer.Application.Messages
     public class MessageService : IMessageService
     {
         private readonly IRepository<DataModel.Model.Message, long> _messageRepository;
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<DataModel.Model.Message>, string, SortOrder, IEnumerable<DataModel.Model.Message>>> SortLambdaCache = new();
 
         public MessageService(IRepository<DataModel.Model.Message, long> messageRepository)
         {

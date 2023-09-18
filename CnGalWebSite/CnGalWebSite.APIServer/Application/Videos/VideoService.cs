@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
@@ -28,8 +28,6 @@ namespace CnGalWebSite.APIServer.Application.Videos
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly ILogger<VideoService> _logger;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Video>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Video>>> SortLambdaCacheArticle = new();
 
         public VideoService(IAppHelper appHelper, ILogger<VideoService> logger, IRepository<Video, long> videoRepository, IRepository<Examine, long> examineRepository, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository)
         {

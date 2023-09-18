@@ -1,4 +1,4 @@
-﻿@inject ToastService? ToastService
+﻿
 
 
 <style>
@@ -49,8 +49,8 @@
                 <div class="@(Model.UserSelections.Contains(item.OptionId)?"mb-2 option-card-active":"mb-2 option-card")" style=" display: flex; flex-direction: row; border-radius: 5px; cursor:pointer"
                      @onclick="@(()=>OnSeletedItemChanged(item,Model.UserSelections.Contains(item.OptionId)?CheckboxState.UnChecked:CheckboxState.Checked))">
                     <div style=" display: flex; flex-direction: column; justify-content: center; " class=" ms-3">
-                        <Checkbox TValue="string" State="@(Model.UserSelections.Contains(item.OptionId)?CheckboxState.Checked:CheckboxState.UnChecked)" OnStateChanged="@((e,o)=>OnSeletedItemChanged(item,e))"
-                                  IsDisabled="@(Model.UserSelections.Contains(item.OptionId)?false:(Model.UserSelections.Count>=Model.MaximumSelectionCount))"></Checkbox>
+                        <MCheckbox TValue="bool" Value="@(Model.UserSelections.Contains(item.OptionId))" ValueChanged="@((e)=>OnSeletedItemChanged(item,e))"
+                                  Disabled="@(Model.UserSelections.Contains(item.OptionId)?false:(Model.UserSelections.Count>=Model.MaximumSelectionCount))"></MCheckbox>
                     </div>
                     <OptionAloneCard TotalCount="Model.Count" IsShowResult="IsShowResult" Model="item" IsSeleted="@(Model.UserSelections.Contains(item.OptionId))"
                                      ImageMinWidth="@ImageMinWidth"/>
@@ -94,9 +94,9 @@
         return Model.UserSelections;
     }
 
-    public async Task OnSeletedItemChanged(VoteOptionViewModel item, CheckboxState state)
+    public async Task OnSeletedItemChanged(VoteOptionViewModel item, bool state)
     {
-        if (state == CheckboxState.Checked)
+        if (state)
         {
             if (Model.Type == VoteType.SingleChoice)
             {

@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
@@ -68,8 +68,6 @@ else
     private List<string> EntryGroupItems { get; set; }
     private List<string> EntryStaffItems { get; set; }
     private List<string> LotteryItems { get; set; }
-
-    List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem>();
 
     private List<string> GamePlatformsValue { get; set; } = new List<string>();
     private bool isReady = false;

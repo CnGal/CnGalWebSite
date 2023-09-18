@@ -4,7 +4,7 @@
 @inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+
 
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -180,9 +180,6 @@ else
 
     private EditVoteModel Model { get; set; } = new EditVoteModel();
 
-    [NotNull]
-    private ValidateForm? ComplexForm { get; set; }
-
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();
     private List<string> EntryRoleItems { get; set; } = new List<string>();
@@ -195,14 +192,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    [NotNull]
-    private CnGalWebSite.Shared.Component.Votes.Options.OptionEditorChartTip? optionEditor { get; set; }
 
-    private DateTimeRangeValue DateTimeRangeValue2 { get; set; } = new DateTimeRangeValue
-    {
-        Start = DateTime.Now.ToCstTime(),
-        End = DateTime.Now.ToCstTime().AddDays(7),
-    };
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

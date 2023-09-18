@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
@@ -89,8 +89,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<UserMonitor, long> _userMonitorRepository;
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
 
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService, IRepository<FavoriteFolder, long> favoriteFolderRepository,
         IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IVideoService videoService, IRepository<Video, long> videoRepository, IFavoriteFolderService favoriteFolderService,

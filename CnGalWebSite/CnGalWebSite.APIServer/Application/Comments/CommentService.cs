@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
@@ -39,8 +39,6 @@ namespace CnGalWebSite.APIServer.Application.Comments
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IUserService _userService;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Comment>, string, SortOrder, IEnumerable<Comment>>> SortLambdaCache = new();
 
         public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository, IRepository<Article, long> articleRepository, IRepository<Video, long> videoRepository,
             IUserService userService,

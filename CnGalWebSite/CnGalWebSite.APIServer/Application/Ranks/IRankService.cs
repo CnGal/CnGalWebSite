@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -9,10 +9,6 @@ namespace CnGalWebSite.APIServer.Application.Ranks
 {
     public interface IRankService
     {
-        Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId);
-
-        Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserRankAloneModel searchModel, string userId);
-
         Task UpdateUserRanks(ApplicationUser user);
 
         Task<List<RankViewModel>> GetUserRanks(ApplicationUser user);

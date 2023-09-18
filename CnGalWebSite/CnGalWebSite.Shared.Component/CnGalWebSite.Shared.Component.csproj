@@ -30,6 +30,8 @@
   
   <ItemGroup>
     <Folder Include="Admin\News\" />
+    <Folder Include="Ranks\" />
+    <Folder Include="Users\" />
   </ItemGroup>
 
 </Project>

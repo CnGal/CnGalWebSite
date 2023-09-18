@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
@@ -52,9 +52,6 @@
     private bool isReady = false;
     private List<string> TagItems { get; set; } = new List<string>();
     private List<string> EntryItems { get; set; } = new List<string>();
-
-    [NotNull]
-    private ValidateForm? ComplexForm { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

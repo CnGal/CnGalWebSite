@@ -551,12 +551,5 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListDisambigAloneModel>>> GetDisambigListNormalAsync(DisambigsPagesInfor input)
-        {
-            var dtos = await _disambigService.GetPaginatedResult(input.Options, input.SearchModel);
-            return dtos;
-        }
-
     }
 }

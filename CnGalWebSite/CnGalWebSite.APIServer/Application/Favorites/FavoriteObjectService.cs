@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 
@@ -19,7 +19,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Entry, long> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<FavoriteObject>, string, SortOrder, IEnumerable<FavoriteObject>>> SortLambdaCache = new();
 
         private readonly IAppHelper _appHelper;
 

@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
@@ -67,8 +67,7 @@ else
     public string Id { get; set; }
     public EditMainViewModel Model { get; set; } = new EditMainViewModel();
     private bool isReady = false;
-    [NotNull]
-    private ValidateForm? ComplexForm { get; set; }
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

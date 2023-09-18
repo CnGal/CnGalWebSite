@@ -1,11 +1,13 @@
 ﻿@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+
 @inject IFileUploadService _fileUploadService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
-@inject DialogService DialogService
+
+@inject IPopupService PopupService
+
 @implements IDisposable
 
 
@@ -142,20 +144,9 @@ else
     }
 
 
-    [Inject]
-    [NotNull]
-    private SwalService? SwalService { get; set; }
     private async Task OnRevoke(Operation operation)
     {
-        //确认
-        var op = new SwalOption()
-        {
-            Title = "确认撤销编辑",
-            Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
-
-            Category = SwalCategory.Warning,
-        };
-        var ret = await SwalService.ShowModal(op);
+        var ret = await PopupService.ConfirmAsync("确认撤销编辑", "撤销编辑后会删除数据，无法恢复，请谨慎操作");
         if (ret == false)
         {
             return;

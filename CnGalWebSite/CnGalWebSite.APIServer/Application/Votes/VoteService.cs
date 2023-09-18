@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
@@ -18,8 +18,6 @@ namespace CnGalWebSite.APIServer.Application.Votes
     {
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IAppHelper _appHelper;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Vote>, string, SortOrder, IEnumerable<Vote>>> SortLambdaCachePeriphery = new();
 
         public VoteService(IAppHelper appHelper, IRepository<Vote, long> voteRepository)
         {

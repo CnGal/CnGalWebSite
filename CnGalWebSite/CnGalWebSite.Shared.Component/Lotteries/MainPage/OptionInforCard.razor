@@ -1,9 +1,8 @@
 ﻿@inject IHttpService _httpService
-
-@inject ToastService? ToastService
+@inject IPopupService PopupService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+
 
 <div class="rounded shadow-sm  bg-opacity mb-4 pt-4">
     <div style=" display: flex; flex-direction: column; align-items: center; ">
@@ -169,12 +168,12 @@
             });
             if (obj.Successful)
             {
-                await ToastService.Success("参与抽奖成功", "参与抽奖成功");
+                await PopupService.ToastAsync("参与抽奖成功",  AlertTypes.Success);
                 await Refresh();
             }
             else
             {
-                await ToastService.Error("参与抽奖失败", obj.Error);
+                await PopupService.ToastAsync("参与抽奖失败", AlertTypes.Error);
             }
         }
         catch (Exception ex)

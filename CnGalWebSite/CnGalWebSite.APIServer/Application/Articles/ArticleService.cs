@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
@@ -34,9 +34,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
         private readonly IRepository<Video, int> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
-
 
         public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<Video, int> videoRepository,
             IUserService userService)

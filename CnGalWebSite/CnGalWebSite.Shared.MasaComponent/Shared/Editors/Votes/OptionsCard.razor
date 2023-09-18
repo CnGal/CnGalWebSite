@@ -1,0 +1,14 @@
+﻿
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="填写选项" Class="@Class" Collapable Outline>
+        <div class="@Class">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Votes.InputOptionsCard Options="Model.Options" />
+        </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+@code {
+    [Parameter]
+    public EditVoteModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

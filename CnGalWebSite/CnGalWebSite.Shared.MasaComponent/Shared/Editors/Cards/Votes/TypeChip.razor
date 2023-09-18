@@ -1,0 +1,31 @@
+﻿<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()" />
+
+
+ @code {
+    [Parameter]
+    public VoteOptionType Type { get; set; }
+
+    public string GetColor(VoteOptionType type)
+    {
+        return type switch
+        {
+            VoteOptionType.Text => "success",
+            VoteOptionType.Article => "info",
+            VoteOptionType.Periphery => "warning",
+            VoteOptionType.Entry => "primary",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(VoteOptionType type)
+    {
+        return type switch
+        {
+            VoteOptionType.Text => IconType.Note,
+            VoteOptionType.Article => IconType.Article,
+            VoteOptionType.Periphery => IconType.Periphery,
+            VoteOptionType.Entry => IconType.Entry,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

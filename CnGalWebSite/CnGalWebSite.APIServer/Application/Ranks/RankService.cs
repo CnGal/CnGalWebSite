@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -21,9 +21,6 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         private readonly IRepository<RankUser, int> _rankUserRepository;
         private readonly IRepository<Examine, int> _examineRepository;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Rank>, string, SortOrder, IEnumerable<Rank>>> SortLambdaCacheRank = new();
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RankUser>, string, SortOrder, IEnumerable<RankUser>>> SortLambdaCacheRankUser = new();
-
         public RankService(IRepository<Rank, int> rankRepository, IRepository<RankUser, int> rankUserRepository, IRepository<Examine, int> examineRepository,
             IRepository<ApplicationUser, string> userRepository)
         {
@@ -31,122 +28,6 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             _rankRepository = rankRepository;
             _examineRepository = examineRepository;
             _userRepository = userRepository;
-        }
-
-        public Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId)
-        {
-            IEnumerable<RankUser> items = _rankUserRepository.GetAll().Include(s => s.ApplicationUser).Where(s => s.RankId == rankId).AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
-            {
-                items = items.Where(item => item.ApplicationUserId?.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
-            {
-                items = items.Where(item => item.ApplicationUser.UserName?.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.ApplicationUserId?.Contains(options.SearchText) ?? false);
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheRankUser.GetOrAdd(typeof(RankUser), key => LambdaExtensions.GetSortLambda<RankUser>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListRankUserAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListRankUserAloneModel
-                {
-                    UserName = item.ApplicationUser.UserName,
-                    UserId = item.ApplicationUserId,
-                    Time = item.Time,
-                    IsHidden = item.IsHidden,
-                    Id = item.Id,
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListRankUserAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
-        }
-
-        public Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserRankAloneModel searchModel, string userId)
-        {
-            IEnumerable<RankUser> items = _rankUserRepository.GetAll().Include(s => s.Rank).Where(s => s.ApplicationUserId == userId).AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.Name))
-            {
-                items = items.Where(item => item.Rank.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => item.Rank.Name?.Contains(options.SearchText) ?? false);
-            }
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheRankUser.GetOrAdd(typeof(RankUser), key => LambdaExtensions.GetSortLambda<RankUser>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListUserRankAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListUserRankAloneModel
-                {
-                    Name = item.Rank.Name,
-                    RankId = item.RankId,
-                    Time = item.Time,
-                    IsHidden = item.IsHidden,
-                    Id = item.Id,
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListUserRankAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
         }
 
         public async Task UpdateUserRanks(ApplicationUser user)

@@ -1,74 +1,42 @@
-﻿
-@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
-@inject DialogService DialogService
 
-<div class="">
-    <Table TItem="ListPerfectionCheckAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-            ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="200" />
-            <TableColumn @bind-Field="@context.Grade"  Sortable Width="80" FormatString="0.0" />
-            <TableColumn @bind-Field="@context.Type" Sortable Width="120" />
-            <TableColumn @bind-Field="@context.VictoryPercentage" Sortable Width="120" FormatString="0.0" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.Id ))" />
-        </RowButtonTemplate>
-    </Table>
-</div>
+<DataTableCard TModel="PerfectionCheckOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(PerfectionCheckOverviewModel.Name))
+        {
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Id="@context.Item.Id" Name="@context.Item.Name" Type="@EntryType.Game" />
+        }
+        else
+        {
+        @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
+
 
 @code {
-    [NotNull]
-    private Table<ListPerfectionCheckAloneModel> TableRows { get; set; }
-    private List<ListPerfectionCheckAloneModel> SelectedRows { get; set; } = new();
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
 
-    public ListPerfectionChecksViewModel ListModel { get; set; } = new ListPerfectionChecksViewModel { PerfectionChecks = new List<ListPerfectionCheckAloneModel>() };
+    private string _baseUrl = "api/perfections/ListPerfectionChecks";
+    private string _name = "完善度单项检查";
 
-    private ListPerfectionCheckAloneModel SearchModelUser { get; set; } = new ListPerfectionCheckAloneModel();
-
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-
-    protected override async Task OnInitializedAsync()
+    private List<DataTableHeader<PerfectionCheckOverviewModel>> _headers = new List<DataTableHeader<PerfectionCheckOverviewModel>>
     {
-        try
-        {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(PerfectionCheckOverviewModel.Id)
+          },
+          new (){ Text= "词条", Value= nameof(PerfectionCheckOverviewModel.Name)},
+          new (){ Text= "检查", Value= nameof(PerfectionCheckOverviewModel.Type)},
+          new (){ Text= "分数", Value= nameof(PerfectionCheckOverviewModel.Grade)},
+          new (){ Text= "击败全站词条百分比", Value= nameof(PerfectionCheckOverviewModel.VictoryPercentage)},
+    };
 
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取完善度数据");
-        }
-
-    }
-
-    private async Task<QueryData<ListPerfectionCheckAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
-    {
-        try
-        {
-            return await _httpService.PostAsync<PerfectionChecksPagesInfor, QueryData<ListPerfectionCheckAloneModel>>("api/perfections/GetPerfectionCheckList", new PerfectionChecksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取完善度检查列表");
-            return new QueryData<ListPerfectionCheckAloneModel>();
-        }
-    }
-    private async Task RefreshTable()
-    {
-        await TableRows.QueryAsync();
-    }
-    private void OnLook(int id)
-    {
-        NavigationManager.NavigateTo("/entries/index/" + id);
-
-    }
+    DataTableCard<PerfectionCheckOverviewModel> dataTableCard;
 }
