@@ -1,0 +1,35 @@
+﻿@if (string.IsNullOrWhiteSpace(Href))
+{
+    <div class="@GetClass()" @onclick="OnClick">
+        @ChildContent
+    </div>
+}
+else
+{
+    <a href="@Href" class="@GetClass()" @onclick="OnClick" target="@Target">
+        @ChildContent
+    </a>
+}
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
+    public string Target { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public bool? ShowHoverStyle { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public string Color { get; set; } = "primary";
+
+    public string GetClass()
+    {
+        return $"md-card {((ShowHoverStyle ?? !string.IsNullOrWhiteSpace(Href)) ? "show-hover-style" : "")} {Class} {(Outline ? "" : ("color-"+Color))}";
+    }
+}

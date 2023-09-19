@@ -1,148 +1,68 @@
 ﻿@inject IDataCacheService _dataCacheService
+@if (Model.MainState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditMain/" + Model.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4" />
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard Class="@($"main-card {(Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup?"game":"role")}")">
 
-
-<div class="rounded shadow-sm bg-opacity rounded pb-4">
-    @if (Model.MainState == EditState.Preview)
-    {
-        <div class="pt-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditMain/" + Model.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4" />
-
-        </div>
-    }
-    <div class="row m-0">
-        @if (ForceSmall)
-        {
-            <div class="w-100 col-12 p-0" style="display: flex; justify-content: center;">
-                @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-                {
-                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
-                }
-                else
-                {
-                    <img style="height:200px;border-radius:50%;" class="mt-4" src="@Model.Thumbnail" alt="@Model.Name" itemprop="image">
-                }
-            </div>
-        }
-        else
-        {
-            <div class="d-md-flex d-none col-auto ps-4 pt-4">
-                @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-                {
-                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
-                }
-                else
-                {
-                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
-                }
-            </div>
-            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-                @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-                {
-                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
-                }
-                else
-                {
-                    <img style="height:200px;border-radius:50%;" class="mt-4" src="@Model.Thumbnail" alt="@Model.Name">
-                }
-            </div>
-        }
-
-        <div class="ps-4 pt-4 pe-4 col">
-
-            @if (ForceSmall)
-            {
-                <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <h1 class="fw-bold h3" itemprop="name">@Model.Name</h1>
-                </div>
-            }
-            else
-            {
-                <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <div class="fw-bold h3" itemprop="name">@Model.Name</div>
-                </div>
-
-                <div class="d-md-flex d-none">
-                    <h1 class="fw-bold h3">@Model.Name</h1>
-                </div>
-            }
-            <div class="row">
-                <div class="col-12 col-xl-6">
-                    <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
-
-                        @if (Model.ProductionGroups.Count > 0)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="制作组" Color="grey darken-3" />
-
-                            @foreach (var temp in Model.ProductionGroups)
-                            {
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="author" ItemType="http://schema.org/Organization" />
-                            }
-                        }
-                    </div>
-                </div>
-                <div class="col-12 col-lg-6">
-                    <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
-                        @if (Model.Publishers.Count > 0)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="发行商" Color="grey darken-3" />
-
-                            @foreach (var temp in Model.Publishers)
-                            {
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="publisher" ItemType="http://schema.org/Organization" />
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
-
-            @if (ForceSmall)
-            {
-                <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <span itemprop="description">
-                        @Model.BriefIntroduction
-                    </span>
-                </div>
-            }
-            else
-            {
-                <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <span itemprop="description">
-                        @Model.BriefIntroduction
-                    </span>
-                </div>
-
-                <div class="d-md-flex d-none">
-                    <span class="text-truncate-4">
-                        @Model.BriefIntroduction
-                    </span>
-                </div>
-            }
-
-            @if (HiddenButton == false)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                    <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
-
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="@Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
-                        @if (ToolHelper.IsMaui)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Class="ms-4" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
-                        }
-                    </div>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-
-            }
-
-            @if (Model.Type == EntryType.ProductionGroup && string.IsNullOrWhiteSpace(Model.Thumbnail) == false && Model.Thumbnail.Contains("user.png") == false)
-            {
-                <meta itemprop="logo" content="@Model.Thumbnail" />
-            }
-        </div>
-
+    <div class="image-card">
+        <img src="@(Model.Type== EntryType.Role||Model.Type== EntryType.Staff?Model.Thumbnail:Model.MainPicture)" alt="@Model.Name">
     </div>
+    <div class="content-card">
+        <h1 class="title-large">@Model.Name</h1>
 
-</div>
+        @if (Model.Type == EntryType.Game)
+        {
+            <div class="groups-card">
+                @if (Model.ProductionGroups.Count > 0)
+                {
+                    <div>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="制作组" Color="grey darken-3" />
+
+                        @foreach (var temp in Model.ProductionGroups)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="author" ItemType="http://schema.org/Organization" />
+                        }
+                    </div>
+
+
+                }
+                @if (Model.Publishers.Count > 0)
+                {
+                    <div>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="发行商" Color="grey darken-3" />
+
+                        @foreach (var temp in Model.Publishers)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="publisher" ItemType="http://schema.org/Organization" />
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+        }
+        <div class="brief label-large text-truncate-3 ">
+            @Model.BriefIntroduction
+        </div>
+        @if (HiddenButton == false)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                <div class="options-card">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry"/>
+
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="@Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
+                    @if (ToolHelper.IsMaui)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
+                    }
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+        }
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard>
 
 @code {
     [Parameter]

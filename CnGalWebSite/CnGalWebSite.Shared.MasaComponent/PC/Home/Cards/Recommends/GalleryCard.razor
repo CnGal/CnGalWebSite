@@ -3,7 +3,8 @@
 @inject IDataCacheService _dataCatcheService
 @inject IEventService _eventService
 
-<div class="gallery-card">
+
+<MDCard Class="gallery-card">
     <div class="content">
         <div class="head">
             <div class="name text-truncate-1">@Model.Name</div>
@@ -25,28 +26,28 @@
                           Align="@AlignTypes.Center"
                           Justify="@JustifyTypes.Center">
                         <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
-                    </MRow>
-                </PlaceholderContent>
-            </MImage>
-        </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
-    </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <div class="actions">
-            <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
-                <MIcon Small="_dataCatcheService.IsApp" Left>@IconType.Game.ToIconString()</MIcon>
+                     </MRow>
+                 </PlaceholderContent>
+             </MImage>
+         </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+     </div>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+         <div class="actions">
+             <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
+                 <MIcon Small="_dataCatcheService.IsApp" Left>@IconType.Game.ToIconString()</MIcon>
                 访问作品页面
             </MButton>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
-            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false&&_dataCatcheService.IsApp==false)
+             @if (string.IsNullOrWhiteSpace(Model.SteamId) == false && _dataCatcheService.IsApp == false)
             {
                 <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
-                    <MIcon Left Small="_dataCatcheService.IsApp">@IconType.Steam.ToIconString()</MIcon>
-                    访问Steam商店
-                </MButton>
+                     <MIcon Left Small="_dataCatcheService.IsApp">@IconType.Steam.ToIconString()</MIcon>
+                     访问Steam商店
+                 </MButton>
             }
         </div>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-</div>
+</MDCard>
 
 
 @code {

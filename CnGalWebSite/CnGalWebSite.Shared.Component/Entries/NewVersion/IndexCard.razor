@@ -1,250 +1,254 @@
 ﻿@inject IDataCacheService _dataCatcheService
-@if (_dataCatcheService.ThemeSetting.IsTransparent)
-{
-    @if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
+
+<div class="default-card">
+    @if (_dataCatcheService.ThemeSetting.IsTransparent)
     {
-        <div id="web_bg" style="background-image: url(@EntryView.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
-    }
-    @if (string.IsNullOrWhiteSpace(EntryView.BackgroundPicture) == false)
-    {
-        <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
-    }
-}
-<div class="row" itemscope itemtype="@(EntryView.Type== EntryType.Game?("http://schema.org/SoftwareApplication"):(EntryView.Type== EntryType.Role?("http://schema.org/Role"):(EntryView.Type== EntryType.ProductionGroup?("http://schema.org/Organization"):("http://schema.org/Person"))))">
-    <div class="col-12 mb-4">
-        @if (EntryView.IsHidden == true)
+        @if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
-                当前词条处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-
+            <div id="web_bg" style="background-image: url(@EntryView.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
         }
-
-        @if (EntryView.Type == EntryType.Staff)
+        @if (string.IsNullOrWhiteSpace(EntryView.BackgroundPicture) == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
-                这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
         }
-
-        <div>
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
-        </div>
-    </div>
-    @if (_dataCatcheService.IsApp)
-    {
-        <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
-            @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
-            {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
-                </div>
-            }
-            @if (EntryView.Information.Any())
-            {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                </div>
-
-            }
-            @if (EntryView.Tags.Any())
-            {
-                <div class=" mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                </div>
-            }
-            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
-
-            @if (EntryView.Type == EntryType.Game)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            }
-        </div>
-        <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
-
-            <div class="mb-4">
-                <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm bg-opacity ">
-
-                    <MTab Value="1">
-                        首页<MIcon>mdi-home</MIcon>
-                    </MTab>
-                    <MTab Value="2">
-                        相关<MIcon>fa fa-link </MIcon>
-                    </MTab>
-                    @if (EntryView.Staffs.Count > 0)
-                    {
-                        <MTab Value="3">
-                            Staff<MIcon>fa fa-sitemap</MIcon>
-                        </MTab>
-                    }
-
-                </MTabs>
-            </div>
-            <div>
-                <MTabsItems @bind-Value="TabIndex">
-                    <MTabItem Value="1">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                            @if (EntryView.Audio.Any())
-                            {
-                                <div class="mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                                </div>
-                            }
-                          
-                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                        @if (EntryView.Pictures.Count != 0)
-                        {
-                            <div class="mb-4">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
-
-                            </div>
-                        }
-
-
-                        @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
-                        {
-                            <div class="mb-4">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
-                            </div>
-                        }
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
-                        @if (EntryView.NewsOfEntry.Count != 0)
-                        {
-                            <div class="mb-4">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
-                            </div>
-                        }
-
-                        <div>
-                            @if (EntryView.CanComment)
-                            {
-
-                                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
-                            }
-                        </div>
-                    </MTabItem>
-                    <MTabItem Value="2">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
-
-                        <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
-
-                        <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game" />
-                    </MTabItem>
-
-                    @if (EntryView.Staffs.Count > 0)
-                    {
-                        <MTabItem Value="3">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
-                        </MTabItem>
-                    }
-                </MTabsItems>
-            </div>
-
-        </div>
-
-
     }
-    else
-    {
-        <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8  order-2 order-lg-1") ">
+    <div class="row" itemscope itemtype="@(EntryView.Type== EntryType.Game?("http://schema.org/SoftwareApplication"):(EntryView.Type== EntryType.Role?("http://schema.org/Role"):(EntryView.Type== EntryType.ProductionGroup?("http://schema.org/Organization"):("http://schema.org/Person"))))">
+        <div class="col-12 mb-4">
+            @if (EntryView.IsHidden == true)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                    当前词条处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+            }
+
+            @if (EntryView.Type == EntryType.Staff)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
+                    这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            }
 
             <div>
-                @if (EntryView.Audio.Any())
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                        </div>
-
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                }
-                @if (EntryView.Pictures.Count != 0)
-                {
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-                }
-                <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
-                @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
-
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                }
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
-                @if (EntryView.NewsOfEntry.Count != 0)
-                {
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
-
-                    </div>
-                }
-                <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
-
-                <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game" />
-                <div>
-                    @if (EntryView.CanComment)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
-                    }
-                </div>
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
             </div>
-
-
         </div>
-
-        <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        @if (_dataCatcheService.IsApp)
+        {
+            <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
                 @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
                 {
                     <div class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
+                     </div>
+                }
+                @if (EntryView.Information.Any())
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                    </div>
+
+                }
+                @if (EntryView.Tags.Any())
+                {
+                    <div class=" mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
                     </div>
                 }
-                @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
-                {
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
 
-                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                @if (EntryView.Type == EntryType.Game)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                }
+            </div>
+            <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
+
+                <div class="mb-4">
+                    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm bg-opacity ">
+
+                         <MTab Value="1">
+                             首页<MIcon>mdi-home</MIcon>
+                         </MTab>
+                         <MTab Value="2">
+                             相关<MIcon>fa fa-link </MIcon>
+                         </MTab>
+                         @if (EntryView.Staffs.Count > 0)
+                        {
+                            <MTab Value="3">
+                                Staff<MIcon>fa fa-sitemap</MIcon>
+                            </MTab>
+                        }
+
+                    </MTabs>
+                </div>
+                <div>
+                    <MTabsItems @bind-Value="TabIndex">
+                        <MTabItem Value="1">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                                @if (EntryView.Audio.Any())
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                                    </div>
+                                }
+
+                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            @if (EntryView.Pictures.Count != 0)
+                            {
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
+
+                                </div>
+                            }
+
+
+                            @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
+                            {
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+                                </div>
+                            }
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
+                            @if (EntryView.NewsOfEntry.Count != 0)
+                            {
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
+                                </div>
+                            }
+
+                            <div>
+                                @if (EntryView.CanComment)
+                                {
+
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                }
+                            </div>
+                        </MTabItem>
+                        <MTabItem Value="2">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
+
+                            <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
+
+                            <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game" />
+                        </MTabItem>
+
+                        @if (EntryView.Staffs.Count > 0)
+                        {
+                            <MTabItem Value="3">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                            </MTabItem>
+                        }
+                    </MTabsItems>
+                </div>
+
+            </div>
+
+
+        }
+        else
+        {
+            <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8  order-2 order-lg-1") ">
+
+                <div>
+                    @if (EntryView.Audio.Any())
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                            </div>
+
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    }
+                    @if (EntryView.Pictures.Count != 0)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
+                        </div>
+                    }
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
+                    @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
+
+                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    }
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
+                    @if (EntryView.NewsOfEntry.Count != 0)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
+
+                        </div>
+                    }
+                    <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
+
+                     <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game" />
+                     <div>
+                         @if (EntryView.CanComment)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                        }
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
+                         </div>
+                    }
+                    @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
+                    {
+
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+
+                    }
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                @if (EntryView.Information.Any())
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                    </div>
 
                 }
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            @if (EntryView.Information.Any())
-            {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                </div>
 
-            }
+                @if (EntryView.Tags.Any())
+                {
+                    <div class=" mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
+                    </div>
 
-            @if (EntryView.Tags.Any())
-            {
-                <div class=" mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                </div>
+                }
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
 
-            }
-            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
+                @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+                    </div>
+                }
+                @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
+                {
+                    <div class=" mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                    </div>
+                }
+                <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
 
-            @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
-            {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
-                </div>
-            }
-            @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
-            {
-                <div class=" mb-4">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
-                </div>
-            }
-            <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
+             </div>
 
-        </div>
+        }
 
-    }
+    </div>
 
 </div>
 

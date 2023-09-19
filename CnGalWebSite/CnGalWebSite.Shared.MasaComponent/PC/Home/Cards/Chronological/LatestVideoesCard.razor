@@ -9,18 +9,18 @@
         <div class="group">
             @foreach (var item in context)
             {
-                <a class="item" href="@item.Url">
+                <MDCard Class="item" Href="@item.Url">
                     <img class="image" src="@item.Image" alt="@item.Name" loading="lazy" />
                     <div class="head">
                         <div class="content">
                             <div class="name text-truncate-2">@item.Name</div>
                         </div>
                         <div class="addinfo">
-                            <div class="name text-truncate-1">@item.OriginalAuthor</div>
-                            <div class="time text-truncate-1">@item.PublishTime</div>
+                            <div class="name text-truncate-1  label-large">@item.OriginalAuthor</div>
+                            <div class="time text-truncate-1  label-large">@item.PublishTime</div>
                         </div>
                     </div>
-                </a>
+                </MDCard>
             }
 
         </div>

@@ -6,155 +6,37 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<style>
-    :root {
-        --main-color: @colorMain;
-        --hover-color: @colorHover;
-        --active-color: @colorActive;
-    }
-</style>
-
-@if (_dataCacheService.ThemeSetting.IsDark)
-{
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/github-markdown-dark.css">
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" />
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
-    <style>
-        [data-bs-toggle="lgbSelect"] .form-select {
-            background-color: transparent;
-            color: white;
-        }
-    </style>
-    @if (_dataCacheService.IsApp)
-    {
-        <style>
-            .bg-opacity {
-                background-color: transparent;
-            }
-        </style>
-    }
-    @if (_dataCacheService.ThemeSetting.IsTransparent)
-    {
-        <style>
-            :root {
-                --home-bg-color: rgba(36,36,36,.6);
-            }
-        </style>
-    }
-}
-else
-{
-    <!-- <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
-    -->
-    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/github-markdown-css/4.0.0/github-markdown.min.css" />
-    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" />
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
-
-    <style>
-        #__vconsole .vc-switch {
-            margin-right: 20px;
-            box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
-        }
-
-        .m-application a {
-            color: var(--main-color);
-        }
-    </style>
-
-    if (_dataCacheService.ThemeSetting.IsTransparent)
-    {
-        <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
-        <style>
-            .bg-opacity {
-                background-color: rgba(255, 255, 255, 0.7) !important;
-            }
-        </style>
-
-    }
-    else
-    {
-        <style>
-            #web_bg {
-                display: none;
-            }
-        </style>
-    }
-}
-
-@if (_dataCacheService.ThemeSetting.IsTransparent)
-{
-
-}
-else
-{
-    <style>
-        .bgimage-ison {
-            display: none !important;
-        }
-    </style>
-}
-
-<style>
-    body, .m-application, .markdown-body {
-        font-family:@_dataCacheService.ThemeSetting.FontFamily !important;
-    }
-</style>
-
-@if (_dataCacheService.ThemeSetting.IsFullScreen)
-{
-    <style>
-        .variable.container {
-            max-width: none;
-            padding: 0;
-        }
-    </style>
-}
-else if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
-{
-    @if (_dataCacheService.IsApp)
-    {
-        <style>
-            .variable.container {
-                max-width: none;
-                padding: 1rem;
-            }
-        </style>
-    }
-    else
-    {
-        <style>
-            .variable.container {
-                max-width: none;
-                padding: 1.5rem;
-            }
-        </style>
-    }
-}
-else
-{
-    @if (_dataCacheService.IsApp)
-    {
-        <style>
-            .container-sm {
-                padding: 0;
-            }
-        </style>
-    }
-    else
-    {
-        <style>
-            .container-sm {
-                max-width: 900px;
-            }
-        </style>
-    }
-
-}
+<!--自定义样式-->
+<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css">
 
 @if (_dataCacheService.IsApp)
 {
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/app.min.css" />
+    <!--移动端-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/app/bundle-app.css" />
 }
+else
+{
+    <!--桌面端-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/pc/bundle-pc.css" />
+}
+
+@if (_dataCacheService.ThemeSetting.IsDark)
+{
+     <!--暗色模式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/dark/bundle-dark.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" />
+}
+else
+{
+     <!--亮色模式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/light/bundle-light.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/vs2015.min.css" />
+}
+
+<!--开放搜索-->
+<link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
+
+
 @code {
 
     public string colorMain;
@@ -408,7 +290,7 @@ else
             ProcColor(_dataCacheService.ThemeSetting.Theme);
             //重新赋值
             var theme = MasaBlazor.Theme;
-            theme.Themes.Light.Primary = colorMain;
+            // theme.Themes.Light.Primary = colorMain;
             MasaBlazor.Theme = theme;
             // MasaBlazor.ToggleTheme();
             // MasaBlazor.ToggleTheme();

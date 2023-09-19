@@ -98,15 +98,12 @@ namespace CnGalWebSite.Server
                     //主题
                     options.ConfigureTheme(s =>
                     {
-                        if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
-                        {
-                            s.Themes.Light.Primary = "#4CAF50";
-                        }
-                        else
-                        {
-                            s.Themes.Light.Primary = "#f06292";
-                        }
-                        s.Themes.Dark.Primary = "#0078BF";
+                        s.Themes.Light.Primary = "var(--md-sys-color-primary)";
+                        s.Themes.Light.Secondary = "var(--md-sys-color-secondary)";
+                        s.Themes.Light.Error = "var(--md-sys-color-error)";
+                        s.Themes.Dark.Primary = "var(--md-sys-color-primary)";
+                        s.Themes.Dark.Secondary = "var(--md-sys-color-secondary)";
+                        s.Themes.Dark.Error = "var(--md-sys-color-error)";
                     });
                 });
 

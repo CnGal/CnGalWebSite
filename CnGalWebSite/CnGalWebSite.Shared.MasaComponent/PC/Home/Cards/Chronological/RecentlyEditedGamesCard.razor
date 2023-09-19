@@ -10,13 +10,13 @@
     <div class="group">
         @foreach (var item in _items)
         {
-            <a class="item" href="@item.Url">
+            <MDCard Class="item" Href="@item.Url">
                 <img src="@item.Image" alt="@item.Name" loading="lazy" />
                 <div class="content">
                     <div class="name text-truncate-1">@item.Name</div>
-                    <div class="time">@item.PublishTime</div>
+                    <div class="time  label-large">@item.PublishTime</div>
                 </div>
-            </a>
+            </MDCard>
         }
     </div>
 </section>

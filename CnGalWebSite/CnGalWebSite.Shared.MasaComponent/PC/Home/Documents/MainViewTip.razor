@@ -20,20 +20,8 @@ else
     <div>
         @if (isReady == false)
         {
-                <div class=" @(Outline?"":"rounded shadow-sm bg-opacity p-4 mb-4")">
-                    <SkeletonParagraph />
-                    <hr class="m-2" />
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+
         }
         else
         {

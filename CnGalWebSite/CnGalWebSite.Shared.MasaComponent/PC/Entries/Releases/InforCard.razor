@@ -1,10 +1,10 @@
 ﻿@inject IHttpService _httpService
 
 
-<div class="rounded shadow-sm bg-opacity p-3 mb-4">
-    <div class="fw-bold d-flex h5 font-color">
-        <MIcon Color="primary" Class="me-4">@GetIcon()</MIcon>@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())
-    </div>
+<MDCard Class="store-info-card pa-3 mb-4">
+    <h3 class="title-card title-large">
+        <MIcon Class="me-4">@GetIcon()</MIcon>@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())
+    </h3>
 
     @if (Model.StoreInfor.State != StoreState.None&& Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
     {
@@ -107,7 +107,7 @@
         <TimeChip Model="Model" />
         <EvaluationChip Model="Model" />
     </div>
-</div>
+</MDCard>
 
 @code {
 

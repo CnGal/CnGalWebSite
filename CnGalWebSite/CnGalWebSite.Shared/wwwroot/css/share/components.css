@@ -1,0 +1,78 @@
+﻿/*卡片*/
+.md-card {
+    display: flex;
+    border-radius: var( --md-card-border-radius);
+    transition: .3s;
+    white-space: normal;
+}
+    /*primary颜色*/
+    .md-card.color-primary {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-primary:hover {
+        background-color: var( --md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+
+
+    .md-card.show-hover-style:active {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+    .md-card img, .md-card .image {
+        transition: .3s;
+        border-radius: var( --md-card-border-radius);
+    }
+
+    .md-card.show-hover-style:active img, .md-card.show-hover-style:active .image {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+
+/*正在加载*/
+.progressing-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .progressing-card .md-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .progressing-card img {
+        width: 70%;
+        margin-bottom: 1rem;
+    }
+/*包含标题的卡片*/
+.title-container-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .title-container-card .title-card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .title-container-card .title-card h2 {
+            display: flex;
+        }
+
+        .title-container-card .title-card i {
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+    .title-container-card .content-card {
+        display: flex;
+        flex-direction: column;
+    }

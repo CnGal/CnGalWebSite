@@ -6,11 +6,11 @@
 
 <section class="free-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="免费游玩" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/free">
-        <a class="item" href="@context.Url">
+        <MDCard Class="item" Href="@context.Url">
             <img src="@context.Image" alt="@context.Name" loading="lazy" />
             <div class="content">
-                <div class="name text-truncate-1">@context.Name</div>
-                <div class="brief text-truncate-2">@context.BriefIntroduction</div>
+                <div class="name text-truncate-1 title-large">@context.Name</div>
+                <div class="brief text-truncate-2 label-large">@context.BriefIntroduction</div>
                 <div class="tags">
                     @foreach (var item in context.Tags.Random().Take(_dataCacheService.IsApp ? 1 : 2))
                     {
@@ -18,8 +18,7 @@
                     }
                 </div>
             </div>
-
-        </a>
+        </MDCard>
     </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 

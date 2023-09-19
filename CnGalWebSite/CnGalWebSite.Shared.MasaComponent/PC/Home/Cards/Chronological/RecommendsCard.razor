@@ -1,28 +1,24 @@
-﻿
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<HotRecommendItemModel>> _pageModelCatche
 
 <section class="published-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="随机推荐" MoreText="换一批" MoreIcon="IconType.Refresh" ForceShowMore OnClickMore="OnClickMore" Items="_items.Take(_dataCacheService.IsApp?9:16)">
-        <a class="item" href="@context.Url">
+         <MDCard Class="item" Href="@context.Url">
              <img src="@context.Image" alt="@context.Name" loading="lazy" />
-            <div class="content">
-                <div>
-                    <div class="name text-truncate-1">@context.Name</div>
-                    <div class="brief text-truncate-3">@context.BriefIntroduction</div>
-                </div>
-                <div class="tags">
-                    @*<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="@IconType.Tag" Text="@context.Reason.GetDisplayName()" />*@
-                    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Reason"/>
-                </div>
-            </div>
-        </a>
-    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
-</section>
+             <div class="content">
+                 <div class="name text-truncate-1 title-large">@context.Name</div>
+                 <div class="brief text-truncate-3 label-large">@context.BriefIntroduction</div>
+                 <div class="tags">
+                     <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Reason" />
+                 </div>
+             </div>
+         </MDCard>
+     </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+ </section>
 
-@code {
+ @code {
 
     List<HotRecommendItemModel> _items { get; set; } = new List<HotRecommendItemModel>();
 
@@ -48,7 +44,7 @@
     {
         try
         {
-             _pageModelCatche.Clean("api/home/ListHotRecommends");
+            _pageModelCatche.Clean("api/home/ListHotRecommends");
             _items = await _pageModelCatche.GetCache("api/home/ListHotRecommends");
             StateHasChanged();
         }

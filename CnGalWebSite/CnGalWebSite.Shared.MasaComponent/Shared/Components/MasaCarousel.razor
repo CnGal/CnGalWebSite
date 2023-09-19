@@ -23,7 +23,7 @@
     [Parameter]
     public EventCallback<CarouselViewModel> OnClick { get; set; }
     [Parameter]
-    public bool HideDelimiters { get; set; }
+    public bool HideDelimiters { get; set; } = true;
     [Parameter]
     public StringNumber AspectRatio { get; set; } = 1024 / 200D;
 }

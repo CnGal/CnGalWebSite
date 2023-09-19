@@ -1,0 +1,83 @@
+﻿/*默认模板 主要信息卡片*/
+.entry-page .default-card .main-card .image-card {
+    display: flex;
+}
+
+.entry-page .default-card .main-card.game .image-card img {
+    width: 460px;
+    height: min-content;
+}
+
+.entry-page .default-card .main-card.role .image-card img {
+    border-radius: 50%;
+    margin: 1rem;
+    height: 200px;
+}
+
+.entry-page .default-card .main-card .content-card {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.entry-page .default-card .main-card.game .content-card .groups-card {
+    display: flex;
+    column-gap: 1rem;
+    flex-wrap: wrap;
+}
+
+    .entry-page .default-card .main-card.game .content-card .groups-card > div {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+.entry-page .default-card .main-card .options-card {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.entry-page .default-card .main-card.role .content-card .brief {
+    -webkit-line-clamp: inherit;
+    white-space: pre-line;
+}
+
+@media screen and (max-width: 768px) {
+    .entry-page .default-card .main-card.game {
+        flex-direction: column;
+    }
+
+    .entry-page .default-card .main-card.role .image-card img {
+        height: 150px;
+    }
+
+    .entry-page .default-card .main-card.game .image-card img {
+        width: 100%;
+        height: min-content;
+    }
+
+    .entry-page .default-card .main-card.game .content-card .brief {
+        -webkit-line-clamp: inherit;
+        white-space: pre-line;
+    }
+}
+/*标签*/
+.entry-page .default-card .tags-card {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+/*商店信息*/
+.entry-page .default-card .store-info-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .entry-page .default-card .store-info-card .title-card i {
+        color: var(--md-sys-color-on-primary-container)!important;
+    }
+
+    .entry-page .default-card .store-info-card .title-card {
+        display: flex;
+    }

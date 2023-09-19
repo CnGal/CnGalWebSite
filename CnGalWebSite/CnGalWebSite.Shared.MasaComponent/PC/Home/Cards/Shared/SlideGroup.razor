@@ -12,14 +12,14 @@
             <div>
                 @if (_dataCacheService.IsApp)
                 {
-                    <MButton XSmall Text Block Color="primary" OnClick="OnClick">
+                    <MButton XSmall Text Block Color="primary" OnClick="@OnClick" Href="@MoreLink">
                         <MIcon Left>@MoreIcon.ToIconString()</MIcon>
                         @MoreText
                     </MButton>
                 }
                 else
                 {
-                    <MButton Text Block Color="primary" OnClick="OnClick">
+                    <MButton Text Block Color="primary" OnClick="@OnClick" Href="@MoreLink">
                         <MIcon Left>@MoreIcon.ToIconString()</MIcon>
                         @MoreText
                     </MButton>
@@ -64,10 +64,11 @@ else
         @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
         {
             <MSlideItem>
-                <a class="item more-link" @onclick="OnClick">
-                    <MIcon Large>@((MoreIcon== IconType.SeeDetails? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
-                    <div class="text">@MoreText</div>
-                </a>
+                <MDCard Class="item more-link" Href="MoreLink" OnClick="OnClick">
+                    <MIcon Large>@((MoreIcon == IconType.SeeDetails ? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
+                 <div class="text">@MoreText</div>
+
+                </MDCard>
             </MSlideItem>
         }
     </MSlideGroup>
@@ -99,10 +100,6 @@ else
         if (string.IsNullOrWhiteSpace(MoreLink))
         {
             await OnClickMore.InvokeAsync();
-        }
-        else
-        {
-            NavigationManager.NavigateTo(MoreLink);
         }
     }
 }

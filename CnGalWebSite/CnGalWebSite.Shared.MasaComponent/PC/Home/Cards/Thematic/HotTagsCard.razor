@@ -9,13 +9,12 @@
     <div class="group">
         @foreach (var item in _items)
         {
-            <a class="item" href="@item.Url">
+            <MDCard Class="item" Href="@item.Url">
                 <MIcon Small>@IconType.Tag.ToIconString()</MIcon>
-                <div class="content">
-                    <div class="name">@item.Name</div>
-                </div>
-
-            </a>
+             <div class="content">
+                 <div class="name">@item.Name</div>
+             </div>
+            </MDCard>
         }
     </div>
 </section>

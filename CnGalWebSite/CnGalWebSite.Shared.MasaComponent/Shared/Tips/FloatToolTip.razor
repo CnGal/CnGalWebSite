@@ -2,6 +2,7 @@
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 @inject IEventService _eventService
+@inject IJSRuntime JS
 
 
 <div style=" position: fixed; z-index: 4; bottom: 7rem; right: 2rem;" class="@(_dataCacheService.IsApp?"d-none":"")">
@@ -38,7 +39,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
 
-@code {
+ @code {
     public event Action SwitchEntryStyle;
 
 
@@ -49,9 +50,9 @@
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton masaCatalogButton;
 
-    public void OnClickFly()
+    public async Task OnClickFly()
     {
-        NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
+        await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
     }
 
     public void OnSwitchStyle()

@@ -1,0 +1,296 @@
+
+/*分享库存*/
+.anniversary-page .user-steam-card {
+    gap: .5rem;
+}
+
+    .anniversary-page .user-steam-card .user-info {
+        gap: .5rem;
+    }
+
+        .anniversary-page .user-steam-card .user-info .image {
+            height: 4rem;
+        }
+
+        .anniversary-page .user-steam-card .user-info .name {
+            font-size: inherit;
+            font-weight: bold;
+        }
+
+    .anniversary-page .user-steam-card .goal .key {
+        font-size: inherit;
+    }
+
+    .anniversary-page .user-steam-card .goal .value {
+        font-size: large;
+        font-weight: bold;
+    }
+
+
+/*全局*/
+#home-page h2 {
+    font-size: 1.5rem;
+    letter-spacing: .2rem;
+    margin-left: 1rem;
+}
+
+#home-page {
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
+    #home-page .right-content h2 {
+        font-size: 1.5rem !important;
+        margin-left: 1rem !important;
+        margin-top: 0;
+    }
+
+    /*卡片间距*/
+    #home-page .left-content, #home-page, .right-content, #home-page > .row {
+        gap: 3rem !important;
+    }
+
+/*滚动卡片组*/
+.slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding-bottom: .5rem;
+    gap: 1rem;
+}
+
+.slide-item {
+    display: flex;
+}
+/*最新动态*/
+.news-card .item {
+    width: 20rem;
+}
+
+/*近期发布的游戏*/
+.published-games-card .brief, .upcoming-games-card .brief {
+    display: none;
+}
+
+.published-games-card .item {
+    width: 10rem;
+}
+
+.published-games-card .name {
+    font-size: 1rem !important;
+    -webkit-line-clamp: 3;
+}
+
+.published-games-card .item .content, .upcoming-games-card .item .content, .free-games-card .item .content, .discount-games-card .item .content {
+    margin: .5rem 1rem;
+}
+/*即将发布*/
+.upcoming-games-card .item {
+    width: 15rem;
+}
+
+.upcoming-games-card .name {
+    font-size: 1rem !important;
+}
+/*最新文章*/
+.latest-articles-card .content .name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.latest-articles-card .content {
+    gap: .5rem;
+}
+
+.latest-articles-card .head {
+    gap: .5rem;
+}
+/*最新视频*/
+.latest-videoes-card .image {
+    width: 9rem !important;
+}
+
+.latest-videoes-card .group {
+    flex-direction: row;
+}
+
+.latest-videoes-card .item {
+    flex-direction: column;
+    width: 12rem;
+}
+
+.latest-videoes-card .image {
+    width: 100% !important;
+    height: auto;
+}
+
+.latest-videoes-card .head {
+    gap: .5rem;
+}
+
+.latest-videoes-card .addinfo {
+    word-break: keep-all;
+    flex-wrap: wrap;
+}
+/*友情连接*/
+.friend-links-card .group {
+    margin: 0;
+}
+
+.friend-links-card .item {
+    width: 10rem;
+}
+/*一言*/
+.quote-card .quote-content {
+    font-size: 1.2rem !important;
+    letter-spacing: .2rem;
+}
+/*关于我们*/
+.about-card .head {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.about-card .links-groups {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0rem;
+    word-break: keep-all;
+    margin: 0;
+}
+
+
+.about-card .addinfo {
+    column-gap: 1rem;
+    flex-wrap: wrap;
+    row-gap: .5rem;
+}
+
+.about-card {
+    gap: 2rem !important;
+}
+/*专题推荐*/
+.evaluations-group {
+    margin: 0;
+    padding: 0;
+}
+
+.evaluations-card .articles-group img {
+    width: 9rem !important;
+}
+
+.articles-group .item {
+    flex-direction: column;
+    width: calc((100% - 1rem)*0.5);
+}
+
+    .articles-group .item img {
+        width: 100% !important;
+    }
+
+.articles-group {
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+    .articles-group .head {
+        gap: .5rem;
+    }
+
+    .articles-group .addinfo {
+        word-break: keep-all;
+        flex-wrap: wrap;
+    }
+
+    .articles-group .name {
+        -webkit-line-clamp: 2;
+    }
+
+.evaluations-card .content {
+    font-size: inherit;
+}
+/*免费游戏*/
+.free-games-card .name {
+    font-size: 1rem !important;
+    font-weight: bold;
+}
+
+.free-games-card .item {
+    width: 15rem;
+}
+/*打折游戏*/
+.discount-games-card .item {
+    width: 17rem;
+}
+
+.discount-games-card .name {
+    font-size: 1rem !important;
+    font-weight: bold;
+}
+/*看板娘*/
+.kanban-card .content {
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 2rem;
+}
+
+/*个性化推荐*/
+.recommends-group {
+    gap: 3rem;
+}
+/*纯文本*/
+.plain-text-card.item {
+    flex-direction: column;
+    gap: 0rem;
+}
+
+    .plain-text-card.item img {
+        width: 100% !important;
+        height: auto !important;
+        min-width: auto !important;
+    }
+
+    .plain-text-card.item .name {
+        font-size: 1.5rem;
+    }
+
+
+/*相册*/
+.gallery-card .actions {
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 0;
+}
+
+.gallery-card .head {
+    gap: .5rem;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.gallery-card .name {
+    font-size: 1.5rem;
+}
+
+.gallery-card {
+    padding: 1rem;
+    gap: 1rem;
+}
+
+    .gallery-card .content {
+        padding: 0;
+    }
+/*图墙*/
+.masa-image .item-image .image-name {
+    opacity: 1;
+    display: flex;
+    font-size: 1rem;
+}
+
+.image-games-card {
+    row-gap: 1rem;
+}

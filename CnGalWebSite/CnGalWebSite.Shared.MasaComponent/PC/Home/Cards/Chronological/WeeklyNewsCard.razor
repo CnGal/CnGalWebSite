@@ -10,7 +10,7 @@
     <div class="group">
         @foreach (var item in _items.Take(_dataCacheService.IsApp ? 3 : 5))
         {
-            <a class="item" href="@($"articles/index/{item.Id}")">
+            <MDCard Class="item" Href="@($"articles/index/{item.Id}")">
                 @if (GetIcon(item) != null)
                 {
                     <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
@@ -19,7 +19,7 @@
                 <div class="content">
                     <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name.MidStrEx("CnGal每周速报（", "）")</div>
                 </div>
-            </a>
+            </MDCard>
         }
     </div>
 </section>

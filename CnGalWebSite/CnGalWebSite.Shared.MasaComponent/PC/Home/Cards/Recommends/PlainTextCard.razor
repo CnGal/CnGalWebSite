@@ -1,11 +1,11 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-<a class="plain-text-card item" href="@($"entries/index/{Model.Id}")">
+<MDCard Class="plain-text-card item" Href="@($"entries/index/{Model.Id}")">
     <img src="@Model.MainPicture" alt="@Model.Name" loading="lazy" />
     <div class="content">
         <div class="name text-truncate-1">@Model.Name</div>
         <div class="tags">
-            @if (Model.Release!=null)
+            @if (Model.Release != null)
             {
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.TimeChip Model="Model.Release" />
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.EvaluationChip Model="Model.Release" />
@@ -13,8 +13,8 @@
         </div>
         <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
     </div>
-</a>
 
+</MDCard>
 
 @code {
     [Parameter]
