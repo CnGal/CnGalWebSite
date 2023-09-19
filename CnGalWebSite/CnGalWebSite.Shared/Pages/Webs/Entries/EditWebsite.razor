@@ -2,6 +2,7 @@
 
 
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -74,7 +75,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑词条专题页样式模板数据失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑词条专题页样式模板数据失败");
             }
 
         }
@@ -88,19 +89,19 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存词条专题页样式模板数据失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存词条专题页样式模板数据失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存词条专题页样式模板数据成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("保存成功", "保存词条专题页样式模板数据成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存词条专题页样式模板数据失败");
+            await ErrorHandler.ProcessError(ex, "保存词条专题页样式模板数据失败");
         }
     }
 

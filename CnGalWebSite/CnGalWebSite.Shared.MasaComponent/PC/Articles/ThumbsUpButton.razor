@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
 
+@inject IPopupService PopupService
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -39,7 +40,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取与用户相关的文章信息失败");
+                await ErrorHandler.ProcessError(ex, "获取与用户相关的文章信息失败");
             }
         }
 
@@ -98,18 +99,18 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("取消点赞文章失败", obj.Error);
+                await PopupService.ToastErrorAsync("取消点赞文章失败", obj.Error);
             }
             else
             {
-                //await ToastService.Success("取消点赞文章成功", "取消点赞文章成功");
+                //await PopupService.ToastSuccessAsync("取消点赞文章成功", "取消点赞文章成功");
                 IsThumbsUp = false;
                 StateHasChanged();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "取消点赞文章失败");
+            await ErrorHandler.ProcessError(ex, "取消点赞文章失败");
         }
     }
     private async Task ThumbsUp()
@@ -120,18 +121,18 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("点赞文章失败", obj.Error);
+                await PopupService.ToastErrorAsync("点赞文章失败", obj.Error);
             }
             else
             {
-                //await ToastService.Success("点赞文章成功", "点赞文章成功");
+                //await PopupService.ToastSuccessAsync("点赞文章成功", "点赞文章成功");
                 IsThumbsUp = true;
                 StateHasChanged();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "点赞文章失败");
+            await ErrorHandler.ProcessError(ex, "点赞文章失败");
         }
     }
 

@@ -122,7 +122,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取审核信息失败");
+                await ErrorHandler.ProcessError(ex, "获取审核信息失败");
             }
         }
     }

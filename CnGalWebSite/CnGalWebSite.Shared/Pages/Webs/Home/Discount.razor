@@ -117,7 +117,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
+                await ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
             }
         }
     }

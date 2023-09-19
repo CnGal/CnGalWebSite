@@ -94,7 +94,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取汇总数据失败");
+            await ErrorHandler.ProcessError(ex, "获取汇总数据失败");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 <div class="row">
@@ -155,7 +156,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
         }
     }
 
@@ -167,12 +168,12 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("使消息已读失败", obj.Error);
+                await PopupService.ToastErrorAsync("使消息已读失败", obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "设置消息已读失败");
+            await ErrorHandler.ProcessError(ex, "设置消息已读失败");
         }
     }
 }

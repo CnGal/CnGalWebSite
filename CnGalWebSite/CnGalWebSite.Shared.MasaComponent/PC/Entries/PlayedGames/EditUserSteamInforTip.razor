@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -51,7 +52,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑用户信息失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑用户信息失败");
         }
     }
 
@@ -61,7 +62,7 @@
         {
             if (string.IsNullOrWhiteSpace(Model.SteamId))
             {
-                await ToastService.Error("编辑用户Steam信息失败", "SteamId不能为空");
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId不能为空");
                 return;
             }
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
@@ -70,7 +71,7 @@
             {
                 if (regex.IsMatch(Model.SteamId) == false)
                 {
-                    await ToastService.Error("编辑用户Steam信息失败", "SteamId需为64位纯数字");
+                    await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId需为64位纯数字");
                     return;
                 }
             }
@@ -80,11 +81,11 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
             }
             else
             {
-                await ToastService.Success("编辑用户Steam信息成功", "编辑用户Steam信息成功");
+                await PopupService.ToastSuccessAsync("编辑用户Steam信息成功", "编辑用户Steam信息成功");
                 Dialog = false;
                 StateHasChanged();
                 await OnChanged.InvokeAsync(Model.SteamId);
@@ -93,7 +94,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑用户Steam信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑用户Steam信息失败");
         }
     }
 

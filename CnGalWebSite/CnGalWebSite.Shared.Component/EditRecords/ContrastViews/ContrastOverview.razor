@@ -118,15 +118,10 @@
                 CurrentItem = item.Id.ToString();
             }
         }
-        if(CurrentItems.Any(s=>s.Active)==false)
-        {
-            CurrentItems.Last().Active = true;
-            CurrentItem = CurrentItems.Last().Value;
-        }
         
     }
 
-    public async Task OnContrastChanged(SelectedItem item)
+    public async Task OnContrastChanged(string value)
     {
         if(isContrastFirst)
         {
@@ -135,7 +130,7 @@
         }
         foreach(var temp in Model.Examines)
         {
-            if(temp.Id.ToString()==item.Value)
+            if (temp.Id.ToString() == value)
             {
                 temp.IsSelected = true;
             }
@@ -147,9 +142,9 @@
 
         GenerateList();
         StateHasChanged();
-        await ContrastChanged.InvokeAsync(item.Value);
+        await ContrastChanged.InvokeAsync(value);
     }
-    public async Task OnCurrentChanged(SelectedItem item)
+    public async Task OnCurrentChanged(string value)
     {
         if (isCurrentFirst)
         {
@@ -158,6 +153,6 @@
         }
         GenerateList();
         StateHasChanged();
-        await CurrentChanged.InvokeAsync(item.Value);
+        await CurrentChanged.InvokeAsync(value);
     }
 }

@@ -136,7 +136,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
+                await ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
                 return (new List<TModel>(), 0);
             }
         }

@@ -2,7 +2,9 @@
 
 @inject ILocalStorageService _localStorage
 
-@inject IServiceProvider Provider
+
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建周边"/>
@@ -79,7 +81,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -93,19 +95,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("创建周边失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建周边失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("创建周边成功", "创建周边成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + obj.Error, Model.Name, "fa fa-shopping-basket");
+                await PopupService.ToastSuccessAsync("创建周边成功", "创建周边成功，等待审核通过");
+                NavigationManager.NavigateTo("/peripheries/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建周边失败");
+            await ErrorHandler.ProcessError(ex, "创建周边失败");
         }
     }
 

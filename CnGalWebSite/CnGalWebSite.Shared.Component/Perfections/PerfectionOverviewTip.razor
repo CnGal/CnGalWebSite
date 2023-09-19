@@ -46,7 +46,7 @@
         }
         catch(Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取完善度概览失败");
+            await ErrorHandler.ProcessError(ex, "获取完善度概览失败");
         }
     }
 

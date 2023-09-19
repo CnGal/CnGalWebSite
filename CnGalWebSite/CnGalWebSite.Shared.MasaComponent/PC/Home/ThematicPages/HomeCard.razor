@@ -90,7 +90,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+            await ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
         }
 
     }

@@ -3,8 +3,9 @@
 
 @inject ILocalStorageService _localStorage
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建抽奖"/>
@@ -69,7 +70,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -82,17 +83,17 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("创建抽奖失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建抽奖失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("创建抽奖成功", "创建抽奖成功");
-                NavigationManager.NavigateTo(Provider, "/lotteries/index/" + obj.Error, Model.Name, "fa fa-dropbox");
+                await PopupService.ToastSuccessAsync("创建抽奖成功", "创建抽奖成功");
+                NavigationManager.NavigateTo( "/lotteries/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建抽奖失败");
+            await ErrorHandler.ProcessError(ex, "创建抽奖失败");
         }
     }
 

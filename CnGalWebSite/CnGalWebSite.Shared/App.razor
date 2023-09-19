@@ -13,43 +13,41 @@
 @using CnGalWebSite.Shared.Layout;
 
 <MApp>
-    <BootstrapBlazorRoot>
-        <CascadingValue Value="connectionInfo" IsFixed="true">
-            <CascadingAuthenticationState>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-                    <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
-                        <Found Context="routeData">
-                            @if (ToolHelper.IsSSR)
-                            {
-                                <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
-                            }
-                            else
-                            {
-                                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
-                                    <NotAuthorized>
-                                        <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
-                                    </NotAuthorized>
-                                    <Authorizing>
+    <CascadingValue Value="connectionInfo" IsFixed="true">
+        <CascadingAuthenticationState>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+                <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+                    <Found Context="routeData">
+                        @if (ToolHelper.IsSSR)
+                        {
+                            <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
+                        }
+                        else
+                        {
+                            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
+                                <NotAuthorized>
+                                    <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                </NotAuthorized>
+                                <Authorizing>
 
-                                    </Authorizing>
-                                </AuthorizeRouteView>
-                            }
-                            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-                        </Found>
-                        <NotFound>
-                            <LayoutView Layout="LayoutType">
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError/>
-                            </LayoutView>
-                        </NotFound>
-                    </Router>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-            </CascadingAuthenticationState>
-        </CascadingValue>
-    </BootstrapBlazorRoot>
+                                </Authorizing>
+                            </AuthorizeRouteView>
+                        }
+                        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                    </Found>
+                    <NotFound>
+                        <LayoutView Layout="LayoutType">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError />
+                        </LayoutView>
+                    </NotFound>
+                </Router>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+        </CascadingAuthenticationState>
+    </CascadingValue>
 </MApp>
 
 
-@code{
+@code {
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
     [Parameter]

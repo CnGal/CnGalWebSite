@@ -116,7 +116,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, $"获取{Type.GetDisplayName()}图表数据失败");
+            await ErrorHandler.ProcessError(ex, $"获取{Type.GetDisplayName()}图表数据失败");
         }
     }
 }

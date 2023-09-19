@@ -1,4 +1,5 @@
-﻿
+﻿@inject IPopupService PopupService
+
 
 
 <style>
@@ -47,7 +48,7 @@
             @foreach (var item in Model.Options)
             {
                 <div class="@(Model.UserSelections.Contains(item.OptionId)?"mb-2 option-card-active":"mb-2 option-card")" style=" display: flex; flex-direction: row; border-radius: 5px; cursor:pointer"
-                     @onclick="@(()=>OnSeletedItemChanged(item,Model.UserSelections.Contains(item.OptionId)?CheckboxState.UnChecked:CheckboxState.Checked))">
+                     @onclick="@(()=>OnSeletedItemChanged(item,Model.UserSelections.Contains(item.OptionId)))">
                     <div style=" display: flex; flex-direction: column; justify-content: center; " class=" ms-3">
                         <MCheckbox TValue="bool" Value="@(Model.UserSelections.Contains(item.OptionId))" ValueChanged="@((e)=>OnSeletedItemChanged(item,e))"
                                   Disabled="@(Model.UserSelections.Contains(item.OptionId)?false:(Model.UserSelections.Count>=Model.MaximumSelectionCount))"></MCheckbox>
@@ -106,7 +107,7 @@
             {
                 if (Model.UserSelections.Count == Model.MaximumSelectionCount)
                 {
-                    await ToastService.Error($"最多选择{Model.MaximumSelectionCount}项", $"最多选择{Model.MaximumSelectionCount}项");
+                    await PopupService.ToastErrorAsync($"最多选择{Model.MaximumSelectionCount}项", $"最多选择{Model.MaximumSelectionCount}项");
                     StateHasChanged();
                     return;
                 }

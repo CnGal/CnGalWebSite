@@ -125,7 +125,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取游玩记录失败");
+            await ErrorHandler.ProcessError(ex, "获取游玩记录失败");
         }
     }
 
@@ -211,7 +211,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑游玩记录失败");
+            await ErrorHandler.ProcessError(ex, "编辑游玩记录失败");
         }
     }
 

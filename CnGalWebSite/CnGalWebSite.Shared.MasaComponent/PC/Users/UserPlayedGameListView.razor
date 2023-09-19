@@ -1,10 +1,11 @@
 ﻿@inject IHttpService _httpService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 
 <div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
@@ -101,7 +102,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
+            await ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
         }
     }
 
@@ -130,17 +131,17 @@
                 _dataCacheService.UserGameRecordDataCatche.Clean(UserId);
                 _dataCacheService.UserSteamInforDataCatche.Clean(UserId);
                 await Refresh();
-                await ToastService.Success("刷新成功", "刷新成功");
+                await PopupService.ToastSuccessAsync("刷新成功", "刷新成功");
                 StateHasChanged();
             }
             else
             {
-                await ToastService.Error("刷新失败", "刷新失败");
+                await PopupService.ToastErrorAsync("刷新失败", "刷新失败");
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
+            await ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
         }
     }
 }

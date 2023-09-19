@@ -1,6 +1,7 @@
 ﻿
 @inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -71,12 +72,12 @@
 
             if (obj.Successful == false)
             {
-                await ToastService.Error("移动收藏失败", obj.Error);
+                await PopupService.ToastErrorAsync("移动收藏失败", obj.Error);
             }
             else
             {
 
-                await ToastService.Success("移动收藏成功", "移动收藏成功");
+                await PopupService.ToastSuccessAsync("移动收藏成功", "移动收藏成功");
                 Dialog = false;
                 StateHasChanged();
                 await OnMoved.InvokeAsync();
@@ -85,7 +86,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "移动收藏失败");
+            await ErrorHandler.ProcessError(ex, "移动收藏失败");
         }
     }
 
@@ -93,7 +94,7 @@
     {
         if (SelectedItemIds.Any()==false)
         {
-            await ToastService.Error("请选择要移动到的收藏夹", "请选择要移动到的收藏夹");
+            await PopupService.ToastErrorAsync("请选择要移动到的收藏夹", "请选择要移动到的收藏夹");
             return;
         }
         await MoveFavoriteObjects(SelectedItemIds, ObjectIds);

@@ -1,4 +1,5 @@
-﻿
+﻿@inject IPopupService PopupService
+
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -63,11 +64,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("审核失败", obj.Error);
+                await PopupService.ToastErrorAsync("审核失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
+                await PopupService.ToastSuccessAsync("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
                 //清除缓存
                 if (_dataCacheService.UserContentCenterCatche?.PendingExamines != null)
                 {
@@ -78,7 +79,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "审核失败");
+            await ErrorHandler.ProcessError(ex, "审核失败");
         }
     }
 }

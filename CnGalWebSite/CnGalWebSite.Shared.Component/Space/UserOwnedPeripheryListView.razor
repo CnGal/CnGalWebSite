@@ -40,7 +40,7 @@
         }
         catch(Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户相关周边集合列表失败");
+            await ErrorHandler.ProcessError(ex, "获取用户相关周边集合列表失败");
         }
     }
 }

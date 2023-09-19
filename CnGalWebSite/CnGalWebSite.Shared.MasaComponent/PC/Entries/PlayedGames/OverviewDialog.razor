@@ -163,7 +163,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
+            await ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
         }
 
         await OnChanged.InvokeAsync();

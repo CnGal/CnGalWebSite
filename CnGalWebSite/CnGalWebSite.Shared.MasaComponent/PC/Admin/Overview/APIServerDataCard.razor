@@ -75,7 +75,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取API服务器动态数据失败");
+            await ErrorHandler.ProcessError(ex, "获取API服务器动态数据失败");
         }
 
         IsRefresh = false;

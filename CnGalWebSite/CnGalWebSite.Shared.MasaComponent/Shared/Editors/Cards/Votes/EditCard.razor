@@ -4,7 +4,7 @@
 
     <MCard>
         <MCardTitle>
-        @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.Name
+        @(Model.RealId == 0 ? $"添加{_name}" : $"编辑{_name}")
         </MCardTitle>
         <MCardText>
             <MRow>
@@ -54,16 +54,16 @@
     public async Task SaveEdit()
     {
         var flag = false;
-        if (Model.Id == 0)
+        if (Model.RealId == 0)
         {
             flag = true;
             if (Options.Count == 0)
             {
-                Model.Id = 1;
+                Model.RealId = 1;
             }
             else
             {
-                Model.Id = Options.Max(i => i.Id) + 1;
+                Model.RealId = Options.Max(i => i.RealId) + 1;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿
+﻿@inject IPopupService PopupService
+
 
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -29,56 +30,56 @@
             </MCardText>
         }
 
-    <MCardText>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
-            <div class="row">
-                <div class="col-12 col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" ShowCropper Text="上传预览图"/>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Name" ShowLabel="true" />
-                </div>
-            </div>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
-            <div class="form-group">
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Count" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Sponsor" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12">
-                        <BootstrapInput @bind-Value="Model.Link" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Integral" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Priority" ShowLabel="true" />
-                    </div>
+        <MCardText>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
+                <MRow>
+                    <MCol Cols="12" Md="6">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" ShowCropper Text="上传预览图" />
 
-                </div>
-            </div>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    </MCardText>
+                     </MCol>
+                     <MCol Cols="12" Md="6">
+                         <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="LotteryAwardType" Label="类型" />
+                     </MCol>
+                     <MCol Cols="12" Md="6">
+                         <MTextField @bind-Value="Model.Name" Label="名称" />
+                     </MCol>
+                 </MRow>
+             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+                <MRow>
 
-          
+                    <MCol Cols="12" Md="6">
+                        <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="LotteryAwardType" Label="类型" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.Count" Label="数量" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.Sponsor" Label="赞助商" />
+                    </MCol>
+                    <MCol Cols="12">
+                        <MTextField @bind-Value="Model.Link" Label="链接" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.Integral" Label="附加积分" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.Priority" Label="优先级" />
+                    </MCol>
+                </MRow>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </MCardText>
+
+
 
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
-            <MSpacer/>
+            <MSpacer />
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
-        </MCardActions>
-    </MCard>
-</MDialog>
+         </MCardActions>
+     </MCard>
+ </MDialog>
 
-@code {
+ @code {
     [Parameter]
     public EventCallback<EditLotteryAwardModel> OnRefreshTable { get; set; }
 
@@ -94,14 +95,14 @@
     public async Task OnSave()
     {
         var result = Model.Validate();
-        if(result.Successful)
+        if (result.Successful)
         {
             await OnRefreshTable.InvokeAsync(Model);
             Dialog = false;
         }
         else
         {
-            await ToastService.Error("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
+            await PopupService.ToastErrorAsync("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
         }
     }
 

@@ -4,7 +4,7 @@
 @inject IHttpService _httpService
 
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 @inject IJSRuntime JS
@@ -256,7 +256,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
         }
     }
     public void ContrastChanged(string conId)
@@ -324,7 +324,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取详细编辑对比视图失败");
+            await ErrorHandler.ProcessError(ex, "获取详细编辑对比视图失败");
         }
     }
     #region 释放实例

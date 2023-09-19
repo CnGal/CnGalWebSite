@@ -122,7 +122,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 
@@ -147,7 +147,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 
@@ -172,7 +172,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
     public async Task EditItemCanComment(EntryOverviewModel model, bool canComment)
@@ -196,7 +196,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 }

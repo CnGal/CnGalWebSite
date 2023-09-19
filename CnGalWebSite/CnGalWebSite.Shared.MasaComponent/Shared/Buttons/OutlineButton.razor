@@ -1,6 +1,7 @@
 ﻿
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 @if (IsTitile)
 {
@@ -92,7 +93,7 @@ else
                 }
                 else
                 {
-                    await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+                    await PopupService.ToastErrorAsync("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
 
                 }
             }

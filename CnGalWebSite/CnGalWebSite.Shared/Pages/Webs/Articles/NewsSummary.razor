@@ -101,7 +101,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取动态分类汇总列表失败");
+            await ErrorHandler.ProcessError(ex, "获取动态分类汇总列表失败");
         }
     }
 

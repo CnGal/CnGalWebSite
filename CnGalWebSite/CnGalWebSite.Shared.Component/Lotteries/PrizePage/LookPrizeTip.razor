@@ -1,34 +1,36 @@
 ﻿
 
 @inject IHttpService _httpService
-<style>
-    .modal-footer {
-        display: none;
-    }
-</style>
 
-<div>
-    @if (isReady)
-    {
-        @if (Model.Type == LotteryAwardType.ActivationCode)
-        {
-            <span style="font-size:large;">激活码：@Model.Context</span>
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            查看奖品
+        </MCardTitle>
+      
+        <MCardText>
+            @if (Model!=null)
+            {
+                @if (Model.Type == LotteryAwardType.ActivationCode)
+                {
+                    <span style="font-size:large;">激活码：@Model.Context</span>
 
-        }
-        else if (Model.Type == LotteryAwardType.RealThing)
-        {
-            <span style="font-size:large;">单号：@Model.Context</span>
+                }
+                else if (Model.Type == LotteryAwardType.RealThing)
+                {
+                    <span style="font-size:large;">单号：@Model.Context</span>
 
-        }
-    }
-    else
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" />
-
-
-    }
-</div>
-
+                }
+            }
+            else
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" />
+            }
+        </MCardText>
+      
+    </MCard>
+</MDialog>
 @code {
     [Parameter]
     public long Id { get; set; }
@@ -42,18 +44,21 @@
     private IEnumerable<long> Value1 { get; set; }
     bool isReady = false;
 
-    protected override async Task OnInitializedAsync()
+    bool Dialog { get; set; }
+
+
+    public async Task Refresh()
     {
         try
         {
+            Dialog = true;
+            StateHasChanged();
             Model = await _httpService.GetAsync<PrizeViewModel>("api/lotteries/GetUserPrize/" + Id);
-
-            isReady = true;
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户奖品失败");
+            await ErrorHandler.ProcessError(ex, "获取用户奖品失败");
         }
     }
 }

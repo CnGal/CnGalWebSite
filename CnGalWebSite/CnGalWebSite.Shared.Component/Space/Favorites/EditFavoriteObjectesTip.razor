@@ -68,7 +68,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
+            await ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
         }
     }
 
@@ -106,7 +106,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 

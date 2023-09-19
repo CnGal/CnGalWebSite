@@ -3,6 +3,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -102,7 +103,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -115,17 +116,17 @@ else
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑抽奖失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑抽奖失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("编辑抽奖成功", "编辑抽奖成功");
+                await PopupService.ToastSuccessAsync("编辑抽奖成功", "编辑抽奖成功");
                 NavigationManager.NavigateTo("/lotteries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑抽奖失败");
+            await ErrorHandler.ProcessError(ex, "编辑抽奖失败");
         }
     }
 

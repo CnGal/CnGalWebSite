@@ -3,6 +3,7 @@
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -18,39 +19,31 @@
             @if (isReady)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-                        </div>
-                    </div>
+                     <MRow>
+                         <MCol Cols="12" Md="6">
+                             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+                         </MCol>
+                         <MCol Cols="12" Md="6">
+                             <MTextField @bind-Value="Model.Title" Label="标题" />
+                         </MCol>
+                         <MCol Cols="12">
+                             <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
+                         </MCol>
+                         <MCol Cols="12" Md="6">
+                             <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
+                         </MCol>
+                     </MRow>
 
-                    <div class="form-group mt-4">
-                        <div class="row">
-
-                            <div class="form-group col-12">
-                                <BootstrapInput @bind-Value="Model.Title" ShowLabel="true" />
-                            </div>
-                            <div class="form-group col-12">
-                                <Textarea @bind-Value="Model.BriefIntroduction" rows="5" ShowLabel="true" />
-                            </div>
-                            <div class="form-group col-12">
-                                <Textarea @bind-Value="Model.MainPage" rows="5" ShowLabel="true" />
-                            </div>
-
-                        </div>
-                    </div>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="form-group col-12  col-sm-6">
-                                <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <DateTimePicker @bind-Value="@Model.PublishTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
-                            </div>
-                        </div>
-                    </div>
+                 <MRow>
+                     <MCol Cols="12" Md="6">
+                         <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
+                     </MCol>
+                     <MCol Cols="12" Md="6">
+                         <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间" />
+                         </MCol>
+                     </MRow>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="包含的动态" Class="mb-4" Collapable Outline OutlineHead>
                     @foreach (var item in Model.News)
@@ -128,7 +121,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑周报信息失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑周报信息失败");
         }
     }
 
@@ -149,7 +142,7 @@
             //处理数据
             if (Model.News.Any(s => s.IsSelected) == false)
             {
-                await ToastService.Error("保存周报数据失败", "至少选中一个动态");
+                await PopupService.ToastErrorAsync("保存周报数据失败", "至少选中一个动态");
                 return;
             }
 
@@ -157,17 +150,17 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存周报数据失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存周报数据失败", obj.Error);
             }
             else
             {
                 await DataChanged();
-                await ToastService.Success("保存周报数据成功", "保存周报数据成功");
+                await PopupService.ToastSuccessAsync("保存周报数据成功", "保存周报数据成功");
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存周报数据失败");
+            await ErrorHandler.ProcessError(ex, "保存周报数据失败");
         }
     }
 
@@ -181,18 +174,18 @@
             var result = await _httpService.GetAsync<Result>("api/news/PublishWeelyNews/" + Id);
             if (result.Successful)
             {
-                await ToastService.Success("发布周报成功", "发布周报成功");
+                await PopupService.ToastSuccessAsync("发布周报成功", "发布周报成功");
                 Dialog = false;
             }
             else
             {
-                await ToastService.Error("发布周报失败", result.Error);
+                await PopupService.ToastErrorAsync("发布周报失败", result.Error);
             }
 
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "发布周报失败");
+            await ErrorHandler.ProcessError(ex, "发布周报失败");
         }
 
     }
@@ -214,7 +207,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取周报预览数据失败");
+            await ErrorHandler.ProcessError(ex, "获取周报预览数据失败");
         }
 
     }
@@ -233,18 +226,18 @@
             if (result.Successful)
             {
                 await DataChanged();
-                await ToastService.Success("重置周报成功", "重置周报成功");
+                await PopupService.ToastSuccessAsync("重置周报成功", "重置周报成功");
 
             }
             else
             {
-                await ToastService.Error("重置周报失败", result.Error);
+                await PopupService.ToastErrorAsync("重置周报失败", result.Error);
             }
 
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "重置周报失败");
+            await ErrorHandler.ProcessError(ex, "重置周报失败");
         }
 
     }

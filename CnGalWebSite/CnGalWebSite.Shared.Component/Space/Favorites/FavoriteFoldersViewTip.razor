@@ -66,7 +66,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
+            await ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
         }
     }
 

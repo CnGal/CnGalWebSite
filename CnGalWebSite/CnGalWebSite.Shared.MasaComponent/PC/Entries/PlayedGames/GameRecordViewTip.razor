@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -118,19 +119,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("修改游玩记录显示状态失败", obj.Error);
+                await PopupService.ToastErrorAsync("修改游玩记录显示状态失败", obj.Error);
             }
             else
             {
                 Model.IsHidden = !Model.IsHidden;
-                await ToastService.Success("修改游玩记录显示状态成功", "修改游玩记录显示状态成功");
+                await PopupService.ToastSuccessAsync("修改游玩记录显示状态成功", "修改游玩记录显示状态成功");
                 Dialog = false;
                await OnChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "修改游玩记录显示状态失败");
+            await ErrorHandler.ProcessError(ex, "修改游玩记录显示状态失败");
         }
     }
 

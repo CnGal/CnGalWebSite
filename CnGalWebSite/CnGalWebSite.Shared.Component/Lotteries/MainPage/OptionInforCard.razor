@@ -1,6 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IPopupService PopupService
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 
@@ -119,7 +119,8 @@
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
-
+<CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip @ref="lookPrizeTip" Id="ViewModel.Id"/>
+<CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard @ref="editAddressCard" />
 @code {
     [Parameter]
     public LotteryViewModel ViewModel { get; set; }
@@ -132,7 +133,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
-
+    CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip lookPrizeTip;
+    CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard editAddressCard;
     protected override async Task OnInitializedAsync()
     {
         await Refresh();
@@ -151,7 +153,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取用户抽奖状态失败");
+                await ErrorHandler.ProcessError(ex, "获取用户抽奖状态失败");
             }
         }
 
@@ -178,7 +180,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "参与抽奖失败");
+            await ErrorHandler.ProcessError(ex, "参与抽奖失败");
         }
     }
 
@@ -203,69 +205,11 @@
 
     public async Task OnLookPrize()
     {
-        var option = new DialogOption()
-        {
-            Title = "查看奖品",
-            Size = Size.Medium
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PrizePage.LookPrizeTip>(new Dictionary<string, object>
-        {
-            [nameof(PrizePage.LookPrizeTip.Id)] = ViewModel.Id,
-        }).Render();
-        await DialogService.Show(option);
+        await lookPrizeTip?.Refresh();
     }
 
     public async Task EditUserAddress()
     {
-        var model = new EditUserAddressModel();
-        try
-        {
-            model = await _httpService.GetAsync<EditUserAddressModel>("api/space/EditUserAddress");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑用户地址信息失败");
-        }
-
-        var items = Utility.GenerateEditorItems<EditUserAddressModel>();
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditUserAddressModel.Address));
-        editItem.Rows = 3;
-
-        var option = new EditDialogOption<EditUserAddressModel>()
-        {
-            Title = "编辑收货地址",
-            Model = model,
-            Items = items,
-            Size = Size.Large,
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (EditUserAddressModel)context.Model;
-
-                try
-                {
-                    var obj = await _httpService.PostAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", item);
-                    //判断结果
-                    if (obj.Successful == false)
-                    {
-                        await ToastService.Error("编辑收货地址失败", obj.Error);
-                        return false;
-                    }
-                    else
-                    {
-                        await ToastService.Success("编辑收货地址成功", "编辑收货地址成功");
-                        await Refresh();
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorHandler.ProcessError(ex, "编辑收货地址失败");
-                    return false;
-                }
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        await editAddressCard?.Refresh();
     }
 }

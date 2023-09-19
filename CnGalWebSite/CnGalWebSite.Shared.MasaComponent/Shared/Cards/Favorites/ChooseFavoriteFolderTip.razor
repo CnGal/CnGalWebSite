@@ -1,6 +1,7 @@
 ﻿
 @inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -69,7 +70,7 @@
     {
         if (SelectedItemIds == null || SelectedItemIds.Any() == false)
         {
-            await ToastService.Error("请选择要保存到的收藏夹", "请选择要保存到的收藏夹");
+            await PopupService.ToastErrorAsync("请选择要保存到的收藏夹", "请选择要保存到的收藏夹");
             return;
         }
         try
@@ -78,7 +79,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("收藏失败", obj.Error);
+                await PopupService.ToastErrorAsync("收藏失败", obj.Error);
                 return;
             }
             else
@@ -90,7 +91,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "收藏失败");
+            await ErrorHandler.ProcessError(ex, "收藏失败");
             return;
         }
     }

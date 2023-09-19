@@ -2,8 +2,9 @@
 @inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
+@inject IPopupService PopupService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<EditInformationModel>> _pageModelCatche
 
@@ -112,7 +113,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条文章标签名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条文章标签名称列表失败");
             }
         }
     }
@@ -136,19 +137,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("创建词条失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建词条失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("创建词条成功", "创建词条成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/entries/index/" + obj.Error, Model.Name, "fa fa-codepen");
+                await PopupService.ToastSuccessAsync("创建词条成功", "创建词条成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建词条失败");
+            await ErrorHandler.ProcessError(ex, "创建词条失败");
         }
     }
 

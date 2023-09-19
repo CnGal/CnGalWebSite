@@ -82,7 +82,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取游戏发售时间列表失败");
+            await ErrorHandler.ProcessError(ex, "获取游戏发售时间列表失败");
         }
 
 

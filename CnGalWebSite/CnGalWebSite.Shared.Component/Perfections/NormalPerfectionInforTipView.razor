@@ -40,7 +40,7 @@
         }
         catch(Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
+            await ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
         }
     }
 }

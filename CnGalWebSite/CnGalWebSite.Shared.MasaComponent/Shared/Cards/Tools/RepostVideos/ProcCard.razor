@@ -65,7 +65,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有词条视频名称失败");
+            await ErrorHandler.ProcessError(ex, "获取所有词条视频名称失败");
             return;
         }
         finally

@@ -39,7 +39,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页即将发布游戏列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页即将发布游戏列表失败");
         }
     }
 

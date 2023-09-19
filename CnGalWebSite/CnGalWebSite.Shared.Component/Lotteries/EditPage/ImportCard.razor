@@ -1,6 +1,7 @@
 ﻿
 
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -44,18 +45,18 @@
                 //判断结果
                 if (obj.Successful == false)
                 {
-                    await ToastService.Error("抽奖失败", obj.Error);
+                    await PopupService.ToastErrorAsync("抽奖失败", obj.Error);
                     //_logger.LogError("抽奖失败，{error}", obj.Error);
                 }
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "抽奖失败");
+                await ErrorHandler.ProcessError(ex, "抽奖失败");
                 //_logger.LogError(ex, "抽奖失败");
             }
         }
 
-        await ToastService.Success("导入数据完成", "导入数据完成");
+        await PopupService.ToastSuccessAsync("导入数据完成", "导入数据完成");
 
     }
 

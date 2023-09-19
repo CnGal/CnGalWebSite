@@ -2,8 +2,8 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="EditVoteOptionModel" Headers="_headers" DataSource="Options" SortByItem="@nameof(StaffModel.PositionOfficial)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
-               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Name!=null&&s.Name.Contains(dataTableCard._search))|| (s.CustomName!=null&&s.CustomName.Contains(dataTableCard._search))|| (s.SubordinateOrganization!=null&&s.SubordinateOrganization.Contains(dataTableCard._search))|| (s.PositionOfficial!=null&&s.PositionOfficial.Contains(dataTableCard._search))">
+<DataTableCard TModel="EditVoteOptionModel" Headers="_headers" DataSource="Options" SortByItem="@nameof(EditVoteOptionModel.Text)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Text!=null&&s.Text.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -56,7 +56,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StaffModel> dataTableCard;
+    DataTableCard<EditVoteOptionModel> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;
@@ -68,9 +68,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public void EditItem(StaffModel item)
+    public void EditItem(EditVoteOptionModel item)
     {
-        _editedItemId = item.Id;
+        _editedItemId = item.RealId;
         _editDialog = true;
         StateHasChanged();
         if (editCard != null)
@@ -119,7 +119,7 @@
             }
             else
             {
-                Staffs.Add(item);
+                Options.Add(item);
             }
         }
         _batchDialog = false;

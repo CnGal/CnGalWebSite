@@ -38,7 +38,7 @@
         {
             await PopupService.ToastAsync(result.Error ?? "某个地方填写有误哦~",  AlertTypes.Error);
 
-           // await ToastService.Error("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
+           // await PopupService.ToastErrorAsync("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
         }
     }
 

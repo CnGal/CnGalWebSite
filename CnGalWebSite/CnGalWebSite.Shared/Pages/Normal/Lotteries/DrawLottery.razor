@@ -5,10 +5,11 @@
 
 @inject ILocalStorageService _localStorage
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject ILogger<DrawLottery> _logger
+@inject IPopupService PopupService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="抽奖" />
 
@@ -135,7 +136,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取抽奖数据失败");
+            await ErrorHandler.ProcessError(ex, "获取抽奖数据失败");
         }
     }
 
@@ -149,12 +150,12 @@
 
         if (CurrentAward == null)
         {
-            await ToastService.Error("抽奖失败", "全部奖品已经抽完");
+            await PopupService.ToastErrorAsync("抽奖失败", "全部奖品已经抽完");
             return;
         }
         if (Model.NotWinningUsers.Count == 0)
         {
-            await ToastService.Error("抽奖失败", "所有参与的用户都已抽中，但是还有奖品剩余");
+            await PopupService.ToastErrorAsync("抽奖失败", "所有参与的用户都已抽中，但是还有奖品剩余");
             return;
         }
 
@@ -193,7 +194,7 @@
                 //判断结果
                 if (obj.Successful == false)
                 {
-                    await ToastService.Error("抽奖失败", obj.Error);
+                    await PopupService.ToastErrorAsync("抽奖失败", obj.Error);
                     _logger.LogError("抽奖失败，{error}", obj.Error);
                 }
             }
@@ -251,13 +252,13 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("结束抽奖失败", obj.Error);
+                await PopupService.ToastErrorAsync("结束抽奖失败", obj.Error);
                 _logger.LogError("结束抽奖失败，{error}", obj.Error);
             }
         }
         catch (Exception ex)
         {
-            // ErrorHandler.ProcessError(ex, "结束抽奖失败");
+            // await ErrorHandler.ProcessError(ex, "结束抽奖失败");
             _logger.LogError(ex, "结束抽奖失败");
         }
     }

@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 
+@inject IPopupService PopupService
 
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 
@@ -37,23 +37,23 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error(text+"投票失败", obj.Error);
+                await PopupService.ToastErrorAsync(text+"投票失败", obj.Error);
             }
             else
             {
-                await ToastService.Success(text + "投票成功", text + "投票成功");
+                await PopupService.ToastSuccessAsync(text + "投票成功", text + "投票成功");
                 await StateChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, text + "投票失败");
+            await ErrorHandler.ProcessError(ex, text + "投票失败");
         }
     }
 
     public void OnEdit()
     {
-        NavigationManager.NavigateTo(Provider,"/votes/editvote/" + Model.Id, "编辑投票");
+        NavigationManager.NavigateTo("/votes/editvote/" + Model.Id);
         
     }
 }

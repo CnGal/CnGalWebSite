@@ -182,7 +182,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "导入Steam信息失败");
+            await ErrorHandler.ProcessError(ex, "导入Steam信息失败");
         }
 
     }

@@ -36,7 +36,7 @@
         }
         catch(Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取文章列表");
+            await ErrorHandler.ProcessError(ex, "无法获取文章列表");
             return new PagedResultDto<ArticleInforTipViewModel> { Data=new List<ArticleInforTipViewModel>()};
         }
     }

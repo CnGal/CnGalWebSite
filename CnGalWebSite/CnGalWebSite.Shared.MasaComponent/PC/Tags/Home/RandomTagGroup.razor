@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取广场随机标签列表失败");
+            await ErrorHandler.ProcessError(ex, "获取广场随机标签列表失败");
         }
     }
     public void OnClickMore(string url)

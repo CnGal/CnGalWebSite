@@ -2,6 +2,7 @@
 @inject IDataCacheService _dataCacheService
 
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
@@ -122,7 +123,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+            await ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
         }
     }
 
@@ -139,13 +140,13 @@
     {
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {
-            await ToastService.Error("请填写需要认证的词条", "请填写需要认证的词条");
+            await PopupService.ToastErrorAsync("请填写需要认证的词条", "请填写需要认证的词条");
             return;
         }
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.Note))
         {
 
-            await ToastService.Error("请填写一些有助于身份认证的信息", "请填写一些有助于身份认证的信息");
+            await PopupService.ToastErrorAsync("请填写一些有助于身份认证的信息", "请填写一些有助于身份认证的信息");
             return;
         }
 
@@ -182,14 +183,14 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败", obj.Error);
+                await PopupService.ToastErrorAsync(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败", obj.Error);
 
             }
             else
             {
 
                 var content = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过";
-                await ToastService.Success(content, content);
+                await PopupService.ToastSuccessAsync(content, content);
 
                 Model.UserCertificationModel.IsPending = true;
                 Dialog = false;
@@ -198,7 +199,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "发送用户认证申请失败");
+            await ErrorHandler.ProcessError(ex, "发送用户认证申请失败");
         }
     }
 

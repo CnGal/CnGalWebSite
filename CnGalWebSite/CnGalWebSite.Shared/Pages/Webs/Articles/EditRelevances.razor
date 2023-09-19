@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
@@ -83,7 +84,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑文章关联信息失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑文章关联信息失败");
             }
         }
     }
@@ -97,19 +98,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑文章关联信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑文章关联信息失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑文章关联信息成功", "编辑文章关联信息成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("编辑文章关联信息成功", "编辑文章关联信息成功，等待审核通过");
                 NavigationManager.NavigateTo( "/articles/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑文章关联信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑文章关联信息失败");
         }
     }
 

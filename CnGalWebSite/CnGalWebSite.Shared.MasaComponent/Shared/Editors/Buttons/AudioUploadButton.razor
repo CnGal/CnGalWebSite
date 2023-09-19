@@ -72,7 +72,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "音频上传失败");
+                await ErrorHandler.ProcessError(ex, "音频上传失败");
             }
         }
         Text = text;

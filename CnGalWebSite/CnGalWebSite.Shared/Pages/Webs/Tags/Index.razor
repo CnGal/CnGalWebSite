@@ -133,7 +133,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取标签失败");
+            await ErrorHandler.ProcessError(ex, "获取标签失败");
         }
 
     }
@@ -158,11 +158,11 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("撤销审核请求失败", obj.Error);
+                await PopupService.ToastErrorAsync("撤销审核请求失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                await PopupService.ToastSuccessAsync("撤销审核请求成功", "撤销审核请求成功");
                 //修改各部分编辑状态
                 switch (operation)
                 {
@@ -181,7 +181,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+            await ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
     }
     public async void LocationChanged(object sender, LocationChangedEventArgs args)

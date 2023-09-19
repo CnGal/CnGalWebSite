@@ -38,7 +38,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页热门标签列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页热门标签列表失败");
         }
     }
 }

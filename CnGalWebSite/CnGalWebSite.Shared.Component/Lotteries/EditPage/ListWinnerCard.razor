@@ -113,7 +113,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取中奖用户列表");
+            await ErrorHandler.ProcessError(ex, "无法获取中奖用户列表");
         }
     }
 
@@ -163,7 +163,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑用户奖品失败");
+            await ErrorHandler.ProcessError(ex, "编辑用户奖品失败");
         }
     }
 }

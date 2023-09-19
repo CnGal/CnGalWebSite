@@ -112,7 +112,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取个性化推荐失败");
+            await ErrorHandler.ProcessError(ex, "获取个性化推荐失败");
         }
     }
 

@@ -2,7 +2,8 @@
 
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
+
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -81,7 +82,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
         }
     }
     public async Task DataChanged()
@@ -101,7 +102,7 @@
             long temp = 0;
             if (string.IsNullOrWhiteSpace(Model.WeiboId) == false && long.TryParse(Model.WeiboId, out temp) == false)
             {
-                await ToastService.Error("保存动态数据失败", "微博Id无效");
+                await PopupService.ToastErrorAsync("保存动态数据失败", "微博Id无效");
                 return;
             }
 
@@ -110,19 +111,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存动态数据失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存动态数据失败", obj.Error);
             }
             else
             {
                 await DataChanged();
 
-                await ToastService.Success("保存动态数据成功", "保存动态数据成功");
+                await PopupService.ToastSuccessAsync("保存动态数据成功", "保存动态数据成功");
             }
         }
         catch (Exception ex)
         {
-            await ToastService.Error("保存动态数据失败", "保存动态数据失败");
-            //ErrorHandler.ProcessError(ex, "保存动态数据失败");
+            await PopupService.ToastErrorAsync("保存动态数据失败", "保存动态数据失败");
+            //await ErrorHandler.ProcessError(ex, "保存动态数据失败");
         }
     }
 
@@ -138,19 +139,19 @@
             {
                 await OnRefreshTable.InvokeAsync();
 
-                await ToastService.Success("发布动态成功", "发布动态成功");
+                await PopupService.ToastSuccessAsync("发布动态成功", "发布动态成功");
                 Dialog = false;
             }
             else
             {
-                await ToastService.Error("发布动态失败", result.Error);
+                await PopupService.ToastErrorAsync("发布动态失败", result.Error);
             }
 
         }
         catch (Exception ex)
         {
-            //await ToastService.Error("发布动态失败", "发布动态失败");
-            ErrorHandler.ProcessError(ex, "发布动态失败");
+            //await PopupService.ToastErrorAsync("发布动态失败", "发布动态失败");
+            await ErrorHandler.ProcessError(ex, "发布动态失败");
         }
 
     }
@@ -171,8 +172,8 @@
         }
         catch (Exception ex)
         {
-            //await ToastService.Error("获取动态预览数据失败", "获取动态预览数据失败");
-            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+            //await PopupService.ToastErrorAsync("获取动态预览数据失败", "获取动态预览数据失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
         }
 
     }
@@ -180,7 +181,7 @@
     private void OnLook()
     {
         Dialog = false;
-        NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
+        NavigationManager.NavigateTo("/articles/index/" + Model.ArticleId);
 
     }
 

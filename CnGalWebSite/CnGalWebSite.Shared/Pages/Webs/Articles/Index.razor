@@ -1,6 +1,6 @@
 ﻿@inject IHttpService _httpService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
@@ -142,7 +142,7 @@ else
             //判断文章名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
-                NavigationManager.NavigateTo(Provider, "/articles/home", "文章", "fa fa-newspaper-o");
+                NavigationManager.NavigateTo("/articles/home");
             }
 
 
@@ -212,11 +212,11 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("撤销审核请求失败", obj.Error);
+                await PopupService.ToastErrorAsync("撤销审核请求失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                await PopupService.ToastSuccessAsync("撤销审核请求成功", "撤销审核请求成功");
                 //修改各部分编辑状态
                 switch (operation)
                 {
@@ -236,7 +236,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+            await ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
     }
 

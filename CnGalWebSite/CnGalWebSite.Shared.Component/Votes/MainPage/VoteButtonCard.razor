@@ -1,15 +1,16 @@
 ﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
 
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-
+@inject IPopupService PopupService
 @if (DateTime.Now.ToCstTime() > Model.BeginTime && DateTime.Now.ToCstTime() < Model.EndTime)
 {
     <div style="display: flex; flex-direction: column; align-content: center;">
         @if (Model.ShowResult == false)
         {
-            <MCheckbox TValue="string" @bind-Value="IsAnonymous" Label="匿名参与投票"></MCheckbox>
+            <MCheckbox TValue="bool" @bind-Value="IsAnonymous" Label="匿名参与投票"></MCheckbox>
             <div style=" display: flex; justify-content: center; ">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted"/>
             </div>
@@ -70,17 +71,17 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("投票失败", obj.Error);
+                await PopupService.ToastErrorAsync("投票失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("投票成功", "投票成功");
+                await PopupService.ToastSuccessAsync("投票成功", "投票成功");
                 await OnVoted.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "投票失败");
+            await ErrorHandler.ProcessError(ex, "投票失败");
         }
     }
 

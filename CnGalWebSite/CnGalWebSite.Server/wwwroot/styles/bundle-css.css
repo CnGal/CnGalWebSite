@@ -1700,11 +1700,13 @@ a .aspect-ratio + p > strong {
     box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
 }
 
-    .carousels-card .carousel-inner {
+    .carousels-card img, .carousels-card .m-responsive__content, .carousels-card .m-window-item, .carousels-card .m-responsive {
         border-radius: 24px !important;
-        cursor: pointer;
     }
 
+    .carousels-card .m-responsive__content {
+        border-radius: 24px !important;
+    }
 /*游戏列表*/
 .published-games-card .item, .upcoming-games-card .item, .free-games-card .item, .discount-games-card .item {
     display: flex;

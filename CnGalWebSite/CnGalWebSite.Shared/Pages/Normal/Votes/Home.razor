@@ -1,7 +1,7 @@
 ﻿@page "/votes/home"
 
 @inject IHttpService _httpService
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 
@@ -56,13 +56,13 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取投票主页信息列表失败");
+            await ErrorHandler.ProcessError(ex, "获取投票主页信息列表失败");
         }
     }
 
     private void OnCreateVote()
     {
-        NavigationManager.NavigateTo(Provider, "/votes/createvote", "创建投票");
+        NavigationManager.NavigateTo( "/votes/createvote");
         
     }
 }

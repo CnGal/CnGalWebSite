@@ -2,14 +2,14 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
 @inject ILocalStorageService _localStorage
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建投票"/>
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
@@ -84,7 +84,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -93,22 +93,22 @@
     {
         try
         {
-            var obj = await _httpService.PostAsync<CreateVoteModel, Result>("api/votes/CreateVote", Model);
+            var obj = await _httpService.PostAsync<EditVoteModel, Result>("api/votes/CreateVote", Model);
             //判断结果
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("创建投票失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建投票失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("创建投票成功", "创建投票成功");
-                NavigationManager.NavigateTo(Provider, "/votes/index/" + obj.Error, Model.Name, "fa fa-dropbox");
+                await PopupService.ToastSuccessAsync("创建投票成功", "创建投票成功");
+                NavigationManager.NavigateTo("/votes/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建投票失败");
+            await ErrorHandler.ProcessError(ex, "创建投票失败");
         }
     }
 }

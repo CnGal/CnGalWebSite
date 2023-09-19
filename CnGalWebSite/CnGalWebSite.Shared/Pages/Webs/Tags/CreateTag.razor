@@ -1,8 +1,9 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
+@inject IPopupService PopupService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 
@@ -72,7 +73,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有标签词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有标签词条名称列表失败");
             }
         }
     }
@@ -86,19 +87,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("创建标签失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建标签失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("创建标签成功", "创建标签成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/tags/index/" + obj.Error, Model.Name, "fa fa-tag");
+                await PopupService.ToastSuccessAsync("创建标签成功", "创建标签成功，等待审核通过");
+                NavigationManager.NavigateTo( "/tags/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建标签失败");
+            await ErrorHandler.ProcessError(ex, "创建标签失败");
         }
     }
 

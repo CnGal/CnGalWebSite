@@ -1,9 +1,9 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
+@inject IPopupService PopupService
 
 
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -75,7 +75,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
             }
         }
     }
@@ -89,19 +89,19 @@ else
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑标签主要信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑标签主要信息失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑标签主要信息成功", "编辑标签主要信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
+                await PopupService.ToastSuccessAsync("编辑标签主要信息成功", "编辑标签主要信息成功，等待审核通过");
+                NavigationManager.NavigateTo( "/tags/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑标签主要信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑标签主要信息失败");
         }
     }
 

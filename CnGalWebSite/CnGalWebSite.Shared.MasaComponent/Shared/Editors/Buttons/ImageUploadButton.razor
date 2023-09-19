@@ -147,7 +147,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
+            await ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
         }
     }
 

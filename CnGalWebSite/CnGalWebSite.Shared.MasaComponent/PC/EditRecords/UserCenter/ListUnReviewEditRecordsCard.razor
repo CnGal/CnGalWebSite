@@ -77,7 +77,7 @@
         catch (Exception ex)
         {
 
-            ErrorHandler.ProcessError(ex, "审阅失败");
+            await ErrorHandler.ProcessError(ex, "审阅失败");
         }
     }
 

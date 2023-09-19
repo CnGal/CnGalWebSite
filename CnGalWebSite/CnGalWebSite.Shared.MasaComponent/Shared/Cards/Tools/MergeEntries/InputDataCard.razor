@@ -6,17 +6,17 @@
 {
     <div class="@Class">
         <div class="pb-2" style="display: flex; justify-content: center;">被合并的词条 -> 合并到的词条</div>
-        <div class="row mb-4">
-            <div class="col-12 col-sm-6 mb-4">
-                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.SubName" PlaceHolder="被合并的词条" />
-            </div>
-            <div class="col-12 col-sm-6 mb-4">
-                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.HostName" PlaceHolder="合并到的词条" />
-            </div>
-            <div class="col-12 col-sm-6 mb-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
-            </div>
-        </div>
+        <MRow>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@model.SubName" Label="被合并的词条" AutoCompleteItems="EntryItems" />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@model.HostName" Label="合并到的词条" AutoCompleteItems="EntryItems" />
+            </MCol>
+        </MRow>
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus"Class="mb-4" />
+
         <MSimpleTable Class="mb-4">
             <thead>
                 <tr>
@@ -67,7 +67,7 @@ else
 
     MergeEntryModel model = new MergeEntryModel();
     private bool isReady = false;
-    public IEnumerable<string> EntryItems { get; set; }
+    public List<string> EntryItems { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -82,7 +82,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+            await ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
         }
     }
 

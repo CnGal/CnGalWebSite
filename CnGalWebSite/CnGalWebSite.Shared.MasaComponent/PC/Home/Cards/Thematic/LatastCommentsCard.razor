@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
         }
     }
 }

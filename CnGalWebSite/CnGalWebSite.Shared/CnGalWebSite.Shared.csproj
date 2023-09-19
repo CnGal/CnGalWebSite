@@ -74,5 +74,9 @@
     <Using Include="CnGalWebSite.Shared.Extentions" />
     <Using Include="CnGalWebSite.DataModel.ViewModel.Dtos" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Pages\Normal\Ranks\" />
+  </ItemGroup>
 
 </Project>

@@ -49,7 +49,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取随机词条完善度检查明细列表失败");
+            await ErrorHandler.ProcessError(ex, "获取随机词条完善度检查明细列表失败");
         }
     }
 

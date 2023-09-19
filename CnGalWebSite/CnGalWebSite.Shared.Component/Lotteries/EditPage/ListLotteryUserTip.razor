@@ -123,7 +123,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 
@@ -180,7 +180,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取参加抽奖的用户列表");
+            await ErrorHandler.ProcessError(ex, "无法获取参加抽奖的用户列表");
         }
         export = true;
         StateHasChanged();

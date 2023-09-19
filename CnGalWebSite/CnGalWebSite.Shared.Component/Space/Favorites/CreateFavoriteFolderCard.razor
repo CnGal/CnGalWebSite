@@ -3,6 +3,7 @@
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -75,12 +76,12 @@
 
             if (obj.Successful == false)
             {
-                await ToastService.Error("创建收藏夹失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建收藏夹失败", obj.Error);
             }
             else
             {
 
-                await ToastService.Success("创建收藏夹成功", "创建收藏夹成功");
+                await PopupService.ToastSuccessAsync("创建收藏夹成功", "创建收藏夹成功");
                 Dialog = false;
                 StateHasChanged();
                 await  OnCreated.InvokeAsync();
@@ -90,7 +91,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建收藏夹失败");
+            await ErrorHandler.ProcessError(ex, "创建收藏夹失败");
         }
     }
 

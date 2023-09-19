@@ -3,16 +3,16 @@
 <MResponsive AspectRatio="AspectRatio">
     <MCarousel Cycle Height="@("inherit")"
                HideDelimiterBackground
-               Interval="4000"
-               HideDelimiters="HideDelimiters"
+                Interval="4000"
+                HideDelimiters="HideDelimiters"
                ShowArrowsOnHover>
         @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
-                <MCarouselItem>
-                    <a  target="_blank" @onclick="@(()=>OnClickLink(item))">
-                        <img src="@item.Image" alt="@item.Note" class="w-100" style="@($" aspect-ratio: {AspectRatio.ToDouble()};")" />
-                    </a>
-                </MCarouselItem>
+            <MCarouselItem>
+                <a href="@item.Link" target="@(item.Link.Contains("http")?"_blank":"_self")" @onclick="@(async ()=>await OnClick.InvokeAsync(item))">
+                    <img src="@item.Image" alt="@item.Note" class="w-100" style="@($" aspect-ratio: {AspectRatio.ToDouble()};")" />
+                </a>
+            </MCarouselItem>
         }
 
     </MCarousel>
@@ -26,11 +26,4 @@
     public bool HideDelimiters { get; set; }
     [Parameter]
     public StringNumber AspectRatio { get; set; } = 1024 / 200D;
-
-    public async Task OnClickLink(CarouselViewModel model)
-    {
-       await _eventService.OpenNewPage(model.Link);
-        await OnClick.InvokeAsync(model);
-    }
-
 }

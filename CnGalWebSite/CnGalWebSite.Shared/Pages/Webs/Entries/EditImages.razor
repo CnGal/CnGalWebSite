@@ -2,8 +2,9 @@
 
 @inject ILocalStorageService _localStorage
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -82,7 +83,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑词条相册失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑词条相册失败");
             }
 
         }
@@ -100,19 +101,19 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存词条图片失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存词条图片失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存词条图片成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                await PopupService.ToastSuccessAsync("保存成功", "保存词条图片成功，等待审核通过");
+                NavigationManager.NavigateTo( "/entries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存词条图片失败");
+            await ErrorHandler.ProcessError(ex, "保存词条图片失败");
         }
     }
 

@@ -2,6 +2,7 @@
 @inject IFileUploadService _fileUploadService
 
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 <MDialog Value="Dialog" ValueChanged="DialogChanged"
          Width="1000">
@@ -126,13 +127,13 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{File.Name}> " + obj.Error ?? "无法图床内部传输错误");
+                await PopupService.ToastErrorAsync("图片上传失败", $"<{File.Name}> " + obj.Error ?? "无法图床内部传输错误");
                 return;
             }
         }
         catch (Exception exc)
         {
-            await ToastService.Error("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
+            await PopupService.ToastErrorAsync("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
             return;
         }
         //回调
@@ -156,13 +157,13 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{File.Name}> {obj.Error}");
+                await PopupService.ToastErrorAsync("图片上传失败", $"<{File.Name}> {obj.Error}");
                 return;
             }
         }
         catch (Exception ex)
         {
-            await ToastService.Error("图片上传失败", "超过1MB的图片请上传到相册");            
+            await PopupService.ToastErrorAsync("图片上传失败", "超过1MB的图片请上传到相册");            
             return;
         }
         //回调

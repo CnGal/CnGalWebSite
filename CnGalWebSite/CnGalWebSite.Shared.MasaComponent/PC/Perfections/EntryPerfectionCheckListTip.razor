@@ -107,7 +107,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取词条完善度明细列表失败");
+            await ErrorHandler.ProcessError(ex, "获取词条完善度明细列表失败");
         }
     }
 

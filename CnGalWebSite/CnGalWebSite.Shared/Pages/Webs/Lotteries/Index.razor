@@ -1,6 +1,6 @@
 ﻿@inject IHttpService _httpService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
@@ -178,7 +178,7 @@ else
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
-                NavigationManager.NavigateTo(Provider, "/votes/home", "主页", "fa fa-home");
+                NavigationManager.NavigateTo("/votes/home");
             }
 
             isReady = true;

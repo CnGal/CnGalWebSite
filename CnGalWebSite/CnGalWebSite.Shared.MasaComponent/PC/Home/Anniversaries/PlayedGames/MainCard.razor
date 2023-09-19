@@ -80,7 +80,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取用户信息失败");
+                await ErrorHandler.ProcessError(ex, "获取用户信息失败");
             }
         }
 
@@ -96,7 +96,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
+            await ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
         }
     }
 

@@ -2,8 +2,9 @@
 @inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
+@inject IPopupService PopupService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -69,7 +70,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑周边相册失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑周边相册失败");
             }
         }
     }
@@ -83,19 +84,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑周边相册失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑周边相册失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑周边相册成功", "编辑周边相册成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-shopping-basket");
+                await PopupService.ToastSuccessAsync("编辑周边相册成功", "编辑周边相册成功，等待审核通过");
+                NavigationManager.NavigateTo("/peripheries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑周边相册失败");
+            await ErrorHandler.ProcessError(ex, "编辑周边相册失败");
         }
     }
 

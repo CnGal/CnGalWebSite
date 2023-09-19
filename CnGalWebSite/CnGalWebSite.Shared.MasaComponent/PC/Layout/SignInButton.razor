@@ -43,7 +43,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "签到失败");
+            await ErrorHandler.ProcessError(ex, "签到失败");
         }
     }
 }

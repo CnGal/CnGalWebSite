@@ -36,7 +36,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取周报列表失败");
+            await ErrorHandler.ProcessError(ex, "获取周报列表失败");
         }
     }
 }

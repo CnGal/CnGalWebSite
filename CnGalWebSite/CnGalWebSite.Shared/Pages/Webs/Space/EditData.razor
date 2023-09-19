@@ -3,7 +3,7 @@
 @inject IPopupService PopupService
 
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
@@ -89,7 +89,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
             }
         }
     }
@@ -109,7 +109,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存用户信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存用户信息失败", obj.Error);
             }
             else
             {
@@ -120,7 +120,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存用户信息失败");
+            await ErrorHandler.ProcessError(ex, "保存用户信息失败");
         }
     }
 

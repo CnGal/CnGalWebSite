@@ -120,7 +120,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 
@@ -145,7 +145,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 }
