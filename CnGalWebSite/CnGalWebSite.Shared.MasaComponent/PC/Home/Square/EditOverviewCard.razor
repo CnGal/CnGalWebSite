@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.EditRecord.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="编辑概览" Icon="@IconType.EditRecord.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Edit" AllowExtend="false" Stacked BaseUrl="@(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLineChart")" Outline />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

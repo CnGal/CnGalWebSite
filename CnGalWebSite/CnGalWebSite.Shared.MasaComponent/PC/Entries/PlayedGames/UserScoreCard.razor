@@ -1,27 +1,13 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<div class="@((Outline?"":" rounded bg-opacity h-100 p-4 ")+(Clickable?"div-shadow":"shadow-sm"))" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick"
-     itemprop="review" itemscope itemtype="https://schema.org/Review">
+<MDCard Outline="Outline" ShowHoverStyle="Clickable" Class="h-100 pa-3" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick">
     <div>
-        <div class="d-flex mb-2" style=" align-items: center;">
-            <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
-            <div class="comment-tx-div">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard  Model="Model.User.Ranks" ForceDisplayBadge NoLeftPandding/>
-
-
-                <div class="a-font-color text-truncate-1" itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <span itemprop="name">
-                        @Model.User.Name
-                    </span>
-               </div>
-
-            </div>
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.User" HideRank Class="mb-2"/>
 
         @if (Model.Socres.IsScored)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Label="总评" />
-            <div style="color:gray;" class="pb-2">
+            <div class="label-large pb-2">
                 @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+((IsDubbing&& Model.Socres.CVSocre>0) ? $",配音{Model.Socres.CVSocre}分" : ""))
             </div>
             <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
@@ -33,7 +19,7 @@
 
         @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
         {
-            <div class="text-truncate-4">
+            <div class="text-truncate-6">
                 评语：
                 <span itemprop="reviewBody" style=" white-space: break-spaces;">
                     @Model.PlayImpressions
@@ -44,7 +30,7 @@
     @if (ShowAction)
     {
         <div style=" color: gray; display: flex; flex-direction: column; align-items: center;">
-            <MButton Text Block  OnClick="OnEdit" Color="primary">
+            <MButton Rounded OnClick="OnEdit" Color="primary">
                 <MIcon Left>mdi-pencil </MIcon>
                 编辑游玩记录
             </MButton>
@@ -60,7 +46,7 @@
                     @($"《{GameName}》")
                 </div>
             }
-            <div style="color:gray;" class="mt-2">
+            <div class="label-large mt-2">
                 @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
             </div>
         </div>
@@ -69,11 +55,11 @@
     {
         @if (string.IsNullOrWhiteSpace(GameName) == false)
         {
-            <div style="color:gray;" class="mt-4">
+            <div class="label-large mt-4">
                 @($"《{GameName}》")
             </div>
         }
-        <div style="color:gray;" class="mt-4">
+        <div class="label-large mt-4">
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
         </div>
     }
@@ -82,7 +68,7 @@
 
     <meta itemprop="datePublished" content="@Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")">
 
-</div>
+</MDCard>
 
 @code {
     [Parameter]

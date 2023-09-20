@@ -1,0 +1,25 @@
+﻿.user-info-card {
+    flex-direction: row;
+    gap: .7rem;
+    width: fit-content;
+}
+
+    .user-info-card .image-card img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+
+    .user-info-card .image-card {
+        display: flex;
+    }
+
+    .user-info-card .content-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+a.user-info-card {
+    color: var(--md-sys-color-on-background) !important;
+}

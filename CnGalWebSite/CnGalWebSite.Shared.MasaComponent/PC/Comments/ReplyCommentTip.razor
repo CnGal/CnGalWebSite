@@ -4,12 +4,10 @@
 @inject IEventService _eventService
 @inject IPopupService PopupService
 
-<div class=" ps-4 pe-4 pb-3 mb-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded ">
+<MDCard Class="comment-reply-card pa-4 pb-0 pt-3 mb-3">
     @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.Id) == false)
     {
-        <div class="pt-3">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard UserId="@_dataCacheService.UserInfor.Id" UserName="@_dataCacheService.UserInfor.Name" Image="@_dataCacheService.UserInfor.PhotoPath" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"/>
-        </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="_dataCacheService.UserInfor" />
     }
 
     @if (_dataCacheService.ThemeSetting.IsCommentUseMarkdown)
@@ -24,11 +22,11 @@
     }
 
     <div style="display: flex !important; flex-wrap: wrap; gap: 1rem;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发表评论" IsAsync="true" OnClick="OnComment" Icon="mdi-check" />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换编辑器" OnClick="OnSwitch" Icon="mdi-circle-edit-outline "/>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Text="上传图片" OnImageUploaded="OnImageUploaded" ShowPreview="false"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发表评论" IsAsync="true" OnClick="OnComment" Icon="mdi-check" Rounded />
+         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换编辑器" OnClick="OnSwitch" Icon="mdi-circle-edit-outline " Rounded />
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Text="上传图片" OnImageUploaded="OnImageUploaded" ShowPreview="false" Rounded />
     </div>
-</div>
+</MDCard>
 @code {
 
     [Parameter]

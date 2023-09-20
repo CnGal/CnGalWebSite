@@ -30,7 +30,10 @@ else
 
 @if (isNotFound == true)
 {
-    <NotFoundPeriphery IsNeedLayput="true"></NotFoundPeriphery>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这个周边哦......</h1>
+        <div class="text-center">可以在这里<a href="/peripheries/createperiphery">创建周边</a>，也可以查看<a href="/articles/index/253">《周边编辑规范》</a></div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 }
 else
 {

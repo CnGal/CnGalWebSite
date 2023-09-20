@@ -4,6 +4,7 @@
     border-radius: var( --md-card-border-radius);
     transition: .3s;
     white-space: normal;
+    flex-direction: column;
 }
     /*primary颜色*/
     .md-card.color-primary {
@@ -16,7 +17,27 @@
         color: var(--md-sys-color-on-tertiary-container) !important;
     }
 
+    /*surface颜色*/
+    .md-card.color-surface {
+        background-color: var(--md-sys-color-surface-1);
+        color: var( --md-sys-color-on-surface) !important;
+    }
 
+    .md-card.show-hover-style.color-surface:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    /*tertiary颜色*/
+    .md-card.color-tertiary {
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-tertiary:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
 
     .md-card.show-hover-style:active {
         border-radius: var( --md-card-active-border-radius);
@@ -38,7 +59,11 @@
     justify-content: center;
 }
 
-    .progressing-card .md-card {
+    .progressing-card .out-card {
+        align-items: center;
+    }
+
+    .progressing-card .inner-card {
         display: flex;
         max-width: 400px;
         width: 100%;
@@ -50,6 +75,29 @@
     .progressing-card img {
         width: 70%;
         margin-bottom: 1rem;
+    }
+/*找不到*/
+.not-found-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .not-found-card .out-card {
+        align-items: center;
+    }
+
+    .not-found-card .inner-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .not-found-card img {
+        width: 70%;
+        margin-bottom: .5rem;
     }
 /*包含标题的卡片*/
 .title-container-card {
@@ -69,10 +117,70 @@
         }
 
         .title-container-card .title-card i {
-            color: var(--md-sys-color-on-primary-container);
+            color: var(--md-sys-color-primary);
         }
 
     .title-container-card .content-card {
         display: flex;
         flex-direction: column;
     }
+/*主要信息卡片模板*/
+.md-main-info-card {
+    flex-direction: row;
+}
+
+    .md-main-info-card .image-card {
+        display: flex;
+    }
+
+    .md-main-info-card.game .image-card img {
+        width: 460px;
+        height: min-content;
+    }
+
+    .md-main-info-card.role .image-card img {
+        border-radius: 50%;
+        margin: 1rem;
+        height: 200px;
+    }
+
+    .md-main-info-card .content-card {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        width: 100%;
+    }
+
+    .md-main-info-card.role .content-card .brief {
+        -webkit-line-clamp: inherit;
+        white-space: pre-line;
+    }
+
+@media screen and (max-width: 768px) {
+    .md-main-info-card.game {
+        flex-direction: column;
+    }
+
+    .md-main-info-card.role .image-card img {
+        height: 150px;
+    }
+
+    .md-main-info-card.game .image-card img {
+        width: 100%;
+        height: min-content;
+    }
+
+    .md-main-info-card.game .content-card .brief {
+        -webkit-line-clamp: inherit;
+        white-space: pre-line;
+    }
+}
+/*内置类型纸片*/
+.type-inline-chip {
+    background-color: var(--md-sys-color-primary);
+    padding: 0 .3rem;
+    border-radius: 5px;
+    color: white;
+    margin-right: 0.5rem;
+}

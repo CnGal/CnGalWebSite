@@ -1,12 +1,12 @@
 ﻿@if (string.IsNullOrWhiteSpace(Href))
 {
-    <div class="@GetClass()" @onclick="OnClick">
+    <div class="@GetClass()" @onclick="OnClick" style="@Style">
         @ChildContent
     </div>
 }
 else
 {
-    <a href="@Href" class="@GetClass()" @onclick="OnClick" target="@Target">
+    <a href="@Href" class="@GetClass()" @onclick="OnClick" target="@Target" style="@Style">
         @ChildContent
     </a>
 }
@@ -20,13 +20,15 @@ else
     [Parameter]
     public string Class { get; set; }
     [Parameter]
+    public string Style { get; set; }
+    [Parameter]
     public EventCallback OnClick { get; set; }
     [Parameter]
     public bool? ShowHoverStyle { get; set; }
     [Parameter]
     public bool Outline { get; set; }
     [Parameter]
-    public string Color { get; set; } = "primary";
+    public string Color { get; set; } = "surface";
 
     public string GetClass()
     {

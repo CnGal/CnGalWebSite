@@ -4,7 +4,7 @@
 {
     <a @onclick="OnClick" class="a-font-color">
 
-        <div class="a-font-color shadow-sm rounded bg-opacity  p-3 mb-4 user-steam-card">
+        <MDCard Class="pa-3 mb-4 user-steam-card">
             <div class="user-info">
                 <img src="@UserInfoModel.BasicInfor.PhotoPath" alt="@UserInfoModel.BasicInfor.Name" class="image" />
                 <div class="name"> @UserInfoModel.BasicInfor.Name</div>
@@ -25,7 +25,7 @@
                 <div class="value">@(SteamUserInfors.Sum(s=>s.Price).ToString("0")+ " ¥")</div>
                 <div class="key">总价格</div>
             </div>
-        </div>
+        </MDCard>
     </a>
 }
 else
@@ -33,8 +33,7 @@ else
     @if (SteamUserInfors.Count == 1 && IsSmallScreen == false)
     {
         var item = SteamUserInfors[0];
-        <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
-            <div class="div-shadow rounded bg-opacity h-100 p-2 mb-3" style="display: flex; align-items: center;">
+        <MDCard Href="@("https://steamcommunity.com/profiles/"+item.SteamId)" Target="_blank" Class=" h-100 pa-2 mb-3" Style="    flex-direction: row; align-items: center;">
                 <img style=" height: 50px;border-radius:50%; " src="@item.Image" alt="@item.Name" />
                 <div class="ms-3" style=" display: flex; flex-direction: column; justify-content: space-between; ">
                     <div class="">
@@ -76,8 +75,7 @@ else
                         </span>
                     </div>
                 </div>
-            </div>
-        </a>
+        </MDCard>
 
     }
     else
@@ -86,16 +84,14 @@ else
             @foreach (var item in SteamUserInfors)
             {
                 <div class="col-12 col-md-6 col-xxl-4 h-100">
-                    <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
-                        <div class="div-shadow rounded bg-opacity p-2 mb-3" style="display: flex; align-items: center;">
+                    <MDCard Href="@("https://steamcommunity.com/profiles/"+item.SteamId)" Class="pa-2 mb-3" Style="    flex-direction: row;; align-items: center;" Target="_blank">
                             <img style=" height: 50px; border-radius: 50%; " src="@item.Image" alt="@item.Name" />
                             <div class="ms-3" style=" display: flex; align-items: center; ">
                                 <span class="">
                                     @item.Name
                                 </span>
                             </div>
-                        </div>
-                    </a>
+                    </MDCard>
                 </div>
 
 
@@ -103,8 +99,7 @@ else
         </div>
 
 
-        <div class="shadow-sm rounded bg-opacity h-100 p-2 mb-3" style="display:flex;">
-            <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+        <MDCard Class=" h-100 pa-2 mb-3" Style="flex-wrap: wrap; justify-content: space-between;">
                 <span class="me-4 d-flex">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
                     <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
@@ -139,8 +134,7 @@ else
                     <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
 
                 </span>
-            </div>
-        </div>
+        </MDCard>
     }
 }
 

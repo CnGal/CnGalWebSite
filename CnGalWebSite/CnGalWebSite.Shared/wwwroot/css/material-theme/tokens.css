@@ -1,6 +1,7 @@
 ﻿:root {
     --md-source: #E91E63;
     /* primary */
+    --md-sys-color-primary-rgb: 188 0 75;
     --md-ref-palette-primary0: #000000;
     --md-ref-palette-primary10: #400014;
     --md-ref-palette-primary20: #660025;
@@ -253,7 +254,7 @@
     --md-sys-typescale-title-large-font-family-style: Regular;
     --md-sys-typescale-title-large-font-weight: 700;
     --md-sys-typescale-title-large-font-size: 22px;
-    --md-sys-typescale-title-large-line-height: 28px;
+    --md-sys-typescale-title-large-line-height: 29px;
     --md-sys-typescale-title-large-letter-spacing: 0px;
     /* title - medium */
     --md-sys-typescale-title-medium-font-family-name: Roboto;

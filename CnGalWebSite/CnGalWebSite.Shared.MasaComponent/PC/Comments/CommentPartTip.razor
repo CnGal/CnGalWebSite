@@ -3,12 +3,11 @@
 @inject NavigationManager NavigationManager
 
 
-<div class=" ps-4 pe-4 pt-3 pb-3 mt-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded " style="cursor:default">
+<MDCard Class="pa-4">
     <div>
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Text="@Model.CommentTime.ToString("yyyy年M月d日 H:mm")"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" />
         <div class="mt-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)" />
         </div>
 
         <AuthorizeView>
@@ -16,57 +15,37 @@
                 <div class="mt-2" style=" display: flex; justify-content: flex-end; ">
                     @if (IsReplying)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" Icon="@IconType.Close.ToIconString()" Rounded />
                     }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" IsAsync XSmall />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" Icon="@IconType.Comment.ToIconString()" IsAsync Rounded />
                     }
 
 
                     @if (CanDeleted)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" OnClick="OnDeleteClick" IsAsync XSmall Class="ms-3"/>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" OnClick="OnDeleteClick" Icon="@IconType.Delete.ToIconString()"  IsAsync Rounded Class="ms-4" />
                     }
                 </div>
             </Authorized>
         </AuthorizeView>
-
-
-
-        @if (Deepth < MaxDeepth)
-        {
-            if (IsReplying)
-            {
-                <div class="mt-3">
-                    <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
-                </div>
-            }
-            @foreach (var item in Model.InverseParentCodeNavigation)
-            {
-
-                <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
-                                Deepth="Deepth+1"  ParentCommentModel="@Model" CanDeleted="@CanDeleted" ></CommentPartTip>
-            }
-        }
-
     </div>
-</div>
-@if (Deepth >= MaxDeepth)
-{
+</MDCard>
     @if (IsReplying)
     {
-        <div class="mt-3">
+        <div class="@($"mt-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
             <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
 
         </div>
     }
     @foreach (var item in Model.InverseParentCodeNavigation)
     {
-        <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
-                        Deepth="Deepth+1" ParentCommentModel="@Model" CanDeleted="@CanDeleted" ></CommentPartTip>
+        <div class="@($"mt-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
+            <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
+                            Deepth="Deepth+1" ParentCommentModel="@Model" CanDeleted="@CanDeleted"></CommentPartTip>
+            </div>
     }
-}
 
 @code {
     [Parameter]
@@ -97,7 +76,7 @@
 
     private string StringMarked { get; set; }
 
-    public string ReplyTip { get { return Deepth > MaxDeepth ? $"回复<a href=\"/space/index/{ParentCommentModel.ApplicationUserId}\">@{ParentCommentModel.UserName}</a>\n": ""; } }
+    public string ReplyTip { get { return Deepth > MaxDeepth ? $"回复<a href=\"/space/index/{ParentCommentModel.UserInfor.Id}\">@{ParentCommentModel.UserInfor.Name}</a>\n" : ""; } }
 
 
     [CascadingParameter]
@@ -143,14 +122,6 @@
         await OnRefresh.InvokeAsync();
     }
 
-    public void OnUserClick()
-    {
-        if (Model != null)
-        {
-            NavigationManager.NavigateTo( "/space/index/" + Model.ApplicationUserId);
-        }
-    }
-
     int count = 0;
 
     private async Task OnDeleteClick()
@@ -166,7 +137,7 @@
                 return;
             }
 
-            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/UserHiddenComment", new HiddenCommentModel { Ids = new long[] { Model.Id },IsHidden=true });
+            var obj = await _httpService.PostAsync<HiddenCommentModel, Result>("api/comments/UserHiddenComment", new HiddenCommentModel { Ids = new long[] { Model.Id }, IsHidden = true });
 
             if (obj.Successful == false)
             {

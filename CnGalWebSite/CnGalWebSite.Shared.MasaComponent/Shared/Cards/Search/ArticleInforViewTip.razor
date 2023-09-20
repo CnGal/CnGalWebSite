@@ -1,74 +1,24 @@
-﻿@inject IDataCacheService _dataCatcheService
-
-@if (_dataCatcheService.IsApp)
-{
-    <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="div-shadow rounded  bg-opacity h-100">
-            <div style="display: flex; align-items: center;">
-                <div>
-                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
-                </div>
-                <div class="me-2 ms-2">
-                    <header class="text-truncate-1">
-                        <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
-                        <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
-                    </header>
-                    <span class="text-truncate-2">
-                        @Model.BriefIntroduction
-                    </span>
-                </div>
-            </div>
-        </div>
-    </TabLink>
-}
-else
-{
-    <div class="shadow-sm rounded  bg-opacity  ps-3 pe-3 pb-3">
-        <div class="mb-2" style="display:flex;">
-            <a href="@("/articles/index/" + Model.Id)" class="pt-3">
-                <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
-            </a>
-            <div class=" pt-3 ps-3">
-               
-                    <a href="@("/articles/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: center;">
-                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
-                    </a>
-           
-                 
-
-                    <a href="@("/articles/index/" + Model.Id)" class="text-truncate-3 a-font-color">
-                        @Model.BriefIntroduction
-                    </a>
-                </div>
-        </div>
-
-        <a href="@("/articles/index/" + Model.Id)" style="color: gray;">
-            <div class="d-flex">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
-                <span class="me-4">@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
-
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
-                <span class="me-4">@(Model.CommentCount)条评论</span>
-
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
-                <span class="me-4">@(Model.ReaderCount)次阅读</span>
-
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.ThumbsUp" Color="grey" />
-                <span class="me-4">@(Model.ThumbsUpCount)人点赞</span>
-                @if (string.IsNullOrWhiteSpace(Model.CreateUserName) == false)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" Color="grey" />
-                    <span>@Model.CreateUserName</span>
-                }
-            </div>
-        </a>
-    </div>
-
-}
+﻿
+<InfoCard Href="@("/articles/index/" + Model.Id)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@Model.Type.GetDisplayName()" />
 
 
 @code {
     [Parameter]
     public ArticleInforTipViewModel Model { get; set; }
+
+    public List<(IconType,string)> GetInfoItems()
+    {
+        var items= new List<(IconType, string)>
+        {
+            (IconType.DeterminedTime,Model.LastEditTime.ToString("yyyy-MM-dd")),
+            (IconType.DeterminedTime,Model.CommentCount.ToString()+"条评论"),
+            (IconType.DeterminedTime,Model.ReaderCount.ToString()+"次阅读"),
+            (IconType.DeterminedTime,Model.ThumbsUpCount.ToString()+"人点赞"),
+        };
+        if (string.IsNullOrWhiteSpace(Model.CreateUserName) == false)
+        {
+            items.Add((IconType.User, Model.CreateUserName));
+        }
+        return items;
+    }
 }

@@ -50,18 +50,6 @@
             transition: .3s;
         }
 
-        #home-page .item:hover .m-chip {
-            background-color: var(--md-sys-color-tertiary) !important;
-            border-color: var(--md-sys-color-tertiary) !important;
-            color: var(--md-sys-color-on-tertiary) !important;
-        }
-
-        #home-page .item:hover .m-chip--outlined {
-            background-color: transparent !important;
-            color: var(--md-sys-color-tertiary) !important;
-            caret-color: var(--md-sys-color-tertiary) !important;
-        }
-
         #home-page .item .m-chip {
             background-color: var(--md-sys-color-primary) !important;
             border-color: var(--md-sys-color-primary) !important;
@@ -83,25 +71,22 @@
             width: 10rem !important;
         }
 
-            #home-page .item.more-link:hover i, .community-card .item:hover i, .weekly-news-card .item:hover i, .announcements-card .item:hover i, .hot-tags-card .item:hover i {
-                color: var(--md-sys-color-on-tertiary-container) !important;
-            }
-
             #home-page .item.more-link i, .community-card .item i, .weekly-news-card .item i, .announcements-card .item i, .hot-tags-card .item i {
-                color: var(--md-sys-color-on-primary-container);
+                color: var(--md-sys-color-primary);
             }
 
         /*轮播图*/
-        #home-page .carousels-card {
+        #home-page .carousels-card, .cv-carousel-card {
             border-radius: 24px !important;
             box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
         }
 
-            #home-page .carousels-card img, .carousels-card .m-responsive__content, .carousels-card .m-window-item, .carousels-card .m-responsive {
+            #home-page .carousels-card img, .carousels-card .m-responsive__content, .carousels-card .m-window-item, .carousels-card .m-responsive
+            .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
                 border-radius: 24px !important;
             }
 
-            #home-page .carousels-card .m-responsive__content {
+            #home-page .carousels-card .m-responsive__content, #home-page .cv-carousel-card .m-responsive__content {
                 border-radius: 24px !important;
             }
         /*游戏列表*/
@@ -147,11 +132,10 @@
 
 
         #home-page .news-card .item {
-            display: flex;
             width: 28rem;
             gap: 1rem;
             padding: .7rem;
-            cursor: pointer;
+            flex-direction: row;
         }
 
         #home-page .news-card .group {
@@ -216,7 +200,6 @@
 
             #home-page .latest-articles-card .content .name {
                 color: var( --md-sys-color-on-primary-container);
-                font-size: 1.5rem;
             }
 
             #home-page .latest-articles-card .content .brief {
@@ -298,6 +281,10 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+        }
+
+        #home-page .recently-edited-games-card .item {
+            flex-direction: row;
         }
 
         #home-page .recently-edited-games-card img {
@@ -392,8 +379,7 @@
         }
 
         #home-page .announcements-card .item {
-            display: flex;
-            justify-content: flex-start;
+            flex-direction: row;
             padding: .5rem 1rem;
             gap: .5rem;
         }
@@ -623,8 +609,6 @@
 #home-page .gallery-card {
     display: flex;
     border-radius: var(--md-card-border-radius);
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
     transition: .3s;
     white-space: normal;
 }
@@ -696,8 +680,7 @@
     }
 
     #home-page .weekly-news-card .item {
-        display: flex;
-        justify-content: flex-start;
+        flex-direction: row;
         padding: .5rem 1rem;
         gap: .5rem;
     }
@@ -709,6 +692,7 @@
 #home-page .birthday-card .default.item {
     padding: 1rem;
     gap: 1rem;
+    flex-direction: row;
 }
 
 #home-page .birthday-card .default .content {
@@ -726,6 +710,7 @@
     padding: .5rem 1rem;
     gap: 1rem;
     align-items: center;
+    flex-direction: row;
 }
 
     #home-page .birthday-card .group .item img {
@@ -842,6 +827,10 @@
     flex-direction: column;
 }
 
+    #home-page .articles-group .item {
+        flex-direction: row;
+    }
+
 #home-page .evaluations-card .type {
     color: var( --md-sys-color-on-primary-container);
 }
@@ -896,6 +885,7 @@
 
 #home-page .hot-tags-card .item {
     padding: .3rem 1rem .3rem .5rem;
+    flex-direction: row;
     gap: .5rem;
 }
 
@@ -906,44 +896,57 @@
 
 /*CV专题页*/
 /*动态*/
-.cv-news .item {
-    display: flex;
-    width: 28rem;
-    gap: 1rem;
-    cursor: pointer;
+#cv-news .content-card {
+    gap: .7rem;
 }
 
-.cv-news .group {
+#cv-news .item {
+    gap: 1rem;
+    flex-direction: row;
+    padding: .5rem;
+}
+
+#cv-news .group {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.cv-news img {
+#cv-news img {
     width: 3rem;
     border-radius: 50%;
 }
 
-.cv-news .content {
+#cv-news a {
+    display: flex;
+}
+
+#cv-news .content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-.cv-news .head {
+#cv-news .head {
     display: flex;
     gap: .5rem;
 }
 
-.cv-news .name {
+#cv-news .name {
     color: var( --md-sys-color-on-primary-container);
     font-weight: bold;
 }
 
-.cv-news .time {
+#cv-news .time {
     color: var( --md-sys-color-on-primary-container);
 }
 
-.cv-news .text {
+#cv-news .text {
     color: var( --md-sys-color-on-primary-container);
+}
+
+.cv-carousel-card {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }

@@ -11,7 +11,6 @@
             {
                 <div class="p-2" style="min-width: 300px;">
                     <UserScoreCard Model="Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" IsDubbing="Model.IsDubbing" />
-
                 </div>
             }
             else
@@ -47,7 +46,7 @@
     }
     else
     {
-        <MSlideGroup ShowArrows="true">
+        <MSlideGroup ShowArrows="true" Class="slide-group-garp mb-4">
             <ChildContent>
                 @if (ShowChart)
                 {
@@ -74,22 +73,20 @@
                     if (ShowBlankAction)
                     {
                         <MSlideItem>
-                            <MCard Width="250" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                                   OnClick="@context.Toggle"
-                                   RefBack="@context.Ref">
-                                <div class="rounded shadow-sm  bg-opacity h-100" style=" display: flex; justify-content: center; align-items: center; ">
+                            <div style="width:250px;">
+                                <MDCard Class="h-100" Style=" display: flex; justify-content: center; align-items: center; ">
                                     <div class="m-4">
                                         <AuthorizeView Context="x">
                                             <Authorized>
-                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnEdit" Icon="mdi-plus" TextStyle />
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnEdit" Icon="mdi-plus" Rounded />
                                             </Authorized>
                                             <NotAuthorized>
-                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+                                                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" Rounded />
                                             </NotAuthorized>
                                         </AuthorizeView>
                                     </div>
-                                </div>
-                            </MCard>
+                                </MDCard>
+                             </div>
                         </MSlideItem>
                     }
 
@@ -98,11 +95,10 @@
                 @foreach (var item in Items.Where(s => s.User.Id != Model.CurrentUserId).Where(s => s.Socres.IsScored || string.IsNullOrWhiteSpace(s.PlayImpressions) == false).Take(MaxCount))
                 {
                     <MSlideItem>
-                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                               OnClick="@context.Toggle"
-                               RefBack="@context.Ref">
-                            <UserScoreCard Model="item" OnClick="@(()=>OnClickUser(item))" IsDubbing="Model.IsDubbing" />
-                        </MCard>
+                        <div style="width:400px;">
+
+                            <UserScoreCard Model="item" OnClick="@(()=>OnClickUser(item))" IsDubbing="Model.IsDubbing" Clickable />
+                                </div>
                     </MSlideItem>
                 }
             </ChildContent>

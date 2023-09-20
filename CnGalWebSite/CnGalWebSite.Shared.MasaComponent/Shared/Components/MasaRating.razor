@@ -1,8 +1,8 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 <div class="@Class">
-    <div style="display: flex; align-items: center;">
-        <div style=" word-break: keep-all;width:60px ">
+    <div style="display: flex; align-items: center;gap: .5rem;">
+        <div style=" word-break: keep-all; ">
             @($"{Label}({Value})")
         </div>
         <MRating Value="_rating" ValueChanged="OnValueChanged" Length="Length" HalfIncrements  BackgroundColor="primary" Large="Large" Style="flex-wrap: wrap; display: flex; "></MRating>

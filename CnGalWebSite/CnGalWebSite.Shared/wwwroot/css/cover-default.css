@@ -18,7 +18,7 @@ html {
 
 /*修正Masa样式的影响*/
 .m-application {
-    font-family: 'Noto Sans SC', sans-serif;
+    font-family: inherit!important;
 }
 
 .row {
@@ -96,4 +96,51 @@ html {
 /*页面跳转Alert*/
 .nav-loading .m-snack__content {
     padding: 0;
+}
+/*Masa卡片*/
+.theme--light.m-card, .theme--light.m-sheet {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+    border-color: var(--md-sys-color-surface-1);
+}
+
+    .theme--light.m-card > .m-card__subtitle, .theme--light.m-card > .m-card__text, .m-toast-detail {
+        color: var(--md-sys-color-on-surface);
+    }
+
+.m-alert:not(.m-sheet--tile) {
+    border-radius: var( --md-card-border-radius);
+}
+
+.m-sheet.m-card, .m-dialog, .m-menu__content {
+    border-radius: var(--md-card-border-radius);
+}
+/*菜单*/
+.m-menu__content {
+    background-color: var(--md-sys-color-background);
+}
+/*步骤条*/
+.m-stepper.theme--light.m-card, .m-stepper.theme--light.m-sheet {
+    background: transparent;
+}
+/*对话框*/
+.m-dialog, .m-snack__wrapper.m-sheet.theme--light {
+    background-color: var(--md-sys-color-background);
+}
+/*Markdown*/
+.markdown-body h1, .markdown-body h2 {
+    border-bottom: 2px solid var(--md-sys-color-primary) !important;
+}
+
+.markdown-body blockquote {
+    color: var(--md-sys-color-secondary) !important;
+    border-left: .25em solid var(--md-sys-color-secondary) !important;
+}
+/*输入框*/
+.m-text-field input {
+    line-height: unset;
+}
+/*卡片标题字体*/
+.m-application .text-h5, .m-application .text-h6 {
+    font-family: inherit !important;
 }

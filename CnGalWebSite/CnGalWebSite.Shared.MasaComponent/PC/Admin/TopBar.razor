@@ -2,14 +2,14 @@
 @inject NavigationManager NavigationManager
 
 
-<div class="mb-4 rounded shadow-sm  bg-opacity d-flex p-3 ">
+<MDCard Class="pa-3 mb-4" Style="flex-direction: row;">
     <MSpacer></MSpacer>
     <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" Min />
-    <MSpacer></MSpacer>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
+     <MSpacer></MSpacer>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
 
-    <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
-</div>
+     <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
+</MDCard>
 
 @code {
     CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;

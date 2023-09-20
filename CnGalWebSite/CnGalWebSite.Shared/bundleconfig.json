@@ -25,7 +25,10 @@
       "wwwroot/css/share/show-background.css",
       "wwwroot/css/share/components.css",
       "wwwroot/css/share/entry.css",
-      "wwwroot/css/share/markdown.css"
+      "wwwroot/css/share/markdown.css",
+      "wwwroot/css/share/rank.css",
+      "wwwroot/css/share/user.css",
+      "wwwroot/css/share/comment.css"
     ]
   },
   {
@@ -38,7 +41,8 @@
     "outputFileName": "wwwroot/css/light/bundle-light.css",
     "inputFiles": [
       "wwwroot/css/light/common-light.css",
-      "wwwroot/css/material-theme/theme.light.css"
+      "wwwroot/css/material-theme/theme.light.css",
+      "wwwroot/css/markdown/github-markdown.css"
     ]
   },
   {
@@ -46,7 +50,8 @@
     "inputFiles": [
       "wwwroot/css/dark/common-dark.css",
       "wwwroot/css/dark/home.css",
-      "wwwroot/css/material-theme/theme.dark.css"
+      "wwwroot/css/material-theme/theme.dark.css",
+      "wwwroot/css/markdown/github-markdown-dark.css"
     ]
   },
   {

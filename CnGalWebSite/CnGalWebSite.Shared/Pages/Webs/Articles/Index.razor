@@ -31,8 +31,10 @@ else
 
 @if (isNotFound == true)
 {
-    int temp = 0;
-    <NotFoundArticle IsNeedLayput="true" ArticleName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundArticle>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这篇文章哦......</h1>
+        <div class="text-center">可以在这里<a href="/articles/createarticle">发布文章</a>，也可以查看<a href="/articles/index/3">《文章发表规范》</a></div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 }
 else
 {
@@ -47,13 +49,11 @@ else
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
 
-                <div class="rounded shadow-sm bg-opacity mb-4 pb-4">
                     <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model" OnRevoke="OnRevoke" />
 
                     <div class="ps-4 pe-4 pt-4">
                         <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />
                     </div>
-                </div>
                 <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
                 <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Article" Id="Model.Id" />
 

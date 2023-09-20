@@ -140,6 +140,24 @@ body {
     word-break: break-all;
 }
 
+.text-truncate-5 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    word-break: break-all;
+}
+
+.text-truncate-6 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    word-break: break-all;
+}
+
 .outline-button-title {
     margin-top: 0px;
     margin-bottom: 5px;
@@ -314,4 +332,12 @@ ins {
     background: #eaf2c2;
     color: #406619;
     text-decoration: none;
+}
+/*字体*/
+.fw-bold {
+    font-weight: bold;
+}
+/*幻灯片组*/
+.slide-group-garp .m-slide-group__content {
+    gap: 1rem;
 }

@@ -1,34 +1,32 @@
-﻿<a href="@("votes/index/"+Model.Id)" class=" a-font-color">
-    <div class="shadow-sm rounded  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div class="">
-            <div>
-                <img class="img-fluid" src="@Model.MainPicture">
-            </div>
-            <div class="p-3">
-                <header style=" display: flex; align-items: center;" class="mb-2">
-                    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
-                    {
-                        <span class="bg-primary article-home-tag me-2" style=" border-radius: 5px; ">未开始</span>
-                    }
-                    else if (DateTime.Now.ToCstTime() > Model.EndTime)
-                    {
-                        <span class="bg-danger article-home-tag me-2">已结束</span>
-                    }
-                    else
-                    {
-                        <span class="bg-success article-home-tag me-2">正在进行</span>
-                    }
+﻿<MDCard Href="@("votes/index/"+Model.Id)" Class="h-100" Style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="">
+        <div style="display:flex;">
+            <img class="img-fluid" src="@Model.MainPicture">
+        </div>
+        <div class="pa-3">
+            <header style=" display: flex; align-items: center;" class="mb-2">
+                @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="未开始" />
+                }
+                else if (DateTime.Now.ToCstTime() > Model.EndTime)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="已结束" />
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="正在进行" />
+                }
 
-                    <h5 class="fw-bold mb-0 text-truncate-2">@Model.Name</h5>
-                </header>
-                <span class="text-truncate-4">
-                    @Model.BriefIntroduction
-                </span>
+                <div class="fw-bold mb-0 text-truncate-2 title-large">@Model.Name</div>
+            </header>
+            <span class=" text-truncate-3 label-large">
+                @Model.BriefIntroduction
+            </span>
 
-            </div>
         </div>
     </div>
-</a>
+</MDCard>
 
 
 @code {

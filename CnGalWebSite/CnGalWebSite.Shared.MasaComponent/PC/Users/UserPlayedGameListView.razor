@@ -43,7 +43,7 @@
             else
             {
                 <div class="mb-3">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
                 </div>
             }
 
@@ -55,9 +55,7 @@
     }
     else
     {
-        <div style="height:300px">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
     }
 </div>
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />

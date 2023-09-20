@@ -9,11 +9,11 @@
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="@IconType.Favorite.ToIconString()" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
 
             }
         </ButtonContent>

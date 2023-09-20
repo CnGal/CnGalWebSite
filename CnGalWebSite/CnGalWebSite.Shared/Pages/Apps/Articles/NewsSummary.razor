@@ -32,7 +32,7 @@
             }
             @if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
             }
         </div>
         @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
@@ -43,7 +43,7 @@
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
     }
 </div>
 

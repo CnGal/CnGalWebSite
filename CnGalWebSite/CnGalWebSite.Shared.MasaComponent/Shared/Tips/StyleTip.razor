@@ -36,6 +36,15 @@ else
 <!--开放搜索-->
 <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
 
+<!--字体-->
+@if(string.IsNullOrWhiteSpace(_dataCacheService.ThemeSetting.FontFamily)==false)
+{
+    <style>
+        body {
+            font-family: @_dataCacheService.ThemeSetting.FontFamily !important;
+        }
+    </style>
+}
 
 @code {
 

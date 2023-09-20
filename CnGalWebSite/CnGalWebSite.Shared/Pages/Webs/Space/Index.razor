@@ -24,7 +24,10 @@
 
 @if (isNotFound)
 {
-    <NotFoundUser IsNeedLayput="true"></NotFoundUser>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这个用户哦......</h1>
+        <div class="text-center">有点可怕呢，可以试试联系管理员</div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 }
 else
 {
@@ -33,7 +36,7 @@ else
 
         <div class="row">
             <div class="col-12 col-lg-4">
-                <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.BasicInfor" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Main Model="Model.BasicInfor" />
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
                 @if (_dataCacheService.IsApp == false)
                 {
@@ -84,7 +87,6 @@ else
                             </MTab>
                         </MTabs>
                     </div>
-                    <div class="row">
                         <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
                                 @if (_dataCacheService.IsApp)
@@ -94,14 +96,14 @@ else
                                 @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                                 {
                                     <div class="mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="个人介绍" Icon="@IconType.Home.ToIconString()">
                                             <ChildContent>
                                                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPageContext" />
                                             </ChildContent>
                                             <ButtonContent>
                                                 @if (Model.IsCurrentUser)
                                                 {
-                                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+                                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Edit.ToIconString()" Tooltip="编辑个人介绍" OnClick="EditMainPage" />
 
                                                 }
                                             </ButtonContent>
@@ -110,23 +112,20 @@ else
                                     </div>
                                 }
 
-                                <div class="row">
-                                    <div class="col-12">
+                                    <div class="mb-4">
                                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
                                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
                                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                        
                                     </div>
-                                    <div class="col-12">
+                                    <div class="mb-4">
                                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
                                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
                                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     </div>
 
-                                </div>
-                                <div class="rounded  rounded shadow-sm  p-3 pb-0 bg-opacity mb-4">
+                   
                                     <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model" />
-                                </div>
                                 <div>
                                     @if (Model.CanComment)
                                     {
@@ -176,7 +175,6 @@ else
                                 <UserOwnedPeripheryListView UserId="@Model.Id" />
                             </MTabItem>
                         </MTabsItems>
-                    </div>
 
                 </div>
 

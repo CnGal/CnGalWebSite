@@ -7,13 +7,10 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="外部链接" Outline Collapable>
-            <div class="mb-3">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
                     以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-            </div>
             <div class="row">
-
                 @foreach (var item in Model.RelatedOutlinks)
                 {
                     <div class="mb-3 col-12">

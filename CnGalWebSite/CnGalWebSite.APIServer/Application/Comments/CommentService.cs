@@ -145,16 +145,16 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
             var model = new CommentViewModel
             {
-                ApplicationUserId = comment.ApplicationUserId,
-                EntryId = comment.EntryId,
-                ArticleId = comment.ArticleId,
-                UserSpaceCommentManagerId = comment.UserSpaceCommentManagerId,
-                IsHidden = comment.IsHidden,
                 CommentTime = comment.CommentTime,
                 Type = comment.Type,
                 Id = comment.Id,
-                UserName = comment.ApplicationUser.UserName,
-                UserImage = _appHelper.GetImagePath(comment.ApplicationUser.PhotoPath, "user.png"),
+                UserInfor=new DataModel.ViewModel.Space.UserInforViewModel
+                {
+                    Id = comment.ApplicationUser.Id,
+                    Name = comment.ApplicationUser.UserName,
+                    PersonalSignature = comment.ApplicationUser.PersonalSignature,
+                    PhotoPath = _appHelper.GetImagePath(comment.ApplicationUser.PhotoPath, "user.png"),
+                },
                 InverseParentCodeNavigation = new List<CommentViewModel>()
             };
             //提前将MarkDown语法转为Html
@@ -166,11 +166,11 @@ namespace CnGalWebSite.APIServer.Application.Comments
             {
                 model.Text = "该评论被隐藏";
             }
-            model.Ranks = await _rankService.GetUserRanks(comment.ApplicationUser);
+            model.UserInfor.Ranks = await _rankService.GetUserRanks(comment.ApplicationUser);
 
             if (comment.ApplicationUserId == ascriptionUserId)
             {
-                model.Ranks.Add(new RankViewModel
+                model.UserInfor.Ranks.Add(new RankViewModel
                 {
                     Text = rankName,
                     Name = rankName,

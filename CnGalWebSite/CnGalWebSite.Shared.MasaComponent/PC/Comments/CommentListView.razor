@@ -1,19 +1,25 @@
 ﻿@inject IDataCacheService _dataCacheService
 
+@if (Model.Items.Skip((Model.CurrentPage - 1) * Model.MaxCount).Take(Model.MaxCount).Any())
+{
+    <div class="mb-3">
 
-<div class="mb-3">
+        @foreach (var item in Model.Items.Skip((Model.CurrentPage - 1) * Model.MaxCount).Take(Model.MaxCount))
+        {
+                <div class="mt-3">
+                <CommentPartTip Model="item" IsChild="false" OnRefresh="OnRefrsh"
+                                CanDeleted="CanDeleted"></CommentPartTip>
 
-    @foreach (var item in Model.Items.Skip((Model.CurrentPage - 1) * Model.MaxCount).Take(Model.MaxCount))
-    {
-        <CommentPartTip Model="item" IsChild="false" OnRefresh="OnRefrsh"
-                        CanDeleted="CanDeleted"></CommentPartTip>
-    }
+                </div>
+        }
 
-    @if (Model.TotalPages > 1)
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage"  Length="@Model.TotalPages" ValueChanged="OnPageClick"/>
-    }
-</div>
+        @if (Model.TotalPages > 1)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
+        }
+    </div>
+
+}
 
 
 
@@ -29,13 +35,13 @@
     {
         Model.CurrentPage = pageIndex;
         StateHasChanged();
-        
+
     }
 
     public void PageToEnd()
     {
         Model.CurrentPage = Model.TotalPages;
         StateHasChanged();
-        
+
     }
 }

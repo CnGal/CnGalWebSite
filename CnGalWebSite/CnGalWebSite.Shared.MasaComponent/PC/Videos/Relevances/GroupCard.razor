@@ -5,18 +5,16 @@
 @if (Model.Any())
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关视频" Icon="@IconType.Video.ToIconString()" Class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="相关视频" Icon="@IconType.Video.ToIconString()" Class="mb-4">
             <ChildContent>
-                <MSlideGroup ShowArrows="true">
+                 <MSlideGroup ShowArrows="true" Class="slide-group-garp mb-4">
                     <ChildContent>
                         @foreach (var item in Model)
                         {
                             <MSlideItem>
-                                <MCard Width="200" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                                       OnClick="@context.Toggle"
-                                       RefBack="@context.Ref">
+                                <div style="width:200px">
                                     <InforCard Model="item" />
-                                </MCard>
+                                </div>
                             </MSlideItem>
                         }
                     </ChildContent>

@@ -19,6 +19,15 @@ else
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
+@if (isNotFound == true)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这个标签哦......</h1>
+        <div class="text-center">可以在这里<a href="/tags/createtag">创建标签</a>，也可以查看<a href="/articles/index/254">《标签编辑规范》</a></div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+}
+else
+{
 <div>
     @if (_dataCatcheService.TagIndexPageCatche.Check(Id) || isReady)
     {
@@ -57,6 +66,7 @@ else
 
     }
 </div>
+}
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Tag" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
                                                                 ObjectName="@Model.Name" />
 @if (isFirstLoad == false)
@@ -71,6 +81,7 @@ else
     bool isReady = false;
     bool isLoading = false;
     bool isFirstLoad = true;
+    bool isNotFound = false;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -115,6 +126,7 @@ else
         }
         catch (Exception ex)
         {
+            isNotFound = true;
             await ErrorHandler.ProcessError(ex, "获取标签失败");
         }
 

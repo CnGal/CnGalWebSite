@@ -173,7 +173,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Other,
         Move,
         Import,
-        Code
+        Code,
+        Folder
     }
 
     public static class IconTypeHelper
@@ -182,6 +183,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Folder:
+                    return "mdi-folder";
                 case IconType.Code:
                     return " mdi-barcode";
                 case IconType.Import:

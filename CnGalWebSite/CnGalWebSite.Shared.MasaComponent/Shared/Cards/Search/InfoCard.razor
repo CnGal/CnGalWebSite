@@ -1,0 +1,72 @@
+﻿<MDCard Outline="Outline" ShowHoverStyle="true" Class="@($"entry-card-default relevance-card {Class}")">
+    <div class="main-card">
+        <MDCard Href="@Href" Outline OnClick="OnClick" Class="pointer">
+            <img src="@Image" class="@($"{(Thumbnail?"thum":"")}")" />
+        </MDCard>
+        <div class="content-card">
+            <div class="head-card">
+                 <MDCard Href="@Href" Outline Class="title-card pointer" OnClick="OnClick">
+                  
+                    <div class="name text-truncate-2">
+                        @if (string.IsNullOrWhiteSpace(Type) == false)
+                        {
+                            <span class="type-inline-chip">@Type</span>
+                        }
+                        <span class="title-large">@Name</span>
+                    </div>
+                    
+                </MDCard>
+                @TitleContent
+            </div>
+           
+            @ChildContent
+            <MDCard Href="@Href" Outline OnClick="OnClick" Class="pointer">
+                <div class="brief text-truncate-3  label-large">
+                    @BriefIntroduction
+                </div>
+            </MDCard>
+        </div>
+    </div>
+    @if (InfoItems?.Any()??false)
+    {
+        <div class="info-card">
+            @foreach (var item in InfoItems)
+            {
+                <div class="info-item">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@item.Item1" />
+                    <div style="word-break: keep-all;">
+                        @item.Item2
+                    </div>
+                </div>
+            }
+        </div>
+
+    }
+</MDCard>
+
+@code {
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string BriefIntroduction { get; set; }
+    [Parameter]
+    public List<(IconType, string)> InfoItems { get; set; }
+    [Parameter]
+    public string Type { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
+    public bool Thumbnail { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment TitleContent { get; set; }
+}

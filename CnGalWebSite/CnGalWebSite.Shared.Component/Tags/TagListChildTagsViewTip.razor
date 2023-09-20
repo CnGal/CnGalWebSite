@@ -4,15 +4,11 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildTags/" + Model.Id)" ExamineType="Operation.EditTagChildTags" OnClickRevoke="OnClickRevoke"/>
 
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子标签" Icon="@IconType.Tags.ToIconString()" Collapable>
-    <div class="row">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子标签" Icon="@IconType.Tags.ToIconString()">
+    <div>
         @foreach (var item in Model.ChildrenTags)
         {
-
-            <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mt-2">
-                <TabLink Text="@item.Name" Url="@("/tags/index/"+item.Id)" Icon="fa fa-tag">@item.Name</TabLink>
-                <hr />
-            </div>
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.None" Text="@item.Name" Href="@("/tags/index/"+item.Id)" />
         }
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

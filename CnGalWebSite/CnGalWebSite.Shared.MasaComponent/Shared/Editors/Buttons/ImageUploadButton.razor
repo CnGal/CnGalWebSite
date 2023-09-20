@@ -40,7 +40,7 @@
 
                 @if (string.IsNullOrWhiteSpace(ImagePath) == false)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Color="error" Fab />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Rounded="Rounded" Class="mb-3" Color="error" Fab />
                 }
 
             </div>
@@ -48,7 +48,7 @@
     }
     else
     {
-        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3">
+        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3 @(Rounded?"m-btn--rounded":"")">
             <span class="m-btn__content">
                 @if (isUploading)
                 {
@@ -92,6 +92,8 @@
     public string Class { get; set; }
     [Parameter]
     public bool Gallery { get; set; }
+    [Parameter]
+    public bool Rounded { get; set; }
 
     private readonly string Id = "input" + new Random().Next();
     bool isUploading;

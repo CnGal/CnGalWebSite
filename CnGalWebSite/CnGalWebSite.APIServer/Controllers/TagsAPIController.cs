@@ -809,7 +809,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var tagIds = await _tagRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entries)
-                .Where(s => s.Entries.Count > 3 && s.Name != "免费")
+                .Where(s => s.Entries.Where(s=>string.IsNullOrWhiteSpace( s.Name)==false&&s.IsHidden==false).Count() > 3 && s.Name != "免费")
                 .Select(s => s.Id)
                 .ToListAsync();
 
@@ -822,7 +822,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     s.Id,
                     s.Name,
-                    Entries= s.Entries.OrderBy(x => EF.Functions.Random()).Take(12)
+                    Entries= s.Entries.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).OrderBy(x => EF.Functions.Random()).Take(12)
                 })
                 .ToListAsync();
 

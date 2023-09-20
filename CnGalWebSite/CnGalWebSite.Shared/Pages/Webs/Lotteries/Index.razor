@@ -9,11 +9,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture" />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 
 @if (_dataCacheService.ThemeSetting.IsTransparent)
@@ -34,77 +34,80 @@ else
 
 @if (isNotFound == true)
 {
-    <NotFoundLottery IsNeedLayput="true"></NotFoundLottery>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这个抽奖哦......</h1>
+        <div class="text-center">如果链接没有错的话，可以试试联系管理员</div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 }
 else
 {
-<div>
-    @if (_dataCacheService.LotteryIndexPageCatche.Check(Id) || isReady)
-    {
-        @if (Model.IsHidden == true)
+    <div>
+        @if (_dataCacheService.LotteryIndexPageCatche.Check(Id) || isReady)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
-                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            @if (Model.IsHidden == true)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                    当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-        }
+            }
 
-        @if (_dataCacheService.IsApp)
-        {
-            <div class="row">
-                <div class="col-12 col-lg-9">
+            @if (_dataCacheService.IsApp)
+            {
+                <div class="row">
+                    <div class="col-12 col-lg-9">
 
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
 
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
-
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
-
-                    @if (Model.Awards.Any(s => s.Users.Any()))
-                    {
-                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
-                    }
-
-                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
 
 
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
 
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+
+                        @if (Model.Awards.Any(s => s.Users.Any()))
+                        {
+                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
+                        }
+
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+
+
+
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-12 col-lg-9">
+
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
+
+
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                    </div>
+                    <div class="col-12 col-lg-3">
+
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
+
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
+                    </div>
+                </div>
+            }
+
         }
         else
         {
-            <div class="row">
-                <div class="col-12 col-lg-9">
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
-
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
-
-                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
-                </div>
-                <div class="col-12 col-lg-3">
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
-
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
-                </div>
-            </div>
-        }
-
-    }
-    else
-    {
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
         }
-</div>
+    </div>
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Lottery" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
@@ -167,7 +170,7 @@ else
             }
 
             isReady = true;
-         //   StateHasChanged();
+            //   StateHasChanged();
             var user = await authenticationStateTask;
             if (user.User.Identity.IsAuthenticated)
             {

@@ -1,55 +1,52 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-<a target="_blank" href="@GetLink()" class="a-font-color" rel="noreferrer">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout p-3 h-100">
-        <div class="" style="height: 100%; align-content: center;display:flex;">
-            @if (string.IsNullOrWhiteSpace(GetImage()))
+
+<MDCard Href="@GetLink()" Class=" pa-3 pt-2 pb-2" Target="_blank">
+    <div class="" style="height: 100%; align-content: center;display:flex;">
+        @if (string.IsNullOrWhiteSpace(GetImage()))
+        {
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="text-truncate-2  title-large">
+                   @GetName()
+                </div>
+                <div class="text-truncate-3 label-large">
+                    @GetValue()
+                </div>
+            </div>
+        }
+        else
+        {
+            if (_dataCatcheService.IsApp)
             {
-                <div style="display: flex; flex-direction: column; justify-content: center;">
-                    <header class="text-truncate-2">
-                        <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
-                    </header>
-                    <span class="text-truncate-3">
+                <div style=" display: flex; flex-direction: column; justify-content: center;">
+                    <img src="@GetImage()" style="width: 50px;" />
+                </div>
+                <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="text-truncate-2 title-large">
+                        @GetName()
+                    </div>
+                    <div class="text-truncate-3 label-large">
                         @GetValue()
-                    </span>
+                    </div>
                 </div>
             }
             else
             {
-                if (_dataCatcheService.IsApp)
-                {
-                    <div style=" display: flex; flex-direction: column; justify-content: center;">
-                        <img src="@GetImage()" style="width: 50px;" />
+                <div style=" display: flex; flex-direction: column; justify-content: center;">
+                    <img src="@GetImage()" style="width: 50px;" />
+                </div>
+                <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="text-truncate-2 title-large">
+                        @GetName()
                     </div>
-                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                        <header class="text-truncate-2">
-                            <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
-                        </header>
-                        <span class="text-truncate-3">
-                            @GetValue()
-                        </span>
+                    <div class="text-truncate-3 label-large">
+                        @GetValue()
                     </div>
-                }
-                else
-                {
-                    <div style=" display: flex; flex-direction: column; justify-content: center;">
-                        <img src="@GetImage()" style="width: 50px;" />
-                    </div>
-                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                        <header class="text-truncate-2">
-                            <h5 class="fw-bold" style=" display: inline;">@GetName()</h5>
-                        </header>
-                        <span class="text-truncate-3">
-                            @GetValue()
-                        </span>
-                    </div>
-                }
+                </div>
             }
-        </div>
+        }
     </div>
-
-
-</a>
+</MDCard>
 
 @code {
     [Parameter]
@@ -95,7 +92,7 @@
     {
         return Model.DisplayName switch
         {
-            "VNDB" => "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
+            "VNDB" => Model.DisplayValue + (string.IsNullOrWhiteSpace(Model.DisplayValue) ? "" : " - ") + "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
             _ => Model.DisplayValue
         };
     }

@@ -7,46 +7,50 @@
         目前只支持B站链接，格式如下<br />
         https://www.bilibili.com/video/BV1tF411N7XD
     </div>
-    <div class="row mb-4">
-        <div class="col-12 col-sm-3">
-            <MTextField Label="类型（可不填，将自动获取）" @bind-Value="@InputModel.Type" TValue="string" ></MTextField>
-        </div>
-        <div class="col-12 col-sm-9">
-            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" ></MTextField>
-        </div>
-        <div class="col-12 ">
-            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" ></MTextField>
-        </div>
-        <div class="col-12 col-sm-6 mb-4">
-            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作"  />
-        </div>
-        <div class="col-12 mb-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="批量导入" OnClick="OnImport" Icon="mdi-database-import" />
-        </div>
-    </div>
-    <MSimpleTable Class="mb-4">
-        <thead>
-            <tr>
-                <th class="text-left">
-                    类型
-                </th>
-                <th class="text-left">
-                    本人创作
-                </th>
-                <th class="text-left">
-                    标题
-                </th>
-                <th class="text-left">
-                    链接
-                </th>
-                <th class="text-left">
-                    操作
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+    <MRow Class="mb-4">
+        <MCol Cols="12" Md="3">
+            <MTextField Label="类型（可不填，将自动获取）" @bind-Value="@InputModel.Type" TValue="string"></MTextField>
+
+        </MCol>
+        <MCol Cols="12" Md="9">
+            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string"></MTextField>
+
+        </MCol>
+        <MCol Cols="12">
+            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string"></MTextField>
+
+        </MCol>
+        <MCol Cols="12">
+            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作" />
+
+        </MCol>
+        <MCol Cols="12">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="批量导入" OnClick="OnImport" Icon="mdi-database-import" />
+         </MCol>
+     </MRow>
+     <MSimpleTable Class="mb-4">
+         <thead>
+             <tr>
+                 <th class="text-left">
+                     类型
+                 </th>
+                 <th class="text-left">
+                     本人创作
+                 </th>
+                 <th class="text-left">
+                     标题
+                 </th>
+                 <th class="text-left">
+                     链接
+                 </th>
+                 <th class="text-left">
+                     操作
+                 </th>
+             </tr>
+         </thead>
+         <tbody>
+             @foreach (var item in Model)
             {
                 <tr @key="item.Url">
                     <td>@item.Type</td>
@@ -64,17 +68,17 @@
                     <td>@item.Url</td>
                     <td>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
-                    </td>
-                </tr>
+                     </td>
+                 </tr>
             }
         </tbody>
     </MSimpleTable>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Depressed Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
-</div>
-<ImportCard @ref="importCard" OnImported="OnImported"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+ </div>
+ <ImportCard @ref="importCard" OnImported="OnImported" />
 
-@code {
+ @code {
     [Parameter]
     public List<RepostVideoModel> Model { get; set; }
     [Parameter]
@@ -92,13 +96,13 @@
     }
     public async Task OnImported(List<string> items)
     {
-        foreach(var item in items)
+        foreach (var item in items)
         {
             var model = new RepostVideoModel
-            {
-                Url = item,
-                IsCreatedByCurrentUser= InputModel.IsCreatedByCurrentUser
-            };
+                {
+                    Url = item,
+                    IsCreatedByCurrentUser = InputModel.IsCreatedByCurrentUser
+                };
             await OnAdd(model);
         }
     }
@@ -135,7 +139,7 @@
     public void OnDelete(RepostVideoModel model)
     {
         Model.Remove(model);
-        
+
     }
 
     public async Task OnClickFinshInput()

@@ -3,13 +3,16 @@
 @if (Page)
 {
     <div class="progressing-card">
-        <MDCard Class="">
+        <MDCard Class="out-card w-100" Outline="!Fill">
+            <MDCard Outline="Fill" Class="inner-card">
             <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
             <div class="d-flex" style="justify-content: center;">
                 <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
              </div>
              <div class="mt-3 text-center">正在加载......</div>
          </MDCard>
+         </MDCard>
+
     </div>
 
 }
@@ -35,4 +38,6 @@ else
     public string Color { get; set; } = "primary";
     [Parameter]
     public bool Page { get; set; }
+    [Parameter]
+    public bool Fill { get; set; }
 }

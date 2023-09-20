@@ -1,9 +1,9 @@
 ﻿@if (isReady)
 {
-    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")" style="display: flex; justify-content: center; height: 100%; flex-direction: column; ">
+    <MDCard Outline="Outline" Class="h-100" Style="display: flex; justify-content: center; flex-direction: column; ">
         @if (isRuning)
         {
-            <div class="mb-2" style=" display: flex; justify-content: center;">
+            <div class="mb-4" style=" display: flex; justify-content: center;">
                 正在同步评分......
             </div>
         }
@@ -11,20 +11,19 @@
         {
             @if (Model.UserScores.Any(s => s.Socres.IsScored))
             {
-                <div class="pb-2">
+                <div class="pb-4">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="270" />
                 </div>
 
             }
             else
             {
-                <div class="mb-2" style=" display: flex; justify-content: center;">
+                <div class="mb-4" style=" display: flex; justify-content: center;">
                     暂无记录
                 </div>
             }
         }
-
-    </div>
+    </MDCard>
 }
 
 
@@ -39,7 +38,7 @@
     EChartsRadarOptionModel model = new EChartsRadarOptionModel();
     bool isReady;
     bool isRuning;
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         isRuning = false;
         if (Model.UserScores.Any(s => s.Socres.IsScored) == false)

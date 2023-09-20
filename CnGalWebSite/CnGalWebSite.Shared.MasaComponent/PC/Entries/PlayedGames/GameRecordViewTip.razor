@@ -8,9 +8,9 @@
 <MDialog @bind-Value="Dialog"
          MaxWidth="440">
     <MCard>
-        <TabLink Icon="fa fa-codepen" Text="@Model.GameName" class="a-font-color" OnClick="OnClose">
+        <a href="@($"/entries/index/{Model.GameId}")">
             <img style="width:100%;" src="@Model.GameImage" alt="@Model.GameName">
-        </TabLink>
+        </a>
 
         <MCardTitle Class="text-h5">
             @Model.GameName
@@ -101,15 +101,6 @@
         Dialog = false;
         await OnEdit.InvokeAsync(Model);
     }
-
-    public async Task OnClose()
-    {
-        Dialog = false;
-        StateHasChanged();
-        await Task.Delay(1);
-        NavigationManager.NavigateTo("/entries/index/" + Model.GameId);
-    }
-
 
     public async Task OnHidden()
     {

@@ -12,7 +12,7 @@
         padding: 0.1rem;
     }
 </style>
-<div class="rounded shadow-sm  bg-opacity mb-4">
+<MDCard Class="mb-4">
     <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
 
         <div class="ps-4 pe-4" style="@((_dataCacheService.IsApp?" max-width: 400px;":" max-width: 200px;")+" display: flex; width: 100%; align-items: center;")">
@@ -21,9 +21,12 @@
         <div class="ps-4 pe-4" style="@((_dataCacheService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.SortType" ValueChanged="SortValueChanged" TValue="PlayedGamesSortType" Class="pt-0" />
         </div>
-        <div class="ps-4 pe-4" style="@((_dataCacheService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+        @if(IsAnniversary)
+        {
+             <div class="ps-4 pe-4" style="@((_dataCacheService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.DisplayType" ValueChanged="DisplayValueChanged" TValue="PlayedGamesDisplayType" Class="pt-0" />
-        </div>
+        </div>     
+        }
         @*@if (IsAnniversary)
         {
             <div class="ps-4 pe-4" style=" display: flex; align-items: center;">
@@ -35,7 +38,7 @@
         }*@
 
     </div>
-</div>
+</MDCard>
 
 <div class="row">
     @foreach (var item in Items.Skip((_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.CurrentPage - 1) * _dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.MaxCount).Take(_dataCacheService.ThemeSetting.AnniversariesSetting.PlayedGameSetting.MaxCount))
