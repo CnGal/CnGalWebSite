@@ -1,44 +1,6 @@
-﻿@inject NavigationManager NavigationManager
-
-<div class="@Class">
-    <a href="@url" class="a-font-color">
-        <div class="rounded shadow-sm bg-opacity pb-3">
-            <div style="display:flex;" class="m-0 row">
-                <div class="d-md-flex d-none col-auto ps-4 pt-4 pe-0">
-                    @if (Model.IsThumbnail)
-                    {
-                        <img style="height:120px;border-radius:50%;" src="@Model.Image" alt="@Model.ObjectName">
-                    }
-                    else
-                    {
-                        <img style="height:120px;" src="@Model.Image" alt="@Model.ObjectName">
-                    }
-                </div>
-                <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-
-                    @if (Model.IsThumbnail)
-                    {
-                        <img style="height: 200px; border-radius: 50%;" src="@Model.Image" alt="@Model.ObjectName">
-                    }
-                    else
-                    {
-                        <img style="width: 100%;" src="@Model.Image" alt="@Model.ObjectName">
-                    }
-                </div>
-                <div class="ps-4 pt-4 pe-4 col" style=" display: flex; flex-direction: column;">
-                    <h1 class="fw-bold h3 text-truncate-1">
-                        @(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName)
-                    </h1>
-                    <span class="text-truncate-3">
-                        @Model.ObjectBriefIntroduction
-                    </span>
-                </div>
-            </div>
-
-        </div>
-    </a>
-  
-</div>
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName)" Image="@Model.Image" Thumbnail="Model.IsThumbnail"
+                                                                         BriefIntroduction="@Model.ObjectBriefIntroduction" Href="@url" Class="@($"edit-record-overview-main-card {Class}")"/>
 
 @code {
     [Parameter]
@@ -46,9 +8,9 @@
     [Parameter]
     public string Class { get; set; }
 
-    string url = "";
+    string url;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         url = Model.Type switch
         {
@@ -57,7 +19,7 @@
             ExaminedNormalListModelType.Periphery => "/peripheries/index/" + Model.ObjectId,
             ExaminedNormalListModelType.Tag => "/tags/index/" + Model.ObjectId,
             ExaminedNormalListModelType.Video => "/videos/index/" + Model.ObjectId,
-            _ => NavigationManager.Uri
+            _ => null
         };
     }
 }

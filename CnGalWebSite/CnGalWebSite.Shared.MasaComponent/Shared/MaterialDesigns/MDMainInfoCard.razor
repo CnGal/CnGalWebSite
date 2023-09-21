@@ -1,4 +1,4 @@
-﻿<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard Class="@($"md-main-info-card {(Thumbnail?"role":"game")} {Class}")">
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard Class="@($"md-main-info-card {(Thumbnail?"role":"game")} {(Small?"small":"")} {Class}")" Href="@Href">
 
     <div class="image-card">
         <img src="@Image" alt="@Name">
@@ -18,9 +18,13 @@
     [Parameter]
     public string Image { get; set; }
     [Parameter]
+    public string Href { get; set; }
+    [Parameter]
     public string Class { get; set; }
     [Parameter]
     public string Name { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
     [Parameter]
     public string BriefIntroduction { get; set; }
     [Parameter]

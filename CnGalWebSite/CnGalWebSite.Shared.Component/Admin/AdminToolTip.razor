@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<div class="h-100 rounded shadow-sm  bg-opacity pt-4" style="display: flex; flex-direction: column; justify-content: space-between;">
+<MDCard Class="h-100 pt-4" Style=" flex-direction: column; justify-content: space-between;">
     <div>
         <MBorder >
             <MCardTitle Class="pt-0">@Title</MCardTitle>
@@ -8,10 +8,10 @@
         </MBorder>
     </div>
     <div class="p-4">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="执行" IsAsync="true" OnClick="OnToolClick" Icon="mdi-send" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="执行" IsAsync="true" OnClick="OnToolClick" Icon="mdi-send" />
     </div>
 
-</div>
+</MDCard>
 
 @code { [Parameter]
     public EventCallback OnToolClick { get; set; }

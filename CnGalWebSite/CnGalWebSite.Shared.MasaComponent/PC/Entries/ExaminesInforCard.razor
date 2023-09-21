@@ -9,7 +9,7 @@
         <MTimelineItem Large>
             <IconContent>
                 <MAvatar Class="pointer" @onclick="@(()=>OnClickUser(item))"  Color="white">
-                    <img src="@item.UserImage" loading="lazy" />
+                    <img src="@item.UserInfor.PhotoPath" loading="lazy" alt="@item.UserInfor.Name" />
                 </MAvatar>
             </IconContent>
             <OppositeContent>
@@ -22,11 +22,9 @@
                         {
                             <div class="comment-tx-div">
                                 <div style=" display: flex; flex-wrap: wrap; align-items: center; ">
-                                   <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="item.Ranks" Outline ForceDisplayBadge/>
-                                    <div class="comment-username a-font-color me-2">@item.UserName</div>
-
-                                    <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
-
+                                    <div class="title-medium me-2">@item.UserInfor.Name</div>
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="item.UserInfor.Ranks" Outline ForceDisplayBadge />
+                                     <div class="label-large">@item.ApplyTime.ToTimeFromNowString()</div>
                                 </div>
                                 <span class="me-2">@item.Operation.GetDisplayName()</span>
 
@@ -34,13 +32,13 @@
                         }
                         else
                         {
-                            <div class="comment-tx-div">
+                            <div style="display: flex;flex-direction: column;">
                                 <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
-                                    <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
+                                    <div class="label-large me-2">@item.ApplyTime.ToTimeFromNowString()</div>
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="item.UserInfor.Ranks" Outline ForceDisplayBadge />
 
-                                    <div class="comment-username a-font-color me-2 ms-2">@item.UserName</div>
+                                     <div class="title-medium">@item.UserInfor.Name</div>
 
-                                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="item.Ranks" Outline ForceDisplayBadge />
                                 </div>
                                 <span class="me-2" style="text-align: end;">@item.Operation.GetDisplayName()</span>
 
@@ -60,16 +58,11 @@
     public EventCallback OnNavClick { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
     public async Task OnClickUser(ExaminedNormalListModel model)
     {
         await OnNavClick.InvokeAsync();
 
-        NavigationManager.NavigateTo("/space/index/" + model.UserId);
+        NavigationManager.NavigateTo("/space/index/" + model.UserInfor.Id);
     }
     public async Task OnClickExamine(ExaminedNormalListModel model)
     {

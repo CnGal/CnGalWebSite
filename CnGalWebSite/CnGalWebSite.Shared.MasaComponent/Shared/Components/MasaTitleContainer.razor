@@ -6,91 +6,43 @@
 }
 else
 {
-    @if (Small)
-    {
-        <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-2 ") + Class + (IsCollapsed ? " mb-3" : ""))">
-            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-                <h2 class="@("m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))" style="font-size: inherit;">
-                    @if (Icon.Contains("mdi"))
-                    {
-                        <MIcon Small Color="@ButtonColor" Class="me-2">@Icon</MIcon>@Title
-                    }
-                    else
-                    {
-                        <span>  <i class="@Icon"></i> &nbsp; &nbsp;@Title</span>
-                    }
+
+    <section id="@SectionId">
+        <MDCard Outline="OutlineHead" Class="@($"title-container-card {Class} {(IsCollapsed ? " mb-3" : "")}")">
+            <div class="title-card pa-3">
+                <h2 class="@($"{ButtonColor}-text title-{(Small?"medium":"large")}")">
+                    <MIcon Color="@ButtonColor" Class="me-4" Small="Small">@Icon</MIcon>
+                    @Title
                 </h2>
                 <div>
                     @ButtonContent
                     @if (ShowMoreButton)
                     {
-                        <MButton XSmall Text Block Color="@ButtonColor" OnClick="OnClickMore">
-                            <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
-                            查看详情
-                        </MButton>
+                        <MButton Small="Small" Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore">
+                             <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
+                         查看详情
+                     </MButton>
                     }
                     @if (Collapable)
                     {
-                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
-
+                        <MasaButton Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" Fab XSmall Icon="@(IsCollapsed?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
                     }
                 </div>
             </div>
             @if (Outline == false)
             {
-                <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-2")">
+                <div class="@((IsCollapsed ? "d-none " : "") + " content-card "+(HideContentPadding?"":"pa-3 pt-0"))">
                     @ChildContent
                 </div>
             }
-        </div>
+        </MDCard>
         @if (Outline)
         {
-            <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-2")">
-                @ChildContent
-            </div>
+            <MDCard Outline Class="@((IsCollapsed ? "d-none " : "") + " content-card mt-3")">
+                 @ChildContent
+             </MDCard>
         }
-
-    }
-    else
-    {
-        <section id="@SectionId">
-            <MDCard Outline="OutlineHead" Class="@($"title-container-card {Class} {(IsCollapsed ? " mb-3" : "")}")">
-                <div class="title-card pa-3">
-                    <h2 class="@($"{ButtonColor}-text title-large")">
-                        <MIcon Color="@ButtonColor" Class="me-4">@Icon</MIcon>
-                        @Title
-                    </h2>
-                    <div>
-                        @ButtonContent
-                        @if (ShowMoreButton)
-                        {
-                            <MButton Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore">
-                                 <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
-                             查看详情
-                         </MButton>
-                        }
-                        @if (Collapable)
-                        {
-                            <MasaButton Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" Fab XSmall Icon="@(IsCollapsed?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
-                        }
-                    </div>
-                </div>
-                @if (Outline == false)
-                {
-                    <div class="@((IsCollapsed ? "d-none " : "") + " content-card "+(HideContentPadding?"":"pa-3 pt-0"))">
-                        @ChildContent
-                    </div>
-                }
-            </MDCard>
-            @if (Outline)
-            {
-                <MDCard Outline Class="@((IsCollapsed ? "d-none " : "") + " content-card mt-3")">
-                    @ChildContent
-                </MDCard>
-            }
-        </section>
-
-    }
+    </section>
 
 }
 

@@ -209,13 +209,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 foreach (var infor in item.WinningUsers.Select(s => s.ApplicationUser))
                 {
-                    temp.Users.Add(new LotteryUserViewModel
+                    temp.Users.Add(new DataModel.ViewModel.Space.UserInforViewModel
                     {
                         PersonalSignature = infor.PersonalSignature,
-                        Image = _appHelper.GetImagePath(infor.PhotoPath, "user.png"),
+                        PhotoPath = _appHelper.GetImagePath(infor.PhotoPath, "user.png"),
                         Ranks = await _rankService.GetUserRanks(infor),
-                        UserId = infor.Id,
-                        UserName = infor.UserName
+                        Id = infor.Id,
+                        Name = infor.UserName
                     });
                 }
 

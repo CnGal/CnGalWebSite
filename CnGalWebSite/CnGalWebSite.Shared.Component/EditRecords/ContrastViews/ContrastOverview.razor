@@ -1,34 +1,29 @@
 ﻿@using static CnGalWebSite.Components.Inputs.MasaTextSelect;
 
 <div class="row">
-    <div class="col-12 col-xl-6">
-        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-key"></i>&nbsp;&nbsp;对比的版本</h2>
-            </div>
-            <div style="width:220px">
-                <CnGalWebSite.Components.Inputs.MasaTextSelect Items="ContrastItems" ValueChanged="OnContrastChanged" Value="CurrentItem" />
-            </div>
-
-        </div>
-        <CascadingValue Value=this>
-            @ContrastView
-        </CascadingValue>
+    <div class="col-12 col-lg-6">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="对比的版本" Icon="@IconType.Key.ToIconString()" Outline>
+            <ButtonContent>
+                <div style="width:220px">
+                    <CnGalWebSite.Components.Inputs.MasaTextSelect Items="ContrastItems" ValueChanged="OnContrastChanged" Value="ContrastItem" HideDetails="true"/>
+                </div>
+            </ButtonContent>
+            <ChildContent>
+                @ContrastView
+            </ChildContent>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     </div>
-    <div class="col-12 col-xl-6">
-        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-lock"></i>&nbsp;&nbsp;当前的版本</h2>
-            </div>
-            <div style="width:220px">
-                <CnGalWebSite.Components.Inputs.MasaTextSelect Items="CurrentItems" ValueChanged="OnCurrentChanged" Value="CurrentItem"/>
-            </div>
-
-        </div>
-        <CascadingValue Value=this>
-            @CurrentView
-        </CascadingValue>
-
+    <div class="col-12 col-lg-6">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="当前的版本" Icon="@IconType.Lock.ToIconString()" Outline>
+            <ButtonContent>
+                <div style="width:220px">
+                    <CnGalWebSite.Components.Inputs.MasaTextSelect Items="CurrentItems" ValueChanged="OnCurrentChanged" Value="CurrentItem" HideDetails="true" />
+                </div>
+            </ButtonContent>
+            <ChildContent>
+                @CurrentView
+            </ChildContent>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     </div>
 </div>
 
@@ -61,7 +56,7 @@
 
     protected override void OnInitialized()
     {
-         GenerateList();
+        GenerateList();
     }
 
     public void GenerateList()
@@ -72,19 +67,19 @@
         var isCurrent = false;
         foreach (var item in Model.Examines)
         {
-            if(isCurrent==false)
+            if (isCurrent == false)
             {
                 ContrastItems.Add(new SelectedItem
-                {
-                    Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                    Value = item.Id.ToString()
-                });
-                if(item.IsSelected)
+                    {
+                        Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                        Value = item.Id.ToString()
+                    });
+                if (item.IsSelected)
                 {
                     ContrastItem = item.Id.ToString();
                 }
             }
-            if(item.Id.ToString()==CurrentItem)
+            if (item.Id.ToString() == CurrentItem)
             {
                 isCurrent = true;
             }
@@ -95,10 +90,10 @@
             if (isContrast)
             {
                 CurrentItems.Add(new SelectedItem
-                {
-                    Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                    Value = item.Id.ToString()
-                });
+                    {
+                        Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                        Value = item.Id.ToString()
+                    });
                 if (CurrentItem == item.Id.ToString())
                 {
                     CurrentItem = item.Id.ToString();
@@ -109,26 +104,26 @@
         {
             var item = Model.Examines.Last();
             CurrentItems.Add(new SelectedItem
-            {
-                Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
-                Value = item.Id.ToString()
-            });
-            if(CurrentItem == item.Id.ToString())
+                {
+                    Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                    Value = item.Id.ToString()
+                });
+            if (CurrentItem == item.Id.ToString())
             {
                 CurrentItem = item.Id.ToString();
             }
         }
-        
+
     }
 
     public async Task OnContrastChanged(string value)
     {
-        if(isContrastFirst)
+        if (isContrastFirst)
         {
             isContrastFirst = false;
             return;
         }
-        foreach(var temp in Model.Examines)
+        foreach (var temp in Model.Examines)
         {
             if (temp.Id.ToString() == value)
             {

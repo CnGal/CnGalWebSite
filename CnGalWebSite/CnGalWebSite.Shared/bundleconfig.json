@@ -13,7 +13,7 @@
     "outputFileName": "wwwroot/css/bundle.css",
     "inputFiles": [
       "wwwroot/css/material-theme/colors.module.css",
-      "wwwroot/css/material-theme/tokens.css",
+      "wwwroot/css/material-theme/typography-tokens.css",
       "wwwroot/css/material-theme/typography.module.css",
       "wwwroot/css/common.css",
       "wwwroot/css/cover-default.css",
@@ -28,7 +28,9 @@
       "wwwroot/css/share/markdown.css",
       "wwwroot/css/share/rank.css",
       "wwwroot/css/share/user.css",
-      "wwwroot/css/share/comment.css"
+      "wwwroot/css/share/comment.css",
+      "wwwroot/css/share/periphery.css",
+      "wwwroot/css/share/edit-record.css"
     ]
   },
   {

@@ -4,9 +4,8 @@
 @inject NavigationManager NavigationManager
 
 
-<div class="rounded shadow-sm  bg-opacity mb-4 pt-4">
-    <div style=" display: flex; flex-direction: column; align-items: center; ">
-        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2" />
+<MDCard Outline Class="pt-4" Style="display: flex; flex-direction: column; align-items: center;">
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2 mb-4" />
         @if (isReady)
         {
             @if (StateModel == null)
@@ -105,17 +104,13 @@
             }
 
         }
-    </div>
-
-</div>
+</MDCard>
 
 @if (isReady && StateModel != null && StateModel.State == UserLotteryState.WaitingDraw)
 {
-    <div class="rounded shadow-sm  bg-opacity mb-4 p-4" style="display: flex; align-items: center; justify-content: center;">
-        <div class="swal2-icon m-0 me-1 border-primary" style="height: 10em; width: 10em; display: flex; align-items: center; border: .5em solid transparent;">
-            <div class="text-primary" style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
-        </div>
-    </div>
+    <MDCard Class="mb-4 p-4" Style="display: flex; align-items: center; justify-content: center;">
+            <div style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
+    </MDCard>
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />

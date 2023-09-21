@@ -5,8 +5,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="词条版块"/>
 <div>
-    <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive>
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow  CenterActive Class="mb-4">
 
             <MTab Value="1">
                 词条<MIcon>mdi-archive</MIcon>
@@ -18,7 +17,6 @@
                 基础信息类型<MIcon>@IconType.Tag.ToIconString()</MIcon>
             </MTab>
         </MTabs>
-    </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.ListCard/>

@@ -1,8 +1,8 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<div class="@Class">
-    <MStepper AltLabels Value="2" Class="rounded shadow-sm bg-opacity" Vertical="_dataCacheService.IsApp">
+<MDCard class="@Class">
+    <MStepper AltLabels Value="2" Vertical="_dataCacheService.IsApp" Elevation="0">
         <MStepperHeader>
             <MStepperStep Step="1" Complete>
                 <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
@@ -91,7 +91,7 @@
 
         </MStepperHeader>
     </MStepper>
-</div>
+</MDCard>
 
 @code {
     [Parameter]

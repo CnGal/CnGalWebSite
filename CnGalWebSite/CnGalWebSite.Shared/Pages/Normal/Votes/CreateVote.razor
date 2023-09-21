@@ -34,7 +34,11 @@
 
 
 @code {
-    private EditVoteModel Model { get; set; } = new EditVoteModel();
+    private EditVoteModel Model { get; set; } = new EditVoteModel
+    {
+            BeginTime = DateTime.Now.ToCstTime(),
+            EndTime = DateTime.Now.ToCstTime(),
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();

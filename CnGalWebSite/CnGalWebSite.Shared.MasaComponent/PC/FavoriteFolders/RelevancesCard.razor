@@ -2,9 +2,7 @@
 
 @if (Model.Objects.Any())
 {
-    <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow Class="rounded" CenterActive
-               >
+        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow Class="mb-4" CenterActive>
             @if (Model.Objects.Any(s => s.entry != null))
             {
                 <MTab Value="1">
@@ -36,7 +34,6 @@
                 </MTab>
             }
         </MTabs>
-    </div>
     <MTabsItems @bind-Value="TabIndex">
         @if (Model.Objects.Any(s => s.entry != null))
         {

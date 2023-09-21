@@ -19,7 +19,7 @@
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建抽奖" Icon="fa fa-fw  fa-dropbox" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建抽奖" Icon="@IconType.Lottery.ToIconString()" Outline>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
@@ -29,8 +29,12 @@
     }
 </div>
 @code {
-
-    private EditLotteryModel Model { get; set; } = new EditLotteryModel();
+    private EditLotteryModel Model { get; set; } = new EditLotteryModel
+        {
+            BeginTime = DateTime.Now.ToCstTime(),
+            EndTime = DateTime.Now.ToCstTime(),
+            LotteryTime = DateTime.Now.ToCstTime(),
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; }

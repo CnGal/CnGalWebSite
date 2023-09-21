@@ -4,6 +4,14 @@
     --md-card-active-border-radius: 24px;
 }
 
+:root {
+    --md-sys-color-surface-1: rgb(var(--md-sys-color-primary-rgb) / 0.05);
+    --md-sys-color-surface-2: rgb(var(--md-sys-color-primary-rgb) / 0.08);
+    --md-sys-color-surface-3: rgb(var(--md-sys-color-primary-rgb) / 0.11);
+    --md-sys-color-surface-4: rgb(var(--md-sys-color-primary-rgb) / 0.12);
+    --md-sys-color-surface-5: rgb(var(--md-sys-color-primary-rgb) / 0.14);
+}
+
 /*全局*/
 body {
     font-family: 'Noto Sans SC', sans-serif;
@@ -12,11 +20,11 @@ body {
 }
 
 .w-100 {
-    width: 100%;
+    width: 100% !important;
 }
 
 .h-100 {
-    height: 100%;
+    height: 100% !important;
 }
 
 /*背景图*/
@@ -62,23 +70,31 @@ body {
 }
 
 .largeimage-btn-close {
-    font-size: 50px;
     position: fixed;
-    right: 0px;
-    color: white;
-    top: 0px;
+    right: 1rem;
+    top: 1rem;
 }
 
 .largeimage-layout-in {
     height: 100%;
     width: 100%;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
 }
 
 .largeimage-btn-left {
-    font-size: 50px;
-    color: white;
+    position: fixed;
+    left: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
+}
+
+.largeimage-btn-right {
+    position: fixed;
+    right: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
 }
 
 .largeimage-img {
@@ -340,4 +356,8 @@ ins {
 /*幻灯片组*/
 .slide-group-garp .m-slide-group__content {
     gap: 1rem;
+}
+/*页面内容距离顶部*/
+.variable.container {
+    padding-top: 24px;
 }

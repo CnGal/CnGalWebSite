@@ -1,7 +1,7 @@
-﻿<MDCard Outline="Outline" ShowHoverStyle="true" Class="@($"entry-card-default relevance-card {Class}")">
+﻿<MDCard Outline="Outline" ShowHoverStyle="true" Class="@($"entry-card-default relevance-card {Class} {(BigCardStyle&&!Thumbnail?"big-card-style":"")}")">
     <div class="main-card">
         <MDCard Href="@Href" Outline OnClick="OnClick" Class="pointer">
-            <img src="@Image" class="@($"{(Thumbnail?"thum":"")}")" />
+            <img src="@Image" class="@($"{(Thumbnail?"thum":"")}")" alt="@Name"/>
         </MDCard>
         <div class="content-card">
             <div class="head-card">
@@ -18,8 +18,22 @@
                 </MDCard>
                 @TitleContent
             </div>
-           
-            @ChildContent
+
+            @if (AddInfors != null && AddInfors.Any()&& ShowAddInfors)
+            {
+                <div>
+                    @foreach (var item in AddInfors)
+                    {
+                        <div style="display: flex;  flex-wrap: wrap; ">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@item.Modifier" />
+                            @foreach (var infor in item.Contents)
+                            {
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
+                            }
+                        </div>
+                    }
+                </div>
+            }
             <MDCard Href="@Href" Outline OnClick="OnClick" Class="pointer">
                 <div class="brief text-truncate-3  label-large">
                     @BriefIntroduction
@@ -50,6 +64,8 @@
     [Parameter]
     public string Name { get; set; }
     [Parameter]
+    public bool BigCardStyle { get; set; }
+    [Parameter]
     public string BriefIntroduction { get; set; }
     [Parameter]
     public List<(IconType, string)> InfoItems { get; set; }
@@ -66,7 +82,11 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public List<EntryInforTipAddInforModel> AddInfors { get; set; }
+    [Parameter]
+    public bool ShowAddInfors { get; set; } = true;
+    [Parameter]
+    public bool IsEdit { get; set; }
     [Parameter]
     public RenderFragment TitleContent { get; set; }
 }

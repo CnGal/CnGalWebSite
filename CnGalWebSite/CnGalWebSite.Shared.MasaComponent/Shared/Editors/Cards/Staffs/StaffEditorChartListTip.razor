@@ -2,7 +2,7 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="StaffModel" Headers="_headers" DataSource="Staffs" SortByItem="@nameof(StaffModel.PositionOfficial)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+<DataTableCard TModel="StaffModel" Headers="_headers" DataSource="Staffs" SortByItem="@nameof(StaffModel.PositionOfficial)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard" Rounded
                Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Name!=null&&s.Name.Contains(dataTableCard._search))|| (s.CustomName!=null&&s.CustomName.Contains(dataTableCard._search))|| (s.SubordinateOrganization!=null&&s.SubordinateOrganization.Contains(dataTableCard._search))|| (s.PositionOfficial!=null&&s.PositionOfficial.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -26,7 +26,7 @@
         }
     </ItemColContent>
     <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="批量导入" Icon="@IconType.Import.ToIconString()" OnClick="BatchItems" Class="me-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="批量导入" Rounded Icon="@IconType.Import.ToIconString()" OnClick="BatchItems" Class="me-4" />
     </ButtonContent>
 </DataTableCard>
 <MDialog @bind-Value="_editDialog"

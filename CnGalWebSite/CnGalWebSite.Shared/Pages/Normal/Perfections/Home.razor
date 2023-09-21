@@ -4,9 +4,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<div class="rounded  shadow-sm bg-opacity mb-4">
-    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-           >
+    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
         <MTab Value="1">
             概览<MIcon>mdi-image-area</MIcon>
@@ -18,7 +16,6 @@
             单项检查列表<MIcon>mdi-alert-circle</MIcon>
         </MTab>
     </MTabs>
-</div>
 <MTabsItems @bind-Value="TabIndex">
     <MTabItem Value="1">
 

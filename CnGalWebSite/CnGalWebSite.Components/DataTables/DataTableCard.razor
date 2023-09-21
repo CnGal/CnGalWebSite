@@ -24,7 +24,7 @@
              @ButtonContent
              @if (ShowAddButton)
             {
-                <MButton Color="primary"
+                <MButton Color="primary" Rounded="Rounded"
                           Dark
                           Class="me-8"
                           OnClick="OnClickAdd">
@@ -62,6 +62,8 @@
     public string LoadingText { get; set; }
     [Parameter]
     public bool ShowAddButton { get; set; } = true;
+    [Parameter]
+    public bool Rounded { get; set; } = true;
     [Parameter]
     public string Class { get; set; } = "elevation-1";
     [Parameter]

@@ -1,18 +1,12 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
     关联信息可以帮助我们建立详细的知识图谱，更好地展示相关内容；请确保关联信息存在，也可以先去创建再来关联哦~
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联词条" Class="@Class" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="关联词条" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-
-
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="@Class">
      <MRow>
          <MCol Cols="12" Md="6" Lg="3">
              <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Text="上传主图" Type="ImageAspectType._16_9" />

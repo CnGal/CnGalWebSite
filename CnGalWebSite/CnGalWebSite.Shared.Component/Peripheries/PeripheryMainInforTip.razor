@@ -1,79 +1,31 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-
-<div class="rounded shadow-sm bg-opacity rounded pb-4">
-    @if (Model.MainState == EditState.Preview)
-    {
-        <div class="pt-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4" />
-        </div>
-    }
-    <div class="row m-0">
-        @if (ForceSmall)
+@if (Model.MainState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4" />
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@Model.Name" Image="@Model.MainPicture"
+                                                                         BriefIntroduction="@Model.BriefIntroduction" Small="ForceSmall">
+    <ButtonContent>
+        @if (HiddenButton == false)
         {
-            <div class="w-100 col-12 p-0" style="display: flex; justify-content: center;">
-                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.DisplayName" itemprop="image">
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Periphery" Class="me-4" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.CollectionButton Id="Model.Id" Class="me-4" CollectionChanged="CollectionChanged" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Periphery" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
+
+
+                    @if (ToolHelper.IsMaui)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@((Model.Type)+" - "+Model.Name)" Class="ms-4" Text="@($"【{Model.Type}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
+                    }
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
         }
-        else
-        {
-            <div class="d-md-flex d-none col-auto ps-4 pt-4">
-                <img style="height:200px;" src="@Model.MainPicture" alt="@Model.DisplayName" itemprop="image">
-            </div>
-            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.DisplayName">
-            </div>
-        }
-
-        <div class="ps-4 pt-4 pe-4 col">
-            <h1 class="fw-bold h3">@Model.DisplayName</h1>
-            <div>
-                @if (ForceSmall)
-                {
-                    <div>
-                        <span itemprop="description">
-                            @Model.BriefIntroduction
-                        </span>
-                    </div>
-                }
-                else
-                {
-                    <div class="d-md-none-co ">
-                        <span itemprop="description">
-                            @Model.BriefIntroduction
-                        </span>
-                    </div>
-
-                    <div class="d-md-flex d-none">
-                        <span class="text-truncate-4">
-                            @Model.BriefIntroduction
-                        </span>
-                    </div>
-                }
-
-                @if (HiddenButton == false)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                        <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Periphery" Class="me-4" />
-                            <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.CollectionButton Id="Model.Id" Class="me-4"  CollectionChanged="CollectionChanged" />
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Periphery" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
-
-
-                            @if (ToolHelper.IsMaui)
-                            {
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@((Model.Type)+" - "+Model.Name)" Class="ms-4" Text="@($"【{Model.Type}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
-                            }
-                        </div>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-
-                }
-            </div>
-
-        </div>
-
-    </div>
-</div>
+    </ButtonContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard>
 @code {
     [Parameter]
     public PeripheryViewModel Model { get; set; }

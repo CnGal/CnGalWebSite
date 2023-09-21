@@ -1,6 +1,13 @@
-﻿<DivideCard />
-<section class="about-card">
-    <QuoteCard/>
+﻿@if (!Mini)
+{
+    <DivideCard />
+}
+<section class="cngal-about-card">
+    @if (!Mini)
+    {
+         <QuoteCard/>
+   
+    }
     <div class="head">
         <div class="introduce">
             <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/footer_logo.png" alt="logo" loading="lazy">
@@ -51,8 +58,12 @@
 
 
 </section>
-<DivideCard />
+@if (!Mini)
+{
+    <DivideCard />
+}
 
 @code {
-
+    [Parameter]
+    public bool Mini{ get; set; }
 }

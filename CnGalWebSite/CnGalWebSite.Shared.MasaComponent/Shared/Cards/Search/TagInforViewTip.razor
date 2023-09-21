@@ -1,53 +1,5 @@
-﻿@inject IDataCacheService _dataCatcheService
-
-@if (_dataCatcheService.IsApp)
-{
-    <TabLink Icon="fa fa-tag" Url="@("/tags/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="div-shadow rounded  bg-opacity h-100">
-            <div style="display: flex; align-items: center;">
-                <div>
-                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
-                </div>
-                <div class="pt-3 ps-3">
-                    <header class="text-truncate-1">
-                        <span class="app-card-tag">标签</span>
-                        <span class="fw-bold" style=" display: inline;">@Model.Name</span>
-                    </header>
-                    <div class="text-truncate-2">
-                        @Model.BriefIntroduction
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-    </TabLink>
-
-}
-else
-{
-    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3">
-        <div class="pb-3" style="display:flex;">
-            <a href="@("/tags/index/" + Model.Id)" class="pt-3">
-                <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
-            </a>
-            <div class="pt-3 ps-3">
-                <a href="@("/tags/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: center;">
-                    <div class="article-home-tag">标签</div>
-                    <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
-                </a>
-
-                <a href="@("/tags/index/" + Model.Id)" class="text-truncate-3 a-font-color">
-                    @Model.BriefIntroduction
-                </a>
-            </div>
-        </div>
-    </div>
-
-}
-
-
-
+﻿
+<InfoCard Href="@("/tags/index/" + Model.Id)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" Name="@Model.Name" Type="标签" />
 
 @code {
     [Parameter]

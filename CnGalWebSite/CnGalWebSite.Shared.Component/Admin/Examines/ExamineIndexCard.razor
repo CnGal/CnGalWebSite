@@ -7,7 +7,6 @@
     @if (isReady == false)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
-
     }
     else
     {
@@ -23,13 +22,13 @@
             <CnGalWebSite.Shared.Component.Admin.Examines.Cards.OverviewCard Model="Model" Class="mb-4" />
             <div class="row">
                 <div class="col-12 col-lg-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-key" Title="@(Model.IsPassed==null? "修改前" : "编辑后")" Class="mb-4" Collapable Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Key.ToIconString()" Title="@(Model.IsPassed==null? "修改前" : "编辑后")" Class="mb-4" Collapable Outline>
                         <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.BeforeModel"/>
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
                 </div>
                 <div class="col-12 col-lg-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-lock" Title="@(Model.IsPassed==null? "修改后" : "当前状态")" Class="mb-4" Collapable Outline>
+                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="@(Model.IsPassed==null? "修改后" : "当前状态")" Class="mb-4" Collapable Outline>
                         <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.AfterModel" />
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
@@ -53,15 +52,9 @@
 
     private bool isReady = false;
     private bool isFirst = true;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

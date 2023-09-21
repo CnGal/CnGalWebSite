@@ -1,18 +1,17 @@
 ﻿
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@Class" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
     <MRow>
         <MCol Cols="12" Md="6" Lg="4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
          </MCol>
          <MCol Cols="12" Md="6" Lg="4">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" Class="mb-4" />
          </MCol>
          <MCol Cols="12" Md="6" Lg="4">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" Class="mb-4" />
          </MCol>
          <MCol Cols="12">
-             <MDivider />
          </MCol>
          <MCol Cols="12" Md="6">
              <MTextField @bind-Value="Model.Type" Label="类别" />
@@ -21,9 +20,6 @@
 
          <MCol Cols="12">
              <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
-         </MCol>
-         <MCol Cols="12">
-             <MDivider />
          </MCol>
          <MCol Cols="12" Md="6">
              <MTextField Value="_duration" TValue="string" ValueChanged="DurationChanged" Label="时长" />
@@ -35,7 +31,6 @@
              <MCheckbox @bind-Value="Model.IsInteractive" Label="互动视频" TValue="bool" />
          </MCol>
          <MCol Cols="12">
-             <MDivider />
          </MCol>
          <MCol Cols="12" Md="6">
              <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Copyright" TValue="CopyrightType" Label="版权" />

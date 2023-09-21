@@ -2,25 +2,22 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@TitleIcon" Class="mb-4">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="@Title" Icon="@TitleIcon" Class="mb-4">
     <ButtonContent>
-
-        <MButton Text Block  OnClick="GetNewRandomList">
+         <MButton Rounded Color="primary" OnClick="GetNewRandomList">
             <MIcon Left>mdi-refresh </MIcon>
             换一组
         </MButton>
-
-
     </ButtonContent>
     <ChildContent>
         <div class="row">
-            @for (int i = 0; i < Model.Count; i++)
+              @foreach (var item in Model)
             {
-                var item = Model[i];
-                <div class="@(IsTransverse?"col-12 col-xl-6":"col-12" )">
+                <div class="@(IsTransverse?"col-12 col-lg-6 mb-4":"col-12 mb-4" )">
                     <NormalPerfectionCheckTipView Model="@item"></NormalPerfectionCheckTipView>
                 </div>
             }
+
         </div>
     </ChildContent>
 

@@ -24,11 +24,9 @@ else
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-dropbox" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Lottery.ToIconString()" Outline>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        <div class="rounded  shadow-sm bg-opacity mb-4">
-            <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-                   >
+            <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
                 <MTab Value="1">
                     编辑<MIcon>mdi-pencil</MIcon>
@@ -40,7 +38,6 @@ else
                     中奖<MIcon>mdi-gift</MIcon>
                 </MTab>
             </MTabs>
-        </div>
         <MTabsItems @bind-Value="TabIndex">
             <MTabItem Value="1">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />

@@ -286,3 +286,12 @@ async function onWebsiteTemplateInit(helper)
     console.log(msg);
 }
 */
+/*获取系统主题*/
+function checkSystemThemeIsDark() {
+    const themeMedia = window.matchMedia("(prefers-color-scheme: light)");
+    if (themeMedia.matches) {
+        return false;
+    } else {
+        return true;
+    }
+}

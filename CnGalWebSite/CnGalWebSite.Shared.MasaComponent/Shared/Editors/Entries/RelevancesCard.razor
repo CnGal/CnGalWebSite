@@ -1,44 +1,34 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
     关联信息可以帮助我们建立详细的知识图谱，更好地展示相关内容；请确保关联信息存在，也可以先去创建再来关联哦~
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联信息" Class="@Class" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-
     @if (Model.Type != EntryType.Game)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     }
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@ArticleItems" Model="Model.news" Title="动态"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="组织"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip  AutoCompleteItems="@VideoItems" Model="Model.videos" Title="视频"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
-
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputOtherLinkListTip Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputOtherLinkListTip>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
-        <span style="word-break: break-all;">
-            下方的Id是指链接后方的标识字符串（绝大多数是数字Id），例如下方链接只要红色部分。 <br />
-            <strong>https://www.bilibili.com/video/<font style="color:red">BV1tF411N7XD</font>/?spm_id_from=333.999.0.0</strong><br />
-            <strong>https://weibo.com/u/<font style="color:red">5643366143</font></strong>  <br />
-            大多数情况下可以直接复制完整链接，我们将会自动裁剪。
-        </span>
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="primary">
+            <span style="word-break: break-all;">
+                下方的Id是指链接后方的标识字符串（绝大多数是数字Id），例如下方链接只要红色部分。 <br />
+                <strong>https://www.bilibili.com/video/<font style="color:red">BV1tF411N7XD</font>/?spm_id_from=333.999.0.0</strong><br />
+                <strong>https://weibo.com/u/<font style="color:red">5643366143</font></strong>  <br />
+                大多数情况下可以直接复制完整链接，我们将会自动裁剪。
+            </span>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="外部平台Id/链接" Text="请填写Id，并仔细阅读上方的提示" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="外部平台Id/链接" Text="请填写Id，并仔细阅读上方的提示" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard Model="Model" />
+    </div>
+
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 

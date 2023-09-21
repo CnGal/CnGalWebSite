@@ -1,48 +1,17 @@
 ﻿
-
-
-<style>
-    .option-card {
-        border: 1px solid var(--bs-secondary);
-    }
-
-    .option-card:hover {
-        border: 1px solid var( --main-color);
-    }
-
-    .option-card-active {
-        border: 1px solid var( --main-color) !important;
-    }
-
-    .option-card-show {
-        border: 1px solid var(--bs-secondary);
-    }
-
-    .option-background {
-        background-color: #EAEFF5;
-    }
-
-    .option-card-active .option-background {
-        background-color: var(--main-color) !important;
-        opacity: 0.5;
-    }
-</style>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()" Class="h-100">
-    <Scroll Height="600px">
-        <div>
-            <div class="row ps-3 pe-3">
-                @foreach (var item in Model.Examines.OrderByDescending(s => s.Id))
-                {
-                    <div class="col-12 col-md-6 col-xl-12">
-                        <div class="mb-2 pe-1" @onclick="@(()=>OnSeletedItemChanged(item))">
-                            <EditRecordInforCard Model="item" />
-                        </div>
-                    </div>
-
-                }
-            </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()" Class="h-100">
+     <div class="overflow-y-auto overflow-x-hidden" style="max-height: 600px;">
+         <div class="row">
+            @foreach (var item in Model.Examines.OrderByDescending(s => s.Id))
+            {
+                <div class="col-12 col-md-6 col-lg-12 mb-3">
+                    <MDCard ShowHoverStyle="true" OnClick="@(()=>OnSeletedItemChanged(item))" Color="@(item.IsSelected?"tertiary":"surface")">
+                        <EditRecordInforCard Model="item" />
+                    </MDCard>
+                </div>
+            }
         </div>
-    </Scroll>
+    </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -53,18 +22,12 @@
 
     public string ImageMinWidth { get; set; }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
     public async Task OnSeletedItemChanged(EditRecordAloneViewModel item)
     {
         item.IsSelected = !item.IsSelected;
-        foreach(var temp in Model.Examines)
+        foreach (var temp in Model.Examines)
         {
-            if(temp == item)
+            if (temp == item)
             {
                 temp.IsSelected = true;
             }

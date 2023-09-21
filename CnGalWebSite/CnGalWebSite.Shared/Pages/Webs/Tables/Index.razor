@@ -23,9 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-               >
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
             <MTab Value="1">
                 游戏<MIcon>mdi-gamepad-square</MIcon>
@@ -49,7 +47,6 @@
                 游戏评分<MIcon>mdi-star</MIcon>
             </MTab>
         </MTabs>
-    </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
                 <CnGalWebSite.Shared.Component.Tables.GamesTableViewTip />

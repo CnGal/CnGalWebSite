@@ -7,7 +7,7 @@
 <MDCard Class="gallery-card">
     <div class="content">
         <div class="head">
-            <div class="name text-truncate-1">@Model.Name</div>
+            <div class="name text-truncate-1 headline-large">@Model.Name</div>
             <div class="tags">
                 @foreach (var item in Model.Tags.Random().Take(2))
                 {
@@ -16,7 +16,7 @@
             </div>
 
         </div>
-        <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
+        <div class="brief text-truncate-2 label-large">@Model.BriefIntroduction</div>
     </div>
     <div class="gallery">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="Model.Images">

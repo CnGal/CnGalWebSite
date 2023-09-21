@@ -1,41 +1,44 @@
 ﻿
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="附加信息" Class="@Class" Collapable Outline>
-    <div class="rounded shadow-sm  bg-opacity p-3 @Class">
-        <MRow>
-            @switch (Model.Type)
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="附加信息" Class="@Class" Collapable Outline>
+    <MDCard Class="@($"pa-3 {Class}")">
+        <div>
+            <MRow>
+                @switch (Model.Type)
+                {
+                    case EntryType.Game:
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.ProductionGroup" Label="制作组" />
+                        </MCol>
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.Publisher" Label="发行商" />
+                        </MCol>
+                        break;
+                    case EntryType.Role:
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.CV" Label="声优" />
+                        </MCol>
+                        break;
+                }
+
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditInformationsCard Informations="Model.Informations" />
+            </MRow>
+
+            @if (Model.Type == EntryType.Game)
             {
-                case EntryType.Game:
-                    <MCol Cols="12" Md="6">
-                        <MTextField @bind-Value="Model.ProductionGroup" Label="制作组" />
-                    </MCol>
-                    <MCol Cols="12" Md="6">
-                        <MTextField @bind-Value="Model.Publisher" Label="发行商" />
-                    </MCol>
-                    break;
-                case EntryType.Role:
-                    <MCol Cols="12" Md="6">
-                        <MTextField @bind-Value="Model.CV" Label="声优" />
-                    </MCol>
-                    break;
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
+                    </Authorized>
+                </AuthorizeView>
             }
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditInformationsCard Informations="Model.Informations" />
-        </MRow>
-
-        @if (Model.Type == EntryType.Game)
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
-                </Authorized>
-            </AuthorizeView>
-        }
-
-    </div>
+</div>
+       
+    </MDCard>
 
     @if (Model.Type == EntryType.Game)
 {

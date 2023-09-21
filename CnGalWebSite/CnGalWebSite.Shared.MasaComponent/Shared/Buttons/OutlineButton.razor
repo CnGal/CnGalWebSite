@@ -8,19 +8,18 @@
     <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
            Color="@Color"
            Small
-           TextColor="@(_dataCacheService.ThemeSetting.IsDark?"dark":"white")"
            Outlined="!IsTitile">
         @Text
     </MChip>
 }
 else
 {
-    <a href="@(EntryId>0?$"/entries/index/{EntryId}":null)">
         <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
                Color="@Color"
                Small
                TextColor="@Color"
                Outlined="!IsTitile"
+                Href="@(EntryId>0?$"/entries/index/{EntryId}":null)"
                OnClick="OnClick">
             @if (IsShowExistTag && EntryId > 0)
             {
@@ -28,7 +27,6 @@ else
             }
             @Text
         </MChip>
-    </a>
 
 }
 

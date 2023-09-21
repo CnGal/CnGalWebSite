@@ -1,23 +1,6 @@
 ﻿
 <InfoCard Href="@(AllowNav?("/entries/index/" + Model.Id):null)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@(ShowType?Model.Type.GetDisplayName():"")" Outline="Outline"
-          Thumbnail="Model.Type == EntryType.Role || Model.Type == EntryType.Staff">
-    <ChildContent>
-        @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
-        {
-            <div>
-                @foreach (var item in Model.AddInfors)
-                {
-                    <div style="display: flex;  flex-wrap: wrap; ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@item.Modifier" />
-                        @foreach (var infor in item.Contents)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
-                        }
-                    </div>
-                }
-            </div>
-        }
-    </ChildContent>
+          Thumbnail="Model.Type == EntryType.Role || Model.Type == EntryType.Staff" BigCardStyle="BigCardStyle" AddInfors="Model.AddInfors" ShowAddInfors="ShowAddInfors" IsEdit="IsEdit">
     <TitleContent>
         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
     </TitleContent>
@@ -55,8 +38,8 @@
         }
         var items = new List<(IconType, string)>
         {
-            (IconType.DeterminedTime,Model.CommentCount.ToString()+"条评论"),
-            (IconType.DeterminedTime,Model.ReaderCount.ToString()+"次阅读"),
+            (IconType.Comment,Model.CommentCount.ToString()+"条评论"),
+            (IconType.Read,Model.ReaderCount.ToString()+"次阅读"),
         };
 
         var time = "未知";

@@ -5,6 +5,7 @@
     padding: 0 .7rem;
     border-radius: 10px;
     font-size: small;
+    background-color: var(--md-sys-color-primary);
 }
 
     .user-rank.rank-lv10 {

@@ -9,7 +9,7 @@
     <div class="row">
         @foreach (var item in Model.ChildrenEntries.Skip((Model.CurrentPage - 1) * MaxCount).Take(MaxCount))
         {
-            <div class="@(ForceSmall?"col-12 col-md-6 mb-3":"col-12 col-md-6 col-lg-4 col-xxl-3 mb-3")">
+            <div class="@(ForceSmall?"col-12 col-md-6 mb-3":"col-12 col-sm-6 col-md-4 col-lg-3 mb-3")">
                 <TagChildEntryInforTip Model="item" />
             </div>
         }

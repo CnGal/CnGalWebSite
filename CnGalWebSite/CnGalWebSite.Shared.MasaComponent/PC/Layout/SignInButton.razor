@@ -5,7 +5,7 @@
 
 @if (Model.IsSignIn)
 {
-    <MButton Text Class="w-100" Color="success" Left="Left">
+    <MButton Text Class="w-100" Color="primary" Left="Left">
         <MIcon Left>mdi-clipboard-check</MIcon>
         @($"连续签到 {Model.SignInDays} 天")
     </MButton>

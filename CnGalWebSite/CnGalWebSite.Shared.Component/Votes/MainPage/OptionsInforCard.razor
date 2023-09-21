@@ -18,7 +18,7 @@
         border: 1px solid var(--bs-secondary);
     }
     .option-background {
-        background-color: #EAEFF5;
+        background-color: var(--md-sys-color-primary-container);
     }
     .option-card-active .option-background {
         background-color: var(--main-color) !important;
@@ -26,12 +26,8 @@
     }
 
 </style>
-<div>
-    <div class="mb-2" style="display: flex; justify-content: space-between; align-items: flex-end; ">
-        <div class="fw-bold " style="font-size:large">投票选项</div>
-        <div  style="color:gray;">@( Model.Type==VoteType.MultipleChoice?(Model.MaximumSelectionCount==Model.MinimumSelectionCount?($"每人投{Model.MaximumSelectionCount}票"):($"最多投{Model.MaximumSelectionCount}票，最少投{Model.MinimumSelectionCount}票")):"每人只能投1票")</div>
-
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票选项" Icon="@IconType.Vote.ToIconString()" Class="mb-4">
+        <div class="mb-4">@( Model.Type==VoteType.MultipleChoice?(Model.MaximumSelectionCount==Model.MinimumSelectionCount?($"每人投{Model.MaximumSelectionCount}票"):($"最多投{Model.MaximumSelectionCount}票，最少投{Model.MinimumSelectionCount}票")):"每人只能投1票")</div>
     @if (IsShowResult)
     {
         @foreach (var item in Model.Options)
@@ -59,7 +55,7 @@
             }
         </div>
     }
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]

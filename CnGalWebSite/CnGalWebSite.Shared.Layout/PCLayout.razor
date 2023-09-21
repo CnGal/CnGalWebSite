@@ -4,11 +4,11 @@
 @inject IJSRuntime JS
 @inject IPopupService PopupService
 
-<MAppBar App Class="shadow-sm  bg-opacity">
+<MAppBar App Style="background-color: var(--md-sys-color-background)!important;">
     <div style=" word-break: keep-all;" class="ms-4 me-8">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
     </div>
-    <MTabs>
+     <MTabs Style="background-color: transparent;">
         <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">首页</MTab>
         <MTab OnClick="@(()=> Nav("/#evaluations-card"))">专题推荐</MTab>
         <MTab OnClick="@(()=>  Nav("/#recommends"))">随机推荐</MTab>
@@ -20,7 +20,7 @@
     </MTabs>
     <MSpacer></MSpacer>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="@IconType.Search.ToIconString()" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
 
@@ -35,7 +35,7 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
 </MMain>
 
-<MFooter App Padless Absolute Class="shadow-sm  bg-opacity">
+<MFooter App Padless Absolute>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
 </MFooter>
 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.SynchronousAuthStateCard />

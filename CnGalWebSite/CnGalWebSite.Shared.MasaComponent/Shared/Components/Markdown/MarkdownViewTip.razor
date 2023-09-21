@@ -2,13 +2,17 @@
 @inject NavigationManager NavigationManager
 
 
-<div class="markdown-body">
+<div class="@($"markdown-body {Class}")" Style="@Style">
     @((MarkupString)Text)
 </div>
 
 @code {
     [Parameter]
     public string Text { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Style { get; set; }
     [Parameter]
     public bool IsNeedHighlight { get; set; } = true;
 

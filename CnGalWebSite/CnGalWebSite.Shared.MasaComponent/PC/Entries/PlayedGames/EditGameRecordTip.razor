@@ -14,7 +14,7 @@
             你可以在这里记录游玩状态和评分，还可以在个人空间中绑定Steam库存
         </MCardText>
 
-        <MCardText Class="pb-0">
+        <MCardText>
             @if (isReady)
             {
                 <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;" Color="primary">
@@ -70,13 +70,9 @@
             }
         </MCardText>
 
-        <MCardActions>
+        <MCardActions Class="pa-6 pt-0">
             <MSpacer></MSpacer>
-            <MButton Color="green darken-1"
-                     Text
-                     OnClick="OnSubmit">
-                保存
-            </MButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Text="保存"/>
         </MCardActions>
     </MCard>
 </MDialog>

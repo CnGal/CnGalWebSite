@@ -174,7 +174,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Move,
         Import,
         Code,
-        Folder
+        Folder,
+        Search,
+        Save,
+        Key,
+        Lock
     }
 
     public static class IconTypeHelper
@@ -183,6 +187,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Lock:
+                    return "mdi-lock";
+                case IconType.Key:
+                    return "mdi-key";
+                case IconType.Save:
+                    return "mdi-content-save";
+                case IconType.Search:
+                    return "mdi-magnify";
                 case IconType.Folder:
                     return "mdi-folder";
                 case IconType.Code:

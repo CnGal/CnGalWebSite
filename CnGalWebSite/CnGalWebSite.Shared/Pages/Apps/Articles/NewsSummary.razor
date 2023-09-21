@@ -5,8 +5,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="动态汇总"/>
 
-<MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded mb-4"
-       >
+<MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="mb-4">
 
     <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
         本周<MIcon>mdi-av-timer </MIcon>
@@ -17,10 +16,6 @@
     <MTab Value="4" OnClick="@(() => OnCondited("本年"))">
         本年<MIcon>mdi-calendar-text </MIcon>
     </MTab>
-    <MTab Value="5" OnClick="@(() => OnCondited("全部"))">
-        全部<MIcon>mdi-all-inclusive</MIcon>
-    </MTab>
-
 </MTabs>
 <div>
     @if (isReady)

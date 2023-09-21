@@ -1,9 +1,9 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
     标签可以帮助我们对词条进行分类；可以关注一下标签的层级关系哦，确保添加的都是最后一级的标签
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-tags" Title="子标签" Class="mb-4" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Tags.ToIconString()" Title="子标签" Class="mb-4" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputTagListCard AutoCompleteItems="TagItems" Model="Model.Tags" @ref="inputTagListTip" OnInput="OnInputList"/>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

@@ -3,9 +3,9 @@
 @inject NavigationManager NavigationManager
 
 
-<MDCard Class="pa-4">
+<MDCard Class="@($"pa-4 {(Deepth==0?"":"elevation-2")}")">
     <div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Outline/>
         <div class="mt-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)" />
         </div>

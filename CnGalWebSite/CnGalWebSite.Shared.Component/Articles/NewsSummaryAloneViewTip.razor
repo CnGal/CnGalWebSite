@@ -21,13 +21,13 @@
                 <div style=" display: flex; flex-direction: row; ">
                     @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
-                        <MButton Text  OnClick="OnClickWeibo" Class="me-3">
+                        <MButton Rounded OnClick="OnClickWeibo" Class="me-3">
                             <MIcon Left>@((Model.Outlink.Contains("weibo") ? IconType.Weibo : IconType.Link).ToIconString())</MIcon>
                            @((Model.Outlink.Contains("weibo") ? "访问微博主页" : "访问社交媒体主页")) 
                         </MButton>
                     }
 
-                    <MButton Text  OnClick="OnClickMainPage">
+                    <MButton Rounded  OnClick="OnClickMainPage">
                         <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                         @(Model.GroupId>0?"查看词条":"查看个人空间")
                     </MButton>
@@ -44,40 +44,7 @@
                 @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
             </MExpansionPanelHeader>
             <MExpansionPanelContent>
-                <div class="mb-2" style="display:flex;">
-                    <a href="@("/articles/index/" + item.Id)">
-                        <img loading="lazy" style=" width: 250px; " src="@item.MainImage" alt="@item.Name">
-                    </a>
-                    <div class="ps-3">
-                        <a href="@("/articles/index/" + item.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">
-                            <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@item.Name</h3>
-                        </a>
-                        <a href="@("/articles/index/" + item.Id)" class="text-truncate-3 a-font-color">
-                            @item.BriefIntroduction
-                        </a>
-                    </div>
-                </div>
-
-                <a href="@("/articles/index/" + item.Id)" style="color: gray;">
-                    <div class="d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
-                        <span class="me-4">@item.LastEditTime.ToString("yyyy-MM-dd")</span>
-
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
-                        <span class="me-4">@(item.CommentCount)条评论</span>
-
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
-                        <span class="me-4">@(item.ReaderCount)次阅读</span>
-
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.ThumbsUp" Color="grey" />
-                        <span class="me-4">@(item.ThumbsUpCount)人点赞</span>
-                        @if (string.IsNullOrWhiteSpace(item.CreateUserName) == false)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" Color="grey" />
-                            <span>@item.CreateUserName</span>
-                        }
-                    </div>
-                </a>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" Outline />
             </MExpansionPanelContent>
         </MExpansionPanel>
     }

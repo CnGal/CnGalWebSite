@@ -1,18 +1,22 @@
 ﻿
+<div class="mb-3">
+    <TagHeadNavTip TagList="Model.Taglevels" />
 
-<TagHeadNavTip TagList="Model.Taglevels" />
-<TagMainInforCard Model="Model" HiddenButton/>
+</div>
+<div class="mb-3">
+    <TagMainInforCard Model="Model" HiddenButton ForceSmall />
+</div>
 
 @if (Model.ChildrenTags.Count != 0 )
 {
     <div class="mb-3">
-        <TagListChildTagsViewTip Model="Model"  />
+        <TagListChildTagsViewTip Model="Model" />
     </div>
 }
 @if (Model.ChildrenEntries.Count != 0 )
 {
     <div class="">
-        <TagListChildEntriesViewTip Model="Model" />
+        <TagListChildEntriesViewTip Model="Model" ForceSmall />
     </div>
 }
 

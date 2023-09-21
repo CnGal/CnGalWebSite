@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 
-<MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
+<MAppBar App Style="background-color: var(--md-sys-color-background)!important;" Dense>
     <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
     <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard  />

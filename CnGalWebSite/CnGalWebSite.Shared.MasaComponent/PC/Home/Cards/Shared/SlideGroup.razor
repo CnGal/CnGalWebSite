@@ -64,7 +64,7 @@ else
         @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
         {
             <MSlideItem>
-                <MDCard Class="item more-link" Href="@MoreLink" OnClick="OnClick">
+                <MDCard Class="item more-link" Href="@MoreLink" OnClick="OnClick" ShowHoverStyle="true">
                     <MIcon Large>@((MoreIcon == IconType.SeeDetails ? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
                  <div class="text">@MoreText</div>
 

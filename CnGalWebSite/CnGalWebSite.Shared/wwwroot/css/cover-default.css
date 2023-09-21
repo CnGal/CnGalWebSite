@@ -18,7 +18,12 @@ html {
 
 /*修正Masa样式的影响*/
 .m-application {
-    font-family: inherit!important;
+    font-family: inherit !important;
+}
+
+.theme--light.m-application {
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
 }
 
 .row {
@@ -69,10 +74,6 @@ html {
 }
 
 /*页脚*/
-.m-main {
-    padding-bottom: 186px !important;
-}
-
 .img-fluid {
     width: 100%;
 }
@@ -115,8 +116,12 @@ html {
 .m-sheet.m-card, .m-dialog, .m-menu__content {
     border-radius: var(--md-card-border-radius);
 }
+
+.m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
 /*菜单*/
-.m-menu__content {
+.m-menu__content, .theme--light.m-picker__body {
     background-color: var(--md-sys-color-background);
 }
 /*步骤条*/
@@ -143,4 +148,91 @@ html {
 /*卡片标题字体*/
 .m-application .text-h5, .m-application .text-h6 {
     font-family: inherit !important;
+}
+/*顶部导航栏*/
+.m-toolbar__content, .m-tabs {
+    background-color: var(--md-sys-color-surface-1);
+}
+/*警告条*/
+.tertiary--text {
+    color: var(--md-sys-color-tertiary) !important;
+}
+/*默认字体颜色*/
+.theme--light.m-expansion-panels .m-expansion-panel-header .m-expansion-panel-header__icon .m-icon, .theme--light.m-tabs > .m-tabs-bar .m-tab--disabled, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active), .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-btn, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-icon {
+    color: var(--md-sys-color-on-surface);
+}
+
+.theme--light.m-label {
+    color: inherit;
+}
+
+.theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
+    color: inherit;
+}
+
+.theme--light.m-select .m-select__selections {
+    color: inherit;
+}
+
+.theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
+    color: inherit;
+}
+
+.theme--light.m-icon {
+    color: inherit;
+}
+
+.m-chip:not(.m-chip--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+
+.m-btn:not(.m-btn--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+/*边框颜色*/
+.theme--light.m-text-field > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+
+.theme--light.m-text-field:not(.m-input--has-state):hover > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+/*表格*/
+.theme--light.m-data-table {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-toolbar.m-sheet {
+    background-color: inherit;
+}
+
+.m-data-table .m-toolbar__content, .m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > thead > tr > th {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table-header th.sortable.active, .theme--light.m-data-table .m-data-table-header th.sortable.active .m-data-table-header__icon, .theme--light.m-data-table .m-data-table-header th.sortable:hover {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table__empty-wrapper {
+    color: inherit;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+/*步骤条*/
+.theme--light.m-stepper .m-stepper__label {
+    color: inherit;
+}
+
+.theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
+    background-color: var(--md-sys-color-surface-1);
 }

@@ -12,8 +12,9 @@
         {
             <div style="display: flex; flex-direction: column; ">
                 <h1 class="fw-bold  h3 mb-8" itemprop="headline">@Model.DisplayName</h1>
-
-                <div class="mb-8 d-flex">
+                @if (HiddenInfo == false)
+                {
+                                    <div class="mb-8 d-flex">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime"/>
                     <span class="me-4">@((Model.CreateTime.Year < 1900 ? Model.LastEditTime : Model.CreateTime).ToString("yyyy-MM-dd"))</span>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />
@@ -22,7 +23,9 @@
                     <span>@(Model.ThumbsUpCount + "人点赞")</span>
                 </div>
 
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Class="mb-4" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Class="mb-4" Outline/>
+
+                }
              </div>
         }
 
@@ -90,6 +93,8 @@
     public bool HiddenImage { get; set; }
     [Parameter]
     public bool HiddenTitle { get; set; }
+    [Parameter]
+    public bool HiddenInfo { get; set; }
     [Parameter]
     public bool Outline { get; set; }
     [Parameter]

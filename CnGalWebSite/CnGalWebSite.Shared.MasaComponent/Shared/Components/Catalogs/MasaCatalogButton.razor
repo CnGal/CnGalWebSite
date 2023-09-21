@@ -12,7 +12,7 @@
                         m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
-                    <MButton Fab Small  Class="@Class" @attributes="@attrs" Dark  Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
+                    <MButton Fab Small  Class="@Class" @attributes="@attrs" Dark>
                         <MIcon>mdi-format-list-bulleted-square </MIcon>
                     </MButton>
                 </ActivatorContent>

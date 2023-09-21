@@ -19,7 +19,7 @@
     #home-page .left-content, #home-page {
         display: flex;
         flex-direction: column;
-        gap: 6rem;
+        gap: 3rem;
     }
 
         #home-page .right-content {
@@ -43,6 +43,7 @@
 
         #home-page .item img, #home-page .item .image {
             width: 100%;
+            height: min-content;
         }
 
         /*内部纸片*/
@@ -168,16 +169,16 @@
         }
 
         #home-page .news-card .name {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
             font-weight: bold;
         }
 
         #home-page .news-card .time {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
         }
 
         #home-page .news-card .text {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
         }
 
         /*最新文章*/
@@ -197,14 +198,6 @@
             flex-direction: column;
             gap: 1rem;
         }
-
-            #home-page .latest-articles-card .content .name {
-                color: var( --md-sys-color-on-primary-container);
-            }
-
-            #home-page .latest-articles-card .content .brief {
-                color: var( --md-sys-color-on-primary-container);
-            }
 
         #home-page .latest-articles-card .addinfo {
             display: flex;
@@ -328,14 +321,10 @@
         }
 
             #home-page .latest-videoes-card .content .name {
-                color: var( --md-sys-color-on-primary-container);
                 font-weight: bold;
                 font-size: 1rem;
             }
 
-            #home-page .latest-videoes-card .content .brief {
-                color: var( --md-sys-color-on-primary-container);
-            }
 
         #home-page .latest-videoes-card .addinfo {
             display: flex;
@@ -407,92 +396,12 @@
             padding: .7rem;
         }
 
-        /*关于我们*/
 
-        #home-page .about-card {
-            padding: 0 2rem;
-            display: flex;
-            flex-direction: column;
-            align-content: center;
-            flex-wrap: wrap;
-        }
-
-            #home-page .about-card .head {
-                display: flex;
-                gap: 6rem;
-                flex-wrap: wrap;
-            }
-
-            #home-page .about-card .links-groups {
-                display: flex;
-                gap: 4rem;
-                margin-top: 3rem;
-            }
-
-            #home-page .about-card .links-item {
-                display: flex;
-                gap: 1rem;
-                flex-direction: column;
-            }
-
-        #home-page .links-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-
-
-        #home-page .about-card .quote-card {
-            max-width: 68rem;
-        }
-
-        #home-page .links-group h3 {
-            font-size: inherit;
-        }
-
-        #home-page .links-item a {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        #home-page .about-card .introduce img {
-            height: 50px;
-            aspect-ratio: 23/5;
-        }
-
-        #home-page .about-card .introduce {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-width: 40rem;
-            gap: 1rem;
-        }
-
-        #home-page .about-card .text {
-            line-height: 1.3rem;
-        }
-
-        #home-page .about-card .addinfo {
-            display: flex;
-            justify-content: flex-start;
-            gap: 2rem;
-            align-items: center;
-        }
-
-            #home-page .about-card .addinfo div {
-                font-size: 1.2rem;
-                font-weight: bold;
-            }
-
-        #home-page .about-card a:hover {
-            text-decoration: underline;
-        }
 
 /*推荐*/
 .recommends-group {
     display: flex;
-    gap: 5rem;
+    gap: 3rem;
     flex-direction: column;
 }
 
@@ -532,9 +441,6 @@
         gap: .5rem;
     }
 
-    #home-page .plain-text-card.item .name {
-        font-size: 2rem;
-    }
 /*图墙*/
 .masa-image .m-image__image {
     border-radius: var( --md-card-border-radius);
@@ -631,10 +537,6 @@
         justify-content: space-around;
         padding: 1rem 1.5rem;
         gap: .5rem;
-    }
-
-    #home-page .gallery-card .name {
-        font-size: 2rem;
     }
 
     #home-page .gallery-card .gallery img {
@@ -745,27 +647,11 @@
     display: flex;
     flex-direction: column;
 }
-/*一言*/
-#home-page .quote-card .quote-content {
-    margin-left: 0 !important;
-    font-size: 2rem !important;
-    font-weight: bold;
-    letter-spacing: .1rem;
+/*关于我们*/
+#home-page .cngal-about-card .links-groups {
+    margin-top: 3rem;
 }
 
-#home-page .quote-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-    #home-page .quote-card .quote-by {
-        font-size: 0.8rem;
-        letter-spacing: .05rem;
-        display: flex;
-        justify-content: flex-end;
-        gap: .5rem;
-    }
 /*看板娘*/
 #home-page .kanban-card {
     display: flex;

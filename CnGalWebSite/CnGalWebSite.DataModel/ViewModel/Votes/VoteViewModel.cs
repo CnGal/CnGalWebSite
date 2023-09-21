@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
 
@@ -139,18 +140,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
         public long Count { get; set; }
     }
 
-    public class VoteUserViewModel
+    public class VoteUserViewModel: UserInforViewModel
     {
-        public string UserId { get; set; }
-
-        public string UserName { get; set; }
-
         public DateTime VotedTime { get; set; }
-
-        public string Image { get; set; }
-
-        public string PersonalSignature { get; set; }
-
-        public List<RankViewModel> Ranks { get; set; }
     }
 }

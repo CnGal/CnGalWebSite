@@ -1,20 +1,19 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@(ShowTagSearch?"mb-4":Class)" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@(ShowTagSearch?"mb-4":Class)" Collapable>
      <MRow>
          <MCol Cols="12" Md="6" Lg="3">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
          </MCol>
          <MCol Cols="12" Md="6" Lg="3">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" Class="mb-4" />
          </MCol>
          <MCol Cols="12" Md="6" Lg="3">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" Class="mb-4" />
          </MCol>
          <MCol Cols="12" Md="6" Lg="3">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" Class="mb-4" />
          </MCol>
          <MCol Cols="12">
-             <MDivider />
          </MCol>
          <MCol Cols="12" Md="6">
              <MTextField @bind-Value="Model.Name" Label="唯一名称" />

@@ -5,7 +5,7 @@
 
 @if (IsReady)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="API Server" Icon="fa fa-fw fa-server" Class="mb-4">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="API Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
         <div class="row">
             @foreach (var item in Items)
             {

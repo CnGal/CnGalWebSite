@@ -11,7 +11,7 @@
 </style>
 
 <div>
-    <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded">
+    <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="mb-4">
         <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
             本周<MIcon>mdi-av-timer </MIcon>
         </MTab>
@@ -21,10 +21,6 @@
         <MTab Value="4" OnClick="@(() => OnCondited("本年"))">
             本年<MIcon>mdi-calendar-text </MIcon>
         </MTab>
-        <MTab Value="5" OnClick="@(() => OnCondited("全部"))">
-            全部<MIcon>mdi-all-inclusive</MIcon>
-        </MTab>
-
     </MTabs>
     <div class="mt-4">
         @if (isReady)
@@ -32,7 +28,7 @@
 
             if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill />
             }
             else
             {

@@ -2,8 +2,8 @@
 @inject IDataCacheService _dataCacheService
 
 
-<div class="@(Class+(AllowExtend?(isExtend?" col-12":" col-12  col-xl-6"):""))">
-    <div class="@(Outline?" ":"h-100 rounded shadow-sm bg-opacity pt-4") ">
+<div class="@(Class+(AllowExtend?(isExtend?" col-12":" col-12  col-md-6"):""))">
+    <MDCard Outline="Outline" Class="@(Outline?"":"h-100 pt-4")">
         <div style="display: flex; justify-content: flex-end; ">
             @if (AllowChangeTime)
             {
@@ -42,7 +42,7 @@
             }
 
         </div>
-    </div>
+    </MDCard>
 
 </div>
 

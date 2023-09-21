@@ -1,24 +1,24 @@
 ﻿@if (Model != null)
 {
-    <MDCard Outline ShowHoverStyle="false" Href="@("/space/index/"+Model.Id)" Class="@($"user-info-card {Class}")">
+    <MDCard Outline="Outline" ShowHoverStyle="!Outline" Href="@($"{(string.IsNullOrWhiteSpace(Href)?$"/space/index/{Model.Id}":Href)}")" Class="@($"user-info-card {Class} {(Small?"small":"")} {(Outline?"":"pa-3 pt-2 pb-2")}" )">
          <div class="image-card">
              <img src="@Model.PhotoPath" alt="@Model.Name" />
          </div>
          <div class="content-card">
              <div style="display: flex;align-items: center;gap: 1rem;">
-                 <span class="title-large" itemprop="name">
+                <span class="@($"title-{(Small?"medium":"large")}")" itemprop="name">
                      @Model.Name
                  </span>
-                 @if (HideRank)
+                @if (HideRank == false)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" NoLeftPandding />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks.Take(ShowOnlyOneRank?1:100).ToList()" NoLeftPandding ForceDisplayBadge />
                 }
             </div>
             <div class="label-large  text-truncate-2">
                 @Model.PersonalSignature
             </div>
         </div>
-        @if (HideRank == false)
+        @if (HideRank == false && ShowOnlyOneRank==false)
         {
             <div class="badges-card">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.BadgesViewCard Model="Model.Ranks" />
@@ -26,7 +26,6 @@
 
         }
     </MDCard>
-
 }
 
 @code {
@@ -35,5 +34,13 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
     public bool HideRank { get; set; }
+    [Parameter]
+    public bool ShowOnlyOneRank { get; set; }
 }

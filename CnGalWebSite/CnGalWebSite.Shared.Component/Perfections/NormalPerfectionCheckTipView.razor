@@ -2,35 +2,19 @@
 
 
 
-<TabLink Icon="fa fa-codepen" Url="@("/entries/index/"+Model.EntryId)" Text="@Model.EntryName" class="a-font-color">
-    <div class=" p-3">
-        <div  class="a-font-color h-100" style="display:flex;">
-            <div style="display: flex;align-items: center;">
-                <div class="swal2-icon m-0 me-1 @("border-"+color)" style="height: 3em; width: 3em; display: flex;align-items: center;">
-                    <div class="@("text-"+color)">@Model.Grade.ToString("0.0")</div>
-                </div>
-            </div>
-            <div  class="comment-tx-div">
-                <div  class="new-row-warp no-margin" style="flex-wrap: nowrap;">
-                    <div class="@("comment-tag me-2 bg-"+color)">@Model.Level.GetDisplayName()</div>
-                    <div class="comment-username me-2">@(Model.EntryName+"的"+ ToolHelper.GetPerfectionCheckTitle(Model))</div>
-                </div>
-                <div class="comment-time">@ToolHelper.GetPerfectionCheckContext(Model)</div>
-            </div>
-        </div>
+<MDCard Href="@("/entries/index/"+Model.EntryId)" Class="pa-3 h-100" Style="flex-direction: row;gap: .5rem;">
+    <div style="display: flex;align-items: center;">
+        <MProgressCircular Value="100" Size="50" Width="2" Color="primary">@Model.Grade.ToString("0.0")</MProgressCircular>
     </div>
-</TabLink>
+    <div>
+        <div class="title-medium ">@("『"+Model.EntryName + "』的" + ToolHelper.GetPerfectionCheckTitle(Model))</div>
+        <div class="label-large">@ToolHelper.GetPerfectionCheckContext(Model)</div>
+    </div>
+</MDCard>
 
 
 
 @code {
     [Parameter]
-    public PerfectionCheckViewModel Model { get; set; } = new PerfectionCheckViewModel();
-
-    string color = "success";
-
-    protected override async Task OnInitializedAsync()
-    {
-        color = ToolHelper.GetEntryPerfectionCheckLevelColor(Model.Level);
-    }
+    public PerfectionCheckViewModel Model { get; set; }
 }

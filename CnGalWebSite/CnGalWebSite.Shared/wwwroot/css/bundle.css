@@ -180,172 +180,6 @@
 }
 
 :root {
-    --md-source: #E91E63;
-    /* primary */
-    --md-sys-color-primary-rgb: 188 0 75;
-    --md-ref-palette-primary0: #000000;
-    --md-ref-palette-primary10: #400014;
-    --md-ref-palette-primary20: #660025;
-    --md-ref-palette-primary25: #7b002e;
-    --md-ref-palette-primary30: #900038;
-    --md-ref-palette-primary35: #a60041;
-    --md-ref-palette-primary40: #bc004b;
-    --md-ref-palette-primary50: #e61a61;
-    --md-ref-palette-primary60: #ff4e7c;
-    --md-ref-palette-primary70: #ff869d;
-    --md-ref-palette-primary80: #ffb2be;
-    --md-ref-palette-primary90: #ffd9de;
-    --md-ref-palette-primary95: #ffecee;
-    --md-ref-palette-primary98: #fff8f7;
-    --md-ref-palette-primary99: #fffbff;
-    --md-ref-palette-primary100: #ffffff;
-    /* secondary */
-    --md-ref-palette-secondary0: #000000;
-    --md-ref-palette-secondary10: #2c1519;
-    --md-ref-palette-secondary20: #43292d;
-    --md-ref-palette-secondary25: #4f3438;
-    --md-ref-palette-secondary30: #5c3f43;
-    --md-ref-palette-secondary35: #694a4f;
-    --md-ref-palette-secondary40: #75565b;
-    --md-ref-palette-secondary50: #906e73;
-    --md-ref-palette-secondary60: #ab888c;
-    --md-ref-palette-secondary70: #c8a2a7;
-    --md-ref-palette-secondary80: #e5bdc2;
-    --md-ref-palette-secondary90: #ffd9de;
-    --md-ref-palette-secondary95: #ffecee;
-    --md-ref-palette-secondary98: #fff8f7;
-    --md-ref-palette-secondary99: #fffbff;
-    --md-ref-palette-secondary100: #ffffff;
-    /* tertiary */
-    --md-ref-palette-tertiary0: #000000;
-    --md-ref-palette-tertiary10: #2b1700;
-    --md-ref-palette-tertiary20: #452b08;
-    --md-ref-palette-tertiary25: #523512;
-    --md-ref-palette-tertiary30: #5f411c;
-    --md-ref-palette-tertiary35: #6c4c27;
-    --md-ref-palette-tertiary40: #795831;
-    --md-ref-palette-tertiary50: #947047;
-    --md-ref-palette-tertiary60: #b0895f;
-    --md-ref-palette-tertiary70: #cda477;
-    --md-ref-palette-tertiary80: #ebbf90;
-    --md-ref-palette-tertiary90: #ffddba;
-    --md-ref-palette-tertiary95: #ffeedf;
-    --md-ref-palette-tertiary98: #fff8f4;
-    --md-ref-palette-tertiary99: #fffbff;
-    --md-ref-palette-tertiary100: #ffffff;
-    /* neutral */
-    --md-ref-palette-neutral0: #000000;
-    --md-ref-palette-neutral10: #201a1b;
-    --md-ref-palette-neutral20: #362f2f;
-    --md-ref-palette-neutral25: #413a3a;
-    --md-ref-palette-neutral30: #4d4546;
-    --md-ref-palette-neutral35: #595051;
-    --md-ref-palette-neutral40: #655c5d;
-    --md-ref-palette-neutral50: #7e7575;
-    --md-ref-palette-neutral60: #988e8f;
-    --md-ref-palette-neutral70: #b4a9a9;
-    --md-ref-palette-neutral80: #cfc4c4;
-    --md-ref-palette-neutral90: #ece0e0;
-    --md-ref-palette-neutral95: #fbeeee;
-    --md-ref-palette-neutral98: #fff8f7;
-    --md-ref-palette-neutral99: #fffbff;
-    --md-ref-palette-neutral100: #ffffff;
-    /* neutral-variant */
-    --md-ref-palette-neutral-variant0: #000000;
-    --md-ref-palette-neutral-variant10: #24191a;
-    --md-ref-palette-neutral-variant20: #3a2d2f;
-    --md-ref-palette-neutral-variant25: #46383a;
-    --md-ref-palette-neutral-variant30: #524345;
-    --md-ref-palette-neutral-variant35: #5e4f50;
-    --md-ref-palette-neutral-variant40: #6a5a5c;
-    --md-ref-palette-neutral-variant50: #847375;
-    --md-ref-palette-neutral-variant60: #9f8c8e;
-    --md-ref-palette-neutral-variant70: #baa6a8;
-    --md-ref-palette-neutral-variant80: #d6c2c3;
-    --md-ref-palette-neutral-variant90: #f3dddf;
-    --md-ref-palette-neutral-variant95: #ffecee;
-    --md-ref-palette-neutral-variant98: #fff8f7;
-    --md-ref-palette-neutral-variant99: #fffbff;
-    --md-ref-palette-neutral-variant100: #ffffff;
-    /* error */
-    --md-ref-palette-error0: #000000;
-    --md-ref-palette-error10: #410002;
-    --md-ref-palette-error20: #690005;
-    --md-ref-palette-error25: #7e0007;
-    --md-ref-palette-error30: #93000a;
-    --md-ref-palette-error35: #a80710;
-    --md-ref-palette-error40: #ba1a1a;
-    --md-ref-palette-error50: #de3730;
-    --md-ref-palette-error60: #ff5449;
-    --md-ref-palette-error70: #ff897d;
-    --md-ref-palette-error80: #ffb4ab;
-    --md-ref-palette-error90: #ffdad6;
-    --md-ref-palette-error95: #ffedea;
-    --md-ref-palette-error98: #fff8f7;
-    --md-ref-palette-error99: #fffbff;
-    --md-ref-palette-error100: #ffffff;
-    /* light */
-    --md-sys-color-primary-light: #bc004b;
-    --md-sys-color-on-primary-light: #ffffff;
-    --md-sys-color-primary-container-light: #ffd9de;
-    --md-sys-color-on-primary-container-light: #400014;
-    --md-sys-color-secondary-light: #75565b;
-    --md-sys-color-on-secondary-light: #ffffff;
-    --md-sys-color-secondary-container-light: #ffd9de;
-    --md-sys-color-on-secondary-container-light: #2c1519;
-    --md-sys-color-tertiary-light: #795831;
-    --md-sys-color-on-tertiary-light: #ffffff;
-    --md-sys-color-tertiary-container-light: #ffddba;
-    --md-sys-color-on-tertiary-container-light: #2b1700;
-    --md-sys-color-error-light: #ba1a1a;
-    --md-sys-color-error-container-light: #ffdad6;
-    --md-sys-color-on-error-light: #ffffff;
-    --md-sys-color-on-error-container-light: #410002;
-    --md-sys-color-background-light: #fffbff;
-    --md-sys-color-on-background-light: #201a1b;
-    --md-sys-color-surface-light: #fffbff;
-    --md-sys-color-on-surface-light: #201a1b;
-    --md-sys-color-surface-variant-light: #f3dddf;
-    --md-sys-color-on-surface-variant-light: #524345;
-    --md-sys-color-outline-light: #847375;
-    --md-sys-color-inverse-on-surface-light: #fbeeee;
-    --md-sys-color-inverse-surface-light: #362f2f;
-    --md-sys-color-inverse-primary-light: #ffb2be;
-    --md-sys-color-shadow-light: #000000;
-    --md-sys-color-surface-tint-light: #bc004b;
-    --md-sys-color-outline-variant-light: #d6c2c3;
-    --md-sys-color-scrim-light: #000000;
-    /* dark */
-    --md-sys-color-primary-dark: #ffb2be;
-    --md-sys-color-on-primary-dark: #660025;
-    --md-sys-color-primary-container-dark: #900038;
-    --md-sys-color-on-primary-container-dark: #ffd9de;
-    --md-sys-color-secondary-dark: #e5bdc2;
-    --md-sys-color-on-secondary-dark: #43292d;
-    --md-sys-color-secondary-container-dark: #5c3f43;
-    --md-sys-color-on-secondary-container-dark: #ffd9de;
-    --md-sys-color-tertiary-dark: #ebbf90;
-    --md-sys-color-on-tertiary-dark: #452b08;
-    --md-sys-color-tertiary-container-dark: #5f411c;
-    --md-sys-color-on-tertiary-container-dark: #ffddba;
-    --md-sys-color-error-dark: #ffb4ab;
-    --md-sys-color-error-container-dark: #93000a;
-    --md-sys-color-on-error-dark: #690005;
-    --md-sys-color-on-error-container-dark: #ffdad6;
-    --md-sys-color-background-dark: #201a1b;
-    --md-sys-color-on-background-dark: #ece0e0;
-    --md-sys-color-surface-dark: #201a1b;
-    --md-sys-color-on-surface-dark: #ece0e0;
-    --md-sys-color-surface-variant-dark: #524345;
-    --md-sys-color-on-surface-variant-dark: #d6c2c3;
-    --md-sys-color-outline-dark: #9f8c8e;
-    --md-sys-color-inverse-on-surface-dark: #201a1b;
-    --md-sys-color-inverse-surface-dark: #ece0e0;
-    --md-sys-color-inverse-primary-dark: #bc004b;
-    --md-sys-color-shadow-dark: #000000;
-    --md-sys-color-surface-tint-dark: #ffb2be;
-    --md-sys-color-outline-variant-dark: #524345;
-    --md-sys-color-scrim-dark: #000000;
     /* display - large */
     --md-sys-typescale-display-large-font-family-name: Roboto;
     --md-sys-typescale-display-large-font-family-style: Regular;
@@ -370,7 +204,7 @@
     /* headline - large */
     --md-sys-typescale-headline-large-font-family-name: Roboto;
     --md-sys-typescale-headline-large-font-family-style: Regular;
-    --md-sys-typescale-headline-large-font-weight: 400;
+    --md-sys-typescale-headline-large-font-weight: 500;
     --md-sys-typescale-headline-large-font-size: 32px;
     --md-sys-typescale-headline-large-line-height: 40px;
     --md-sys-typescale-headline-large-letter-spacing: 0px;
@@ -595,6 +429,14 @@
     --md-card-active-border-radius: 24px;
 }
 
+:root {
+    --md-sys-color-surface-1: rgb(var(--md-sys-color-primary-rgb) / 0.05);
+    --md-sys-color-surface-2: rgb(var(--md-sys-color-primary-rgb) / 0.08);
+    --md-sys-color-surface-3: rgb(var(--md-sys-color-primary-rgb) / 0.11);
+    --md-sys-color-surface-4: rgb(var(--md-sys-color-primary-rgb) / 0.12);
+    --md-sys-color-surface-5: rgb(var(--md-sys-color-primary-rgb) / 0.14);
+}
+
 /*全局*/
 body {
     font-family: 'Noto Sans SC', sans-serif;
@@ -603,11 +445,11 @@ body {
 }
 
 .w-100 {
-    width: 100%;
+    width: 100% !important;
 }
 
 .h-100 {
-    height: 100%;
+    height: 100% !important;
 }
 
 /*背景图*/
@@ -653,23 +495,31 @@ body {
 }
 
 .largeimage-btn-close {
-    font-size: 50px;
     position: fixed;
-    right: 0px;
-    color: white;
-    top: 0px;
+    right: 1rem;
+    top: 1rem;
 }
 
 .largeimage-layout-in {
     height: 100%;
     width: 100%;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
 }
 
 .largeimage-btn-left {
-    font-size: 50px;
-    color: white;
+    position: fixed;
+    left: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
+}
+
+.largeimage-btn-right {
+    position: fixed;
+    right: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
 }
 
 .largeimage-img {
@@ -932,6 +782,10 @@ ins {
 .slide-group-garp .m-slide-group__content {
     gap: 1rem;
 }
+/*页面内容距离顶部*/
+.variable.container {
+    padding-top: 24px;
+}
 
 
 /*去掉下划线*/
@@ -953,7 +807,12 @@ html {
 
 /*修正Masa样式的影响*/
 .m-application {
-    font-family: inherit!important;
+    font-family: inherit !important;
+}
+
+.theme--light.m-application {
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
 }
 
 .row {
@@ -1004,10 +863,6 @@ html {
 }
 
 /*页脚*/
-.m-main {
-    padding-bottom: 186px !important;
-}
-
 .img-fluid {
     width: 100%;
 }
@@ -1050,8 +905,12 @@ html {
 .m-sheet.m-card, .m-dialog, .m-menu__content {
     border-radius: var(--md-card-border-radius);
 }
+
+.m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
 /*菜单*/
-.m-menu__content {
+.m-menu__content, .theme--light.m-picker__body {
     background-color: var(--md-sys-color-background);
 }
 /*步骤条*/
@@ -1078,6 +937,93 @@ html {
 /*卡片标题字体*/
 .m-application .text-h5, .m-application .text-h6 {
     font-family: inherit !important;
+}
+/*顶部导航栏*/
+.m-toolbar__content, .m-tabs {
+    background-color: var(--md-sys-color-surface-1);
+}
+/*警告条*/
+.tertiary--text {
+    color: var(--md-sys-color-tertiary) !important;
+}
+/*默认字体颜色*/
+.theme--light.m-expansion-panels .m-expansion-panel-header .m-expansion-panel-header__icon .m-icon, .theme--light.m-tabs > .m-tabs-bar .m-tab--disabled, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active), .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-btn, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-icon {
+    color: var(--md-sys-color-on-surface);
+}
+
+.theme--light.m-label {
+    color: inherit;
+}
+
+.theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
+    color: inherit;
+}
+
+.theme--light.m-select .m-select__selections {
+    color: inherit;
+}
+
+.theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
+    color: inherit;
+}
+
+.theme--light.m-icon {
+    color: inherit;
+}
+
+.m-chip:not(.m-chip--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+
+.m-btn:not(.m-btn--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+/*边框颜色*/
+.theme--light.m-text-field > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+
+.theme--light.m-text-field:not(.m-input--has-state):hover > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+/*表格*/
+.theme--light.m-data-table {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-toolbar.m-sheet {
+    background-color: inherit;
+}
+
+.m-data-table .m-toolbar__content, .m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > thead > tr > th {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table-header th.sortable.active, .theme--light.m-data-table .m-data-table-header th.sortable.active .m-data-table-header__icon, .theme--light.m-data-table .m-data-table-header th.sortable:hover {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table__empty-wrapper {
+    color: inherit;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+/*步骤条*/
+.theme--light.m-stepper .m-stepper__label {
+    color: inherit;
+}
+
+.theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
+    background-color: var(--md-sys-color-surface-1);
 }
 
 
@@ -1281,7 +1227,7 @@ html {
     #home-page .left-content, #home-page {
         display: flex;
         flex-direction: column;
-        gap: 6rem;
+        gap: 3rem;
     }
 
         #home-page .right-content {
@@ -1305,6 +1251,7 @@ html {
 
         #home-page .item img, #home-page .item .image {
             width: 100%;
+            height: min-content;
         }
 
         /*内部纸片*/
@@ -1430,16 +1377,16 @@ html {
         }
 
         #home-page .news-card .name {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
             font-weight: bold;
         }
 
         #home-page .news-card .time {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
         }
 
         #home-page .news-card .text {
-            color: var( --md-sys-color-on-primary-container);
+            color: var( --md-sys-color-on-surface) !important;
         }
 
         /*最新文章*/
@@ -1459,14 +1406,6 @@ html {
             flex-direction: column;
             gap: 1rem;
         }
-
-            #home-page .latest-articles-card .content .name {
-                color: var( --md-sys-color-on-primary-container);
-            }
-
-            #home-page .latest-articles-card .content .brief {
-                color: var( --md-sys-color-on-primary-container);
-            }
 
         #home-page .latest-articles-card .addinfo {
             display: flex;
@@ -1590,14 +1529,10 @@ html {
         }
 
             #home-page .latest-videoes-card .content .name {
-                color: var( --md-sys-color-on-primary-container);
                 font-weight: bold;
                 font-size: 1rem;
             }
 
-            #home-page .latest-videoes-card .content .brief {
-                color: var( --md-sys-color-on-primary-container);
-            }
 
         #home-page .latest-videoes-card .addinfo {
             display: flex;
@@ -1669,92 +1604,12 @@ html {
             padding: .7rem;
         }
 
-        /*关于我们*/
 
-        #home-page .about-card {
-            padding: 0 2rem;
-            display: flex;
-            flex-direction: column;
-            align-content: center;
-            flex-wrap: wrap;
-        }
-
-            #home-page .about-card .head {
-                display: flex;
-                gap: 6rem;
-                flex-wrap: wrap;
-            }
-
-            #home-page .about-card .links-groups {
-                display: flex;
-                gap: 4rem;
-                margin-top: 3rem;
-            }
-
-            #home-page .about-card .links-item {
-                display: flex;
-                gap: 1rem;
-                flex-direction: column;
-            }
-
-        #home-page .links-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-
-
-        #home-page .about-card .quote-card {
-            max-width: 68rem;
-        }
-
-        #home-page .links-group h3 {
-            font-size: inherit;
-        }
-
-        #home-page .links-item a {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        #home-page .about-card .introduce img {
-            height: 50px;
-            aspect-ratio: 23/5;
-        }
-
-        #home-page .about-card .introduce {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-width: 40rem;
-            gap: 1rem;
-        }
-
-        #home-page .about-card .text {
-            line-height: 1.3rem;
-        }
-
-        #home-page .about-card .addinfo {
-            display: flex;
-            justify-content: flex-start;
-            gap: 2rem;
-            align-items: center;
-        }
-
-            #home-page .about-card .addinfo div {
-                font-size: 1.2rem;
-                font-weight: bold;
-            }
-
-        #home-page .about-card a:hover {
-            text-decoration: underline;
-        }
 
 /*推荐*/
 .recommends-group {
     display: flex;
-    gap: 5rem;
+    gap: 3rem;
     flex-direction: column;
 }
 
@@ -1794,9 +1649,6 @@ html {
         gap: .5rem;
     }
 
-    #home-page .plain-text-card.item .name {
-        font-size: 2rem;
-    }
 /*图墙*/
 .masa-image .m-image__image {
     border-radius: var( --md-card-border-radius);
@@ -1893,10 +1745,6 @@ html {
         justify-content: space-around;
         padding: 1rem 1.5rem;
         gap: .5rem;
-    }
-
-    #home-page .gallery-card .name {
-        font-size: 2rem;
     }
 
     #home-page .gallery-card .gallery img {
@@ -2007,27 +1855,11 @@ html {
     display: flex;
     flex-direction: column;
 }
-/*一言*/
-#home-page .quote-card .quote-content {
-    margin-left: 0 !important;
-    font-size: 2rem !important;
-    font-weight: bold;
-    letter-spacing: .1rem;
+/*关于我们*/
+#home-page .cngal-about-card .links-groups {
+    margin-top: 3rem;
 }
 
-#home-page .quote-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-    #home-page .quote-card .quote-by {
-        font-size: 0.8rem;
-        letter-spacing: .05rem;
-        display: flex;
-        justify-content: flex-end;
-        gap: .5rem;
-    }
 /*看板娘*/
 #home-page .kanban-card {
     display: flex;
@@ -2821,6 +2653,7 @@ div.prizeTips {
     .md-card img, .md-card .image {
         transition: .3s;
         border-radius: var( --md-card-border-radius);
+        height: min-content;
     }
 
     .md-card.show-hover-style:active img, .md-card.show-hover-style:active .image {
@@ -2931,7 +2764,7 @@ div.prizeTips {
         -webkit-line-clamp: inherit;
         white-space: pre-line;
     }
-
+/*小屏幕*/
 @media screen and (max-width: 768px) {
     .md-main-info-card.game {
         flex-direction: column;
@@ -2951,6 +2784,24 @@ div.prizeTips {
         white-space: pre-line;
     }
 }
+
+.md-main-info-card.game.small {
+    flex-direction: column;
+}
+
+.md-main-info-card.role.small .image-card img {
+    height: 150px;
+}
+
+.md-main-info-card.game.small .image-card img {
+    width: 100%;
+    height: min-content;
+}
+
+.md-main-info-card.game.small .content-card .brief {
+    -webkit-line-clamp: inherit;
+    white-space: pre-line;
+}
 /*内置类型纸片*/
 .type-inline-chip {
     background-color: var(--md-sys-color-primary);
@@ -2959,25 +2810,131 @@ div.prizeTips {
     color: white;
     margin-right: 0.5rem;
 }
+/*关于我们*/
 
-/*默认模板 主要信息卡片*/
+.cngal-about-card {
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+}
 
-    .entry-card-default.main-card.game .content-card .groups-card {
+    .cngal-about-card .head {
         display: flex;
-        column-gap: 1rem;
+        gap: 6rem;
         flex-wrap: wrap;
     }
 
-        .entry-card-default.main-card.game .content-card .groups-card > div {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-    .entry-card-default.main-card .options-card {
+    .cngal-about-card .links-groups {
         display: flex;
-        justify-content: flex-end;
+        gap: 4rem;
+        margin-top: 1rem;
+    }
+
+    .cngal-about-card .links-item {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .cngal-about-card .links-group {
+        display: flex;
+        flex-direction: column;
         gap: 1rem;
     }
+
+
+
+    .cngal-about-card .quote-card {
+        max-width: 68rem;
+    }
+
+    .cngal-about-card .links-group h3 {
+        font-size: inherit;
+    }
+
+    .cngal-about-card .links-item a {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .cngal-about-card .introduce img {
+        height: 50px;
+        aspect-ratio: 23/5;
+    }
+
+    .cngal-about-card .introduce {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        max-width: 40rem;
+        gap: 1rem;
+    }
+
+    .cngal-about-card .text {
+        line-height: 1.3rem;
+    }
+
+    .cngal-about-card .addinfo {
+        display: flex;
+        justify-content: flex-start;
+        gap: 2rem;
+        align-items: center;
+    }
+
+        .cngal-about-card .addinfo div {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+    .cngal-about-card a:hover {
+        text-decoration: underline;
+    }
+/*一言*/
+.quote-card .quote-content {
+    margin-left: 0 !important;
+    font-size: 2rem !important;
+    font-weight: bold;
+    letter-spacing: .1rem;
+}
+
+.quote-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .quote-card .quote-by {
+        font-size: 0.8rem;
+        letter-spacing: .05rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+/*颜色选择器*/
+.color-selector-card {
+    background-color: transparent !important;
+}
+
+/*默认模板 主要信息卡片*/
+
+.entry-card-default.main-card.game .content-card .groups-card {
+    display: flex;
+    column-gap: 1rem;
+    flex-wrap: wrap;
+}
+
+    .entry-card-default.main-card.game .content-card .groups-card > div {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+.entry-card-default.main-card .options-card {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
 
 /*标签*/
 .entry-card-default.tags-card {
@@ -2991,8 +2948,10 @@ div.prizeTips {
     gap: .5rem;
 }
 
+
+
     .entry-card-default.relevance-card a {
-        color: var(--md-sys-color-on-primary-container) !important;
+        color: var(--md-sys-color-on-surface);
     }
 
     .entry-card-default.relevance-card .main-card {
@@ -3033,14 +2992,48 @@ div.prizeTips {
 
     .entry-card-default.relevance-card .info-card {
         display: flex;
-        gap: 1rem;
+        column-gap: 1rem;
+        flex-wrap: wrap;
     }
 
     .entry-card-default.relevance-card .info-item {
         display: flex;
         align-items: center;
     }
+    /*大卡片样式*/
+    .entry-card-default.relevance-card.big-card-style {
+        padding: 0;
+    }
 
+        .entry-card-default.relevance-card.big-card-style .main-card {
+            flex-direction: column;
+        }
+
+            .entry-card-default.relevance-card.big-card-style .main-card img {
+                width: 100%;
+            }
+
+        .entry-card-default.relevance-card.big-card-style .content-card {
+            width: 100%;
+            padding: .7rem;
+            padding-top: 0;
+        }
+
+        .entry-card-default.relevance-card.big-card-style .info-card {
+            width: 100%;
+            padding: .7rem;
+            padding-top: 0;
+        }
+
+.markdown-body {
+    white-space: break-spaces;
+    display: flex;
+    flex-direction: column;
+}
+
+.markdown-body pre {
+    overflow: initial !important;
+}
 /*图片注释*/
 .markdown-body img + strong {
     display: flex;
@@ -3086,8 +3079,8 @@ div.prizeTips {
         top: 0;
     }
 
-.markdown-body img{
-    max-width:100%;
+.markdown-body img {
+    max-width: 100%;
 }
 
 .user-rank {
@@ -3097,6 +3090,7 @@ div.prizeTips {
     padding: 0 .7rem;
     border-radius: 10px;
     font-size: small;
+    background-color: var(--md-sys-color-primary);
 }
 
     .user-rank.rank-lv10 {
@@ -3171,8 +3165,14 @@ div.prizeTips {
         border-radius: 50%;
     }
 
+    .user-info-card.small .image-card img {
+        width: 40px;
+        height: 40px;
+    }
+
     .user-info-card .image-card {
         display: flex;
+        align-items: center;
     }
 
     .user-info-card .content-card {
@@ -3185,3 +3185,29 @@ a.user-info-card {
     color: var(--md-sys-color-on-background) !important;
 }
 
+
+.periphery-overview-card a {
+    color: var(--md-sys-color-on-background) !important;
+}
+
+.basic-info-group-card {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    padding: 4px !important;
+    padding-top: 0;
+}
+
+.basic-info-group-card >div {
+    display: flex;
+}
+
+.md-main-info-card.edit-record-overview-main-card.game .image-card img {
+    width: 320px;
+}
+
+.md-main-info-card.edit-record-overview-main-card.role .image-card img {
+    border-radius: 50%;
+    margin: 1rem;
+    height: 150px;
+}

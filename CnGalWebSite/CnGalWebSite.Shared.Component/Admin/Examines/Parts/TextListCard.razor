@@ -2,10 +2,10 @@
 <div class="@Class">
     @foreach (var item in Model)
     {
-        <div class="rounded shadow-sm  bg-opacity mb-4 p-3 pb-2">
+        <MDCard Class="mb-4 pa-3 pb-2">
             @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
             {
-                <div class="font-color fw-bold h5 mb-2">@item.Modifier</div>
+                <div class="title-large mb-2">@item.Modifier</div>
             }
 
             <div class="row">
@@ -17,7 +17,7 @@
                 }
             </div>
 
-        </div>
+        </MDCard>
     }
 </div>
 

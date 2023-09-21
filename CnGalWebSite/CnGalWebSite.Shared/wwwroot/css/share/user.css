@@ -10,8 +10,14 @@
         border-radius: 50%;
     }
 
+    .user-info-card.small .image-card img {
+        width: 40px;
+        height: 40px;
+    }
+
     .user-info-card .image-card {
         display: flex;
+        align-items: center;
     }
 
     .user-info-card .content-card {

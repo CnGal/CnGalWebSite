@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IEventService _eventService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="@Class">
     <MRow>
         <MCol Cols="12" Md="6">
             <MTextField @bind-Value="Model.UserName" Label="用户名" />

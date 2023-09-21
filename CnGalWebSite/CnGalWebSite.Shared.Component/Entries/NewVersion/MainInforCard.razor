@@ -4,7 +4,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditMain/" + Model.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4" />
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@Model.Name" Thumbnail="Model.Type== EntryType.Role||Model.Type== EntryType.Staff" Image="@(Model.Type== EntryType.Role||Model.Type== EntryType.Staff?Model.Thumbnail:Model.MainPicture)"
-                                                                         BriefIntroduction="@Model.BriefIntroduction" Class="entry-card-default main-card">
+                                                                         BriefIntroduction="@Model.BriefIntroduction" Class="entry-card-default main-card" Small="ForceSmall">
     <ChildContent>
         @if (Model.Type == EntryType.Game)
         {

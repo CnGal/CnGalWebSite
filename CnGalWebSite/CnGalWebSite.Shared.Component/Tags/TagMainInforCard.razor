@@ -4,7 +4,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4 pt-4" />
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@Model.Name" Image="@Model.MainPicture"
-                                                                         BriefIntroduction="@Model.BriefIntroduction">
+                                                                         BriefIntroduction="@Model.BriefIntroduction" Small="ForceSmall">
     <ButtonContent>
         @if (HiddenButton == false)
         {
@@ -27,6 +27,8 @@
     public TagIndexViewModel Model { get; set; }
     [Parameter]
     public bool HiddenButton { get; set; }
+    [Parameter]
+    public bool ForceSmall { get; set; }
 
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }

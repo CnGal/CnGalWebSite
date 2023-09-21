@@ -11,22 +11,24 @@
     </style>
     <div class="largeimage-bg">
         <div class="largeimage-layout">
-            <a class="pe-3 largeimage-btn-close font-color" @onclick="OnClose"><i class="fa fa-close"></i></a>
             <div class="d-flex p-3 largeimage-layout-in">
-                <a class="largeimage-btn-left font-color" @onclick="OnMoveLeft"><i class="fa fa-chevron-left"></i></a>
                 <div class="ps-3 pe-3 largeimage-layout-img">
                     <a href="@Model.Pictures[Model.Index].Image" target="_blank" class="largeimage-a ">
                         <img class="largeimage-img" src="@Model.Pictures[Model.Index].Image" alt="@Model.Pictures[Model.Index].Note" />
                     </a>
                 </div>
-                <a class="largeimage-btn-left font-color" @onclick="OnMoveRight"><i class="fa fa-chevron-right"></i></a>
             </div>
             <p class="text-center m-0" style="line-break: anywhere; font-size: medium;color:white">@Model.Pictures[Model.Index].Note</p>
-
             <p class="text-center mb-0" style=" line-break: anywhere; font-size: x-large; font-weight: bold; color: white;">@((Model.Index+1).ToString()+" / "+Model.Pictures.Count.ToString())</p>
-
         </div>
-
+         <div class="largeimage-btn-close">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="关闭" Fab Icon="@IconType.Close.ToIconString()" OnClick="OnClose" />
+         </div>                <div class="largeimage-btn-left">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="上一张" Fab Icon="@IconType.Left.ToIconString()" OnClick="OnMoveLeft" />
+         </div>
+         <div class="largeimage-btn-right">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="下一张" Fab Icon="@IconType.Right.ToIconString()" OnClick="OnMoveRight" />
+         </div>
     </div>
 }
 
@@ -46,6 +48,11 @@
         base.OnInitialized();
 
         ImagesLargeViewService.Register(this, ViewLargeImages);
+    }
+
+    public void Blank()
+    {
+        
     }
 
     /// <summary>

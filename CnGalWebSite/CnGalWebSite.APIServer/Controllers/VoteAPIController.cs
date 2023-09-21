@@ -198,9 +198,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         PersonalSignature = item.PersonalSignature,
                         Ranks = await _rankService.GetUserRanks(item),
-                        UserId = item.Id,
-                        UserName = item.UserName,
-                        Image = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
+                        Id = item.Id,
+                        Name = item.UserName,
+                        PhotoPath = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
                         VotedTime = vote.VoteUsers.FirstOrDefault(s => s.ApplicationUserId == item.Id)?.VotedTime ?? DateTime.MinValue,
                     });
                 }

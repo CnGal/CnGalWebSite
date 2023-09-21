@@ -1,4 +1,13 @@
-﻿/*图片注释*/
+﻿.markdown-body {
+    white-space: break-spaces;
+    display: flex;
+    flex-direction: column;
+}
+
+.markdown-body pre {
+    overflow: initial !important;
+}
+/*图片注释*/
 .markdown-body img + strong {
     display: flex;
     justify-content: center;
@@ -43,6 +52,6 @@
         top: 0;
     }
 
-.markdown-body img{
-    max-width:100%;
+.markdown-body img {
+    max-width: 100%;
 }

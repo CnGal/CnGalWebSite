@@ -5,15 +5,17 @@
 @code {
     [Parameter]
     public ArticleInforTipViewModel Model { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
 
     public List<(IconType,string)> GetInfoItems()
     {
         var items= new List<(IconType, string)>
         {
             (IconType.DeterminedTime,Model.LastEditTime.ToString("yyyy-MM-dd")),
-            (IconType.DeterminedTime,Model.CommentCount.ToString()+"条评论"),
-            (IconType.DeterminedTime,Model.ReaderCount.ToString()+"次阅读"),
-            (IconType.DeterminedTime,Model.ThumbsUpCount.ToString()+"人点赞"),
+            (IconType.Comment,Model.CommentCount.ToString()+"条评论"),
+            (IconType.Read,Model.ReaderCount.ToString()+"次阅读"),
+            (IconType.ThumbsUp,Model.ThumbsUpCount.ToString()+"人点赞"),
         };
         if (string.IsNullOrWhiteSpace(Model.CreateUserName) == false)
         {

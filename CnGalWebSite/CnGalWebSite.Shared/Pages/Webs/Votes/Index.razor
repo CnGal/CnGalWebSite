@@ -9,11 +9,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture" />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 @if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
@@ -47,29 +47,26 @@ else
                 当前投票处于隐藏状态，如果你看到了这个提示，请立即联系管理员
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
+        <MDCard Outline>
+         <div>
+             <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
+         </div>
+         <AuthorizeView Roles="Admin">
+             <Authorized>
+                 <div class="ms-3 me-3 mt-3">
+                     <CnGalWebSite.Shared.Component.Votes.MainPage.ExtraButtonCard Model="Model" StateChanged="HiddenStateChanged" />
+                 </div>
+             </Authorized>
+         </AuthorizeView>
 
-        <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-            <div>
-                <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
-
-            </div>
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <div class="ms-3 me-3 mt-3">
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.ExtraButtonCard Model="Model" StateChanged="HiddenStateChanged" />
-                    </div>
-                </Authorized>
-            </AuthorizeView>
-            <div class="ms-3 me-3 mt-3">
+        </MDCard>
                 <CnGalWebSite.Shared.Component.Votes.MainPage.OptionsInforCard Model="Model" IsShowResult="Model.ShowResult" />
-            </div>
             @if (Model.ShowResult == false || Model.IsAllowModification)
             {
-                <div class="ms-3 me-3 mt-3">
+                <MDCard Class="mb-4">
                     <CnGalWebSite.Shared.Component.Votes.MainPage.VoteButtonCard Model="Model" OnVoted="OnVoted" OnReVoted="OnReVoted" />
-                </div>
+                </MDCard>
             }
-        </div>
         @if (Model.Users.Count != 0)
         {
             <CnGalWebSite.Shared.Component.Votes.MainPage.ListUserInforCard Model="Model" />

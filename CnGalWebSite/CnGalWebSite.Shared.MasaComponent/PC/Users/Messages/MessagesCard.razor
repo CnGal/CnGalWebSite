@@ -6,8 +6,8 @@
 <div class="row">
     @if (_dataCacheService.IsApp)
     {
-        <div class="col-12 mb-4">
-            <MTabs @bind-Value="selected" IconsAndText Grow Class="shadow-sm bg-opacity rounded" CenterActive>
+        <div class="col-12">
+            <MTabs @bind-Value="selected" IconsAndText Grow Class="mb-4" CenterActive>
 
              <MTab Value="0">
                  回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
