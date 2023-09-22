@@ -7,19 +7,16 @@
 @if (string.IsNullOrWhiteSpace(Model.PhotoPath) == false)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <a class="d-flex a-font-color" href="@("space/index/"+Model.Id)" style="align-items: center; flex-direction: column; ">
+        <a class="d-flex on-surface-text" href="@("space/index/"+Model.Id)" style="align-items: center; flex-direction: column; ">
             <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
             <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-                <span class="h6 fw-bold">@Model.Name</span>
-                <span>
-                    <i class="fa fa-diamond fa-fw"></i>
-                    <span>积分：@Model.Integral</span>
-                    <i class="fa fa-magic fa-fw ms-3"></i>
-                    <span>Lv @ToolHelper.GetUserLevel(Model.Integral)</span>
-                </span>
-            </div>
+                <span class="title-large mb-1">@Model.Name</span>
+                 <span class="label-large mb-1 text-center">@Model.PersonalSignature</span>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center />
+
+             </div>
         </a>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2"/>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
     <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/"))">
@@ -29,13 +26,13 @@
     @if (Admin == false)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
 
             <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
 
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                    <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
+                     <MButton Text Block Color="primary" OnClick="@(()=>OnClickUrl("/admin/index"))">
                         <MIcon Left>mdi-car-traction-control</MIcon>
                         管理员后台
                     </MButton>
@@ -67,8 +64,8 @@
                 退出登入
             </MButton>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
+     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 
         <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/birthday"))">

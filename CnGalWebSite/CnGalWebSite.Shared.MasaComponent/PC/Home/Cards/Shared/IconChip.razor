@@ -1,7 +1,5 @@
-﻿@inject IDataCacheService _dataCacheService
-
-
-<MChip Outlined="Outlined" Dark="!Outlined" XSmall="_dataCacheService.IsApp" Small="!_dataCacheService.IsApp" Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href">
+﻿
+<MChip Outlined="Outlined" Dark="!Outlined" Small Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href">
     @if (Icon != IconType.None)
     {
         <MIcon Left XSmall>@Icon.ToIconString() </MIcon>

@@ -3,7 +3,7 @@
 
 @if (string.IsNullOrWhiteSpace(Url))
 {
-    <span class="@(Class+" d-flex ma-1")" style=" align-items: center;">
+    <span class="@(Class+" d-flex label-large")" style="align-items: center;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString"/>
         @if (string.IsNullOrWhiteSpace(Title) == false)
         {
@@ -19,7 +19,7 @@
 else
 {
 
-    <span class="@(Class+" d-flex ma-1")" style=" word-break: break-all; align-items: center;">
+    <span class="@(Class+" d-flex label-large")" style="word-break: break-all; align-items: center;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString"/>
         <span style="word-break: keep-all;"> @Text</span>
         <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>

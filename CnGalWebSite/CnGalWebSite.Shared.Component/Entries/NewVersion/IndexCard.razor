@@ -68,15 +68,15 @@
                     <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4">
 
                          <MTab Value="1">
-                             首页<MIcon>mdi-home</MIcon>
+                             首页<MIcon>@IconType.Home.ToIconString()</MIcon>
                          </MTab>
                          <MTab Value="2">
-                             相关<MIcon>fa fa-link </MIcon>
+                             相关<MIcon>@IconType.Link.ToIconString()</MIcon>
                          </MTab>
                          @if (EntryView.Staffs.Count > 0)
                         {
                             <MTab Value="3">
-                                Staff<MIcon>fa fa-sitemap</MIcon>
+                            Staff<MIcon>@IconType.Staff.ToIconString()</MIcon>
                             </MTab>
                         }
 

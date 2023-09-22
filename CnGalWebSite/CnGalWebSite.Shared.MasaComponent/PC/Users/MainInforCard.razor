@@ -1,28 +1,18 @@
 ﻿@if (Small)
 {
-    <MDCard Class="mb-4">
-        <a href="@("/space/index/"+Model.Id)" style=" display: flex; flex-direction: row; align-items: center;" class="a-font-color" itemprop="url">
-            <img src="@Model.PhotoPath" alt="@Model.Name" style="width:50px;border-radius:50%;" itemprop="image" />
-            <div style="display: flex; flex-direction: column;" class="ms-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" ForceDisplayBadge NoLeftPandding />
-                <span style="font-size: large; font-weight: bold; " itemprop="name">
-                    @Model.Name
-                </span>
-            </div>
-        </a>
-     </MDCard>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model" Class="mb-4" />
 }
 else
 {
     <MDCard Class="mb-4">
-        <a  href="@("/space/index/"+Model.Id)"  class="a-font-color">
+        <a href="@("/space/index/"+Model.Id)" class="a-font-color">
             <img src="@Model.BackgroundImage" alt="@Model.Name" class="w-100">
             <div style="display: flex; margin-top: -40px; justify-content: center;">
                 <img src="@Model.PhotoPath" style="width:80px; border-radius: 50%;" alt="@Model.Name">
             </div>
         </a>
         <div class="pa-3 pt-2" style=" display: flex; flex-direction: column; align-items: center;">
-            @if(Main)
+            @if (Main)
             {
                 <h1 class=" text-center fw-bold mb-1" style=" word-break: break-all;">@Model.Name</h1>
             }
@@ -32,9 +22,9 @@ else
             }
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center />
 
-            <span class="text-center mt-1">@Model.PersonalSignature</span>
-        </div>
-    </MDCard>
+             <span class="text-center mt-1">@Model.PersonalSignature</span>
+         </div>
+     </MDCard>
 }
 
 

@@ -140,7 +140,25 @@ html {
 .markdown-body blockquote {
     color: var(--md-sys-color-secondary) !important;
     border-left: .25em solid var(--md-sys-color-secondary) !important;
+    display: flex;
+    flex-direction: column;
 }
+
+.markdown-body hr {
+    height: .1em !important;
+    background-color: var(--md-sys-color-primary) !important;
+}
+
+.markdown-body li > p {
+    margin-top: 0 !important;
+    margin-bottom: 0;
+}
+
+.markdown-body ol, .markdown-body ul {
+    display: flex;
+    flex-direction: column;
+}
+
 /*输入框*/
 .m-text-field input {
     line-height: unset;
@@ -235,4 +253,74 @@ html {
 
 .theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
     background-color: var(--md-sys-color-surface-1);
+}
+/*页脚*/
+.theme--light.m-footer {
+    background-color: var(--md-sys-color-background) !important;
+}
+
+    .theme--light.m-footer > div {
+        background-color: var(--md-sys-color-surface-1);
+    }
+/*底部导航栏激活样式*/
+.nav-bottom-tab-active {
+    color: var(--md-sys-color-primary) !important;
+}
+
+.theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
+    color: inherit !important;
+}
+
+.theme--light.m-bottom-navigation {
+    color: inherit;
+}
+/*icon按钮*/
+.theme--light.m-btn.m-btn--icon {
+    color: inherit;
+}
+
+.theme--light.m-btn {
+    color: inherit;
+}
+/*侧边导航栏*/
+.theme--light.m-navigation-drawer, .theme--light.m-tabs > .m-tabs-bar {
+    background-color: var(--md-sys-color-background);
+}
+
+    .theme--light.m-navigation-drawer .m-navigation-drawer__content {
+        background-color: var(--md-sys-color-surface-1);
+    }
+
+/*溢出的tab栏*/
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__wrapper {
+    background-color: var(--md-sys-color-surface-1);
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__content {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.cngal-main-tab-card .m-toolbar__content, .m-tabs {
+    background-color: transparent;
+}
+/*扩展卡片*/
+.theme--light.m-expansion-panels .m-expansion-panel {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+}
+
+.m-expansion-panels:not(.m-expansion-panels--accordion):not(.m-expansion-panels--tile) > .m-expansion-panel--active {
+    border-radius: var(--md-card-border-radius);
+}
+
+.m-expansion-panels {
+    border-radius: var(--md-card-border-radius);
+    padding-bottom: 1rem;
+}
+/*树状列表*/
+.theme--light.m-treeview {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+    border-radius: 24px;
 }

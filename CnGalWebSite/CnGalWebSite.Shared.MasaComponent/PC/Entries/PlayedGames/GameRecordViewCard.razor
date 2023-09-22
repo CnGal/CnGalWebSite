@@ -4,22 +4,18 @@
 {
     @if (Type == PlayedGamesDisplayType.LargeCard)
     {
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
             <MDCard Class="h-100" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
                 <div class="">
                     <div class="">
                         <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName" crossOrigin="anonymous">
                     </div>
                     <div class="pa-3">
-                        <header class="text-truncate-2 mb-2">
-                            <h5 class="fw-bold" style=" display: inline;">@Model.GameName</h5>
-                        </header>
+                        <div class="text-truncate-2 mb-2 title-large">@Model.GameName</div>
                         <div>
                             <GameRecordTagCard Model="Model" />
                         </div>
-                        <div class="text-truncate-4">
-                            @Model.GameBriefIntroduction
-                        </div>
+                        <div class="text-truncate-4  label-large"> @Model.GameBriefIntroduction</div>
                     </div>
                 </div>
             </MDCard>
@@ -31,10 +27,10 @@
         @if (_dataCacheService.IsApp)
         {
 
-            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4">
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2  mb-4">
                 <MDCard Class="h-100" Style="cursor: pointer " OnClick="OnClick" ShowHoverStyle="true">
                     <div>
-                        <img loading="lazy" src="@Model.GameImage" class="card-img-top" crossOrigin="anonymous" style="word-break: break-all;" alt="@Model.GameName" />
+                        <img loading="lazy" src="@Model.GameImage" class="card-img-top" crossOrigin="anonymous" style="width: 100%;" alt="@Model.GameName" />
                     </div>
                     <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
                         <span style="font-size: 15px;" class="home-card-name-text">@Model.GameName</span>
@@ -47,7 +43,7 @@
         }
         else
         {
-            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4">
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2  mb-4">
                 <MDCard Class="h-100" OnClick="OnClick" ShowHoverStyle="true">
                     <img loading="lazy" src="@Model.GameImage" class="card-img-top" alt="@Model.GameName" crossOrigin="anonymous" />
                     <div class="pa-2 pb-1">
@@ -79,9 +75,7 @@
                             <div>
                                 <GameRecordTagCard Model="Model" />
                             </div>
-                            <span class="text-truncate-2">
-                                @Model.GameBriefIntroduction
-                            </span>
+                            <span class="text-truncate-2  label-large">@Model.GameBriefIntroduction</span>
                         </div>
                     </div>
                 </MDCard>
@@ -100,15 +94,11 @@
                             <img loading="lazy" style=" width: 285px; " src="@Model.GameImage" crossOrigin="anonymous">
                         </div>
                         <div class="pa-3" style=" width: 100%;">
-                            <header class="text-truncate-1">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.GameName</h5>
-                            </header>
+                            <div class="text-truncate-1 mb-2 title-large">@Model.GameName</div>
                             <div class="mt-2">
                                 <GameRecordTagCard Model="Model" />
                             </div>
-                            <span class="text-truncate-2">
-                                @Model.GameBriefIntroduction
-                            </span>
+                            <span class="text-truncate-2 label-large">@Model.GameBriefIntroduction</span>
 
                         </div>
                     </div>
@@ -120,7 +110,7 @@
 }
 else
 {
-    <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
+    <div class="col-6 col-md-6 col-lg-4 col-xl-3 mb-3">
         <MDCard Class=" h-100" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
                 <div style="display: flex;">
                     <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName">

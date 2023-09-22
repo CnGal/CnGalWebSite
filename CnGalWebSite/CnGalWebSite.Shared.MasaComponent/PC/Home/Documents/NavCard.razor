@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<div class="rounded shadow-sm bg-opacity">
+<MDCard Outline>
     <MTreeview @bind-Open="@initiallyOpen"
                Active="new List<long> { Id}"
                Items="Items"
@@ -24,7 +24,7 @@
             }
         </PrependContent>
     </MTreeview>
-</div>
+</MDCard>
 
 @code {
     [Parameter]

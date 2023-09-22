@@ -1,0 +1,77 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IEventService _eventService
+
+<MTimeline Dense="_dataCacheService.IsApp||Model.Count()<3" Class="ms-2 me-2">
+    @foreach (var item in Model)
+    {
+        <MTimelineItem Large>
+         <IconContent>
+             <MAvatar Class="pointer" @onclick="@(()=>OnClickImage(item))" Color="white">
+                 <img src="@item.Image" alt="@item.GroupName" />
+             </MAvatar>
+         </IconContent>
+         <OppositeContent>
+             <span>@item.HappenedTime.ToString("yyyy-MM-dd HH:mm")</span>
+         </OppositeContent>
+         <ChildContent>
+             <MCard Class="elevation-2" @onclick="@(()=>ViewAt(item))">
+                 <MCardTitle Class="fw-bold">
+                     @item.Title
+                 </MCardTitle>
+                 <MCardText Style=" white-space: break-spaces;">
+                     @item.BriefIntroduction
+                 </MCardText>
+             </MCard>
+         </ChildContent>
+     </MTimelineItem>
+    }
+</MTimeline>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
+@code {
+    [Parameter]
+    public IEnumerable<NewsModel> Model { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public EventCallback OnCloseed { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
+    public async Task OnClickImage(NewsModel item)
+    {
+        if (item.GroupId != 0 && item.GroupId != Id)
+        {
+            NavigationManager.NavigateTo("/entries/index/" + item.GroupId);
+        }
+        else if (string.IsNullOrWhiteSpace(item.UserId) == false)
+        {
+            NavigationManager.NavigateTo("/space/index/" + item.UserId);
+        }
+        await OnCloseed.InvokeAsync();
+    }
+
+    public async void ViewAt(NewsModel item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Title))
+        {
+            return;
+        }
+        if (item.Link.Contains("cngal.org"))
+        {
+            NavigationManager.NavigateTo(item.Link);
+        }
+        else
+        {
+            if (trackEven != null)
+            {
+                await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.Title);
+            }
+
+            await _eventService.OpenNewPage(item.Link);
+
+        }
+    }
+}

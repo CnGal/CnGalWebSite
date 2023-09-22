@@ -3,42 +3,50 @@
 @inject IHttpService _httpService
 @inject IEventService _eventService
 
-<section class="birthday-card">
-    <h2>角色生日</h2>
-    @if (Model == null || Model.Any() == false)
-    {
-        <MDCard Class="default item" Href="/birthday">
-            <div class="head">🎂</div>
-            <div class="content">
-                <div>好像今天没人过生日欸</div>
-                <div>前往 <strong>生日日历</strong> 提前准备吧</div>
+@if (_dataCacheService.IsApp && (Model == null || Model.Any() == false))
+{
+
+}
+else
+{
+    <section class="birthday-card">
+        <h2>角色生日</h2>
+        @if (Model == null || Model.Any() == false)
+        {
+            <MDCard Class="default item" Href="/birthday">
+                <div class="head">🎂</div>
+                <div class="content">
+                    <div>好像今天没人过生日欸</div>
+                    <div>前往 <strong>生日日历</strong> 提前准备吧</div>
+                </div>
+            </MDCard>
+        }
+        else
+        {
+            <div class="group">
+                @foreach (var item in Model)
+                {
+                    <MDCard Class="item" Href="@($"/entries/index/{item.Id}")">
+                        <img src="@item.MainImage" alt="@item.Name" loading="lazy" />
+                        <div class="content">
+                            <div class="head">
+                                <div class="name text-truncate-1  title-large"> @item.Name </div>
+                                @if (string.IsNullOrWhiteSpace(item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
+                                {
+                                    <div class="debut-game text-truncate-1"> @($"《{item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》") </div>
+                                }
+                            </div>
+                            <div class="brief text-truncate-2 label-large">
+                                @item.BriefIntroduction
+                            </div>
+                        </div>
+                    </MDCard>
+                }
             </div>
-</MDCard>
-    }
-    else
-    {
-        <div class="group">
-            @foreach (var item in Model)
-            {
-                <MDCard Class="item" Href="@($"/entries/index/{item.Id}")">
-                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" />
-                    <div class="content">
-                        <div class="head">
-                            <div class="name text-truncate-1  title-large"> @item.Name </div>
-                            @if (string.IsNullOrWhiteSpace(item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
-                            {
-                                <div class="debut-game text-truncate-1"> @($"《{item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》") </div>
-                            }
-                        </div>
-                        <div class="brief text-truncate-2 label-large">
-                            @item.BriefIntroduction
-                        </div>
-                    </div>
-</MDCard>
-            }
-        </div>
-    }
-</section>
+        }
+    </section>
+}
+
 
 
 @code {

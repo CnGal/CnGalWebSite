@@ -3,16 +3,16 @@
 @inject NavigationManager NavigationManager
 
 
-<MDCard Class="@($"pa-4 {(Deepth==0?"":"elevation-2")}")">
+<MDCard Class="@($"pa-4 mb-3 {(Deepth==0?"":"elevation-2")}")">
     <div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Outline/>
-        <div class="mt-2">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Outline Class="mb-2"/>
+        <div class="mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)" />
         </div>
 
         <AuthorizeView>
             <Authorized>
-                <div class="mt-2" style=" display: flex; justify-content: flex-end; ">
+                <div style=" display: flex; justify-content: flex-end; ">
                     @if (IsReplying)
                     {
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" Icon="@IconType.Close.ToIconString()" Rounded />
@@ -34,14 +34,14 @@
 </MDCard>
     @if (IsReplying)
     {
-        <div class="@($"mt-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
-            <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
+        <div class="@($"mb-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
+            <ReplyCommentTip ObjectId="@ObjectId" IsChild="true" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
 
         </div>
     }
     @foreach (var item in Model.InverseParentCodeNavigation)
     {
-        <div class="@($"mt-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
+        <div class="@($"mb-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
             <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
                             Deepth="Deepth+1" ParentCommentModel="@Model" CanDeleted="@CanDeleted"></CommentPartTip>
             </div>
@@ -76,7 +76,7 @@
 
     private string StringMarked { get; set; }
 
-    public string ReplyTip { get { return Deepth > MaxDeepth ? $"回复<a href=\"/space/index/{ParentCommentModel.UserInfor.Id}\">@{ParentCommentModel.UserInfor.Name}</a>\n" : ""; } }
+    public string ReplyTip { get { return Deepth > MaxDeepth ? $"<p>回复<a href=\"/space/index/{ParentCommentModel.UserInfor.Id}\">@{ParentCommentModel.UserInfor.Name}</a></p>\n" : ""; } }
 
 
     [CascadingParameter]

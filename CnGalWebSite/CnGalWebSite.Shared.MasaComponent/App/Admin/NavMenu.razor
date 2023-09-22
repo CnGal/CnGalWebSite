@@ -3,25 +3,26 @@
 @inject IDataCacheService _dataCacheService
 
 
-<MNavigationDrawer  @bind-Value="Drawer"  App Temporary>
-    <MList Nav Class="mt-4"
-           Dense>
-        <AuthorizeView>
-            <Authorized>
-                <CnGalWebSite.Shared.MasaComponent.App.Layout.UserButton OnClosed="OnClose" OnRefresh="OnRefresh" Admin/>
-            </Authorized>
-            <NotAuthorized>
-                <CnGalWebSite.Shared.MasaComponent.App.Layout.LoginButton />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block  Left OnClick="OnRefresh">
-                    <MIcon Left>mdi-home</MIcon>
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
+    <MDCard Outline Class="pa-4">
+         <AuthorizeView>
+             <Authorized>
+                 <CnGalWebSite.Shared.MasaComponent.App.Layout.UserButton OnClosed="OnClose" OnRefresh="OnRefresh" Admin />
+                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
+
+                 <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu Style="background-color: transparent;" />
+
+             </Authorized>
+             <NotAuthorized>
+                 <CnGalWebSite.Shared.MasaComponent.App.Layout.LoginButton />
+                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
+                 <MButton Text Block Left OnClick="OnRefresh">
+                     <MIcon Left>mdi-home</MIcon>
                     主页
                 </MButton>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
             </NotAuthorized>
         </AuthorizeView>
-    </MList>
-    <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu />
+    </MDCard>
 </MNavigationDrawer>
 
 @code {
@@ -36,21 +37,21 @@
     {
         Drawer = drawer;
         StateHasChanged();
-        
+
     }
     private void OnClickUrl(string url)
     {
         NavigationManager.NavigateTo(url);
         Drawer = false;
         StateHasChanged();
-        
+
     }
 
     private void OnClose()
     {
         Drawer = false;
         StateHasChanged();
-        
+
     }
 
 

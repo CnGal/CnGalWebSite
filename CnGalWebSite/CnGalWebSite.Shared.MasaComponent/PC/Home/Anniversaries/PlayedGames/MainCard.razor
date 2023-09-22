@@ -2,12 +2,6 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
-<style>
-    .markdown-body img {
-        max-width: 50%;
-    }
-</style>
-<IntroductionCard />
 @if (OverviewModel != null)
 {
     <div class="row">
@@ -23,31 +17,29 @@
             @if (Model != null)
             {
                 <div id="game-library-card">
-
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary TotalCount="OverviewModel.Count" UserInfoModel="Model" />
-
-                </div>
+                 </div>
             }
         </Authorized>
         <NotAuthorized>
-            <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+            <MDCard Style="display: flex; justify-content: center;" Class="pa-3 mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
-            </div>
+            </MDCard>
         </NotAuthorized>
     </AuthorizeView>
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill Class="mb-4"/>
 }
 
 
 @if (isReady)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-    晒出的你的游戏库吧
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4" Color="tertiary">
+        晒出的你的游戏库吧
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc />
 }
 
 @code {
@@ -101,10 +93,10 @@ else
     protected void OnLogin()
     {
         InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
+            {
+                Interaction = InteractionType.SignIn,
+                ReturnUrl = NavigationManager.Uri,
+            };
 
 
         if (ToolHelper.IsSSR)

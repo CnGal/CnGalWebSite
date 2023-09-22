@@ -6,9 +6,8 @@
 }
 else
 {
-
-    <section id="@SectionId">
-        <MDCard Outline="OutlineHead" Class="@($"title-container-card {Class} {(IsCollapsed ? " mb-3" : "")}")">
+    <section id="@SectionId" class="@($"{Class}")">
+        <MDCard Outline="OutlineHead" Class="@($"title-container-card h-100 {(IsCollapsed ? " mb-3" : "")}")">
             <div class="title-card pa-3">
                 <h2 class="@($"{ButtonColor}-text title-{(Small?"medium":"large")}")">
                     <MIcon Color="@ButtonColor" Class="me-4" Small="Small">@Icon</MIcon>

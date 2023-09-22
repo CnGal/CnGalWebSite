@@ -105,3 +105,14 @@
             padding: .7rem;
             padding-top: 0;
         }
+/*折扣页面*/
+.discount-screen-card .title-card {
+    display: flex;
+    justify-content: space-between;
+}
+
+.discount-screen-card .input-card {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}

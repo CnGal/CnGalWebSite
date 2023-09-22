@@ -2,8 +2,8 @@
 .md-card {
     display: flex;
     border-radius: var( --md-card-border-radius);
-    transition: .3s;
-    white-space: normal;
+    /*     transition: .3s;
+ */ white-space: normal;
     flex-direction: column;
 }
     /*primary颜色*/
@@ -44,7 +44,7 @@
     }
 
     .md-card img, .md-card .image {
-        transition: .3s;
+        /* transition: .3s; */
         border-radius: var( --md-card-border-radius);
         height: min-content;
     }
@@ -164,7 +164,12 @@
     }
 
     .md-main-info-card.role .image-card img {
-        height: 150px;
+        height: 100px;
+        margin: .5rem;
+    }
+
+    .md-main-info-card .content-card {
+        padding: .5rem;
     }
 
     .md-main-info-card.game .image-card img {
@@ -308,4 +313,54 @@
 /*颜色选择器*/
 .color-selector-card {
     background-color: transparent !important;
+}
+/*日历*/
+.masa-calendar-card .title-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.masa-calendar-card .button-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.masa-calendar-card .week-card {
+    border-top: thin solid var(--md-sys-color-surface-1);
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+    min-height: 40px;
+}
+
+    .masa-calendar-card .week-card div {
+        width: 14.28%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.masa-calendar-card .month-card {
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+}
+
+.masa-calendar-card .day-card {
+    display: flex;
+    border-right: thin solid var(--md-sys-color-surface-1);
+    width: 14.28%;
+}
+
+    .masa-calendar-card .day-card.first {
+        border-left: thin solid var(--md-sys-color-surface-1);
+    }
+
+    .masa-calendar-card .day-card.active {
+        background-color: var(--md-sys-color-surface-1);
+    }
+/*图片列表查看*/
+.image-slide-group-card .m-slide-group__content {
+    justify-content: center;
 }

@@ -25,7 +25,7 @@
     <div class="d-flex align-center justify-center">
         @if (isReady)
         {
-            <MECharts Option="Model" InitOptions="@(opt => opt.Locale = "zh")" Width="@("100%")" Height="@(_dataCacheService.IsApp?(ShowScrollBar?"900px":"850px"):(ShowScrollBar?"250px":"200px"))" @ref="echarts">
+        <MECharts Option="Model" InitOptions="@(opt => opt.Locale = "zh")" Width="@("100%")" Height="@(_dataCacheService.IsApp?(ShowScrollBar?"900px":"850px"):(ShowScrollBar?"250px":"200px"))" @ref="echarts" Dark="_dataCacheService.ThemeSetting.IsDark">
             </MECharts>
         }
     </div>

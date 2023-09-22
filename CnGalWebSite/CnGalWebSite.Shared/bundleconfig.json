@@ -30,7 +30,8 @@
       "wwwroot/css/share/user.css",
       "wwwroot/css/share/comment.css",
       "wwwroot/css/share/periphery.css",
-      "wwwroot/css/share/edit-record.css"
+      "wwwroot/css/share/edit-record.css",
+      "wwwroot/css/share/article.css"
     ]
   },
   {
@@ -60,7 +61,10 @@
     "outputFileName": "wwwroot/css/app/bundle-app.css",
     "inputFiles": [
       "wwwroot/css/app/anniversary.css",
-      "wwwroot/css/app/home.css"
+      "wwwroot/css/app/home.css",
+      "wwwroot/css/app/common-app.css",
+      "wwwroot/css/app/entry.css",
+      "wwwroot/css/app/article.css"
     ]
   }
 ]

@@ -4,15 +4,20 @@
 
 @inject IDataCacheService _dataCacheService
 
+    <div itemscope itemtype="https://schema.org/WebSite" style="display:none;">
+        <meta itemprop="url" content="https://ww.cngal.com/" />
+        <form itemprop="potentialAction" itemscope itemtype="https://schema.org/SearchAction">
+            <meta itemprop="target" content="https://ww.cngal.com/search?Text={search_term_string}" />
+            <input itemprop="query-input" type="text" name="search_term_string" required />
+            <input type="submit" />
+        </form>
+    </div>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Home.Index/>
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Home.Index />
-}
-
-
-
+    @if (_dataCacheService.IsApp == true)
+    {
+        <CnGalWebSite.Shared.Pages.Apps.Home.Index />
+    }
+    else
+    {
+        <CnGalWebSite.Shared.Pages.Webs.Home.Index />
+    }

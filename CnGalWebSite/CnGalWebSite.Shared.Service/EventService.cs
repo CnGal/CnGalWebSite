@@ -15,7 +15,7 @@ namespace CnGalWebSite.Shared.Service
     {
         public event Action SavaTheme;
         public event Action CleanTempEffectTheme;
-        public event Action TempEffectTheme;
+        public event Action<bool?, bool?, bool?,string> TempEffectTheme;
         public event Action ToggleMiniMode;
         public event Action<string> ChangeTitle;
 
@@ -56,9 +56,9 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 临时设置主题
         /// </summary>
-        public void OnTempEffectTheme()
+        public void OnTempEffectTheme(bool? isDark, bool? isFullScreen, bool? isTransparent, string themeColor)
         {
-            TempEffectTheme?.Invoke();
+            TempEffectTheme?.Invoke(isDark,isFullScreen, isTransparent, themeColor);
         }
 
         public async Task OpenNewPage(string url)

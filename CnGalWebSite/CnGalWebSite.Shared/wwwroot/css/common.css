@@ -184,7 +184,7 @@ body {
 }
 
 .outline-button-null-url {
-    transition: all .6s ease;
+    /* transition: all .6s ease; */
     word-break: keep-all;
     margin-top: 0px;
     height: 25px;
@@ -195,7 +195,7 @@ body {
 }
 
 .outline-button-normal {
-    transition: all .6s ease;
+    /* transition: all .6s ease; */
     word-break: keep-all;
     margin-top: 0px;
     height: 25px;

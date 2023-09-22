@@ -117,7 +117,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var now = DateTime.Now.ToCstTime();
 
-            if (_overviewModel!=null&&(now - _overviewModelUpdateTime).TotalMinutes<10)
+            if (_overviewModel!=null&&(now - _overviewModelUpdateTime).TotalMinutes<60)
             {
                 return _overviewModel;
             }

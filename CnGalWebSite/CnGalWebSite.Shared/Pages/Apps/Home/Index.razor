@@ -6,33 +6,45 @@
 @inject IMauiService _mauiService
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
 
-<div itemscope itemtype="https://schema.org/WebSite" style="display:none;">
-    <meta itemprop="url" content="https://m.cngal.com/" />
-    <form itemprop="potentialAction" itemscope itemtype="https://schema.org/SearchAction">
-        <meta itemprop="target" content="https://m.cngal.com/search?Text={search_term_string}" />
-        <input itemprop="query-input" type="text" name="search_term_string" required />
-        <input type="submit" />
-    </form>
-</div>
 
-<style>
-    .font-color {
-        color: var(--md-sys-color-primary) !important;
-    }
-</style>
+
 <MTabsItems Value="_dataCacheService.HomeTabIndex"Class="pb-12">
     <MTabItem Value="0">
-        <div style=" padding: .1rem;">
-            <CnGalWebSite.Shared.Pages.Webs.Home.Index Lock="_dataCacheService.HomeTabIndex!=0" />
+        <div id="home-page">
+            
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CarouselsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.ButtonGroupCard/>
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecommendsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.PublishedGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.UpcomingGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.NewsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.WeeklyNewsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
+
         </div>
     </MTabItem>
     <MTabItem Value="1">
-        <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries />
+        <div id="home-page">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
+
+        </div>
+
     </MTabItem>
     <MTabItem Value="2">
-        <div style=" padding: .1rem;">
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.HomeCard />
+        <div id="home-page">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
         </div>
+
     </MTabItem>
     <MTabItem Value="3">
         <AuthorizeView>
@@ -41,7 +53,7 @@
             </Authorized>
             <NotAuthorized>
                 <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin" />
                 </div>
             </NotAuthorized>
         </AuthorizeView>
@@ -50,26 +62,21 @@
 
 <MFooter Fixed Padless>
     <MBottomNavigation Value="_dataCacheService.HomeTabIndex"  ValueChanged="ValueChanged" Shift Grow>
-        <MButton ActiveClass="font-color" Value="0">
+        <MButton ActiveClass="nav-bottom-tab-active" Value="0">
             <span>主页</span>
-
-            <MIcon>mdi-home-outline </MIcon>
+            <MIcon>@IconType.Home.ToIconString()</MIcon>
         </MButton>
-        <MButton ActiveClass="font-color" Value="1">
-            <span>周年庆</span>
-
-            <MIcon>mdi-cake</MIcon>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="1">
+            <span>探索</span>
+            <MIcon>@IconType.Explore.ToIconString()</MIcon>
         </MButton>
-
-        <MButton ActiveClass="font-color" Value="2">
-            <span>专题</span>
-
-            <MIcon>mdi-align-vertical-top </MIcon>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+            <span>广场</span>
+            <MIcon>@IconType.Shape.ToIconString()</MIcon>
         </MButton>
-        <MButton ActiveClass="font-color" Value="3">
+        <MButton ActiveClass="nav-bottom-tab-active" Value="3">
             <span>空间</span>
-
-            <MIcon>mdi-account-outline</MIcon>
+            <MIcon>@IconType.User.ToIconString()</MIcon>
         </MButton>
     </MBottomNavigation>
 </MFooter>
@@ -80,7 +87,7 @@
     public ErrorHandler ErrorHandler { get; set; }
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
 
     {
         if (firstRender)
@@ -111,6 +118,6 @@
     }
     public void ValueChanged(StringNumber value)
     {
-        _dataCacheService.NewsSummaryCache.TabIndex = value.ToInt32();
+        _dataCacheService.HomeTabIndex = value.ToInt32();
     }
 }

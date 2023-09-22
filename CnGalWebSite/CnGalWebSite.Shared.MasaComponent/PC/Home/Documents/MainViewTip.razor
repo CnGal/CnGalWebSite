@@ -20,15 +20,15 @@ else
     <div>
         @if (isReady == false)
         {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Outline />
 
         }
         else
         {
 
-            <div class="@(Outline?"":"rounded shadow-sm bg-opacity mb-4 pb-4")">
+        <MDCard Outline="Outline" Class="@(Outline?"":"mb-4 pa-4")">
                 <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model"  HiddenImage HiddenTitle="HiddenTitle" Outline="Outline" HiddenCatalog/>
-            </div>
+            </MDCard>
 
         }
     </div>

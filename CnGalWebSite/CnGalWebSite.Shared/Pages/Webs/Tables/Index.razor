@@ -4,74 +4,72 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="资料站数据汇总"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="资料站数据汇总" />
 
-<div class="">
-    <div class="  rounded shadow-sm  bg-opacity pt-4 pb-3 mb-3">
+<MDCard Class="pa-4 mb-4">
+    <h1 class="title-large text-center mb-2">CnGal资料站数据汇总</h1>
+    <div class="d-flex" style="justify-content: center;flex-wrap: wrap;">
         <div>
-            <h2 class="h4 font-color fw-bold text-center">CnGal资料站数据汇总</h2>
-            <div class="d-flex" style="color: gray; justify-content: center;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Entry" Color="grey" />
-                <span class="me-4">@(Model.EntriesCount + "个词条")</span>
-
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Article" Color="grey" />
-                <span class="me-4">@(Model.ArticlesCount + "篇文章")</span>
-
-                <br class="d-flex d-md-none " />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" Color="grey" />
-                <span>@(Model.LastEditTime?.ToString("yyyy-MM-dd HH:mm"))</span>
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Entry" />
+            <span class="me-4">@(Model.EntriesCount + "个词条")</span>
+        </div>
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Article" />
+            <span class="me-4">@(Model.ArticlesCount + "篇文章")</span>
+        </div>
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
+            <span>@(Model.LastEditTime?.ToString("yyyy-MM-dd HH:mm"))</span>
         </div>
     </div>
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
+</MDCard>
+<MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
-            <MTab Value="1">
-                游戏<MIcon>mdi-gamepad-square</MIcon>
-            </MTab>
-            <MTab Value="2">
-                制作组<MIcon>mdi-account-multiple </MIcon>
-            </MTab>
-            <MTab Value="3">
-                STAFF<MIcon>mdi-magic-staff</MIcon>
-            </MTab>
-            <MTab Value="4">
-                制作人<MIcon>mdi-coffee-maker-outline</MIcon>
-            </MTab>
-            <MTab Value="5">
-                角色<MIcon>mdi-clover </MIcon>
-            </MTab>
-            <MTab Value="6">
-                游戏价格<MIcon>mdi-currency-usd </MIcon>
-            </MTab>
-            <MTab Value="7">
-                游戏评分<MIcon>mdi-star</MIcon>
-            </MTab>
-        </MTabs>
-    <MTabsItems @bind-Value="TabIndex">
-        <MTabItem Value="1">
-                <CnGalWebSite.Shared.Component.Tables.GamesTableViewTip />
-
-        </MTabItem>
-        <MTabItem Value="2">
-                <CnGalWebSite.Shared.Component.Tables.GroupsTableViewTip />
-        </MTabItem>
-        <MTabItem Value="3">
-                <CnGalWebSite.Shared.Component.Tables.StaffsTableViewTip />
-        </MTabItem>
-        <MTabItem Value="4">
-                <CnGalWebSite.Shared.Component.Tables.MakersTableViewTip />
-        </MTabItem>
-        <MTabItem Value="5">
-                <CnGalWebSite.Shared.Component.Tables.RolesTableViewTip />
-        </MTabItem>
-        <MTabItem Value="6">
-                <CnGalWebSite.Shared.Component.Tables.SteamsTableViewTip />
-        </MTabItem>
-        <MTabItem Value="7">
-                <CnGalWebSite.Shared.MasaComponent.PC.Tables.ScoresTable />
-        </MTabItem>
-    </MTabsItems>
-</div>
+    <MTab Value="1">
+        游戏<MIcon>mdi-gamepad-square</MIcon>
+    </MTab>
+    <MTab Value="2">
+        制作组<MIcon>mdi-account-multiple </MIcon>
+    </MTab>
+    <MTab Value="3">
+        STAFF<MIcon>mdi-magic-staff</MIcon>
+    </MTab>
+    <MTab Value="4">
+        制作人<MIcon>mdi-coffee-maker-outline</MIcon>
+    </MTab>
+    <MTab Value="5">
+        角色<MIcon>mdi-clover </MIcon>
+    </MTab>
+    <MTab Value="6">
+        游戏价格<MIcon>mdi-currency-usd </MIcon>
+    </MTab>
+    <MTab Value="7">
+        游戏评分<MIcon>mdi-star</MIcon>
+    </MTab>
+</MTabs>
+<MTabsItems @bind-Value="TabIndex">
+    <MTabItem Value="1">
+        <CnGalWebSite.Shared.Component.Tables.GamesTableViewTip />
+    </MTabItem>
+    <MTabItem Value="2">
+        <CnGalWebSite.Shared.Component.Tables.GroupsTableViewTip />
+    </MTabItem>
+    <MTabItem Value="3">
+        <CnGalWebSite.Shared.Component.Tables.StaffsTableViewTip />
+    </MTabItem>
+    <MTabItem Value="4">
+        <CnGalWebSite.Shared.Component.Tables.MakersTableViewTip />
+    </MTabItem>
+    <MTabItem Value="5">
+        <CnGalWebSite.Shared.Component.Tables.RolesTableViewTip />
+    </MTabItem>
+    <MTabItem Value="6">
+        <CnGalWebSite.Shared.Component.Tables.SteamsTableViewTip />
+    </MTabItem>
+    <MTabItem Value="7">
+        <CnGalWebSite.Shared.MasaComponent.PC.Tables.ScoresTable />
+    </MTabItem>
+</MTabsItems>
 @code {
     private StringNumber TabIndex { get; set; } = 1;
 

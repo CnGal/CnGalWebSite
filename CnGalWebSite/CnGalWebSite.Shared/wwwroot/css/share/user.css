@@ -5,8 +5,8 @@
 }
 
     .user-info-card .image-card img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
     }
 
@@ -25,6 +25,10 @@
         flex-direction: column;
         justify-content: space-evenly;
     }
+
+        .user-info-card .content-card .name {
+            word-break: keep-all;
+        }
 
 a.user-info-card {
     color: var(--md-sys-color-on-background) !important;

@@ -178,7 +178,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Search,
         Save,
         Key,
-        Lock
+        Lock,
+        Explore,
+        Shape,
+        Setting,
+        Calendar,
+        About,
+        Certification
     }
 
     public static class IconTypeHelper
@@ -187,6 +193,18 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Certification:
+                    return "mdi-check-decagram";
+                case IconType.About:
+                    return "mdi-information";
+                case IconType.Setting:
+                    return "mdi-cog";
+                case IconType.Calendar:
+                    return "mdi-calendar-month";
+                case IconType.Shape:
+                    return "mdi-shape";
+                case IconType.Explore:
+                    return "mdi-compass";
                 case IconType.Lock:
                     return "mdi-lock";
                 case IconType.Key:

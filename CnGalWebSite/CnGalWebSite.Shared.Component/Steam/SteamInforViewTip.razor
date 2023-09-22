@@ -2,23 +2,22 @@
 
 
 
-<a href="@("/entries/index/" + Model.Id)" class="a-font-color">
+<MDCard Href="@("/entries/index/" + Model.Id)" Class="on-surface-text h-100">
     @if (Type == SteamDisplayType.LargeCard)
     {
-        <div class="div-shadow rounded  bg-opacity h-100">
             <div class="h-100" style="display: flex; flex-direction: column;">
                 <img class="w-100" src="@Model.MainImage" alt="@Model.Name">
-                <div class="p-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="pa-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; width: 100%;">
                         <div style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                             <header class="mb-2" style=" display: flex; align-items: center;">
                                 @if (Purchased)
                                 {
-                                    <div class="article-home-tag ">已入库</div>
+                                    <div class="type-inline-chip">已入库</div>
                                 }
-                                <h3 class="fw-bold h5 mb-0">@Model.Name</h3>
+                                <div class="title-large">@Model.Name</div>
                             </header>
-                            <span class="text-truncate-3">
+                            <span class="text-truncate-3 label-large">
                                 @Model.BriefIntroduction
                             </span>
 
@@ -53,8 +52,8 @@
                                 </div>
                             }
                         </div>
-                        <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color);">
-                            <span class="h4 m-0 fw-bold">
+                        <div class="primary-text  label-large" style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center;">
+                            <span class="title-large">
                                 @(Model.PriceNow.Value.ToString("¥ 0.00"))
                             </span>
 
@@ -63,31 +62,29 @@
                                 <span>
                                     @(Model.CutNow+"% OFF")
                                 </span>
-                                <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                                <span class="h6" style="text-decoration: line-through; ">
                                     @("¥ "+Model.OriginalPrice.Value.ToString("0.00"))
                                 </span>
                             }
                         </div>
-
                     </div>
                 </div>
             </div>
-        </div>
     }
     else
     {
         @if (_datacacheService.IsApp)
         {
-            <div style="display:flex;" class="shadow-sm bg-opacity rounded">
+            <MDCard Outline Style="flex-direction: row;">
                 <div style="display: flex; width: 100%;">
                     <img style=" height: 67px; " src="@Model.MainImage">
                     <div class="ps-2" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                         <header style=" display: flex; align-items: center;">
                             @if (Purchased)
                             {
-                                <i class="fa fa-fw font-color fa-check-circle"></i>
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Check" XSmall/>
                             }
-                            <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
+                            <span class="text-truncate-1 title-medium">@Model.Name</span>
                         </header>
 
                         <div style="display: flex; flex-direction: column;">
@@ -106,8 +103,8 @@
                         </div>
                     </div>
                 </div>
-                <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color); ">
-                    <span class="h5 m-0">
+                <div class="primary-text  label-large" style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; ">
+                    <span class="title-medium">
                         @(Model.PriceNow.Value.ToString("¥ 0.00"))
                     </span>
 
@@ -116,29 +113,28 @@
                         <span style="font-size:small ">
                             @(Model.CutNow+"% OFF")
                         </span>
-                        <span style=" color: gray; text-decoration: line-through; ">
+                        <span style=" text-decoration: line-through; ">
                             @("¥ "+Model.OriginalPrice.Value.ToString("0.00"))
                         </span>
                     }
 
                 </div>
-            </div>
+            </MDCard>
         }
         else
         {
-            <div class="div-shadow rounded  bg-opacity p-3 h-100">
                 <div style="display:flex;">
                     <div style="display: flex; width: 100%;">
-                        <img style="height: 115px;" src="@Model.MainImage">
-                        <div class="ps-3" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                        <img style="height: 140px;" src="@Model.MainImage">
+                        <div class="ps-3 pt-2 pb-2" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                             <header style=" display: flex; align-items: center;">
                                 @if (Purchased)
                                 {
-                                    <div class="article-home-tag">已入库</div>
+                                    <div class="type-inline-chip">已入库</div>
                                 }
-                                <h3 class="fw-bold h5 mb-0">@Model.Name</h3>
+                                <div class="title-large">@Model.Name</div>
                             </header>
-                            <span class="text-truncate-2">
+                            <span class="text-truncate-2 label-large">
                                 @Model.BriefIntroduction
                             </span>
                             <div class="row">
@@ -169,9 +165,9 @@
                             </div>
                         </div>
                     </div>
-                    <div style=" display: flex; flex-direction: column; align-items: center; width: 180px; justify-content: center; color: var(--active-color);">
+                    <div class="primary-text label-large" style=" display: flex; flex-direction: column; align-items: center; width: 180px; justify-content: center;">
                         <span style="display: flex; align-items: center;">
-                            <span class="h4 fw-bold">
+                            <span class="title-large">
                                 @(Model.PriceNow.Value.ToString("¥ 0.00"))
                             </span>
                             @if (Model.CutNow > 0)
@@ -183,20 +179,19 @@
                         </span>
                         @if (Model.CutNow > 0)
                         {
-                            <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                            <span style="text-decoration: line-through; ">
                                 @("¥ "+Model.OriginalPrice.Value.ToString("0.00"))
                             </span>
                         }
                     </div>
                 </div>
-            </div>
 
         }
 
 
     }
 
-</a>
+</MDCard>
 
 @code {
     [Parameter]

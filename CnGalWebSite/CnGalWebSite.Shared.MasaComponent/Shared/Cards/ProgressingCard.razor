@@ -3,8 +3,8 @@
 @if (Page)
 {
     <div class="progressing-card">
-        <MDCard Class="out-card w-100" Outline="!Fill">
-            <MDCard Outline="Fill" Class="inner-card">
+        <MDCard Class="out-card w-100" Outline="!Fill||Outline">
+            <MDCard Outline="Fill||Outline" Class="inner-card">
             <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
             <div class="d-flex" style="justify-content: center;">
                 <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
@@ -32,6 +32,8 @@ else
 @code {
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
     [Parameter]
     public string Style { get; set; }
     [Parameter]

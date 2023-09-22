@@ -3,8 +3,7 @@
 <div>
     @foreach (var item in FixedModel)
     {
-        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small TextColor="@(InputData.Any(s=>s.IsSame(item))?"white":"")"
-               Color="@Color"
+        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small Color="primary"
                Outlined="!InputData.Any(s=>s.IsSame(item))">
             @item.Note
         </MChip>
@@ -13,22 +12,18 @@
 
     @if (customTime != null)
     {
-        <MChip Class="ma-1" OnClick="OnClean" Small TextColor="white"
-               Color="@Color">
+        <MChip Class="ma-1" OnClick="OnClean" Small Color="primary">
             @(customTime.AfterTime.ToString("yyyy-MM-dd") + " ~ " + customTime.BeforeTime.ToString("yyyy-MM-dd"))
         </MChip>
     }
     else
     {
-        <MChip Class="ma-1" OnClick="OnAdd" Small TextColor="white"
-               Color="@Color">
+        <MChip Class="ma-1" OnClick="OnAdd" Small Color="primary">
             <MIcon Left Small>
                 mdi-plus
             </MIcon>
             自定义时间段
         </MChip>
-
-
     }
 </div>
 
@@ -38,22 +33,16 @@
 
     <MDatePicker @bind-Value="_dates" Locale="zh-CN"
                  Range Scrollable>
-        <MSpacer></MSpacer>
-        <MButton Text
-                 Color="red"
-                 OnClick="ModalCancel">
+        <MButton Color="primary" OnClick="ModalCancel">
             取消
-        </MButton>
-        <MButton Text
-                 Color="success"
-                 OnClick="ModalOK">
+         </MButton>
+         <MSpacer></MSpacer>
+        <MButton Rounded Color="primary" OnClick="ModalOK">
             确定
         </MButton>
     </MDatePicker>
 </MDialog>
 @code {
-    [Parameter]
-    public string Color { get; set; }
     [Parameter]
     public List<SearchTimeModel> InputData { get; set; }
     [Parameter]

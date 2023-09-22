@@ -5,7 +5,7 @@
 @inject IPopupService PopupService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="@IconType.Certification.ToIconString()" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {

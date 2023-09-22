@@ -1,7 +1,6 @@
 ﻿@if (Model.Type == RankType.Rank || ForceDisplayBadge)
 {
-    <span class="@($"comment-tag {Class} {Model.CSS}")" style="@Model.Styles">@Model.Text</span>
-
+    <span class="@($"user-rank {Class} {Model.CSS}")" style="@Model.Styles">@Model.Text</span>
 }
 
 @code {

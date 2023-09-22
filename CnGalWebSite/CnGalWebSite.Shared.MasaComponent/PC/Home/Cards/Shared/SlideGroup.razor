@@ -39,15 +39,6 @@
             </div>
 
         }
-        @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
-        {
-            <div class="slide-item">
-                <a class="item more-link" @onclick="OnClick">
-                    <MIcon Large>@((MoreIcon== IconType.SeeDetails? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
-                    <div class="text">@MoreText</div>
-                </a>
-            </div>
-        }
     </div>
 }
 else
@@ -64,7 +55,7 @@ else
         @if (string.IsNullOrWhiteSpace(MoreLink) == false|| ForceShowMore)
         {
             <MSlideItem>
-                <MDCard Class="item more-link" Href="@MoreLink" OnClick="OnClick" ShowHoverStyle="true">
+                <MDCard Class="item more-link pointer" Href="@MoreLink" OnClick="OnClick" ShowHoverStyle="true">
                     <MIcon Large>@((MoreIcon == IconType.SeeDetails ? IconType.SeeMore : MoreIcon).ToIconString())</MIcon>
                  <div class="text">@MoreText</div>
 

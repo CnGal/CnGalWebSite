@@ -22,7 +22,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑个人资料" Icon="@IconType.User.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.ImageCard Model="Model" Class="mb-4" />
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="账户安全" Icon="fa fa-fw fa-briefcase" Outline Collapable Class="mb-4">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="账户安全" Icon="fa fa-fw fa-briefcase" Outline Collapable>
                 <div class="row">
                     <div class=" col-12 col-md-6  col-lg-4 mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.BindCard/>
@@ -99,7 +99,8 @@
             {
                 await autoSave.Clean();
 
-                var ret = await PopupService.ConfirmAsync("修改个人资料成功", "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见");
+                await PopupService.ConfirmAsync("修改个人资料成功", "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见");
+                NavigationManager.NavigateTo( "/space/index/" + Model.Id);
             }
         }
         catch (Exception ex)

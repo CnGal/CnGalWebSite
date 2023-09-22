@@ -48,7 +48,7 @@
 
         /*内部纸片*/
         #home-page .item .m-chip {
-            transition: .3s;
+            /* transition: .3s; */
         }
 
         #home-page .item .m-chip {
@@ -72,31 +72,31 @@
             width: 10rem !important;
         }
 
-            #home-page .item.more-link i, .community-card .item i, .weekly-news-card .item i, .announcements-card .item i, .hot-tags-card .item i {
+            #home-page .item.more-link i, #home-page .community-card .item i, #home-page .weekly-news-card .item i, #home-page .announcements-card .item i, #home-page .hot-tags-card .item i {
                 color: var(--md-sys-color-primary);
             }
 
         /*轮播图*/
         #home-page .carousels-card, .cv-carousel-card {
-            border-radius: 24px !important;
+            border-radius: var( --md-card-active-border-radius) !important;
             box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
         }
 
-            #home-page .carousels-card img, .carousels-card .m-responsive__content, .carousels-card .m-window-item, .carousels-card .m-responsive
+            #home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive
             .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
-                border-radius: 24px !important;
+                border-radius: var( --md-card-active-border-radius) !important;
             }
 
             #home-page .carousels-card .m-responsive__content, #home-page .cv-carousel-card .m-responsive__content {
-                border-radius: 24px !important;
+                border-radius: var( --md-card-active-border-radius) !important;
             }
         /*游戏列表*/
-        #home-page .published-games-card .item, .upcoming-games-card .item, .free-games-card .item, .discount-games-card .item {
+        #home-page .published-games-card .item, #home-page .upcoming-games-card .item, #home-page .free-games-card .item, #home-page .discount-games-card .item {
             display: flex;
             flex-direction: column;
         }
 
-            #home-page .published-games-card .item .content, .upcoming-games-card .item .content, .free-games-card .item .content, .discount-games-card .item .content {
+            #home-page .published-games-card .item .content, #home-page .upcoming-games-card .item .content, #home-page .free-games-card .item .content, #home-page .discount-games-card .item .content {
                 margin: 1rem;
                 display: flex;
                 flex-direction: column;
@@ -187,7 +187,6 @@
         }
 
         #home-page .latest-articles-card .item {
-            margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
             width: 20rem;
@@ -312,6 +311,7 @@
 
         #home-page .latest-videoes-card .image {
             width: 15rem !important;
+            height: min-content;
         }
 
         #home-page .latest-videoes-card .content {
@@ -444,7 +444,7 @@
 /*图墙*/
 .masa-image .m-image__image {
     border-radius: var( --md-card-border-radius);
-    transition: .3s;
+    /* transition: .3s; */
 }
 
 .masa-image .item-image:active .m-image__image {
@@ -457,7 +457,7 @@
 
 .masa-image .image-name {
     display: none;
-    transition: .3s;
+    /* transition: .3s; */
 }
 
 .masa-image .item-image:hover .image-name {
@@ -515,7 +515,7 @@
 #home-page .gallery-card {
     display: flex;
     border-radius: var(--md-card-border-radius);
-    transition: .3s;
+    /* transition: .3s; */
     white-space: normal;
 }
 
@@ -551,7 +551,7 @@
     }
 
     #home-page .gallery-card button {
-        transition: .3s;
+        /* transition: .3s; */
     }
 
         #home-page .gallery-card button:hover {
@@ -836,3 +836,18 @@
     align-items: center;
     height: 100%;
 }
+/*按钮组*/
+#home-page .button-group-card .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 1rem;
+}
+
+    #home-page .button-group-card .button-group .button-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        width: 20%;
+    }

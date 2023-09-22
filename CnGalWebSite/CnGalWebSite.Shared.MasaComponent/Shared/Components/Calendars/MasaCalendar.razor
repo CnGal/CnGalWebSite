@@ -1,12 +1,12 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<div style="display: flex; flex-direction: column;">
-    <div class="ps-4 pe-4 pb-2" style=" display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <div class="h5 fw-bold mb-0 font-color">
+<MDCard Outline Class="masa-calendar-card">
+    <div class="title-card ps-4 pe-4 pb-2">
+        <div class="title-large">
             @Month.ToString("yyyy年M月")
         </div>
-        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
+        <div class="button-card">
             <MButton Text  OnClick="@(()=>ValueChanged(0))" Class="me-4" Color="primary">
                 上一年
             </MButton>
@@ -24,28 +24,28 @@
             </MButton>
         </div>
     </div>
-    <div style="border-top: thin solid rgba(0,0,0,.12); display: flex; border-bottom: thin solid rgba(0,0,0,.12); min-height: 40px; ">
-        <div style="width: 14.28%; display: flex; align-items: center; justify-content: center;">日</div>
-        <div style="width: 14.28%;  display: flex; align-items: center; justify-content: center;">一</div>
-        <div style="width: 14.28%; display: flex; align-items: center; justify-content: center;">二</div>
-        <div style="width: 14.28%;  display: flex; align-items: center; justify-content: center;">三</div>
-        <div style="width: 14.28%;display: flex; align-items: center; justify-content: center;">四</div>
-        <div style="width: 14.28%; display: flex; align-items: center; justify-content: center;">五</div>
-        <div style="width: 14.28%;  display: flex; align-items: center; justify-content: center;">六</div>
+    <div class="week-card">
+        <div>日</div>
+        <div>一</div>
+        <div>二</div>
+        <div>三</div>
+        <div>四</div>
+        <div>五</div>
+        <div>六</div>
     </div>
     @for (var k = 0; k < 6; k++)
     {
-        <div style="@(($"display:flex;border-bottom :thin solid rgba(0,0,0,.{(k==4?"20":"12")});"))">
+        <div class="month-card">
             @for (int i = 0; i < 7; i++)
             {
                 var date = Begin.AddDays(k * 7 + i);
-                <div style="@((date.Month==Month.Month?"":"background-color:rgba(0,0,0,.12);")+"width: 14.28%;border-right :thin solid rgba(0,0,0,.12);"+(i==0?"border-left :thin solid rgba(0,0,0,.12);":""))">
+                <div class="day-card @((date.Month==Month.Month?"":"active")) @((i==0?"first":""))">
                   @ChildContent(date)
                 </div>
             }
         </div>
     }
-</div>
+</MDCard>
 
 
 @code {

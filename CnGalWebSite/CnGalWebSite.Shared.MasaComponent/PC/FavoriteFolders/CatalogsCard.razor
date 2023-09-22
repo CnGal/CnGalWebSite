@@ -5,52 +5,21 @@
 @if (Model.Any())
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Catalogs.ToIconString()" Title="相关目录" Outline Collapable>
-        @foreach (var item in Model)
+     @foreach (var item in Model)
         {
             <div class="mb-3">
-                @if (_dataCacheService.IsApp)
-                {
-                <a href="@("/favoritefolders/index/" + item.Id)" class="a-font-color">
-                    <div class="div-shadow rounded  bg-opacity h-100">
-                        <div style="display: flex; align-items: center;">
-                            <div>
-                                <img loading="lazy" style=" width: 160px; " src="@item.MainImage" alt="@item.Name">
-                            </div>
-                            <div class="me-2 ms-2">
-                                <header class="text-truncate-1">
-                                    <span class="fw-bold" style=" display: inline;">@item.Name</span>
-                                </header>
-                                <span class="text-truncate-2">
-                                    @item.BriefIntroduction
-                                </span>
-                            </div>
+                <MDCard Href="@("/favoritefolders/index/" + item.Id)" class="on-surface-text h-100">
+                    <div style="display: flex; align-items: center;">
+                        <div style="display: flex;">
+                            <img loading="lazy" style=" width: 160px; " src="@item.MainImage" alt="@item.Name">
+                        </div>
+                        <div class="me-2 ms-2">
+                            <div class="text-truncate-1 title-large">@item.Name</div>
+                            <div class="text-truncate-2 label-large">@item.BriefIntroduction</div>
                         </div>
                     </div>
-                </a>
-                }
-                else
-                {
-                <a href="@("/favoritefolders/index/" + item.Id)" class="a-font-color">
-                    <div class="div-shadow rounded  bg-opacity h-100">
-                        <div style="display: flex; align-items: center;">
-                            <div>
-                                <img loading="lazy" style=" width: 160px; " src="@item.MainImage" alt="@item.Name">
-                            </div>
-                            <div class="me-2 ms-3">
-                                <header class="text-truncate-1">
-                                    <span class="h5 fw-bold" style=" display: inline;">@item.Name</span>
-                                </header>
-                                <span class="text-truncate-2">
-                                    @item.BriefIntroduction
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                }
-
+                </MDCard>
             </div>
-          
         }
 
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

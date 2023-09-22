@@ -5,52 +5,49 @@
 
 
 <MNavigationDrawer @bind-Value="Drawer" App Temporary>
-    <MList Nav Class="mt-4"
-           Dense>
-        <AuthorizeView>
-            <Authorized>
-            
-                    <UserButton OnClosed="OnClose" OnClickSetting="OnOpenSetting" />
-            </Authorized>
-            <NotAuthorized>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                    <LoginButton />
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <MDCard Outline Class="pa-4">
+         <AuthorizeView>
+             <Authorized>
 
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/"))">
-                    <MIcon Left>mdi-home</MIcon>
+                 <UserButton OnClosed="OnClose" OnClickSetting="OnOpenSetting" />
+             </Authorized>
+             <NotAuthorized>
+                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                     <LoginButton />
+                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
+
+                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                 <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/"))">
+                     <MIcon Left>mdi-home</MIcon>
                     主页
                 </MButton>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block  Color="primary"  Left OnClick="OnOpenSetting">
-                    <MIcon Left>mdi-cog</MIcon>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
+                <MButton Text Block Color="primary" Left OnClick="OnOpenSetting">
+                     <MIcon Left>mdi-cog</MIcon>
                     主题设置
                 </MButton>
-                <MButton Text Block  Color="primary"  Left OnClick="@(()=>OnClickUrl("/about"))">
-                    <MIcon Left>mdi-information-outline</MIcon>
+                <MButton Text Block Color="primary" Left OnClick="@(()=>OnClickUrl("/about"))">
+                     <MIcon Left>mdi-information-outline</MIcon>
                     关于我们
                 </MButton>
             </NotAuthorized>
         </AuthorizeView>
-    </MList>
+    </MDCard>
 </MNavigationDrawer>
-@if (isOpen)
-{
+
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard @ref="themeSettingCard" />
-}
+
 @code {
     [Parameter]
     public bool Drawer { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
-    bool isOpen;
 
     public void SetDrawer(bool drawer)
     {
         Drawer = drawer;
         StateHasChanged();
-        
+
     }
 
     private void OnClickUrl(string url)
@@ -58,20 +55,18 @@
         NavigationManager.NavigateTo(url);
         Drawer = false;
         StateHasChanged();
-        
+
     }
 
     private void OnClose()
     {
         Drawer = false;
         StateHasChanged();
-        
+
     }
 
     public void OnOpenSetting()
     {
-        isOpen = true;
-        StateHasChanged();
         OnClose();
 
         if (themeSettingCard != null)

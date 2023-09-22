@@ -4,7 +4,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="@IconType.QQ.ToIconString()" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
         {

@@ -2,24 +2,22 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="拥有率排行榜" Icon="@IconType.Game.ToIconString()" Class="mb-4" Outline Collapable>
     @foreach (var item in Model)
     {
-        <a href="@("/entries/index/"+item.Id)">
-            <div class="shadow-sm rounded  bg-opacity w-100 mb-4">
-                <div class="a-font-color" style="display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: .5rem; padding: .5rem;">
-                    <div style=" padding: 0 .5rem; font-size: 2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; color: var(--main-color) !important; ">
-                        @(Model.IndexOf(item)+1)
-                    </div>
-                    <div class="">
-                        <img loading="lazy" style=" width: 100px; " src="@item.MainImage">
-                    </div>
-                    <div class="ps-2 pe-2 w-100 fw-bold" style="font-size: medium;">
-                        @item.Name
-                    </div>
-                    <div style=" font-weight: bold; color: var(--active-color); min-width: 3rem; "> 
-                        @((item.Rate*100).ToString("0.0")+" %")
-                    </div>
+        <MDCard Href="@("/entries/index/"+item.Id)" Class=" w-100 mb-4">
+            <div class="a-font-color" style="display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: .5rem; padding: .5rem;">
+                <div class="headline-medium primary-text fw-bold ms-2 me-2">
+                    @(Model.IndexOf(item) + 1)
+                </div>
+                <div class="">
+                    <img loading="lazy" style=" width: 100px; " src="@item.MainImage">
+                </div>
+                <div class="ps-2 pe-2 w-100 title-medium">
+                    @item.Name
+                </div>
+                <div style=" min-width: 4rem; " class="primary-text  title-medium">
+                    @((item.Rate * 100).ToString("0.0") + " %")
                 </div>
             </div>
-        </a>
+        </MDCard>
     }
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

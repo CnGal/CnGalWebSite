@@ -83,7 +83,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
     {
         [Display(Name ="跟随系统")]
         System,
-        [Display(Name = "亮色")]
+        [Display(Name = "浅色")]
         Light,
         [Display(Name = "深色")]
         Dark,

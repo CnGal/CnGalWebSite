@@ -19,11 +19,11 @@
                      NoTitle Locale="zh-CN"
                      Scrollable>
             <MSpacer></MSpacer>
-            <MButton Text 
+            <MButton Text Color="primary"
                      OnClick="MenuCancel">
                 取消
             </MButton>
-            <MButton Text 
+             <MButton Rounded Color="primary"
                      OnClick="MenuOk">
                确定
             </MButton>
@@ -42,7 +42,7 @@
     private bool _menu;
     private string _str;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         _date = _prevDate = Date;
         _str = _date.ToString("yyyy年M月");

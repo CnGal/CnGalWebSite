@@ -189,8 +189,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Type = RankType.Rank,
                     Text = "作者",
-                    CSS = "bg-success",
-
                 });
             }
             else
@@ -199,8 +197,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Type = RankType.Rank,
                     Text = "搬运",
-                    CSS = "bg-primary",
-
                 });
             }
 

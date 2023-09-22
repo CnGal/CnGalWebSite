@@ -4,7 +4,7 @@
 @inject IEventService _eventService
 @inject IPopupService PopupService
 
-<MDCard Class="comment-reply-card pa-4 pb-0 pt-3 mb-3">
+<MDCard Class="@($"comment-reply-card pa-4 pb-0 pt-3 mb-3 {(IsChild?"elevation-2":"")}")">
     @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.Id) == false)
     {
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="_dataCacheService.UserInfor" Outline/>

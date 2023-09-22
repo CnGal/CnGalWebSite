@@ -23,7 +23,7 @@
         <div class="row">
             @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Skip((_dataCacheService.DiscountPageCatcheHelper.CurrentPage - 1) * _dataCacheService.DiscountPageCatcheHelper.MaxCount).Take(_dataCacheService.DiscountPageCatcheHelper.MaxCount))
             {
-                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-xxl-4"))">
+                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-lg-4"))">
                     <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s=>s==item.Id)"/>
                 </div>
             }

@@ -5,9 +5,7 @@
 @inject IPageModelCatche<List<HomeNewsAloneViewModel>>  _pageModelCatche
 
 <section class="news-card">
-    <h2>最新动态</h2>
-
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新动态" Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news" ForceShowMore>
         <div class="group">
             @foreach (var item in context)
             {

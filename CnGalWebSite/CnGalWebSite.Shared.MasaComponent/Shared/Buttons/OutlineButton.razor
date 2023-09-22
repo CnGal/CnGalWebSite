@@ -5,20 +5,19 @@
 
 @if (IsTitile)
 {
-    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))" Style="color: var(--md-sys-color-on-primary);"
            Color="@Color"
-           Small
-           Outlined="!IsTitile">
+           Small>
         @Text
     </MChip>
 }
 else
 {
-        <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
                Color="@Color"
                Small
                TextColor="@Color"
-               Outlined="!IsTitile"
+               Outlined
                 Href="@(EntryId>0?$"/entries/index/{EntryId}":null)"
                OnClick="OnClick">
             @if (IsShowExistTag && EntryId > 0)

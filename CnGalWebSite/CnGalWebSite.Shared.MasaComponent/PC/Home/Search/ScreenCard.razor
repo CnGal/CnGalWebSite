@@ -1,35 +1,32 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<div class="rounded shadow-sm p-2 bg-opacity">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="筛选" Icon="@IconType.Filter.ToIconString()" Collapable IsCollapsed="true">
     <div class="row">
         <div class="col-12 col-lg-6">
-            <SortChipsList Model="Model" Color="@GetColor(0)" OnChanged="OnChanged" />
+            <SortChipsList Model="Model" OnChanged="OnChanged" />
+        </div>
+        <div class="col-12 col-lg-6">
+            <TimeChipsList FixedModel="Times" InputData="Model.Times" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TimeChipsList FixedModel="Times" InputData="Model.Times" Color="@GetColor(1)" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="EntryTypes" InputData="Model.Types" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="EntryTypes" InputData="Model.Types" Color="@GetColor(2)" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="ArticleTypes" InputData="Model.Types" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="ArticleTypes" InputData="Model.Types" Color="@GetColor(3)" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="PeripheryTypes" InputData="Model.Types" OnChanged="OnChanged" />
+        </div>
+        <div class="col-12 col-lg-6">
+             <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" OnChanged="OnChanged" />
+             <TypeChipsList FixedModel="VideoTypes" InputData="Model.Types" OnChanged="OnChanged" />
 
-        </div>
-        <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="PeripheryTypes" InputData="Model.Types" Color="@GetColor(4)" OnChanged="OnChanged" />
-        </div>
-        <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" Color="@GetColor(5)" OnChanged="OnChanged" />
-            <TypeChipsList FixedModel="VideoTypes" InputData="Model.Types" Color="@GetColor(6)" OnChanged="OnChanged" />
-        </div>
-        <div class="col-12 col-lg-6">
-          
         </div>
     </div>
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
@@ -43,11 +40,4 @@
     List<SearchType> TagTypes { get; set; } = SearchInputModel.GetTagTypes();
     List<SearchType> VideoTypes { get; set; } = SearchInputModel.GetVideoTypes();
     List<SearchTimeModel> Times { get; set; } = SearchInputModel.GetTimes();
-
-    public string GetColor(int index)
-    {
-        var baseStr = _dataCacheService.ThemeSetting.ThemeColor.Split(' ').FirstOrDefault();
-
-        return $"{baseStr} {index switch { 0 => "darken-3", 1 => "darken-2", 2 => "darken-1", 3 => "lighten-1", 4 => "lighten-2", 5 => "lighten-1", 6 => "darken-1", _ => "darken-2" }}";
-    }
 }

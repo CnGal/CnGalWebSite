@@ -1,0 +1,12 @@
+﻿.variable.container {
+    max-width: none;
+    padding: 1.5rem;
+}
+
+/*小屏幕*/
+@media screen and (max-width: 768px) {
+    .variable.container {
+        max-width: none;
+        padding: 1rem;
+    }
+}

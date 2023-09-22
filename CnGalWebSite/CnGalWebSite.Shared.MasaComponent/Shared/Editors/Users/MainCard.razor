@@ -19,8 +19,8 @@
              <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
          </MCol>
          <MCol Cols="12">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2">
-                 点击查看<a @onclick="OnClickQuestion" class="info--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2" Color="primary">
+                 点击查看<a @onclick="OnClickQuestion" class="primary--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
              </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
          </MCol>
         <MCol Cols="12" Md="6">
@@ -30,7 +30,7 @@
              <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录" />
          </MCol>
          <MCol Cols="12">
-             <MCardText Class="p-0">展示的头衔</MCardText>
+             <div>展示的头衔</div>
              <div style="display:flex;">
                  @foreach (var item in Model.Ranks)
                 {

@@ -1,182 +1,241 @@
 .primary {
-  background-color: var(--md-sys-color-primary);
+    background-color: var(--md-sys-color-primary);
 }
+
 .primary-text {
-  color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-primary);
 }
+
 .on-primary {
-  background-color: var(--md-sys-color-on-primary);
+    background-color: var(--md-sys-color-on-primary);
 }
+
 .on-primary-text {
-  color: var(--md-sys-color-on-primary);
+    color: var(--md-sys-color-on-primary);
 }
+
 .primary-container {
-  background-color: var(--md-sys-color-primary-container);
+    background-color: var(--md-sys-color-primary-container);
 }
+
 .primary-container-text {
-  color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-primary-container);
 }
+
 .on-primary-container {
-  background-color: var(--md-sys-color-on-primary-container);
+    background-color: var(--md-sys-color-on-primary-container);
 }
+
 .on-primary-container-text {
-  color: var(--md-sys-color-on-primary-container);
+    color: var(--md-sys-color-on-primary-container);
 }
+
 .secondary {
-  background-color: var(--md-sys-color-secondary);
+    background-color: var(--md-sys-color-secondary);
 }
+
 .secondary-text {
-  color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-secondary);
 }
+
 .on-secondary {
-  background-color: var(--md-sys-color-on-secondary);
+    background-color: var(--md-sys-color-on-secondary);
 }
+
 .on-secondary-text {
-  color: var(--md-sys-color-on-secondary);
+    color: var(--md-sys-color-on-secondary);
 }
+
 .secondary-container {
-  background-color: var(--md-sys-color-secondary-container);
+    background-color: var(--md-sys-color-secondary-container);
 }
+
 .secondary-container-text {
-  color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-secondary-container);
 }
+
 .on-secondary-container {
-  background-color: var(--md-sys-color-on-secondary-container);
+    background-color: var(--md-sys-color-on-secondary-container);
 }
+
 .on-secondary-container-text {
-  color: var(--md-sys-color-on-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
 }
+
 .tertiary {
-  background-color: var(--md-sys-color-tertiary);
+    background-color: var(--md-sys-color-tertiary);
 }
+
 .tertiary-text {
-  color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-tertiary);
 }
+
 .on-tertiary {
-  background-color: var(--md-sys-color-on-tertiary);
+    background-color: var(--md-sys-color-on-tertiary);
 }
+
 .on-tertiary-text {
-  color: var(--md-sys-color-on-tertiary);
+    color: var(--md-sys-color-on-tertiary);
 }
+
 .tertiary-container {
-  background-color: var(--md-sys-color-tertiary-container);
+    background-color: var(--md-sys-color-tertiary-container);
 }
+
 .tertiary-container-text {
-  color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-tertiary-container);
 }
+
 .on-tertiary-container {
-  background-color: var(--md-sys-color-on-tertiary-container);
+    background-color: var(--md-sys-color-on-tertiary-container);
 }
+
 .on-tertiary-container-text {
-  color: var(--md-sys-color-on-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
 }
+
 .error {
-  background-color: var(--md-sys-color-error);
+    background-color: var(--md-sys-color-error);
 }
+
 .error-text {
-  color: var(--md-sys-color-error);
+    color: var(--md-sys-color-error);
 }
+
 .error-container {
-  background-color: var(--md-sys-color-error-container);
+    background-color: var(--md-sys-color-error-container);
 }
+
 .error-container-text {
-  color: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-error-container);
 }
+
 .on-error {
-  background-color: var(--md-sys-color-on-error);
+    background-color: var(--md-sys-color-on-error);
 }
+
 .on-error-text {
-  color: var(--md-sys-color-on-error);
+    color: var(--md-sys-color-on-error);
 }
+
 .on-error-container {
-  background-color: var(--md-sys-color-on-error-container);
+    background-color: var(--md-sys-color-on-error-container);
 }
+
 .on-error-container-text {
-  color: var(--md-sys-color-on-error-container);
+    color: var(--md-sys-color-on-error-container);
 }
+
 .background {
-  background-color: var(--md-sys-color-background);
+    background-color: var(--md-sys-color-background);
 }
+
 .background-text {
-  color: var(--md-sys-color-background);
+    color: var(--md-sys-color-background);
 }
+
 .on-background {
-  background-color: var(--md-sys-color-on-background);
+    background-color: var(--md-sys-color-on-background);
 }
+
 .on-background-text {
-  color: var(--md-sys-color-on-background)!important;
+    color: var(--md-sys-color-on-background) !important;
 }
+
 .surface {
-  background-color: var(--md-sys-color-surface);
+    background-color: var(--md-sys-color-surface);
 }
+
 .surface-text {
-  color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-surface);
 }
+
 .on-surface {
-  background-color: var(--md-sys-color-on-surface);
+    background-color: var(--md-sys-color-on-surface);
 }
+
 .on-surface-text {
-  color: var(--md-sys-color-on-surface);
+    color: var(--md-sys-color-on-surface) !important;
 }
+
 .surface-variant {
-  background-color: var(--md-sys-color-surface-variant);
+    background-color: var(--md-sys-color-surface-variant);
 }
+
 .surface-variant-text {
-  color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-surface-variant);
 }
+
 .on-surface-variant {
-  background-color: var(--md-sys-color-on-surface-variant);
+    background-color: var(--md-sys-color-on-surface-variant);
 }
+
 .on-surface-variant-text {
-  color: var(--md-sys-color-on-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
 }
+
 .outline {
-  background-color: var(--md-sys-color-outline);
+    background-color: var(--md-sys-color-outline);
 }
+
 .outline-text {
-  color: var(--md-sys-color-outline);
+    color: var(--md-sys-color-outline);
 }
+
 .inverse-on-surface {
-  background-color: var(--md-sys-color-inverse-on-surface);
+    background-color: var(--md-sys-color-inverse-on-surface);
 }
+
 .inverse-on-surface-text {
-  color: var(--md-sys-color-inverse-on-surface);
+    color: var(--md-sys-color-inverse-on-surface);
 }
+
 .inverse-surface {
-  background-color: var(--md-sys-color-inverse-surface);
+    background-color: var(--md-sys-color-inverse-surface);
 }
+
 .inverse-surface-text {
-  color: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-surface);
 }
+
 .inverse-primary {
-  background-color: var(--md-sys-color-inverse-primary);
+    background-color: var(--md-sys-color-inverse-primary);
 }
+
 .inverse-primary-text {
-  color: var(--md-sys-color-inverse-primary);
+    color: var(--md-sys-color-inverse-primary);
 }
+
 .shadow {
-  background-color: var(--md-sys-color-shadow);
+    background-color: var(--md-sys-color-shadow);
 }
+
 .shadow-text {
-  color: var(--md-sys-color-shadow);
+    color: var(--md-sys-color-shadow);
 }
+
 .surface-tint {
-  background-color: var(--md-sys-color-surface-tint);
+    background-color: var(--md-sys-color-surface-tint);
 }
+
 .surface-tint-text {
-  color: var(--md-sys-color-surface-tint);
+    color: var(--md-sys-color-surface-tint);
 }
+
 .outline-variant {
-  background-color: var(--md-sys-color-outline-variant);
+    background-color: var(--md-sys-color-outline-variant);
 }
+
 .outline-variant-text {
-  color: var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-outline-variant);
 }
+
 .scrim {
-  background-color: var(--md-sys-color-scrim);
+    background-color: var(--md-sys-color-scrim);
 }
+
 .scrim-text {
-  color: var(--md-sys-color-scrim);
+    color: var(--md-sys-color-scrim);
 }
 
 :root {
@@ -609,7 +668,7 @@ body {
 }
 
 .outline-button-null-url {
-    transition: all .6s ease;
+    /* transition: all .6s ease; */
     word-break: keep-all;
     margin-top: 0px;
     height: 25px;
@@ -620,7 +679,7 @@ body {
 }
 
 .outline-button-normal {
-    transition: all .6s ease;
+    /* transition: all .6s ease; */
     word-break: keep-all;
     margin-top: 0px;
     height: 25px;
@@ -929,7 +988,25 @@ html {
 .markdown-body blockquote {
     color: var(--md-sys-color-secondary) !important;
     border-left: .25em solid var(--md-sys-color-secondary) !important;
+    display: flex;
+    flex-direction: column;
 }
+
+.markdown-body hr {
+    height: .1em !important;
+    background-color: var(--md-sys-color-primary) !important;
+}
+
+.markdown-body li > p {
+    margin-top: 0 !important;
+    margin-bottom: 0;
+}
+
+.markdown-body ol, .markdown-body ul {
+    display: flex;
+    flex-direction: column;
+}
+
 /*输入框*/
 .m-text-field input {
     line-height: unset;
@@ -1024,6 +1101,76 @@ html {
 
 .theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
     background-color: var(--md-sys-color-surface-1);
+}
+/*页脚*/
+.theme--light.m-footer {
+    background-color: var(--md-sys-color-background) !important;
+}
+
+    .theme--light.m-footer > div {
+        background-color: var(--md-sys-color-surface-1);
+    }
+/*底部导航栏激活样式*/
+.nav-bottom-tab-active {
+    color: var(--md-sys-color-primary) !important;
+}
+
+.theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
+    color: inherit !important;
+}
+
+.theme--light.m-bottom-navigation {
+    color: inherit;
+}
+/*icon按钮*/
+.theme--light.m-btn.m-btn--icon {
+    color: inherit;
+}
+
+.theme--light.m-btn {
+    color: inherit;
+}
+/*侧边导航栏*/
+.theme--light.m-navigation-drawer, .theme--light.m-tabs > .m-tabs-bar {
+    background-color: var(--md-sys-color-background);
+}
+
+    .theme--light.m-navigation-drawer .m-navigation-drawer__content {
+        background-color: var(--md-sys-color-surface-1);
+    }
+
+/*溢出的tab栏*/
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__wrapper {
+    background-color: var(--md-sys-color-surface-1);
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__content {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.cngal-main-tab-card .m-toolbar__content, .m-tabs {
+    background-color: transparent;
+}
+/*扩展卡片*/
+.theme--light.m-expansion-panels .m-expansion-panel {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+}
+
+.m-expansion-panels:not(.m-expansion-panels--accordion):not(.m-expansion-panels--tile) > .m-expansion-panel--active {
+    border-radius: var(--md-card-border-radius);
+}
+
+.m-expansion-panels {
+    border-radius: var(--md-card-border-radius);
+    padding-bottom: 1rem;
+}
+/*树状列表*/
+.theme--light.m-treeview {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+    border-radius: 24px;
 }
 
 
@@ -1256,7 +1403,7 @@ html {
 
         /*内部纸片*/
         #home-page .item .m-chip {
-            transition: .3s;
+            /* transition: .3s; */
         }
 
         #home-page .item .m-chip {
@@ -1280,31 +1427,31 @@ html {
             width: 10rem !important;
         }
 
-            #home-page .item.more-link i, .community-card .item i, .weekly-news-card .item i, .announcements-card .item i, .hot-tags-card .item i {
+            #home-page .item.more-link i, #home-page .community-card .item i, #home-page .weekly-news-card .item i, #home-page .announcements-card .item i, #home-page .hot-tags-card .item i {
                 color: var(--md-sys-color-primary);
             }
 
         /*轮播图*/
         #home-page .carousels-card, .cv-carousel-card {
-            border-radius: 24px !important;
+            border-radius: var( --md-card-active-border-radius) !important;
             box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
         }
 
-            #home-page .carousels-card img, .carousels-card .m-responsive__content, .carousels-card .m-window-item, .carousels-card .m-responsive
+            #home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive
             .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
-                border-radius: 24px !important;
+                border-radius: var( --md-card-active-border-radius) !important;
             }
 
             #home-page .carousels-card .m-responsive__content, #home-page .cv-carousel-card .m-responsive__content {
-                border-radius: 24px !important;
+                border-radius: var( --md-card-active-border-radius) !important;
             }
         /*游戏列表*/
-        #home-page .published-games-card .item, .upcoming-games-card .item, .free-games-card .item, .discount-games-card .item {
+        #home-page .published-games-card .item, #home-page .upcoming-games-card .item, #home-page .free-games-card .item, #home-page .discount-games-card .item {
             display: flex;
             flex-direction: column;
         }
 
-            #home-page .published-games-card .item .content, .upcoming-games-card .item .content, .free-games-card .item .content, .discount-games-card .item .content {
+            #home-page .published-games-card .item .content, #home-page .upcoming-games-card .item .content, #home-page .free-games-card .item .content, #home-page .discount-games-card .item .content {
                 margin: 1rem;
                 display: flex;
                 flex-direction: column;
@@ -1395,7 +1542,6 @@ html {
         }
 
         #home-page .latest-articles-card .item {
-            margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
             width: 20rem;
@@ -1520,6 +1666,7 @@ html {
 
         #home-page .latest-videoes-card .image {
             width: 15rem !important;
+            height: min-content;
         }
 
         #home-page .latest-videoes-card .content {
@@ -1652,7 +1799,7 @@ html {
 /*图墙*/
 .masa-image .m-image__image {
     border-radius: var( --md-card-border-radius);
-    transition: .3s;
+    /* transition: .3s; */
 }
 
 .masa-image .item-image:active .m-image__image {
@@ -1665,7 +1812,7 @@ html {
 
 .masa-image .image-name {
     display: none;
-    transition: .3s;
+    /* transition: .3s; */
 }
 
 .masa-image .item-image:hover .image-name {
@@ -1723,7 +1870,7 @@ html {
 #home-page .gallery-card {
     display: flex;
     border-radius: var(--md-card-border-radius);
-    transition: .3s;
+    /* transition: .3s; */
     white-space: normal;
 }
 
@@ -1759,7 +1906,7 @@ html {
     }
 
     #home-page .gallery-card button {
-        transition: .3s;
+        /* transition: .3s; */
     }
 
         #home-page .gallery-card button:hover {
@@ -2044,6 +2191,21 @@ html {
     align-items: center;
     height: 100%;
 }
+/*按钮组*/
+#home-page .button-group-card .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 1rem;
+}
+
+    #home-page .button-group-card .button-group .button-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        width: 20%;
+    }
 
 .slotMachine-box {
     min-height: calc(100% - 341px);
@@ -2609,8 +2771,8 @@ div.prizeTips {
 .md-card {
     display: flex;
     border-radius: var( --md-card-border-radius);
-    transition: .3s;
-    white-space: normal;
+    /*     transition: .3s;
+ */ white-space: normal;
     flex-direction: column;
 }
     /*primary颜色*/
@@ -2651,7 +2813,7 @@ div.prizeTips {
     }
 
     .md-card img, .md-card .image {
-        transition: .3s;
+        /* transition: .3s; */
         border-radius: var( --md-card-border-radius);
         height: min-content;
     }
@@ -2771,7 +2933,12 @@ div.prizeTips {
     }
 
     .md-main-info-card.role .image-card img {
-        height: 150px;
+        height: 100px;
+        margin: .5rem;
+    }
+
+    .md-main-info-card .content-card {
+        padding: .5rem;
     }
 
     .md-main-info-card.game .image-card img {
@@ -2916,6 +3083,56 @@ div.prizeTips {
 .color-selector-card {
     background-color: transparent !important;
 }
+/*日历*/
+.masa-calendar-card .title-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.masa-calendar-card .button-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.masa-calendar-card .week-card {
+    border-top: thin solid var(--md-sys-color-surface-1);
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+    min-height: 40px;
+}
+
+    .masa-calendar-card .week-card div {
+        width: 14.28%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.masa-calendar-card .month-card {
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+}
+
+.masa-calendar-card .day-card {
+    display: flex;
+    border-right: thin solid var(--md-sys-color-surface-1);
+    width: 14.28%;
+}
+
+    .masa-calendar-card .day-card.first {
+        border-left: thin solid var(--md-sys-color-surface-1);
+    }
+
+    .masa-calendar-card .day-card.active {
+        background-color: var(--md-sys-color-surface-1);
+    }
+/*图片列表查看*/
+.image-slide-group-card .m-slide-group__content {
+    justify-content: center;
+}
 
 /*默认模板 主要信息卡片*/
 
@@ -3024,6 +3241,17 @@ div.prizeTips {
             padding: .7rem;
             padding-top: 0;
         }
+/*折扣页面*/
+.discount-screen-card .title-card {
+    display: flex;
+    justify-content: space-between;
+}
+
+.discount-screen-card .input-card {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
 
 .markdown-body {
     white-space: break-spaces;
@@ -3031,57 +3259,57 @@ div.prizeTips {
     flex-direction: column;
 }
 
-.markdown-body pre {
-    overflow: initial !important;
-}
-/*图片注释*/
-.markdown-body img + strong {
-    display: flex;
-    justify-content: center;
-    font-weight: inherit !important;
-    margin-top: .66667em;
-    color: #999;
-    text-align: center;
-    font-size: .9em
-}
-
-.markdown-body a img + strong {
-    color: var(--md-sys-color-primary) !important;
-}
-
-/*视频注释*/
-.markdown-body .aspect-ratio + p > strong {
-    display: flex;
-    justify-content: center;
-    font-weight: inherit !important;
-    margin-top: .66667em;
-    color: #999;
-    font-size: .9em
-}
-
-.markdown-body a .aspect-ratio + p > strong {
-    color: var(--md-sys-color-primary) !important;
-}
-/* 这个规则规定了iframe父元素容器的尺寸，我们要去它的宽高比应该是 25:14 */
-.markdown-body .aspect-ratio {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56%; /* 高度应该是宽度的56% */
-}
-
-    /* 设定iframe的宽度和高度，让iframe占满整个父元素容器 */
-    .markdown-body .aspect-ratio iframe {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
+    .markdown-body pre {
+        overflow: initial !important;
+    }
+    /*图片注释*/
+    .markdown-body img + strong {
+        display: flex;
+        justify-content: center;
+        font-weight: inherit !important;
+        margin-top: .66667em;
+        color: var(--md-sys-color-primary);
+        text-align: center;
+        font-size: .9em
     }
 
-.markdown-body img {
-    max-width: 100%;
-}
+    .markdown-body a img + strong {
+        color: var(--md-sys-color-primary) !important;
+    }
+
+    /*视频注释*/
+    .markdown-body .aspect-ratio + p > strong {
+        display: flex;
+        justify-content: center;
+        font-weight: inherit !important;
+        margin-top: .66667em;
+        color: var(--md-sys-color-primary);
+        font-size: .9em
+    }
+
+    .markdown-body a .aspect-ratio + p > strong {
+        color: var(--md-sys-color-primary) !important;
+    }
+    /* 这个规则规定了iframe父元素容器的尺寸，我们要去它的宽高比应该是 25:14 */
+    .markdown-body .aspect-ratio {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56%; /* 高度应该是宽度的56% */
+    }
+
+        /* 设定iframe的宽度和高度，让iframe占满整个父元素容器 */
+        .markdown-body .aspect-ratio iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+    .markdown-body img {
+        max-width: 100%;
+    }
 
 .user-rank {
     display: flex;
@@ -3160,8 +3388,8 @@ div.prizeTips {
 }
 
     .user-info-card .image-card img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
     }
 
@@ -3180,6 +3408,10 @@ div.prizeTips {
         flex-direction: column;
         justify-content: space-evenly;
     }
+
+        .user-info-card .content-card .name {
+            word-break: keep-all;
+        }
 
 a.user-info-card {
     color: var(--md-sys-color-on-background) !important;
@@ -3210,4 +3442,10 @@ a.user-info-card {
     border-radius: 50%;
     margin: 1rem;
     height: 150px;
+}
+
+.article-main-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }

@@ -7,13 +7,8 @@
 @inject MasaBlazor MasaBlazor
 @implements IDisposable
 
-
-
 <!--主题颜色-->
-<link rel="stylesheet" href="@($"_content/CnGalWebSite.Shared/css/material-theme/color-tokens/color-{_dataCacheService.ThemeSetting.ThemeColor}-tokens.css")">
-
-<!--自定义样式-->
-<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css">
+<link rel="stylesheet" href="@($"_content/CnGalWebSite.Shared/css/material-theme/color-tokens/color-{_themeColor??_dataCacheService.ThemeSetting.ThemeColor}-tokens.css")">
 
 @if (_dataCacheService.IsApp)
 {
@@ -27,13 +22,12 @@ else
 }
 
 <!--主题模式-->
-
-@if (_dataCacheService.ThemeSetting.ThemeMode== ThemeMode.System)
+@if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.System && _isDark != true)
 {
     <!--跟随系统-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/theme.css" />
 }
-else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Dark)
+else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Dark || _isDark == true)
 {
     <!--暗色模式-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/dark/bundle-dark.css" />
@@ -58,9 +52,13 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
         }
     </style>
 }
-
+<!--窄边距-->
+@if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
+{
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/extend-entire-screen.css">
+}
 <!--无边距-->
-@if (_dataCacheService.ThemeSetting.IsFullScreen)
+@if (_isFullScreen ?? _dataCacheService.ThemeSetting.IsFullScreen)
 {
     <style>
         .variable.container {
@@ -69,12 +67,17 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
         }
     </style>
 }
-@code {
 
+@code {
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
 
     ThemeModel _themeSetting = new ThemeModel();
+
+    bool? _isDark;
+    bool? _isTransparent;
+    bool? _isFullScreen;
+    string _themeColor;
 
 
     protected override void OnInitialized()
@@ -89,8 +92,12 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
         _eventService.TempEffectTheme += OnTempEffectTheme;
     }
 
-    public async void OnTempEffectTheme()
+    public async void OnTempEffectTheme(bool? isDark, bool? isFullScreen, bool? isTransparent, string themeColor)
     {
+        _isDark = isDark;
+        _isTransparent = isTransparent;
+        _isFullScreen = isFullScreen;
+        _themeColor = themeColor;
         await Refresh();
     }
 
@@ -101,8 +108,10 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     }
     public async void OnCleanTempEffectTheme()
     {
-        _dataCacheService.ThemeSetting.IsFullScreen = false;
-        await LoadTheme();
+        _isTransparent = null;
+        _themeColor = null;
+        _isFullScreen = null;
+        _isDark = null;
         await Refresh();
     }
 
@@ -136,14 +145,18 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
         {
             _dataCacheService.ThemeSetting = new ThemeModel();
         }
-        if(ThemeModel.AvailableColors.Contains(_dataCacheService.ThemeSetting.ThemeColor)==false)
+        if (ThemeModel.AvailableColors.Contains(_dataCacheService.ThemeSetting.ThemeColor) == false)
         {
             _dataCacheService.ThemeSetting.ThemeColor = ThemeModel.DefaultThemeColor;
         }
         //获取系统主题
-        if (_dataCacheService.ThemeSetting.ThemeMode== ThemeMode.System)
+        if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.System)
         {
             _dataCacheService.ThemeSetting.IsDark = await JS.InvokeAsync<bool>("checkSystemThemeIsDark");
+        }
+        else
+        {
+            _dataCacheService.ThemeSetting.IsDark = _dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Dark;
         }
     }
 

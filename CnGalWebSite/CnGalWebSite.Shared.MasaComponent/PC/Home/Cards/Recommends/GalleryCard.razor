@@ -33,17 +33,14 @@
      </div>
      <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
          <div class="actions">
-             <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
-                 <MIcon Small="_dataCatcheService.IsApp" Left>@IconType.Game.ToIconString()</MIcon>
-                访问作品页面
-            </MButton>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
-             @if (string.IsNullOrWhiteSpace(Model.SteamId) == false && _dataCatcheService.IsApp == false)
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="详情" TextStyle Rounded Icon="@IconType.Infor.ToIconString()" OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))" />
+             @if (_dataCatcheService.IsApp == false)
             {
-                <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
-                     <MIcon Left Small="_dataCatcheService.IsApp">@IconType.Steam.ToIconString()</MIcon>
-                     访问Steam商店
-                 </MButton>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
+            }
+            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="Steam" Icon="@IconType.Steam.ToIconString()" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))" />
             }
         </div>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -63,13 +60,13 @@
         else
         {
             await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
-            {
-                Index = Model.Images.IndexOf(image),
-                Pictures = Model.Images.Select(s => new EditImageAloneModel
                 {
-                    Image = s,
-                }).ToList()
-            });
+                    Index = Model.Images.IndexOf(image),
+                    Pictures = Model.Images.Select(s => new EditImageAloneModel
+                    {
+                        Image = s,
+                    }).ToList()
+                });
         }
 
     }

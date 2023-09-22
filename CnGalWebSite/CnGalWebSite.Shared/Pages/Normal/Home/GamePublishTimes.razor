@@ -21,9 +21,9 @@
     }
     else
     {
-        <div class=" rounded shadow-sm ps-4 pe-4 mb-4 bg-opacity">
+        <MDCard Class="ps-4 pe-4 mb-4">
             <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
-                <div class="h4 fw-bold font-color">游戏发售时间汇总</div>
+                <div class="title-large mb-3">游戏发售时间汇总</div>
                 <div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
                 </div>
@@ -32,16 +32,10 @@
                 @if (Type == PublishGamesDisplayType.CardList)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft" />
-                    <div style="max-width:160px" class="ps-4 pe-4">
+                    <div style="max-width:170px" class="ps-2 pe-2">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMonthPick Date="Date" DateChanged="DateChanged" />
-
                     </div>
-                    <div style="max-width:100px;">
-                        <MButton Text Block  OnClick="OnClickRight" Color="primary">
-                            下个月
-                            <MIcon Right>mdi-arrow-right-thick</MIcon>
-                        </MButton>
-                    </div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下个月" Icon="mdi-arrow-right-thick" TextStyle OnClick="OnClickRight" />
                 }
                 else
                 {
@@ -55,13 +49,11 @@
 
                     </div>
                 }
-
-
             </div>
-        </div>
+        </MDCard>
         @if (Type == PublishGamesDisplayType.CardList)
         {
-            <div class="row">
+            <div>
                 @foreach (var item in CardModel.OrderBy(s => s.PublishTime))
                 {
                     <div class="mb-4">

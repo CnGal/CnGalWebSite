@@ -1,87 +1,80 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCatcheService
 
-<MDCard Outline>
-    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false && HiddenImage == false)
+<MDCard Outline Class="article-main-card">
+     @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false && HiddenImage == false)
     {
         <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
     }
-    <div class="@(Outline?"":"pt-8") ">
-
-        @if (HiddenTitle == false)
+    @if (HiddenTitle == false)
+    {
+        <h1 class="fw-bold  h3" itemprop="headline">@Model.DisplayName</h1>
+        @if (HiddenInfo == false)
         {
-            <div style="display: flex; flex-direction: column; ">
-                <h1 class="fw-bold  h3 mb-8" itemprop="headline">@Model.DisplayName</h1>
-                @if (HiddenInfo == false)
-                {
-                                    <div class="mb-8 d-flex">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime"/>
-                    <span class="me-4">@((Model.CreateTime.Year < 1900 ? Model.LastEditTime : Model.CreateTime).ToString("yyyy-MM-dd"))</span>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />
-                    <span class="me-4">@(Model.ReaderCount + "次阅读")</span>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.ThumbsUp" />
-                    <span>@(Model.ThumbsUpCount + "人点赞")</span>
-                </div>
+            <div class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" />
+                <span class="me-4">@((Model.CreateTime.Year < 1900 ? Model.LastEditTime : Model.CreateTime).ToString("yyyy-MM-dd"))</span>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />
+                <span class="me-4">@(Model.ReaderCount + "次阅读")</span>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.ThumbsUp" />
+                <span>@(Model.ThumbsUpCount + "人点赞")</span>
+            </div>
 
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Class="mb-4" Outline/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Outline />
+
+        }
+    }
+
+    <div>
+        @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+                作者：
+                <strong> @Model.OriginalAuthor</strong>
+                &nbsp; 原文发表在：
+                <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank" itemprop="url">@Model.OriginalLink</a>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                @foreach (var item in Model.OriginalAuthor.Replace("，", ",").Replace("、", ",").Split(','))
+                {
+                    <meta itemprop="name" content="@item" />
 
                 }
-             </div>
+            </div>
+            <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
+                <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                <meta itemprop="name" content="@Model.UserInfor.Name" />
+                <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+            </div>
+        }
+        else
+        {
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                <meta itemprop="name" content="@Model.UserInfor.Name" />
+                <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+            </div>
         }
 
-        <div class="@(HiddenTitle?"":"mt-4")">
-
-            @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
-            {
-
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
-                    作者：
-                    <strong> @Model.OriginalAuthor</strong>
-                    &nbsp; 原文发表在：
-                    <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank" itemprop="url">@Model.OriginalLink</a>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-
-                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    @foreach (var item in Model.OriginalAuthor.Replace("，", ",").Replace("、", ",").Split(','))
-                    {
-                        <meta itemprop="name" content="@item" />
-
-                    }
-                </div>
-                <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
-                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
-                    <meta itemprop="name" content="@Model.UserInfor.Name" />
-                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
-                </div>
-            }
-            else
-            {
-                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
-                    <meta itemprop="name" content="@Model.UserInfor.Name" />
-                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
-                </div>
-            }
-
-            @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
-            }
+        @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
+        }
 
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
-            <div style=" display: flex; flex-direction: column; align-items: flex-end;">
-                <div class="d-flex mt-2">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
-                    <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy年M月d日  HH:mm:ss")</span>
-                </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+        <div style=" display: flex; flex-direction: column; align-items: flex-end;">
+            <div class="d-flex mt-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
+                <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy年M月d日  HH:mm:ss")</span>
             </div>
         </div>
     </div>
 
     <meta itemprop="datePublished" content="@Model.CreateTime.ToString("G")" />
     <meta itemprop="dateModified" content="@Model.LastEditTime.ToString("G")" />
-    </MDCard>
+</MDCard>
 
 
 
