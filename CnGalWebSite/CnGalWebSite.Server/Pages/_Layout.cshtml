@@ -51,34 +51,35 @@
 
 
     <div id="blazor-error-ui">
-        <div class="components-reconnect-show">
-            <div class="rounded  rounded shadow  bg-opacity" style="max-width: 400px; width: 100%;">
-                <div class="modal-body">
-                    <div class="swal2-header">
-
-                        <h2 class="swal2-title">发生未知错误</h2>
-                    </div>
-                    <div class="swal2-content d-flex text-center">
-                        请尝试刷新页面,如果问题无法解决<br />
-                        可加 Q群 761794704 进行反馈
-                    </div>
-                    <div class="swal2-actions mb-0">
-                        <div class="btn btn-outline-primary reload" style="width:100px" href="" onclick="openNewPage">
-                            <i class="fa fa-refresh"></i>&nbsp;刷新
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面,如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
                         </div>
                     </div>
                 </div>
-
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
             </div>
+
         </div>
     </div>
-    <div id="components-reconnect-modal" style="height:0px;width:0px;">
-
+    <div id="components-reconnect-modal">
     </div>
 
     <!--自定义脚本-->
     <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script>
-  
+
     <!--图片裁剪-->
     <script src="https://app.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
 
