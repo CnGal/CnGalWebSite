@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"{Name} 基本信息")" Icon="fa fa-fw fa-info-circle" Class="mb-4">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"{Name} 基本信息")" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
     <div class="row">
         @foreach (var item in Items)
         {

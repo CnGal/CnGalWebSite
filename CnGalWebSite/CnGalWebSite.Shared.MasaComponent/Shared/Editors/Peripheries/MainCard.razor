@@ -1,80 +1,74 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@Class" Collapable>
-    <ValidateForm Model="@Model">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
+    <MRow>
+        <MCol Cols="12" Md="6" Lg="3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4"/>
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="3">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12">
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="PeripheryType" Label="分类" />
+         </MCol>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Category" Label="类别" />
+         </MCol>
 
-        <div class="row mb-4">
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"/>
-            </div>
-            <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"/>
-            </div>
-        </div>
+         <MCol Cols="12">
+             <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Author" Label="作者" />
+         </MCol>
 
-        <div class="row">
-            <div class="form-group col-12  col-sm-6">
-                <Select @bind-Value="Model.Type" />
-            </div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Material" Label="材质" />
+         </MCol>
 
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Category" />
-            </div>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Size" Label="尺寸" />
+         </MCol>
 
-            <div class="form-group col-12">
-                <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Author" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <BootstrapInput @bind-Value="Model.Material" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.Size" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <BootstrapInput @bind-Value="Model.Brand" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.IndividualParts" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <BootstrapInput @bind-Value="Model.Price" />
-            </div>
-            <div class="form-group col-12">
-                <BootstrapInput @bind-Value="Model.SaleLink" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.IsReprint" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <Switch @bind-Value="Model.IsAvailableItem" />
-            </div>
-            <div class="form-group col-12">
-                <hr />
-            </div>
-            @if (Model.Type == PeripheryType.SetorAlbumEtc)
-            {
-                <div class="form-group col-12 col-sm-6">
-                    <BootstrapInputNumber @bind-Value="Model.PageCount" />
-                </div>
-            }
-            @if (Model.Type == PeripheryType.Ost)
-            {
-                <div class="form-group col-12 col-sm-6">
-                    <BootstrapInputNumber @bind-Value="Model.SongCount" />
-                </div>
-            }
-        </div>
-    </ValidateForm>
-
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Brand" Label="品牌" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.IndividualParts" Label="单独部件数量" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Price" Label="价格" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.SaleLink" Label="贩售链接" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MCheckbox @bind-Value="Model.IsReprint" Label="再版" TValue="bool" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MCheckbox @bind-Value="Model.IsAvailableItem" Label="装饰品" TValue="bool" />
+         </MCol>
+         @if (Model.Type == PeripheryType.SetorAlbumEtc)
+        {
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.PageCount" Label="页数" />
+            </MCol>
+        }
+        @if (Model.Type == PeripheryType.Ost)
+        {
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.SongCount" Label="歌曲数" />
+            </MCol>
+        }
+    </MRow>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {

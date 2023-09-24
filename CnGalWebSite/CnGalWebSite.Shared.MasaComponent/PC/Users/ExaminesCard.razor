@@ -2,21 +2,21 @@
 @inject IDataCacheService _dataCacheService
 
 
-<div class="rounded shadow-sm  bg-opacity mb-4">
+<MDCard Class="mb-4">
     <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-8">
         <div class="ps-4 pe-4" style="max-width: 300px; width: 100%;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ExaminedNormalListPassType" Lable="筛选" Class="pt-0" />
+            <CnGalWebSite.Components.Inputs.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ExaminedNormalListPassType" Label="筛选" Class="pt-0" />
         </div>
         <div class="ps-4 pe-4" style="max-width: 300px; width: 100%;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" TValue="ExaminedNormalListSortType" Lable="排序" Class="pt-0" />
+            <CnGalWebSite.Components.Inputs.MasaSelecte Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" TValue="ExaminedNormalListSortType" Label="排序" Class="pt-0" />
         </div>
     </div>
-</div>
-
-    <div>
-        @foreach (var examine in pagedResultDto.Data)
+</MDCard>
+@if(isReady)
+{
+    @foreach (var examine in pagedResultDto.Data)
         {
-            <div class="rounded shadow-sm  bg-opacity mb-3 p-3">
+            <MDCard Class="pa-3 mb-3">
                 <div style="display: flex; align-items: center;">
                     <div>
                         @if (examine.IsPassed != null)
@@ -78,9 +78,9 @@
                         {
                             <span>
                                 @($"序号『{ examine.Id.ToString("00000")}』")
-                                <TabLink Text="@name" Url="@("/home/examines?Id="+examine.Id)" Icon="fa fa-pencil">
+                                <a  href="@("/home/examines?Id="+examine.Id)">
                                     @examine.Operation.GetDisplayName()
-                                </TabLink>
+                                </a>
                             </span>
                         }
                         else
@@ -89,19 +89,19 @@
 
                                 @($"序号『{ examine.Id.ToString("00000")}』")
                                 对
-                                <TabLink Text="@examine.RelatedName" Url="@(name+"/index/"+examine.RelatedId)" Icon="fa fa-codepen">
+                                <a  href="@(name+"/index/"+examine.RelatedId)">
                                     @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                                </TabLink>
+                                </a>
                                 进行
-                                <TabLink Text="@name" Url="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/examine?Id="+examine.Id))" Icon="fa fa-pencil">
+                                <a href="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/examine?Id="+examine.Id))">
                                     @examine.Operation.GetDisplayName()
-                                </TabLink>
+                                </a>
                                 操作
                             </span>
                         }
 
                         <br />
-                        <span style="color:gray;">
+                        <span class="label-large">
                             @("申请时间："+examine.ApplyTime.ToString("yyyy-MM-dd HH:mm")) &nbsp; &nbsp;
                             @if (examine.PassedTime != null)
                             {
@@ -111,7 +111,7 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </MDCard>
         }
         @if (pagedResultDto.TotalPages > 1)
         {
@@ -120,12 +120,16 @@
         @if (pagedResultDto.Data.Count == 0)
         {
             <div class="mb-3">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
             </div>
-
         }
-    </div>
 
+
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill/>
+}
 
 @code {
     [CascadingParameter]
@@ -133,6 +137,8 @@
 
     [Parameter]
     public string Id { get; set; }
+
+    bool isReady;
 
     public string Sorting { get; set; } = "Id desc";
     public string ScreeningConditions { get; set; } = "All";
@@ -188,6 +194,7 @@
         }
         //获取审核列表
         await OnPageClick(_dataCacheService.SpaceViewCache.ExaminesCurrentPage);
+        isReady=true;
     }
 
     private async Task OnPageClick(int pageIndex)
@@ -200,7 +207,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑记录失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑记录失败");
         }
     }
 

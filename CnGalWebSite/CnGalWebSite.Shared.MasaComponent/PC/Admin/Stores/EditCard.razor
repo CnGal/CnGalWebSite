@@ -21,59 +21,59 @@ else
         </MCardText>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.PlatformType" TValue="PublishPlatformType" Lable="平台类型" />
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.PlatformType" TValue="PublishPlatformType" Label="平台类型" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.PlatformName" Label="平台名称" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Name" Label="名称" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Link" Label="链接" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.State" TValue="StoreState" Lable="状态" />
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.State" TValue="StoreState" Label="状态" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.CurrencyCode" TValue="CurrencyCode" Lable="币种" />
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.CurrencyCode" TValue="CurrencyCode" Label="币种" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.UpdateType" TValue="StoreUpdateType" Lable="信息更新方式" />
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.UpdateType" TValue="StoreUpdateType" Label="信息更新方式" />
                 </MCol>
 
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.OriginalPrice" Label="原价" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.PriceNow" Label="现价" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.CutNow" Label="折扣" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.PriceLowest" Label="史低" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.CutLowest" Label="最高折扣" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.PlayTime" Label="平均游玩时长 分钟" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.EvaluationCount" Label="评测数" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.RecommendationRate" Label="好评率" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.EstimationOwnersMax" Label="估计拥有人数 上限" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.EstimationOwnersMin" Label="估计拥有人数 下限" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.EntryId" Label="关联的游戏" />
                 </MCol>
             </MRow>
@@ -81,9 +81,7 @@ else
         </MCardText>
         <MCardActions Class="pb-6 ps-6 pe-6">
             <MSpacer></MSpacer>
-            <MButton Color="primary"
-                     Text
-                     OnClick="SaveEdit">
+            <MButton Color="primary" Rounded  OnClick="SaveEdit">
                 <MIcon Left>mdi-check</MIcon>
                 保存
             </MButton>
@@ -126,7 +124,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+            await ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
         }
     }
 
@@ -151,7 +149,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+            await ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
         }
 
     }

@@ -3,26 +3,20 @@
 
 @if (string.IsNullOrWhiteSpace(Url))
 {
-    <span class="@(Class+" d-flex ma-1")" style=" align-items: center;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString" />
-        @if (string.IsNullOrWhiteSpace(Title) == false)
-        {
-            <span style="word-break: keep-all;">
-                @Title：
-            </span>
-        }
-        <span itemprop="@ItemProp">
-            @Text
-        </span>
-    </span>
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString"/>
+        @($"{Title}{(string.IsNullOrWhiteSpace(Title)?"":"：")}{Text}")
+    </div>
 }
 else
 {
 
-    <span class="@(Class+" d-flex ma-1")" style=" word-break: break-all; align-items: center;">
+    <span class="@(Class+" d-flex label-large")" style="word-break: break-all; align-items: center;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString"/>
-        <span style="word-break: keep-all;"> @Text</span>
-        <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
+        <span>
+            @($"{Title}{(string.IsNullOrWhiteSpace(Title) ? "" : "：")}{Text}")
+            <a href="@Url" target="_blank">@Url</a>
+        </span>
     </span>
 }
 
@@ -40,8 +34,6 @@ else
     public IconType Icon { get; set; }
     [Parameter]
     public string IconString { get; set; }
-    [Parameter]
-    public string ItemProp { get; set; }
     [Parameter]
     public string Content { get; set; }
 }

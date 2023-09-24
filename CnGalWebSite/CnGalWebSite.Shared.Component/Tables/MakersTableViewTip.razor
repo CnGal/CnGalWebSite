@@ -1,152 +1,53 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 @inject IEventService _eventService
 
-@if (!isReady)
-{
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-}
-else
-{
-    <Table TItem="MakerInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQueryMakerAsync" SearchModel="@SearchModelMaker" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-        <TableToolbarTemplate>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="MakerInforTableModel" Columns="table.Columns" Items="ModelMaker.MakerInfors" Name="制作人汇总表" />
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.AnotherName" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Bilibili" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.MicroBlog" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
-        </RowButtonTemplate>
-
-    </Table>
-}
+<DataTableCard TModel="MakerInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
 
 @code {
-    Table<MakerInforTableModel> table;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/tables/ListMakers";
+    private string _name = "制作者";
+
+    private List<DataTableHeader<MakerInforTableModel>> _headers = new List<DataTableHeader<MakerInforTableModel>>
+    {
+        new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(MakerInforTableModel.RealId)
+          },
+          new (){ Text= "名称", Value= nameof(MakerInforTableModel.Name)},
+          new (){ Text= "别称", Value= nameof(MakerInforTableModel.AnotherName)},
+          new (){ Text= "B站", Value= nameof(MakerInforTableModel.Bilibili)},
+          new (){ Text= "微博", Value= nameof(MakerInforTableModel.MicroBlog)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<MakerInforTableModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
-
-    private bool isReady = false;
-    public MakerInforListViewModel ModelMaker { get; set; } = new MakerInforListViewModel
+    public async Task LookItem(MakerInforTableModel model)
     {
-        MakerInfors = new List<MakerInforTableModel>()
-    };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<MakerInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<MakerInforTableModel>>> SortLambdaCacheMaker = new();
-    private MakerInforTableModel SearchModelMaker { get; set; } = new MakerInforTableModel();
-
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
-
-    public async Task OnLook(long id)
-    {
-        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + id);
-
-
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelMaker = await _httpService.GetAsync<MakerInforListViewModel>("api/tables/GetMakerInforList");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取制作人信息汇总表格");
-        }
-    }
-
-    private Task<QueryData<MakerInforTableModel>> OnQueryMakerAsync(QueryPageOptions options)
-    {
-
-
-        IEnumerable<MakerInforTableModel> items = ModelMaker.MakerInfors;
-        // 处理高级搜索
-        if (!string.IsNullOrWhiteSpace(SearchModelMaker.Name))
-        {
-            items = items.Where(item => item.Name?.Contains(SearchModelMaker.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(SearchModelMaker.Nickname))
-        {
-            items = items.Where(item => item.Nickname?.Contains(SearchModelMaker.Nickname, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-        if (!string.IsNullOrWhiteSpace(SearchModelMaker.AnotherName))
-        {
-            items = items.Where(item => item.AnotherName?.Contains(SearchModelMaker.AnotherName, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-
-
-        // 处理 Searchable=true 列与 SeachText 模糊搜索
-        if (options.Searchs.Any())
-        {
-            items = items.Where(options.Searchs.GetFilterFunc<MakerInforTableModel>(FilterLogic.Or));
-        }
-        else
-        {
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                             || (item.Nickname?.Contains(options.SearchText) ?? false)
-                             || (item.AnotherName?.Contains(options.SearchText) ?? false));
-            }
-        }
-        // 过滤
-        var isFiltered = false;
-        if (options.Filters.Any())
-        {
-            items = items.Where(options.Filters.GetFilterFunc<MakerInforTableModel>());
-            isFiltered = true;
-        }
-
-        // 排序
-        var isSorted = false;
-        if (!string.IsNullOrWhiteSpace(options.SortName))
-        {
-            // 外部未进行排序，内部自动进行排序处理
-            var invoker = SortLambdaCacheMaker.GetOrAdd(typeof(MakerInforTableModel), key => LambdaExtensions.GetSortLambda<MakerInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-            isSorted = true;
-        }
-
-        // 设置记录总数
-        var total = items.Count();
-
-        // 内存分页
-        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-        return Task.FromResult(new QueryData<MakerInforTableModel>()
-        {
-            Items = items,
-            TotalCount = total,
-            IsSorted = isSorted,
-            IsFiltered = isFiltered
-        });
+        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + model.RealId);
     }
 }

@@ -1,7 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
-@inject ToastService ToastService
+@inject IPopupService PopupService
+
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
@@ -75,7 +76,7 @@
             }
             catch
             {
-                await ToastService.Error("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
+                await PopupService.ToastErrorAsync("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
             }
         }
     }

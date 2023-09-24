@@ -34,7 +34,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            await ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
             await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
         }
     }

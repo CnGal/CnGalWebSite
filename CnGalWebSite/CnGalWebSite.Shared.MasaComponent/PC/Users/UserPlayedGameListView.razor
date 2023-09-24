@@ -1,10 +1,11 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 
 <div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
@@ -20,44 +21,45 @@
                 }
                 else
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
 
                 }
             }
 
 
         </ButtonContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    @if (isReady)
-    {
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
-        @if (GameRecords.Count == 0)
-        {
-            @if (IsAnniversary&& string.IsNullOrWhiteSpace(SteamId)&& IsCurrentUser)
+        <ChildContent>
+            @if (isReady)
             {
-                <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
+                @if (GameRecords.Count == 0)
+                {
+                    @if (IsAnniversary && string.IsNullOrWhiteSpace(SteamId) && IsCurrentUser)
+                    {
+                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                         </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill />
+                         </div>
+                    }
+
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary" />
+                }
             }
             else
             {
-                <div class="mb-3">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
             }
-
-        }
-        else
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary" />
-        }
-    }
-    else
-    {
-        <div style="height:300px">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-        </div>
-    }
+        </ChildContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+   
 </div>
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
 
@@ -101,7 +103,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
+            await ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
         }
     }
 
@@ -130,17 +132,17 @@
                 _dataCacheService.UserGameRecordDataCatche.Clean(UserId);
                 _dataCacheService.UserSteamInforDataCatche.Clean(UserId);
                 await Refresh();
-                await ToastService.Success("刷新成功", "刷新成功");
+                await PopupService.ToastSuccessAsync("刷新成功", "刷新成功");
                 StateHasChanged();
             }
             else
             {
-                await ToastService.Error("刷新失败", "刷新失败");
+                await PopupService.ToastErrorAsync("刷新失败", "刷新失败");
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
+            await ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
         }
     }
 }

@@ -3,17 +3,16 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票" Icon="@IconType.Vote.ToIconString()" Class="h-100"  ShowMoreButton OnClickMore="OnClickMore">
-    <MSlideGroup ShowArrows="true">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="投票" Icon="@IconType.Vote.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
+     <MSlideGroup ShowArrows="true" Class="slide-group-garp">
         <ChildContent>
             @foreach (var item in _dataCacheService.VoteCardsCatche)
             {
                 <MSlideItem>
-                    <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                           OnClick="@context.Toggle"
-                           RefBack="@context.Ref">
+                    <div style="width:300px;">
                         <VoteViewTip Model="item" />
-                    </MCard>
+                    </div> 
+                      
                 </MSlideItem>
             }
         </ChildContent>
@@ -40,7 +39,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取广场投票列表失败");
+            await ErrorHandler.ProcessError(ex, "获取广场投票列表失败");
         }
     }
     public void OnClickMore()

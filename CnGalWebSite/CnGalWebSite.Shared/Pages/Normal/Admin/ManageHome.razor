@@ -2,8 +2,8 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -11,9 +11,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="其他设置"/>
 
 <div>
-    <div class="rounded  shadow-sm bg-opacity mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-               >
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
             <MTab Value="1">
                 轮播图<MIcon>mdi-image-area</MIcon>
@@ -22,7 +20,6 @@
                 友情链接<MIcon>mdi-link</MIcon>
             </MTab>
         </MTabs>
-    </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Carousels.ListCard/>

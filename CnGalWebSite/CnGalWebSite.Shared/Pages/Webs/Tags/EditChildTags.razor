@@ -1,8 +1,9 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
+
+
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -18,25 +19,12 @@ else
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Tag" Class="mb-3" />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-tag" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Tag.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Tags.ChildTagsCard Model="Model" Class="mb-4" TagItems="TagItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -76,7 +64,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑标签子标签失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑标签子标签失败");
             }
         }
     }
@@ -89,19 +77,19 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("编辑标签子标签失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑标签子标签失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑标签子标签成功", "编辑标签子标签成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
+                await PopupService.ToastSuccessAsync("编辑标签子标签成功", "编辑标签子标签成功，等待审核通过");
+                NavigationManager.NavigateTo("/tags/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑标签子标签失败");
+            await ErrorHandler.ProcessError(ex, "编辑标签子标签失败");
         }
     }
 

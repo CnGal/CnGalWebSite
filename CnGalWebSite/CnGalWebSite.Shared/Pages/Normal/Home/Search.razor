@@ -5,68 +5,67 @@
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="搜索"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="搜索" />
 
 
 <div class="search-view">
-    <div class="shadow-sm bg-opacity rounded p-3 mb-3">
+    <MDCard Class="mb-3">
         <div style=" display: flex; justify-content: center; ">
-            <div style=" display: flex; max-width: 500px; width: 100%; align-items: center;">
-                <MTextField Placeholder="可以搜索哦~" TValue="string" @bind-Value="@InputModel.FilterText"  OnKeyDown="OnKeyDown" Autofocus></MTextField>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" IsAsync OnClick="OnSearchString" Icon="mdi-magnify" Class="ms-4" />
-            </div>
-        </div>
-    </div>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Search.ScreenCard OnChanged="()=>OnChanged()" Model="InputModel"/>
-    <div class="mt-3">
+            <div style=" display: flex;align-items: center;">
+                <MTextField Placeholder="可以搜索哦~" TValue="string" @bind-Value="@InputModel.FilterText" OnKeyDown="OnKeyDown" Autofocus></MTextField>
+                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="搜索" Rounded IsAsync OnClick="OnSearchString" Icon="mdi-magnify" Class="ms-4" />
+             </div>
+         </div>
+     </MDCard>
+     <CnGalWebSite.Shared.MasaComponent.PC.Home.Search.ScreenCard OnChanged="()=>OnChanged()" Model="InputModel" />
+     <div class="mt-3">
 
-        @if (isReady == false)
+         @if (isReady == false)
         {
-            <div style="height:300px">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
         }
         else
         {
-            
-                @foreach (var item in DataModel.pagedResultDto.Data)
-                {
-                    <div class="mb-3">
-                        @if (item.entry != null)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip>
-                        }
-                        else if (item.article != null)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip>
-                        }
-                        else if (item.periphery != null)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip>
-                        }
-                        else if (item.tag != null)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip>
-                        }
-                        else if (item.video != null)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip>
-                        }
-                    </div>
+
+            @foreach (var item in DataModel.pagedResultDto.Data)
+            {
+                <div class="mb-3">
+                    @if (item.entry != null)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip>
+                    }
+                    else if (item.article != null)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip>
+                    }
+                    else if (item.periphery != null)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip>
+                    }
+                    else if (item.tag != null)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.TagInforViewTip>
+                    }
+                    else if (item.video != null)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.VideoInforViewTip>
+                    }
+                </div>
             }
 
 
             @if (DataModel.pagedResultDto.Data.Count == 0)
             {
-                <NotFoundSearch IsNeedLayput="true"></NotFoundSearch>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill>
+                 <h1 class="text-center title-large">搜索不到呢......</h1>
+                 <div class="text-center">不过你可以在这里<a href="/entries/establishentry">创建词条</a>或者<a href="/articles/createarticle">发布文章</a></div>
+             </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
             }
             else
             {
-
-
                 @if (DataModel.pagedResultDto.TotalPages > 1)
                 {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@DataModel.pagedResultDto.CurrentPage" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@DataModel.pagedResultDto.CurrentPage" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick" />
 
                 }
 
@@ -133,7 +132,7 @@
                 }
                 catch (Exception ex)
                 {
-                    ErrorHandler.ProcessError(ex, "无法获取搜索结果");
+                    await ErrorHandler.ProcessError(ex, "无法获取搜索结果");
                     DataModel = new SearchViewModel();
 
                 }
@@ -161,13 +160,13 @@
         InputModel.CurrentPage = page;
         NavigationManager.NavigateTo("/search" + InputModel.ToQueryParameterString());
 
-        
+
     }
 
 
     private void OnPageClick(int pageIndex)
     {
-        if (isReady == false ||  DataModel.pagedResultDto.CurrentPage == pageIndex)
+        if (isReady == false || DataModel.pagedResultDto.CurrentPage == pageIndex)
         {
             return;
         }

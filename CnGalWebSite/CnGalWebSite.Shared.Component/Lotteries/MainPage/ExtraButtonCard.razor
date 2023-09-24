@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 <div style="display: flex; justify-content: center;">
@@ -40,17 +41,17 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error(text + "抽奖失败", obj.Error);
+                await PopupService.ToastErrorAsync(text + "抽奖失败", obj.Error);
             }
             else
             {
-                await ToastService.Success(text + "抽奖成功", text + "抽奖成功");
+                await PopupService.ToastSuccessAsync(text + "抽奖成功", text + "抽奖成功");
                 await StateChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, text + "抽奖失败");
+            await ErrorHandler.ProcessError(ex, text + "抽奖失败");
         }
     }
 

@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(IsDefault?"默认":"其他")" />
+
+ @code {
+    [Parameter]
+    public bool IsDefault { get; set; }
+
+    public string GetColor()
+    {
+        return IsDefault switch
+        {
+            false => "success",
+            true => "info"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsDefault switch
+        {
+            false => IconType.Default,
+            true => IconType.Other,
+        };
+    }
+}

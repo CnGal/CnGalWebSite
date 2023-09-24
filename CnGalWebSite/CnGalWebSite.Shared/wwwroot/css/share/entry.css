@@ -1,0 +1,128 @@
+﻿/*默认模板 主要信息卡片*/
+
+.entry-card-default.main-card.game .content-card .groups-card {
+    display: flex;
+    column-gap: 1rem;
+    flex-wrap: wrap;
+}
+
+    .entry-card-default.main-card.game .content-card .groups-card > div {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+.entry-card-default.main-card .options-card {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/*标签*/
+.entry-card-default.tags-card {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+/*关联卡片*/
+.entry-card-default.relevance-card {
+    padding: .7rem;
+    gap: .5rem;
+}
+
+    .entry-card-default.relevance-card a {
+        color: var(--md-sys-color-on-surface);
+    }
+
+    .entry-card-default.relevance-card .main-card {
+        display: flex;
+        gap: 1rem;
+    }
+
+        .entry-card-default.relevance-card .main-card img {
+            width: 250px;
+            height: min-content;
+        }
+
+            .entry-card-default.relevance-card .main-card img.thum {
+                width: 120px;
+                border-radius: 50%;
+            }
+
+    .entry-card-default.relevance-card .title-card {
+        flex-direction: row;
+    }
+
+    .entry-card-default.relevance-card .head-card {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    .entry-card-default.relevance-card .content-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        gap: .2rem;
+    }
+
+    .entry-card-default.relevance-card .title-card .name {
+        width: -webkit-fill-available;
+    }
+
+    .entry-card-default.relevance-card .info-card {
+        display: flex;
+        column-gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .entry-card-default.relevance-card .info-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .entry-card-default.relevance-card.hide-title .head-card {
+        display: none;
+    }
+
+
+
+    .entry-card-default.relevance-card.hide-title .content-card .brief {
+        -webkit-line-clamp: 5;
+        white-space: break-spaces;
+    }
+
+    /*大卡片样式*/
+    .entry-card-default.relevance-card.big-card-style {
+        padding: 0;
+    }
+
+        .entry-card-default.relevance-card.big-card-style .main-card {
+            flex-direction: column;
+        }
+
+            .entry-card-default.relevance-card.big-card-style .main-card img {
+                width: 100%;
+            }
+
+        .entry-card-default.relevance-card.big-card-style .content-card {
+            width: 100%;
+            padding: .7rem;
+            padding-top: 0;
+        }
+
+        .entry-card-default.relevance-card.big-card-style .info-card {
+            width: 100%;
+            padding: .7rem;
+            padding-top: 0;
+        }
+/*折扣页面*/
+.discount-screen-card .title-card {
+    display: flex;
+    justify-content: space-between;
+}
+
+.discount-screen-card .input-card {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}

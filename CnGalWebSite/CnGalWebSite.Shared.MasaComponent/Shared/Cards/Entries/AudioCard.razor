@@ -1,11 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
 
-<style>
-    .theme--light.m-icon {
-        color: none;
-    }
-</style>
 @if (currentAudio != null)
 {
     <div class="@(_dataCacheService.IsApp?"":"d-flex")">

@@ -2,24 +2,16 @@
 @inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
-<div class=" rounded shadow-sm p-2 bg-opacity" style=" display: flex; justify-content: space-between; align-items: center; ">
-    <a href="@("/examine?id="+Model.Id)" class="a-font-color w-100">
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard UserId="@Model.UserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Time="@Model.ApplyTime"
-                             Text="@("对『"+ (string.IsNullOrWhiteSpace(Model.RelatedName) ?("Id："+ Model.RelatedId) : Model.RelatedName )+"』 "+Model.Operation.GetDisplayName())" ForceBadgeShowText></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard>
-
-    </a>
-
-
+<MDCard Class=" pa-2" Style="flex-direction: row;justify-content: space-between;">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Href="@("/examine?id="+Model.Id)" Outline />
     <div style="display:flex;">
         @if (InReview)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="已读" Icon="mdi-read" Color="success" TextStyle OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="忽略" Icon="mdi-bell-off" Color="warning" TextStyle OnClick="@(()=>OnReview( EditRecordReviewState.Ignored))" />
-
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="已读" Icon="mdi-read" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="忽略" Icon="mdi-bell-off" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Ignored))" />
         }
     </div>
-</div>
+</MDCard>
 
 
 @code {
@@ -33,16 +25,24 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (Model != null)
+        {
+            Model.UserInfor.PersonalSignature = "对『" + (string.IsNullOrWhiteSpace(Model.RelatedName) ? ("Id：" + Model.RelatedId) : Model.RelatedName) + "』 " + Model.Operation.GetDisplayName();
+        }
+    }
+
     public async Task OnReview(EditRecordReviewState state)
     {
         //上传
         try
         {
             var obj = await _httpService.PostAsync<EditUserReviewEditRecordStateModel, Result>("api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
-            {
-                State = state,
-                ExamineIds = new long[] { Model.Id }
-            });
+                {
+                    State = state,
+                    ExamineIds = new long[] { Model.Id }
+                });
 
             //判断结果
             if (obj.Successful == false)
@@ -57,7 +57,7 @@
         catch (Exception ex)
         {
 
-            ErrorHandler.ProcessError(ex, "审阅失败");
+            await ErrorHandler.ProcessError(ex, "审阅失败");
         }
     }
 

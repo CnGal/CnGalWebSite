@@ -4,7 +4,7 @@
 @implements IDisposable
 
 
-<MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
+<MAppBar App Dark Dense>
     <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
     <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />

@@ -2,17 +2,17 @@
 @inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
 
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
 
 <div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImageTransformTip Text="@Context" TextChanged="ContextValueChanged" Class="mb-3" />
 
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-4" Color="primary" Transparent="false">
+        不了解Markdown？可以在这 <a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="primary--text fw-bold">查看语法说明</a>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     <MasaMarkdown Context="@Context" Height="800" MinHeight="800" Mode="MarkdownEditorMode.sv" ContextChanged="ContextValueChanged" @ref="masaMarkdown" />

@@ -1,24 +1,24 @@
-﻿@inject ToastService ToastService
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<FriendLinkItemModel >> _pageModelCatche
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-<section class="friend-links-card">
-    <h2>友情链接</h2>
+    <section class="friend-links-card">
+        <h2>友情链接</h2>
 
-    <div class="group">
-        @foreach (var item in _items)
-        {
-            <a class="item" href="@item.Url" target="_blank">
-                <img src="@item.Image" alt="@item.Name" loading="lazy" />
-                <div class="content">
-                    <div class="name">@item.Name</div>
-                </div>
-            </a>
-        }
-    </div>
-</section>
+        <div class="group">
+            @foreach (var item in _items)
+            {
+                <MDCard Class="item" Href="@item.Url" Target="_blank">
+                    <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                    <div class="content">
+                        <div class="name title-medium">@item.Name</div>
+                    </div>
+
+                </MDCard>
+            }
+        </div>
+    </section>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 @code {
 
@@ -38,7 +38,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页友情链接列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页友情链接列表失败");
         }
     }
 }

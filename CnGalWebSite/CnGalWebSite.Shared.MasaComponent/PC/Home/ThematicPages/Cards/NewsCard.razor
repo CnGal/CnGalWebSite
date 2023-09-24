@@ -3,38 +3,24 @@
 @inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
 
-<div class="rounded shadow-sm bg-opacity  p-4 pt-3 h-100" style=" display: flex; flex-direction: column; ">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-2" Outline OutlineHead>
-        <ButtonContent>
-            <MButton Text Block  OnClick="OnClickMore" Color="primary">
-                <MIcon Left>mdi-share-all-outline  </MIcon>
-                查看更多
-            </MButton>
 
-        </ButtonContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-
-    <div class="cv-news" style=" display: flex; height: 100%; flex-direction: column; justify-content: space-around;">
-
-        @foreach (var item in Model.Take(MaxCount))
-        {
-            <div class="@(" pointer"+(Model.IndexOf(item)==MaxCount-1?" d-none d-lg-flex ":" d-flex "))">
-                <div class="item">
-                    <a href="@($"/entries/index/{item.GroupId}")">
-                        <img src="@item.Image" alt="@item.Title" />
-                    </a>
-                    <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
-                        <div class="head">
-                            <div class="name text-truncate-1">@item.Title</div>
-                            <div class="time">@item.Time.ToTimeFromNowString()</div>
-                        </div>
-                        <div class="text text-truncate-1">@item.Text</div>
-                    </a>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" OnClickMore="OnClickMore" Class="mb-2" Outline SectionId="cv-news">
+     @foreach (var item in Model.Take(MaxCount))
+    {
+        <MDCard Class="item">
+            <a href="@($"/entries/index/{item.GroupId}")">
+                <img src="@item.Image" alt="@item.Title" />
+            </a>
+            <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
+                <div class="head">
+                    <div class="name text-truncate-1">@item.Title</div>
+                    <div class="time">@item.Time.ToTimeFromNowString()</div>
                 </div>
-            </div>
-        }
-    </div>
-</div>
+                <div class="text text-truncate-1 label-large">@item.Text</div>
+            </a>
+        </MDCard>
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 
@@ -58,7 +44,7 @@
     public void OnClickMore()
     {
         NavigationManager.NavigateTo("/articles/news");
-        
+
     }
 
 }

@@ -7,7 +7,7 @@
     @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
     {
         <div class="mb-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="介绍" Icon="@IconType.MainPage.ToIconString()">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="介绍" Icon="@IconType.MainPage.ToIconString()">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
                 <div>
                     <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Entry" Id="Model.Id" />

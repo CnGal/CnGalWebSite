@@ -1,4 +1,4 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
@@ -12,7 +12,7 @@
         {
             <div class="evaluations-item col-12 col-md-6">
                 <div class="masa-image">
-                    <a class="item-image" href="@item.Url">
+                    <a class="item-image" href="@item.Url" aria-label="@item.Name">
                         <MImage AspectRatio="460/215D" Width="@("100%")" Src="@item.Image">
                             <ChildContent>
                                 <div class="image-name">
@@ -33,18 +33,18 @@
                 <div class="articles-group">
                     @foreach (var infor in item.Articles)
                     {
-                            <a class="item" href="@($"/articles/index/{infor.Id}")">
+                        <MDCard Class="item" Href="@($"/articles/index/{infor.Id}")">
                             <img class="image" src="@infor.Image" alt="@infor.Name" loading="lazy" />
-                                <div class="head">
-                                    <div class="content">
-                                        <div class="name text-truncate-1">@infor.Name</div>
-                                    </div>
-                                    <div class="addinfo">
-                                        <div class="name text-truncate-1">@infor.OriginalAuthor</div>
-                                        <div class="type"> @infor.Type.GetDisplayName() </div>
-                                    </div>
+                            <div class="head">
+                                <div class="content">
+                                    <div class="name text-truncate-1">@infor.Name</div>
                                 </div>
-                            </a>
+                                <div class="addinfo">
+                                    <div class="name text-truncate-1  label-large">@infor.OriginalAuthor</div>
+                                    <div class="type  label-large"> @infor.Type.GetDisplayName() </div>
+                                </div>
+                            </div>
+                        </MDCard>
                     }
                 </div>
             </div>
@@ -65,12 +65,12 @@
     {
         try
         {
-            _items = await _pageModelCatche.GetCache("api/home/ListEvaluations");
+            _items = (await _pageModelCatche.GetCache("api/home/ListEvaluations")).Take(_dataCacheService.IsApp?2:4).ToList();
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页专题推荐列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页专题推荐列表失败");
         }
     }
 }

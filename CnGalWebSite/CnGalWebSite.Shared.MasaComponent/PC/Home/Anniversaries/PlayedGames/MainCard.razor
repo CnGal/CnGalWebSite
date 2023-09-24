@@ -2,12 +2,6 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
-<style>
-    .markdown-body img {
-        max-width: 50%;
-    }
-</style>
-<IntroductionCard />
 @if (OverviewModel != null)
 {
     <div class="row">
@@ -23,33 +17,29 @@
             @if (Model != null)
             {
                 <div id="game-library-card">
-
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary TotalCount="OverviewModel.Count" UserInfoModel="Model" />
-
-                </div>
+                 </div>
             }
         </Authorized>
         <NotAuthorized>
-            <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
-            </div>
+            <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-3 mb-4">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+            </MDCard>
         </NotAuthorized>
     </AuthorizeView>
 }
 else
 {
-    <div style="height:300px">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill Class="mb-4"/>
 }
 
 
 @if (isReady)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-    晒出的你的游戏库吧
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4" Color="tertiary">
+        晒出的你的游戏库吧
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc />
 }
 
 @code {
@@ -80,7 +70,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取用户信息失败");
+                await ErrorHandler.ProcessError(ex, "获取用户信息失败");
             }
         }
 
@@ -96,17 +86,17 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
+            await ErrorHandler.ProcessError(ex, "获取所有Steam游戏数量失败");
         }
     }
 
     protected void OnLogin()
     {
         InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
+            {
+                Interaction = InteractionType.SignIn,
+                ReturnUrl = NavigationManager.Uri,
+            };
 
 
         if (ToolHelper.IsSSR)

@@ -1,0 +1,34 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
+    关联信息可以帮助我们建立详细的知识图谱，更好地展示相关内容；请确保关联信息存在，也可以先去创建再来关联哦~
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="@Class" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.Articles" Title="文章"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="组织"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+@code {
+    [Parameter]
+    public EditVoteModel Model { get; set; }
+    [Parameter]
+    public List<string> EntryGameItems { get; set; }
+    [Parameter]
+    public List<string> EntryRoleItems { get; set; }
+    [Parameter]
+    public List<string> EntryGroupItems { get; set; }
+    [Parameter]
+    public List<string> EntryStaffItems { get; set; }
+    [Parameter]
+    public List<string> ArticleItems { get; set; }
+    [Parameter]
+    public List<string> PeripheryItems { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

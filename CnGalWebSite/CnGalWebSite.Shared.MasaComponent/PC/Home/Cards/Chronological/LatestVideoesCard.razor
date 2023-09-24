@@ -1,4 +1,4 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
@@ -9,18 +9,18 @@
         <div class="group">
             @foreach (var item in context)
             {
-                <a class="item" href="@item.Url">
+                <MDCard Class="item" Href="@item.Url">
                     <img class="image" src="@item.Image" alt="@item.Name" loading="lazy" />
                     <div class="head">
                         <div class="content">
                             <div class="name text-truncate-2">@item.Name</div>
                         </div>
                         <div class="addinfo">
-                            <div class="name text-truncate-1">@item.OriginalAuthor</div>
-                            <div class="time text-truncate-1">@item.PublishTime</div>
+                            <div class="name text-truncate-1  label-large">@item.OriginalAuthor</div>
+                            <div class="time text-truncate-1  label-large">@item.PublishTime</div>
                         </div>
                     </div>
-                </a>
+                </MDCard>
             }
 
         </div>
@@ -54,7 +54,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页最新视频列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页最新视频列表失败");
         }
     }
 }

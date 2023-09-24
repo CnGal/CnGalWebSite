@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="发表文章"/>
 
@@ -11,29 +12,13 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" Creating/>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发表文章" Icon="fa fa-fw  fa-newspaper-o" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发表文章" Icon="@IconType.Article.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainCard Model="Model.Main" Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model.Relevances" Class="mb-4"  EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems"/>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model.Relevances" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" VideoItems="VideoItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainPageCard Model="Model.MainPage" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -42,7 +27,13 @@
 </div>
 
 @code {
-    private CreateArticleViewModel Model { get; set; } = new CreateArticleViewModel();
+    private CreateArticleViewModel Model { get; set; } = new CreateArticleViewModel
+        {
+            Main = new EditArticleMainViewModel
+            {
+                PubishTime = DateTime.Now.ToCstTime()
+            }
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();
@@ -79,7 +70,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
             }
         }
     }
@@ -93,19 +84,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("创建文章失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建文章失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("创建文章成功", "创建文章成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("创建文章成功", "创建文章成功，等待审核通过");
                 NavigationManager.NavigateTo("/articles/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建文章失败");
+            await ErrorHandler.ProcessError(ex, "创建文章失败");
         }
     }
 

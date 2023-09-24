@@ -3,20 +3,20 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/space/EditMain/EditSpaceFavoriteObjects?FolderId=" + Model.Id)" ExamineType="Operation.EditVideoMain" OnClickRevoke="OnRevoke" />
 }
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle">
-    <div class="row">
-        <div class="col-12 ">
-            <i class="fa  fa-fw font-color fa-leaf"></i>&nbsp;&nbsp;总数：@Model.Objects.Count
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()">
+    <div class="basic-info-group-card">
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />总数：@Model.Objects.Count
         </div>
 
-        <div class="col-12 ">
-            <i class="fa  fa-fw font-color fa-eye"></i>&nbsp;&nbsp;浏览数：@Model.ReaderCount
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Look" />浏览数：@Model.ReaderCount
         </div>
-        <div class="col-12">
-            <i class="fa  fa-fw font-color fa-calendar-check-o"></i>&nbsp;&nbsp;创建时间：@Model.CreateTime.ToString("G")
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" />创建时间：@Model.CreateTime.ToString("G")
         </div>
-        <div class="col-12">
-            <i class="fa  fa-fw font-color fa-pencil"></i>&nbsp;&nbsp;最后编辑时间：@Model.LastEditTime.ToString("G")
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />最后编辑时间：@Model.LastEditTime.ToString("G")
         </div>
     </div>
 

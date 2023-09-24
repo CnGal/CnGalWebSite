@@ -279,22 +279,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListMessageAloneModel>>> GetMessageListAsync(MessagesPagesInfor input)
-        {
-            var dtos = await _messageService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
-        {
-            var dtos = await _favoriteFolderService.GetPaginatedResult(input.Options, input.SearchModel, null);
-
-            return dtos;
-        }
-
         /// <summary>
         /// 刷新ES缓存
         /// </summary>

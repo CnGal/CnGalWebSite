@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(IsReaded?"已读":"未读")" />
+
+ @code {
+    [Parameter]
+    public bool IsReaded { get; set; }
+
+    public string GetColor()
+    {
+        return IsReaded switch
+        {
+            false => "error",
+            true => "success"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return IsReaded switch
+        {
+            false => IconType.Hide,
+            true => IconType.Read,
+        };
+    }
+}

@@ -1,4 +1,4 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IPageModelCatche<List<LatestCommentItemModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
@@ -9,16 +9,16 @@
         <div class="group">
             @foreach (var item in _items.Take(6))
             {
-                <a class="item" href="@item.Url">
+                <MDCard Class="item" Href="@item.Url">
                     <img class="user-image" src="@item.UserImage" alt="@item.UserName" loading="lazy" />
                     <div class="content">
                         <div class="name">@item.UserName</div>
                         <div class="text">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@item.Content" IsNeedHighlight="false"/>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@item.Content" IsNeedHighlight="false" />
                         </div>
-                        <div class="time">@item.Time</div>
+                        <div class="time  label-large">@item.Time</div>
                     </div>
-                </a>
+                </MDCard>
             }
         </div>
     </section>
@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
         }
     }
 }

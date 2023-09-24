@@ -1,6 +1,7 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -20,7 +21,7 @@
 
         <MCardActions Class="pb-4 pe-6 ps-6 pt-0">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" Rounded />
         </MCardActions>
     </MCard>
 </MDialog>
@@ -35,11 +36,6 @@
 
     bool Dialog { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
     public async Task OnSave()
     {
         //上传
@@ -49,7 +45,7 @@
             long temp = 0;
             if (string.IsNullOrWhiteSpace(Model.Link))
             {
-                await ToastService.Error("添加微博动态失败", "微博Id无效");
+                await PopupService.ToastErrorAsync("添加微博动态失败", "微博Id无效");
             }
 
 
@@ -57,20 +53,20 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("添加微博动态失败", obj.Error);
+                await PopupService.ToastErrorAsync("添加微博动态失败", obj.Error);
             }
             else
             {
 
-                await ToastService.Success("添加微博动态成功", "添加微博动态成功");
+                await PopupService.ToastSuccessAsync("添加微博动态成功", "添加微博动态成功");
                 await OnRefreshTable.InvokeAsync();
                 Dialog = false;
             }
         }
         catch (Exception ex)
         {
-            await ToastService.Error("添加微博动态失败", "添加微博动态失败");
-            //ErrorHandler.ProcessError(ex, "保存动态数据失败");
+            await PopupService.ToastErrorAsync("添加微博动态失败", "添加微博动态失败");
+            //await ErrorHandler.ProcessError(ex, "保存动态数据失败");
         }
     }
     public void Refresh()

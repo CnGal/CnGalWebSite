@@ -10,9 +10,7 @@
         }
         else
         {
-            <div style="height:300px">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
         }
 
     </div>
@@ -34,7 +32,7 @@
                 }
                 catch (Exception ex)
                 {
-                    ErrorHandler.ProcessError(ex, "无法获取词条关系图");
+                    await ErrorHandler.ProcessError(ex, "无法获取词条关系图");
                 }
             }
         }

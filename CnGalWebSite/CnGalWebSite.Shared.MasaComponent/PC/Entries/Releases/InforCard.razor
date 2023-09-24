@@ -1,11 +1,8 @@
 ﻿@inject IHttpService _httpService
 
 
-<div class="rounded shadow-sm bg-opacity p-3 mb-4">
-    <div class="fw-bold d-flex h5 font-color">
-        <MIcon Color="primary" Class="me-4">@GetIcon()</MIcon>@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())
-    </div>
-
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@GetIcon()" Title="@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())"
+Class="entry-card-default store-info-card mb-4">
     @if (Model.StoreInfor.State != StoreState.None&& Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
     {
         <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
@@ -107,7 +104,7 @@
         <TimeChip Model="Model" />
         <EvaluationChip Model="Model" />
     </div>
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
 

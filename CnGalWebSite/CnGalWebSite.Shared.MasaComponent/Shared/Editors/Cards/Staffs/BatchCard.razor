@@ -1,0 +1,55 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+
+<MCard>
+    <MCardTitle>
+        批量导入Staff
+    </MCardTitle>
+    <MCardText>
+        按照下方例子整理Staff文本后输入可以批量导入Staff信息<br />
+        括号中的内容分别是通用职位、配音角色、隶属组织<br />
+        同类项将会自动合并<br />
+        其中“、”“，”“，”和“:”“：”和“（）”“()”都可作分隔符，如果Staff名称中包含分隔符，请单独录入<br />
+        请把有分类的Staff放到最后<br />
+        <br />
+        主催：小明<br />
+        CV（配音）：小红、小亮（工作室A）、小李<br />
+        主题曲：<br />
+        作词：小红（工作室B）<br />
+        作曲：小刚<br />
+    </MCardText>
+    <MCardText>
+        <MTextarea Rows="7" @bind-Value="_text" Label="Staff" HideDetails="true" />
+    </MCardText>
+    <MCardActions Class="pb-6 ps-6 pe-6">
+        <MSpacer></MSpacer>
+        <MButton Color="primary" Text OnClick="SaveEdit">
+             <MIcon Left>mdi-check</MIcon>
+            保存
+        </MButton>
+    </MCardActions>
+
+</MCard>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<List<StaffModel>> OnBatched { get; set; }
+
+    private string _text;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task SaveEdit()
+    {
+        if (string.IsNullOrWhiteSpace(_text))
+        {
+            await PopupService.ToastErrorAsync("请输入Staff文本");
+        }
+        await OnBatched.InvokeAsync(ToolHelper.GetStaffsFromString(_text));
+    }
+}

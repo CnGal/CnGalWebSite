@@ -2,46 +2,44 @@
 @inject NavigationManager NavigationManager
 @inject IEventService _eventService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
-    <MForm>
-        <div class="row">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="@Class">
+    <MRow>
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.UserName" Label="用户名" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-NullableValue="Model.Birthday" Label="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
+         </MCol>
+        <MCol Cols="12">
+            <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
+        </MCol>
 
-            <div class="col-12  col-sm-6">
-                <MTextField @bind-Value="Model.UserName" Label="用户名" />
-            </div>
-            <div class="col-12">
-                <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
-            </div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Birthday" Lable="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
 
-            <div class="col-12">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2">
-                    点击查看<a @onclick="OnClickQuestion" class="info--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-            </div>
-            <div class="col-12  col-sm-6">
-                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
-            </div>
-            <div class="col-12 col-sm-6">
-                <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
-            </div>
-            <div class="col-12 col-sm-6">
-                <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录" />
-            </div>
-            <div class="col-12">
-                <MCardText Class="p-0">展示的头衔</MCardText>
-                <div style="display:flex;">
-                    @foreach (var item in Model.Ranks)
-                    {
-                        <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Class="me-4 mt-2" />
+        <MCol Cols="12">
+             <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
+         </MCol>
+         <MCol Cols="12">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2" Color="primary">
+                 点击查看<a @onclick="OnClickQuestion" class="primary--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
+             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+         </MCol>
+        <MCol Cols="12" Md="6">
+             <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
+         </MCol>
+        <MCol Cols="12" Md="6">
+             <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录" />
+         </MCol>
+         <MCol Cols="12">
+             <div>展示的头衔</div>
+             <div style="display:flex;">
+                 @foreach (var item in Model.Ranks)
+                {
+                    <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Class="me-4 mt-2" />
 
-                    }
-                </div>
-
+                }
             </div>
-
-        </div>
-    </MForm>
+        </MCol>
+     </MRow>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -49,12 +47,6 @@
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
     [Parameter]
     public string Class { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-
-
-    }
 
     public void OnClickQuestion()
     {

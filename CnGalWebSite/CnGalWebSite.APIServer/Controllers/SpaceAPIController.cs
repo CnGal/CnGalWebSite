@@ -8,7 +8,8 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;
@@ -31,6 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -56,11 +58,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IEditRecordService _editRecordService;
+        private readonly IQueryService _queryService;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
          IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
-        ISteamInforService steamInforService)
+        ISteamInforService steamInforService, IQueryService queryService)
         {
             _examineRepository = examineRepository;
             _examineService = examineService;
@@ -79,6 +82,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _entryRepository = entryRepository;
             _videoRepository = videoRepository;
+            _queryService = queryService;
         }
 
         /// <summary>
@@ -532,19 +536,30 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListMessageAloneModel>>> GetMessagesListNormalAsync(MessagesPagesInfor input)
-        {  //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            //检查是否为当前用户Id
-            if (input.SearchModel.ApplicationUserId != user.Id && _userService.CheckCurrentUserRole( "Admin") == false)
-            {
-                return BadRequest("你没有权限查看此用户的消息列表");
-            }
-            var dtos = await _messageService.GetPaginatedResult(input.Options, input.SearchModel);
+        public async Task<QueryResultModel<MessageOverviewModel>> ListMessages(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Message, int>(_messageRepository.GetAll().AsSingleQuery().Include(s=>s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.Title.Contains(model.SearchText) || s.LinkTitle.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<MessageOverviewModel>
+            {
+                Items = await items.Select(s => new MessageOverviewModel
+                {
+                    Id = s.Id,
+                    Type = s.Type,
+                    PostTime = s.PostTime,
+                    Text = s.Text,
+                    Title = s.Title,
+                    UserId = s.ApplicationUser.Id,
+                    UserName=s.ApplicationUser.UserName,
+                    Link = s.Link,
+                    IsReaded = s.IsReaded
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         [HttpPost]
@@ -556,27 +571,6 @@ namespace CnGalWebSite.APIServer.Controllers
             var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             await _messageRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
-            return new Result { Successful = true };
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Result>> PostMessagesAsync(ListMessageAloneModel model)
-        {
-            await _messageRepository.InsertAsync(new Message
-            {
-                Type = (MessageType)model.Type,
-                PostTime = model.PostTime ?? DateTime.Now.ToCstTime(),
-                Title = model.Title,
-                Text = model.Text,
-                ApplicationUserId = model.ApplicationUserId,
-                Rank = model.Rank,
-                Link = model.Link,
-                AdditionalInfor = model.AdditionalInfor,
-                LinkTitle = model.LinkTitle,
-                Image = model.Image,
-                IsReaded = model.IsReaded
-            });
             return new Result { Successful = true };
         }
 

@@ -1,0 +1,15 @@
+﻿.article-main-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.article-page-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .article-page-card > div {
+        max-width: 1000px;
+    }

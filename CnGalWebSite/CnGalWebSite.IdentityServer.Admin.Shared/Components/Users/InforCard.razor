@@ -150,7 +150,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            await ErrorHandler.ProcessError(ex, "获取用户信息失败");
         }
     }
 

@@ -1,24 +1,18 @@
-﻿using IdentityModel;
+﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Data;
+using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Models.DataModels.Records;
+using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
+using IdentityModel;
+using IdentityServer4.Models;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using CnGalWebSite.IdentityServer.Models.DataModels.Account;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
-using BlazorComponent;
-using IdentityServer4.Stores;
-using IdentityServer4.Models;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.IdentityServer.Models.DataModels.Records;
-using Microsoft.AspNetCore.Http;
-using CnGalWebSite.IdentityServer.Data;
 
 namespace CnGalWebSite.IdentityServer.Services.Account
 {
-    public class AccountService:IAccountService
+    public class AccountService : IAccountService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IClientStore _clientStore;
@@ -32,7 +26,7 @@ namespace CnGalWebSite.IdentityServer.Services.Account
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _operationRecordRepository = operationRecordRepository;
-            _accessor = accessor;   
+            _accessor = accessor;
         }
 
         /// <summary>
@@ -65,7 +59,7 @@ namespace CnGalWebSite.IdentityServer.Services.Account
             return (user, provider, providerUserId, claims);
         }
 
-        public async Task<AccountBindInfor> GetAccountBindInforAsync(AuthorizationRequest context,ApplicationUser user)
+        public async Task<AccountBindInfor> GetAccountBindInforAsync(AuthorizationRequest context, ApplicationUser user)
         {
             var model = new AccountBindInfor();
             //密码
@@ -100,7 +94,7 @@ namespace CnGalWebSite.IdentityServer.Services.Account
             }
 
             //第三方登入
-            var providers =await GetExternalProvidersAsync(context);
+            var providers = await GetExternalProvidersAsync(context);
             var logins = (await _userManager.GetLoginsAsync(user)).Select(s => s.ProviderDisplayName);
             model.ExternalFields = providers.Select(s => new SelectModifyExternalFieldModel
             {

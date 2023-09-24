@@ -1,7 +1,8 @@
 ﻿@inject ILocalStorageService _localStorage
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
-@inject ToastService ToastService
+@inject IPopupService PopupService
+
 
 @code {
 
@@ -35,11 +36,11 @@
                         if (obj.Successful == false)
                         {
 
-                            await ToastService.Error(tipStr,"抽奖失败，"+ obj.Error);
+                            await PopupService.ToastErrorAsync(tipStr,"抽奖失败，"+ obj.Error);
                         }
                         else
                         {
-                            await ToastService.Success(tipStr, "抽奖成功");
+                            await PopupService.ToastSuccessAsync(tipStr, "抽奖成功");
                         }
                     }
 

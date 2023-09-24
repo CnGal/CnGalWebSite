@@ -2,9 +2,10 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="工具"/>
@@ -33,42 +34,42 @@
     {
         try
         {
-            await ToastService.Success("正在刷新搜索缓存", "任务执行需要一定时间，请稍安勿躁哦");
+            await PopupService.ToastSuccessAsync("正在刷新搜索缓存", "任务执行需要一定时间，请稍安勿躁哦");
             var obj = await _httpService.GetAsync<Result>("api/admin/RefreshSearchData");
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("刷新搜索缓存失败", obj.Error);
+                await PopupService.ToastErrorAsync("刷新搜索缓存失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("成功刷新搜索缓存", "成功刷新搜索缓存");
+                await PopupService.ToastSuccessAsync("成功刷新搜索缓存", "成功刷新搜索缓存");
             }
         }
         catch(Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "刷新搜索缓存失败");
+            await ErrorHandler.ProcessError(ex, "刷新搜索缓存失败");
         }
     }
     public async Task OnGetSteamImage()
     {
         try
         {
-            await ToastService.Success("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
+            await PopupService.ToastSuccessAsync("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
             var obj = await _httpService.GetAsync<Result>("api/admin/TempFunction");
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("执行临时脚本失败", obj.Error);
+                await PopupService.ToastErrorAsync("执行临时脚本失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("成功执行临时脚本", "成功执行临时脚本");
+                await PopupService.ToastSuccessAsync("成功执行临时脚本", "成功执行临时脚本");
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "执行临时脚本失败");
+            await ErrorHandler.ProcessError(ex, "执行临时脚本失败");
         }
     }
 }

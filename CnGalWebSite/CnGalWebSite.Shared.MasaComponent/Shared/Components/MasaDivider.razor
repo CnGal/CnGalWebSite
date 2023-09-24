@@ -1,10 +1,10 @@
 ﻿@if (string.IsNullOrWhiteSpace(Text))
 {
-    <MDivider />
+    <MDivider Class="@Class" />
 }
 else
 {
-    <div class="row">
+    <div class="@($"row {Class}") ">
         <div class="col">
             <MDivider />
 
@@ -21,4 +21,6 @@ else
 @code {
     [Parameter]
     public string Text { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 }

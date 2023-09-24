@@ -2,9 +2,9 @@
 <div class="@Class">
     @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
     {
-        <div class="rounded shadow-sm  bg-opacity mb-4 p-3 ">
+        <MDCard Outline Class="mb-4 pa-3 ">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
-        </div>
+        </MDCard>
     }
     @if (Model.Pictures.Count > 0)
     {

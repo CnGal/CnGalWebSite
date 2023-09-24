@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject IDataCacheService _dataCatcheService
 
 
@@ -119,7 +119,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
+                await ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
             }
         }
         else

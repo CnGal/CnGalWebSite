@@ -1,8 +1,10 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="创建周边"/>
@@ -12,25 +14,11 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Periphery" Class="mb-3" Creating/>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建周边" Icon="fa fa-fw  fa-shopping-basket" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建周边" Icon="@IconType.Periphery.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.MainCard Model="Model.Main" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.ImagesCard Model="Model.Images" Class="mb-4" />
 
@@ -79,7 +67,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -93,19 +81,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("创建周边失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建周边失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("创建周边成功", "创建周边成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + obj.Error, Model.Name, "fa fa-shopping-basket");
+                await PopupService.ToastSuccessAsync("创建周边成功", "创建周边成功，等待审核通过");
+                NavigationManager.NavigateTo("/peripheries/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建周边失败");
+            await ErrorHandler.ProcessError(ex, "创建周边失败");
         }
     }
 

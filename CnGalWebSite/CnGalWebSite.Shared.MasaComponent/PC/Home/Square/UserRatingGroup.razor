@@ -2,25 +2,23 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="@IconType.GameRecord.ToIconString()" Class="mb-4">
-
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="随机评价" Icon="@IconType.GameRecord.ToIconString()" Class="mb-4">
     <ButtonContent>
-        <MButton Text Block  OnClick="OnClickMore" Color="primary">
+        <MButton Rounded  OnClick="OnClickMore" Color="primary">
             <MIcon Left>mdi-refresh  </MIcon>
             换一批
         </MButton>
     </ButtonContent>
     <ChildContent>
-        <MSlideGroup ShowArrows="true">
+        <MSlideGroup ShowArrows="true" Class="slide-group-garp">
             <ChildContent>
                 @foreach (var item in _dataCacheService.RandomUserScoresCatche.Take(12))
                 {
                     <MSlideItem>
-                        <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                               OnClick="@context.Toggle"
-                               RefBack="@context.Ref">
-                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName" OnClick="@(()=>OnClickUser(item))" IsDubbing="item.IsDubbing" />
-                        </MCard>
+                        <div style="width:400px;">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName" OnClick="@(()=>OnClickUser(item))" IsDubbing="item.IsDubbing" Clickable />
+                        </div>
+                       
                     </MSlideItem>
                 }
             </ChildContent>
@@ -57,7 +55,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取随机用户评分列表失败");
+            await ErrorHandler.ProcessError(ex, "获取随机用户评分列表失败");
         }
     }
 

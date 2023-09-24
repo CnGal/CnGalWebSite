@@ -1,4 +1,5 @@
-﻿@inject ToastService? ToastService
+﻿@inject IPopupService PopupService
+
 
 
 <style>
@@ -17,7 +18,7 @@
         border: 1px solid var(--bs-secondary);
     }
     .option-background {
-        background-color: #EAEFF5;
+        background-color: var(--md-sys-color-primary-container);
     }
     .option-card-active .option-background {
         background-color: var(--main-color) !important;
@@ -25,12 +26,8 @@
     }
 
 </style>
-<div>
-    <div class="mb-2" style="display: flex; justify-content: space-between; align-items: flex-end; ">
-        <div class="fw-bold " style="font-size:large">投票选项</div>
-        <div  style="color:gray;">@( Model.Type==VoteType.MultipleChoice?(Model.MaximumSelectionCount==Model.MinimumSelectionCount?($"每人投{Model.MaximumSelectionCount}票"):($"最多投{Model.MaximumSelectionCount}票，最少投{Model.MinimumSelectionCount}票")):"每人只能投1票")</div>
-
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票选项" Icon="@IconType.Vote.ToIconString()" Class="mb-4">
+        <div class="mb-4">@( Model.Type==VoteType.MultipleChoice?(Model.MaximumSelectionCount==Model.MinimumSelectionCount?($"每人投{Model.MaximumSelectionCount}票"):($"最多投{Model.MaximumSelectionCount}票，最少投{Model.MinimumSelectionCount}票")):"每人只能投1票")</div>
     @if (IsShowResult)
     {
         @foreach (var item in Model.Options)
@@ -47,10 +44,10 @@
             @foreach (var item in Model.Options)
             {
                 <div class="@(Model.UserSelections.Contains(item.OptionId)?"mb-2 option-card-active":"mb-2 option-card")" style=" display: flex; flex-direction: row; border-radius: 5px; cursor:pointer"
-                     @onclick="@(()=>OnSeletedItemChanged(item,Model.UserSelections.Contains(item.OptionId)?CheckboxState.UnChecked:CheckboxState.Checked))">
+                     @onclick="@(()=>OnSeletedItemChanged(item,Model.UserSelections.Contains(item.OptionId)))">
                     <div style=" display: flex; flex-direction: column; justify-content: center; " class=" ms-3">
-                        <Checkbox TValue="string" State="@(Model.UserSelections.Contains(item.OptionId)?CheckboxState.Checked:CheckboxState.UnChecked)" OnStateChanged="@((e,o)=>OnSeletedItemChanged(item,e))"
-                                  IsDisabled="@(Model.UserSelections.Contains(item.OptionId)?false:(Model.UserSelections.Count>=Model.MaximumSelectionCount))"></Checkbox>
+                        <MCheckbox TValue="bool" Value="@(Model.UserSelections.Contains(item.OptionId))" ValueChanged="@((e)=>OnSeletedItemChanged(item,e))"
+                                  Disabled="@(Model.UserSelections.Contains(item.OptionId)?false:(Model.UserSelections.Count>=Model.MaximumSelectionCount))"></MCheckbox>
                     </div>
                     <OptionAloneCard TotalCount="Model.Count" IsShowResult="IsShowResult" Model="item" IsSeleted="@(Model.UserSelections.Contains(item.OptionId))"
                                      ImageMinWidth="@ImageMinWidth"/>
@@ -58,7 +55,7 @@
             }
         </div>
     }
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
@@ -94,9 +91,9 @@
         return Model.UserSelections;
     }
 
-    public async Task OnSeletedItemChanged(VoteOptionViewModel item, CheckboxState state)
+    public async Task OnSeletedItemChanged(VoteOptionViewModel item, bool state)
     {
-        if (state == CheckboxState.Checked)
+        if (state)
         {
             if (Model.Type == VoteType.SingleChoice)
             {
@@ -106,7 +103,7 @@
             {
                 if (Model.UserSelections.Count == Model.MaximumSelectionCount)
                 {
-                    await ToastService.Error($"最多选择{Model.MaximumSelectionCount}项", $"最多选择{Model.MaximumSelectionCount}项");
+                    await PopupService.ToastErrorAsync($"最多选择{Model.MaximumSelectionCount}项", $"最多选择{Model.MaximumSelectionCount}项");
                     StateHasChanged();
                     return;
                 }

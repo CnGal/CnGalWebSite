@@ -24,7 +24,6 @@ namespace CnGalWebSite.APIServer.Application.Tags
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IAppHelper _appHelper;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Tag>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Tag>>> SortLambdaCacheApplicationUser = new();
         public TagService(IRepository<Tag, int> tagRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository,
             IAppHelper appHelper)
         {

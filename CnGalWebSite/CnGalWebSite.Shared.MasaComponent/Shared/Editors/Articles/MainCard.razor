@@ -1,75 +1,64 @@
 ﻿
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@Class" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
+    <MRow>
+        <MCol Cols="12" Md="6" Lg="4">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4"/>
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="4">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="4">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12">
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
+         </MCol>
+         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
 
-    <div class="row">
-        <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-        </div>
-        <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"/>
-        </div>
-        <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"/>
-        </div>
-    </div>
-    <ValidateForm Model="@Model">
-        <div class="form-group mt-4">
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type"></Select>
-                </div>
+         <MCol Cols="12">
+             <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.OriginalAuthor" Label="原作者" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.PubishTime" ShowDate ShowTime Nullable="false" Label="发布日期" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MCheckbox @bind-Value="Model.IsCreatedByCurrentUser" Label="本人创作" TValue="bool" />
+         </MCol>
+         <MCol Cols="12">
+             <MTextField @bind-Value="Model.OriginalLink" Label="原文链接" />
+         </MCol>
+         @if (Model.Type == ArticleType.News)
+        {
+            <MCol Cols="12">
+                <MDivider />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <MCheckbox @bind-Value="IsSame" Label="动态发生时间与发布日期一致" TValue="bool" />
+            </MCol>
+            @if (IsSame)
+            {
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.PubishTime" ShowDate ShowTime Nullable="false" Disabled Label="动态发生时间" />
+                 </MCol>
+            }
+            else
+            {
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-NullableValue="Model.RealNewsTime" ShowDate ShowTime Nullable Label="动态发生时间" />
+                 </MCol>
+            }
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.NewsType" Label="动态类别" />
+            </MCol>
+        }
+    </MRow>
 
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
-
-                <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
-                </div>
-                <div class="form-group col-12">
-                    <hr />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.OriginalAuthor" />
-                </div>
-
-                <div class="form-group col-12  col-sm-6">
-                    <DateTimePicker TValue="DateTime" Value="@Model.PubishTime" ValueChanged="OnPubishTimeChanged" ViewMode="DatePickerViewMode .DateTime" DisplayText="发布时间" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <Checkbox TValue="bool" @bind-Value="Model.IsCreatedByCurrentUser" ShowAfterLabel ShowLabel="false" DisplayText="本人创作"></Checkbox>
-                </div>
-                <div class="form-group col-12">
-                    <BootstrapInput @bind-Value="Model.OriginalLink" />
-                </div>
-
-                @if (Model.Type == ArticleType.News)
-                {
-                    <div class="form-group col-12">
-                        <hr />
-                    </div>
-                    <div class="form-group col-12 col-sm-6">
-                        <Switch @bind-Value="IsSame" ShowLabel="true" DisplayText="动态发生时间与发布日期一致" />
-                    </div>
-                    @if (IsSame)
-                    {
-                        <div class="form-group col-12  col-sm-6">
-                            <DateTimePicker @bind-Value="@Model.PubishTime" ViewMode="DatePickerViewMode .DateTime" IsDisabled="true" DisplayText="动态发生时间" />
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="form-group col-12  col-sm-6">
-                            <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewMode="DatePickerViewMode .DateTime" />
-                        </div>
-                    }
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.NewsType"></BootstrapInput>
-                    </div>
-                }
-            </div>
-        </div>
-    </ValidateForm>
-     
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -79,7 +68,7 @@
     public string Class { get; set; }
 
     private bool IsSame { get; set; }
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
         IsSame = Model.PubishTime == Model.RealNewsTime;
@@ -91,11 +80,11 @@
 
     }
 
-    public async Task OnPubishTimeChanged(DateTime time)
+    public void OnPubishTimeChanged(DateTime time)
     {
         Model.PubishTime = time;
 
-        if (IsSame&&Model.Type== ArticleType.News)
+        if (IsSame && Model.Type == ArticleType.News)
         {
             Model.RealNewsTime = time;
         }

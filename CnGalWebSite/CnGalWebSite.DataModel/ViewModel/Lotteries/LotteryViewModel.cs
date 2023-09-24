@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
 
@@ -129,21 +130,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         /// <summary>
         /// 中奖的用户
         /// </summary>
-        public List<LotteryUserViewModel> Users { get; set; } = new List<LotteryUserViewModel>();
+        public List<UserInforViewModel> Users { get; set; } = new List<UserInforViewModel>();
 
     }
-    public class LotteryUserViewModel
+    public class LotteryUserViewModel: UserInforViewModel
     {
-        public string UserId { get; set; }
-
-        public string UserName { get; set; }
-
         public DateTime VotedTime { get; set; }
-
-        public string Image { get; set; }
-
-        public string PersonalSignature { get; set; }
-
-        public List<RankViewModel> Ranks { get; set; }
     }
 }

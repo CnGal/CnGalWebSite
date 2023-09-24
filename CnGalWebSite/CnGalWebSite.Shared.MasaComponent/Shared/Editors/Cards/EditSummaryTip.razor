@@ -1,37 +1,37 @@
 ﻿<div class="@Class">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-3">
-        我们鼓励用户创建编辑词条、文章，也设置了<a href="/articles/index/4" class="success--text fw-bold">奖励</a>，十分感谢你为CnGal资料站做出的贡献
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-3" Color="tertiary">
+        我们鼓励用户创建编辑词条、文章，也设置了<a href="/articles/index/4" class="tertiary--text fw-bold">奖励</a>，十分感谢你为CnGal资料站做出的贡献
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     @if (Type == ExaminedNormalListModelType.Entry)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info">
-            在@(Creating?"创建": "编辑")词条前请先<a href="/articles/index/2" class="info--text fw-bold">阅读《词条编辑规范》</a>，我们不会审核通过不符合规范的词条
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary">
+            在@(Creating ? "创建" : "编辑")词条前请先<a href="/articles/index/2" class="tertiary--text fw-bold">阅读《词条编辑规范》</a>，我们不会审核通过不符合规范的词条
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
     else if (Type == ExaminedNormalListModelType.Article)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info">
-            在@(Creating?"发表": "编辑")文章前请先<a href="/articles/index/3" class="info--text fw-bold">阅读《文章发表规范》</a>，我们不会审核通过不符合规范的文章
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary">
+            在@(Creating ? "发表" : "编辑")文章前请先<a href="/articles/index/3" class="tertiary--text fw-bold">阅读《文章发表规范》</a>，我们不会审核通过不符合规范的文章
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     }
     else if (Type == ExaminedNormalListModelType.Periphery)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info">
-            在@(Creating?"创建": "编辑")周边前请先<a href="/articles/index/253" class="info--text fw-bold">阅读《周边编辑规范》</a>，我们不会审核通过不符合规范的周边
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary">
+            在@(Creating ? "创建" : "编辑")周边前请先<a href="/articles/index/253" class="tertiary--text fw-bold">阅读《周边编辑规范》</a>，我们不会审核通过不符合规范的周边
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     }
     else if (Type == ExaminedNormalListModelType.Tag)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info">
-            在@(Creating?"创建": "编辑")标签前请先<a  href="/articles/index/254" class="info--text fw-bold">阅读《标签编辑规范》</a>，我们不会审核通过不符合规范的标签
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary">
+            在@(Creating ? "创建" : "编辑")标签前请先<a href="/articles/index/254" class="tertiary--text fw-bold">阅读《标签编辑规范》</a>，我们不会审核通过不符合规范的标签
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
     else if (Type == ExaminedNormalListModelType.Video)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info">
-            在@(Creating?"发布": "编辑")视频前请先<a href="/articles/index/254" class="info--text fw-bold">阅读《视频编辑规范》</a>，我们不会审核通过不符合规范的视频
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary">
+            在@(Creating ? "发布" : "编辑")视频前请先<a href="/articles/index/254" class="tertiary--text fw-bold">阅读《视频编辑规范》</a>，我们不会审核通过不符合规范的视频
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
 

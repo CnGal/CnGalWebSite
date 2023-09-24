@@ -1,4 +1,4 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IPageModelCatche<List<HotTagItemModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
@@ -9,13 +9,12 @@
     <div class="group">
         @foreach (var item in _items)
         {
-            <a class="item" href="@item.Url">
+            <MDCard Class="item" Href="@item.Url">
                 <MIcon Small>@IconType.Tag.ToIconString()</MIcon>
-                <div class="content">
-                    <div class="name">@item.Name</div>
-                </div>
-
-            </a>
+             <div class="content">
+                 <div class="name label-large">@item.Name</div>
+             </div>
+            </MDCard>
         }
     </div>
 </section>
@@ -38,7 +37,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页热门标签列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页热门标签列表失败");
         }
     }
 }

@@ -2,7 +2,7 @@
 
 @if (Model.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-gavel" Title="待审核编辑" Class="mb-4" Collapable Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Edit.ToIconString()" Title="待审核编辑" Class="mb-4" Collapable Outline>
 
         @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
         {

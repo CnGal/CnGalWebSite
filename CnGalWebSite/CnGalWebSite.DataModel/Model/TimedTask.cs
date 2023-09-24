@@ -81,9 +81,9 @@ namespace CnGalWebSite.DataModel.Model
     }
     public enum TimedTaskExecuteType
     {
-        [Display(Name = "间隔固定时间运行")]
+        [Display(Name = "间隔时间")]
         IntervalTime,
-        [Display(Name = "每天运行")]
+        [Display(Name = "每天")]
         EveryDay
     }
 }

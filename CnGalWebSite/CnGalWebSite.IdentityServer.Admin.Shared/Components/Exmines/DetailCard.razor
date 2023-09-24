@@ -128,7 +128,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取审核记录失败");
+            await ErrorHandler.ProcessError(ex, "获取审核记录失败");
         }
     }
 
@@ -157,7 +157,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, $"处理{_name}失败");
+            await ErrorHandler.ProcessError(ex, $"处理{_name}失败");
         }
 
     }

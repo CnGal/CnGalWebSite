@@ -23,7 +23,7 @@
                     </div>
                     @if (IsShowResult)
                     {
-                        <div style="font-size:small;color:gray;">@(Model.Count+"票")</div>
+                        <div style="font-size:small;">@(Model.Count+"票")</div>
                     }
                 </div>
                 @if (IsShowResult)
@@ -56,7 +56,7 @@
     public string Url { get; set; } = "";
     public string Percent { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Url = Model.Type switch
         {

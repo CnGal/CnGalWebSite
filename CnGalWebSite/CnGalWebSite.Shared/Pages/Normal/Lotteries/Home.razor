@@ -1,8 +1,8 @@
 ﻿@page "/lotteries/home"
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
 
 
@@ -57,13 +57,13 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取抽奖主页信息列表失败");
+            await ErrorHandler.ProcessError(ex, "获取抽奖主页信息列表失败");
         }
     }
 
     private void OnCreateLottery()
     {
-        NavigationManager.NavigateTo(Provider, "/lotteries/createlottery", "创建抽奖", "fa fa-gift");
+        NavigationManager.NavigateTo("/lotteries/createlottery");
         
     }
 }

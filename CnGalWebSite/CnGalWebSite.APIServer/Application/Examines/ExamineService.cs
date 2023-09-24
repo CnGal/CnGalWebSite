@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
@@ -89,8 +89,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<UserMonitor, long> _userMonitorRepository;
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
 
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService, IRepository<FavoriteFolder, long> favoriteFolderRepository,
         IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IVideoService videoService, IRepository<Video, long> videoRepository, IFavoriteFolderService favoriteFolderService,
@@ -309,12 +307,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Id = item.Id,
                     ApplyTime = item.ApplyTime,
                     PassedTime = item.PassedTime,
-                    UserId = item.UserId,
-                    UserName = item.UserName,
+                    UserInfor = new UserInforViewModel {
+                        Id = item.UserId,
+                        Name = item.UserName,
+                        PhotoPath = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
+                        Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
+
+                    },
                     Operation = item.Operation,
                     IsPassed = item.IsPassed,
-                    UserImage = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
-                    Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
                     RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.VideoId != null ? item.VideoId.ToString() : item.FavoriteFolderId != null ? item.FavoriteFolderId.ToString() : item.UserId,
                     Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : item.VideoId != null ? ExaminedNormalListModelType.Video : item.FavoriteFolderId != null ? ExaminedNormalListModelType.FavoriteFolder : ExaminedNormalListModelType.User,
                     RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.VideoId != null ? item.VideoName : item.FavoriteFolderId != null ? item.FavoriteFolderName : item.UserName

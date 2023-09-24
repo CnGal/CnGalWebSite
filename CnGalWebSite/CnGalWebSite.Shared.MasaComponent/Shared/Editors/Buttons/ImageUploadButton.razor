@@ -1,5 +1,5 @@
-﻿@inject DialogService DialogService
-@inject ToastService ToastService
+﻿
+
 @inject IFileUploadService _fileUploadService
 @inject IPopupService PopupService
 
@@ -17,16 +17,14 @@
 
     @if (ShowPreview)
     {
-        <div class="card text-black" style="background-color:transparent;">
-
-            <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" class="card-img" alt="...">
-            <div class="card-img-overlay d-flex">
-
-                <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3">
+        <div style="display: flex;">
+            <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" style="width: 100%;border-radius: var( --md-card-border-radius);" alt="预览图" class="elevation-2">
+            <div class="ps-4 pt-4" style="position: absolute;">
+                <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3 @(Rounded?"m-btn--rounded":"")">
                     <span class="m-btn__content">
                         @if (isUploading)
                         {
-                            <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="white">
+                            <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="primary">
                             </MProgressCircular>
                         }
                         else
@@ -37,10 +35,9 @@
                         @Text
                     </span>
                 </label>
-
                 @if (string.IsNullOrWhiteSpace(ImagePath) == false)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Color="error" Fab />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Fab Tooltip="删除"/>
                 }
 
             </div>
@@ -48,11 +45,11 @@
     }
     else
     {
-        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3">
+        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3 @(Rounded?"m-btn--rounded":"")">
             <span class="m-btn__content">
                 @if (isUploading)
                 {
-                    <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="white">
+                    <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="primary">
                     </MProgressCircular>
                 }
                 else
@@ -92,6 +89,8 @@
     public string Class { get; set; }
     [Parameter]
     public bool Gallery { get; set; }
+    [Parameter]
+    public bool Rounded { get; set; } = true;
 
     private readonly string Id = "input" + new Random().Next();
     bool isUploading;
@@ -147,7 +146,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
+            await ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
         }
     }
 

@@ -4,7 +4,7 @@
 
 @if (Model.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-history" Title="近期修改" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Edit.ToIconString()" Title="近期修改" Class="mb-4" Outline>
         <ButtonContent>
             <MButton Text Block Color="success" OnClick="ReviewAll">
                 <MIcon Left>mdi-read </MIcon>
@@ -77,7 +77,7 @@
         catch (Exception ex)
         {
 
-            ErrorHandler.ProcessError(ex, "审阅失败");
+            await ErrorHandler.ProcessError(ex, "审阅失败");
         }
     }
 

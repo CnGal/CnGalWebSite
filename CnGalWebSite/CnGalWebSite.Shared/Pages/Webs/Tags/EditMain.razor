@@ -1,9 +1,9 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
+@inject IPopupService PopupService
 
-@inject IServiceProvider Provider
+
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -21,25 +21,12 @@ else
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Tag" Class="mb-3" />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-tag" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Tag.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Tags.MainCard Model="Model" Class="mb-4" ShowTagSearch TagItems="TagItems"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -53,10 +40,7 @@ else
     private EditTagMainViewModel Model { get; set; } = new EditTagMainViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> TagItems { get; set; } = new string[1] { "" };
-
-    [NotNull]
-    private ValidateForm? ComplexForm { get; set; }
+    private List<string> TagItems { get; set; } = new List<string>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -78,7 +62,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
             }
         }
     }
@@ -92,19 +76,19 @@ else
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑标签主要信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑标签主要信息失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑标签主要信息成功", "编辑标签主要信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
+                await PopupService.ToastSuccessAsync("编辑标签主要信息成功", "编辑标签主要信息成功，等待审核通过");
+                NavigationManager.NavigateTo( "/tags/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑标签主要信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑标签主要信息失败");
         }
     }
 

@@ -1,57 +1,13 @@
-﻿@inject NavigationManager NavigationManager
-
-<a href="@url" class="a-font-color">
-    <div class="rounded shadow-sm bg-opacity rounded pb-3">
-        <div style="display:flex;" class="m-0 row">
-            <div class="d-md-flex d-none col-auto ps-4 pt-4">
-                @if (Model.IsThumbnail)
-                {
-                    <img style="height:120px;border-radius:50%;" src="@Model.Image" alt="@Model.ObjectName">
-                }
-                else
-                {
-                    <img style="height:120px;" src="@Model.Image" alt="@Model.ObjectName">
-                }
-            </div>
-            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-
-                @if (Model.IsThumbnail)
-                {
-                    <img style="height: 200px; border-radius: 50%;" src="@Model.Image" alt="@Model.ObjectName">
-                }
-                else
-                {
-                    <img style="width: 100%;" src="@Model.Image" alt="@Model.ObjectName">
-                }
-            </div>
-            <div class="ps-4 pt-4 pe-4 col" style=" display: flex; flex-direction: column; justify-content: space-between;">
-
-                <h1 class="fw-bold h3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
-                    @("『"+Model.ObjectName+"』历史编辑记录总览")
-                </h1>
-                <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                    @Model.ObjectBriefIntroduction
-                </span>
-                <span class="" style="color: gray;">
-                    <i class="fa fa-calendar fa-fw"></i>
-                    <span class="article-home-infor-text">最后编辑时间：@Model.Examines.Max(s => s.ApplyTime).ToString("yyyy/M/d HH:mm")&nbsp;&nbsp;&nbsp;</span>
-
-                    <i class="fa fa-pencil fa-fw"></i>
-                    <span class="article-home-infor-text">总计@(Model.Examines.Count)次编辑&nbsp;&nbsp;&nbsp;</span>
-                </span>
-            </div>
-        </div>
-
-    </div>
-</a>
-
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@("『"+Model.ObjectName+"』历史编辑记录总览")" Image="@Model.Image" Thumbnail="Model.IsThumbnail"
+                                                                         BriefIntroduction="@Model.ObjectBriefIntroduction" Href="@url" Class="edit-record-overview-main-card"/>
 @code {
     [Parameter]
     public ExaminesOverviewViewModel Model { get; set; }
 
     public string url { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         url = Model.Type switch
         {
@@ -60,13 +16,7 @@
             ExaminedNormalListModelType.Periphery => $"/peripheries/index/{Model.ObjectId}",
             ExaminedNormalListModelType.Tag => $"/tags/index/{Model.ObjectId}",
             ExaminedNormalListModelType.Video => $"/videos/index/{Model.ObjectId}",
-            _ => ""
+            _ =>null
         };
-
-        if (string.IsNullOrWhiteSpace(url))
-        {
-            url = NavigationManager.Uri;
-        }
-
     }
 }

@@ -1,8 +1,9 @@
-﻿@inject ToastService ToastService
-@inject DialogService DialogService
+﻿
+
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -15,40 +16,31 @@
         </MCardText>
         <MCardText Class="pb-0">
             <div style="color: black;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-image" Title="图片" Class="mb-4" Collapable Outline OutlineHead>
-                    <div class="row">
-                        <div class="col-12 col-sm-6 mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Type="ImageAspectType._16_9" Text="上传主图"/>
-                        </div>
-                    </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Image.ToIconString()" Title="图片" Class="mb-4" Collapable Outline OutlineHead>
+                    <MRow>
+                        <MCol Cols="12" Md="6">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Type="ImageAspectType._16_9" Text="上传主图" />
+                        </MCol>
+                    </MRow>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="信息" Class="mb-4" Collapable Outline OutlineHead>
-                    <div class="row">
-                        <div class="col-12  col-sm-6">
-                            <MTextField @bind-Value="Model.Name" Label="名称"  />
-                        </div>
-                        <div class="col-12">
-                            <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介"  />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <MCheckbox @bind-Value="Model.ShowPublicly"
-                                       Label="公开" Class="m-0"
-                                       HideDetails="true"
-                                       ></MCheckbox>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <MCheckbox @bind-Value="Model.IsDefault"
-                                       Label="默认收藏夹" Class="m-0"
-                                       HideDetails="true"
-                                       ></MCheckbox>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <MCheckbox @bind-Value="Model.IsHidden"
-                                       Label="不展示在个人主页中" Class="m-0"
-                                       HideDetails="true"
-                                       ></MCheckbox>
-                        </div>
-                    </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="信息" Class="mb-4" Collapable Outline OutlineHead>
+                    <MRow>
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.Name" Label="名称" />
+                        </MCol>
+                        <MCol Cols="12">
+                            <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+                        </MCol>
+                          <MCol Cols="12" Md="4">
+                            <MCheckbox @bind-Value="Model.ShowPublicly" Label="公开" Class="m-0" HideDetails="true" />
+                        </MCol>
+                          <MCol Cols="12" Md="4">
+                            <MCheckbox @bind-Value="Model.IsDefault" Label="默认收藏夹" Class="m-0" HideDetails="true" />
+                        </MCol>
+                        <MCol Cols="12" Md="4">
+                            <MCheckbox @bind-Value="Model.IsHidden" Label="不展示在个人主页中" Class="m-0" HideDetails="true" />
+                        </MCol>
+                    </MRow>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
             </div>
         </MCardText>
@@ -84,12 +76,12 @@
 
             if (obj.Successful == false)
             {
-                await ToastService.Error("创建收藏夹失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建收藏夹失败", obj.Error);
             }
             else
             {
 
-                await ToastService.Success("创建收藏夹成功", "创建收藏夹成功");
+                await PopupService.ToastSuccessAsync("创建收藏夹成功", "创建收藏夹成功");
                 Dialog = false;
                 StateHasChanged();
                 await  OnCreated.InvokeAsync();
@@ -99,7 +91,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建收藏夹失败");
+            await ErrorHandler.ProcessError(ex, "创建收藏夹失败");
         }
     }
 

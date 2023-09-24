@@ -1,16 +1,12 @@
-﻿<div class="@(Class+( Outline?"":" rounded shadow-sm"))">
-    <MAlert Class=" m-0 bg-opacity "
-            ColoredBorder
+﻿<MAlert Text Class="@Class"
             Type="Type"
             Color="@Color"
-            Icon="@Icon"
-            Border="Borders.Left">
+         Style="@(Transparent?"":"background-color: var(--md-sys-color-background)!important;")"
+            Icon="@Icon">
         @ChildContent
-    </MAlert>
+</MAlert>
 
-</div>
-
-@code {
+ @code {
     [Parameter]
     public AlertTypes Type { get; set; }
     [Parameter]
@@ -21,6 +17,8 @@
     public bool Outline { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Transparent { get; set; } = true;
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 }

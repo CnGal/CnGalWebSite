@@ -1,11 +1,11 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService ToastService
+
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 
 @if (IsReady)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="API Server" Icon="fa fa-fw fa-server" Class="mb-4">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="API Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
         <div class="row">
             @foreach (var item in Items)
             {
@@ -75,7 +75,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取API服务器动态数据失败");
+            await ErrorHandler.ProcessError(ex, "获取API服务器动态数据失败");
         }
 
         IsRefresh = false;

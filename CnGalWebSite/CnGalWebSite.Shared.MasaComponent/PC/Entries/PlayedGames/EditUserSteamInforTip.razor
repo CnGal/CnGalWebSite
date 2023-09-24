@@ -1,8 +1,9 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IPopupService PopupService
 
 
 <MDialog @bind-Value="Dialog"
@@ -17,14 +18,14 @@
 
         <MCardText>
                 <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）"  />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="primary">
                     Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" Color="error" TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" TextStyle />
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Rounded />
         </MCardActions>
     </MCard>
 </MDialog>
@@ -51,7 +52,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑用户信息失败");
+            await ErrorHandler.ProcessError(ex, "获取编辑用户信息失败");
         }
     }
 
@@ -61,7 +62,7 @@
         {
             if (string.IsNullOrWhiteSpace(Model.SteamId))
             {
-                await ToastService.Error("编辑用户Steam信息失败", "SteamId不能为空");
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId不能为空");
                 return;
             }
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
@@ -70,7 +71,7 @@
             {
                 if (regex.IsMatch(Model.SteamId) == false)
                 {
-                    await ToastService.Error("编辑用户Steam信息失败", "SteamId需为64位纯数字");
+                    await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId需为64位纯数字");
                     return;
                 }
             }
@@ -80,11 +81,11 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
             }
             else
             {
-                await ToastService.Success("编辑用户Steam信息成功", "编辑用户Steam信息成功");
+                await PopupService.ToastSuccessAsync("编辑用户Steam信息成功", "编辑用户Steam信息成功");
                 Dialog = false;
                 StateHasChanged();
                 await OnChanged.InvokeAsync(Model.SteamId);
@@ -93,7 +94,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑用户Steam信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑用户Steam信息失败");
         }
     }
 

@@ -5,11 +5,11 @@
 @if (MainItems.Count > 0)
 {
     <div class="row">
-        <div class="col-12 col-lg-4 mb-4">
+        <div class="col-12 col-md-4 mb-4">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.NavCard Id="Id" Items="_dataCacheService.DocumentsCatche" IdChanged="IdChanged" />
 
         </div>
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-md-8">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.MainGroupCard Items="MainItems" Index="Id" @ref="mainGroupCard" />
         </div>
     </div>
@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取文档列表失败");
+            await ErrorHandler.ProcessError(ex, "获取文档列表失败");
         }
     }
 

@@ -1,5 +1,4 @@
-﻿@inject ToastService ToastService
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject IPageModelCatche<List< AnnouncementItemModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
 
@@ -9,7 +8,7 @@
     <div class="group">
         @foreach (var item in _items)
         {
-            <a class="item" href="@item.Url">
+            <MDCard Class="item" Href="@item.Url">
                 @if (GetIcon(item) != null)
                 {
                     <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
@@ -19,7 +18,7 @@
                     <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name</div>
                 </div>
 
-            </a>
+            </MDCard>
         }
     </div>
 </section>
@@ -42,18 +41,18 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页公告列表失败");
         }
     }
 
     public string GetIcon(AnnouncementItemModel model)
     {
-        if(model.Priority!=0)
+        if (model.Priority != 0)
         {
             return IconType.Pin.ToIconString();
         }
 
-        if(model==_items.FirstOrDefault(s=>s.Priority==0))
+        if (model == _items.FirstOrDefault(s => s.Priority == 0))
         {
             return IconType.New.ToIconString();
         }

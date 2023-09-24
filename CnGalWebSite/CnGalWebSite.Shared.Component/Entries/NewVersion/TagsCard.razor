@@ -11,16 +11,11 @@
 @if (Model.Tags.Count > 0)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="@IconType.Tags.ToIconString()">
-        <div>
+        <div class="entry-card-default tags-card">
             @foreach (var item in Model.Tags)
             {
-                <TabLink type="button" class="btn btn-dark m-1 ms-0 me-2 btn-xs ps-2 pe-2 " Url="@("/tags/index/"+item.Id)"
-                         Text="@item.Name" Icon="fa fa-tag">
-                    @item.Name
-                </TabLink>
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.None" Text="@item.Name" Href="@("/tags/index/"+item.Id)" />
             }
-
-
         </div>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }

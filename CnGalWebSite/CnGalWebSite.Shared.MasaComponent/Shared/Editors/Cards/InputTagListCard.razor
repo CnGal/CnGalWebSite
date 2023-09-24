@@ -1,22 +1,21 @@
 ﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
-@inject SwalService SwalService
-@inject ToastService ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
+
+
 
 <div class="@Class">
-    <div class="row">
-        @for (int i = 0; i < Model.Count; i++)
+    <MRow>
+        @foreach(var item in Model)
         {
-            int temp = i;
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-2">
-                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" Value="@Model[temp].DisplayName" placeholder="标签" OnValueChanged="@((s)=>OnValueChanged(temp,s))"/>
-            </div>
+            <MCol Cols="12" Md="6" Lg="4">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@item.DisplayName" Label="标签" AutoCompleteItems="AutoCompleteItems" />
+            </MCol>
         }
-    </div>
+</MRow>
     <div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAdd" Icon="mdi-plus" Color="info"/>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建" OnClick="OnCreate" Icon="mdi-creation" Class="ms-2" Color="success"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAdd" Icon="mdi-plus" Rounded/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建" OnClick="OnCreate" Icon="mdi-creation" Class="ms-4" Rounded/>
     </div>
 </div>
 
@@ -24,7 +23,7 @@
     [Parameter]
     public List<RelevancesModel> Model { get; set; }
     [Parameter]
-    public IEnumerable<string> AutoCompleteItems { get; set; }
+    public List<string> AutoCompleteItems { get; set; }
     [Parameter]
     public string Class { get; set; }
     [Parameter]
@@ -51,7 +50,7 @@
         }
         catch
         {
-            await ToastService.Error("添加标签失败", "发生了未预料的异常，请联系开发人员");
+            await PopupService.ToastAsync("添加标签失败", AlertTypes.Error);
         }
     }
 
@@ -71,20 +70,13 @@
 
     public async Task OnCreate()
     {
-        //确认
-        var op = new SwalOption()
-        {
-            Title = "确认跳转标签创建页面",
-            Content = "跳转后当前页面数据不会保存，请确保备份编辑数据后跳转",
+        var ret = await PopupService.ConfirmAsync("确认跳转标签创建页面", "跳转后当前页面数据不会保存，请确保备份编辑数据后跳转");
 
-            Category = SwalCategory.Warning,
-        };
-        var ret = await SwalService.ShowModal(op);
         if (ret == false)
         {
             return;
         }
-        NavigationManager.NavigateTo(Provider, "/tags/createtag", "创建标签", "fa fa-pencil");
+        NavigationManager.NavigateTo( "/tags/createtag");
     }
 
 }

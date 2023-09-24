@@ -1,11 +1,12 @@
-﻿<div class="@("rounded shadow-sm bg-opacity h-100 "+Class)">
+﻿<MDCard Outline="@string.IsNullOrWhiteSpace(Model.Note)" Class="@("h-100 "+Class)">
     <img src="@Model.Url" alt="@Model.Note" class="w-100">
 
     @if (string.IsNullOrWhiteSpace(Model.Note) == false)
-    {<div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
+    {
+        <div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
 
             <span>
-                <i class="fa fa-image fa-fw font-color"></i>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Image" />
                 <a href="@Model.Url" target="_blank">
                     @Model.Note
                 </a>
@@ -13,7 +14,7 @@
         </div>
     }
 
-</div>
+</MDCard>
 
 @code {
     [Parameter]

@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -164,10 +164,6 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
         /// <summary>
-        /// 用户收藏夹列表缓存
-        /// </summary>
-        public IPageModelCatche<FavoriteFoldersViewModel> UserFavoriteFoldersDataCatche { get; set; }
-        /// <summary>
         /// 用户收藏对象列表缓存
         /// </summary>
         public IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
@@ -276,7 +272,6 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<UserArticleListModel> userArticleListDataCatche,
         IPageModelCatche<UserVideoListModel> userVideoListDataCatche,
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> userExaminesDataCatche,
-        IPageModelCatche<FavoriteFoldersViewModel> userFavoriteFoldersDataCatche,
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
         IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche,
         IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche,
@@ -308,7 +303,6 @@ namespace CnGalWebSite.Shared.Service
             (UserArticleListDataCatche = userArticleListDataCatche).Init(nameof(UserArticleListDataCatche), ToolHelper.WebApiPath + "api/space/GetUserArticles/");
             (UserVideoListDataCatche = userVideoListDataCatche).Init(nameof(UserVideoListDataCatche), ToolHelper.WebApiPath + "api/space/GetUserVideos/");
             (UserExaminesDataCatche = userExaminesDataCatche).Init(nameof(UserExaminesDataCatche), ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
-            (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(nameof(UserFavoriteFoldersDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(nameof(UserFavoriteObjectsDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
             (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(nameof(PublishGameTimesDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
             (PublishGamesTimelineDataCatche = publishGamesTimelineDataCatche).Init(nameof(PublishGamesTimelineDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesTimeline");

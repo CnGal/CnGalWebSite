@@ -164,7 +164,28 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         DisableComment,
         Badge,
         Score,
-        UnLink
+        UnLink,
+        Run,
+        Runing,
+        Stop,
+        Error,
+        Default,
+        Other,
+        Move,
+        Import,
+        Code,
+        Folder,
+        Search,
+        Save,
+        Key,
+        Lock,
+        Explore,
+        Shape,
+        Setting,
+        Calendar,
+        About,
+        Point,
+        Certification
     }
 
     public static class IconTypeHelper
@@ -173,6 +194,48 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Point:
+                    return "mdi-vector-point";
+                case IconType.Certification:
+                    return "mdi-check-decagram";
+                case IconType.About:
+                    return "mdi-information";
+                case IconType.Setting:
+                    return "mdi-cog";
+                case IconType.Calendar:
+                    return "mdi-calendar-month";
+                case IconType.Shape:
+                    return "mdi-shape";
+                case IconType.Explore:
+                    return "mdi-compass";
+                case IconType.Lock:
+                    return "mdi-lock";
+                case IconType.Key:
+                    return "mdi-key";
+                case IconType.Save:
+                    return "mdi-content-save";
+                case IconType.Search:
+                    return "mdi-magnify";
+                case IconType.Folder:
+                    return "mdi-folder";
+                case IconType.Code:
+                    return " mdi-barcode";
+                case IconType.Import:
+                    return "mdi-import";
+                case IconType.Move:
+                    return "mdi-file-move";
+                case IconType.Default:
+                    return "mdi-star";
+                case IconType.Other:
+                    return " mdi-star-shooting-outline";
+                case IconType.Error:
+                    return "mdi-close-circle";
+                case IconType.Runing:
+                    return "mdi-play-circle-outline";
+                case IconType.Run:
+                    return "mdi-play";
+                case IconType.Stop:
+                    return "mdi-pause";
                 case IconType.UnLink:
                     return "mdi-link-off";
                 case IconType.Score:

@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject IDataCacheService _dataCatcheService
 
 
@@ -10,57 +10,49 @@
     @if (Model.Peripheries.Count != 0)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
-
-            <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity " +Class)">
-                <a class="a-font-color" @onclick="OnClick">
-                    <div class="row m-0">
-                        @if (Model.IsThumbnail)
+             <MDCard Outline="Outline" Class="@($"periphery-overview-card {Class}")">
+                 <MDCard Outline Href="@GetUrl()" OnClick="OnClick" Style="flex-direction: row;">
+                         @if (Model.IsThumbnail)
                         {
-                            <div class="col-auto  ps-3 pt-3 pe-0" style=" display: flex; align-items: center;">
+                        <div class="ms-3 mt-3 pe-0 image-card" style=" display: flex; align-items: center;">
                                 <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 1/1; height: 75px; border-radius: 50%;" />
                             </div>
                         }
                         else
                         {
-                            <div class="d-md-flex d-none col-auto  ps-3 pt-3 pe-0">
+                            <div class="ps-3 pt-3 pe-0 image-card">
                                 <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; height: 75px;" />
                             </div>
-                            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; width: 100%;" />
-                            </div>
                         }
-                        <div class="ps-3 pt-3 pe-4 col">
+                        <div class="ps-3 pt-3 pe-4 proc-card">
                             <div style=" display: flex; flex-wrap: wrap; flex-direction: column; justify-content: center;" class="w-100 h-100">
                                 <div style="display: flex; align-items: flex-end; justify-content: flex-start; flex-wrap: wrap;" class="mb-2">
-                                    <div class="h5 fw-bold m-0 me-2">@Model.Name</div>
+                                    <div class="title-large me-2">@Model.Name</div>
 
-                                    <div style="color: gray;">@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
+                                    <div>@("收集进度 " + Model.Peripheries.Count(s => s.IsCollected == true) + "/" + Model.Peripheries.Count)</div>
                                 </div>
-                                <div class=" text-truncate-2">@Model.BriefIntroduction</div>
+                                <div class="label-large text-truncate-2">@Model.BriefIntroduction</div>
 
                             </div>
                         </div>
-                    </div>
-                </a>
+                 </MDCard>
                 <div class="ms-3 me-3 mb-1 mt-1 pt-2">
                     <MProgressLinear Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" BufferValue="0" Stream />
                 </div>
-                <MSlideGroup ShowArrows="true" Class="ms-2 me-2 pb-2">
+                 <MSlideGroup ShowArrows="true" Class="ms-3 me-2 pb-3 slide-group-garp">
                     <ChildContent>
                         @foreach (var item in Model.Peripheries)
                         {
                             <MSlideItem>
-                                <MCard Width="150" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                                       OnClick="@context.Toggle"
-                                       RefBack="@context.Ref">
+                                <div style="width: 150px;padding-top: .5rem;padding-bottom: .5rem;">
                                     <PeripheryOverviewAloneTip Model="item" />
-                                </MCard>
+                                </div>
                             </MSlideItem>
                         }
                     </ChildContent>
 
                 </MSlideGroup>
-            </div>
+            </MDCard>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
     else
@@ -71,15 +63,15 @@
 
                 <AuthorizeView>
                     <Authorized>
-                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4 ">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
-                        </div>
+                     <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
+                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
+                        </MDCard>
                     </Authorized>
                     <NotAuthorized>
-                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
-                        </div>
-                    </NotAuthorized>
+                     <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
+                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                     </MDCard>
+                 </NotAuthorized>
                 </AuthorizeView>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         }
@@ -119,7 +111,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
+                await ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
             }
         }
         else
@@ -130,7 +122,7 @@
 
     }
 
-    public void OnClick()
+    public string GetUrl()
     {
         string url = null;
         if (Model.Type == PeripheryOverviewType.Entry)
@@ -146,13 +138,14 @@
             url = string.IsNullOrWhiteSpace(Model.ObjectId) ? null : ("/space/index/" + Model.ObjectId + "?TabIndex=11");
         }
 
-        if(string.IsNullOrWhiteSpace(url))
+        return url;
+    }
+
+    public void OnClick()
+    {
+        if(GetUrl()==null)
         {
             OnLogin();
-        }
-        else
-        {
-            NavigationManager.NavigateTo(url);
         }
     }
 

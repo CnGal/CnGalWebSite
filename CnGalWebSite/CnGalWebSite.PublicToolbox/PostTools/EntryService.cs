@@ -82,7 +82,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{SubName}({SubId}) -> {HostName}({HostId}) 生成审核记录失败", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(model, OutputLevel.Dager, "生成审核记录失败");
+                OnProgressUpdate(model, OutputLevel.Dager, $"生成审核记录失败，详情：{ex.Message}");
 
                 return;
             }

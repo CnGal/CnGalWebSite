@@ -1,12 +1,11 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="参与投票的用户" Icon="fa fa-fw fa-users" Outline Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="参与投票的用户" Icon="@IconType.Users.ToIconString()" Outline Collapable>
     <div class="row">
         @foreach (var item in Model.Users)
         {
-            <div class="col-12 col-lg-6 pb-2">
-                <UserInforCard Model="item" />
-            </div>
-            temp = !temp;
+            <div class="col-12 col-lg-6 mb-4">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="item" Small Class="w-100" ShowOnlyOneRank />
+             </div>
         }
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

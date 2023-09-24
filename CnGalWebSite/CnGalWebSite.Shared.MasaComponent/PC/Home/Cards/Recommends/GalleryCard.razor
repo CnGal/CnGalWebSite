@@ -3,10 +3,11 @@
 @inject IDataCacheService _dataCatcheService
 @inject IEventService _eventService
 
-<div class="gallery-card">
+
+<MDCard Class="gallery-card">
     <div class="content">
         <div class="head">
-            <div class="name text-truncate-1">@Model.Name</div>
+            <div class="name text-truncate-1 headline-large">@Model.Name</div>
             <div class="tags">
                 @foreach (var item in Model.Tags.Random().Take(2))
                 {
@@ -15,7 +16,7 @@
             </div>
 
         </div>
-        <div class="brief text-truncate-2">@Model.BriefIntroduction</div>
+        <div class="brief text-truncate-2 label-large">@Model.BriefIntroduction</div>
     </div>
     <div class="gallery">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="Model.Images">
@@ -25,28 +26,25 @@
                           Align="@AlignTypes.Center"
                           Justify="@JustifyTypes.Center">
                         <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
-                    </MRow>
-                </PlaceholderContent>
-            </MImage>
-        </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
-    </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <div class="actions">
-            <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))">
-                <MIcon Small="_dataCatcheService.IsApp" Left>@IconType.Game.ToIconString()</MIcon>
-                访问作品页面
-            </MButton>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
-            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false&&_dataCatcheService.IsApp==false)
+                     </MRow>
+                 </PlaceholderContent>
+             </MImage>
+         </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+     </div>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+         <div class="actions">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="详情" TextStyle Rounded Icon="@IconType.Infor.ToIconString()" OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))" />
+             @if (_dataCatcheService.IsApp == false)
             {
-                <MButton Small="_dataCatcheService.IsApp" Rounded Color="primary" Outlined OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))">
-                    <MIcon Left Small="_dataCatcheService.IsApp">@IconType.Steam.ToIconString()</MIcon>
-                    访问Steam商店
-                </MButton>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
+            }
+            @if (string.IsNullOrWhiteSpace(Model.SteamId) == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="Steam" Icon="@IconType.Steam.ToIconString()" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))" />
             }
         </div>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-</div>
+</MDCard>
 
 
 @code {
@@ -62,13 +60,13 @@
         else
         {
             await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
-            {
-                Index = Model.Images.IndexOf(image),
-                Pictures = Model.Images.Select(s => new EditImageAloneModel
                 {
-                    Image = s,
-                }).ToList()
-            });
+                    Index = Model.Images.IndexOf(image),
+                    Pictures = Model.Images.Select(s => new EditImageAloneModel
+                    {
+                        Image = s,
+                    }).ToList()
+                });
         }
 
     }

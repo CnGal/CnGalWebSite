@@ -1,8 +1,9 @@
 ﻿
 @inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -18,32 +19,14 @@ else
 <div>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-            </div>
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-dropbox" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Lottery.ToIconString()" Outline>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        <div class="rounded  shadow-sm bg-opacity mb-4">
-            <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-                   >
+            <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
 
                 <MTab Value="1">
                     编辑<MIcon>mdi-pencil</MIcon>
@@ -55,7 +38,6 @@ else
                     中奖<MIcon>mdi-gift</MIcon>
                 </MTab>
             </MTabs>
-        </div>
         <MTabsItems @bind-Value="TabIndex">
             <MTabItem Value="1">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />
@@ -64,16 +46,10 @@ else
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
             </MTabItem>
             <MTabItem Value="2">
-                <div class="  rounded shadow-sm p-3 bg-opacity">
                     <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListLotteryUserTip Id="Model.Id" />
-                </div>
-
             </MTabItem>
             <MTabItem Value="3">
-                <div class="  rounded shadow-sm p-3 bg-opacity">
                     <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListWinnerCard Id="Model.Id" />
-                </div>
-
             </MTabItem>
         </MTabsItems>
     }
@@ -86,7 +62,7 @@ else
 
     private bool isReady = false;
     public StringNumber TabIndex { get; set; } = 1;
-    private IEnumerable<string> EntryGameItems { get; set; }
+    private List<string> EntryGameItems { get; set; }
 
 
     [CascadingParameter]
@@ -108,7 +84,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
             }
         }
     }
@@ -121,17 +97,17 @@ else
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑抽奖失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑抽奖失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("编辑抽奖成功", "编辑抽奖成功");
+                await PopupService.ToastSuccessAsync("编辑抽奖成功", "编辑抽奖成功");
                 NavigationManager.NavigateTo("/lotteries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑抽奖失败");
+            await ErrorHandler.ProcessError(ex, "编辑抽奖失败");
         }
     }
 

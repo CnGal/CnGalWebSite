@@ -1,57 +1,34 @@
-﻿<div class="rounded shadow-sm bg-opacity rounded pb-4">
-    @if (Model.MainState == EditState.Preview)
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke"  Class="ms-4 me-4 pt-4"/>
-    }
-    <div class="row m-0">
-        <div class="d-md-flex d-none col-auto ps-4 pt-4">
-            <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
+﻿
+@if (Model.MainState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke" Class="ms-4 me-4 pt-4" />
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard Name="@Model.Name" Image="@Model.MainPicture"
+                                                                         BriefIntroduction="@Model.BriefIntroduction" Small="ForceSmall">
+    <ButtonContent>
+        @if (HiddenButton == false)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Tag" Class="me-4" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
+                </div>
+                @if (ToolHelper.IsMaui)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@("标签 - "+Model.Name)" Class="ms-4" Text="@($"【标签】《{Model.Name}》\n{Model.BriefIntroduction}")" />
+                }
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        }
 
-        </div>
-        <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-
-            <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
-
-        </div>
-        <div class="ps-4 pt-4 pe-4 col">
-            <h1 class="fw-bold h3 mb-4">@Model.Name</h1>
-
-            <div class="d-md-none-co">
-                <span class="text-truncate-3">
-                    @Model.BriefIntroduction
-                </span>
-            </div>
-
-            <div class="d-md-flex d-none">
-                <span class="text-truncate-3">
-                    @Model.BriefIntroduction
-                </span>
-            </div>
-            @if (HiddenButton == false)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                    <div class="mt-2" style="display: flex; justify-content: flex-end;">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Tag" Class="me-4"/>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
-                    </div>
-
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            }
-            @if (ToolHelper.IsMaui)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@("标签 - "+Model.Name)" Class="ms-4" Text="@($"【标签】《{Model.Name}》\n{Model.BriefIntroduction}")" />
-            }
-
-        </div>
-    </div>
-
-</div>
-
+    </ButtonContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDMainInfoCard>
 @code {
     [Parameter]
     public TagIndexViewModel Model { get; set; }
     [Parameter]
     public bool HiddenButton { get; set; }
+    [Parameter]
+    public bool ForceSmall { get; set; }
 
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }

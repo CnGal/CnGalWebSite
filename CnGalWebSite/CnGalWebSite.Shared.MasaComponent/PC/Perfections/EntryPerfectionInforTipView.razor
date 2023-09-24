@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject DialogService DialogService
-@inject IServiceProvider Provider
+
+
+
 @inject NavigationManager NavigationManager
 
 @if (isReady)
@@ -54,7 +54,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
+            await ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
         }
     }
 

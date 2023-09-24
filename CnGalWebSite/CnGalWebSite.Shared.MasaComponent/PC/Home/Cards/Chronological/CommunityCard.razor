@@ -5,13 +5,13 @@
     <div class="group">
         @foreach (var item in _items)
         {
-            <a class="item" href="@item.Link" target="_blank" rel="noreferrer">
-                <MIcon Size="@("2rem")">@item.Icon.ToIconString()</MIcon>
-                <div class="content">
-                    <div class="name">@item.Title</div>
-                    <div>@item.Text</div>
-                </div>
-            </a>
+                <MDCard Class="item" Href="@item.Link" Target="_blank">
+                        <MIcon Size="@("2rem")">@item.Icon.ToIconString()</MIcon>
+                        <div class="content">
+                            <div class="name">@item.Title</div>
+                            <div class=" label-large">@item.Text</div>
+                        </div>
+            </MDCard>
         }
     </div>
 </section>

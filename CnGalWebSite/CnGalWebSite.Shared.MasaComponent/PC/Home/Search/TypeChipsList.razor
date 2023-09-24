@@ -1,8 +1,8 @@
 ﻿<div>
     @foreach (var item in FixedModel)
     {
-        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small TextColor="@(InputData.Any(s=>s==item)?"white":"")"
-               Color="@Color"
+        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small
+                Color="primary"
                Outlined="!InputData.Any(s=>s==item)">
             @item.GetDisplayName()
         </MChip>
@@ -11,8 +11,6 @@
 </div>
 
 @code {
-    [Parameter]
-    public string Color { get; set; }
     [Parameter]
     public List<SearchType> InputData { get; set; }
     [Parameter]

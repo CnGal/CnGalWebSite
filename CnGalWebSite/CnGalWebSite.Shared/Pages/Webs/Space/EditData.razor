@@ -1,8 +1,9 @@
 ﻿@inject IHttpService _httpService
 
-@inject SwalService SwalService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
+
+
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
@@ -14,30 +15,14 @@
 <div>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑个人资料" Icon="fa fa-fw  fa-user" Outline>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.ImageCard Model="Model" Class="mb-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑个人资料" Icon="@IconType.User.ToIconString()" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.ImageCard Model="Model"/>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="账户安全" Icon="fa fa-fw fa-briefcase" Outline Collapable Class="mb-4">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="账户安全" Icon="fa fa-fw fa-briefcase" Outline Collapable>
                 <div class="row">
                     <div class=" col-12 col-md-6  col-lg-4 mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Users.SecurityCards.BindCard/>
@@ -88,7 +73,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
             }
         }
     }
@@ -104,45 +89,23 @@
         //上传
         try
         {
-
             var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/edituserdata", Model);
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存用户信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存用户信息失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                SwalOption op= new SwalOption()
-                {
-                    Category = SwalCategory.Success,
-                    Title = "修改个人资料成功",
-                    Content = "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见",
-                    ShowClose = false
-                };
-
-                op.ButtonTemplate = new RenderFragment(builder =>
-                {
-                    builder.OpenComponent<Button>(0);
-                    builder.AddAttribute(1, nameof(Button.Text), "我知道了");
-                    builder.AddAttribute(2, nameof(Button.Icon), "fa fa-check");
-                    builder.AddAttribute(3, nameof(Button.Color), Color.Success);
-                    builder.AddAttribute(4, nameof(Button.IsOutline), true);
-                    builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
-                    {
-                        await op.Close();
-                        NavigationManager.NavigateTo(Provider, "/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
-                    }));
-                    builder.CloseComponent();
-                });
-                await SwalService.Show(op);
+                await PopupService.ConfirmAsync("修改个人资料成功", "我们需要对你的修改进行审核，在通过审核之前你的修改对其他用户不可见");
+                NavigationManager.NavigateTo( "/space/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存用户信息失败");
+            await ErrorHandler.ProcessError(ex, "保存用户信息失败");
         }
     }
 

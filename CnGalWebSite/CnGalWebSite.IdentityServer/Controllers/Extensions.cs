@@ -1,10 +1,7 @@
-﻿using System;
-using BlazorComponent;
-using System.Collections.Generic;
+﻿using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 
 namespace CnGalWebSite.IdentityServer.Models.DataModels.Account
 {
@@ -24,7 +21,7 @@ namespace CnGalWebSite.IdentityServer.Models.DataModels.Account
         {
             controller.HttpContext.Response.StatusCode = 200;
             controller.HttpContext.Response.Headers["Location"] = "";
-            
+
             return controller.View(viewName, new RedirectViewModel { RedirectUrl = redirectUri });
         }
 

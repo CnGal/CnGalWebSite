@@ -1,7 +1,8 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject IFileUploadService _fileUploadService
-@inject ToastService ToastService
+
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 <MDialog Value="Dialog" ValueChanged="DialogChanged"
          Width="1000">
@@ -33,9 +34,10 @@
         </MCardText>
         <MCardActions Class="pb-4 pe-6 ps-6 pt-0">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="直接上传" IsAsync="true" OnClick="@CancelCropAsync" Icon="mdi-upload " Color="primary" TextStyle />
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="裁剪" IsAsync="true" OnClick="DoneCrop" Icon="mdi-content-cut " Color="success" TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="裁剪" IsAsync="true" OnClick="DoneCrop" Icon="mdi-content-cut " TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="直接上传" IsAsync="true" OnClick="@CancelCropAsync" Icon="mdi-upload " Rounded />
+
         </MCardActions>
     </MCard>
 </MDialog>
@@ -126,13 +128,13 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{File.Name}> " + obj.Error ?? "无法图床内部传输错误");
+                await PopupService.ToastErrorAsync("图片上传失败", $"<{File.Name}> " + obj.Error ?? "无法图床内部传输错误");
                 return;
             }
         }
         catch (Exception exc)
         {
-            await ToastService.Error("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
+            await PopupService.ToastErrorAsync("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
             return;
         }
         //回调
@@ -156,13 +158,13 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{File.Name}> {obj.Error}");
+                await PopupService.ToastErrorAsync("图片上传失败", $"<{File.Name}> {obj.Error}");
                 return;
             }
         }
         catch (Exception ex)
         {
-            await ToastService.Error("图片上传失败", "超过1MB的图片请上传到相册");            
+            await PopupService.ToastErrorAsync("图片上传失败", "超过1MB的图片请上传到相册");            
             return;
         }
         //回调

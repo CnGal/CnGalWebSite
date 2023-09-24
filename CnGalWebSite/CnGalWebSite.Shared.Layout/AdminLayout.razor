@@ -7,8 +7,8 @@
     <Authorized>
         @if (_dataCacheService.IsApp)
         {
-            <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
-                <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+            <MAppBar App Style="background-color: var(--md-sys-color-background)!important;" Dense>
+             <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
                 <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard />
                 <MSpacer></MSpacer>
@@ -25,12 +25,12 @@
             <CascadingValue Value="this" IsFixed="true">
                     @if (_dataCacheService.IsApp == false)
                     {
-                        <div style=" min-height: 100vh; top: 0px; max-height: calc(100% - 0px);width: 300px; position: fixed; min-width: 300px;" class="me-4 rounded shadow-sm  bg-opacity ">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard Style=" min-height: 100vh; top: 0px; max-height: calc(100% - 0px);width: 300px; position: fixed; min-width: 300px;" Class="me-4">
                             <div style="display: flex; justify-content: center; " class="mt-6 mb-6">
                                 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip OnClick="OnRefreshLayout" Admin />
                             </div>
                             <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu Style="overflow-y: auto; height: calc(100vh - 85px);background-color:transparent" Class="scroll" />
-                        </div>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns.MDCard>
                         <div style=" margin-left: 317px; margin-bottom: 17px;">
                             <div style=" position: fixed; right: 0; z-index: 3; left: 317px;top:0">
                                 <CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar />
@@ -56,7 +56,7 @@
     </Authorized>
     <NotAuthorized>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Page/>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
     </NotAuthorized>
 </AuthorizeView>

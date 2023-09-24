@@ -1,8 +1,9 @@
 ﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+
 @inject IDataCacheService _dataCacheService
-@inject ToastService ToastService
+@inject IPopupService PopupService
+
 
 
 @if (isReady)
@@ -12,9 +13,9 @@
         <div class="pointer" @onclick="OnClickPerfection">
             <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" />
         </div>
-        <MDivider Class="w-100"></MDivider>
+        <MDivider Class="w-100 mt-2 mb-2"></MDivider>
     }
-    <MButton Text Block Color="warning" OnClick="OnClickHistory">
+    <MButton Text Block Color="primary" OnClick="OnClickHistory">
         <MIcon Left>mdi-history </MIcon>
         历史编辑记录
     </MButton>
@@ -29,14 +30,14 @@
             <Authorized>
                 @if (isInMonitor)
                 {
-                    <MButton Text Block Color="success" OnClick="@(()=>SetMonitor(false))">
+                    <MButton Text Block Color="primary" OnClick="@(()=>SetMonitor(false))">
                         <MIcon Left>mdi-monitor</MIcon>
                         已关注
                     </MButton>
                 }
                 else
                 {
-                    <MButton Text Block Color="warning" OnClick="@(()=>SetMonitor(true))">
+                    <MButton Text Block Color="primary" OnClick="@(()=>SetMonitor(true))">
                         <MIcon Left>mdi-monitor</MIcon>
                         关注词条
                     </MButton>
@@ -54,7 +55,7 @@
             }
         </Authorized>
         <NotAuthorized>
-            <MButton Text Block Color="success" OnClick="OnLogin">
+            <MButton Text Block Color="primary" OnClick="OnLogin">
                 <MIcon Left>mdi-login </MIcon>
                 登入后编辑
             </MButton>
@@ -225,7 +226,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取" + Type.GetDisplayName() + "编辑信息失败");
+            await ErrorHandler.ProcessError(ex, "获取" + Type.GetDisplayName() + "编辑信息失败");
             return;
         }
 
@@ -263,7 +264,7 @@ else
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("修改监视状态失败", obj.Error);
+                await PopupService.ToastErrorAsync("修改监视状态失败", obj.Error);
             }
             else
             {
@@ -273,7 +274,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "修改监视状态失败");
+            await ErrorHandler.ProcessError(ex, "修改监视状态失败");
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Models;
 using CnGalWebSite.DataModel.Helper;
@@ -31,9 +31,6 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<BackUpArchive>, string, SortOrder, IEnumerable<BackUpArchive>>> SortLambdaCacheApplicationUser = new();
 
         public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IConfiguration configuration, IRepository<Periphery, long> peripheryRepository,
         IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment, IRepository<Tag, int> tagRepository, IRepository<Video, long> videoRepository)

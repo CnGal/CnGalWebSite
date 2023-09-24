@@ -1,0 +1,85 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+    <MCard>
+        <MCardTitle>
+        @(Model.RealId == 0 ? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12" Xl="6">
+                <MTextField @bind-Value="Model.Text" Label="内容" />
+                </MCol>
+                <MCol Cols="12" Xl="6">
+                <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="VoteOptionType" Label="类型" />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                  Text
+                       OnClick="SaveEdit">
+                  <MIcon Left>mdi-check</MIcon>
+             保存
+         </MButton>
+     </MCardActions>
+
+ </MCard>
+
+
+
+@code {
+    [Parameter]
+    public List<EditVoteOptionModel> Options { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    EditVoteOptionModel Model = new EditVoteOptionModel();
+
+    private string _name = "选项";
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void Refresh(EditVoteOptionModel model)
+    {
+        Model = model;
+        StateHasChanged();
+    }
+
+    public async Task SaveEdit()
+    {
+        var flag = false;
+        if (Model.RealId == 0)
+        {
+            flag = true;
+            if (Options.Count == 0)
+            {
+                Model.RealId = 1;
+            }
+            else
+            {
+                Model.RealId = Options.Max(i => i.RealId) + 1;
+            }
+        }
+
+        var result = Model.Validate(Options);
+
+        if (result.Successful == false)
+        {
+            await PopupService.ToastAsync(result.Error, AlertTypes.Error);
+        }
+        else
+        {
+            if (flag)
+            {
+                Options.Add(Model);
+            }
+            await OnEdited.InvokeAsync();
+        }
+    }
+}

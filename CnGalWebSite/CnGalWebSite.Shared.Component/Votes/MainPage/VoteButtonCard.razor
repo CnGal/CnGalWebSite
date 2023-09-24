@@ -1,23 +1,24 @@
 ﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
 
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-
+@inject IPopupService PopupService
 @if (DateTime.Now.ToCstTime() > Model.BeginTime && DateTime.Now.ToCstTime() < Model.EndTime)
 {
     <div style="display: flex; flex-direction: column; align-content: center;">
         @if (Model.ShowResult == false)
         {
-            <Checkbox TValue="string" State="CheckboxState.UnChecked" DisplayText="匿名参与投票" ShowAfterLabel="true" class="ms-1 mb-2" OnStateChanged="OnSeletedItemChanged"></Checkbox>
+            <MCheckbox TValue="bool" @bind-Value="IsAnonymous" Label="匿名参与投票"></MCheckbox>
             <div style=" display: flex; justify-content: center; ">
-                <Button Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted" style=" width: 100px;" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted"/>
             </div>
         }
         else
         {
             <div style=" display: flex; justify-content: center; ">
-                <Button Icon="fa fa-refresh" Text="重新投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickReVoted" style=" width: 100px;" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="fa fa-refresh" Text="重新投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickReVoted"/>
             </div>
         }
     </div>
@@ -33,7 +34,7 @@
     [Parameter]
     public EventCallback OnReVoted { get; set; }
 
-    public CheckboxState IsAnonymous { get; set; }
+    public bool IsAnonymous { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -62,7 +63,7 @@
 
             var obj = await _httpService.PostAsync<UserVoteModel, Result>("api/votes/UserVote", new UserVoteModel
             {
-                IsAnonymous = IsAnonymous == CheckboxState.Checked,
+                IsAnonymous = IsAnonymous,
                 VoteId = Model.Id,
                 VoteOptionIds = Model.UserSelections,
                 Identification = await deviceIdentification.GetDeviceIdentificationModel()
@@ -70,24 +71,18 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("投票失败", obj.Error);
+                await PopupService.ToastErrorAsync("投票失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("投票成功", "投票成功");
+                await PopupService.ToastSuccessAsync("投票成功", "投票成功");
                 await OnVoted.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "投票失败");
+            await ErrorHandler.ProcessError(ex, "投票失败");
         }
-    }
-
-    public async Task OnSeletedItemChanged(CheckboxState state, string str)
-    {
-
-        IsAnonymous = state;
     }
 
     protected void OnLogin()

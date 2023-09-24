@@ -1,8 +1,8 @@
 ﻿<div>
     @foreach (var item in sorts)
     {
-        <MChip Class="ma-1" OnClick="@(()=>OnClick(item.Key))" Small TextColor="@(item.Key==current?"white":"")"
-               Color="@Color"
+        <MChip Class="ma-1" OnClick="@(()=>OnClick(item.Key))" Small
+               Color="primary"
                Outlined="item.Key!=current">
             @item.Value
         </MChip>
@@ -11,8 +11,8 @@
     {
         @if (asc)
         {
-            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(false))" Small TextColor="white"
-                   Color="@Color">
+            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(false))" Small
+                    Color="primary">
                 <MIcon Left Small>
                     mdi-sort-ascending
                 </MIcon>
@@ -21,8 +21,8 @@
         }
         else
         {
-            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(true))" Small TextColor="white"
-                   Color="@Color">
+            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(true))" Small
+                    Color="primary">
                 <MIcon Left Small>
                     mdi-sort-descending
                 </MIcon>
@@ -45,7 +45,7 @@
     bool asc = false;
     string current = "";
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         current = Model.Sorting.Replace(" desc", "");
         if(current!="")

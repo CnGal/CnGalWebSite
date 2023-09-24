@@ -2,13 +2,12 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
-@inject IApplicationStateService _applicationStateService
 @implements IDisposable
 
 
 @if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@Model.BasicInfor.Name" Description="@Model.BasicInfor.PersonalSignature"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@Model.BasicInfor.Name" Description="@Model.BasicInfor.PersonalSignature" />
 }
 @if (_dataCacheService.ThemeSetting.IsTransparent)
 {
@@ -24,7 +23,10 @@
 
 @if (isNotFound)
 {
-    <NotFoundUser IsNeedLayput="true"></NotFoundUser>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+        <h1 class="text-center title-large">找不到这个用户哦......</h1>
+        <div class="text-center">有点可怕呢，可以试试联系管理员</div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 }
 else
 {
@@ -32,179 +34,150 @@ else
     {
 
         <div class="row">
-            <div class="col-12 col-lg-4">
-                <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.BasicInfor" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
-                @if (_dataCacheService.IsApp == false)
+            <div class="col-12 col-md-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Main Model="Model.BasicInfor" />
+                 <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
+                 @if (_dataCacheService.IsApp == false)
                 {
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
                 }
             </div>
-            <div class="col-12 col-lg-8">
-
-
+            <div class="col-12 col-md-8">
                 <div>
+                    <MTabs Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive ValueChanged="TabValueChanged">
 
-                    <div class="rounded  shadow-sm bg-opacity mb-4">
-                        <MTabs Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive ValueChanged="TabValueChanged">
+                         <MTab Value="1">
+                             首页<MIcon>mdi-home</MIcon>
+                         </MTab>
+                         <MTab Value="2">
+                             编辑记录<MIcon>mdi-script-text-outline </MIcon>
+                         </MTab>
+                         @if (Model.BasicInfor.ArticleCount != 0)
+                        {
+                            <MTab Value="3">
+                                文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
+                            </MTab>
+                        }
+                        @if (Model.BasicInfor.VideoCount != 0)
+                        {
+                            <MTab Value="7">
+                                视频<MIcon>mdi-animation-play</MIcon>
+                            </MTab>
+                        }
+                        @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                        {
+                            <MTab Value="4">
+                                游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
+                            </MTab>
+                        }
+                        @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                        {
+                            <MTab Value="11">
+                                收藏夹<MIcon>mdi-heart-multiple </MIcon>
+                            </MTab>
+                        }
 
-                            <MTab Value="1">
-                                首页<MIcon>mdi-home</MIcon>
-                            </MTab>
-                            <MTab Value="2">
-                                编辑记录<MIcon>mdi-script-text-outline </MIcon>
-                            </MTab>
-                            @if (Model.BasicInfor.ArticleCount != 0)
+                        <MTab Value="6">
+                            周边<MIcon>mdi-basket-outline </MIcon>
+                        </MTab>
+                    </MTabs>
+                    <MTabsItems @bind-Value="TabIndex">
+                        <MTabItem Value="1">
+                            @if (_dataCacheService.IsApp)
                             {
-                                <MTab Value="3">
-                                    文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
-                                </MTab>
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
                             }
-                            @if (Model.BasicInfor.VideoCount != 0)
+                            @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                             {
-                                <MTab Value="7">
-                                    视频<MIcon>mdi-animation-play</MIcon>
-                                </MTab>
-                            }
-                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
-                            {
-                                <MTab Value="4">
-                                    游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
-                                </MTab>
-                            }
-                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                            {
-                                <MTab Value="11">
-                                    收藏夹<MIcon>mdi-heart-multiple </MIcon>
-                                </MTab>
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="个人介绍" Icon="@IconType.Home.ToIconString()">
+                                         <ChildContent>
+                                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPageContext" />
+                                         </ChildContent>
+                                         <ButtonContent>
+                                             @if (Model.IsCurrentUser)
+                                            {
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Edit.ToIconString()" Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+
+                                            }
+                                        </ButtonContent>
+                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+                                </div>
                             }
 
-                            <MTab Value="6">
-                                周边<MIcon>mdi-basket-outline </MIcon>
-                            </MTab>
-                        </MTabs>
-                    </div>
-                    <div class="row">
-                        <MTabsItems @bind-Value="TabIndex">
-                            <MTabItem Value="1">
-                                @if (_dataCacheService.IsApp)
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
+                                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
+                             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+                         </div>
+                         <div class="mb-4">
+                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
+                                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
+                                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                             </div>
+
+
+                             <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model" />
+                             <div>
+                                 @if (Model.CanComment)
                                 {
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
+
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser" />
                                 }
-                                @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
-                                {
-                                    <div class="mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
-                                            <ChildContent>
-                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPageContext" />
-                                            </ChildContent>
-                                            <ButtonContent>
-                                                @if (Model.IsCurrentUser)
-                                                {
-                                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+                            </div>
 
-                                                }
-                                            </ButtonContent>
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                        </MTabItem>
+                        <MTabItem Value="2">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
+                        </MTabItem>
+                        @if (Model.BasicInfor.ArticleCount != 0)
+                        {
+                            <MTabItem Value="3">
 
-                                    </div>
-                                }
-
-                                <div class="row">
-                                    <div class="col-12">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                                       
-                                    </div>
-                                    <div class="col-12">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                                    </div>
-
-                                </div>
-                                <div class="rounded  rounded shadow-sm  p-3 pb-0 bg-opacity mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model" />
-                                </div>
-                                <div>
-                                    @if (Model.CanComment)
-                                    {
-
-                                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser" />
-                                    }
-                                </div>
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.ArticlesCard Id="@Model.Id" />
 
                             </MTabItem>
-                            <MTabItem Value="2">
-                                <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
+                        }
+
+                        @if (Model.BasicInfor.VideoCount != 0)
+                        {
+                            <MTabItem Value="7">
+
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.VideosCard Id="@Model.Id" />
+
                             </MTabItem>
-                            @if (Model.BasicInfor.ArticleCount != 0)
-                            {
-                                <MTabItem Value="3">
+                        }
 
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.ArticlesCard Id="@Model.Id" />
-
-                                </MTabItem>
-                            }
-
-                            @if (Model.BasicInfor.VideoCount != 0)
-                            {
-                                <MTabItem Value="7">
-
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.VideosCard Id="@Model.Id" />
-
-                                </MTabItem>
-                            }
-
-                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
-                            {
-                                <MTabItem Value="4">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView>
-                                </MTabItem>
-                            }
-
-
-                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                            {
-                                <MTabItem Value="11">
-                                    <FavoriteFoldersViewTip UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
-                                </MTabItem>
-                            }
-
-                            <MTabItem Value="6">
-                                <UserOwnedPeripheryListView UserId="@Model.Id" />
+                        @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                        {
+                            <MTabItem Value="4">
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView>
                             </MTabItem>
-                        </MTabsItems>
-                    </div>
+                        }
+
+
+                        @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                        {
+                            <MTabItem Value="11">
+                                <FavoriteFoldersViewTip UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
+                            </MTabItem>
+                        }
+
+                        <MTabItem Value="6">
+                            <UserOwnedPeripheryListView UserId="@Model.Id" />
+                        </MTabItem>
+                    </MTabsItems>
 
                 </div>
-
-
             </div>
         </div>
 
     }
     else
     {
-        <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-
-            <div class="mt-2">
-                <SkeletonParagraph />
-            </div>
-
-            <div class="mt-2">
-                <SkeletonParagraph />
-            </div>
-
-            <div class="mt-2">
-                <SkeletonParagraph />
-            </div>
-
-            <div class="mt-2">
-                <SkeletonParagraph />
-            </div>
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
 
 
@@ -316,9 +289,9 @@ else
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
     {
-        if (Id != Model.Id.ToString())
+        if (Id != Model.Id)
         {
-            if (_dataCacheService.VideoIndexPageCatche.Check(Id) == false)
+            if (_dataCacheService.PersonalSpaceDataCatche.Check(Id) == false)
             {
                 isLoading = true;
                 StateHasChanged();

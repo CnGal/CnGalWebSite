@@ -1,0 +1,55 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+
+<MCard>
+    <MCardTitle>
+        批量导入选项
+    </MCardTitle>
+    <MCardText>
+        按照下方例子整理选项文本后输入可以批量导入选项<br />
+        其中“:”“：”都可作分隔符，如果选项文本中包含分隔符，请单独录入<br />
+        请把有分类的选项放到最后<br />
+        <br />
+        选项A<br />
+        选项B<br />
+        词条：<br />
+        选项C<br />
+        选项D<br />
+        文章：<br />
+        选项E<br />
+    </MCardText>
+    <MCardText>
+        <MTextarea Rows="7" @bind-Value="_text" Label="Staff" HideDetails="true" />
+    </MCardText>
+    <MCardActions Class="pb-6 ps-6 pe-6">
+        <MSpacer></MSpacer>
+        <MButton Color="primary" Text OnClick="SaveEdit">
+             <MIcon Left>mdi-check</MIcon>
+            保存
+        </MButton>
+    </MCardActions>
+
+</MCard>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<List<EditVoteOptionModel>> OnBatched { get; set; }
+
+    private string _text;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task SaveEdit()
+    {
+        if (string.IsNullOrWhiteSpace(_text))
+        {
+            await PopupService.ToastErrorAsync("请输入选项文本");
+        }
+        await OnBatched.InvokeAsync(ToolHelper.GetOptionsFromString(_text));
+    }
+}

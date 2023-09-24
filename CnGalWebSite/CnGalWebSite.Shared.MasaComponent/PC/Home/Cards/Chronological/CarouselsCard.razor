@@ -2,11 +2,11 @@
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
 @inject IStructuredDataService _structuredDataService
-@inject IPageModelCatche<List<CarouselViewModel>>  _pageModelCatche
+@inject IPageModelCatche<List<CarouselViewModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
 
 <section class="carousels-card">
-    <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick"></BootstrapBlazor.Components.Carousel>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" />
 </section>
 
 
@@ -14,7 +14,7 @@
 
 @code {
 
-    private List<string> Images = new List<string>();
+    private List<CarouselViewModel> Images = new List<CarouselViewModel>();
     private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
 
     [CascadingParameter]
@@ -27,15 +27,15 @@
         {
             Carousels = await _pageModelCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 
-            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).Select(s => s.Image).ToList();
+            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
             if (Carousels.Count >= 6)
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s => s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false).ToList().Random().Take(3));
 
             }
             else
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s => s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false));
             }
 
             //生成轮播结构数据
@@ -44,30 +44,14 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
         }
     }
 
 
-    private async Task OnClick(string imageUrl)
+    private async Task OnClick(CarouselViewModel item)
     {
-        //查找图片对应的Link
-        var item = Carousels.FirstOrDefault(s => s.Image == imageUrl);
-        if (item == null)
-        {
-            return;
-        }
-        if(item.Link.Contains("http"))
-        {
-            await _eventService.OpenNewPage(item.Link);
-        }
-        else
-        {
-            NavigationManager.NavigateTo(item.Link);
-        }
-
         await trackEven?.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, item.Id.ToString(), item.Note);
-
     }
 
 }

@@ -1,28 +1,20 @@
-﻿@inject ToastService ToastService
+﻿@inject IPopupService PopupService
+
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<div class="@Class">
-    <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-4">
-        <div>
-            <MCardText>
-                <MTextField Label="附加贡献值" TValue="int" @bind-Value="Model.ContributionValue" Color="success"></MTextField>
-                <MTextarea Label="批注" Rows="3" Color="success"
-                           @bind-Value="Model.Comments">
-                </MTextarea>
-
-            </MCardText>
-            <MCardActions>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="通过" IsAsync="true" OnClick="()=>OnExamine(true)" Icon="mdi-check" Color="success" />
-
-                <MSpacer />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="驳回" IsAsync="true" OnClick="()=>OnExamine(false)" Icon="mdi-close" Color="error" />
-
-            </MCardActions>
-        </div>
-    </div>
-</div>
+<MDCard Class="@($"{Class} pa-4")">
+    <MCardText>
+        <MTextField Label="附加贡献值" TValue="int" @bind-Value="Model.ContributionValue"></MTextField>
+        <MTextarea Label="批注" Rows="3" @bind-Value="Model.Comments"/>
+    </MCardText>
+    <MCardActions>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="通过" IsAsync="true" OnClick="()=>OnExamine(true)" Icon="mdi-check" Rounded />
+        <MSpacer />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="驳回" IsAsync="true" OnClick="()=>OnExamine(false)" Icon="mdi-close" TextStyle />
+    </MCardActions>
+</MDCard>
 
 
 @code {
@@ -54,20 +46,20 @@
                 //提醒敏感词
             }
             var obj = await _httpService.PostAsync<ExamineProcModel, Result>("api/examines/proc", new ExamineProcModel
-            {
-                Id = Model.Id,
-                IsPassed = isPassed,
-                Comments = Model.Comments,
-                ContributionValue = Model.ContributionValue
-            });
+                {
+                    Id = Model.Id,
+                    IsPassed = isPassed,
+                    Comments = Model.Comments,
+                    ContributionValue = Model.ContributionValue
+                });
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("审核失败", obj.Error);
+                await PopupService.ToastErrorAsync("审核失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
+                await PopupService.ToastSuccessAsync("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
                 //清除缓存
                 if (_dataCacheService.UserContentCenterCatche?.PendingExamines != null)
                 {
@@ -78,7 +70,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "审核失败");
+            await ErrorHandler.ProcessError(ex, "审核失败");
         }
     }
 }

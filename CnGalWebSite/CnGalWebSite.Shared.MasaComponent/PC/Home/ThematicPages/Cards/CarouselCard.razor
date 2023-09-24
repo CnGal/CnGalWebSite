@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JS
 
-<div class="rounded shadow-sm">
+<div class="cv-carousel-card">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" AspectRatio="4/3D" />
 </div>
 
@@ -13,7 +13,7 @@
     private List<CarouselViewModel> Images = new List<CarouselViewModel>();
     CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
         Images = Model.OrderByDescending(s => s.Priority).Take(3).ToList();

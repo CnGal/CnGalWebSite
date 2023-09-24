@@ -6,8 +6,8 @@
   "description": "CnGal资料站的建站目的是收集,索引国产及中文化galgame资料、文章、攻略，为galgame同好们提供方便",
   "start_url": "./",
   "display": "standalone",
+  "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
-  "theme_color": "#d979a2",
   "icons": [
     {
       "src": "icon-512.png",

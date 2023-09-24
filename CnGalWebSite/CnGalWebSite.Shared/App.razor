@@ -1,5 +1,4 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject IApplicationStateService _applicationStateService
 @inject NavigationManager NavigationManager
 @inject IHttpService _httpService
 @inject IJSRuntime JS
@@ -12,48 +11,48 @@
 @using BlazorComponent.I18n
 @using CnGalWebSite.Shared.Layout;
 
+@attribute [StreamRendering(true)]
+
 <MApp>
-    <BootstrapBlazorRoot>
-        <CascadingValue Value="connectionInfo" IsFixed="true">
-            <CascadingAuthenticationState>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-                    <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
-                        <Found Context="routeData">
-                            @if (ToolHelper.IsSSR)
-                            {
-                                <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
-                            }
-                            else
-                            {
-                                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
-                                    <NotAuthorized>
-                                        <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
-                                    </NotAuthorized>
-                                    <Authorizing>
+    <CascadingValue Value="connectionInfo" IsFixed="true">
+        <CascadingAuthenticationState>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+                <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+                    <Found Context="routeData">
+                        @if (ToolHelper.IsSSR)
+                        {
+                            <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
+                        }
+                        else
+                        {
+                            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
+                                <NotAuthorized>
+                                    <NotAuthorizedTipView NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                </NotAuthorized>
+                                <Authorizing>
 
-                                    </Authorizing>
-                                </AuthorizeRouteView>
-                            }
-                            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-                        </Found>
-                        <NotFound>
-                            <LayoutView Layout="LayoutType">
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundError/>
-                            </LayoutView>
-                        </NotFound>
-                    </Router>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-            </CascadingAuthenticationState>
-        </CascadingValue>
-    </BootstrapBlazorRoot>
-</MApp>
+                                </Authorizing>
+                            </AuthorizeRouteView>
+                        }
+                        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                    </Found>
+                    <NotFound>
+                        <LayoutView Layout="LayoutType">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Page />
+                         </LayoutView>
+                     </NotFound>
+                 </Router>
+             </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+         </CascadingAuthenticationState>
+     </CascadingValue>
+ </MApp>
 
 
-@code{
+ @code {
     [Parameter]
     public ConnectionInfo? connectionInfo { get; set; }
     [Parameter]
-    public bool Mobile { get; set; }
+    public bool? Mobile { get; set; }
 
 
     private System.Threading.Timer mytimer;
@@ -65,28 +64,35 @@
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        await base.OnParametersSetAsync();
-
-        I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
-
-        //判断移动端
-        if (Mobile)
+        if (parameters.TryGetValue<bool?>(nameof(Mobile), out var value))
         {
-            _dataCacheService.IsApp = true;
+            //SSR 预置值
+            if (value != null)
+            {
+                _dataCacheService.IsApp = value.Value;
+            }
         }
 
         if (ToolHelper.IsMaui)
         {
             _dataCacheService.IsApp = ToolHelper.IsApp;
         }
-
         //判断来源
         if (NavigationManager.Uri.Contains("ref=gov"))
         {
             _dataCacheService.IsMiniMode = true;
         }
+        //将语言切换成zh-CN
+        I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
 
     }
 
@@ -95,34 +101,14 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        //已经结束预渲染
-        _applicationStateService.InPreRendered = false;
-
-        if (firstRender && (OperatingSystem.IsBrowser() || ToolHelper.IsMaui))
-        {
-            try
-            {
-                await JS.InvokeVoidAsync("$.loading");
-            }
-            catch
-            {
-
-            }
-        }
-
         if (firstRender)
         {
             var needRefresh = false;
             //检查是否为移动设备
-            if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost") && ToolHelper.IsMaui == false)
+            if (!ToolHelper.IsSSR && !ToolHelper.IsMaui)
             {
-                var isApp = await IsMobile();
-                if (isApp != _dataCacheService.IsApp)
-                {
-                    _dataCacheService.IsApp = isApp;
-                    // needRefresh = true;
-
-                }
+                _dataCacheService.IsApp = await JS.InvokeAsync<bool>("isMobile");
+                _eventService.OnSavaTheme();
             }
             //检查迷你模式
             try
@@ -152,33 +138,7 @@
             if (needRefresh)
             {
                 _eventService.OnToggleMiniMode();
-                //await _dataCacheService.OnRefreshRequsted(null);
             }
         }
-
-
-
-    }
-
-    public async Task<bool> IsMobile()
-    {
-        try
-        {
-            var re = await JS.InvokeAsync<string>("isMobile");
-            if (re == "true")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }
-
     }
 }
-

@@ -1,0 +1,52 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+
+<MCard>
+    <MCardTitle>
+        批量导入Staff
+    </MCardTitle>
+    <MCardText>
+        将每个 @Title 用换行分隔，无特殊格式要求<br />
+        <br />
+        例如：<br />
+        @Title A<br />
+        @Title B<br />
+        @Title C<br />
+    </MCardText>
+    <MCardText>
+        <MTextarea Rows="7" @bind-Value="_text" Label="@(Title+"文本")" HideDetails="true" />
+    </MCardText>
+    <MCardActions Class="pb-6 ps-6 pe-6">
+        <MSpacer></MSpacer>
+        <MButton Color="primary" Text OnClick="SaveEdit">
+             <MIcon Left>mdi-check</MIcon>
+            保存
+        </MButton>
+    </MCardActions>
+
+</MCard>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> OnBatched { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+
+    private string _text;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task SaveEdit()
+    {
+        if (string.IsNullOrWhiteSpace(_text))
+        {
+            await PopupService.ToastErrorAsync($"请输入{Title}文本");
+        }
+        await OnBatched.InvokeAsync(ToolHelper.GetTextListFromString(_text));
+    }
+}

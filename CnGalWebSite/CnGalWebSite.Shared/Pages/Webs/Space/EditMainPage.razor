@@ -1,9 +1,10 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
 
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
+
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="编辑个人主页"/>
@@ -13,27 +14,11 @@
 <div>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑个人资料" Icon="fa fa-fw  fa-user" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑个人主页" Icon="@IconType.MainPage.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.MainPageCard Model="Model" Class="mb-4"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -65,7 +50,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑用户主页失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑用户主页失败");
             }
         }
     }
@@ -80,19 +65,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存用户主页失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存用户主页失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存用户主页成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
+                await PopupService.ToastSuccessAsync("保存成功", "保存用户主页成功，等待审核通过");
+                NavigationManager.NavigateTo("/space/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存用户主页失败");
+            await ErrorHandler.ProcessError(ex, "保存用户主页失败");
         }
     }
 

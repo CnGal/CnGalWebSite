@@ -1,17 +1,17 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@IconType.Folder.ToIconString()" Class="mb-4" Outline>
     <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
     </ButtonContent>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 
-
-<div>
+@if(isReady)
+{
     @foreach (var item in pagedResultDto.Data)
     {
         <div class="mb-3">
@@ -40,9 +40,6 @@
 
     }
 
-
-</div>
-
 @if (pagedResultDto.TotalPages > 1)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@pagedResultDto.CurrentPage"  Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
@@ -50,10 +47,15 @@
 @if (pagedResultDto.Data.Count == 0&&isReady)
 {
     <div class="mb-3">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
     </div>
-
 }
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill/>
+}
+
 @code {
 
     public PagedResultDto<FavoriteObjectAloneViewModel> pagedResultDto { get; set; } = new PagedResultDto<FavoriteObjectAloneViewModel>();
@@ -93,7 +95,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取收藏夹内容");
+            await ErrorHandler.ProcessError(ex, "无法获取收藏夹内容");
         }
     }
 

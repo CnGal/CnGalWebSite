@@ -12,11 +12,6 @@
     {
         <div id="web_bg" style="@($"background-image: url({Model?.SBgImage})")" class="d-md-none"></div>
     }
-    @if (_dataCacheService.ThemeSetting.IsDark)
-    {
-        <div id="web_bg" style="background-color: rgba(36,36,36,0.9);z-index:-8"></div>
-    }
-
 }
 
 @code {

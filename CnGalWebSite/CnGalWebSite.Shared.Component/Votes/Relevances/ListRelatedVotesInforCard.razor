@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取关联投票数据失败");
+            await ErrorHandler.ProcessError(ex, "无法获取关联投票数据失败");
         }
     }
 }

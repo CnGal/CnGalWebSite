@@ -127,24 +127,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRankUserAloneModel>>> GetRankUserListAsync(RankUsersPagesInfor input)
-        {
-            var dtos = await _rankService.GetPaginatedResult(input.Options, input.SearchModel, input.RankId);
-
-            return dtos;
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserRankAloneModel>>> GetUserRankListAsync(UserRanksPagesInfor input)
-        {
-            var dtos = await _rankService.GetPaginatedResult(input.Options, input.SearchModel, input.UserId);
-
-            return dtos;
-        }
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditRankPriorityAsync(EditRankPriorityViewModel model)

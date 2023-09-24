@@ -58,7 +58,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "刷新网站数据概览失败");
+                await ErrorHandler.ProcessError(ex, "刷新网站数据概览失败");
             }
 
         }

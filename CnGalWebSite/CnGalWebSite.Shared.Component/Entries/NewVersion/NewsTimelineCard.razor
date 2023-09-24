@@ -8,82 +8,37 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke" />
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="@IconType.News.ToIconString()">
-    <Scroll style="max-height:500px">
-        <MTimeline Dense="_dataCacheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
-            @foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
-            {
-                <MTimelineItem Large>
-                    <IconContent>
-                        <MAvatar Class="pointer" @onclick="@(()=>OnClickImage(item))" Color="white">
-                            <img src="@item.Image" alt="@item.GroupName" />
-                        </MAvatar>
-                    </IconContent>
-                    <OppositeContent>
-                        <span>@item.HappenedTime.ToString("yyyy-MM-dd HH:mm")</span>
-                    </OppositeContent>
-                    <ChildContent>
-                        <MCard Class="elevation-2" @onclick="@(()=>ViewAt(item))">
-                            <MCardTitle Class="fw-bold">
-                                @item.Title
-                            </MCardTitle>
-                            <MCardText Style=" white-space: break-spaces;">
-                                @item.BriefIntroduction
-                            </MCardText>
-                        </MCard>
-                    </ChildContent>
-                </MTimelineItem>
-            }
-        </MTimeline>
-    </Scroll>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="动态" ShowMoreButton OnClickMore="@(()=>{Dialog=true;})" Icon="@IconType.News.ToIconString()">
+     <NewsCard Model="Model.NewsOfEntry.Take(2)" />
+ </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+ <MDialog @bind-Value="Dialog"
+          Width="1000">
+     <MCard>
+         <MCardTitle Class="text-h5">
+             动态
+         </MCardTitle>
+         <MCardText>
+             @Model.Name 的所有动态
+         </MCardText>
+         <MCardText>
+             <NewsCard Model="Model.NewsOfEntry" OnCloseed=OnCloseed />
+         </MCardText>
+     </MCard>
+ </MDialog>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
-
-@code {
+ @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
+    bool Dialog { get; set; }
 
-    public void OnClickImage(NewsModel item)
+    public void OnCloseed()
     {
-        if (item.GroupId != 0 && item.GroupId != Model.Id)
-        {
-            NavigationManager.NavigateTo("/entries/index/" + item.GroupId);
-        }
-        else if (string.IsNullOrWhiteSpace(item.UserId) == false)
-        {
-
-
-            NavigationManager.NavigateTo("/space/index/" + item.UserId);
-
-        }
-        
+        Dialog=false;
+        StateHasChanged();
     }
 
-    public async void ViewAt(NewsModel item)
-    {
-        if (string.IsNullOrWhiteSpace(item.Title))
-        {
-            return;
-        }
-        if (item.Link.Contains("cngal.org"))
-        {
-            NavigationManager.NavigateTo(item.Link);
-        }
-        else
-        {
-            if (trackEven != null)
-            {
-                await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.Title);
-            }
-
-            await _eventService.OpenNewPage(item.Link);
-
-        }
-    }
 }

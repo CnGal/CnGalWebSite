@@ -1,8 +1,8 @@
 ﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+
 @inject IDataCacheService _dataCacheService
-@inject ToastService ToastService
+
 
 <MMenu OffsetY CloseOnContentClick="false" Value="Menu" ValueChanged="ValueChanged">
     <ActivatorContent Context="m">
@@ -13,7 +13,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Fab Small @attributes="@attrs" Class="@Class" Dark="_dataCacheService.ThemeSetting.IsDark" Color="primary">
+                <MButton Fab Small @attributes="@attrs" Class="@Class" Color="primary">
                     <MIcon>@IconType.Edit.ToIconString()</MIcon>
                 </MButton>
             </ActivatorContent>
@@ -24,14 +24,14 @@
     </ActivatorContent>
 
     <ChildContent>
-        <div class="bg-theme d-flex p-3" style="@("flex-direction: column; align-items: center; "+(ShowPerfection?"width:350px;":"width:300px;"))">
+        <MDCard Class="pa-3" Style="@("flex-direction: column; align-items: center; "+(ShowPerfection?"width:350px;":"width:300px;"))">
             <div class="w-100">
                 @if (Menu)
                 {
                     <EditButtonContent Id="Id" IsEdit="IsEdit" IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" IsEditChanged="IsEditChanged" Type="Type" ShowPerfection="ShowPerfection" OnClickExamines="OnClickExamines" OnClickPerfectionInfor="OnClickPerfectionInfor" />
                 }
             </div>
-        </div>
+        </MDCard>
     </ChildContent>
 </MMenu>
 

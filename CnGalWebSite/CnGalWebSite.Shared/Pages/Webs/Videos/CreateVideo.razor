@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="发布视频"/>
@@ -11,27 +12,11 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Video" Class="mb-3" Creating />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发布视频" Icon="fa fa-fw fa-video-camera" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发布视频" Icon="@IconType.Video.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Videos.MainCard Model="Model.Main" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Videos.ImagesCard Model="Model.Images" Class="mb-4"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Videos.RelevancesCard Model="Model.Relevances" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" VideoItems="VideoItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" />
@@ -43,7 +28,13 @@
 </div>
 
 @code {
-    private CreateVideoViewModel Model { get; set; } = new CreateVideoViewModel();
+    private CreateVideoViewModel Model { get; set; } = new CreateVideoViewModel
+        {
+            Main = new EditVideoMainViewModel
+            {
+                PubishTime = DateTime.Now.ToCstTime()
+            }
+        };
 
     private bool isReady = false;
     private List<string> EntryGameItems { get; set; } = new List<string>();
@@ -80,7 +71,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
+                await ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
             }
         }
     }
@@ -94,19 +85,19 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("创建视频失败", obj.Error);
+                await PopupService.ToastErrorAsync("创建视频失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("创建视频成功", "创建视频成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("创建视频成功", "创建视频成功，等待审核通过");
                 NavigationManager.NavigateTo( "/videos/index/" + obj.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "创建视频失败");
+            await ErrorHandler.ProcessError(ex, "创建视频失败");
         }
     }
 
@@ -119,6 +110,4 @@
         StateHasChanged();
         
     }
-
-
 }

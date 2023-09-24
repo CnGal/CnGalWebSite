@@ -66,7 +66,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有用户角色失败");
+            await ErrorHandler.ProcessError(ex, "获取所有用户角色失败");
         }
 
     }
@@ -82,7 +82,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取客户端列表失败");
+            await ErrorHandler.ProcessError(ex, "获取客户端列表失败");
         }
     }
 

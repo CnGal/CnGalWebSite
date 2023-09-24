@@ -1,0 +1,69 @@
+﻿.user-rank {
+    display: flex;
+    word-break: keep-all;
+    color: white;
+    padding: 0 .7rem;
+    border-radius: 10px;
+    font-size: small;
+    background-color: var(--md-sys-color-primary);
+}
+
+    .user-rank.rank-lv10 {
+        background-color: #F44336;
+    }
+
+    .user-rank.rank-lv9 {
+        background-color: #E91E63;
+    }
+
+    .user-rank.rank-lv8 {
+        background-color: #9C27B0;
+    }
+
+    .user-rank.rank-lv7 {
+        background-color: #673AB7;
+    }
+
+    .user-rank.rank-lv6 {
+        background-color: #3F51B5;
+    }
+
+    .user-rank.rank-lv5 {
+        background-color: #2196F3;
+    }
+
+    .user-rank.rank-lv4 {
+        background-color: #03A9F4;
+    }
+
+    .user-rank.rank-lv3 {
+        background-color: #00BCD4;
+    }
+
+    .user-rank.rank-lv2 {
+        background-color: #009688;
+    }
+
+    .user-rank.rank-lv1 {
+        background-color: #4CAF50;
+    }
+
+    .user-rank.rank-lv0 {
+        background-color: #795548;
+    }
+
+    .user-rank.rank-lv0 {
+        background-color: #607D8B;
+    }
+
+    .user-rank.rank-judges {
+        background-color: #0091EA;
+    }
+
+    .user-rank.rank-editor {
+        background-color: #4CAF50;
+    }
+
+    .user-rank.rank-verify {
+        background-color: #BF360C;
+    }

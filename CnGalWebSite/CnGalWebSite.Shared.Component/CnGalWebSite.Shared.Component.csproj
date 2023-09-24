@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -30,6 +30,8 @@
   
   <ItemGroup>
     <Folder Include="Admin\News\" />
+    <Folder Include="Ranks\" />
+    <Folder Include="Users\" />
   </ItemGroup>
 
 </Project>

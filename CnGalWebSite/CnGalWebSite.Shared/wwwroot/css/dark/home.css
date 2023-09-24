@@ -1,0 +1,10 @@
+﻿
+/*纸片*/
+#home-page .item:hover .m-chip--outlined {
+    color: var( --md-sys-color-on-primary-container) !important;
+    caret-color: var( --md-sys-color-on-primary-container) !important;
+}
+
+#home-page .item:hover .m-chip {
+    border-color: var( --md-sys-color-on-primary-container) !important;
+}

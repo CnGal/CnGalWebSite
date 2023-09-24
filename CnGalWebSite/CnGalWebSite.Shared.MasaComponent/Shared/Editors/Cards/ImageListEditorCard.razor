@@ -1,36 +1,63 @@
-﻿@typeparam TValue where TValue : BaseImageEditModel , new()
+﻿@typeparam TValue where TValue : BaseImageEditModel, new()
 
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Multiple Text="上传图片到图床" Icon="IconType.CloudUpload" OnImageUploaded="AddImage" ShowPreview="false"/>
-@if (Model.Count != 0)
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Multiple Text="上传图片到图床" Icon="IconType.CloudUpload" OnImageUploaded="AddImage" ShowPreview="false" />
+ @if (Model.Count != 0)
 {
-    <div class="row mt-3">
-        @foreach (var item in Model.OrderByDescending(s=>s.Priority))
+    <MRow>
+        @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
-            <div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
-                <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
-                    <div class="h-100">
-                        <div>
-                            <img src="@item.Image" class="card-img" alt="...">
-                        </div>
-                        <div class=" mt-2">
-                            <p class="text-center" style="font-size: medium; word-break: break-word; ">
-                                @(item.Note??"")
-                            </p>
-                        </div>
-
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(item))"></Button>
-                        <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(item))"></Button>
-                    </div>
+            <MCol Cols="12" Md="6" Lg="4" Xl="3">
+                <img src="@item.Image" alt="@item.Note" class="w-100 mb-3">
+                <div style="display: flex;justify-content: space-between;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Color="success" Text="编辑" Icon="@IconType.Edit.ToIconString()" OnClick="@(()=> EditImage(item))" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Color="error" Text="删除" Icon="@IconType.Delete.ToIconString()" OnClick="@(()=> DeleteImage(item))" />
                 </div>
-            </div>
+            </MCol>
         }
-    </div>
+    </MRow>
+}
+
+@if (_model != null)
+{
+    <MDialog @bind-Value="_editDialog"
+             MaxWidth="800">
+        <MCard>
+            <MCardTitle>
+                编辑图片
+            </MCardTitle>
+            <MCardText>
+                <MRow>
+                    <MCol Cols="12" Md="6">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@_model.Image" Type="ImageAspectType.None" Text="上传图片" />
+                    </MCol>
+                    <MCol Cols="12">
+                        <MDivider />
+                    </MCol>
+                    <MCol Cols="12" Xl="6">
+                        <MTextField @bind-Value="_model.Note" Label="备注" />
+                    </MCol>
+                    <MCol Cols="12" Xl="6">
+                        <MTextField @bind-Value="_model.Priority" Label="优先级" />
+                    </MCol>
+                    @if (_model is EditWebsiteImageModel)
+                    {
+                        var _temp = _model as EditWebsiteImageModel;
+                        <MCol Cols="12" Xl="6">
+                            <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="_temp.Type" TValue="EntryWebsiteImageType" Label="类型" />
+                        </MCol>
+                        <MCol Cols="12" Xl="6">
+                            <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="_temp.Size" TValue="EntryWebsiteImageSize" Label="大小" />
+                        </MCol>
+                    }
+                </MRow>
+
+            </MCardText>
+        </MCard>
+    </MDialog>
 }
 
 
@@ -38,48 +65,28 @@
     [Parameter]
     public List<TValue> Model { get; set; } = new List<TValue>();
 
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
+    private bool _editDialog;
+    TValue _model;
 
-    public async Task DeleteImage(TValue model)
+
+    public void DeleteImage(TValue model)
     {
         Model.Remove(model);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除图片");
     }
-    public async Task EditImage(TValue model)
+    public void EditImage(TValue model)
     {
-        var items = Utility.GenerateEditorItems<TValue>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<TValue>()
-        {
-            Title = "编辑图片",
-            Model = model,
-            Items = items,
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                Model.Remove(model);
-                Model.Add((TValue)context.Model);
-                StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改图片");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        _editDialog = true;
+        _model = model;
+        StateHasChanged();
     }
+
     public void AddImage(string url)
     {
         Model.Add(new TValue
-        {
-            Image = url
-        });
+            {
+                Image = url
+            });
         StateHasChanged();
-        
     }
-
 }

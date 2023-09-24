@@ -1,4 +1,4 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
@@ -6,19 +6,19 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 <section class="discount-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="折扣中的游戏" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/discount">
-        <a class="item" href="@context.Url">
-            <img src="@context.Image" alt="@context.Name" loading="lazy" />
-            <div class="content">
-                <div>
-                    <div class="name text-truncate-1">@context.Name</div>
-                    <div class="brief text-truncate-3">@context.BriefIntroduction</div>
+            <MDCard Class="item" Href="@context.Url">
+                <img src="@context.Image" alt="@context.Name" loading="lazy" />
+                <div class="content">
+                    <div class="name text-truncate-1 title-large">@context.Name</div>
+                    <div class="brief text-truncate-3 label-large">@context.BriefIntroduction</div>
+                    <div class="tags">
+                        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="success" Icon="IconType.Discount" Text="@($"{context.Cut}% OFF")" />
+                        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="info" Text="@($"¥ {context.Price:0.00}")" />
+                    </div>
                 </div>
-                <div class="tags">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="success" Icon="IconType.Discount" Text="@($"{context.Cut}% OFF")" />
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="info" Text="@($"¥ {context.Price:0.00}")" />
-                </div>
-            </div>
-        </a>
+
+            </MDCard>
+
     </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -39,7 +39,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页折扣游戏列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页折扣游戏列表失败");
         }
     }
 }

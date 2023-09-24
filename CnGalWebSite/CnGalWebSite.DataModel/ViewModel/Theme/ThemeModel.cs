@@ -1,15 +1,29 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.DataModel.ViewModel.Theme
 {
     public class ThemeModel
     {
-        public static string DefaultTheme = "pink lighten-2";
-        public string Theme { get; set; } = DefaultTheme;
+        public static string DefaultThemeColor = "pink";
+        public static string[] AvailableColors = new string[] { "red", "pink", "purple", "deep-purple", "indigo", "blue", "light-blue", "cyan", "teal", "green", "light-green", "lime", "yellow", "amber", "orange", "deep-orange", "brown", "blue-grey", "grey" };
 
-        public bool IsDark { get; set; }
+        /// <summary>
+        /// 主题颜色
+        /// </summary>
+        public string ThemeColor { get; set; } = DefaultThemeColor;
+
+        /// <summary>
+        /// 主题模式
+        /// </summary>
+        public ThemeMode ThemeMode { get; set; }
+
+        /// <summary>
+        /// 最终是否为深色模式
+        /// </summary>
+        public bool IsDark;
 
         /// <summary>
         /// 是否背景透明
@@ -49,7 +63,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public DateTime LastDisplayBrithdayTime { get; set; }
 
-        public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
+        public string FontFamily { get; set; }
 
         /// <summary>
         /// 显示错误详细信息
@@ -65,10 +79,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         Text
     }
 
-    public enum ThemeType
+    public enum ThemeMode
     {
-        Default,
-        Custom,
+        [Display(Name ="跟随系统")]
+        System,
+        [Display(Name = "浅色")]
+        Light,
+        [Display(Name = "深色")]
+        Dark,
     }
 
     public class AnniversariesSetting

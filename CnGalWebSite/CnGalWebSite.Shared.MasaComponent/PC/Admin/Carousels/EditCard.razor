@@ -28,7 +28,7 @@ else
                     <MTextField @bind-Value="Model.Link" Label="链接" />
                 </MCol>
                 <MCol Cols="12" Xl="6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="Model.Type" TValue="CarouselType" Lable="类型" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="CarouselType" Label="类型" />
                 </MCol>
                 <MCol Cols="12" Xl="6">
                     <MTextField @bind-Value="Model.Note" Label="备注" />
@@ -84,7 +84,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+            await ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
         }
     }
 
@@ -109,7 +109,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+            await ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
         }
 
     }

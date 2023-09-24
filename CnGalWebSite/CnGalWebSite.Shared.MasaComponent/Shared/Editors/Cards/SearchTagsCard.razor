@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="fa fa-fw fa-search" Collapable Class="@Class">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="@IconType.Search.ToIconString()" Collapable Class="@Class">
     <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
                 Label="可以搜索标签哦~"
                 Clearable
@@ -66,7 +66,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取树形标签数据失败");
+            await ErrorHandler.ProcessError(ex, "获取树形标签数据失败");
         }
     }
 

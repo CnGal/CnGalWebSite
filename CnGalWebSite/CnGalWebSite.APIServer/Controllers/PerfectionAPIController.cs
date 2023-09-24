@@ -3,6 +3,8 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -29,15 +31,18 @@ namespace CnGalWebSite.APIServer.Controllers
     {
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
+        private readonly IRepository<Perfection, long> _perfectionRepository;
         private readonly IAppHelper _appHelper;
         private readonly IPerfectionService _perfectionService;
         private readonly IExamineService _examineService;
         private readonly IChartService _chartService;
         private readonly IConfiguration _configuration;
+        private readonly IQueryService _queryService;
+        private readonly IRepository<PerfectionCheck, long> _perfectionCheckRepository;
 
         public PerfectionAPIController(IRepository<Examine, long> examineRepository, IConfiguration configuration,
-        IAppHelper appHelper,
-       IPerfectionService perfectionService, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
+        IAppHelper appHelper, IRepository<Perfection, long> perfectionRepository, IQueryService queryService, IRepository<PerfectionCheck, long> perfectionCheckRepository,
+        IPerfectionService perfectionService, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
          IExamineService examineService, IChartService chartService)
         {
             _appHelper = appHelper;
@@ -47,6 +52,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _chartService = chartService;
             _configuration = configuration;
+            _perfectionRepository = perfectionRepository;
+            _queryService = queryService;
+            _perfectionCheckRepository = perfectionCheckRepository;
         }
 
         [AllowAnonymous]
@@ -105,8 +113,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-     
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ExaminedNormalListModel>>> GetRecentlyEditListAsync()
@@ -118,20 +124,48 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPerfectionAloneModel>>> GetPerfectionListAsync(PerfectionsPagesInfor input)
+        public async Task<QueryResultModel<PerfectionOverviewModel>> ListPerfections(QueryParameterModel model)
         {
-            var dtos = await _perfectionService.GetPaginatedResult(input.Options, input.SearchModel);
+            var (items, total) = await _queryService.QueryAsync<Perfection, long>(_perfectionRepository.GetAll().AsSingleQuery().Include(s => s.Entry)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.Type == EntryType.Game), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<PerfectionOverviewModel>
+            {
+                Items = await items.Select(s => new PerfectionOverviewModel
+                {
+                    Id = s.EntryId,
+                    Name = s.Entry.Name,
+                    Grade = s.Grade,
+                    VictoryPercentage = s.VictoryPercentage,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPerfectionCheckAloneModel>>> GetPerfectionCheckListAsync(PerfectionChecksPagesInfor input)
+        public async Task<QueryResultModel<PerfectionCheckOverviewModel>> ListPerfectionChecks(QueryParameterModel model)
         {
-            var dtos = await _perfectionService.GetPaginatedResult(input.Options, input.SearchModel);
+            var (items, total) = await _queryService.QueryAsync<PerfectionCheck, long>(_perfectionCheckRepository.GetAll().AsSingleQuery().Include(s => s.Perfection).ThenInclude(s => s.Entry)
+                .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false && s.Perfection.Entry.Type == EntryType.Game), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Perfection.Entry.Name.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<PerfectionCheckOverviewModel>
+            {
+                Items = await items.Select(s => new PerfectionCheckOverviewModel
+                {
+                    Id = s.Perfection.EntryId,
+                    Name = s.Perfection.Entry.Name,
+                    Type = s.CheckType,
+                    Grade = s.Grade,
+                    VictoryPercentage = s.VictoryPercentage,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
+
     }
 }

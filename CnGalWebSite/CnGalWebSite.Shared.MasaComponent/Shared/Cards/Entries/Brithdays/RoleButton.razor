@@ -1,25 +1,25 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
-<MTooltip Top Color="white">
+<MTooltip Top Color="primary-container elevation-2">
     <ActivatorContent>
         <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="@((_dataCacheService.IsApp?"height:30px;":"height:40px;")+"aspect-ratio:1;border-radius:50%;") " @onclick="@(()=>OnClick())" />
     </ActivatorContent>
     <ChildContent>
-        <div style=" display: flex; flex-direction: column; align-items: center; width:230px;color:black;">
+         <div style=" display: flex; flex-direction: column; align-items: center; width:230px;color: var(--md-sys-color-on-primary-container);gap: .3rem;padding: 1rem 0;">
             <img src="@Model.MainImage" alt="@Model.Name" style="border-radius: 50%; height: 100px; width: 100px;" class="mb-2">
 
 
-            <div class="text-truncate-2 fw-bold">
+            <div class="text-truncate-2 title-large">
                 @Model.Name
             </div>
             @if (string.IsNullOrWhiteSpace(Model.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
             {
-                <div class=" text-center" style="color:gray;">
+                <div class="text-center">
                     @($"《{Model.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》")
                 </div>
             }
-            <div class="text-truncate-3 text-center">
+            <div class="text-truncate-3 text-center label-large">
                 @Model.BriefIntroduction
             </div>
         </div>

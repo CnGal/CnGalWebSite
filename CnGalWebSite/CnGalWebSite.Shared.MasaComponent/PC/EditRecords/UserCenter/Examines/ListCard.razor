@@ -37,7 +37,7 @@
         {
             @context.Item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
         }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.UserName))
+        else if (context.Header.Value == nameof(ExamineOverviewModel.ApplicationUserId))
         {
             <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.ApplicationUserId" Name="@context.Item.UserName" />
         }
@@ -70,7 +70,7 @@
         new (){ Text= "状态", Value= nameof(ExamineOverviewModel.IsPassed)},
         new (){ Text= "处理时间", Value= nameof(ExamineOverviewModel.PassedTime)},
         new (){ Text= "申请时间", Value= nameof(ExamineOverviewModel.ApplyTime)},
-        new (){ Text= "申请人", Value= nameof(ExamineOverviewModel.UserName)},
+        new (){ Text= "申请人", Value= nameof(ExamineOverviewModel.ApplicationUserId)},
         new (){ Text= "处理人", Value= nameof(ExamineOverviewModel.PassedAdminName)},
         new (){ Text= "批注", Value= nameof(ExamineOverviewModel.Comments)},
         new (){ Text= "操作", Value= "actions",Sortable=false }
@@ -107,7 +107,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, operationName + "失败");
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 }

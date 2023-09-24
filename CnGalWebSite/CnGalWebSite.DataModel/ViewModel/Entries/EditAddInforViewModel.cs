@@ -25,11 +25,17 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 基础信息
         /// </summary>
         public List<EditInformationModel> Informations { get; set; } = new List<EditInformationModel>();
-        [Display(Name = "制作组")]
+        /// <summary>
+        /// 制作组
+        /// </summary>
         public string ProductionGroup { get; set; }
-        [Display(Name = "发行商")]
+        /// <summary>
+        /// 发行商
+        /// </summary>
         public string Publisher { get; set; }
-        [Display(Name = "声优")]
+        /// <summary>
+        /// 声优
+        /// </summary>
         public string CV { get; set; }
 
         public override Result Validate()
@@ -129,6 +135,18 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         [Display(Name = "隶属组织")]
         public string SubordinateOrganization { get; set; }
+
+        public Result Validate(List<StaffModel> staffs)
+        {
+            if (staffs.Where(s => s.Id != Id).Any(s => s.Name == Name && s.Modifier == Modifier && s.PositionOfficial == PositionOfficial))
+            {
+                return new Result { Error = $"已存在【{Modifier}{PositionOfficial}：{Name}】" };
+            }
+            else
+            {
+                return new Result { Successful = true };
+            }
+        }
     }
 
     public class SocialPlatform

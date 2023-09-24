@@ -1,11 +1,13 @@
 ﻿@inject IPopupService PopupService
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3" Color="tertiary">
     音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-volume-up" Title="音频试听" Class="@Class" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="音频试听" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
-    <MSimpleTable Class="mb-4">
+    @if(Model.Audio.Any())
+    {
+            <MSimpleTable Class="mb-4">
         <thead>
             <tr>
                 <th class="text-left">
@@ -44,6 +46,8 @@
             }
         </tbody>
     </MSimpleTable>
+
+    }
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard @ref="editAudioCard" OnChanged="OnChanged" />

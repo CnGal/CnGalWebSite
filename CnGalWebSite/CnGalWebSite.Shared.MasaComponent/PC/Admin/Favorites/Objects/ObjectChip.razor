@@ -1,0 +1,61 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public FavoriteObjectType Type { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public string GetColor(FavoriteObjectType type)
+    {
+        return type switch
+        {
+            FavoriteObjectType.Article => "orange",
+            FavoriteObjectType.Entry => "pink",
+            FavoriteObjectType.Periphery => "light-blue",
+            FavoriteObjectType.Tag => "teal",
+            FavoriteObjectType.Video => "green",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(FavoriteObjectType type)
+    {
+        return type switch
+        {
+            FavoriteObjectType.Article => IconType.Article,
+            FavoriteObjectType.Entry => IconType.Entry,
+            FavoriteObjectType.Periphery => IconType.Periphery,
+            FavoriteObjectType.Video => IconType.Video,
+            FavoriteObjectType.Tag => IconType.Tag,
+            _ => IconType.UnknowTime,
+        };
+    }
+
+    public void OnClick()
+    {
+        switch (Type)
+        {
+            case FavoriteObjectType.Entry:
+                NavigationManager.NavigateTo($"/entries/index/{Id}");
+                break;
+            case FavoriteObjectType.Article:
+                NavigationManager.NavigateTo($"/articles/index/{Id}");
+                break;
+            case FavoriteObjectType.Periphery:
+                NavigationManager.NavigateTo($"/comments/index/{Id}");
+                break;
+            case FavoriteObjectType.Tag:
+                NavigationManager.NavigateTo($"/tags/index/{Id}");
+                break;
+            case FavoriteObjectType.Video:
+                NavigationManager.NavigateTo($"/videos/index/{Id}");
+                break;
+        }
+    }
+}

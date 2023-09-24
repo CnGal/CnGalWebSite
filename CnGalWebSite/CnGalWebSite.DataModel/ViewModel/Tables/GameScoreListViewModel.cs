@@ -5,10 +5,6 @@ using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
-    public class GameScoreListViewModel
-    {
-        public List<GameScoreTableModel> GameScores { get; set; }=new List<GameScoreTableModel> { };
-    }
 
     public class GameScoreTableModel
     {

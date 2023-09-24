@@ -4,70 +4,70 @@
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
-    <div class="row">
+    <div class=" basic-info-group-card">
 
-        <div class="col-12 d-flex">
+        <div>
            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Tag"/>@Model.Type.GetDisplayName()
         </div>
         @if (string.IsNullOrWhiteSpace(Model.Category) == false)
         {
-            <div class="col-12 d-flex ">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Category" />@Model.Category
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.Size) == false)
         {
-            <div class="col-12 d-flex ">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Size" />尺寸：@Model.Size
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.Brand) == false)
         {
-            <div class="col-12 d-flex ">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Brand" />品牌：@Model.Brand
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.Author) == false)
         {
-            <div class="col-12 d-flex ">
-               <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" />作者：@Model.Author
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" />作者：@Model.Author
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.Material) == false)
         {
-            <div class="col-12 d-flex ">
-               <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Material" />材质：@Model.Material
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Material" />材质：@Model.Material
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.IndividualParts) == false)
         {
-            <div class="col-12  d-flex">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />单独部件数量：@Model.IndividualParts
             </div>
         }
         @if (string.IsNullOrWhiteSpace(Model.Price) == false)
         {
-            <div class="col-12  d-flex">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />价格：@Model.Price
             </div>
         }
         @if (Model.IsReprint)
         {
-            <div class="col-12  d-flex">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Update" />已再版
             </div>
         }
         else
         {
-    <div class="col-12  d-flex">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Takedown" />未再版
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Takedown" />未再版
     </div>
 
         }
 
         @if (Model.IsAvailableItem)
         {
-            <div class="col-12 d-flex">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Ornament" />装饰品
             </div>
 
@@ -77,7 +77,7 @@
         {
             @if (Model.PageCount != 0)
             {
-                <div class="col-12 d-flex">
+                <div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />页数：@Model.PageCount
                 </div>
             }
@@ -86,16 +86,16 @@
         {
             @if (Model.SongCount != 0)
             {
-                <div class="col-12 d-flex">
+                <div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />歌曲数：@Model.SongCount
                 </div>
             }
         }
         @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
         {
-            <div class="col-12 d-flex">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Link" />
-                <span class=" text-truncate">
+                <span>
                     贩售链接：<a href="@Model.SaleLink" style="word-break: break-all;" target="_blank">@Model.SaleLink</a>
                 </span>
 

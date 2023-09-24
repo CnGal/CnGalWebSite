@@ -1,209 +1,10 @@
-﻿@inject IDataCacheService _dataCatcheService
-
-@if (_dataCatcheService.IsApp&&BigCardStyle==false)
-{
-    <div class="shadow-sm rounded  bg-opacity h-100">
-        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-        {
-            <div style="display: flex; align-items: center;">
-                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color">
-                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
-                </a>
-                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color ms-2 me-2 w-100">
-                    <span class="text-truncate-1">
-                        <span class="fw-bold" style=" display: inline;">@Model.Name</span>
-                    </span>
-                    <span class="text-truncate-2">
-                        @Model.BriefIntroduction
-                    </span>
-
-                </a>
-            </div>
-        }
-        else
-        {
-            <div style="display: flex; align-items: center;">
-
-                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color p-2">
-                    <img loading="lazy" src="@Model.MainImage" style="border-radius: 50%;width: 80px;" alt="@Model.Name" />
-                </a>
-
-                <div class="ms-2 me-2 w-100">
-                    <div style=" display: flex; align-items: center;">
-                        <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-1">
-                            <span class="fw-bold" style=" display: inline;">@Model.Name</span>
-                        </a>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
-                    </div>
-
-
-
-                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-1" : "text-truncate-2"))">
-                        @Model.BriefIntroduction
-                    </a>
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
-                    {
-                        <div class="d-flex row">
-
-                            @foreach (var item in Model.AddInfors)
-                            {
-                                <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
-                                    <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile Text="@item.Modifier" />
-                                        @foreach (var infor in item.Contents)
-                                        {
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" />
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-
-    </div>
-
-
-
-}
-else
-{
-
-    <div class="@(Outline?"ps-3 pe-3 h-100":"shadow-sm rounded  bg-opacity ps-3 pe-3 h-100")">
-        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-        {
-            <div style="@((BigCardStyle?"flex-direction: column;":"")+"display:flex;")">
-                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color pt-3 pb-3">
-                    <img loading="lazy" style="@(BigCardStyle?" width:100%;":" width: 250px;") " src="@Model.MainImage" alt="@Model.Name">
-                </a>
-
-                <div class="@(BigCardStyle?"pb-2":"pt-3 ps-3")" style=" width: 100%;">
-                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color mb-2" style="display: flex; align-items: center;">
-                        @if (ShowType)
-                        {
-                            <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                        }
-
-                        <h3 class="h5 mb-0 fw-bold text-truncate-2">@Model.Name</h3>
-                    </a>
-
-                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
-
-                        @Model.BriefIntroduction
-
-                    </a>
-
-
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
-                    {
-                        <div class="d-none d-sm-flex row">
-
-                            @foreach (var item in Model.AddInfors)
-                            {
-                                <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
-                                    <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@item.Modifier" />
-                                        @foreach (var infor in item.Contents)
-                                        {
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                    }
-                </div>
-            </div>
-
-
-        }
-        else
-        {
-            <div style="display:flex;">
-                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color pt-3 pb-3 p-0 ps-2">
-                    <img src="@Model.MainImage" style="border-radius: 50%;width: 116px;" alt="@Model.Name" />
-                </a>
-
-                <div class="pt-3 ps-3" style=" width: 100%;">
-                    <div style=" display: flex; align-items: center;" class="mb-2">
-                        <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-2" style="display: flex; align-items: center;">
-                            @if (ShowType)
-                            {
-                                <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                            }
-
-                            <h3 class="h5 fw-bold mb-0 text-truncate-2">@Model.Name</h3>
-                        </a>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
-                    </div>
-
-                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
-                        @Model.BriefIntroduction
-                    </a>
-
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
-                    {
-
-
-
-                        <div class="d-none d-sm-flex row">
-
-                            @foreach (var item in Model.AddInfors)
-                            {
-                                <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
-                                    <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@item.Modifier" />
-                                        @foreach (var infor in item.Contents)
-                                        {
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
-                                        }
-                                    </div>
-                                </div>
-
-                            }
-
-                        </div>
-                    }
-
-                </div>
-            </div>
-        }
-        @if (Model.Type == EntryType.Game&& ShowDetailNumber)
-        {
-            <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color">
-                <span style="color: gray;" class="d-flex pb-3">
-
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
-                    @if (Model.PublishTime == null)
-                    {
-                        <span class="me-4">未知</span>
-                    }
-                    else
-                    {
-                        @if (Model.PublishTime.Value > DateTime.Now.ToCstTime() && ForcedShowPublishTime == false)
-                        {
-                            <span class="me-4">未发售</span>
-                        }
-                        else
-                        {
-                            <span class="me-4">@((Model.Type== EntryType.Game?Model.PublishTime.Value: Model.LastEditTime).ToString("yyyy-MM-dd"))</span>
-
-                        }
-                    }
-
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
-                    <span class="me-4">@(Model.CommentCount)条评论</span>
-
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
-                    <span class="me-4">@(Model.ReaderCount)次阅读</span>
-                </span>
-            </a>
-        }
-    </div>
-}
+﻿
+<InfoCard Href="@(AllowNav?("/entries/index/" + Model.Id):null)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@(ShowType?Model.Type.GetDisplayName():"")" Outline="Outline"
+          Thumbnail="Model.Type == EntryType.Role || Model.Type == EntryType.Staff" BigCardStyle="BigCardStyle" AddInfors="Model.AddInfors" ShowAddInfors="ShowAddInfors" IsEdit="IsEdit">
+    <TitleContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
+    </TitleContent>
+</InfoCard>
 
 
 @code {
@@ -228,4 +29,33 @@ else
     public bool BigCardStyle { get; set; }
     [Parameter]
     public bool ForcedShowPublishTime { get; set; }
+
+    public List<(IconType, string)> GetInfoItems()
+    {
+        if (ShowDetailNumber==false||Model.Type!= EntryType.Game)
+        {
+            return null;
+        }
+        var items = new List<(IconType, string)>
+        {
+            (IconType.Comment,Model.CommentCount.ToString()+"条评论"),
+            (IconType.Read,Model.ReaderCount.ToString()+"次阅读"),
+        };
+
+        var time = "未知";
+        if (Model.PublishTime != null)
+        {
+            if (Model.PublishTime.Value > DateTime.Now.ToCstTime() && ForcedShowPublishTime == false)
+            {
+                time = "未发售";
+            }
+            else
+            {
+                time = (Model.Type == EntryType.Game ? Model.PublishTime.Value : Model.LastEditTime).ToString("yyyy-MM-dd");
+            }
+        }
+        items.Insert(0, (IconType.DeterminedTime, time));
+
+        return items;
+    }
 }

@@ -1,12 +1,14 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<div class="bg-theme d-flex p-3" style="flex-direction: column; align-items: center; ">
+<MDCard Class="pa-3" style="flex-direction: column; align-items: center; ">
     <div class="d-flex" style="align-items: center; flex-direction: column; ">
         <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
         <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-            <span class="h6 fw-bold mb-1">@Model.Name</span>
+            <span class="title-large mb-1">@Model.Name</span>
+            <span class="label-large mb-1">@Model.PersonalSignature</span>
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center />
+
             @*<span>
                     <i class="fa fa-diamond fa-fw"></i>
                     <span>积分：@Model.Integral</span>
@@ -15,13 +17,13 @@
                 </span>*@
         </div>
     </div>
-    <MDivider Class="w-100"></MDivider>
+    <MDivider Class="w-100 mt-2 mb-2"></MDivider>
     <div class="w-100">
         <SignInButton Model="Model" />
 
         <AuthorizeView Roles="Admin">
             <Authorized>
-                <MButton Text Block Color="success" OnClick="@(()=>OnNav("/admin/index"))">
+                 <MButton Text Block Color="primary" OnClick="@(()=>OnNav("/admin/index"))">
                     <MIcon Left>mdi-car-traction-control</MIcon>
                     管理员后台
                 </MButton>
@@ -60,7 +62,7 @@
 
         <MButton Text Block Color="primary" StopPropagation OnClick="OnClickSetting">
             <MIcon Left>mdi-cog</MIcon>
-            <span style="background: linear-gradient(to right,var(--main-color),var(--active-color)); -webkit-background-clip: text; color: transparent; ">主题设置</span>
+            主题设置
         </MButton>
 
 
@@ -70,7 +72,7 @@
         </MButton>
 
     </div>
-</div>
+</MDCard>
 
 
 @code {

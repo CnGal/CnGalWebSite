@@ -1,17 +1,9 @@
-﻿<a href="@("/peripheries/index/"+Model.Id)" class="a-font-color  h-100">
-    <div class="rounded shadow-sm  bg-opacity h-100">
-        <img src="@Model.Image" class="card-img-top" style="aspect-ratio: 460/215; width: 100%;" alt="@Model.Name" />
-        <div style="color: white; margin-top: -26px;">
-            <div class="ps-2">
-                <i class="fa fa-shopping-basket fa-fw "></i>
-                <span class="article-infor-text">@Model.CollectedCount</span>
-            </div>
-        </div>
-        <div class="p-2">
-            <span class="text-truncate-2">@Model.Name</span>
-        </div>
+﻿<MDCard Href="@("/peripheries/index/"+Model.Id)" Class="h-100 elevation-2">
+    <img src="@Model.Image" class="card-img-top" style="aspect-ratio: 460/215; width: 100%;" alt="@Model.Name" />
+    <div class="pa-2">
+        <span class="label-large text-truncate-2">@Model.Name</span>
     </div>
-</a>
+</MDCard>
 
 @code {
     [Parameter]

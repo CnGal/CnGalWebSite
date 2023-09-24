@@ -2,7 +2,7 @@
 @page "/gamepublishtimelist"
 
 @inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
@@ -17,48 +17,13 @@
 <div>
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity pt-3">
-
-            <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
-                <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
-                    <SkeletonAvatar Round="false" />
-                </div>
-
-                <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
-                    <SkeletonParagraph />
-                </div>
-            </div>
-        </div>
-        <div class="mt-3">
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
-                <SkeletonParagraph />
-
-            </div>
-        </div>
-
-
-        <div class=" mt-3">
-            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                <SkeletonParagraph />
-            </div>
-        </div>
-        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-            </div>
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <div class=" rounded shadow-sm ps-4 pe-4 mb-4 bg-opacity">
+        <MDCard Class="ps-4 pe-4 mb-4">
             <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
-                <div class="h4 fw-bold font-color">游戏发售时间汇总</div>
+                <div class="title-large mb-3">游戏发售时间汇总</div>
                 <div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
                 </div>
@@ -67,36 +32,28 @@
                 @if (Type == PublishGamesDisplayType.CardList)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft" />
-                    <div style="max-width:160px" class="ps-4 pe-4">
+                    <div style="max-width:170px" class="ps-2 pe-2">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMonthPick Date="Date" DateChanged="DateChanged" />
-
                     </div>
-                    <div style="max-width:100px;">
-                        <MButton Text Block  OnClick="OnClickRight" Color="primary">
-                            下个月
-                            <MIcon Right>mdi-arrow-right-thick</MIcon>
-                        </MButton>
-                    </div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下个月" Icon="mdi-arrow-right-thick" TextStyle OnClick="OnClickRight" />
                 }
                 else
                 {
                     <div style="max-width: 180px" class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="After" ValueChanged="AfterChanged" />
+                        <CnGalWebSite.Components.Inputs.MasaDatePicker ShowTime="false" Value="After" ValueChanged="AfterChanged" />
 
                     </div>
                     <span class="ms-4 me-4">  ~  </span>
                     <div style="max-width: 180px" class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="Before" ValueChanged="BeforeChanged" />
+                        <CnGalWebSite.Components.Inputs.MasaDatePicker ShowTime="false" Value="Before" ValueChanged="BeforeChanged" />
 
                     </div>
                 }
-
-
             </div>
-        </div>
+        </MDCard>
         @if (Type == PublishGamesDisplayType.CardList)
         {
-            <div class="row">
+            <div>
                 @foreach (var item in CardModel.OrderBy(s => s.PublishTime))
                 {
                     <div class="mb-4">
@@ -141,7 +98,7 @@
 
         @if (isFirst == false && ((Type == PublishGamesDisplayType.CardList && CardModel.Any() == false) || (Type == PublishGamesDisplayType.Timeline && TimelineModel.Any() == false)))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
         }
     }
 </div>
@@ -231,7 +188,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取游戏发售时间列表失败");
+            await ErrorHandler.ProcessError(ex, "获取游戏发售时间列表失败");
         }
 
     }

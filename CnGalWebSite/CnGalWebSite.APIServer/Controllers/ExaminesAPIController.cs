@@ -479,7 +479,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Image = "default/logo.png",
                     Rank = "系统",
                     Text = "你的『" + examine.Operation.GetDisplayName() + "』操作被『" + currentUser.UserName + "』驳回" + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
-                    Link = "home/examined/" + examine.Id,
+                    Link = "home/examines?id=" + examine.Id,
                     LinkTitle = "第" + examine.Id + "条审核记录",
                     Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
                     ApplicationUserId = examine.ApplicationUser.Id

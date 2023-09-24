@@ -7,7 +7,7 @@
 {
     @if (Check() == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="ma-3" Transparent="false">
             此样式目前仅适配游戏类型的词条，其他类型适配持续推进中，尽情期待
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
@@ -48,21 +48,21 @@ else
     {
         if (Check())
         {
-            _dataCacheService.ThemeSetting.IsFullScreen = true;
-            _dataCacheService.ThemeSetting.IsTransparent = true;
+            bool? isDark = null;
+            string themeColor = null;
             if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Color) == false)
             {
                 if(Model.WebsiteAddInfor.Color=="black")
                 {
-                    _dataCacheService.ThemeSetting.IsDark = true;
+                    isDark = true;
                 }
                 else
                 {
-                    _dataCacheService.ThemeSetting.Theme = Model.WebsiteAddInfor?.Color;
+                    themeColor = Model.WebsiteAddInfor?.Color;
                 }
 
             }
-            _eventService.OnTempEffectTheme();
+            _eventService.OnTempEffectTheme(isDark, true, true, themeColor);
         }
     }
 

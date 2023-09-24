@@ -1,9 +1,10 @@
 ﻿@inject IHttpService _httpService
 
 @inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
 
-@inject IServiceProvider Provider
+@inject IPopupService PopupService
+
+
 @inject NavigationManager NavigationManager
 
 
@@ -26,16 +27,7 @@ else
 
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
 
     }
     else
@@ -62,7 +54,7 @@ else
     public EditEntryTagViewModel Model { get; set; } = new EditEntryTagViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> TagItems { get; set; } = new string[1] { "" };
+    private List<string> TagItems { get; set; } = new List<string>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -84,7 +76,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑词条标签失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑词条标签失败");
             }
         }
     }
@@ -97,19 +89,19 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存词条标签失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存词条标签失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存词条标签成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                await PopupService.ToastSuccessAsync("保存成功", "保存词条标签成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存词条标签失败");
+            await ErrorHandler.ProcessError(ex, "保存词条标签失败");
         }
     }
 

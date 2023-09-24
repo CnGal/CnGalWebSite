@@ -129,7 +129,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, string.IsNullOrWhiteSpace(_tempItem.Id) ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+            await ErrorHandler.ProcessError(ex, string.IsNullOrWhiteSpace(_tempItem.Id) ? $"添加{_name}失败" : $"编辑{_name}信息失败");
         }
 
     }

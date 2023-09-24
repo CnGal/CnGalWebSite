@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
@@ -13,27 +14,11 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-newspaper-o" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Article.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -68,7 +53,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
             }
         }
     }
@@ -82,19 +67,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑文章主要信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑文章主要信息失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("编辑文章主要信息成功", "编辑文章主要信息成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("编辑文章主要信息成功", "编辑文章主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo( "/articles/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑文章主要信息失败");
+            await ErrorHandler.ProcessError(ex, "编辑文章主要信息失败");
         }
     }
 

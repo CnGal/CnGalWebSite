@@ -8,10 +8,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("内容中心"+Tab switch {"monitor"=>" - 监视列表","review"=> " - 审阅记录列表","editrecord" =>" - 审核",_=>""})" />
 
-<div class="rounded  shadow-sm bg-opacity mb-4">
-    <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
-           >
-
+    <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow CenterActive Class="mb-4">
         <MTab Value="1">
             概览<MIcon>mdi-home</MIcon>
         </MTab>
@@ -25,7 +22,6 @@
             审核<MIcon>mdi-pencil</MIcon>
         </MTab>
     </MTabs>
-</div>
 <MTabsItems @bind-Value="TabIndex">
     <MTabItem Value="1">
 

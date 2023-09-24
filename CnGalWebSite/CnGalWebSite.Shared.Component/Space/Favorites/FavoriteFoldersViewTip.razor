@@ -1,8 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-
+@inject IPageModelCatche<List<FavoriteFolderOverviewModel>> _pageModelCatche
 
 @if (_dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId != 0)
 {
@@ -10,18 +9,18 @@
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="@IconType.Favorite.ToIconString()" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
 
             }
         </ButtonContent>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    @if (Model != null && Model.Favorites != null)
+    @if (Model.Any())
     {
-        foreach (var item in Model.Favorites)
+        foreach (var item in Model)
         {
             <FavoriteFolderInforViewTip Model="item" OnClickLayout="OnClickFolder"></FavoriteFolderInforViewTip>
         }
@@ -29,8 +28,7 @@ else
 }
 
 @code {
-
-    public FavoriteFoldersViewModel Model { get; set; }
+    public List<FavoriteFolderOverviewModel> Model { get; set; } = new List<FavoriteFolderOverviewModel>();
 
     public PagedSortedAndFilterInput FavoriteObjectInput { get; set; } = new PagedSortedAndFilterInput();
 
@@ -62,17 +60,17 @@ else
             {
                 return;
             }
-            Model = await _dataCacheService.UserFavoriteFoldersDataCatche.GetCache(UserId);
+            Model = await _pageModelCatche.GetCache("api/favorites/GetUserFavoriteFolders/"+UserId);
 
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
+            await ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
         }
     }
 
-    public void OnClickFolder(FavoriteFolderAloneModel model)
+    public void OnClickFolder(FavoriteFolderOverviewModel model)
     {
         _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = model.Id;
         _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderName = model.Name;

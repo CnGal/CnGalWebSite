@@ -1,6 +1,8 @@
 ﻿using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -29,10 +31,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<MakerInforTableModel, long> _makerInforTableModelRepository;
         private readonly IRepository<GameScoreTableModel, long> _gameScoreTableRepository;
         private readonly ITableService _tableService;
+        private readonly IQueryService _queryService;
+
+
         public TablesAPIController(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<GameScoreTableModel, long> gameScoreTableRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<GroupInforTableModel, long> groupInforTableModelRepository,
             IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, IRepository<StoreInfo, long> storeInfoRepository,
-           IRepository<MakerInforTableModel, long> makerInforTableModelRepository, ITableService tableService)
+           IRepository<MakerInforTableModel, long> makerInforTableModelRepository, ITableService tableService, IQueryService queryService)
         {
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
@@ -45,74 +50,81 @@ namespace CnGalWebSite.APIServer.Controllers
             _makerInforTableModelRepository=makerInforTableModelRepository;
             _gameScoreTableRepository = gameScoreTableRepository;
             _tableService = tableService;
+            _queryService = queryService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<BasicInforListViewModel>> GetBasicInforListAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<BasicInforTableModel>> ListGames(QueryParameterModel model)
         {
-            var model = new BasicInforListViewModel { BasicInfors = new List<BasicInforTableModel>() };
-            var result = await _basicInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
-            {
-                model.BasicInfors = result;
-            }
+            var (items, total) = await _queryService.QueryAsync<BasicInforTableModel, long>(_basicInforTableModelRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
-            return model;
+            return new QueryResultModel<BasicInforTableModel>
+            {
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
-        [HttpGet]
-        public async Task<ActionResult<GroupInforListViewModel>> GetGroupInforListAsync()
+
+        [HttpPost]
+        public async Task<QueryResultModel<GroupInforTableModel>> ListGroups(QueryParameterModel model)
         {
+            var (items, total) = await _queryService.QueryAsync<GroupInforTableModel, long>(_groupInforTableModelRepository.GetAll().AsSingleQuery(), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
-            var model = new GroupInforListViewModel { GroupInfors = new List<GroupInforTableModel>() };
-            var result = await _groupInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
+            return new QueryResultModel<GroupInforTableModel>
             {
-                model.GroupInfors = result;
-            }
-
-            return model;
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
-        [HttpGet]
-        public async Task<ActionResult<StaffInforListViewModel>> GetStaffInforListAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<StaffInforTableModel>> ListStaffs(QueryParameterModel model)
         {
+            var (items, total) = await _queryService.QueryAsync<StaffInforTableModel, long>(_staffInforTableModelRepository.GetAll().AsSingleQuery(), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.GameName.Contains(model.SearchText)));
 
-            var model = new StaffInforListViewModel { StaffInfors = new List<StaffInforTableModel>() };
-            var result = await _staffInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
+            return new QueryResultModel<StaffInforTableModel>
             {
-                model.StaffInfors = result;
-            }
-
-            return model;
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
-        [HttpGet]
-        public async Task<ActionResult<MakerInforListViewModel>> GetMakerInforListAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<MakerInforTableModel>> ListMakers(QueryParameterModel model)
         {
-            var model = new MakerInforListViewModel { MakerInfors = new List<MakerInforTableModel>() };
-            var result = await _makerInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
-            {
-                model.MakerInfors = result;
-            }
+            var (items, total) = await _queryService.QueryAsync<MakerInforTableModel, long>(_makerInforTableModelRepository.GetAll().AsSingleQuery(), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
-            return model;
+            return new QueryResultModel<MakerInforTableModel>
+            {
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
-        [HttpGet]
-        public async Task<ActionResult<RoleInforListViewModel>> GetRoleInforListAsync()
+
+        [HttpPost]
+        public async Task<QueryResultModel<RoleInforTableModel>> ListRoles(QueryParameterModel model)
         {
-            var model = new RoleInforListViewModel { RoleInfors = new List<RoleInforTableModel>() };
-            var result = await _roleInforTableModelRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
-            {
-                model.RoleInfors = result;
-            }
+            var (items, total) = await _queryService.QueryAsync<RoleInforTableModel, long>(_roleInforTableModelRepository.GetAll().AsSingleQuery(), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
-            return model;
+            return new QueryResultModel<RoleInforTableModel>
+            {
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
+      
 
         [HttpGet]
         public async Task<ActionResult<TableViewModel>> GetTableViewAsync()
@@ -130,48 +142,52 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<StoreInfoViewModel>>> GetStoreInfoListAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<StoreInfoViewModel>> ListStoreInfo(QueryParameterModel model)
         {
-            var items = await _storeInfoRepository.GetAll().AsNoTracking()
-                .Where(s=>s.State != StoreState.None)
-                .ToListAsync();
+            var (items, total) = await _queryService.QueryAsync<StoreInfo, long>(_storeInfoRepository.GetAll().AsSingleQuery().Where(s => s.State != StoreState.None), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
-            return items.Select(s => new StoreInfoViewModel
+            return new QueryResultModel<StoreInfoViewModel>
             {
-                State = s.State,
-                CurrencyCode = s.CurrencyCode,
-                CutLowest = s.CutLowest,
-                CutNow = s.CutNow,
-                EstimationOwnersMax = s.EstimationOwnersMax,
-                EstimationOwnersMin = s.EstimationOwnersMin,
-                EvaluationCount = s.EvaluationCount,
-                Link = s.Link,
-                OriginalPrice = s.OriginalPrice,
-                PlatformName = s.PlatformName,
-                PlatformType = s.PlatformType,
-                PlayTime = s.PlayTime,
-                PriceLowest = s.PriceLowest,
-                PriceNow = s.PriceNow,
-                RecommendationRate = s.RecommendationRate,
-                UpdateTime = s.UpdateTime,
-                UpdateType = s.UpdateType,
-                Name = s.Name,
-            }).ToList();
+                Items = await items.Select(s => new StoreInfoViewModel
+                {
+                    State = s.State,
+                    CurrencyCode = s.CurrencyCode,
+                    CutLowest = s.CutLowest,
+                    CutNow = s.CutNow,
+                    EstimationOwnersMax = s.EstimationOwnersMax,
+                    EstimationOwnersMin = s.EstimationOwnersMin,
+                    EvaluationCount = s.EvaluationCount,
+                    Link = s.Link,
+                    OriginalPrice = s.OriginalPrice,
+                    PlatformName = s.PlatformName,
+                    PlatformType = s.PlatformType,
+                    PlayTime = s.PlayTime,
+                    PriceLowest = s.PriceLowest,
+                    PriceNow = s.PriceNow,
+                    RecommendationRate = s.RecommendationRate,
+                    UpdateTime = s.UpdateTime,
+                    UpdateType = s.UpdateType,
+                    Name = s.Name,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
-        [HttpGet]
-        public async Task<ActionResult<GameScoreListViewModel>> GetGameScoreListAsync()
+        [HttpPost]
+        public async Task<QueryResultModel<GameScoreTableModel>> ListGameScores(QueryParameterModel model)
         {
-            var model = new GameScoreListViewModel();
+            var (items, total) = await _queryService.QueryAsync<GameScoreTableModel, long>(_gameScoreTableRepository.GetAll().AsSingleQuery(), model,
+              s => string.IsNullOrWhiteSpace(model.SearchText) || (s.GameName.Contains(model.SearchText)));
 
-            var result = await _gameScoreTableRepository.GetAll().AsNoTracking().ToListAsync();
-            if (result != null)
+            return new QueryResultModel<GameScoreTableModel>
             {
-                model.GameScores = result;
-            }
-
-            return model;
+                Items = await items.ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         [HttpGet]

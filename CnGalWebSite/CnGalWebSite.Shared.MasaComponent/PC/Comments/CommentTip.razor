@@ -10,18 +10,17 @@
             <AuthorizeView>
                 <Authorized>
                     <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" OnRefresh="OnOutComment"></ReplyCommentTip>
-
                 </Authorized>
                 <NotAuthorized>
-                    <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
-                    </div>
+                     <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" Rounded OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                    </MDCard>
                 </NotAuthorized>
             </AuthorizeView>
         }
         else
         {
-            <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
+            <CloseCommentTip ></CloseCommentTip>
         }
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -82,7 +81,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
+            await ErrorHandler.ProcessError(ex, "获取评论列表失败");
         }
     }
     protected void OnLogin()

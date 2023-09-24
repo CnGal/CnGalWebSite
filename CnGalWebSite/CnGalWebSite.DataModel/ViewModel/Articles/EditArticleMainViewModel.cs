@@ -6,37 +6,58 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
     public class EditArticleMainViewModel : BaseEditModel
     {
-        [Display(Name = "显示名称")]
-        [Required(ErrorMessage = "请填写显示名称")]
+        /// <summary>
+        /// 显示名称
+        /// </summary>
         public string DisplayName { get; set; }
-        [Display(Name = "简介")]
-        [Required(ErrorMessage = "请填写简介")]
+        /// <summary>
+        /// 简介
+        /// </summary>
         public string BriefIntroduction { get; set; }
 
-        [Display(Name = "主图")]
+        /// <summary>
+        /// 主图
+        /// </summary>
         public string MainPicture { get; set; }
 
-        [Display(Name = "背景图")]
+        /// <summary>
+        /// 背景图
+        /// </summary>
         public string BackgroundPicture { get; set; }
 
-        [Display(Name = "小背景图")]
+        /// <summary>
+        /// 小背景图
+        /// </summary>
         public string SmallBackgroundPicture { get; set; }
 
-        [Display(Name = "类别")]
-        [Required(ErrorMessage = "请选择类别")]
+        /// <summary>
+        /// 类别
+        /// </summary>
         public ArticleType Type { get; set; }
-        [Display(Name = "动态类别")]
+        /// <summary>
+        /// 动态类别
+        /// </summary>
         public string NewsType { get; set; }
 
-        [Display(Name = "本人创作")]
+        /// <summary>
+        /// 本人创作
+        /// </summary>
         public bool IsCreatedByCurrentUser { get; set; }
-        [Display(Name = "原作者")]
+        /// <summary>
+        /// 原作者
+        /// </summary>
         public string OriginalAuthor { get; set; }
-        [Display(Name = "原文链接")]
+        /// <summary>
+        /// 原文链接
+        /// </summary>
         public string OriginalLink { get; set; }
-        [Display(Name = "发布日期")]
+        /// <summary>
+        /// 发布日期
+        /// </summary>
         public DateTime PubishTime { get; set; }
-        [Display(Name = "动态发生时间")]
+        /// <summary>
+        /// 动态发生时间
+        /// </summary>
         public DateTime? RealNewsTime { get; set; }
 
         public override Result Validate()

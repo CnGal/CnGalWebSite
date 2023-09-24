@@ -4,14 +4,14 @@
 
     @if (Model.State == EditState.None)
     {
-        <MButton Text Block Color="success" OnClick="OnNav">
+    <MButton Text Block Color="primary" OnClick="OnNav">
             <MIcon Left>mdi-plus</MIcon>
             @("添加"+Model.Title)
         </MButton>
     }
     else if (Model.State == EditState.Normal)
     {
-        <MButton Text Block Color="blue" OnClick="OnNav">
+    <MButton Text Block Color="primary" OnClick="OnNav">
             <MIcon Left>mdi-pencil</MIcon>
             @("编辑"+Model.Title)
         </MButton>
@@ -19,7 +19,7 @@
     }
     else if (Model.State == EditState.Preview)
     {
-        <MButton Text Block Color="warning" OnClick="OnNav">
+    <MButton Text Block Color="primary" OnClick="OnNav">
             <MIcon Left>mdi-cube-scan </MIcon>
             @("预览"+Model.Title)
         </MButton>
@@ -27,7 +27,7 @@
     }
     else if (Model.State == EditState.Locked)
     {
-        <MButton Text Block Color="grey">
+    <MButton Text Block Color="primary">
             <MIcon Left>mdi-lock </MIcon>
             @(Model.Title+"被锁定")
         </MButton>

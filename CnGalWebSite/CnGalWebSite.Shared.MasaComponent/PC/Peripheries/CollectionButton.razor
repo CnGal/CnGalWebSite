@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject DialogService DialogService
+
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 
@@ -108,7 +109,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("取消拥有周边失败", obj.Error);
+                await PopupService.ToastErrorAsync("取消拥有周边失败", obj.Error);
             }
             else
             {
@@ -119,7 +120,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "取消拥有周边失败");
+            await ErrorHandler.ProcessError(ex, "取消拥有周边失败");
         }
     }
     private async Task Collect()
@@ -131,7 +132,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("拥有周边失败", obj.Error);
+                await PopupService.ToastErrorAsync("拥有周边失败", obj.Error);
             }
             else
             {
@@ -143,7 +144,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "拥有周边失败");
+            await ErrorHandler.ProcessError(ex, "拥有周边失败");
         }
     }
 }

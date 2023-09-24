@@ -70,7 +70,7 @@
             oneTimeCodeModel = await _httpService.GetAsync<OneTimeCodeModel>("api/account/GetOneTimeCode");
             if (string.IsNullOrWhiteSpace(oneTimeCodeModel.Code))
             {
-                ErrorHandler.ProcessError(new Exception(), "获取一次性授权码失败");
+                await ErrorHandler.ProcessError(new Exception(), "获取一次性授权码失败");
                 return;
             }
 
@@ -78,7 +78,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取一次性授权码失败");
+            await ErrorHandler.ProcessError(ex, "获取一次性授权码失败");
         }
 
     }

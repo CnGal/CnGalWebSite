@@ -1,0 +1,32 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Name" />
+
+@code {
+    [Parameter]
+    public LotteryAwardType Type { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    public string GetColor(LotteryAwardType type)
+    {
+        return type switch
+        {
+            LotteryAwardType.ActivationCode => "success",
+            LotteryAwardType.Integral => "info",
+            LotteryAwardType.RealThing => "warning",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(LotteryAwardType type)
+    {
+        return type switch
+        {
+            LotteryAwardType.ActivationCode => IconType.Code,
+            LotteryAwardType.Integral => IconType.Count,
+            LotteryAwardType.RealThing => IconType.Periphery,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

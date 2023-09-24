@@ -2,10 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
-    public class GroupInforListViewModel
-    {
-        public List<GroupInforTableModel> GroupInfors { get; set; }
-    }
 
     public class GroupInforTableModel
     {

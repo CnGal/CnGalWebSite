@@ -6,17 +6,9 @@
     <div>
         @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false && _dataCacheService.UserPendingDataCatche.Items.Any()==false)
         {
-            <div class="  rounded shadow-sm p-3 bg-opacity">
-                <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
-                    <div style="width: 100%;">
-                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
-                        <div class="h5 text-center mt-4" style=" font-weight: 600;">
-                            貌似没有待办事项，可以一起快乐摸鱼了呢
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill>
+                <h1 class="text-center title-large">貌似没有待办事项，可以一起快乐摸鱼了呢</h1>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
 
         }
 
@@ -28,10 +20,7 @@
 }
 else
 {
-    <div style="height:300px">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.LoadingTip Height="100%" />
-    </div>
-
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
 }
 
 
@@ -64,7 +53,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+                await ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
             }
         }
     }

@@ -2,7 +2,7 @@
 
 @inject IHttpService _httpService
 @inject IQueryService _queryService
-@using OneOf;
+    @using OneOf;
 
 <MDataTable Headers="Headers"
             Items="_items"
@@ -14,25 +14,24 @@
              ServerItemsLength="_totalDesserts"
              Loading="_loading"
              Class="@Class"
-             LoadingText="@LoadingText"
-             @ref="_dataTable">
+             LoadingText="@LoadingText">
      <TopContent>
          <MToolbar Flat>
             <MToolbarTitle> @Title</MToolbarTitle>
             <MDivider Class="mx-4" Inset Vertical />
              <MSpacer></MSpacer>
+             @ButtonContent
              @if (ShowAddButton)
             {
-                <MButton Color="primary"
+                <MButton Color="primary" Rounded="Rounded"
                           Dark
                           Class="me-8"
                           OnClick="OnClickAdd">
                      <MIcon Left>mdi-plus</MIcon>
                  添加
              </MButton>
-                
             }
-            @ButtonContent
+
             <MTextField Value="_search" ValueChanged="OnSearch" TValue="string"
                         AppendIcon="mdi-magnify"
                         Label="搜索"
@@ -62,6 +61,8 @@
     [Parameter]
     public bool ShowAddButton { get; set; } = true;
     [Parameter]
+    public bool Rounded { get; set; } = true;
+    [Parameter]
     public string Class { get; set; } = "elevation-1";
     [Parameter]
     public RenderFragment<ItemColProps<TModel>> ItemColContent { get; set; }
@@ -90,13 +91,10 @@
         GetDataFromApi();
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            CopyOptions(Data.Parameter, _dataTable.Options);
-            GetDataFromApi();
-        }
+        //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
+        GetDataFromApi();
     }
 
     public void GetDataFromApi()
@@ -115,7 +113,7 @@
 
     public void OnSearch(string text)
     {
-        _search = Data.Parameter.SearchText = text;
+        Data.Parameter.SearchText = text;
         StateHasChanged();
         GetDataFromApi();
     }
@@ -135,11 +133,10 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
+                await ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
                 return (new List<TModel>(), 0);
             }
         }
-
     }
 
     public void CopyOptions(QueryParameterModel parameter, DataOptions options)
@@ -153,4 +150,4 @@
         parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
         parameter.Page = options.Page == 0 ? 1 : options.Page;
     }
-}
+ }

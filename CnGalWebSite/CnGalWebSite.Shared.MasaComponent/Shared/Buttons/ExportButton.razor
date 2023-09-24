@@ -5,10 +5,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " TextStyle>
     <div style=" display: flex; flex-direction: column;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="CSV" Icon="mdi-file-delimited-outline" OnClick="()=>OnExportExcel(false)" IsAsync />
-
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Json" Icon="mdi-code-json " IsAsync OnClick="OnExportJson" />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Excel" Icon="mdi-microsoft-excel " IsAsync OnClick="()=>OnExportExcel(true)" />
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu>
 
@@ -16,8 +13,6 @@
 
     [Parameter]
     public IEnumerable<TItem> Items { get; set; }
-    [Parameter]
-    public IEnumerable<ITableColumn> Columns { get; set; }
     [Parameter]
     public string Name { get; set; }
 
@@ -61,114 +56,7 @@
         await DownloadFileFromStream(fileStream, $"{Name} - {items.Count()}条记录.json");
     }
 
-    public async Task OnExportExcel(bool isExcel)
-    {
-        //获取
-        var items = await GetData();
-        //检查
-        if (items == null || items.Any() == false || Columns == null || Columns.Any() == false)
-        {
-            return;
-        }
-
-        await  ExportExcelAsync(items, Columns,isExcel);
-    }
-
-    public async Task ExportExcelAsync(IEnumerable<TItem> items, IEnumerable<ITableColumn> cols,bool isExcel)
-    {
-        OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-
-        using var excelPackage = new OfficeOpenXml.ExcelPackage();
-
-        var worksheet = excelPackage.Workbook.Worksheets.Add("sheet1");
-
-        var y = 1;
-        var colNum = 1;
-        foreach (var item in items)
-        {
-            var x = 1;
-            foreach (var pi in item.GetType().GetProperties())
-            {
-                if (!cols.Any(col => col.GetFieldName() == pi.Name)) continue;
-
-                if (y == 1)
-                {
-                    if (pi.Name != null)
-                    {
-                        if (pi.PropertyType == typeof(DateTime) || pi.PropertyType == typeof(DateTime?)
-                            || pi.PropertyType == typeof(TimeSpan) || pi.PropertyType == typeof(TimeSpan?))
-                        {
-                            worksheet.Column(x).Width = 18;
-                            worksheet.Column(x).Style.Numberformat.Format = "yyyy/m/d h:mm:ss";
-                        }
-
-                        var th_value = cols.FirstOrDefault(x => x.GetFieldName() == pi.Name)?.Text
-                            ?? Utility.GetDisplayName(items.First(), pi.Name);
-                        worksheet.SetValue(1, x, th_value);
-                    }
-                }
-                var value = await FormatValue(cols.First(col => col.GetFieldName() == pi.Name), pi.GetValue(item, null));
-                worksheet.SetValue(y + 1, x, value);
-                x++;
-            }
-            if(x> colNum)
-            {
-                colNum = x;
-            }
-            y++;
-        }
-
-        if(isExcel)
-        {
-            var fileStream = new MemoryStream(await excelPackage.GetAsByteArrayAsync());
-            await DownloadFileFromStream(fileStream, $"{Name} - {items.Count()}条记录.xlsx");
-        }
-        else
-        {
-            var b = worksheet.Cells[1, 1].Address;
-            var e = worksheet.Cells[items.Count(), colNum].Address;
-            var fileStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await worksheet.Cells[$"{b}:{e}"].ToTextAsync(new OfficeOpenXml.ExcelOutputTextFormat
-            {
-                Encoding = System.Text.Encoding.UTF8,
-                TextQualifier = '"'
-            })));
-            await DownloadFileFromStream(fileStream, $"{Name} - {items.Count()}条记录.csv");
-        }
-
-
-    }
-
-    private static async Task<string> FormatValue(ITableColumn col, object? value)
-    {
-        var ret = "";
-        if (col.Formatter != null)
-        {
-            // 格式化回调委托
-            ret = await col.Formatter(value);
-        }
-        else if (!string.IsNullOrEmpty(col.FormatString))
-        {
-            // 格式化字符串
-            ret = Utility.Format(value, col.FormatString);
-        }
-        else if (col.PropertyType.IsEnum())
-        {
-            ret = col.PropertyType.ToDescriptionString(value?.ToString());
-        }
-        else if (col.PropertyType.IsDateTime())
-        {
-            ret = Utility.Format(value, CultureInfo.CurrentUICulture.DateTimeFormat);
-        }
-        else if (value is IEnumerable<object> v)
-        {
-            ret = string.Join(",", v);
-        }
-        else
-        {
-            ret = value?.ToString() ?? "";
-        }
-        return ret;
-    }
+   
 
     private async Task DownloadFileFromStream(MemoryStream fileStream, string fileName)
     {

@@ -1,154 +1,65 @@
 ﻿@inject IHttpService _httpService
-@inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 @inject IEventService _eventService
 
-
-@if (!isReady)
-{
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-    <div class="mt-2">
-    </div>
-    <SkeletonParagraph />
-}
-else
-{
-    <Table TItem="StoreInfoViewModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQuerySteamAsync" SearchModel="@SearchModelSteam" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-        <TableToolbarTemplate>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="StoreInfoViewModel" Columns="table.Columns" Items="Model" Name="商店信息汇总表" />
-        </TableToolbarTemplate>
-
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Link" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.PlatformType" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.PlatformName" Filterable="true" Sortable="true" Width="120" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Width="170" TextWrap="true"  />
-            <TableColumn @bind-Field="@context.State" Filterable="true" Sortable="true" Width="90" TextWrap="true"  />
-            <TableColumn @bind-Field="@context.CurrencyCode" Filterable="true" Sortable="true" Width="90" TextWrap="true"  />
-            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true"  FormatString="¥ 0.0"/>
-            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" FormatString="¥ 0.0"/>
-            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" />
-            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="100" TextWrap="true"  FormatString="¥ 0.0" />
-            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="100" TextWrap="true"/>
-            <TableColumn @bind-Field="@context.PlayTime" Filterable="true" Sortable="true" Width="100" TextWrap="true" />
-            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="100" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="100" TextWrap="true" FormatString="0." />
-            <TableColumn @bind-Field="@context.EstimationOwnersMax" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.EstimationOwnersMin" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.UpdateTime" Filterable="true" Width="170" TextWrap="true"/>
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context))" />
-        </RowButtonTemplate>
-
-    </Table>
-}
+<DataTableCard TModel="StoreInfoViewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</DataTableCard>
 
 
 @code {
-    Table<StoreInfoViewModel> table;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/tables/ListStoreInfo";
+    private string _name = "商店信息";
+
+    private List<DataTableHeader<StoreInfoViewModel>> _headers = new List<DataTableHeader<StoreInfoViewModel>>
+    {
+        new ()
+          {
+            Text= "链接",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(StoreInfoViewModel.Link)
+          },
+          new (){ Text= "平台类型", Value= nameof(StoreInfoViewModel.PlatformType)},
+          new (){ Text= "平台名称", Value= nameof(StoreInfoViewModel.PlatformName)},
+          new (){ Text= "状态", Value= nameof(StoreInfoViewModel.State)},
+          new (){ Text= "币种", Value= nameof(StoreInfoViewModel.CurrencyCode)},
+          new (){ Text= "信息更新方式", Value= nameof(StoreInfoViewModel.UpdateType)},
+          new (){ Text= "原价", Value= nameof(StoreInfoViewModel.OriginalPrice)},
+          new (){ Text= "现价", Value= nameof(StoreInfoViewModel.PriceNow)},
+          new (){ Text= "折扣", Value= nameof(StoreInfoViewModel.CutNow)},
+          new (){ Text= "史低", Value= nameof(StoreInfoViewModel.PriceLowest)},
+          new (){ Text= "最高折扣", Value= nameof(StoreInfoViewModel.CutLowest)},
+          new (){ Text= "平均游玩时长 分钟", Value= nameof(StoreInfoViewModel.PlayTime)},
+          new (){ Text= "评测数", Value= nameof(StoreInfoViewModel.EvaluationCount)},
+          new (){ Text= "好评率", Value= nameof(StoreInfoViewModel.RecommendationRate)},
+          new (){ Text= "估计拥有人数 上限", Value= nameof(StoreInfoViewModel.EstimationOwnersMax)},
+          new (){ Text= "估计拥有人数 下限", Value= nameof(StoreInfoViewModel.EstimationOwnersMin)},
+          new (){ Text= "更新时间", Value= nameof(StoreInfoViewModel.UpdateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<StoreInfoViewModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
-
-    private bool isReady = false;
-
-    public List<StoreInfoViewModel> Model { get; set; } = new List<StoreInfoViewModel>();
-
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<StoreInfoViewModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<StoreInfoViewModel>>> SortLambdaCacheSteam = new();
-    private StoreInfoViewModel SearchModelSteam { get; set; } = new StoreInfoViewModel();
-
-    public async Task OnLook(StoreInfoViewModel model)
+    public async Task LookItem(StoreInfoViewModel model)
     {
         await _eventService.OpenNewPage(GameReleaseViewModel.GetLink(model.PlatformType, model.Link));
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            Model = await _httpService.GetAsync<List<StoreInfoViewModel>>("api/tables/GetStoreInfoList");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取游戏价格信息汇总表格");
-        }
-    }
-
-
-
-    private Task<QueryData<StoreInfoViewModel>> OnQuerySteamAsync(QueryPageOptions options)
-    {
-        IEnumerable<StoreInfoViewModel> items = Model;
-        // 处理高级搜索
-        if (!string.IsNullOrWhiteSpace(SearchModelSteam.PlatformName))
-        {
-            items = items.Where(item => item.PlatformName?.Contains(SearchModelSteam.PlatformName, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-        if (!string.IsNullOrWhiteSpace(SearchModelSteam.Name))
-        {
-            items = items.Where(item => item.Name?.Contains(SearchModelSteam.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-        if (!string.IsNullOrWhiteSpace(SearchModelSteam.Link))
-        {
-            items = items.Where(item => item.Link?.Contains(SearchModelSteam.Link, StringComparison.OrdinalIgnoreCase) ?? false);
-        }
-
-        // 处理 Searchable=true 列与 SeachText 模糊搜索
-        if (options.Searchs.Any())
-        {
-            items = items.Where(options.Searchs.GetFilterFunc<StoreInfoViewModel>(FilterLogic.Or));
-        }
-        else
-        {
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
-            }
-        }
-        // 过滤
-        var isFiltered = false;
-        if (options.Filters.Any())
-        {
-            items = items.Where(options.Filters.GetFilterFunc<StoreInfoViewModel>());
-            isFiltered = true;
-        }
-
-        // 排序
-        var isSorted = false;
-        if (!string.IsNullOrWhiteSpace(options.SortName))
-        {
-            // 外部未进行排序，内部自动进行排序处理
-            var invoker = SortLambdaCacheSteam.GetOrAdd(typeof(StoreInfoViewModel), key => LambdaExtensions.GetSortLambda<StoreInfoViewModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-            isSorted = true;
-        }
-
-        // 设置记录总数
-        var total = items.Count();
-
-        // 内存分页
-        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-        return Task.FromResult(new QueryData<StoreInfoViewModel>()
-        {
-            Items = items,
-            TotalCount = total,
-            IsSorted = isSorted,
-            IsFiltered = isFiltered
-        });
-    } }
+}

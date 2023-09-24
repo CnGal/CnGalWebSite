@@ -1,28 +1,26 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<HomeNewsAloneViewModel>>  _pageModelCatche
 
 <section class="news-card">
-    <h2>最新动态</h2>
-
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新动态" Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news" ForceShowMore>
         <div class="group">
             @foreach (var item in context)
             {
-                <div class="item">
-                    <a href="@($"/entries/index/{item.GroupId}")">
+                <MDCard Class="item" ShowHoverStyle="true">
+                    <a href="@($"/entries/index/{item.GroupId}")" class="user-image">
                         <img src="@item.Image" alt="@item.Title" loading="lazy" />
                     </a>
                     <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
                         <div class="head">
                             <div class="name text-truncate-1">@item.Title</div>
-                            <div class="time">@item.Time.ToTimeFromNowString()</div>
+                            <div class="time  label-large">@item.Time.ToTimeFromNowString()</div>
                         </div>
-                        <div class="text text-truncate-1">@item.Text</div>
+                        <div class="text text-truncate-1 label-large">@item.Text</div>
                     </a>
-                </div>
+                </MDCard>
             }
         </div>
     </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
@@ -58,7 +56,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取主页动态列表失败");
+            await ErrorHandler.ProcessError(ex, "获取主页动态列表失败");
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
@@ -46,8 +46,6 @@ namespace CnGalWebSite.APIServer.Application.Users
         private readonly IAppHelper _appHelper;
         private readonly IRankService _rankService;
         private readonly IHttpContextAccessor _accessor;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<ApplicationUser>, string, SortOrder, IEnumerable<ApplicationUser>>> SortLambdaCacheApplicationUser = new();
 
         public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository, IHttpContextAccessor accessor,
         IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
@@ -432,7 +430,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 .GroupBy(n => n.Time)
                 // 返回汇总样式
                 .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                .OrderBy(n => n.Time)
                 .ToListAsync();
 
             return GetHeatMap(datas, "编辑概览", afterTime, beforeTime);
@@ -455,7 +453,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 .GroupBy(n => n.Time)
                 // 返回汇总样式
                 .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                .OrderBy(n => n.Time)
                 .ToListAsync();
 
             return GetHeatMap(datas, "签到记录", afterTime, beforeTime);

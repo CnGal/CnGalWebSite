@@ -1,0 +1,15 @@
+﻿.periphery-overview-card a {
+    color: var(--md-sys-color-on-background) !important;
+}
+
+.basic-info-group-card {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    padding: 4px !important;
+    padding-top: 0;
+}
+
+.basic-info-group-card >div {
+    display: flex;
+}

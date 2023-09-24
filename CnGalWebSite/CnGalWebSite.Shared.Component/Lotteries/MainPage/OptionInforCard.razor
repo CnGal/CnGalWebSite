@@ -1,13 +1,11 @@
 ﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
 
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
 
-<div class="rounded shadow-sm  bg-opacity mb-4 pt-4">
-    <div style=" display: flex; flex-direction: column; align-items: center; ">
-        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2" />
+
+<MDCard Outline Class="pt-4" Style="display: flex; flex-direction: column; align-items: center;">
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="max-width:250px;width:100%" class="ps-2 pe-2 mb-4" />
         @if (isReady)
         {
             @if (StateModel == null)
@@ -106,21 +104,18 @@
             }
 
         }
-    </div>
-
-</div>
+</MDCard>
 
 @if (isReady && StateModel != null && StateModel.State == UserLotteryState.WaitingDraw)
 {
-    <div class="rounded shadow-sm  bg-opacity mb-4 p-4" style="display: flex; align-items: center; justify-content: center;">
-        <div class="swal2-icon m-0 me-1 border-primary" style="height: 10em; width: 10em; display: flex; align-items: center; border: .5em solid transparent;">
-            <div class="text-primary" style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
-        </div>
-    </div>
+    <MDCard Class="mb-4 p-4" Style="display: flex; align-items: center; justify-content: center;">
+            <div style=" font-size: 3rem; font-weight: bold;">@StateModel.Number</div>
+    </MDCard>
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
-
+<CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip @ref="lookPrizeTip" Id="ViewModel.Id"/>
+<CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard @ref="editAddressCard" />
 @code {
     [Parameter]
     public LotteryViewModel ViewModel { get; set; }
@@ -133,7 +128,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
-
+    CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip lookPrizeTip;
+    CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard editAddressCard;
     protected override async Task OnInitializedAsync()
     {
         await Refresh();
@@ -152,7 +148,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取用户抽奖状态失败");
+                await ErrorHandler.ProcessError(ex, "获取用户抽奖状态失败");
             }
         }
 
@@ -169,17 +165,17 @@
             });
             if (obj.Successful)
             {
-                await ToastService.Success("参与抽奖成功", "参与抽奖成功");
+                await PopupService.ToastAsync("参与抽奖成功",  AlertTypes.Success);
                 await Refresh();
             }
             else
             {
-                await ToastService.Error("参与抽奖失败", obj.Error);
+                await PopupService.ToastAsync("参与抽奖失败", AlertTypes.Error);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "参与抽奖失败");
+            await ErrorHandler.ProcessError(ex, "参与抽奖失败");
         }
     }
 
@@ -204,69 +200,11 @@
 
     public async Task OnLookPrize()
     {
-        var option = new DialogOption()
-        {
-            Title = "查看奖品",
-            Size = Size.Medium
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PrizePage.LookPrizeTip>(new Dictionary<string, object>
-        {
-            [nameof(PrizePage.LookPrizeTip.Id)] = ViewModel.Id,
-        }).Render();
-        await DialogService.Show(option);
+        await lookPrizeTip?.Refresh();
     }
 
     public async Task EditUserAddress()
     {
-        var model = new EditUserAddressModel();
-        try
-        {
-            model = await _httpService.GetAsync<EditUserAddressModel>("api/space/EditUserAddress");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑用户地址信息失败");
-        }
-
-        var items = Utility.GenerateEditorItems<EditUserAddressModel>();
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditUserAddressModel.Address));
-        editItem.Rows = 3;
-
-        var option = new EditDialogOption<EditUserAddressModel>()
-        {
-            Title = "编辑收货地址",
-            Model = model,
-            Items = items,
-            Size = Size.Large,
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (EditUserAddressModel)context.Model;
-
-                try
-                {
-                    var obj = await _httpService.PostAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", item);
-                    //判断结果
-                    if (obj.Successful == false)
-                    {
-                        await ToastService.Error("编辑收货地址失败", obj.Error);
-                        return false;
-                    }
-                    else
-                    {
-                        await ToastService.Success("编辑收货地址成功", "编辑收货地址成功");
-                        await Refresh();
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorHandler.ProcessError(ex, "编辑收货地址失败");
-                    return false;
-                }
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        await editAddressCard?.Refresh();
     }
 }

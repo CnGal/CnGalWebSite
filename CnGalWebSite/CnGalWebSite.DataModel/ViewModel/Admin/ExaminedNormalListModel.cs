@@ -1,6 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
-
+using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,18 +21,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public string RelatedName { get; set; }
 
-        public string UserId { get; set; }
-
-        public string UserName { get; set; }
-
-        public string UserImage { get; set; }
-
         public Operation Operation { get; set; }
 
         public bool? IsPassed { get; set; }
 
-        public List<RankViewModel> Ranks { get; set; }
-
+        public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel();
     }
 
     public enum ExaminedNormalListModelType

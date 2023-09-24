@@ -1,0 +1,42 @@
+﻿
+<section class="button-group-card">
+    <div class="button-group">
+        @foreach (var item in _items)
+        {
+            <div class="button-item">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@item.Item1.ToIconString()" Href="@item.Item3" OnClick="@(()=>OnClick(item))" />
+                <div class="name label-large">@item.Item2</div>
+            </div>
+        }
+    </div>
+
+</section>
+<CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard @ref="themeSettingCard" />
+
+@code {
+    List<(IconType, string, string)> _items = new List<(IconType, string, string)>
+    {
+        (IconType.Steam,"分享库存","/sharegames"),
+        (IconType.Game,"免费游戏","/free"),
+        (IconType.Discount,"折扣中","/discount"),
+        (IconType.News,"每周速报","/weeklynews"),
+        (IconType.Birthday,"生日日历","/birthday"),
+        (IconType.Calendar,"时间线","/times"),
+        (IconType.Dub,"专题页","/cv"),
+        (IconType.Data,"数据汇总","/data"),
+        (IconType.Setting,"主题设置",null),
+        (IconType.Shape,"关于我们","/about"),
+    };
+    CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
+
+    public void OnClick((IconType, string, string) model)
+    {
+        if (model.Item3 != null)
+        {
+            return;
+        }
+
+        themeSettingCard?.Refresh(true);
+
+    }
+}

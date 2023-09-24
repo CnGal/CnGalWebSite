@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.BackUpArchives;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Files;
@@ -43,8 +43,6 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly IRecommendService _recommendService;
         private readonly ILogger<TimedTaskService> _logger;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
-
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
         IPerfectionService perfectionService, ISearchHelper searchHelper, ISteamInforService steamService,
         INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService,
@@ -64,78 +62,6 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _entryService = entryService;
             _steamService = steamService;
             _recommendService = recommendService;
-        }
-
-        public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
-        {
-            IEnumerable<TimedTask> items = _timedTaskRepository.GetAll().AsNoTracking();
-            // 处理高级搜索
-            if (!string.IsNullOrWhiteSpace(searchModel.Name))
-            {
-                items = items.Where(item => item.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-            if (searchModel.Type != null)
-            {
-                items = items.Where(item => item.Type == searchModel.Type);
-            }
-            if (searchModel.ExecuteType != null)
-            {
-                items = items.Where(item => item.ExecuteType == searchModel.ExecuteType);
-            }
-
-
-
-
-            // 处理 SearchText 模糊搜索
-            if (!string.IsNullOrWhiteSpace(options.SearchText))
-            {
-                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
-            }
-
-
-            // 排序
-            var isSorted = false;
-            if (!string.IsNullOrWhiteSpace(options.SortName))
-            {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(TimedTask), key => LambdaExtensions.GetSortLambda<TimedTask>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
-                isSorted = true;
-            }
-
-            // 设置记录总数
-            var total = items.Count();
-
-            // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //复制数据
-            var resultItems = new List<ListTimedTaskAloneModel>();
-            foreach (var item in items)
-            {
-                resultItems.Add(new ListTimedTaskAloneModel
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Type = item.Type,
-                    ExecuteType = item.ExecuteType,
-                    IntervalTime = item.IntervalTime,
-                    EveryTime = item.EveryTime?.ToString("yyyy-MM-dd HH:mm"),
-                    LastExecutedTime = item.LastExecutedTime,
-                    Parameter = item.Parameter,
-                    IsPause = item.IsPause,
-                    IsRuning = item.IsRuning,
-                    IsLastFail = item.IsLastFail
-                });
-            }
-
-            return Task.FromResult(new QueryData<ListTimedTaskAloneModel>()
-            {
-                Items = resultItems,
-                TotalCount = total,
-                IsSorted = isSorted,
-                // IsFiltered = isFiltered
-            });
         }
 
         public async Task RunTimedTask(TimedTask item)

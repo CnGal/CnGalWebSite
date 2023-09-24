@@ -4,7 +4,7 @@
 
 @if (Model.TotalPages == 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard IsNeedLayput="true" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
 }
 else
 {
@@ -41,7 +41,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户发表视频列表失败");
+            await ErrorHandler.ProcessError(ex, "获取用户发表视频列表失败");
         }
     }
 

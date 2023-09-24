@@ -1,0 +1,57 @@
+﻿.markdown-body {
+    white-space: break-spaces;
+    display: flex;
+    flex-direction: column;
+}
+
+    .markdown-body pre {
+        overflow: initial !important;
+    }
+    /*图片注释*/
+    .markdown-body img + strong {
+        display: flex;
+        justify-content: center;
+        font-weight: inherit !important;
+        margin-top: .66667em;
+        color: var(--md-sys-color-primary);
+        text-align: center;
+        font-size: .9em
+    }
+
+    .markdown-body a img + strong {
+        color: var(--md-sys-color-primary) !important;
+    }
+
+    /*视频注释*/
+    .markdown-body .aspect-ratio + p > strong {
+        display: flex;
+        justify-content: center;
+        font-weight: inherit !important;
+        margin-top: .66667em;
+        color: var(--md-sys-color-primary);
+        font-size: .9em
+    }
+
+    .markdown-body a .aspect-ratio + p > strong {
+        color: var(--md-sys-color-primary) !important;
+    }
+    /* 这个规则规定了iframe父元素容器的尺寸，我们要去它的宽高比应该是 25:14 */
+    .markdown-body .aspect-ratio {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56%; /* 高度应该是宽度的56% */
+    }
+
+        /* 设定iframe的宽度和高度，让iframe占满整个父元素容器 */
+        .markdown-body .aspect-ratio iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+    .markdown-body img {
+        max-width: 100%;
+    }

@@ -1,0 +1,68 @@
+﻿
+.entry-card-default.relevance-card .main-card img {
+    width: 160px;
+}
+
+.entry-card-default.relevance-card .content-card .name > span {
+    font-size: .8rem;
+    line-height: inherit;
+}
+
+.entry-card-default.relevance-card:not(.hide-title) .content-card .brief {
+    -webkit-line-clamp: 2;
+    font-size: .8rem;
+}
+
+.entry-card-default.relevance-card .content-card .name {
+    -webkit-line-clamp: 1;
+}
+
+.entry-card-default.relevance-card {
+    padding: 0;
+}
+
+    .entry-card-default.relevance-card .info-card {
+        display: none;
+    }
+
+    .entry-card-default.relevance-card .main-card {
+        gap: 0;
+    }
+
+    .entry-card-default.relevance-card .content-card {
+        padding: .2rem .5rem;
+    }
+
+    .entry-card-default.relevance-card .title-card .name {
+        line-height: 1rem;
+    }
+
+    .entry-card-default.relevance-card .main-card img.thum {
+        width: 90px;
+        padding: .5rem;
+        padding-right: 0;
+    }
+
+    .entry-card-default.relevance-card.big-card-style .content-card {
+        padding-top: .5rem;
+    }
+
+        .entry-card-default.relevance-card.big-card-style .content-card .brief {
+            -webkit-line-clamp: 2;
+        }
+
+    .entry-card-default.relevance-card.hide-title .content-card .brief {
+        -webkit-line-clamp: 4;
+        white-space:inherit;
+    }
+
+/*折扣页面*/
+.discount-screen-card .title-card {
+    align-items: center;
+    gap: .5rem;
+    align-items: flex-end;
+}
+
+.discount-screen-card .input-card {
+    justify-content: space-between;
+}

@@ -1,64 +1,51 @@
 ﻿@inject IHttpService _httpService
 
 
-<div style="color: black;">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
-        <div class="row">
-            <div class="col-12 col-sm-6">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"/>
-            </div>
-        </div>
-
-        <div class="form-group mt-4">
-            <div class="row">
-
-                <div class="form-group col-12">
-                    <BootstrapInput @bind-Value="Model.Title" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.BriefIntroduction" rows="5" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12">
-                    <Textarea @bind-Value="Model.MainPage" rows="5" ShowLabel="true" />
-                </div>
-
-            </div>
-        </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
-        <div class="form-group">
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.NewsType" ShowLabel="true" />
-                </div>
-
-                <div class="form-group col-12  col-sm-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Lable="原文发布时间"/>
-                </div>
-                <div class="form-group col-12">
-                    <BootstrapInput @bind-Value="Model.Link" ShowLabel="true" />
-                </div>
-            </div>
-        </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
-        <div class="form-group m-0">
-            <div class="row">
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Author" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.WeiboId" ShowLabel="true" />
-                </div>
-                <div class="form-group col-12">
-                    <AutoComplete Items="@Items" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.AuthorEntryName" ShowLabel="true" />
-                </div>
-            </div>
-        </div>
-        <hr />
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
+        <MRow>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
+             </MCol>
+             <MCol Cols="12">
+                 <MTextField @bind-Value="Model.Title" Label="标题" />
+             </MCol>
+             <MCol Cols="12">
+                 <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
+             </MCol>
+             <MCol Cols="12">
+                 <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
+             </MCol>
+         </MRow>
+     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+        <MRow>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.NewsType" Label="动态类型" />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间" />
+             </MCol>
+             <MCol Cols="12">
+                 <MTextField @bind-Value="Model.Link" Label="原文链接" />
+             </MCol>
+         </MRow>
+     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
+        <MRow>
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.Author" Label="作者" />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.WeiboId" Label="微博Id" />
+            </MCol>
+            <MCol Cols="12" Md="6">
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.AuthorEntryName" Label="关联词条名称" AutoCompleteItems="Items" />
+            </MCol>
+            </MRow>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="词条"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 </div>
@@ -79,7 +66,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+            await ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
         }
     }
 }

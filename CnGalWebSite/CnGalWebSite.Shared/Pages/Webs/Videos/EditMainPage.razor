@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -13,27 +14,12 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Video" Class="mb-3" />
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
 
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-
-        </div>
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw fa-video-camera" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Video.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Videos.MainPageCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -68,7 +54,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑视频主页失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑视频主页失败");
             }
         }
     }
@@ -82,19 +68,19 @@
             if (obj.Successful == false)
             {
 
-                await ToastService.Error("编辑视频主页失败", obj.Error);
+                await PopupService.ToastErrorAsync("编辑视频主页失败", obj.Error);
             }
             else
             {
                 autoSave.Clean();
 
-                await ToastService.Success("编辑视频主页成功", "编辑视频主页成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("编辑视频主页成功", "编辑视频主页成功，等待审核通过");
                 NavigationManager.NavigateTo("/videos/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "编辑视频主页失败");
+            await ErrorHandler.ProcessError(ex, "编辑视频主页失败");
         }
     }
 

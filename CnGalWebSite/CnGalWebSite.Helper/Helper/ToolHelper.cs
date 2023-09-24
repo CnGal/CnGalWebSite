@@ -375,7 +375,7 @@ namespace CnGalWebSite.DataModel.Helper
                         Name = infor.Replace($"({roleName})", "").Trim(),
                         PositionOfficial = Position.Trim(),
                         Modifier = Subcategory.Trim(),
-                        SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
+                        SubordinateOrganization = roleName,
                         PositionGeneral = type
                     });
                 }
@@ -852,7 +852,7 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     continue;
                 }
-                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem" && item.Name != "IsCreatedByCurrentUser" && item.Name != "Open" && item.Name != "IsNeedNotification")
+                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem" && item.Name != "IsCreatedByCurrentUser" && item.Name != "Open" && item.Name != "IsNeedNotification" && item.Name != "IsInteractive")
                 {
                     continue;
                 }

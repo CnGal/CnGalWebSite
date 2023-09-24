@@ -1,0 +1,35 @@
+﻿.user-info-card {
+    flex-direction: row;
+    gap: .7rem;
+    width: fit-content;
+}
+
+    .user-info-card .image-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .user-info-card.small .image-card img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-info-card .image-card {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-info-card .content-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+        .user-info-card .content-card .name {
+            word-break: keep-all;
+        }
+
+a.user-info-card {
+    color: var(--md-sys-color-on-background) !important;
+}

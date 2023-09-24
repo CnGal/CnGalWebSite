@@ -2,21 +2,21 @@
 {
     if (item.Name == "生日")
     {
-        <div class="form-group col-12  col-sm-6">
-            <DateTimePicker Value="@Birthday" ValueChanged="BirthdayChanged" TValue="DateTime?" DisplayText="生日" ShowLabel="true" />
-        </div>
+        <MCol Cols="12" Md="6">
+            <CnGalWebSite.Components.Inputs.MasaDatePicker NullableValue="Birthday" NullableValueChanged="BirthdayChanged" ShowDate Nullable="true" Label="生日" />
+         </MCol>
     }
     else if (item.Name == "性别")
     {
-        <div class="form-group col-12  col-sm-6">
-            <Select Value="Gender" ValueChanged="GenderChanged" TValue="GenderType" DisplayText="性别" ShowLabel="true" />
-        </div>
+        <MCol Cols="12" Md="6">
+            <CnGalWebSite.Components.Inputs.MasaSelecte Value="Gender" ValueChanged="GenderChanged" TValue="GenderType" Label="性别" />
+        </MCol>
     }
     else
     {
-        <div class="form-group col-12  col-sm-6">
-            <BootstrapInput @bind-Value="item.Value" DisplayText="@item.Name" ShowLabel="true" />
-        </div>
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="item.Value" Label="@item.Name" />
+        </MCol>
     }
 
 }
@@ -33,7 +33,6 @@
         if (Informations.Any(s => s.Name == "性别"))
         {
             Gender = Informations.First(s => s.Name == "性别").Value.ToEnumValue<GenderType>();
-
         }
         if (Informations.Any(s => s.Name == "生日"))
         {

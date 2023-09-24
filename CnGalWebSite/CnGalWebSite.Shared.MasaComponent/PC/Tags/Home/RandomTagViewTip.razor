@@ -1,44 +1,32 @@
-﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color h-100">
-
-    <div class="shadow-sm rounded  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+﻿<MDCard Href="@("/entries/index/" + Model.Id)" Class=" h-100" Style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
-            <div class="">
-                <div class="">
+            <div style="width:300px;">
+            <div style="display: flex;">
                     <img class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
                 </div>
-                <div class="p-3">
-                    <header class="text-truncate-2">
-                        <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                    </header>
-                    <div class="text-truncate-4">
-                        @Model.BriefIntroduction
-                    </div>
-                </div>
+                <div class="pa-3">
+                <div class="name text-truncate-1 title-large mb-1">@Model.Name</div>
+                <div class="brief text-truncate-3 label-large">@Model.BriefIntroduction</div>
+            </div>
             </div>
         }
         else
         {
-            <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center; ">
-                <div class="p-3">
-                    <div class="" style="width: 50%; margin-right: auto; margin-left: auto;">
+        <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center;width:200px; ">
+                <div class="pa-3">
+                <div style="width: 50%; margin-right: auto; margin-left: auto;display: flex;">
                         <img class="img-fluid" src="@Model.MainImage" style=" border-radius: 50%;">
                     </div>
                     <div class="pt-3">
-                        <header style=" display: flex; justify-content: center;">
-                            <h5 class="fw-bold" style=" margin-bottom: 0px; margin-left: 5px; margin-top: 1px;">@Model.Name</h5>
-                        </header>
-                        <div class="text-truncate-3">
-                            @Model.BriefIntroduction
-                        </div>
-                    </div>
+                    <div class="name text-center text-truncate-1 title-large mb-1">@Model.Name</div>
+                    <div class="brief text-center  text-truncate-3 label-large">@Model.BriefIntroduction</div>
+                </div>
                 </div>
 
             </div>
         }
-
-    </div>
-</TabLink>
+</MDCard>
 
 
 

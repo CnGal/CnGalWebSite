@@ -80,14 +80,14 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .Select(n => new { Time = n.RegistTime.Date })
                .GroupBy(n => n.Time)
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var onlineCounts = await _userOnlineInforRepository.GetAll().Where(s => s.Date <= beforeTime && s.Date >= afterTime)
              .Select(n => new { Time = n.Date.Date })
              .GroupBy(n => n.Time)
              .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-             .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
              .ToListAsync();
 
 
@@ -95,7 +95,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
              .Select(n => new { Time = n.Time.Date })
              .GroupBy(n => n.Time)
              .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-             .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
              .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["注册"] = registerCounts, ["在线"] = onlineCounts, ["签到"] = SignIns }, "用户");
@@ -120,7 +120,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             //获取数据
             var commentCounts = await _commentRepository.GetAll().Where(s => s.Type == CommentType.CommentEntries && s.CommentTime <= beforeTime && s.CommentTime >= afterTime)
@@ -131,7 +131,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             //获取数据
             var favoriteCounts = await _favoriteObjectRepository.GetAll().Where(s => s.Type == FavoriteObjectType.Entry && s.CreateTime <= beforeTime && s.CreateTime >= afterTime)
@@ -142,7 +142,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["编辑"] = editCounts, ["评论"] = commentCounts, ["收藏"] = favoriteCounts }, "词条");
@@ -164,7 +164,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var editCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleRelevanes || s.Operation == Operation.EditArticleMainPage)
@@ -176,7 +176,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             var thumsupCounts = await _thumbsUpRepository.GetAll().Where(s => s.ThumbsUpTime <= beforeTime && s.ThumbsUpTime >= afterTime)
                // 先进行了时间字段变更为String字段，切只保留到天
@@ -186,7 +186,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var commentCounts = await _commentRepository.GetAll().Where(s => s.Type == CommentType.CommentArticle && s.CommentTime <= beforeTime && s.CommentTime >= afterTime)
@@ -197,7 +197,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
               .GroupBy(n => n.Time)
               // 返回汇总样式
               .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-              .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
               .ToListAsync();
 
             var favoriteCounts = await _favoriteObjectRepository.GetAll().Where(s => s.Type == FavoriteObjectType.Article && s.CreateTime <= beforeTime && s.CreateTime >= afterTime)
@@ -208,7 +208,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["发表"] = createCounts, ["编辑"] = editCounts, ["点赞"] = thumsupCounts, ["评论"] = commentCounts, ["收藏"] = favoriteCounts },  "文章");
@@ -231,7 +231,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["编辑"] = editCounts },  "标签");
@@ -253,7 +253,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var passCounts = await _examineRepository.GetAll().Where(s => s.PassedTime != null && s.PassedTime.Value <= beforeTime && s.PassedTime.Value >= afterTime)
@@ -264,7 +264,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["申请"] = applyCounts, ["处理"] = passCounts }, "审核");
@@ -286,7 +286,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["发表"] = publishCounts }, "评论");
@@ -309,7 +309,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["发送"] = postCounts },  "消息");
@@ -331,7 +331,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var Spaces = await _userFileRepository.GetAll().Where(s => s.UploadTime <= beforeTime && s.UploadTime >= afterTime)
@@ -342,7 +342,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Sum(s => s.Space) })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["数目"] = Counts, ["大小 MB"] = Spaces },  "文件");
@@ -364,7 +364,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var times = await _backUpArchiveDetailRepository.GetAll().Where(s => s.BackUpTime <= beforeTime && s.BackUpTime >= afterTime)
@@ -375,7 +375,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Average(s => s.TimeUsed) })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var errors = await _backUpArchiveDetailRepository.GetAll().Where(s => s.IsFail == true && s.BackUpTime <= beforeTime && s.BackUpTime >= afterTime)
@@ -386,7 +386,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["成功"] = success, ["错误"] = errors, ["用时 秒"] = times }, "备份");
@@ -411,7 +411,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             //获取数据
             var articleCounts = await _examineRepository.GetAll().Where(s =>s.ArticleId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
@@ -422,7 +422,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             //获取数据
             var tagCounts = await _examineRepository.GetAll().Where(s => s.TagId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
@@ -433,7 +433,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
             //获取数据
             var peripheryCounts = await _examineRepository.GetAll().Where(s => s.PeripheryId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
@@ -444,7 +444,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             //获取数据
@@ -456,7 +456,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .GroupBy(n => n.Time)
                // 返回汇总样式
                .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["词条"] = entryCounts, ["文章"] = articleCounts, ["标签"] = tagCounts, ["周边"] = peripheryCounts, ["视频"] = videoCounts }, "编辑概览");
@@ -473,7 +473,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                 //获取数据
                 var datas = await _perfectionOverviewRepository.GetAll().Where(s => s.LastUpdateTime <= beforeTime && s.LastUpdateTime >= afterTime)
                    .Select(n => new { Time = n.LastUpdateTime.Date, n.AverageValue, n.Median, n.Mode, n.StandardDeviation })
-                   .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                   .OrderBy(n => n.Time)
                    .ToListAsync();
 
                 var averageValues = datas.Select(s => new LineChartSingleData { Count = s.AverageValue, Time = s.Time }).ToList();
@@ -500,7 +500,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                // 先进行了时间字段变更为String字段，切只保留到天
                // 采用拼接的方式
                .Select(n => new { Time = n.LastUpdateTime.Date, n.ToBeImprovedCount, n.GoodCount, n.ExcellentCount })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .OrderBy(n => n.Time)
                .ToListAsync();
 
             var toBeImprovedCounts = datas.Select(s => new LineChartSingleData { Count = s.ToBeImprovedCount, Time = s.Time }).ToList();

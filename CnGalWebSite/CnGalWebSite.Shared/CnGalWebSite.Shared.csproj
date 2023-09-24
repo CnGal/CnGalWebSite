@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -18,43 +18,7 @@
 
 
   <ItemGroup>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\app.min.css" Link="wwwroot\css\app.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\bundle-css.min.css" Link="wwwroot\css\bundle-css.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\cover-default.min.css" Link="wwwroot\css\cover-default.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\dark-cover.min.css" Link="wwwroot\css\dark-cover.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\Lighting-mode.min.css" Link="wwwroot\css\Lighting-mode.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\lottery.min.css" Link="wwwroot\css\lottery.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\mouse.min.css" Link="wwwroot\css\mouse.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\pc.min.css" Link="wwwroot\css\pc.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\show-background.min.css" Link="wwwroot\css\show-background.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\bundle-js.min.js" Link="wwwroot\js\bundle-js.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\css\vs.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\css\vs2015.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 
@@ -66,13 +30,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\check.min.js" Link="wwwroot\js\check.min.js" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Using Include="CnGalWebSite.Extensions" />
     <Using Include="CnGalWebSite.Shared.Extentions" />
     <Using Include="CnGalWebSite.DataModel.ViewModel.Dtos" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Pages\Normal\Ranks\" />
   </ItemGroup>
 
 </Project>

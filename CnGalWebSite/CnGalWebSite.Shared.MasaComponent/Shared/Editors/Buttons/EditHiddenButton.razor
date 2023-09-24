@@ -1,7 +1,8 @@
-﻿@inject ToastService ToastService
+﻿
 @inject IHttpService _httpService
+@inject IPopupService PopupService
 
-<MButton Text Block Color="warning" OnClick="OnHidden">
+<MButton Text Block Color="primary" OnClick="OnHidden">
     <MIcon Left>@(IsHidden? "mdi-eye " : "mdi-eye-off")</MIcon>
     @(IsHidden?("取消隐藏" + Type.GetDisplayName()):("隐藏"+Type.GetDisplayName()))
 </MButton>
@@ -39,11 +40,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error(str + "失败", obj.Error);
+                await PopupService.ToastErrorAsync(str + "失败", obj.Error);
             }
             else
             {
-                await ToastService.Success(str + "成功", str + "成功，离开此页面后可以请在后台恢复状态");
+                await PopupService.ToastSuccessAsync(str + "成功", str + "成功，离开此页面后可以请在后台恢复状态");
                 IsHidden = !IsHidden;
                 await IsHiddenChanged.InvokeAsync(IsHidden);
                 StateHasChanged();
@@ -51,7 +52,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, str + "失败");
+            await ErrorHandler.ProcessError(ex, str + "失败");
         }
     }
 

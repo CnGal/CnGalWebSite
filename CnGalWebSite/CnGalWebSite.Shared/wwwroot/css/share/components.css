@@ -1,0 +1,366 @@
+﻿/*卡片*/
+.md-card {
+    display: flex;
+    border-radius: var( --md-card-border-radius);
+     transition: .3s;
+ white-space: normal;
+    flex-direction: column;
+}
+    /*primary颜色*/
+    .md-card.color-primary {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-primary:hover {
+        background-color: var( --md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+    /*surface颜色*/
+    .md-card.color-surface {
+        background-color: var(--md-sys-color-surface-1);
+        color: var( --md-sys-color-on-surface) !important;
+    }
+
+    .md-card.show-hover-style.color-surface:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    /*tertiary颜色*/
+    .md-card.color-tertiary {
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-tertiary:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    .md-card.show-hover-style:active {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+    .md-card img, .md-card .image {
+        transition: .3s;
+        border-radius: var( --md-card-border-radius);
+        height: min-content;
+    }
+
+    .md-card.show-hover-style:active img, .md-card.show-hover-style:active .image {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+
+/*正在加载*/
+.progressing-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .progressing-card .out-card {
+        align-items: center;
+    }
+
+    .progressing-card .inner-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .progressing-card img {
+        width: 70%;
+        margin-bottom: 1rem;
+    }
+/*找不到*/
+.not-found-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .not-found-card .out-card {
+        align-items: center;
+    }
+
+    .not-found-card .inner-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .not-found-card img {
+        width: 70%;
+        margin-bottom: .5rem;
+    }
+/*包含标题的卡片*/
+.title-container-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .title-container-card .title-card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .title-container-card .title-card h2 {
+            display: flex;
+        }
+
+        .title-container-card .title-card i {
+            color: var(--md-sys-color-primary);
+        }
+
+    .title-container-card .content-card {
+        display: flex;
+        flex-direction: column;
+    }
+/*主要信息卡片模板*/
+.md-main-info-card {
+    flex-direction: row;
+}
+
+    .md-main-info-card .image-card {
+        display: flex;
+    }
+
+    .md-main-info-card.game .image-card img {
+        width: 460px;
+        height: min-content;
+    }
+
+    .md-main-info-card.role .image-card img {
+        border-radius: 50%;
+        margin: 1rem;
+        height: 200px;
+    }
+
+    .md-main-info-card .content-card {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        width: 100%;
+    }
+
+    .md-main-info-card.role .content-card .brief {
+        -webkit-line-clamp: inherit;
+        white-space: pre-line;
+    }
+/*小屏幕*/
+@media screen and (max-width: 768px) {
+    .md-main-info-card.game {
+        flex-direction: column;
+    }
+
+    .md-main-info-card.role .image-card img {
+        height: 100px;
+        margin: .5rem;
+    }
+
+    .md-main-info-card .content-card {
+        padding: .5rem;
+    }
+
+    .md-main-info-card.game .image-card img {
+        width: 100%;
+        height: min-content;
+    }
+
+    .md-main-info-card.game .content-card .brief {
+        -webkit-line-clamp: inherit;
+        white-space: pre-line;
+    }
+}
+
+.md-main-info-card.game.small {
+    flex-direction: column;
+}
+
+.md-main-info-card.role.small .image-card img {
+    height: 150px;
+}
+
+.md-main-info-card.game.small .image-card img {
+    width: 100%;
+    height: min-content;
+}
+
+.md-main-info-card.game.small .content-card .brief {
+    -webkit-line-clamp: inherit;
+    white-space: pre-line;
+}
+/*内置类型纸片*/
+.type-inline-chip {
+    background-color: var(--md-sys-color-primary);
+    padding: 0 .3rem;
+    border-radius: 5px;
+    color: white;
+    margin-right: 0.5rem;
+}
+/*关于我们*/
+
+.cngal-about-card {
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+    .cngal-about-card .head {
+        display: flex;
+        gap: 6rem;
+        flex-wrap: wrap;
+    }
+
+    .cngal-about-card .links-groups {
+        display: flex;
+        gap: 4rem;
+        margin-top: 1rem;
+    }
+
+    .cngal-about-card .links-item {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .cngal-about-card .links-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+
+
+    .cngal-about-card .quote-card {
+        max-width: 68rem;
+    }
+
+    .cngal-about-card .links-group h3 {
+        font-size: inherit;
+    }
+
+    .cngal-about-card .links-item a {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .cngal-about-card .introduce img {
+        height: 50px;
+        aspect-ratio: 23/5;
+    }
+
+    .cngal-about-card .introduce {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        max-width: 40rem;
+        gap: 1rem;
+    }
+
+    .cngal-about-card .text {
+        line-height: 1.3rem;
+    }
+
+    .cngal-about-card .addinfo {
+        display: flex;
+        justify-content: flex-start;
+        gap: 2rem;
+        align-items: center;
+    }
+
+        .cngal-about-card .addinfo div {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+    .cngal-about-card a:hover {
+        text-decoration: underline;
+    }
+/*一言*/
+.quote-card .quote-content {
+    margin-left: 0 !important;
+    font-size: 2rem !important;
+    font-weight: bold;
+    letter-spacing: .1rem;
+}
+
+.quote-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .quote-card .quote-by {
+        font-size: 0.8rem;
+        letter-spacing: .05rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+/*颜色选择器*/
+.color-selector-card {
+    background-color: transparent !important;
+}
+/*日历*/
+.masa-calendar-card .title-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.masa-calendar-card .button-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.masa-calendar-card .week-card {
+    border-top: thin solid var(--md-sys-color-surface-1);
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+    min-height: 40px;
+}
+
+    .masa-calendar-card .week-card div {
+        width: 14.28%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.masa-calendar-card .month-card {
+    display: flex;
+    border-bottom: thin solid var(--md-sys-color-surface-1);
+}
+
+.masa-calendar-card .day-card {
+    display: flex;
+    border-right: thin solid var(--md-sys-color-surface-1);
+    width: 14.28%;
+}
+
+    .masa-calendar-card .day-card.first {
+        border-left: thin solid var(--md-sys-color-surface-1);
+    }
+
+    .masa-calendar-card .day-card.active {
+        background-color: var(--md-sys-color-surface-1);
+    }
+/*图片列表查看*/
+.image-slide-group-card .m-slide-group__content {
+    justify-content: center;
+}

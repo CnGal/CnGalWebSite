@@ -1,34 +1,30 @@
-﻿@inject DialogService DialogService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 
-    <div class="a-font-color" style="display: flex; align-items: center; flex-direction: column;">
-        <div style="display: flex;align-items: center;">
-            <div class="swal2-icon m-0 me-1 @("border-"+color)" style="height: 4em; width: 4em; display: flex;align-items: center;">
-                <div class="@("text-"+color)">@Model.Grade.ToString("0.0")</div>
-            </div>
+<div style="display: flex; align-items: center; flex-direction: column;">
+    <div style="display: flex;align-items: center;">
+        <MProgressCircular Value="100" Size="80" Color="primary">@Model.Grade.ToString("0.0")</MProgressCircular>
+    </div>
+    <div class="mt-2" style="display: flex; flex-direction: column;">
+        <div style=" display: flex;align-items: center;flex-direction: column; ">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="@Model.Level.GetDisplayName()" Color="primary" />
+            <div>@("超过全站 " + Model.VictoryPercentage.ToString("0.0") + "% 的词条")</div>
         </div>
-        <div class="mt-4" style="display: flex; flex-direction: column;">
-            <div style=" display: flex; justify-content: center; ">
-                <div class="@("comment-tag me-2 bg-"+color)">@Model.Level.GetDisplayName()</div>
-                <div class="comment-username me-2">@("超过全站 "+Model.VictoryPercentage.ToString("0.0")+"% 的词条")</div>
+        <div class="mt-2" style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div style="display: flex;align-items: center;">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
+                <span class="label-large me-4">@(Model.LastEditTime.ToTimeFromNowString() + "编辑")</span>
             </div>
-            <div class="mt-2" style=" color: gray; display: flex; flex-wrap: wrap; justify-content: center;">
-                <div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" Color="grey" />
-                    <span class="me-4">@(Model.LastEditTime.ToTimeFromNowString()+ "编辑")</span>
-                </div>
-                <div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" Color="grey" />
-                    <span class="me-4">@(Model.DefectCount+ "个项目待完善")</span><br />
-                </div>
-                <div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Chart" Color="grey" />
-                    <span class="me-4">@("总计"+Model.EditCount + "次编辑")</span>
-                </div>
+            <div style="display: flex;align-items: center;">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                <span class="label-large me-4">@(Model.DefectCount + "个项目待完善")</span><br />
+            </div>
+            <div style="display: flex;align-items: center;">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Chart" />
+                <span class="label-large me-4">@("总计" + Model.EditCount + "次编辑")</span>
             </div>
         </div>
     </div>
+</div>
 
 @code {
     [Parameter]

@@ -1,5 +1,5 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
+
 @inject IDataCacheService _dataCatcheService
 
 <div style="display: flex; justify-content: space-between;">
@@ -13,7 +13,7 @@
                     {
                         <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
                     }
-                    <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
+                    <div class="title-larger me-2 ms-2">@UserName</div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Ranks" Outline  ForceDisplayBadge="ForceBadgeShowText"/>
                 </div>
                 <span class="me-2">@Text</span>
@@ -30,10 +30,10 @@
             <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
                 <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
             </a>
-            <div class="comment-tx-div">
+            <div style="display: flex;flex-direction: column;">
                 <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
+                    <div class="title-larger me-2">@UserName</div>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Ranks.RanksViewCard Model="Ranks" Outline ForceDisplayBadge="ForceBadgeShowText" />
-                    <div class="comment-username a-font-color me-2">@UserName</div>
                     @if (Time != null)
                     {
                         <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
@@ -97,7 +97,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            await ErrorHandler.ProcessError(ex, "获取用户信息失败");
         }
     }
 }

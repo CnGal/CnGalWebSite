@@ -1,0 +1,87 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            查看奖品
+        </MCardTitle>
+
+        <MCardText>
+            @if (Model != null)
+            {
+                <MRow>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.RealName" Label="真实姓名" />
+                    </MCol>
+                    <MCol Cols="12" Md="6">
+                        <MTextField @bind-Value="Model.PhoneNumber" Label="手机号码" />
+                    </MCol>
+                    <MCol Cols="12">
+                        <MTextarea Rows="3" @bind-Value="Model.Address" Label="详细地址" />
+                    </MCol>
+                </MRow>
+            }
+            else
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" />
+            }
+        </MCardText>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+<MSpacer/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
+         </MCardActions>
+    </MCard>
+</MDialog>
+ @code {
+    public EditUserAddressModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public string Text { get; set; }
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    bool Dialog { get; set; }
+
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Dialog = true;
+            StateHasChanged();
+            Model = await _httpService.GetAsync<EditUserAddressModel>("api/space/EditUserAddress");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取用户地址失败");
+        }
+    }
+
+    public async Task OnSave()
+    {
+        try
+        {
+            var obj = await _httpService.PostAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", Model);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastErrorAsync("编辑收货地址失败", obj.Error);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync("编辑收货地址成功", "编辑收货地址成功");
+                Dialog=false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "编辑收货地址失败");
+        }
+    }
+}

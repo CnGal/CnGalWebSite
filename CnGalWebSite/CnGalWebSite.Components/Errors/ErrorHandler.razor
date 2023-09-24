@@ -43,12 +43,12 @@
         }
         else
         {
-            ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            await ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
             return true;
         }
     }
 
-    public async void ProcessError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "")
+    public async Task ProcessError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "")
     {
         try
         {

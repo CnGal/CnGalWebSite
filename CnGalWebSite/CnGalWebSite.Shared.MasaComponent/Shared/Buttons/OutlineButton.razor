@@ -1,25 +1,24 @@
-﻿@inject ToastService ToastService
+﻿
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
 
 @if (IsTitile)
 {
-    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))" TextColor="@($"{(Color=="primary"?null:"white")}")"
            Color="@Color"
-           Small
-           TextColor="@(_dataCacheService.ThemeSetting.IsDark?"dark":"white")"
-           Outlined="!IsTitile">
+           Small>
         @Text
     </MChip>
 }
 else
 {
-    <a href="@(EntryId>0?$"/entries/index/{EntryId}":null)">
-        <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
                Color="@Color"
                Small
                TextColor="@Color"
-               Outlined="!IsTitile"
+               Outlined
+                Href="@(EntryId>0?$"/entries/index/{EntryId}":null)"
                OnClick="OnClick">
             @if (IsShowExistTag && EntryId > 0)
             {
@@ -27,7 +26,6 @@ else
             }
             @Text
         </MChip>
-    </a>
 
 }
 
@@ -59,19 +57,8 @@ else
     [Parameter]
     public string ItemType { get; set; }
 
-    private string color;
     [Parameter]
-    public string Color
-    {
-        get
-        {
-            return color ?? "primary";
-        }
-        set
-        {
-            color = value;
-        }
-    }
+    public string Color { get; set; } = "primary";
 
 
 
@@ -92,7 +79,7 @@ else
                 }
                 else
                 {
-                    await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+                    await PopupService.ToastErrorAsync("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
 
                 }
             }

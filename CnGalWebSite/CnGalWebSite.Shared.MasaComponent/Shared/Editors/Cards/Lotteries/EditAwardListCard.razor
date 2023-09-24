@@ -1,13 +1,13 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
+
+
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+
 
 <div class="">
     <div class="mb-3">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" IsAsync="true" OnClick="AddAward" Icon="mdi-plus" Color="success" />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" IsAsync="true" OnClick="OnImportClick" Icon="mdi-database-import-outline " Color="info" Class="ms-3"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" IsAsync="true" OnClick="BatchItems" Icon="mdi-database-import-outline " Color="info" Class="ms-3" />
 
     </div>
 
@@ -63,17 +63,24 @@
 </div>
 <EditAwardCard @ref="editAwardCard" OnRefreshTable="OnRefreshTable"/>
 
+<MDialog @bind-Value="_batchDialog"
+         MaxWidth="800">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.BatchCard OnBatched="OnBatched" @ref="batchCard" Title="奖品" />
+</MDialog>
 
 @code {
     [Parameter]
     public List<EditLotteryAwardModel> Awards { get; set; }
     EditAwardCard editAwardCard;
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Lotteries.Prizes.BatchCard batchCard;
+    private bool _batchDialog;
+
+
     public async Task DeleteAward(EditLotteryAwardModel item)
     {
         Awards.Remove(item);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除奖品");
     }
     public async Task EditAward(EditLotteryAwardModel item)
     {
@@ -95,35 +102,26 @@
         await editAwardCard.Refresh(true, new EditLotteryAwardModel());
     }
 
-    public async Task OnImportClick()
+    public void BatchItems()
     {
-        var option = new DialogOption()
-        {
-            Title = "批量导入奖品",
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImportPrizeTip>(new Dictionary<string, object>
-        {
-            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, (model) => OnImported(model)),
-            [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(BatchImportPrizeTip.Title)] = "奖品"
-
-        }).Render();
-        await DialogService.Show(option);
+        _batchDialog = true;
+        StateHasChanged();
     }
 
-    public void OnImported(List<string> model)
+
+    public void OnBatched(List<string> model)
     {
         //检查是否符合要求
         foreach (var item in model)
         {
             Awards.Add(new EditLotteryAwardModel
-            {
-                Name = item,
-                Count=1,
-            });
+                {
+                    Name = item,
+                    Count=1
+                });
+
         }
+        _batchDialog = false;
         StateHasChanged();
-        
     }
 }

@@ -209,13 +209,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 foreach (var infor in item.WinningUsers.Select(s => s.ApplicationUser))
                 {
-                    temp.Users.Add(new LotteryUserViewModel
+                    temp.Users.Add(new DataModel.ViewModel.Space.UserInforViewModel
                     {
                         PersonalSignature = infor.PersonalSignature,
-                        Image = _appHelper.GetImagePath(infor.PhotoPath, "user.png"),
+                        PhotoPath = _appHelper.GetImagePath(infor.PhotoPath, "user.png"),
                         Ranks = await _rankService.GetUserRanks(infor),
-                        UserId = infor.Id,
-                        UserName = infor.UserName
+                        Id = infor.Id,
+                        Name = infor.UserName
                     });
                 }
 
@@ -806,30 +806,46 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryUserAloneModel>>> GetLotteryUserListAsync(LotteryUsersPagesInfor input)
+        public async Task<QueryResultModel<LotteryUserOverviewModel>> ListLotteryUsers(QueryParameterModel model, [FromQuery]long lotteryId)
         {
-            var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel, input.LotteryId);
+            var (items, total) = await _queryService.QueryAsync<LotteryUser, long>(_lotteryUserRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
+                .Where(s => s.LotteryId == lotteryId), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
 
-            return dtos;
+            return new QueryResultModel<LotteryUserOverviewModel>
+            {
+                Items = await items.Select(s => new LotteryUserOverviewModel
+                {
+                    UserId = s.ApplicationUser.Id,
+                    Name = s.ApplicationUser.UserName,
+                    Number = s.Number,
+                    LotteryUserId = s.Id,
+                    IsHidden = s.IsHidden,
+                    Cookie = s.ApplicationUser.OperationRecords.First().Cookie,
+                    Ip = s.ApplicationUser.OperationRecords.First().Ip,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<WinnerDataModel>>> GetWinnerDatas(long id)
+        public async Task<ActionResult<List<WinnerOverviewModel>>> GetWinnerDatas(long id)
         {
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
                            .Include(s => s.Awards).ThenInclude(s => s.WinningUsers).ThenInclude(s=>s.LotteryPrize)
                            .Include(s => s.Awards).ThenInclude(s => s.WinningUsers).ThenInclude(s=>s.ApplicationUser).ThenInclude(s=>s.UserAddress)
                            .FirstOrDefaultAsync(s => s.Id == id);
-            var model = new List<WinnerDataModel>();
+            var model = new List<WinnerOverviewModel>();
 
             foreach (var item in lottery.Awards)
             {
                 foreach(var temp in item.WinningUsers)
                 {
-                    model.Add(new WinnerDataModel
+                    model.Add(new WinnerOverviewModel
                     {
                         AwardId = item.Id,
                         ActivationCode = item.Type == LotteryAwardType.ActivationCode ? temp.LotteryPrize?.Context : null,

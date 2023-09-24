@@ -4,47 +4,37 @@
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()">
-    <div class="row">
-
-        <div class="col-12 d-flex">
+    <div class="basic-info-group-card">
+        <div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Tag" />@Model.Type
         </div>
         @if (Model.IsInteractive)
         {
-            <div class="col-12 ">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Category" />互动视频
             </div>
         }
-
-    <div class="col-12 ">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Copyright" />@Model.Copyright.GetDisplayName()
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Copyright" />@Model.Copyright.GetDisplayName()
     </div>
-    <div class="col-12 ">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />浏览数：@Model.ReaderCount
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />浏览数：@Model.ReaderCount
     </div>
         @if (Model.Duration.TotalSeconds != 0)
         {
-            <div class="col-12 ">
+            <div>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />时长：@Model.Duration
             </div>
         }
-
         @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false)
         {
-            <div class="col-12 ">
-              <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" />原作者：@Model.OriginalAuthor
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" />原作者：@Model.OriginalAuthor
             </div>
         }
-
-
-        <div class="col-12">
+        <div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" />发布时间：@Model.PubishTime.ToString("G")
         </div>
-
-
-
-
-
     </div>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

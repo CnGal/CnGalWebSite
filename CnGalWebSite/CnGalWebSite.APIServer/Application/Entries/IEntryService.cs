@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 
 using CnGalWebSite.DataModel.ExamineModel.Entries;

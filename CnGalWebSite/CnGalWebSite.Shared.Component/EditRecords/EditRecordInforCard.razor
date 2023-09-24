@@ -1,21 +1,13 @@
-﻿<div class="@("p-2 "+(Model.IsSelected?"option-card-active":"option-card"))" style=" display: flex; flex-direction: column; border-radius: 5px;cursor:pointer">
-    <div>
-
+﻿<div class="pa-3 pt-2 pb-2">
+    <div class="title-medium">
         @($"『{ Model.Id.ToString("00000")}』{Model.Operation.GetDisplayName()}")
-        @if (Model.IsSelected)
-        {
-            <i class="fa fa-check-circle fa-fw font-color"></i>
-        }
     </div>
-    <div class="row" style="color: gray; ">
-        <div class="col-6">
-            <TabLink Url="@("/space/index/"+Model.UserId)" Text="@Model.UserName" Icon="fa fa-star-o">
-
-                <i class="fa fa-user fa-fw"></i>@Model.UserName
-            </TabLink>
+    <div class="label-large" style="display: flex;justify-content: space-between;">
+        <div>
+             @Model.UserName
         </div>
-        <div class="col-6">
-            <i class="fa fa-calendar fa-fw"></i>@Model.ApplyTime.ToString("yyyy/M/d HH:mm")
+        <div>
+           @Model.ApplyTime.ToString("yyyy/M/d HH:mm")
         </div>
     </div>
 

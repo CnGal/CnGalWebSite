@@ -1,7 +1,8 @@
 ﻿@inject IHttpService _httpService
 
-@inject ToastService? ToastService
+
 @inject NavigationManager NavigationManager
+@inject IPopupService PopupService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -21,16 +22,7 @@ else
 
     @if (isReady == false)
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
     }
     else
     {
@@ -74,7 +66,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑词条音频失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑词条音频失败");
             }
 
         }
@@ -88,19 +80,19 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存词条音频失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存词条音频失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("保存成功", "保存词条音频成功，等待审核通过");
+                await PopupService.ToastSuccessAsync("保存成功", "保存词条音频成功，等待审核通过");
                 NavigationManager.NavigateTo( "/entries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存词条音频失败");
+            await ErrorHandler.ProcessError(ex, "保存词条音频失败");
         }
     }
 

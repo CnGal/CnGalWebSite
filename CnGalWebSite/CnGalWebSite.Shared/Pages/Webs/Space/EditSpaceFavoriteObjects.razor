@@ -1,6 +1,7 @@
 ﻿
 @inject IHttpService _httpService
-@inject ToastService? ToastService
+@inject IPopupService PopupService
+
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="编辑收藏夹"/>
@@ -9,33 +10,19 @@
 
 @if (isReady == false)
 {
-    <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-        <SkeletonParagraph />
-        <div class="mt-2">
-        </div>
-        <SkeletonParagraph />
-        <div class="mt-2">
-        </div>
-        <SkeletonParagraph />
-        <div class="mt-2">
-        </div>
-        <SkeletonParagraph />
-        <div class="mt-2">
-        </div>
-        <SkeletonParagraph />
-    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑收藏夹" Icon="fa fa-fw  fa-folder-open" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑收藏夹" Icon="@IconType.Favorite.ToIconString()" Outline>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.FolderMainCard Model="Model" Class="mb-4" />
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
             下方的编辑会实时生效
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-
-        <EditFavoriteObjectesTip Id="@FolderId"></EditFavoriteObjectesTip>
-
+        <div class="mb-4">
+         <EditFavoriteObjectesTip Id="@FolderId"></EditFavoriteObjectesTip>
+        </div>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" Class="mb-4" />
 
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -71,7 +58,7 @@ else
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取编辑收藏夹基本信息失败");
+                await ErrorHandler.ProcessError(ex, "获取编辑收藏夹基本信息失败");
             }
         }
     }
@@ -85,7 +72,7 @@ else
             //处理数据
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
-                await ToastService.Error("必须填写收藏夹名称", "必须填写收藏夹名称");
+                await PopupService.ToastErrorAsync("必须填写收藏夹名称", "必须填写收藏夹名称");
                 return;
             }
 
@@ -94,13 +81,13 @@ else
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存收藏夹基本信息失败", obj.Error);
+                await PopupService.ToastErrorAsync("保存收藏夹基本信息失败", obj.Error);
             }
             else
             {
                 await autoSave.Clean();
 
-                await ToastService.Success("保存收藏夹基本信息成功", "保存收藏夹基本信息成功");
+                await PopupService.ToastSuccessAsync("保存收藏夹基本信息成功", "保存收藏夹基本信息成功");
 
                 if (string.IsNullOrWhiteSpace(UserId))
                 {
@@ -117,7 +104,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
+            await ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
         }
     }
     private void DataLoaded(EditFavoriteFolderViewModel model)

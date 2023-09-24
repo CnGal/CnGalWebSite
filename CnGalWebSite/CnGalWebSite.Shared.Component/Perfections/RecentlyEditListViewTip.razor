@@ -1,13 +1,13 @@
 ﻿@inject IHttpService _httpService
-@inject ToastService ToastService
+
 @inject IDataCacheService _dataCacheService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新编辑" Icon="fa fa-fw fa-pencil" Class="mb-4">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="最新编辑" Icon="@IconType.Edit.ToIconString()" Class="mb-4">
         <ButtonContent>
 
-            <MButton Text Block  OnClick="GetNewRandomList">
+            <MButton Rounded Color="primary" OnClick="GetNewRandomList">
                 <MIcon Left>mdi-refresh </MIcon>
                 刷新
             </MButton>
@@ -15,10 +15,10 @@
 
         </ButtonContent>
         <ChildContent>
-            <div class="row h-100 ps-2 pe-2">
+            <div class="row">
                 @foreach (var item in Model)
                 {
-                    <div class="col-12 col-md-6 col-xxl-4">
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
                         @{
                             string name = item.RelatedName + " 编辑记录";
                             string context = string.IsNullOrWhiteSpace(item.RelatedName) ? ("Id：" + item.RelatedId) : item.RelatedName;
@@ -32,14 +32,9 @@
                                 ExaminedNormalListModelType.Video => "videos",
                                 _=>""
                             } + "/index/" + item.RelatedId;
+                            item.UserInfor.PersonalSignature = "对『" + context + "』" + item.Operation.GetDisplayName();
                         }
-
-                        <a href="@url" class="a-font-color">
-                            <div class=" p-3 ">
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.UserRankTextCard>
-                            </div>
-                        </a>
+                         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="item.UserInfor" Href="@url" Class="w-100 h-100"/>
 
                     </div>
                 }
@@ -69,7 +64,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取近期编辑列表失败");
+            await ErrorHandler.ProcessError(ex, "获取近期编辑列表失败");
         }
     }
 

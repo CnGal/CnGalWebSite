@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -53,8 +53,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IEmailService _emailService;
         private readonly IViewRenderService _viewRenderService;
         private readonly IStoreInfoService _storeInfoService;
-
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
         public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository, IStoreInfoService storeInfoService,
         IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger, IRepository<Lottery, long> lotteryRepository,
@@ -1228,9 +1226,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.Information.Add(new EntryInformationModel
                     {
-                        Name= "QQ群",
-                        Icon= qqIcon,
-                        Value =$"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
+                        Name = model.Information.Any(s => s.Name == "QQ群") ? item.DisplayName : "QQ群",
+                        Icon= model.Information.Any(s=>s.Name== "QQ群")? "mdi-vector-point" : qqIcon,
+                        Value = model.Information.Any(s => s.Name == "QQ群") ? item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue : $"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
                     });
                 }
             }

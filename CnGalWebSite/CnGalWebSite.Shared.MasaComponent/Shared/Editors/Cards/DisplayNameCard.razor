@@ -1,12 +1,13 @@
-﻿<div class="@Class">
-    <Switch @bind-Value="IsSame" ShowLabel="true" DisplayText="显示名称与唯一名称保持一致" />
-</div>
-<div class="@Class">
-    <BootstrapInput TValue="string" Value="Name" ValueChanged="OnNameChanged" ShowLabel="true" DisplayText="唯一名称"/>
-</div>
-<div class="@Class">
-    <BootstrapInput Value="DisplayName" IsDisabled="IsSame" ValueChanged="DisplayNameChanged" ShowLabel="true"  DisplayText="显示名称"/>
-</div>
+﻿
+<MCol Cols="12" Md="6">
+    <MCheckbox @bind-Value="IsSame" Label="显示名称与唯一名称保持一致" TValue="bool" />
+</MCol>
+<MCol Cols="12" Md="6">
+    <MTextField Value="Name" TValue="string" ValueChanged="OnNameChanged" Label="唯一名称" />
+</MCol>
+<MCol Cols="12" Md="6">
+    <MTextField Value="DisplayName" Disabled="IsSame" TValue="string" ValueChanged="DisplayNameChanged" Label="显示名称" />
+</MCol>
 @code {
     [Parameter]
     public string Class { get; set; }
@@ -21,11 +22,9 @@
 
     private bool IsSame { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-
         IsSame = Name == DisplayName;
-
     }
 
     public async Task OnNameChanged(string name)
@@ -38,7 +37,5 @@
             DisplayName = name;
            await DisplayNameChanged.InvokeAsync(name);
         }
-
-
     }
 }
