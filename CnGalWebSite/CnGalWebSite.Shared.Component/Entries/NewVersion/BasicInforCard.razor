@@ -17,7 +17,7 @@
 @if (Model.Information.Any())
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
-        <div>
+        <div class="basic-info-group-card">
             @foreach (var item in Model.Information)
             {
                 <BasicInforAloneTip IconString="@item.Icon" Title="@item.Name" Text="@item.Value" />
@@ -34,5 +34,7 @@
     public long Id { get; set; }
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+
+
 
 }

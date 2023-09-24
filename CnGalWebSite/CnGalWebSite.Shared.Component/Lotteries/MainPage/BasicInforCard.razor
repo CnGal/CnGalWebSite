@@ -1,35 +1,31 @@
 ﻿
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="抽奖信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
-    <div class="ms-1">
-        <div class="row">
+        <div class="basic-info-group-card">
             @if (DateTime.Now.ToCstTime() < Model.BeginTime)
             {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="未开始" Class="col-12  text-truncate-1" />
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="未开始"/>
             }
             else if (DateTime.Now.ToCstTime() > Model.EndTime)
             {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="已结束" Class="col-12  text-truncate-1" />
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="已结束"/>
             }
             else
             {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="正在进行" Class="col-12  text-truncate-1" />
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.State" Text="正在进行"/>
             }
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Count" Text="@("参与人数："+Model.Count)" Class="col-12  text-truncate-1" />
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Count" Text="@("参与人数："+Model.Count)"/>
             @if (Model.ConditionType == LotteryConditionType.GameRecord)
             {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Filter" Text="参与条件：至少有一条游玩记录" Class="col-12 " />
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Filter" Text="参与条件：至少有一条游玩记录"/>
             }
             @if (Model.Type == LotteryType.Automatic)
             {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.IndeterminateTime" Text="@("抽奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.IndeterminateTime" Text="@("抽奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))" />
             }
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@("开始时间："+ Model.BeginTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@("结束时间："+ Model.EndTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@("开始时间："+ Model.BeginTime.ToString("yyyy.M.d HH:mm"))" />
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@("结束时间："+ Model.EndTime.ToString("yyyy.M.d HH:mm"))" />
 
         </div>
-
-    </div>
-
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
     @code {

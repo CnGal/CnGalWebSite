@@ -901,10 +901,6 @@ html {
     background-color: transparent;
 }
 
-.m-main__wrap {
-    background-color: transparent;
-}
-
 .m-toast-detail {
     white-space: pre-line;
 }
@@ -2394,7 +2390,6 @@ div.prizeTips {
             }
 
     .official-website {
-        background-color: rgba(255, 255, 255, 0.8);
         display: flex;
         flex-direction: column;
         letter-spacing: 0.05rem !important;
@@ -3449,6 +3444,16 @@ a.user-info-card {
     flex-direction: column;
     gap: 1.5rem;
 }
+
+.article-page-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .article-page-card > div {
+        max-width: 1000px;
+    }
 
 #blazor-error-ui {
     background-color: transparent;

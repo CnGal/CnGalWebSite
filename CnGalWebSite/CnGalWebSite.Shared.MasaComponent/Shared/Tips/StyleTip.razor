@@ -67,7 +67,15 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
         }
     </style>
 }
-
+<!--背景透明-->
+@if (!_dataCacheService.ThemeSetting.IsTransparent)
+{
+    <style>
+        .m-main__wrap {
+            background-color: transparent;
+        }
+    </style>
+}
 @code {
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }

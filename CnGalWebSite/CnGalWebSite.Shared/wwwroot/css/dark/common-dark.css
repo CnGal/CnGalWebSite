@@ -1,4 +1,3 @@
-﻿/*官网样式*/
-.official-website {
-    background-color: transparent;
+﻿.m-main__wrap {
+    background-color: rgba(0,0,0,0.8);
 }

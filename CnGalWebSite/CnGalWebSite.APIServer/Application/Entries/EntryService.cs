@@ -1226,9 +1226,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.Information.Add(new EntryInformationModel
                     {
-                        Name= "QQ群",
-                        Icon= qqIcon,
-                        Value =$"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
+                        Name = model.Information.Any(s => s.Name == "QQ群") ? item.DisplayName : "QQ群",
+                        Icon= model.Information.Any(s=>s.Name== "QQ群")? "mdi-vector-point" : qqIcon,
+                        Value = model.Information.Any(s => s.Name == "QQ群") ? item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue : $"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
                     });
                 }
             }

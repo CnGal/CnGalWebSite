@@ -10,11 +10,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture" />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 @if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
@@ -38,8 +38,8 @@ else
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer Small>
-        <div itemscope itemtype="http://schema.org/Article">
+    <div class="article-page-card">
+        <div>
             @if (_dataCatcheService.ArticleIndexPageCatche.Check(Id) || isReady)
             {
                 @if (Model.IsHidden == true)
@@ -49,11 +49,11 @@ else
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
 
-                    <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model" OnRevoke="OnRevoke" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model" OnRevoke="OnRevoke" />
 
-                    <div class="ps-4 pe-4 pt-4">
-                        <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />
-                    </div>
+                <div class="ps-4 pe-4 pt-4">
+                    <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />
+                </div>
                 <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
                 <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Article" Id="Model.Id" />
 
@@ -66,8 +66,7 @@ else
 
             }
         </div>
-
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+    </div>
 
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Article" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"

@@ -184,6 +184,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Setting,
         Calendar,
         About,
+        Point,
         Certification
     }
 
@@ -193,6 +194,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Point:
+                    return "mdi-vector-point";
                 case IconType.Certification:
                     return "mdi-check-decagram";
                 case IconType.About:

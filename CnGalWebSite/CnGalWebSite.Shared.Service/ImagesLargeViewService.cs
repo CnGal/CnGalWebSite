@@ -5,7 +5,6 @@ namespace CnGalWebSite.Shared.Service
 {
     public class ImagesLargeViewService
     {
-
         /// <summary>
         /// 获得 回调委托缓存集合
         /// </summary>

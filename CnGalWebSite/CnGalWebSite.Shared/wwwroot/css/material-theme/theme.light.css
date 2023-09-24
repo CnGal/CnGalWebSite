@@ -29,9 +29,4 @@
     --md-sys-color-surface-tint: var(--md-sys-color-surface-tint-light);
     --md-sys-color-outline-variant: var(--md-sys-color-outline-variant-light);
     --md-sys-color-scrim: var(--md-sys-color-scrim-light);
-    --md-sys-color-surface-1: rgb(var(--md-sys-color-primary-rgb) / 0.05);
-    --md-sys-color-surface-2: rgb(var(--md-sys-color-primary-rgb) / 0.08);
-    --md-sys-color-surface-3: rgb(var(--md-sys-color-primary-rgb) / 0.11);
-    --md-sys-color-surface-4: rgb(var(--md-sys-color-primary-rgb) / 0.12);
-    --md-sys-color-surface-5: rgb(var(--md-sys-color-primary-rgb) / 0.14);
 }
