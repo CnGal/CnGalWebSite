@@ -5,7 +5,7 @@
 
 @if (IsTitile)
 {
-    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))" Style="color: var(--md-sys-color-on-primary);"
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))" TextColor="@($"{(Color=="primary"?null:"white")}")"
            Color="@Color"
            Small>
         @Text
@@ -57,19 +57,8 @@ else
     [Parameter]
     public string ItemType { get; set; }
 
-    private string color;
     [Parameter]
-    public string Color
-    {
-        get
-        {
-            return color ?? "primary";
-        }
-        set
-        {
-            color = value;
-        }
-    }
+    public string Color { get; set; } = "primary";
 
 
 
