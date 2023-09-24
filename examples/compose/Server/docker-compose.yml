@@ -17,7 +17,7 @@ services:
     hostname: blazorserver
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -27,5 +27,5 @@ services:
         limits:
           memory: 1.5G
     ports:
-      - "3002:443"
-      - "2002:80"
+      - "3002:8081"
+      - "2002:8080"

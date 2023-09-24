@@ -40,7 +40,7 @@ services:
     hostname: robotclientx
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -50,4 +50,4 @@ services:
         limits:
           memory: 1.5G
     ports:
-      - "2004:80"
+      - "2004:8080"

@@ -54,7 +54,7 @@ services:
     hostname: identityserver
     # restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -64,7 +64,7 @@ services:
         limits:
           memory: 0.7G
     ports:
-      - "5011:80"
-      - "5001:443"
+      - "5011:8080"
+      - "5001:8081"
     volumes:
       - "/mnt/docker/IdentityServer:/app/cert"
