@@ -32,17 +32,10 @@ services:
       - ImageApiPath=${ImageApiPath}
       # IP 白名单
       - IpWhitelist=${IpWhitelist}
-      # gpt相关
-      # 上限 每分钟
-      - ChatGPTLimit=${ChatGPTLimit}
-      - ChatGPTApiUrl=${ChatGPTApiUrl}
-      - ChatGPTApiKey=${ChatGPTApiKey}
-      - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
-      - ChatGPT_UserMessageTemplate=${ChatGPT_UserMessageTemplate}
     hostname: apiserver
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -52,5 +45,5 @@ services:
         limits:
           memory: 1.2G
     ports:
-      - "3001:443"
-      - "2001:80"
+      - "3001:8081"
+      - "2001:8080"

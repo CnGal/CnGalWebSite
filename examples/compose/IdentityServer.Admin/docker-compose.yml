@@ -15,7 +15,7 @@ services:
     hostname: identityserveradmin
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -25,4 +25,4 @@ services:
         limits:
           memory: 0.7G
     ports:
-      - "5100:80"
+      - "5100:8080"
