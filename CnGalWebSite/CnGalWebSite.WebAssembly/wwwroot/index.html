@@ -18,8 +18,12 @@
 
     <link rel="manifest" href="manifest.json">
 
+    <!--开放搜索-->
+    <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://res.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
+
     <!--组件库-->
-    <link rel="stylesheet" href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <!-- <link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" /> -->
     <!--Markdown编辑器-->
     <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
 
@@ -33,16 +37,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
      -->
     <!--自定义样式-->
-    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css">
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.min.css">
 
     <!--不同屏幕大小自适应样式-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css">
 
     <!--跟随系统-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/theme.css" />
-
-    <link rel="search" id="open-search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
-
 </head>
 
 <body class="overflow-hidden">
@@ -93,10 +94,10 @@
         </div>
     </div>
     <!--自定义脚本-->
-    <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script>
+    <script src="_content/CnGalWebSite.Shared/js/bundle.min.js"></script>
 
     <!--图片裁剪-->
-    <script src="https://app.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
 
     <!--代码语法高亮-->
     <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
@@ -120,7 +121,8 @@
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
     <!--组件库-->
-    <script src="_content/BlazorComponent/js/blazor-component.js"></script>
+    <!-- <script src="_content/BlazorComponent/js/blazor-component.js"></script> -->
+    <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
 
     <!--服务工作进程-->
     <script src="service-worker-register.js"></script>

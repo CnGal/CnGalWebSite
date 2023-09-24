@@ -1,2 +1,2 @@
-﻿@import url(app/bundle-app.css) (max-width: 768px);
-@import url(pc/bundle-pc.css) (min-width: 768px);
+﻿@import url(app/bundle-app.min.css) (max-width: 768px);
+@import url(pc/bundle-pc.min.css) (min-width: 768px);
