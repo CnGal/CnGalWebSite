@@ -185,7 +185,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Calendar,
         About,
         Point,
-        Certification
+        Certification,
+        Light,
+        Dark
     }
 
     public static class IconTypeHelper
@@ -194,6 +196,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Light:
+                    return "mdi-weather-sunny";
+                case IconType.Dark:
+                    return "mdi-weather-night";
                 case IconType.Point:
                     return "mdi-vector-point";
                 case IconType.Certification:

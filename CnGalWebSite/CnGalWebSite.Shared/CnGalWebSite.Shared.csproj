@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,9 +7,13 @@
 
   <ItemGroup>
     <Compile Remove="AppComponent\**" />
+    <Compile Remove="Pages\Normal\Ranks\**" />
     <Content Remove="AppComponent\**" />
+    <Content Remove="Pages\Normal\Ranks\**" />
     <EmbeddedResource Remove="AppComponent\**" />
+    <EmbeddedResource Remove="Pages\Normal\Ranks\**" />
     <None Remove="AppComponent\**" />
+    <None Remove="Pages\Normal\Ranks\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,10 +37,6 @@
     <Using Include="CnGalWebSite.Extensions" />
     <Using Include="CnGalWebSite.Shared.Extentions" />
     <Using Include="CnGalWebSite.DataModel.ViewModel.Dtos" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Pages\Normal\Ranks\" />
   </ItemGroup>
 
 </Project>

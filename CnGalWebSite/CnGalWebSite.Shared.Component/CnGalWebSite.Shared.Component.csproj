@@ -7,18 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Entries\Tags\**" />
-    <Compile Remove="Space\Messages\**" />
-    <Content Remove="Entries\Tags\**" />
-    <Content Remove="Space\Messages\**" />
-    <EmbeddedResource Remove="Entries\Tags\**" />
-    <EmbeddedResource Remove="Space\Messages\**" />
-    <None Remove="Entries\Tags\**" />
-    <None Remove="Space\Messages\**" />
-  </ItemGroup>
-
-
-  <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
   
@@ -30,8 +18,6 @@
   
   <ItemGroup>
     <Folder Include="Admin\News\" />
-    <Folder Include="Ranks\" />
-    <Folder Include="Users\" />
   </ItemGroup>
 
 </Project>
