@@ -27,7 +27,6 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using BlazorComponent;
 
 namespace CnGalWebSite.WebAssembly
 {
@@ -57,50 +56,12 @@ namespace CnGalWebSite.WebAssembly
                 ToolHelper.ImageApiPath = builder.Configuration["ImageApiPath"];
             }
 
-            builder.RootComponents.Add<App>("app");
+            builder.RootComponents.Add<App>("#app");
+            builder.RootComponents.Add<HeadX>("head::after");
+            builder.RootComponents.Add<StyleTip>("#global-style");
 
-            // 增加 BootstrapBlazor 组件
-            builder.Services.AddBootstrapBlazor();
-            //动态修改标题
-            builder.RootComponents.Add<HeadOutlet>("head::after");
-
-            builder.Services.AddBlazoredLocalStorage()
-                 .AddBlazoredSessionStorage();
-
-            
-            builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
-            builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
-
-            builder.Services.AddScoped(x => new ImagesLargeViewService());
-
-            builder.Services.AddMasaBlazor(options =>
-            {
-                //主题
-                options.ConfigureTheme(s =>
-                {
-                    if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
-                    {
-                        s.Themes.Light.Primary = "#4CAF50";
-                    }
-                    else
-                    {
-                        s.Themes.Light.Primary = "#f06292";
-                    }
-                    s.Themes.Dark.Primary = "#0078BF";
-                });
-            });
-                //添加工具箱
-                _ = builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
-                .AddScoped<IEntryService, EntryService>()
-                .AddScoped<IArticleService, ArticleService>()
-                .AddScoped<IImageService, ImageService>()
-                .AddScoped<IVideoService, VideoService>();
-            //添加预渲染状态记录
-            builder.Services.AddScoped<IApplicationStateService, ApplicationStateService>();
-
-            //添加结构化数据
-            builder.Services.AddScoped<IStructuredDataService, StructuredDataService>();
-            builder.RootComponents.Add<StructuredDataTip>("head::after");
+            //主站
+            builder.Services.AddMainSite();
 
             builder.Services.BuildServiceProvider(validateScopes: false);
 
@@ -110,12 +71,6 @@ namespace CnGalWebSite.WebAssembly
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
             ToolHelper.options.Converters.Add(new JsonStringEnumConverter());
-
-            //添加空白MAUI服务 
-            builder.Services.AddScoped<IMauiService, MauiService>();
-
-            builder.Services.AddScoped<IFileUploadService, FileUploadService>();
-            builder.Services.AddScoped<IEventService, EventService>();
 
             //添加OpenId
             builder.Services.AddOidcAuthentication(options =>
@@ -135,8 +90,7 @@ namespace CnGalWebSite.WebAssembly
 
             //注册匿名的HttpClient
             builder.Services.AddHttpClient("AnonymousAPI");
-            //添加Query
-            builder.Services.AddScoped<IQueryService, QueryService>();
+
             var host = builder.Build();
 
             await host.RunAsync();

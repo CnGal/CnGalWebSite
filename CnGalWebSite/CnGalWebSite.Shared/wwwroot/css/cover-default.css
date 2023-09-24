@@ -320,3 +320,11 @@ html {
     color: var(--md-sys-color-on-surface);
     border-radius: 24px;
 }
+/*背景透明*/
+.m-main__wrap {
+    background-color: transparent;
+}
+/*错误按钮*/
+.m-btn:not(.m-btn--outlined).error {
+  color: var(--md-sys-color-on-error);
+}

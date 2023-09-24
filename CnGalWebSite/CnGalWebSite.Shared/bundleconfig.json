@@ -32,7 +32,8 @@
       "wwwroot/css/share/periphery.css",
       "wwwroot/css/share/edit-record.css",
       "wwwroot/css/share/article.css",
-      "wwwroot/css/share/error.css"
+      "wwwroot/css/share/error.css",
+      "wwwroot/css/share/loading.css"
     ]
   },
   {

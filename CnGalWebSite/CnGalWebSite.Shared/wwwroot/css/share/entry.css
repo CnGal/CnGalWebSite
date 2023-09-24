@@ -29,8 +29,6 @@
     gap: .5rem;
 }
 
-
-
     .entry-card-default.relevance-card a {
         color: var(--md-sys-color-on-surface);
     }
@@ -81,6 +79,18 @@
         display: flex;
         align-items: center;
     }
+
+    .entry-card-default.relevance-card.hide-title .head-card {
+        display: none;
+    }
+
+
+
+    .entry-card-default.relevance-card.hide-title .content-card .brief {
+        -webkit-line-clamp: 5;
+        white-space: break-spaces;
+    }
+
     /*大卡片样式*/
     .entry-card-default.relevance-card.big-card-style {
         padding: 0;

@@ -4,7 +4,7 @@
 @inject IEventService _eventService
 
 <MExpansionPanels>
-    <MExpansionPanel @key="0" Class="bg-opacity">
+    <MExpansionPanel @key="0">
         <MExpansionPanelHeader>
             <div class="" style=" display: flex; align-items: center; ">
                 <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
@@ -21,13 +21,13 @@
                 <div style=" display: flex; flex-direction: row; ">
                     @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
-                        <MButton Rounded OnClick="OnClickWeibo" Class="me-3">
+                        <MButton Rounded Color="primary" OnClick="OnClickWeibo" Class="me-3">
                             <MIcon Left>@((Model.Outlink.Contains("weibo") ? IconType.Weibo : IconType.Link).ToIconString())</MIcon>
                            @((Model.Outlink.Contains("weibo") ? "访问微博主页" : "访问社交媒体主页")) 
                         </MButton>
                     }
 
-                    <MButton Rounded  OnClick="OnClickMainPage">
+                    <MButton Rounded Color="primary" OnClick="OnClickMainPage">
                         <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                         @(Model.GroupId>0?"查看词条":"查看个人空间")
                     </MButton>
@@ -39,12 +39,12 @@
 
     @foreach (var item in Model.Articles)
     {
-        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)" Class="bg-opacity">
+        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)">
             <MExpansionPanelHeader>
                 @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
             </MExpansionPanelHeader>
-            <MExpansionPanelContent>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" Outline />
+            <MExpansionPanelContent Class="pa-0">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" Outline HideTitle />
             </MExpansionPanelContent>
         </MExpansionPanel>
     }

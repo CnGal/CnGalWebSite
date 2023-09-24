@@ -85,41 +85,18 @@ namespace CnGalWebSite.Server
                     options.MaximumReceiveMessageSize = int.MaxValue;
                 });
 
+
+            //主站
+            services.AddMainSite();
+
             //本地化
             services.AddLocalization()
-                .AddBlazoredLocalStorage()
-                .AddBlazoredSessionStorage()
                 .AddAuthorizationCore()
-                .AddScoped<IHttpService, HttpService>()
-                .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
-                .AddScoped<IDataCacheService, DataCatcheService>()
-                .AddScoped(x => new ImagesLargeViewService())
-                .AddMasaBlazor(options => {
-                    //主题
-                    options.ConfigureTheme(s =>
-                    {
-                        s.Themes.Light.Primary = "var(--md-sys-color-primary)";
-                        s.Themes.Light.Secondary = "var(--md-sys-color-secondary)";
-                        s.Themes.Light.Error = "var(--md-sys-color-error)";
-                        s.Themes.Dark.Primary = "var(--md-sys-color-primary)";
-                        s.Themes.Dark.Secondary = "var(--md-sys-color-secondary)";
-                        s.Themes.Dark.Error = "var(--md-sys-color-error)";
-                    });
-                });
+                .AddScoped<IHttpService, HttpService>();
 
             //添加状态检查
             services.AddHealthChecks();
 
-            //添加工具箱
-            _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
-                .AddScoped<IEntryService, EntryService>()
-                .AddScoped<IArticleService, ArticleService>()
-                .AddScoped<IImageService, ImageService>()
-                .AddScoped<IVideoService, VideoService>();
-            //services.AddScoped<IEventBase, EventBase>();
-
-            //添加预渲染状态记录
-            _ = services.AddScoped<IApplicationStateService, ApplicationStateService>();
             //添加真实IP
             _ = services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -127,22 +104,12 @@ namespace CnGalWebSite.Server
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
-            //添加结构化数据
-            _ = services.AddScoped<IStructuredDataService, StructuredDataService>();
-
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            //添加空白MAUI服务 
-            services.AddScoped<IMauiService, MauiService>();
-
-            services.AddScoped<IFileUploadService, FileUploadService>();
-            services.AddScoped<IEventService, EventService>();
 
             //自定义服务
             services.AddScoped<IHttpService, HttpService>();
             services.AddSingleton<ITokenStoreService, TokenStoreService>();
-            //添加Query
-            services.AddScoped<IQueryService, QueryService>();
+
             //使用 IdentityModel 管理刷新令牌
             services.AddAccessTokenManagement();
 

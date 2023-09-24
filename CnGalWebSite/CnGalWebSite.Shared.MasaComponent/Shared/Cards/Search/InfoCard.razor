@@ -1,4 +1,4 @@
-﻿<MDCard Outline="Outline" ShowHoverStyle="true" Class="@($"entry-card-default relevance-card {Class} {(BigCardStyle&&!Thumbnail?"big-card-style":"")}")">
+﻿<MDCard Outline="Outline" ShowHoverStyle="true" Class="@($"entry-card-default relevance-card {Class} {(BigCardStyle&&!Thumbnail?"big-card-style":"")} {(HideTitle?"hide-title":"")}")">
     <div class="main-card">
         <MDCard Href="@Href" Outline OnClick="OnClick" Class="pointer">
             <img src="@Image" class="@($"{(Thumbnail?"thum":"")}")" alt="@Name"/>
@@ -79,6 +79,8 @@
     public string Href { get; set; }
     [Parameter]
     public bool Thumbnail { get; set; }
+    [Parameter]
+    public bool HideTitle { get; set; }
     [Parameter]
     public string Class { get; set; }
     [Parameter]

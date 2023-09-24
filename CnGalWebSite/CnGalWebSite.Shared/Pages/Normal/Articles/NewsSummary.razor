@@ -2,14 +2,8 @@
 
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Articles.NewsSummary />
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Articles.NewsSummary/>
-}
-@code{
+<CnGalWebSite.Shared.Pages.Webs.Articles.NewsSummary />
+
+@code {
 
 }

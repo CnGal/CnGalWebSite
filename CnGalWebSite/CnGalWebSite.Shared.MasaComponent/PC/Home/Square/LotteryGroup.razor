@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="抽奖" Icon="@IconType.Lottery.ToIconString()" Class="h-100" ShowMoreButton OnClickMore="OnClickMore">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="抽奖" Icon="@IconType.Lottery.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
      <MSlideGroup ShowArrows="true" Class="slide-group-garp">
         <ChildContent>
             @foreach (var item in _dataCacheService.LotteryCardsCatche)

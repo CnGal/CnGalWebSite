@@ -8,7 +8,7 @@
     line-height: inherit;
 }
 
-.entry-card-default.relevance-card .content-card .brief {
+.entry-card-default.relevance-card:not(.hide-title) .content-card .brief {
     -webkit-line-clamp: 2;
     font-size: .8rem;
 }
@@ -50,6 +50,12 @@
         .entry-card-default.relevance-card.big-card-style .content-card .brief {
             -webkit-line-clamp: 2;
         }
+
+    .entry-card-default.relevance-card.hide-title .content-card .brief {
+        -webkit-line-clamp: 4;
+        white-space:inherit;
+    }
+
 /*折扣页面*/
 .discount-screen-card .title-card {
     align-items: center;

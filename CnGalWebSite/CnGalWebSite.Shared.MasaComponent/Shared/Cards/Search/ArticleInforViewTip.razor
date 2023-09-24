@@ -1,5 +1,5 @@
 ﻿
-<InfoCard Href="@("/articles/index/" + Model.Id)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@Model.Type.GetDisplayName()" />
+<InfoCard Href="@("/articles/index/" + Model.Id)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@Model.Type.GetDisplayName()" HideTitle="HideTitle" Outline="Outline" />
 
 
 @code {
@@ -7,6 +7,8 @@
     public ArticleInforTipViewModel Model { get; set; }
     [Parameter]
     public bool Outline { get; set; }
+    [Parameter]
+    public bool HideTitle { get; set; }
 
     public List<(IconType,string)> GetInfoItems()
     {
