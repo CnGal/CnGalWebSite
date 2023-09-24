@@ -1,0 +1,15 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="@((_dataCacheService.ThemeSetting.IsDark?IconType.Light:IconType.Dark).ToIconString())" Tooltip="切换主题" OnClick="OnClick" Class="@Class"/>
+
+@code {
+    [Parameter]
+    public string Class{ get; set; }
+
+    public void OnClick()
+    {
+        _dataCacheService.ThemeSetting.ThemeMode = _dataCacheService.ThemeSetting.IsDark ? ThemeMode.Light : ThemeMode.Dark;
+        _eventService.OnSavaTheme();
+    }
+}

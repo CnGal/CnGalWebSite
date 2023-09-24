@@ -3,7 +3,7 @@
 @inject IPopupService PopupService
 
 <MDCard Class=" pa-2" Style="flex-direction: row;justify-content: space-between;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Href="@("/examine?id="+Model.Id)" Outline />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Href="@("/examine?id="+Model.Id)" Outline Class="@(InReview?"":"w-100")" />
     <div style="display:flex;">
         @if (InReview)
         {

@@ -5,7 +5,9 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="关于我们"/>
 
-<MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive >
+@if(isReady)
+{
+    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive >
     @foreach (var item in _dataCacheService.DocumentsCatche)
     {
         <MTab Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
@@ -21,6 +23,12 @@
         </MTabItem>
     }
 </MTabsItems>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill/>
+}
+
 
 
 @code {
@@ -32,10 +40,10 @@
 
     public StringNumber TabIndex { get; set; } = 0;
 
+    bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
-
         try
         {
             if (_dataCacheService.DocumentsCatche.Count == 0)
@@ -51,6 +59,7 @@
                     break;
                 }
             }
+            isReady = true;
         }
         catch (Exception ex)
         {
