@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
-<MDCard Class=" pa-2" Style=" display: flex; justify-content: space-between; align-items: center; ">
+<MDCard Class=" pa-2" Style="flex-direction: row;justify-content: space-between;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Href="@("/examine?id="+Model.Id)" Outline />
     <div style="display:flex;">
         @if (InReview)
