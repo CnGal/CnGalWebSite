@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using CnGalWebSite.Shared
 @using CnGalWebSite.DataModel.ViewModel.OperationRecords
+@using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
 @using Microsoft.AspNetCore.Authentication
 @using CnGalWebSite.Server.Extensions
 
@@ -19,5 +20,5 @@
 
     var mobile = HttpContext.Request.IsMobileBrowser();
 }
-
+<component type="typeof(StyleTip)" render-mode="ServerPrerendered" param-Mobile="mobile" />
 <component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo" param-Mobile="mobile" />

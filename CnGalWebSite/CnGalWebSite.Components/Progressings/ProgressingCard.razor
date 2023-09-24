@@ -1,0 +1,17 @@
+﻿
+<div class="@Class" style="@Style">
+    <div class="d-flex" style="justify-content: center;">
+        <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
+     </div>
+     <div class="mt-3 text-center">正在加载......</div>
+
+ </div>
+
+ @code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string Color { get; set; } = "primary";
+}

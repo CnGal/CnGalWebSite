@@ -10,7 +10,7 @@
 <!--主题颜色-->
 <link rel="stylesheet" href="@($"_content/CnGalWebSite.Shared/css/material-theme/color-tokens/color-{_themeColor??_dataCacheService.ThemeSetting.ThemeColor}-tokens.css")">
 
-@if (_dataCacheService.IsApp)
+@* @if (Mobile??_dataCacheService.IsApp)
 {
     <!--移动端-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/app/bundle-app.css" />
@@ -19,13 +19,12 @@ else
 {
     <!--桌面端-->
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/pc/bundle-pc.css" />
-}
+} *@
 
 <!--主题模式-->
 @if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.System && _isDark != true)
 {
-    <!--跟随系统-->
-    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/theme.css" />
+    
 }
 else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Dark || _isDark == true)
 {
@@ -70,7 +69,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
 
 @code {
     [Parameter]
-    public EventCallback OnTransparentChanged { get; set; }
+    public bool? Mobile { get; set; }
 
     ThemeModel _themeSetting = new ThemeModel();
 
@@ -175,48 +174,6 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     /// </summary>
     public async Task Refresh()
     {
-        // if (_dataCacheService.ThemeSetting == null)
-        // {
-        //     return;
-        // }
-        // //检查是否修改配置
-        // if (_themeSetting.DeepEquals(_dataCacheService.ThemeSetting))
-        // {
-        //     return;
-        // }
-
-        // //刷新默认主题色
-        // if (MasaBlazor.Theme.Themes.Light.Primary != _dataCacheService.ThemeSetting.ThemeColor)
-        // {
-        //     //重新赋值
-        //     var theme = MasaBlazor.Theme;
-        //     // theme.Themes.Light.Primary = colorMain;
-        //     MasaBlazor.Theme = theme;
-        //     // MasaBlazor.ToggleTheme();
-        //     // MasaBlazor.ToggleTheme();
-        // }
-
-
-
-        // //通知主题模式切换
-        // if (MasaBlazor.Theme.Dark != _dataCacheService.ThemeSetting.IsDark)
-        // {
-        //     //重新赋值
-        //     var theme = MasaBlazor.Theme;
-        //     theme.Dark = _dataCacheService.ThemeSetting.IsDark;
-        //     MasaBlazor.Theme = theme;
-        //     // MasaBlazor.ToggleTheme();
-        //     // MasaBlazor.ToggleTheme();
-
-        //     //await _dataCacheService.OnRefreshRequsted(null);
-        // }
-
-        // if (!ToolHelper.IsSSR)
-        // {
-        //     //await Task.Delay(10000);
-        // }
-        //缓存配置
-        // _themeSetting.SynchronizationProperties(_dataCacheService.ThemeSetting);
         await InvokeAsync(StateHasChanged);
     }
 

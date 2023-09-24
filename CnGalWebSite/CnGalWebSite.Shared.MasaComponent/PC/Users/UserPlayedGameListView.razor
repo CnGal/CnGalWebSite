@@ -28,35 +28,38 @@
 
 
         </ButtonContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    @if (isReady)
-    {
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
-        @if (GameRecords.Count == 0)
-        {
-            @if (IsAnniversary&& string.IsNullOrWhiteSpace(SteamId)&& IsCurrentUser)
+        <ChildContent>
+            @if (isReady)
             {
-                <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
+                @if (GameRecords.Count == 0)
+                {
+                    @if (IsAnniversary && string.IsNullOrWhiteSpace(SteamId) && IsCurrentUser)
+                    {
+                        <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                         </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill />
+                         </div>
+                    }
+
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary" />
+                }
             }
             else
             {
-                <div class="mb-3">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
             }
-
-        }
-        else
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.ListGameRecordCard Model="GameRecords.Where(s=>s.IsInSteam||IsAnniversary==false)" IsCurrentUser="IsCurrentUser" IsAnniversary="IsAnniversary" />
-        }
-    }
-    else
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
-    }
+        </ChildContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+   
 </div>
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
 

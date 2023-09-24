@@ -99,7 +99,7 @@ else
         </div>
 
 
-        <MDCard Class=" h-100 pa-2 mb-3" Style="flex-wrap: wrap; justify-content: space-between;">
+        <MDCard Class=" h-100 pa-2 mb-3" Style="flex-direction: row;flex-wrap: wrap;justify-content: space-between;">
                 <span class="me-4 d-flex">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
                     <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>

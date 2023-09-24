@@ -1,4 +1,4 @@
-﻿@import url(light/bundle-light.css) (prefers-color-scheme: light);
+﻿@import url(light/bundle-light.css) (prefers-color-scheme: light) or (prefers-color-scheme: no-preference);
 @import url(dark/bundle-dark.css) (prefers-color-scheme: dark);
 
 @import url(https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css) (prefers-color-scheme: light);

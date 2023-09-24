@@ -322,7 +322,11 @@
         }
         /*随机推荐*/
         #home-page .recommends .container {
-            padding:0;
+            padding: 0;
+        }
+        /*轮播图*/
+        #home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
+            border-radius: var( --md-card-border-radius);
         }
 
 

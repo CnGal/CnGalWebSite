@@ -21,7 +21,7 @@
 
         <MCardActions Class="pb-4 pe-6 ps-6 pt-0">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" Rounded />
         </MCardActions>
     </MCard>
 </MDialog>
@@ -35,11 +35,6 @@
     public ErrorHandler ErrorHandler { get; set; }
 
     bool Dialog { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
 
     public async Task OnSave()
     {

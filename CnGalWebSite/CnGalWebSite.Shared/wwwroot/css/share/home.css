@@ -78,17 +78,17 @@
 
         /*轮播图*/
         #home-page .carousels-card, .cv-carousel-card {
-            border-radius: var( --md-card-active-border-radius) !important;
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.01) !important;
+            border-radius: var( --md-card-active-border-radius) ;
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.01);
         }
 
             #home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive
             .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
-                border-radius: var( --md-card-active-border-radius) !important;
+                border-radius: var( --md-card-active-border-radius);
             }
 
             #home-page .carousels-card .m-responsive__content, #home-page .cv-carousel-card .m-responsive__content {
-                border-radius: var( --md-card-active-border-radius) !important;
+                border-radius: var( --md-card-active-border-radius);
             }
         /*游戏列表*/
         #home-page .published-games-card .item, #home-page .upcoming-games-card .item, #home-page .free-games-card .item, #home-page .discount-games-card .item {

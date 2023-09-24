@@ -27,6 +27,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.WebAssembly
 {
@@ -71,6 +73,9 @@ namespace CnGalWebSite.WebAssembly
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
             ToolHelper.options.Converters.Add(new JsonStringEnumConverter());
+
+            //日志
+            builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 
             //添加OpenId
             builder.Services.AddOidcAuthentication(options =>

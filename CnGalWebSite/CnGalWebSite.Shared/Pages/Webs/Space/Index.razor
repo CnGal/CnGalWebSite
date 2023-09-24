@@ -2,7 +2,6 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
-@inject IApplicationStateService _applicationStateService
 @implements IDisposable
 
 
@@ -35,7 +34,7 @@ else
     {
 
         <div class="row">
-            <div class="col-12 col-lg-4">
+            <div class="col-12 col-md-4">
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Main Model="Model.BasicInfor" />
                  <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
                  @if (_dataCacheService.IsApp == false)
@@ -43,7 +42,7 @@ else
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
                 }
             </div>
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-md-8">
                 <div>
                     <MTabs Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive ValueChanged="TabValueChanged">
 

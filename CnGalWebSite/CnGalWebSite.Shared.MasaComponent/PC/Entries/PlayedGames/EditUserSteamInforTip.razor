@@ -18,14 +18,14 @@
 
         <MCardText>
                 <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）"  />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="primary">
                     Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" TextStyle />
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="success" Rounded />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Rounded />
         </MCardActions>
     </MCard>
 </MDialog>

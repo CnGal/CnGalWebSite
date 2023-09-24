@@ -90,9 +90,9 @@ namespace CnGalWebSite.Server
             services.AddMainSite();
 
             //本地化
-            services.AddLocalization()
-                .AddAuthorizationCore()
-                .AddScoped<IHttpService, HttpService>();
+            services.AddLocalization();
+            //身份验证
+            services.AddAuthorizationCore();
 
             //添加状态检查
             services.AddHealthChecks();
@@ -107,7 +107,7 @@ namespace CnGalWebSite.Server
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             //自定义服务
-            services.AddScoped<IHttpService, HttpService>();
+            //services.AddScoped<IHttpService, HttpService>();
             services.AddSingleton<ITokenStoreService, TokenStoreService>();
 
             //使用 IdentityModel 管理刷新令牌

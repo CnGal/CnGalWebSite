@@ -18,24 +18,24 @@
         <MCardText>
             @if (isReady)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
                      <MRow>
                          <MCol Cols="12" Md="6">
-                             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+                             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4"/>
                          </MCol>
-                         <MCol Cols="12" Md="6">
+                         <MCol Cols="12">
                              <MTextField @bind-Value="Model.Title" Label="标题" />
                          </MCol>
                          <MCol Cols="12">
                              <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
                          </MCol>
-                         <MCol Cols="12" Md="6">
+                         <MCol Cols="12">
                              <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
                          </MCol>
                      </MRow>
 
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
                  <MRow>
                      <MCol Cols="12" Md="6">
                          <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
@@ -45,7 +45,7 @@
                          </MCol>
                      </MRow>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="包含的动态" Class="mb-4" Collapable Outline OutlineHead>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="包含的动态" Class="mb-4" Collapable Outline OutlineHead>
                     @foreach (var item in Model.News)
                     {
                         <MCheckbox @bind-Value="item.IsSelected" Label="@($"{item.NewsId}. {item.NewsTitle}")" Class="m-0" ></MCheckbox>
@@ -62,12 +62,12 @@
             }
 
         </MCardText>
-        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
             @if (isReady)
             {
                 @if (Model.State == GameNewsState.Edit)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" TextStyle/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day"  TextStyle/>
                 }
                 else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
                 {
@@ -78,12 +78,12 @@
             <MSpacer></MSpacer>
             @if (Model.State == GameNewsState.Edit)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" TextStyle/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" Rounded />
 
             }
 
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" Rounded />
         </MCardActions>
     </MCard>
 </MDialog>

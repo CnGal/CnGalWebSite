@@ -1,35 +1,14 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.IdentityServer.Models.DataModels.Account;
-
-using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
-using CnGalWebSite.IdentityServer.Services.Account;
-using CnGalWebSite.IdentityServer.Services.Geetest;
-using CnGalWebSite.IdentityServer.Services.Messages;
-using IdentityModel;
-using IdentityServer4.Services;
-using IdentityServer4.Stores;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using static IdentityServer4.IdentityServerConstants;
-using System.Linq.Dynamic.Core;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using BlazorComponent;
-using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
-using OneOf.Types;
-using CnGalWebSite.IdentityServer.Data;
-using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.IdentityServer.Data;
+using CnGalWebSite.IdentityServer.Models.DataModels.Account;
+using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
+using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
+using static IdentityServer4.IdentityServerConstants;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -50,7 +29,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable< KeyValuePair<string, string>>> All()
+        public async Task<IEnumerable<KeyValuePair<string, string>>> All()
         {
             return await _roleRepository.GetAll().Select(s => new KeyValuePair<string, string>(s.Name, null)).ToListAsync();
         }
@@ -84,7 +63,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
             ApplicationRole role = null;
 
-            if(string.IsNullOrWhiteSpace( model.Id))
+            if (string.IsNullOrWhiteSpace(model.Id))
             {
                 role = await _roleRepository.InsertAsync(new ApplicationRole());
             }
@@ -129,10 +108,10 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<UserOverviewModel>> ListUser(QueryParameterModel model, [FromQuery]string id)
+        public async Task<QueryResultModel<UserOverviewModel>> ListUser(QueryParameterModel model, [FromQuery] string id)
         {
             var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().Include(s => s.UserRoles).ThenInclude(s => s.Role), model,
-                s => (string.IsNullOrWhiteSpace(model.SearchText)||(s.Id.Contains(model.SearchText) || s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText))) && s.UserRoles.Select(s => s.Role.Id).Contains(id));
+                s => (string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText))) && s.UserRoles.Select(s => s.Role.Id).Contains(id));
 
             return new QueryResultModel<UserOverviewModel>
             {

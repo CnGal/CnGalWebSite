@@ -2,8 +2,8 @@
 .md-card {
     display: flex;
     border-radius: var( --md-card-border-radius);
-    /*     transition: .3s;
- */ white-space: normal;
+     transition: .3s;
+ white-space: normal;
     flex-direction: column;
 }
     /*primary颜色*/
@@ -44,7 +44,7 @@
     }
 
     .md-card img, .md-card .image {
-        /* transition: .3s; */
+        transition: .3s;
         border-radius: var( --md-card-border-radius);
         height: min-content;
     }

@@ -82,12 +82,12 @@ else
     public ErrorHandler ErrorHandler { get; set; }
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Refresh();
+        await Refresh();
     }
 
-    public void Refresh()
+    public async Task Refresh()
     {
         try
         {

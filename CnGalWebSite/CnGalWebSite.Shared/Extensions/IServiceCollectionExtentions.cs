@@ -51,12 +51,12 @@ namespace CnGalWebSite.Shared.Extentions
             services.AddScoped<IFileUploadService, FileUploadService>();
             //事件
             services.AddScoped<IEventService, EventService>();
-            //预渲染状态记录
-            services.AddScoped<IApplicationStateService, ApplicationStateService>();
             //结构化数据
             _ = services.AddScoped<IStructuredDataService, StructuredDataService>();
             //Query
             services.AddScoped<IQueryService, QueryService>();
+            
+
 
             return services;
         }

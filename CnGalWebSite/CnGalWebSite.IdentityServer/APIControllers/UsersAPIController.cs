@@ -1,33 +1,16 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
-
 using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
-using CnGalWebSite.IdentityServer.Services.Account;
-using CnGalWebSite.IdentityServer.Services.Geetest;
-using CnGalWebSite.IdentityServer.Services.Messages;
 using IdentityModel;
-using IdentityServer4.Services;
-using IdentityServer4.Stores;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using static IdentityServer4.IdentityServerConstants;
-using System.Linq.Dynamic.Core;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
-using BlazorComponent;
-using CnGalWebSite.IdentityServer.Data;
-using CnGalWebSite.Core.Models;
-using CnGalWebSite.Core.Services.Query;
+using System.Linq.Dynamic.Core;
+using System.Security.Claims;
+using static IdentityServer4.IdentityServerConstants;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -173,7 +156,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             //保存
             await _userRepository.UpdateAsync(user);
 
-           //同步角色
+            //同步角色
             bool check = false;
             foreach (var item in _roleRepository.GetAll().AsNoTracking().Select(s => s.Name))
             {

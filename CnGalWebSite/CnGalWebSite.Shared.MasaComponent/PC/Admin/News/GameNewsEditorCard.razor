@@ -1,24 +1,24 @@
 ﻿@inject IHttpService _httpService
 
 
-<div style="color: black;">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
              </MCol>
-             <MCol Cols="12" Md="6">
+             <MCol Cols="12">
                  <MTextField @bind-Value="Model.Title" Label="标题" />
              </MCol>
              <MCol Cols="12">
                  <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
              </MCol>
-             <MCol Cols="12" Md="6">
+             <MCol Cols="12">
                  <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
              </MCol>
          </MRow>
      </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
@@ -34,7 +34,7 @@
              </MCol>
          </MRow>
      </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
                 <MTextField @bind-Value="Model.Author" Label="作者" />
@@ -45,11 +45,7 @@
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.AuthorEntryName" Label="关联词条名称" AutoCompleteItems="Items" />
             </MCol>
-            <MCol Cols="12" Md="6">
-                <MTextField @bind-Value="Model.Link" Label="原文链接" />
-            </MCol>
-        </MRow>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+            </MRow>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="词条"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 </div>

@@ -30,10 +30,11 @@
           {
             Text= "Id",
             Align= DataTableHeaderAlign.Start,
-            Value= nameof(PerfectionCheckOverviewModel.Id)
+            Value= nameof(PerfectionCheckOverviewModel.Id),
+            Sortable=false
           },
-          new (){ Text= "词条", Value= nameof(PerfectionCheckOverviewModel.Name)},
-          new (){ Text= "检查", Value= nameof(PerfectionCheckOverviewModel.Type)},
+          new (){ Text= "词条", Value= nameof(PerfectionCheckOverviewModel.Name), Sortable=false},
+          new (){ Text= "检查", Value= nameof(PerfectionCheckOverviewModel.Type), Sortable=false},
           new (){ Text= "分数", Value= nameof(PerfectionCheckOverviewModel.Grade)},
           new (){ Text= "击败全站词条百分比", Value= nameof(PerfectionCheckOverviewModel.VictoryPercentage)},
     };

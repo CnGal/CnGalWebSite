@@ -28,7 +28,7 @@
         </MCardText>
        
 
-        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
             @if (isReady)
             {
                 @if (Model.State == GameNewsState.Edit)
@@ -37,19 +37,19 @@
                 }
                 else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" TextStyle/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" TextStyle />
 
                 }
             }
             <MSpacer></MSpacer>
             @if (Model.State == GameNewsState.Edit)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" TextStyle />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" Rounded />
 
             }
 
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Rounded/>
         </MCardActions>
     </MCard>
 </MDialog>

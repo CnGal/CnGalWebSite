@@ -7,7 +7,7 @@
 <section class="latest-articles-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新文章" Items="_items.Take(_dataCacheService.IsApp?9:12)" MoreLink="/search/?Types=Article">
         <MDCard Class="item" Href="@context.Url">
-            <img class="image" src="@context.Image" alt="@context.Name" />
+            <img class="image" src="@context.Image" alt="@context.Name" loading="lazy" />
             <div class="head">
                 <div class="content">
                     <div class="name text-truncate-2 title-large">@context.Name</div>

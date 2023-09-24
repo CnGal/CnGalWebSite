@@ -14,7 +14,9 @@
 
 /*全局*/
 body {
-    font-family: 'Noto Sans SC', sans-serif;
+    /*     font-family: 'Noto Sans SC', sans-serif;
+ */
+    font-family: "Google Sans Text",sans-serif;
     background-color: var(--md-sys-color-background);
     color: var(--md-sys-color-on-background);
 }
