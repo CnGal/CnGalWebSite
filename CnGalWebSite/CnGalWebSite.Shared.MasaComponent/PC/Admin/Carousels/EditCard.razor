@@ -21,19 +21,19 @@ else
         </MCardText>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" Text="上传图片" Class="mb-4" Gallery />
                 </MCol>
                 <MCol Cols="12" >
                     <MTextField @bind-Value="Model.Link" Label="链接" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="CarouselType" Label="类型" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Note" Label="备注" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Priority" Label="优先级" />
                 </MCol>
             </MRow>

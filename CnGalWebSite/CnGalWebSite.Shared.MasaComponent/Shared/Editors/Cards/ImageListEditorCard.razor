@@ -37,19 +37,19 @@
                     <MCol Cols="12">
                         <MDivider />
                     </MCol>
-                    <MCol Cols="12" Xl="6">
+                    <MCol Cols="12" Md="6">
                         <MTextField @bind-Value="_model.Note" Label="备注" />
                     </MCol>
-                    <MCol Cols="12" Xl="6">
+                    <MCol Cols="12" Md="6">
                         <MTextField @bind-Value="_model.Priority" Label="优先级" />
                     </MCol>
                     @if (_model is EditWebsiteImageModel)
                     {
                         var _temp = _model as EditWebsiteImageModel;
-                        <MCol Cols="12" Xl="6">
+                        <MCol Cols="12" Md="6">
                             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="_temp.Type" TValue="EntryWebsiteImageType" Label="类型" />
                         </MCol>
-                        <MCol Cols="12" Xl="6">
+                        <MCol Cols="12" Md="6">
                             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="_temp.Size" TValue="EntryWebsiteImageSize" Label="大小" />
                         </MCol>
                     }

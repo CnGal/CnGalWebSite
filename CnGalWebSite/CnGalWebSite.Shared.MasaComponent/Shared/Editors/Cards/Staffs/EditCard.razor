@@ -1,29 +1,30 @@
 ﻿@inject IHttpService _httpService
 @inject IPopupService PopupService
 
-
+@if (Model != null)
+{
     <MDCard>
         <MCardTitle>
             @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.Name
         </MCardTitle>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Modifier" Label="分组" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.PositionOfficial" Label="★官方职位" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Name" Label="★唯一名称" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.PositionGeneral" TValue="PositionGeneralType" Label="通用职位" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.SubordinateOrganization" Label="隶属组织" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.CustomName" Label="自定义名称" />
                 </MCol>
             </MRow>
@@ -31,15 +32,15 @@
         </MCardText>
         <MCardActions Class="pb-6 ps-6 pe-6">
             <MSpacer></MSpacer>
-            <MButton Color="primary"
-                  Text
-                      OnClick="SaveEdit">
+            <MButton Color="primary" Rounded OnClick="SaveEdit">
                  <MIcon Left>mdi-check</MIcon>
              保存
          </MButton>
      </MCardActions>
 
  </MDCard>
+}
+
 
 
 
@@ -48,23 +49,22 @@
     public List<StaffModel> Staffs { get; set; }
     [Parameter]
     public EventCallback OnEdited { get; set; }
-
-    StaffModel Model = new StaffModel();
+    [Parameter]
+    public StaffModel Model { get; set; }
 
     private string _name = "Staff";
 
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    public void Refresh(StaffModel model)
-    {
-        Model = model;
-        StateHasChanged();
-    }
-
     public async Task SaveEdit()
     {
+        var result = Model.Validate(Staffs);
+
+        if (result.Successful == false)
+        {
+            await PopupService.ToastAsync(result.Error, AlertTypes.Error);
+            return;
+        }
+
         var flag = false;
         if (Model.Id == 0)
         {
@@ -78,20 +78,11 @@
                 Model.Id = Staffs.Max(i => i.Id) + 1;
             }
         }
-
-        var result = Model.Validate(Staffs);
-
-        if (result.Successful==false)
+        if (flag)
         {
-            await PopupService.ToastAsync(result.Error, AlertTypes.Error);
+            Staffs.Add(Model);
         }
-        else
-        {
-            if (flag)
-            {
-                Staffs.Add(Model);
-            }
-            await  OnEdited.InvokeAsync();
-        }
+        await OnEdited.InvokeAsync();
+
     }
 }

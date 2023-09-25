@@ -17,21 +17,21 @@ else
         </MCardText>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.Name" Label="名称" HideDetails="true" />
 
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.DisplayName" Label="显示名称" HideDetails="true" />
                 </MCol>
 
                 <MCol Cols="12">
                     <MTextarea Rows="3" @bind-Value="Model.Description" Label="简介" HideDetails="true" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MCheckbox @bind-Value="Model.Required" Label="必选" TValue="bool" HideDetails="true" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" HideDetails="true" />
                 </MCol>
                 <MCol Cols="12">
