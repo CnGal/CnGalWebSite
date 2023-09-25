@@ -5,7 +5,7 @@
 
 <MDialog @bind-Value="Dialog"
          Width="800">
-    <MCard>
+    <MDCard>
         <MCardTitle Class="text-h5">
             时间轴
         </MCardTitle>
@@ -27,9 +27,9 @@
                                     <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
                                 </OppositeContent>
                                 <ChildContent>
-                                    <MCard Class="elevation-2" @onclick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Id))">
+                                 <MDCard Class="elevation-2" OnClick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Id))">
                                         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" Outline ShowType="false" ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
-                                    </MCard>
+                                    </MDCard>
                                 </ChildContent>
                             </MTimelineItem>
 
@@ -45,7 +45,7 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
             }
         </MCardText>
-    </MCard>
+    </MDCard>
 </MDialog>
 @code {
     [Parameter]
@@ -64,13 +64,6 @@
     {
         return index switch { 0 => "red", 1 => "pink", 2 => "purple", 3 => "deep-purple", 4 => "indigo", 5 => "blue", 6 => "cyan", 7 => "teal", 8 => "green", 9 => "yellow", 10 => "orange", _ => "black" };
     }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
 
     public async Task Refresh(string name,int id)
     {

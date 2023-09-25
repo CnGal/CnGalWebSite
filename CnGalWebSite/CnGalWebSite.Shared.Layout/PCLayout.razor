@@ -4,14 +4,14 @@
 @inject IJSRuntime JS
 @inject IPopupService PopupService
 
-<MAppBar App Style="background-color: var(--md-sys-color-background)!important;">
+<MAppBar App Class="elevation-2" Style="background-color: var(--md-sys-color-background)!important;">
     <div style=" word-break: keep-all;" class="ms-4 me-8">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
     </div>
      <MTabs Class="cngal-main-tab-card" Routable>
         <MTab Href="/" OnClick="@(()=>NavigationManager.NavigateTo("/"))">首页</MTab>
-        <MTab OnClick="@(()=> Nav("/#evaluations-card"))">专题推荐</MTab>
-        <MTab OnClick="@(()=>  Nav("/#recommends"))">随机推荐</MTab>
+        <MTab Href="/#evaluations-card" >专题推荐</MTab>
+        <MTab Href="/#recommends">随机推荐</MTab>
         <MTab Href="/cv">CV</MTab>
         <MTab Href="/square">广场</MTab>
          <MTab Href="/sharegames">晒库存</MTab>

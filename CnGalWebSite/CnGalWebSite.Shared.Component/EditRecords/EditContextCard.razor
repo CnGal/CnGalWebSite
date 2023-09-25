@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 
-<MDCard Class="h-100" Outline>
+<MDCard Outline>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="mdi-share" Text="查看详情" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation />

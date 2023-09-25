@@ -2,7 +2,8 @@
 
 <div class="image-games-card masa-image row">
     @{ var model = Model.ImageCards.First();}
-    <a class="item-image col-12 col-lg-6" href="@($"entries/index/{model.Id}")">
+    <div class="col-12 col-lg-6">
+    <MDCard Class="item-image " Href="@($"entries/index/{model.Id}")">
         <MImage AspectRatio="1" Width="@("100%")" Src="@model.Image">
             <ChildContent>
                 <div class="image-name">
@@ -17,27 +18,32 @@
                 </MRow>
             </PlaceholderContent>
         </MImage>
-    </a>
+    </MDCard>
+
+    </div>
     <div class="sub-group col-12 col-lg-6">
         <div class="row">
             @foreach (var item in Model.ImageCards.Skip(1))
             {
-                <a class="item-image col-6" href="@($"entries/index/{item.Id}")">
-                    <MImage AspectRatio="1" Width="@("100%")" Src="@item.Image">
-                        <ChildContent>
-                            <div class="image-name">
-                                @item.Name
-                            </div>
-                        </ChildContent>
-                        <PlaceholderContent>
-                            <MRow Class="fill-height ma-0"
-                                  Align="@AlignTypes.Center"
-                                  Justify="@JustifyTypes.Center">
-                                <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
-                            </MRow>
-                        </PlaceholderContent>
-                    </MImage>
-                </a>
+                <div class=" col-6">
+                    <MDCard Class="item-image" Href="@($"entries/index/{item.Id}")">
+                        <MImage AspectRatio="1" Width="@("100%")" Src="@item.Image">
+                            <ChildContent>
+                                <div class="image-name">
+                                    @item.Name
+                                </div>
+                            </ChildContent>
+                            <PlaceholderContent>
+                                <MRow Class="fill-height ma-0"
+                                      Align="@AlignTypes.Center"
+                                      Justify="@JustifyTypes.Center">
+                                    <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+                                 </MRow>
+                             </PlaceholderContent>
+                         </MImage>
+                     </MDCard>
+                    </div>
+                
             }
         </div>
     </div>

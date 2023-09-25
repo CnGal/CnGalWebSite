@@ -8,38 +8,42 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="推荐版块"/>
 
-<DataTableCard TModel="RecommendOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="success"
-                   Class="mr-2"
-                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
-            @if (context.Item.EntryId > 0)
+<MDCard>
+    <DataTableCard TModel="RecommendOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="info"
+                <MIcon Color="success"
                        Class="mr-2"
-                       OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+                @if (context.Item.EntryId > 0)
+                {
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+                }
             }
-        }
-        else if (context.Header.Value == "State")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
-        }
-        else if (context.Header.Value == nameof(RecommendOverviewModel.EntryName))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@context.Item.EntryId" Name="@context.Item.EntryName" />
-        }
-        else if (context.Header.Value == "reason")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Item.Reason" Outlined/>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+            else if (context.Header.Value == "State")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+            }
+            else if (context.Header.Value == nameof(RecommendOverviewModel.EntryName))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@context.Item.EntryId" Name="@context.Item.EntryName" />
+            }
+            else if (context.Header.Value == "reason")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.ReasonChip Reason="context.Item.Reason" Outlined />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">

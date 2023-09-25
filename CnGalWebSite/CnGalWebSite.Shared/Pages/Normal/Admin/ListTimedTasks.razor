@@ -5,67 +5,71 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="TimedTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard" >
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 140px;">
-                <MIcon Color="success"
-                       Class="mr-2"
-                       OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>RunItem(context.Item)">@IconType.Runing.ToIconString()</MIcon>
-                @if (context.Item.IsPause)
-                {
+<MDCard>
+    <DataTableCard TModel="TimedTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 140px;">
                     <MIcon Color="success"
                            Class="mr-2"
-                           OnClick="()=>PauseItem(context.Item,false)">@IconType.Run.ToIconString()</MIcon>
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>RunItem(context.Item)">@IconType.Runing.ToIconString()</MIcon>
+                    @if (context.Item.IsPause)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>PauseItem(context.Item,false)">@IconType.Run.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>PauseItem(context.Item,true)">@IconType.Stop.ToIconString()</MIcon>
+                    }
+                </div>
+            }
+            else if (context.Header.Value == nameof(TimedTaskOverviewModel.IsLastFail))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.StateChip IsLastFail="context.Item.IsLastFail" IsPause="context.Item.IsPause" IsRuning="context.Item.IsRuning" />
+            }
+            else if (context.Header.Value == nameof(TimedTaskOverviewModel.ExecuteType))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.ExecuteTypeChip Type="context.Item.ExecuteType" />
+            }
+            else if (context.Header.Value == nameof(TimedTaskOverviewModel.Type))
+            {
+                @context.Item.Type.GetDisplayName()
+            }
+            else if (context.Header.Value == nameof(TimedTaskOverviewModel.IntervalTime))
+            {
+                if (context.Item.ExecuteType == TimedTaskExecuteType.EveryDay)
+                {
+                    @context.Item.EveryTime?.ToString("HH:mm:ss")
                 }
                 else
                 {
-                    <MIcon Color="error"
-                           Class="mr-2"
-                           OnClick="()=>PauseItem(context.Item,true)">@IconType.Stop.ToIconString()</MIcon>
+                    @($"{context.Item.IntervalTime / 60.0:0.0} 小时")
                 }
-            </div>
-        }
-        else if (context.Header.Value == nameof(TimedTaskOverviewModel.IsLastFail))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.StateChip IsLastFail="context.Item.IsLastFail" IsPause="context.Item.IsPause" IsRuning="context.Item.IsRuning" />
-        }
-        else if (context.Header.Value == nameof(TimedTaskOverviewModel.ExecuteType))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.ExecuteTypeChip Type="context.Item.ExecuteType"/>
-        }
-        else if (context.Header.Value == nameof(TimedTaskOverviewModel.Type))
-        {
-            @context.Item.Type.GetDisplayName()
-        }
-        else if (context.Header.Value == nameof(TimedTaskOverviewModel.IntervalTime))
-        {
-            if(context.Item.ExecuteType== TimedTaskExecuteType.EveryDay)
+
+            }
+            else if (context.Header.Value == nameof(TimedTaskOverviewModel.LastExecutedTime))
             {
-                 @context.Item.EveryTime?.ToString("HH:mm:ss")
+
+                @context.Item.LastExecutedTime?.ToString("yyyy-MM-dd HH:mm")
+
             }
             else
             {
-                @($"{context.Item.IntervalTime/60.0:0.0} 小时")
+                @context.Value
             }
-           
-        }
-        else if (context.Header.Value == nameof(TimedTaskOverviewModel.LastExecutedTime))
-        {
-           
-                @context.Item.LastExecutedTime?.ToString("yyyy-MM-dd HH:mm")
-           
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
     <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />

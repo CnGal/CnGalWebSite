@@ -3,7 +3,7 @@
 
 <MDialog @bind-Value="Dialog"
          Width="800">
-    <MCard>
+    <MDCard>
         @if (Model.Id == 0)
         {
             <MCardTitle Class="text-h5">
@@ -76,7 +76,7 @@
             <MSpacer />
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" TextStyle />
          </MCardActions>
-     </MCard>
+     </MDCard>
  </MDialog>
 
  @code {

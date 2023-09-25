@@ -50,11 +50,9 @@
                         @foreach (var item in Model.Peripheries)
                         {
                             <MSlideItem>
-                                <MCard Width="150" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                                       OnClick="@context.Toggle"
-                                       RefBack="@context.Ref">
+                                <div style="width:150;">
                                     <PeripheryOverviewAloneTip Model="item" />
-                                </MCard>
+                                </div>
                             </MSlideItem>
                         }
                     </ChildContent>

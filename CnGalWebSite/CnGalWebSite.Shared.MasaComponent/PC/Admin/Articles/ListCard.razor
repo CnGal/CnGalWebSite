@@ -2,6 +2,7 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
+<MDCard>
 <DataTableCard TModel="ArticleOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -66,6 +67,8 @@
         }
     </ItemColContent>
 </DataTableCard>
+
+</MDCard>
 
 @code {
     private string _baseUrl = "api/articles/List";

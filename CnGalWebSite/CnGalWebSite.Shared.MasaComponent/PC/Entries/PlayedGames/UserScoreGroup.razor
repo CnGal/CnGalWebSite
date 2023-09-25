@@ -51,10 +51,9 @@
                 @if (ShowChart)
                 {
                     <MSlideItem>
-                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                               RefBack="@context.Ref">
+                        <MDCard Class="pa-2" Outline Style="border:0;background-color:transparent;width:300px;">
                             <TotalScoreCard Model="Model" />
-                        </MCard>
+                        </MDCard>
                     </MSlideItem>
                 }
 
@@ -62,10 +61,9 @@
                 @if (Model.IsCurrentUserScoreExist)
                 {
                     <MSlideItem>
-                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                               RefBack="@context.Ref">
+                        <MDCard Class="pa-2" Outline Style="border:0;background-color:transparentwidth:300px;">
                             <UserScoreCard Model="Model.UserScores.FirstOrDefault(s=>s.User.Id==Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" IsDubbing="Model.IsDubbing" />
-                        </MCard>
+                        </MDCard>
                     </MSlideItem>
                 }
                 else

@@ -2,78 +2,82 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="VoteOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 170px;">
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
-                @if (context.Item.CanComment)
-                {
-                    <MIcon Color="error"
+<MDCard>
+    <DataTableCard TModel="VoteOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 170px;">
+                    <MIcon Color="info"
                            Class="mr-2"
-                           OnClick="()=>EditItemCanComment(context.Item,false)">@IconType.DisableComment.ToIconString()</MIcon>
-                }
-                else
-                {
-                    <MIcon Color="success"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
                            Class="mr-2"
-                           OnClick="()=>EditItemCanComment(context.Item,true)">@IconType.Comment.ToIconString()</MIcon>
-                }
-                @if (context.Item.IsHidden)
-                {
-                    <MIcon Color="success"
-                           Class="mr-2"
-                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
-                }
-                else
-                {
-                    <MIcon Color="error"
-                           Class="mr-2"
-                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
-                }
-               
-            </div>
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.IsHidden))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.Name))
-        {
-            <VoteChip Id="@context.Item.Id" Name="@context.Item.Name"/>
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.Type))
-        {
-            @context.Item.Type.GetDisplayName()
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.BeginTime))
-        {
-            @context.Item.BeginTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.EndTime))
-        {
-            @context.Item.EndTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.LastEditTime))
-        {
-            @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(VoteOverviewModel.CanComment))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.CanCommentChip CanComment="context.Item.CanComment"/>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.CanComment)
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>EditItemCanComment(context.Item,false)">@IconType.DisableComment.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>EditItemCanComment(context.Item,true)">@IconType.Comment.ToIconString()</MIcon>
+                    }
+                    @if (context.Item.IsHidden)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+
+                </div>
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.IsHidden))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.Name))
+            {
+                <VoteChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.Type))
+            {
+                @context.Item.Type.GetDisplayName()
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.BeginTime))
+            {
+                @context.Item.BeginTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.EndTime))
+            {
+                @context.Item.EndTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.LastEditTime))
+            {
+                @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(VoteOverviewModel.CanComment))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.CanCommentChip CanComment="context.Item.CanComment" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 @code {
     private string _baseUrl = "api/votes/List";

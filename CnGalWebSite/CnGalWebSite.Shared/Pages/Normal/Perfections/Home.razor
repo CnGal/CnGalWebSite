@@ -3,8 +3,8 @@
 
 @inject IDataCacheService _dataCacheService
 
-
-    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
+<MDCard Class="mb-4">
+    <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
         <MTab Value="1">
             概览<MIcon>mdi-image-area</MIcon>
@@ -16,6 +16,8 @@
             单项检查列表<MIcon>mdi-alert-circle</MIcon>
         </MTab>
     </MTabs>
+</MDCard>
+
 <MTabsItems @bind-Value="TabIndex">
     <MTabItem Value="1">
 

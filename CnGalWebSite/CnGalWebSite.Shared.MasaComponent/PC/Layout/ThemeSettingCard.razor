@@ -3,7 +3,7 @@
 
 <MDialog @bind-Value="Dialog"
          MaxWidth="440">
-    <MCard>
+    <MDCard>
         <MCardTitle Class="text-h5">
             主题设置
         </MCardTitle>
@@ -87,7 +87,7 @@
         <MCardText Class="pb-0">
             <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Class="m-0"></MSwitch>
         </MCardText>
-    </MCard>
+    </MDCard>
 </MDialog>
 
 @code {

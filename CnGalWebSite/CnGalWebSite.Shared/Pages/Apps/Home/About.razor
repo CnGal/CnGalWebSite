@@ -7,14 +7,16 @@
 
 @if(isReady)
 {
-    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive >
-    @foreach (var item in _dataCacheService.DocumentsCatche)
-    {
-        <MTab Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
-            @item.Title<MIcon>@item.Icon</MIcon>
-        </MTab>
-    }
-</MTabs>
+    <MDCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText GrowCenterActive>
+         @foreach (var item in _dataCacheService.DocumentsCatche)
+            {
+                <MTab Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
+                    @item.Title<MIcon>@item.Icon</MIcon>
+                </MTab>
+            }
+        </MTabs>
+    </MDCard>
 <MTabsItems @bind-Value="TabIndex">
     @foreach (var item in _dataCacheService.DocumentsCatche)
     {

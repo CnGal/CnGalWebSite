@@ -2,47 +2,51 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="UserReviewEditRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)" @ref="dataTableCard"
-               LoadingText="找不到数据欸......可以前往词条页面关注一些词条，点击编辑按钮就能看到入口哦~">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-            @if (context.Item.ReviewedTime == null)
+<MDCard>
+    <DataTableCard TModel="UserReviewEditRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)" @ref="dataTableCard"
+                   LoadingText="找不到数据欸......可以前往词条页面关注一些词条，点击编辑按钮就能看到入口哦~">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="success"
+                <MIcon Color="info"
                        Class="mr-2"
-                       OnClick="()=>ReadItem(context.Item, EditRecordReviewState.UnRead)">@IconType.UnRead.ToIconString()</MIcon>
-                <MIcon Color="warning"
-                       Class="mr-2"
-                       OnClick="()=>ReadItem(context.Item, EditRecordReviewState.Ignored)">@IconType.Hide.ToIconString()</MIcon>
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                @if (context.Item.ReviewedTime == null)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>ReadItem(context.Item, EditRecordReviewState.UnRead)">@IconType.UnRead.ToIconString()</MIcon>
+                    <MIcon Color="warning"
+                           Class="mr-2"
+                           OnClick="()=>ReadItem(context.Item, EditRecordReviewState.Ignored)">@IconType.Hide.ToIconString()</MIcon>
 
+                }
             }
-        }
-        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.State))
-        {
-            <StateChip State="context.Item.State" />
-        }
-        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.Operation))
-        {
-            @context.Item.Operation.GetDisplayName()
-        }
-        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
-        {
-            @context.Item.ReviewedTime?.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
-        {
-            <UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+            else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.State))
+            {
+                <StateChip State="context.Item.State" />
+            }
+            else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.Operation))
+            {
+                @context.Item.Operation.GetDisplayName()
+            }
+            else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
+            {
+                @context.Item.ReviewedTime?.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(UserReviewEditRecordOverviewModel.ReviewedTime))
+            {
+                <UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 
 @code {

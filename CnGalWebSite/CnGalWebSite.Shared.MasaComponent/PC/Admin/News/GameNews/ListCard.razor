@@ -2,59 +2,62 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="GameNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" SortByItem="@nameof(GameNewsOverviewModel.State)" SortDesc="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 100px;">
-                <MIcon Color="success"
-                   Class="mr-2"
-                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
-            @if (context.Item.ArticleId > 0)
+<MDCard>
+    <DataTableCard TModel="GameNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" SortByItem="@nameof(GameNewsOverviewModel.State)" SortDesc="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                <div style="width: 100px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    @if (context.Item.ArticleId > 0)
+                    {
+                        <MIcon Color="info"
+                               Class="mr-2"
+                               OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                    }
+                    @if (context.Item.State != GameNewsState.Ignore)
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="warning"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                </div>
+
             }
-            @if (context.Item.State != GameNewsState.Ignore)
+            else if (context.Header.Value == nameof(GameNewsOverviewModel.State))
             {
-                <MIcon Color="error"
-                       Class="mr-2"
-                       OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                <StateChip State="context.Item.State" />
+            }
+            else if (context.Header.Value == nameof(GameNewsOverviewModel.PublishTime))
+            {
+                @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
+            {
+                <div style="white-space: pre-line;">
+                    @context.Item.BriefIntroduction
+                </div>
             }
             else
             {
-                <MIcon Color="warning"
-                       Class="mr-2"
-                       OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                @context.Value
             }
-</div>
-            
-        }
-        else if (context.Header.Value == nameof(GameNewsOverviewModel.State))
-        {
-            <StateChip State="context.Item.State" />
-        }
-        else if (context.Header.Value == nameof(GameNewsOverviewModel.PublishTime))
-        {
-            @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
-        {
-            <div style="white-space: pre-line;">
-                @context.Item.BriefIntroduction
-            </div>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-    <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加自定义动态" Icon="@IconType.Create.ToIconString()" OnClick="AddCustomNews" Class="me-2" />
-         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加微博动态" Icon="@IconType.Weibo.ToIconString()" OnClick="AddWeiboNews" Class="me-2" />
-    </ButtonContent>
-</DataTableCard>
+        </ItemColContent>
+        <ButtonContent>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加自定义动态" Icon="@IconType.Create.ToIconString()" OnClick="AddCustomNews" Class="me-2" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加微博动态" Icon="@IconType.Weibo.ToIconString()" OnClick="AddWeiboNews" Class="me-2" />
+         </ButtonContent>
+     </DataTableCard>
+
+</MDCard>
 
 <AddCustomNewsTip @ref="addCustomNewsTip" OnRefreshTable="RefreshTable" />
 <AddWeiboNewsTip @ref="addWeiboNewsTip" OnRefreshTable="RefreshTable" />

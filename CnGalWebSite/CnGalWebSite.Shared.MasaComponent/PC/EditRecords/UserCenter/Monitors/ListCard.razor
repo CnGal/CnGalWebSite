@@ -2,32 +2,36 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="UserMonitorOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserMonitorOverviewModel.CreateTime)" @ref="dataTableCard"
-               LoadingText="找不到数据欸......不过你可以到词条页面添加监视，点击编辑按钮就能看到入口哦~">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-            <MIcon Color="error"
-                   Class="mr-2"
-                   OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
-        }
-        else if (context.Header.Value == nameof(UserMonitorOverviewModel.Type))
-        {
-            <TypeChip Type="context.Item.Type" />
-        }
-        else if (context.Header.Value == nameof(UserMonitorOverviewModel.CreateTime))
-        {
-            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+<MDCard>
+    <DataTableCard TModel="UserMonitorOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserMonitorOverviewModel.CreateTime)" @ref="dataTableCard"
+                   LoadingText="找不到数据欸......不过你可以到词条页面添加监视，点击编辑按钮就能看到入口哦~">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                <MIcon Color="error"
+                       Class="mr-2"
+                       OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+            }
+            else if (context.Header.Value == nameof(UserMonitorOverviewModel.Type))
+            {
+                <TypeChip Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(UserMonitorOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 
 @code {

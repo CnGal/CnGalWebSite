@@ -8,60 +8,64 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="商店信息版块" />
 
-<DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width:70px;">
-                <MIcon Color="success"
-                       Class="mr-2"
-                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
-                @if (context.Item.EntryId > 0)
-                {
-                    <MIcon Color="info"
+<MDCard>
+    <DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width:70px;">
+                    <MIcon Color="success"
                            Class="mr-2"
-                           OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+                           OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+                    @if (context.Item.EntryId > 0)
+                    {
+                        <MIcon Color="info"
+                               Class="mr-2"
+                               OnClick="()=>DetailItem(context.Item)">mdi-eye</MIcon>
+                    }
+                </div>
+
+
+            }
+            else if (context.Header.Value == "State")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.StateChip State="context.Item.State" />
+            }
+            else if (context.Header.Value == "UpdateType")
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.UpdateTypeChip Type="context.Item.UpdateType" />
+            }
+            else if (context.Header.Value == nameof(StoreInfoOverviewModel.Name))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@(context.Item.EntryId??0)" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == "PlatformType")
+            {
+                @context.Item.PlatformType.GetDisplayName()
+            }
+            else if (context.Header.Value == "PriceNow")
+            {
+                @if (context.Item.PriceNow != null)
+                {
+                    @context.Item.PriceNow.Value.ToString("¥ 0.00")
                 }
-            </div>
-
-
-        }
-        else if (context.Header.Value == "State")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.StateChip State="context.Item.State" />
-        }
-        else if (context.Header.Value == "UpdateType")
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.UpdateTypeChip Type="context.Item.UpdateType" />
-        }
-        else if (context.Header.Value == nameof(StoreInfoOverviewModel.Name))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Certifications.EntryChip Type="EntryType.Game" Id="@(context.Item.EntryId??0)" Name="@context.Item.Name" />
-        }
-        else if (context.Header.Value == "PlatformType")
-        {
-            @context.Item.PlatformType.GetDisplayName()
-        }
-        else if (context.Header.Value == "PriceNow")
-        {
-            @if (context.Item.PriceNow != null)
-            {
-                @context.Item.PriceNow.Value.ToString("¥ 0.00")
             }
-        }
-        else if (context.Header.Value == "CutNow")
-        {
-            @if (context.Item.CutNow != null)
+            else if (context.Header.Value == "CutNow")
             {
-                @($"{context.Item.CutNow.Value} %")
+                @if (context.Item.CutNow != null)
+                {
+                    @($"{context.Item.CutNow.Value} %")
+                }
             }
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">

@@ -7,59 +7,63 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="评论版块" />
 
-<DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 100px;">
-                <MIcon Color="success"
-                       Class="mr-2"
-                       OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
-                @if (context.Item.IsHidden)
-                {
-                    <MIcon Color="warning"
+<MDCard>
+    <DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 100px;">
+                    <MIcon Color="success"
                            Class="mr-2"
-                    OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
-                }
-                else
-                {
-                    <MIcon Color="error"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
                            Class="mr-2"
-                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
-                }
-            </div>
-        }
-        else if (context.Header.Value == nameof(CommentOverviewModel.IsHidden))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
-        }
-        else if (context.Header.Value == nameof(CommentOverviewModel.ObjectName))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Comments.ObjectChip Id="@context.Item.ObjectId" Name="@context.Item.ObjectName" Type="context.Item.Type" />
-        }
-        else if (context.Header.Value == nameof(CommentOverviewModel.UserName))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
-        }
-        else if (context.Header.Value == nameof(CommentOverviewModel.CommentTime))
-        {
-            @context.Item.CommentTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(CommentOverviewModel.Text))
-        {
-            <div style="white-space: pre-line;width: 300px;word-break: break-all;">
-                @context.Item.Text
-            </div>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.IsHidden)
+                    {
+                        <MIcon Color="warning"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+                </div>
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.IsHidden))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.ObjectName))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Comments.ObjectChip Id="@context.Item.ObjectId" Name="@context.Item.ObjectName" Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.UserName))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.CommentTime))
+            {
+                @context.Item.CommentTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.Text))
+            {
+                <div style="white-space: pre-line;width: 300px;word-break: break-all;">
+                    @context.Item.Text
+                </div>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 @code {
     private string _baseUrl = "api/comments/List";

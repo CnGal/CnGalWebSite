@@ -9,7 +9,8 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="用户版块"/>
 
 <div>
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
+    <MDCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
             <MTab Value="1">
                 用户<MIcon>mdi-account</MIcon>
@@ -25,6 +26,8 @@
             </MTab>
 
         </MTabs>
+    </MDCard>
+
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.ListCard/>

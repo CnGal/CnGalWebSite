@@ -6,6 +6,7 @@
 @inject IPopupService PopupService
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="文件版块"/>
 
+    <MDCard>
     <DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -24,7 +25,7 @@
             }
             else if (context.Header.Value == "size")
             {
-                <span>  @(((double)context.Item.Size/(1024*1024)).ToString("0.00")) MB</span>
+                <span>  @(((double)context.Item.Size / (1024 * 1024)).ToString("0.00")) MB</span>
             }
             else
             {
@@ -32,6 +33,8 @@
             }
         </ItemColContent>
     </DataTableCard>
+
+    </MDCard>
 
     <MDialog @bind-Value="_detailDialog"
              MaxWidth="1000">

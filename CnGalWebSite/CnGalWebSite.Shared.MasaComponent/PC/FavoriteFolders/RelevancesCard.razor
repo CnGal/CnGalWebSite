@@ -2,38 +2,41 @@
 
 @if (Model.Objects.Any())
 {
-        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow Class="mb-4" CenterActive>
-            @if (Model.Objects.Any(s => s.entry != null))
+    <MDCard Class="mb-4">
+        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive>
+         @if (Model.Objects.Any(s => s.entry != null))
             {
                 <MTab Value="1">
-                    @($"词条{(Model.Objects.Count(s => s.entry != null)>4?$" ({Model.Objects.Count(s => s.entry != null)})":"")}")<MIcon>mdi-archive </MIcon>
+                    @($"词条{(Model.Objects.Count(s => s.entry != null) > 4 ? $" ({Model.Objects.Count(s => s.entry != null)})" : "")}")<MIcon>mdi-archive </MIcon>
                 </MTab>
             }
             @if (Model.Objects.Any(s => s.article != null))
             {
                 <MTab Value="2">
-                    @($"文章{(Model.Objects.Count(s => s.article != null)>4?$" ({Model.Objects.Count(s => s.article != null)})":"")}")<MIcon>mdi-script-text </MIcon>
+                    @($"文章{(Model.Objects.Count(s => s.article != null) > 4 ? $" ({Model.Objects.Count(s => s.article != null)})" : "")}")<MIcon>mdi-script-text </MIcon>
                 </MTab>
             }
             @if (Model.Objects.Any(s => s.Tag != null))
             {
                 <MTab Value="3">
-                    @($"标签{(Model.Objects.Count(s => s.Tag != null)>4?$" ({Model.Objects.Count(s => s.Tag != null)})":"")}")<MIcon>mdi-tag</MIcon>
+                    @($"标签{(Model.Objects.Count(s => s.Tag != null) > 4 ? $" ({Model.Objects.Count(s => s.Tag != null)})" : "")}")<MIcon>mdi-tag</MIcon>
                 </MTab>
             }
             @if (Model.Objects.Any(s => s.periphery != null))
             {
                 <MTab Value="4">
-                    @($"周边{(Model.Objects.Count(s => s.periphery != null)>4?$" ({Model.Objects.Count(s => s.periphery != null)})":"")}")<MIcon>mdi-basket</MIcon>
+                    @($"周边{(Model.Objects.Count(s => s.periphery != null) > 4 ? $" ({Model.Objects.Count(s => s.periphery != null)})" : "")}")<MIcon>mdi-basket</MIcon>
                 </MTab>
             }
             @if (Model.Objects.Any(s => s.Video != null))
             {
                 <MTab Value="5">
-                    @($"视频{(Model.Objects.Count(s => s.Video != null)>4?$" ({Model.Objects.Count(s => s.Video != null)})":"")}")<MIcon>mdi-animation-play </MIcon>
+                    @($"视频{(Model.Objects.Count(s => s.Video != null) > 4 ? $" ({Model.Objects.Count(s => s.Video != null)})" : "")}")<MIcon>mdi-animation-play </MIcon>
                 </MTab>
             }
         </MTabs>
+    </MDCard>
+     
     <MTabsItems @bind-Value="TabIndex">
         @if (Model.Objects.Any(s => s.entry != null))
         {

@@ -44,43 +44,46 @@ else
             </div>
             <div class="col-12 col-md-8">
                 <div>
-                    <MTabs Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive ValueChanged="TabValueChanged">
+                    <MDCard Class="mb-4">
+                        <MTabs Value="TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
 
-                         <MTab Value="1">
-                             首页<MIcon>mdi-home</MIcon>
-                         </MTab>
-                         <MTab Value="2">
-                             编辑记录<MIcon>mdi-script-text-outline </MIcon>
-                         </MTab>
-                         @if (Model.BasicInfor.ArticleCount != 0)
-                        {
-                            <MTab Value="3">
-                                文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
-                            </MTab>
-                        }
-                        @if (Model.BasicInfor.VideoCount != 0)
-                        {
-                            <MTab Value="7">
-                                视频<MIcon>mdi-animation-play</MIcon>
-                            </MTab>
-                        }
-                        @if (Model.IsCurrentUser || Model.IsShowGameRecord)
-                        {
-                            <MTab Value="4">
-                                游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
-                            </MTab>
-                        }
-                        @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                        {
-                            <MTab Value="11">
-                                收藏夹<MIcon>mdi-heart-multiple </MIcon>
-                            </MTab>
-                        }
+                             <MTab Value="1">
+                                 首页<MIcon>mdi-home</MIcon>
+                             </MTab>
+                             <MTab Value="2">
+                                 编辑记录<MIcon>mdi-script-text-outline </MIcon>
+                             </MTab>
+                             @if (Model.BasicInfor.ArticleCount != 0)
+                            {
+                                <MTab Value="3">
+                                    文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
+                                </MTab>
+                            }
+                            @if (Model.BasicInfor.VideoCount != 0)
+                            {
+                                <MTab Value="7">
+                                    视频<MIcon>mdi-animation-play</MIcon>
+                                </MTab>
+                            }
+                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                            {
+                                <MTab Value="4">
+                                    游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
+                                </MTab>
+                            }
+                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                            {
+                                <MTab Value="11">
+                                    收藏夹<MIcon>mdi-heart-multiple </MIcon>
+                                </MTab>
+                            }
 
-                        <MTab Value="6">
-                            周边<MIcon>mdi-basket-outline </MIcon>
-                        </MTab>
-                    </MTabs>
+                            <MTab Value="6">
+                                周边<MIcon>mdi-basket-outline </MIcon>
+                            </MTab>
+                        </MTabs>
+                    </MDCard>
+
                     <MTabsItems @bind-Value="TabIndex">
                         <MTabItem Value="1">
                             @if (_dataCacheService.IsApp)
@@ -90,7 +93,7 @@ else
                             @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                             {
                                 <div class="mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="个人介绍" Icon="@IconType.Home.ToIconString()">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="@IconType.Home.ToIconString()">
                                          <ChildContent>
                                              <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPageContext" />
                                          </ChildContent>

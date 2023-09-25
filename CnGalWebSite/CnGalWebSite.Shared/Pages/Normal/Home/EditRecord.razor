@@ -122,16 +122,29 @@ else
 
     async Task OnReLoad()
     {
-        await OnInitializedAsync();
+        try
+        {
+            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
+
+            await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
+        }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+           await  OnReLoad();
+
             NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
-
         }
 
     }
@@ -153,19 +166,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
 
-            await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
-
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
-        }
     }
     public void ContrastChanged(string conId)
     {

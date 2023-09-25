@@ -65,7 +65,8 @@
                 }
             </div>
             <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
-                    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4">
+                <MDCard Class="mb-4">
+                    <MTabs @bind-Value="TabIndex" IconsAndText Grow>
 
                          <MTab Value="1">
                              首页<MIcon>@IconType.Home.ToIconString()</MIcon>
@@ -76,11 +77,13 @@
                          @if (EntryView.Staffs.Count > 0)
                         {
                             <MTab Value="3">
-                            Staff<MIcon>@IconType.Staff.ToIconString()</MIcon>
+                                Staff<MIcon>@IconType.Staff.ToIconString()</MIcon>
                             </MTab>
                         }
 
                     </MTabs>
+                </MDCard>
+                   
                 <div>
                     <MTabsItems @bind-Value="TabIndex">
                         <MTabItem Value="1">

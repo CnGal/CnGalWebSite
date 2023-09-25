@@ -3,32 +3,35 @@
 @inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
+<MDCard>
+    <DataTableCard TModel="FavoriteObjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>MoveItem(context.Item)">@IconType.Move.ToIconString()</MIcon>
+                <MIcon Color="error"
+                       Class="mr-2"
+                       OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+            }
+            else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.Type))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Objects.ObjectChip Name=@context.Item.ObjectName Id="@context.Item.ObjectId" Type="@context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
 
-<DataTableCard TModel="FavoriteObjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="success"
-                   Class="mr-2"
-                   OnClick="()=>MoveItem(context.Item)">@IconType.Move.ToIconString()</MIcon>
-            <MIcon Color="error"
-                   Class="mr-2"
-                   OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
-        }
-        else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.Type))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Objects.ObjectChip Name=@context.Item.ObjectName Id="@context.Item.ObjectId" Type="@context.Item.Type" />
-        }
-        else if (context.Header.Value == nameof(FavoriteObjectOverviewModel.CreateTime))
-        {
-            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+</MDCard>
+
 <MoveFavoriteFolderTip Id="Id" OnMoved="@( () => { dataTableCard.GetDataFromApi(); })" @ref="moveFavoriteFolderTip" />
 @code {
     [Parameter]

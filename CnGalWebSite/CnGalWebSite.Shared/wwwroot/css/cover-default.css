@@ -163,10 +163,6 @@ html {
 .m-application .text-h5, .m-application .text-h6 {
     font-family: inherit !important;
 }
-/*顶部导航栏*/
-.m-toolbar__content, .m-tabs {
-    background-color: var(--md-sys-color-surface-1);
-}
 /*警告条*/
 .tertiary--text {
     color: var(--md-sys-color-tertiary) !important;
@@ -213,8 +209,8 @@ html {
 }
 /*表格*/
 .theme--light.m-data-table {
-    background-color: var(--md-sys-color-surface-1);
-    color: var(--md-sys-color-on-surface);
+    background-color: inherit;
+    color: inherit;
     border-radius: var(--md-card-border-radius) !important;
 }
 
@@ -250,14 +246,6 @@ html {
 .theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
     background-color: var(--md-sys-color-surface-1);
 }
-/*页脚*/
-.theme--light.m-footer {
-    background-color: var(--md-sys-color-background) !important;
-}
-
-    .theme--light.m-footer > div {
-        background-color: var(--md-sys-color-surface-1);
-    }
 /*底部导航栏激活样式*/
 .nav-bottom-tab-active {
     color: var(--md-sys-color-primary) !important;
@@ -268,7 +256,8 @@ html {
 }
 
 .theme--light.m-bottom-navigation {
-    color: inherit;
+    background-color: var(--md-sys-color-background);
+    color: inherit !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -278,18 +267,15 @@ html {
 .theme--light.m-btn {
     color: inherit;
 }
-/*侧边导航栏*/
-.theme--light.m-navigation-drawer, .theme--light.m-tabs > .m-tabs-bar {
-    background-color: var(--md-sys-color-background);
-}
 
-    .theme--light.m-navigation-drawer .m-navigation-drawer__content {
-        background-color: var(--md-sys-color-surface-1);
-    }
+/*侧边导航栏*/
+
+.theme--light.m-navigation-drawer .m-navigation-drawer__content {
+    background-color: var(--md-sys-color-surface-1);
+}
 
 /*溢出的tab栏*/
 .m-tabs:not(.cngal-main-tab-card) .m-slide-group__wrapper {
-    background-color: var(--md-sys-color-surface-1);
     border-radius: var(--md-card-border-radius) !important;
 }
 
@@ -331,4 +317,8 @@ html {
 /*下拉框*/
 .m-select__selection--comma {
     overflow: inherit;
+}
+/*相册*/
+.m-card > :first-child:not(.m-btn):not(.m-chip):not(.m-avatar) {
+    border-radius: var(--md-card-border-radius) !important;
 }

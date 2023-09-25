@@ -9,9 +9,9 @@
         @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
             <MCarouselItem>
-                <a href="@item.Link" target="@(item.Link.Contains("http")?"_blank":"_self")" @onclick="@(async ()=>await OnClick.InvokeAsync(item))">
+                <MDCard Href="@item.Link" Target="@(item.Link.Contains("http")?"_blank":"_self")" OnClick="@(async ()=>await OnClick.InvokeAsync(item))">
                     <img src="@item.Image" alt="@item.Note" class="w-100" style="@($" aspect-ratio: {AspectRatio.ToDouble()};")" />
-                </a>
+                </MDCard>
             </MCarouselItem>
         }
 

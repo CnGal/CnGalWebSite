@@ -15,14 +15,14 @@
              <span>@item.HappenedTime.ToString("yyyy-MM-dd HH:mm")</span>
          </OppositeContent>
          <ChildContent>
-             <MCard Class="elevation-2" @onclick="@(()=>ViewAt(item))">
+             <MDCard OnClick="@(()=>ViewAt(item))" ShowHoverStyle="true" Class="pointer">
                  <MCardTitle Class="fw-bold">
                      @item.Title
                  </MCardTitle>
                  <MCardText Style=" white-space: break-spaces;">
                      @item.BriefIntroduction
                  </MCardText>
-             </MCard>
+             </MDCard>
          </ChildContent>
      </MTimelineItem>
     }

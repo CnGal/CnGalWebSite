@@ -7,18 +7,21 @@
     @if (_dataCacheService.IsApp)
     {
         <div class="col-12">
-            <MTabs @bind-Value="selected" IconsAndText Grow Class="mb-4" CenterActive>
+            <MDCard Class="mb-4">
+                <MTabs @bind-Value="selected" IconsAndText GrowCenterActive>
 
-             <MTab Value="0">
-                 回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
-             </MTab>
-             <MTab Value="1">
-                 编辑通过提醒<MIcon>mdi-checkbox-marked-circle-outline</MIcon>
-             </MTab>
-             <MTab Value="2">
-                 编辑驳回提醒<MIcon>mdi-alert-circle-outline</MIcon>
-             </MTab>
-         </MTabs>
+                 <MTab Value="0">
+                     回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
+                 </MTab>
+                 <MTab Value="1">
+                     编辑通过提醒<MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                 </MTab>
+                 <MTab Value="2">
+                     编辑驳回提醒<MIcon>mdi-alert-circle-outline</MIcon>
+                 </MTab>
+             </MTabs>
+            </MDCard>
+           
      </div>
     }
     else
@@ -63,9 +66,9 @@
                 <MWindowItem Value="0">
                     <ScaleTransition>
                         <Element Show="selected==0">
-                            <MCard Style=" display: contents; ">
+                            <MDCard Style=" display: contents; ">
                                 <GroupMessageViewTip Model="RelyItems" />
-                            </MCard>
+                            </MDCard>
                         </Element>
                     </ScaleTransition>
                 </MWindowItem>
@@ -73,9 +76,9 @@
                 <MWindowItem Value="1">
                     <ScaleTransition>
                         <Element Show="selected==1">
-                            <MCard Style=" display: contents; ">
+                            <MDCard Style=" display: contents; ">
                                 <GroupMessageViewTip Model="PassedItems" />
-                            </MCard>
+                            </MDCard>
                         </Element>
                     </ScaleTransition>
                 </MWindowItem>
@@ -83,9 +86,9 @@
                 <MWindowItem Value="2">
                     <ScaleTransition>
                         <Element Show="selected==2">
-                            <MCard Style=" display: contents; ">
+                            <MDCard Style=" display: contents; ">
                                 <GroupMessageViewTip Model="UnPassedItems" />
-                            </MCard>
+                            </MDCard>
                         </Element>
                     </ScaleTransition>
                 </MWindowItem>

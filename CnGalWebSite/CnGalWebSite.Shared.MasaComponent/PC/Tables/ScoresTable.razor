@@ -2,20 +2,24 @@
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
-<DataTableCard TModel="GameScoreTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+<MDCard>
+    <DataTableCard TModel="GameScoreTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 
 @code {

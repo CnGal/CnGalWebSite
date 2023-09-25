@@ -9,12 +9,13 @@
 
 <div class="anniversary-page">
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})" />
-        <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="mb-4" CenterActive>
+    <MDCard Class="mb-4">
+        <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow CenterActive>
             <MTab Value="1">
                 主页<MIcon>mdi-home</MIcon>
             </MTab>
             @*<MTab Value="2">
-                评选<MIcon>mdi-star</MIcon>
+            评选<MIcon>mdi-star</MIcon>
             </MTab>*@
             <MTab Value="3">
                 晒出你的游戏库<MIcon>@IconType.Game.ToIconString()</MIcon>
@@ -26,6 +27,8 @@
                 活动介绍<MIcon>mdi-av-timer</MIcon>
             </MTab>
         </MTabs>
+        </MDCard>
+
     <MTabsItems @bind-Value="index">
         <MTabItem Value="1">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.HomeCard />

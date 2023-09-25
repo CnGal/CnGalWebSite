@@ -1,6 +1,6 @@
 ﻿@if (Model.Staffs != null && Model.Staffs.Count != 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="Staff" Icon="@IconType.Staff.ToIconString()" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" Icon="@IconType.Staff.ToIconString()" Collapable>
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
         </ButtonContent>
@@ -43,7 +43,7 @@
 {
     <MDialog @bind-Value="export"
              MaxWidth="500">
-        <MCard>
+        <MDCard>
             <MCardTitle Class="text-h5">
                 导出STAFF
             </MCardTitle>
@@ -53,7 +53,7 @@
                 </PCopyableText>
              
             </MCardText>
-        </MCard>
+        </MDCard>
     </MDialog>
 }
 @code {
