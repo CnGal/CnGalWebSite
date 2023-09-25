@@ -17,11 +17,11 @@ else
         </MCardText>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.ClientName" Label="应用名称" HideDetails="true" />
 
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.ClientUri" Label="应用主页" HideDetails="true" />
                 </MCol>
 
@@ -63,13 +63,13 @@ else
                     <SecretCard Id="Model.Id" ClientId="@Model.ClientId" />
                 </MCol>
 
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <InputStringListCard Title="主域" SubTitle="网站运行时的根Url" Items="Model.AllowedCorsOrigins" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <InputStringListCard Title="登入回调地址" SubTitle="登录成功之后将要跳转的Url" Items="Model.RedirectUris" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <InputStringListCard Title="登出回调地址" SubTitle="登出之后将要跳转的Url" Items="Model.PostLogoutRedirectUris" />
                 </MCol>
             </MRow>

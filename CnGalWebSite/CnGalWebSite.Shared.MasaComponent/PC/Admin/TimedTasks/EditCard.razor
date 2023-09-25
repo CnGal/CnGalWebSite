@@ -21,21 +21,21 @@ else
         </MCardText>
         <MCardText>
             <MRow>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="TimedTaskType" Label="任务类型" />
                 </MCol>
-                <MCol Cols="12" Xl="6">
+                <MCol Cols="12" Md="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.ExecuteType" TValue="TimedTaskExecuteType" Label="定时类型" />
                 </MCol>
                 @if (Model.ExecuteType == TimedTaskExecuteType.EveryDay)
                 {
-                    <MCol Cols="12" Xl="6">
+                    <MCol Cols="12" Md="6">
                         <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-NullableValue="Model.EveryTime" Nullable ShowDate="false" ShowTime Label="固定时间" />
                      </MCol>
                 }
                 else
                 {
-                    <MCol Cols="12" Xl="6">
+                    <MCol Cols="12" Md="6">
                         <MTextField @bind-Value="Model.IntervalTime" Label="间隔时间（分钟）" />
                     </MCol>
                 }
