@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<MDCard Outline="Outline" ShowHoverStyle="Clickable" Class="h-100 pa-3" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick">
+<MDCard Outline="Outline" ShowHoverStyle="Clickable" Class="@($"h-100 pa-3 {(Clickable?"pointer":"")}")" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick">
     <div>
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.User" HideRank Class="mb-2" Outline/>
 
@@ -29,7 +29,7 @@
     </div>
     @if (ShowAction)
     {
-        <div style=" color: gray; display: flex; flex-direction: column; align-items: center;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
             <MButton Rounded OnClick="OnEdit" Color="primary">
                 <MIcon Left>mdi-pencil </MIcon>
                 编辑游玩记录
@@ -42,7 +42,7 @@
             }
             @if (string.IsNullOrWhiteSpace(GameName) == false)
             {
-                <div style="color:gray;" class="mt-2 pb-2" itemprop="name">
+                <div class="mt-2 pb-2" itemprop="name">
                     @($"《{GameName}》")
                 </div>
             }
