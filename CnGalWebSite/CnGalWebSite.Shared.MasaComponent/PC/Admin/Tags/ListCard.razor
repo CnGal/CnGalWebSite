@@ -2,44 +2,47 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="TagOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 170px;">
-                @if (context.Item.IsHidden)
-                {
-                    <MIcon Color="success"
-                           Class="mr-2"
-                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
-                }
-                else
-                {
-                    <MIcon Color="error"
-                           Class="mr-2"
-                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
-                }
-               
-            </div>
-        }
-        else if (context.Header.Value == nameof(TagOverviewModel.IsHidden))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
-        }
-        else if (context.Header.Value == nameof(TagOverviewModel.Name))
-        {
-            <TagChip Id="@context.Item.Id" Name="@context.Item.Name"/>
-        }
-        else if (context.Header.Value == nameof(TagOverviewModel.LastEditTime))
-        {
-            @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+<MDCard>
+    <DataTableCard TModel="TagOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 170px;">
+                    @if (context.Item.IsHidden)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+
+                </div>
+            }
+            else if (context.Header.Value == nameof(TagOverviewModel.IsHidden))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
+            }
+            else if (context.Header.Value == nameof(TagOverviewModel.Name))
+            {
+                <TagChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(TagOverviewModel.LastEditTime))
+            {
+                @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
 
 @code {
     private string _baseUrl = "api/tags/List";

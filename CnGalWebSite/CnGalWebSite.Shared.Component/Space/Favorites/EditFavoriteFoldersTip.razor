@@ -9,48 +9,50 @@
     审核通过前，修改的内容仅在  <strong>编辑收藏夹</strong> 页面展示
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
+<MDCard>
+    <DataTableCard TModel="FavoriteFolderOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" OnClickAdd="AddFavoriteFolder" Title="@($"{_name}列表")" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                <MIcon Color="info"
+                       Class="mr-2"
+                       OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.MainImage))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.MainImage" />
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.UserId))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsHidden))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden=@context.Item.IsHidden />
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.ShowPublicly))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.PlayedGames.ShowPubilcChip ShowPublicly=@context.Item.ShowPublicly />
+            }
+            else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsDefault))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Folders.StateChip IsDefault=@context.Item.IsDefault />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
 
-<DataTableCard TModel="FavoriteFolderOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" OnClickAdd="AddFavoriteFolder" Title="@($"{_name}列表")" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="success"
-                   Class="mr-2"
-                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.MainImage))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.MainImage" />
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.UserId))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.CreateTime))
-        {
-            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsHidden))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden=@context.Item.IsHidden />
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.ShowPublicly))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.PlayedGames.ShowPubilcChip ShowPublicly=@context.Item.ShowPublicly />
-        }
-        else if (context.Header.Value == nameof(FavoriteFolderOverviewModel.IsDefault))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Favorites.Folders.StateChip IsDefault=@context.Item.IsDefault />
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+</MDCard>
 <CreateFavoriteFolderCard @ref="createFavoriteFolderCard" UserId="@Id" OnCreated="@(()=> dataTableCard.GetDataFromApi())" />
 
 @code {

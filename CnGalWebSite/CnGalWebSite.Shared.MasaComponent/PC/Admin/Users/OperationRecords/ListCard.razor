@@ -2,32 +2,36 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="OperationRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
+<MDCard>
+    <DataTableCard TModel="OperationRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
                 <MIcon Color="success"
                        Class="mr-2"
                        OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-        }
-        else if (context.Header.Value == nameof(OperationRecordOverviewModel.Type))
-        {
-            <TypeChip Type="context.Item.Type" />
-        }
-        else if (context.Header.Value == nameof(OperationRecordOverviewModel.UserName))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
-        }
-        else if (context.Header.Value == nameof(OperationRecordOverviewModel.OperationTime))
-        {
-            @context.Item.OperationTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+            }
+            else if (context.Header.Value == nameof(OperationRecordOverviewModel.Type))
+            {
+                <TypeChip Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(OperationRecordOverviewModel.UserName))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(OperationRecordOverviewModel.OperationTime))
+            {
+                @context.Item.OperationTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 @code {
     private string _baseUrl = "api/account/ListOperationRecords";

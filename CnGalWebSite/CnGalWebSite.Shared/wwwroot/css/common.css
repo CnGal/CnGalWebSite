@@ -327,6 +327,7 @@ ins {
 /*幻灯片组*/
 .slide-group-garp .m-slide-group__content {
     gap: 1rem;
+    padding: 3px;
 }
 /*页面内容距离顶部*/
 .variable.container {

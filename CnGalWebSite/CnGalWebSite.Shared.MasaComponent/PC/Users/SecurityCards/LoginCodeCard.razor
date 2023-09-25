@@ -21,7 +21,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
 <MDialog @bind-Value="Dialog"
          Width="600">
-    <MCard>
+    <MDCard>
         <MCardTitle Class="text-h5">
             一次性授权码
         </MCardTitle>
@@ -37,7 +37,7 @@
             <MSpacer></MSpacer>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="success" TextStyle />
         </MCardActions>
-    </MCard>
+    </MDCard>
 </MDialog>
 @code {
     [Parameter]

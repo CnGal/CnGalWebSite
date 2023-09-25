@@ -23,30 +23,33 @@
         </div>
     </div>
 </MDCard>
-<MTabs @bind-Value="TabIndex" IconsAndText Grow Class="mb-4" CenterActive>
+<MDCard Class="mb-4">
+    <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
-    <MTab Value="1">
-        游戏<MIcon>mdi-gamepad-square</MIcon>
-    </MTab>
-    <MTab Value="2">
-        制作组<MIcon>mdi-account-multiple </MIcon>
-    </MTab>
-    <MTab Value="3">
-        STAFF<MIcon>mdi-magic-staff</MIcon>
-    </MTab>
-    <MTab Value="4">
-        制作人<MIcon>mdi-coffee-maker-outline</MIcon>
-    </MTab>
-    <MTab Value="5">
-        角色<MIcon>mdi-clover </MIcon>
-    </MTab>
-    <MTab Value="6">
-        游戏价格<MIcon>mdi-currency-usd </MIcon>
-    </MTab>
-    <MTab Value="7">
-        游戏评分<MIcon>mdi-star</MIcon>
-    </MTab>
-</MTabs>
+        <MTab Value="1">
+            游戏<MIcon>mdi-gamepad-square</MIcon>
+        </MTab>
+        <MTab Value="2">
+            制作组<MIcon>mdi-account-multiple </MIcon>
+        </MTab>
+        <MTab Value="3">
+            STAFF<MIcon>mdi-magic-staff</MIcon>
+        </MTab>
+        <MTab Value="4">
+            制作人<MIcon>mdi-coffee-maker-outline</MIcon>
+        </MTab>
+        <MTab Value="5">
+            角色<MIcon>mdi-clover </MIcon>
+        </MTab>
+        <MTab Value="6">
+            游戏价格<MIcon>mdi-currency-usd </MIcon>
+        </MTab>
+        <MTab Value="7">
+            游戏评分<MIcon>mdi-star</MIcon>
+        </MTab>
+    </MTabs>
+</MDCard>
+
 <MTabsItems @bind-Value="TabIndex">
     <MTabItem Value="1">
         <CnGalWebSite.Shared.Component.Tables.GamesTableViewTip />

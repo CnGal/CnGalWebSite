@@ -11,17 +11,20 @@
 </style>
 
 <div>
-    <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive Class="mb-4">
-        <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
-            本周<MIcon>mdi-av-timer </MIcon>
-        </MTab>
-        <MTab Value="2" OnClick="@(() => OnCondited("本月"))">
-            本月<MIcon>mdi-clock-outline</MIcon>
-        </MTab>
-        <MTab Value="4" OnClick="@(() => OnCondited("本年"))">
-            本年<MIcon>mdi-calendar-text </MIcon>
-        </MTab>
-    </MTabs>
+    <MDCard Class="mb-4">
+        <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive>
+             <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
+                 本周<MIcon>mdi-av-timer </MIcon>
+             </MTab>
+             <MTab Value="2" OnClick="@(() => OnCondited("本月"))">
+                 本月<MIcon>mdi-clock-outline</MIcon>
+             </MTab>
+             <MTab Value="4" OnClick="@(() => OnCondited("本年"))">
+                 本年<MIcon>mdi-calendar-text </MIcon>
+             </MTab>
+         </MTabs>
+    </MDCard>
+
     <div class="mt-4">
         @if (isReady)
         {

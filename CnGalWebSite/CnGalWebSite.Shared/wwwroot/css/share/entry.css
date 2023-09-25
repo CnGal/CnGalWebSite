@@ -80,6 +80,10 @@
         align-items: center;
     }
 
+        .entry-card-default.relevance-card .info-item > div {
+            word-break: keep-all;
+        }
+
     .entry-card-default.relevance-card.hide-title .head-card {
         display: none;
     }

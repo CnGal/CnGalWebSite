@@ -5,18 +5,21 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="词条版块"/>
 <div>
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow  CenterActive Class="mb-4">
+    <MDCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
-            <MTab Value="1">
-                词条<MIcon>mdi-archive</MIcon>
-            </MTab>
-            <MTab Value="2">
-                游玩记录<MIcon>mdi-star</MIcon>
-            </MTab>
-            <MTab Value="3">
-                基础信息类型<MIcon>@IconType.Tag.ToIconString()</MIcon>
-            </MTab>
-        </MTabs>
+             <MTab Value="1">
+                 词条<MIcon>mdi-archive</MIcon>
+             </MTab>
+             <MTab Value="2">
+                 游玩记录<MIcon>mdi-star</MIcon>
+             </MTab>
+             <MTab Value="3">
+                 基础信息类型<MIcon>@IconType.Tag.ToIconString()</MIcon>
+             </MTab>
+         </MTabs>
+    </MDCard>
+
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Entries.ListCard/>
@@ -34,11 +37,4 @@
 @code {
 
     public StringNumber TabIndex { get; set; } = 1;
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
 }

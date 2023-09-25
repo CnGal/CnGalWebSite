@@ -5,10 +5,9 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Style.ToIconString()" Title="专题页样式补充信息" Class="@Class" Collapable @bind-IsCollapsed="IsCollapsed">
      <MRow>
          <MCol Cols="12" Md="6" Lg="4">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Logo" Type="ImageAspectType.None" Text="上传Logo" />
+             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Logo" Type="ImageAspectType.None" Text="上传Logo" Class="mb-4" />
          </MCol>
          <MCol Cols="12">
-             <MDivider />
          </MCol>
          <MCol Cols="12" Md="6">
              <MTextField @bind-Value="Model.SubTitle" Label="副标题" />
@@ -20,24 +19,25 @@
              <MTextField @bind-Value="Model.Color" Label="主题颜色" />
          </MCol>
      </MRow>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="图片" Text="包括轮播图和背景图" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard Model="Model.Images" TValue="EditWebsiteImageModel"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard>
+     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="图片" Text="包括轮播图和背景图" />
+     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard Model="Model.Images" TValue="EditWebsiteImageModel"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.ImageListEditorCard>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mt-3">
-        SSR模式下会拦截不受信任的源和内联脚本，请与管理员联系以添加脚本
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="primary">
+         SSR模式下会拦截不受信任的源和内联脚本，请与管理员联系以添加脚本
+     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
      <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="自定义Html" Text="将会覆盖整个页面" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.Html" />
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.Html" />
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="自定义首页" Text="可使用Html" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.FirstPage" />
+
+     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="自定义首页" Text="可使用Html" />
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.FirstPage" />
 
      <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="自定义介绍" Text="可使用Html" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.Introduction" />
+     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaHtmlEditor @bind-Context="Model.Introduction" />
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-@code {
+ </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+ @code {
     [Parameter]
     public EditEntryWebsiteViewModel Model { get; set; }
     [Parameter]

@@ -4,15 +4,15 @@
 
 @if (Model == null)
 {
-    <MCard>
+    <MDCard>
         <MCardText Class="pt-8 pb-8">
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
         </MCardText>
-    </MCard>
+    </MDCard>
 }
 else
 {
-    <MCard>
+    <MDCard>
         <MCardTitle>
             @(Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.Note
         </MCardTitle>
@@ -48,7 +48,7 @@ else
              保存
          </MButton>
      </MCardActions>
- </MCard>
+ </MDCard>
 }
 
 

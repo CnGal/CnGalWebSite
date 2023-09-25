@@ -2,8 +2,8 @@
 .md-card {
     display: flex;
     border-radius: var( --md-card-border-radius);
-     transition: .3s;
- white-space: normal;
+    transition: .3s;
+    white-space: normal;
     flex-direction: column;
 }
     /*primary颜色*/
@@ -35,6 +35,17 @@
     }
 
     .md-card.show-hover-style.color-tertiary:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+    /*background颜色*/
+    .md-card.color-background {
+        background-color: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-background) !important;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12) !important;
+    }
+
+    .md-card.show-hover-style.color-background:hover {
         background-color: var( --md-sys-color-primary-container);
         color: var(--md-sys-color-on-primary-container) !important;
     }

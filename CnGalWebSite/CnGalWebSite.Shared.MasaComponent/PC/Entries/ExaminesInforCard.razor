@@ -16,7 +16,7 @@
                 <span>@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
             </OppositeContent>
             <ChildContent>
-                <MCard Class="elevation-2" @onclick="@(()=>OnClickExamine(item))">
+                <MDCard Class="elevation-2" OnClick="@(()=>OnClickExamine(item))">
                     <MCardText>
                         @if (Model.IndexOf(item) % 2 == 0 || (_dataCacheService.IsApp || Model.Count < 3))
                         {
@@ -46,7 +46,7 @@
                         }
 
                     </MCardText>
-                </MCard>
+                </MDCard>
             </ChildContent>
         </MTimelineItem>
     }

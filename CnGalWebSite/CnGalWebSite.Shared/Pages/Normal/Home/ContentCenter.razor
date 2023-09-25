@@ -7,21 +7,23 @@
 @implements IDisposable
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("内容中心"+Tab switch {"monitor"=>" - 监视列表","review"=> " - 审阅记录列表","editrecord" =>" - 审核",_=>""})" />
+<MDCard Class="mb-4">
+    <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow CenterActive>
+         <MTab Value="1">
+             概览<MIcon>mdi-home</MIcon>
+         </MTab>
+         <MTab Value="2">
+             关注<MIcon>mdi-monitor</MIcon>
+         </MTab>
+         <MTab Value="3">
+             审阅记录<MIcon>mdi-read</MIcon>
+         </MTab>
+         <MTab Value="4">
+             审核<MIcon>mdi-pencil</MIcon>
+         </MTab>
+     </MTabs>
+    </MDCard>
 
-    <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow CenterActive Class="mb-4">
-        <MTab Value="1">
-            概览<MIcon>mdi-home</MIcon>
-        </MTab>
-        <MTab Value="2">
-            关注<MIcon>mdi-monitor</MIcon>
-        </MTab>
-        <MTab Value="3">
-            审阅记录<MIcon>mdi-read</MIcon>
-        </MTab>
-        <MTab Value="4">
-            审核<MIcon>mdi-pencil</MIcon>
-        </MTab>
-    </MTabs>
 <MTabsItems @bind-Value="TabIndex">
     <MTabItem Value="1">
 

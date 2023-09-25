@@ -2,46 +2,50 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="WeeklyNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <div style="width: 70px;">
-            <MIcon Color="success"
-                   Class="mr-2"
-                   OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
-            @if (context.Item.ArticleId > 0)
+<MDCard>
+    <DataTableCard TModel="WeeklyNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="info"
-                       Class="mr-2"
-                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                <div style="width: 70px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    @if (context.Item.ArticleId > 0)
+                    {
+                        <MIcon Color="info"
+                               Class="mr-2"
+                               OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                    }
+                </div>
             }
-            </div>
-        }
-        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.State))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.News.GameNews.StateChip State="context.Item.State" />
-        }
-        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.PublishTime))
-        {
-            @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.CreateTime))
-        {
-            @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
-        {
-            <div style="white-space: pre-line;">
-                @context.Item.BriefIntroduction
-            </div>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</DataTableCard>
+            else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.State))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.News.GameNews.StateChip State="context.Item.State" />
+            }
+            else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.PublishTime))
+            {
+                @context.Item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(WeeklyNewsOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(GameNewsOverviewModel.BriefIntroduction))
+            {
+                <div style="white-space: pre-line;">
+                    @context.Item.BriefIntroduction
+                </div>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
 
 <EditWeeklyNewsTip @ref="editWeeklyNewsTip" OnRefreshTable="RefreshTable" />
 

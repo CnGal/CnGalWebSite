@@ -23,9 +23,8 @@
         @foreach (var item in Model)
         {
             <MSlideItem>
-                <MCard Class="mt-4 me-4 mb-2" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="context.Ref">
+                <MCard Class="mt-4 me-4 mb-2 pointer" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})">
                     <div style="@($"background-image: url({item.Image});")" class="@((context.Active?"active":"")+" image-overlays ")">
-
                     </div>
                 </MCard>
             </MSlideItem>

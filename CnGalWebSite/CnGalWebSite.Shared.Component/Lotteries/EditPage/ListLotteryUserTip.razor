@@ -2,47 +2,50 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="LotteryUserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            @if (context.Item.IsHidden)
+<MDCard>
+    <DataTableCard TModel="LotteryUserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="success"
-                       Class="mr-2"
-                       OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                @if (context.Item.IsHidden)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                }
+                else
+                {
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                }
+            }
+            else if (context.Header.Value == nameof(LotteryUserOverviewModel.IsHidden))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="@context.Item.IsHidden" />
+            }
+            else if (context.Header.Value == nameof(LotteryUserOverviewModel.Name))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.Name" />
             }
             else
             {
-                <MIcon Color="error"
-                       Class="mr-2"
-                       OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                @context.Value
             }
-        }
-        else if (context.Header.Value == nameof(LotteryUserOverviewModel.IsHidden))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="@context.Item.IsHidden" />
-        }
-        else if (context.Header.Value == nameof(LotteryUserOverviewModel.Name))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.Name" />
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-    <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导出数据" Icon="@IconType.Export.ToIconString()" OnClick="OnExport" Class="me-4" />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入数据" Icon="@IconType.Import.ToIconString()" OnClick="OnImport" Class="me-4" />
-    </ButtonContent>
+        </ItemColContent>
+        <ButtonContent>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导出数据" Icon="@IconType.Export.ToIconString()" OnClick="OnExport" Class="me-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入数据" Icon="@IconType.Import.ToIconString()" OnClick="OnImport" Class="me-4" />
+        </ButtonContent>
 
-</DataTableCard>
+    </DataTableCard>
+
+</MDCard>
 @if (export)
 {
     <MDialog @bind-Value="export"
              MaxWidth="500">
-        <MCard>
+        <MDCard>
             <MCardTitle Class="text-h5">
                 导出抽奖数据
             </MCardTitle>
@@ -57,7 +60,7 @@
                     关闭
                 </MButton>
             </MCardActions>
-        </MCard>
+        </MDCard>
     </MDialog>
 }
 

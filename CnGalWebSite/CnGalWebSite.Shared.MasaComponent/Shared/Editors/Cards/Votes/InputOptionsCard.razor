@@ -2,11 +2,12 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="EditVoteOptionModel" Headers="_headers" DataSource="Options" SortByItem="@nameof(EditVoteOptionModel.Text)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
-               Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Text!=null&&s.Text.Contains(dataTableCard._search))">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
+<MDCard>
+    <DataTableCard TModel="EditVoteOptionModel" Headers="_headers" DataSource="Options" SortByItem="@nameof(EditVoteOptionModel.Text)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+                   Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Text!=null&&s.Text.Contains(dataTableCard._search))">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
                 <div style="width: 140px;">
                     <MIcon Color="success"
                            Class="mr-2"
@@ -15,20 +16,23 @@
                            Class="mr-2"
                            OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
                 </div>
-        }
-        else if (context.Header.Value == nameof(EditVoteOptionModel.Type))
-        {
-        <TypeChip Type="@context.Item.Type"/>
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-    <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="批量导入" Icon="@IconType.Import.ToIconString()" OnClick="BatchItems" Class="me-4" />
-    </ButtonContent>
-</DataTableCard>
+            }
+            else if (context.Header.Value == nameof(EditVoteOptionModel.Type))
+            {
+                <TypeChip Type="@context.Item.Type" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+        <ButtonContent>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="批量导入" Icon="@IconType.Import.ToIconString()" OnClick="BatchItems" Class="me-4" />
+        </ButtonContent>
+    </DataTableCard>
+
+</MDCard>
+
 <MDialog @bind-Value="_editDialog"
          MaxWidth="800">
     <EditCard Options="Options" OnEdited="OnEdited" @ref="editCard" />

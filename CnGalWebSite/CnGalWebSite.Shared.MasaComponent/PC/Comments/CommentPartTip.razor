@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 
-<MDCard Class="@($"pa-4 mb-3 {(Deepth==0?"":"elevation-2")}")">
+<MDCard Class="@($"pa-4 mb-3  {(IsChild?"elevation-2":"")}")" Color="@(IsChild?"primary":"background")">
     <div>
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.UserInfor" Outline Class="mb-2"/>
         <div class="mb-2">

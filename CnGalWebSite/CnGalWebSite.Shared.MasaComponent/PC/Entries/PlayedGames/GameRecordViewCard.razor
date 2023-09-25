@@ -5,7 +5,7 @@
     @if (Type == PlayedGamesDisplayType.LargeCard)
     {
         <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
-            <MDCard Class="h-100" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
+            <MDCard Class="h-100 pointer" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
                 <div class="">
                     <div class="">
                         <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName" crossOrigin="anonymous">
@@ -28,7 +28,7 @@
         {
 
             <div class="col-6 col-md-4 col-lg-3 col-xl-2  mb-4">
-                <MDCard Class="h-100" Style="cursor: pointer " OnClick="OnClick" ShowHoverStyle="true">
+                <MDCard Class="h-100 pointer" OnClick="OnClick" ShowHoverStyle="true">
                     <div>
                         <img loading="lazy" src="@Model.GameImage" class="card-img-top" crossOrigin="anonymous" style="width: 100%;" alt="@Model.GameName" />
                     </div>
@@ -44,7 +44,7 @@
         else
         {
             <div class="col-6 col-md-4 col-lg-3 col-xl-2  mb-4">
-                <MDCard Class="h-100" OnClick="OnClick" ShowHoverStyle="true">
+                <MDCard Class="h-100 pointer" OnClick="OnClick" ShowHoverStyle="true">
                     <img loading="lazy" src="@Model.GameImage" class="card-img-top" alt="@Model.GameName" crossOrigin="anonymous" />
                     <div class="pa-2 pb-1">
                         <span class="home-card-name-text">@Model.GameName</span>
@@ -63,7 +63,7 @@
         @if (_dataCacheService.IsApp)
         {
             <div class="col-12  mb-4">
-                <MDCard Class="h-100" OnClick="OnClick" ShowHoverStyle="true">
+                <MDCard Class="h-100 pointer" OnClick="OnClick" ShowHoverStyle="true">
                     <div style="display: flex; align-items: center;">
                         <div>
                             <img loading="lazy" style=" width: 160px; " src="@Model.GameImage" crossOrigin="anonymous">
@@ -87,7 +87,7 @@
         {
             <div class="col-12  mb-4">
 
-                <MDCard Class="h-100" OnClick="OnClick" ShowHoverStyle="true">
+                <MDCard Class="h-100 pointer" OnClick="OnClick" ShowHoverStyle="true">
 
                     <div class="" style="display:flex;">
                         <div class="">
@@ -111,7 +111,7 @@
 else
 {
     <div class="col-6 col-md-6 col-lg-4 col-xl-3 mb-3">
-        <MDCard Class=" h-100" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
+        <MDCard Class=" h-100 pointer" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick" ShowHoverStyle="true">
                 <div style="display: flex;">
                     <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName">
                 </div>

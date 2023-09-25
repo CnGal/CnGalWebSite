@@ -7,14 +7,14 @@
                 <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"orange":"green")"
                                Icon="@(item.Target>Model.Booking.BookingCount?IconType.IndeterminateTime.ToIconString():IconType.Check.ToIconString())"
                                FillDot>
-                    <MCard>
+                    <MDCard>
                         <MCardTitle Class="h6 fw-bold p-3 pb-0">
                             @item.Name
                         </MCardTitle>
                         <MCardText>
                             @($"达到{item.Target}人解锁")
                         </MCardText>
-                    </MCard>
+                    </MDCard>
                 </MTimelineItem>
             }
         </MTimeline>

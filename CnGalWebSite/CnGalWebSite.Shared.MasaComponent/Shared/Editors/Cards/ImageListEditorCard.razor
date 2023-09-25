@@ -12,7 +12,7 @@
         {
             <MCol Cols="12" Md="6" Lg="4" Xl="3">
                 <img src="@item.Image" alt="@item.Note" class="w-100 mb-3">
-                <div style="display: flex;justify-content: space-between;">
+                <div class="mb-4" style="display: flex;justify-content: space-between;">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Color="success" Text="编辑" Icon="@IconType.Edit.ToIconString()" OnClick="@(()=> EditImage(item))" />
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Color="error" Text="删除" Icon="@IconType.Delete.ToIconString()" OnClick="@(()=> DeleteImage(item))" />
                 </div>
@@ -25,7 +25,7 @@
 {
     <MDialog @bind-Value="_editDialog"
              MaxWidth="800">
-        <MCard>
+        <MDCard>
             <MCardTitle>
                 编辑图片
             </MCardTitle>
@@ -56,7 +56,7 @@
                 </MRow>
 
             </MCardText>
-        </MCard>
+        </MDCard>
     </MDialog>
 }
 

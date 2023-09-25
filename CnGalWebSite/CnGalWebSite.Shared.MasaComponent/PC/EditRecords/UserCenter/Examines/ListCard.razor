@@ -2,52 +2,55 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(ExamineOverviewModel.PassedTime)" @ref="dataTableCard"
-    LoadingText="找不到数据欸......可以尝试申请用户认证哦~">
-    <ItemColContent>
-        @if (context.Header.Value == "actions")
-        {
-            <MIcon Color="info"
-                   Class="mr-2"
-                   OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
-            @if (context.Item.IsPassed == null)
+<MDCard>
+    <DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(ExamineOverviewModel.PassedTime)" @ref="dataTableCard"
+                   LoadingText="找不到数据欸......可以尝试申请用户认证哦~">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
             {
-                <MIcon Color="success"
+                <MIcon Color="info"
                        Class="mr-2"
-                       OnClick="()=>ProcItem(context.Item, true)">@IconType.Check.ToIconString()</MIcon>
-                <MIcon Color="error"
-                       Class="mr-2"
-                       OnClick="()=>ProcItem(context.Item, false)">@IconType.Close.ToIconString()</MIcon>
+                       OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                @if (context.Item.IsPassed == null)
+                {
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>ProcItem(context.Item, true)">@IconType.Check.ToIconString()</MIcon>
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>ProcItem(context.Item, false)">@IconType.Close.ToIconString()</MIcon>
 
+                }
             }
-        }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.IsPassed))
-        {
-            <StateChip IsPassed="context.Item.IsPassed" />
-        }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.Operation))
-        {
-            @context.Item.Operation.GetDisplayName()
-        }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.PassedTime))
-        {
-            @context.Item.PassedTime?.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.ApplyTime))
-        {
-            @context.Item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
-        }
-        else if (context.Header.Value == nameof(ExamineOverviewModel.ApplicationUserId))
-        {
-            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.ApplicationUserId" Name="@context.Item.UserName" />
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-    
-</DataTableCard>
+            else if (context.Header.Value == nameof(ExamineOverviewModel.IsPassed))
+            {
+                <StateChip IsPassed="context.Item.IsPassed" />
+            }
+            else if (context.Header.Value == nameof(ExamineOverviewModel.Operation))
+            {
+                @context.Item.Operation.GetDisplayName()
+            }
+            else if (context.Header.Value == nameof(ExamineOverviewModel.PassedTime))
+            {
+                @context.Item.PassedTime?.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(ExamineOverviewModel.ApplyTime))
+            {
+                @context.Item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(ExamineOverviewModel.ApplicationUserId))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.ApplicationUserId" Name="@context.Item.UserName" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+
+    </DataTableCard>
+</MDCard>
+
 
 
 @code {

@@ -3,7 +3,7 @@
 
 <MDialog @bind-Value="Dialog"
          Width="250">
-    <MCard Class="w-100 pa-4">
+    <MDCard Class="w-100 pa-4">
             <MButton Text Block  Color="primary"  OnClick="@(()=>OnClick("/entries/establishentry"))">
                 <MIcon Left>mdi-archive</MIcon>
                 创建词条
@@ -37,7 +37,7 @@
                     </MButton>
                 </Authorized>
             </AuthorizeView>
-    </MCard>
+    </MDCard>
 </MDialog>
 @code {
     bool Dialog { get; set; }
