@@ -1,40 +1,46 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using CnGalWebSite.DataModel.Helper;
+@using CnGalWebSite.DataModel.ViewModel.Articles;
+@using CnGalWebSite.DataModel.ViewModel.Others;
+@using Microsoft.AspNetCore.Components.Routing;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
-@inject IEventService _eventService
+@inject CnGalWebSite.Shared.Service.IEventService _eventService
 @inject IJSRuntime JS
 
 
-<div style=" position: fixed; z-index: 4; bottom: 7rem; right: 2rem;" class="@(_dataCacheService.IsApp?"d-none":"")">
-    <div style=" display: flex; flex-direction: column;">
-        @*<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.BrithdayButton Class="mb-4" />*@
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" />
-        @if (showEntryStyle)
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Style.ToIconString()" Tooltip="切换词条样式模板" OnClick="_eventService.OnSwitchStyle"  Class="mb-4"/>
-        }
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" Kanban />
+@if (showEntryStyle)
+{
+    <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/entrystyle.png" Tooltip="切换词条样式模板" OnClick="_eventService.OnSwitchStyle" />
+}
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="left" Text="社区交流" Class="mb-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-sina-weibo" Tooltip="微博" OnClick="@(()=>OnNav("https://weibo.com/cngalorg?sudaref=www.cngal.org"))" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-qqchat" Tooltip="QQ" OnClick="@(()=>OnNav("https://jq.qq.com/?_wv=1027&k=mG6qNvyg"))" />
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/tool.png" ShowMenu Tooltip="工具箱">
+     <MenuContent>
+         <div class="tool-menu">
+             <div>
+                 <MButton Text Block Color="primary" OnClick="OnRepostVideos">
+                     <MIcon Left>mdi-animation-play</MIcon>
+                    转载视频
+                </MButton>
+                @if (ToolHelper.IsSSR)
+                {
+                    <MButton Text Block Color="primary" OnClick="OnRepostArticles">
+                         <MIcon Left>mdi-script-text</MIcon>
+                     转载文章
+                 </MButton>
+                }
+                <MButton Text Block Color="primary" OnClick="OnMergeEntries">
+                     <MIcon Left>mdi-archive</MIcon>
+                    合并词条
+                </MButton>
+            </div>
+        </div>
 
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
+    </MenuContent>
+</CnGalWebSite.Kanban.Components.Shared.FloatButton>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-toolbox" Direction="left" Text="工具箱" Class="mb-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-archive" Tooltip="合并词条" OnClick="OnMergeEntries" />
-            @if (ToolHelper.IsSSR)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnRepostArticles" />
-            }
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-animation-play" Tooltip="转载视频" OnClick="OnRepostVideos" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
-
-    </div>
-
-</div>
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
@@ -75,10 +81,10 @@
     protected void OnLogin()
     {
         InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
+            {
+                Interaction = InteractionType.SignIn,
+                ReturnUrl = NavigationManager.Uri,
+            };
 
 
         if (ToolHelper.IsSSR)
@@ -140,7 +146,7 @@
     {
         NavigationManager.LocationChanged -= LocationChanged;
         NavigationManager.LocationChanged += LocationChanged;
-        LocationChanged(null,null);
+        LocationChanged(null, null);
 
     }
 

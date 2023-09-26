@@ -84,9 +84,6 @@ else
     public ErrorHandler ErrorHandler { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    [CascadingParameter]
-    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
-
 
     public bool IsAdmin { get; set; } = false;
     public bool CanDeleted { get; set; }
@@ -100,8 +97,8 @@ else
             NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
 
-            CnGalRootTip.FloatTool.SwitchEntryStyle -= SwitchEntryStyle;
-            CnGalRootTip.FloatTool.SwitchEntryStyle += SwitchEntryStyle;
+            _eventService.SwitchEntryStyle -= SwitchEntryStyle;
+            _eventService.SwitchEntryStyle += SwitchEntryStyle;
 
             isFirstLoad = false;
         }
@@ -298,7 +295,7 @@ else
     {
 
         NavigationManager.LocationChanged -= LocationChanged;
-        CnGalRootTip.FloatTool.SwitchEntryStyle -= SwitchEntryStyle;
+        _eventService.SwitchEntryStyle -= SwitchEntryStyle;
 
         GC.SuppressFinalize(this);
     }

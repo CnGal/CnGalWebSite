@@ -1,13 +1,15 @@
 ﻿@inject IDialogBoxService _dialogBoxService
+@inject IDataCacheService _dataCacheService
+@inject CnGalWebSite.Shared.Service.IEventService _eventService
+@inject IEventService _kanbanEventService
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/quit.png" OnClick="OnClick" Tooltip="退出" />
 
 @code {
-    public void OnClick()
+    public async void OnClick()
     {
-        _dialogBoxService.ShowDialogBox(new DialogBoxModel
-            {
-                Content = $"真的要离开我吗？"
-            });
+        await _kanbanEventService.TriggerCustomEventAsync("关闭");
+        _dataCacheService.ThemeSetting.HideKanban = true;
+        _eventService.OnSavaTheme();
     }
 }

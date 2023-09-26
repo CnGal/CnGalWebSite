@@ -32,6 +32,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Kanban\CnGalWebSite.Kanban.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Layout\CnGalWebSite.Shared.Layout.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Service\CnGalWebSite.Shared.Service.csproj" />
   </ItemGroup>

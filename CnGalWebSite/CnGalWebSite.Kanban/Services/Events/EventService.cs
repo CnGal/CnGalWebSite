@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.Services.Events
 {
-    public class EventService : IEventService,IDisposable
+    public class EventService : IEventService, IDisposable
     {
         private readonly ILocalStorageService _localStorageService;
         private readonly HttpClient _httpClient;
@@ -91,7 +91,7 @@ namespace CnGalWebSite.Kanban.Services.Events
             //创建对象引用
             objRef = DotNetObjectReference.Create(this);
 
-            await _jSRuntime.InvokeVoidAsync("initMouseOverEvent", objRef, _eventGroupModel.MouseOverEvents.Select(s=>new
+            await _jSRuntime.InvokeVoidAsync("initMouseOverEvent", objRef, _eventGroupModel.MouseOverEvents.Select(s => new
             {
                 s.Selector,
                 s.Id
@@ -107,8 +107,8 @@ namespace CnGalWebSite.Kanban.Services.Events
         [JSInvokable]
         public async Task TriggerMouseOverEventAsync(int id)
         {
-            var item =_eventGroupModel.MouseOverEvents.FirstOrDefault(s => s.Id == id);
-            if(item!=null)
+            var item = _eventGroupModel.MouseOverEvents.FirstOrDefault(s => s.Id == id);
+            if (item != null)
             {
                 await TriggerEventAsync(item, new CancellationTokenSource().Token);
             }
@@ -122,7 +122,7 @@ namespace CnGalWebSite.Kanban.Services.Events
         public async Task TriggerCustomEventAsync(string name)
         {
             var item = _eventGroupModel.CustomEvents.FirstOrDefault(s => s.Name == name);
-            if(item!=null)
+            if (item != null)
             {
                 await TriggerEventAsync(item, new CancellationTokenSource().Token);
             }
@@ -136,7 +136,7 @@ namespace CnGalWebSite.Kanban.Services.Events
         /// <returns></returns>
         private async Task TriggerEventAsync(BaseEventModel model, CancellationToken token)
         {
-            if(_processing)
+            if (_processing && model.Priority < 1)
             {
                 return;
             }
@@ -198,7 +198,7 @@ namespace CnGalWebSite.Kanban.Services.Events
                 foreach (var item in list)
                 {
                     await TriggerEventAsync(item, token);
-                   
+
                     //取消
                     if (token.IsCancellationRequested)
                     {
@@ -225,8 +225,8 @@ namespace CnGalWebSite.Kanban.Services.Events
         private async void LocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             var url = _navigationManager.Uri.Replace(_navigationManager.BaseUri, "");
-            var item=_eventGroupModel.NavigationEvents.FirstOrDefault(s=>s.Url == url);
-            if (item!=null)
+            var item = _eventGroupModel.NavigationEvents.FirstOrDefault(s => s.Url == url);
+            if (item != null)
             {
                 await TriggerEventAsync(item, new CancellationTokenSource().Token);
             }

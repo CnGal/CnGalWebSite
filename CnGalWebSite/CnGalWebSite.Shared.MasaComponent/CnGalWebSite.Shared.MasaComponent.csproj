@@ -19,7 +19,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\CnGalWebSite.Kanban\CnGalWebSite.Kanban.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Common\CnGalWebSite.Shared.Common.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Service\CnGalWebSite.Shared.Service.csproj" />
   </ItemGroup>

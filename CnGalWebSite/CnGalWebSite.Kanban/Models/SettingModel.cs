@@ -39,7 +39,7 @@ namespace CnGalWebSite.Kanban.Models
         public Size Size { get; set; } = new Size
         {
             Height = 500,
-            Width = 500,
+            Width = 300,
         };
     }
 

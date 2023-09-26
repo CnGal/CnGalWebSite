@@ -56,8 +56,7 @@ namespace CnGalWebSite.Kanban.Services.Dialogs
                 switch (index)
                 {
                     case '0':
-                        var exp= _expressionRepository.GetAll().FirstOrDefault(s => s.DisplayName == str);
-                        model.Expression = _expressionRepository.GetAll().IndexOf(exp);
+                        model.Expression = _expressionRepository.GetAll().FirstOrDefault(s => s.DisplayName == str)?.Name;
                         break;
                     case '1':
                         var motionGroup = "";

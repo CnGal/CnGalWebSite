@@ -169,6 +169,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     public async Task Refresh()
     {
         await InvokeAsync(StateHasChanged);
+        _eventService.OnKanbanChanged();
     }
 
     #region 释放实例

@@ -1,5 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
 @if (CatalogItems != null && CatalogItems.Any())
 {
@@ -33,12 +33,12 @@ else
     [Parameter]
     public List<ArticleCatalogModel> CatalogItems { get; set; }
 
-    public async Task OnActiveUpdate(List<ArticleCatalogModel> model)
+    public void OnActiveUpdate(List<ArticleCatalogModel> model)
     {
         if (model == null || model.Any() == false)
         {
             return;
         }
-        await JS.InvokeAsync<string>("navigateTo", $"{Url}#{model.FirstOrDefault().Href}");
+        NavigationManager.NavigateTo($"{Url}#{model.FirstOrDefault().Href}");
     }
 }

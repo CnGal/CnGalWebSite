@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.Services.UserDatas
 {
-    public class UserDataService:IUserDataService
+    public class UserDataService : IUserDataService
     {
         private readonly ILocalStorageService _localStorageService;
         private readonly IRepository<ClothesModel> _clothesRepository;
+        private readonly IRepository<StockingsModel> _strockingsRepository;
+        private readonly IRepository<ShoesModel> _shoesRepository;
 
 
         private UserDataModel _userDataModel = new();
@@ -27,10 +29,12 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
             }
         }
 
-        public UserDataService(ILocalStorageService localStorageService, IRepository<ClothesModel> clothesRepository)
+        public UserDataService(ILocalStorageService localStorageService, IRepository<ClothesModel> clothesRepository, IRepository<StockingsModel> strockingsRepository, IRepository<ShoesModel> shoesRepository)
         {
             _localStorageService = localStorageService;
             _clothesRepository = clothesRepository;
+            _strockingsRepository = strockingsRepository;
+            _shoesRepository = shoesRepository;
         }
 
         public async Task LoadAsync()
@@ -66,31 +70,18 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
         /// <returns></returns>
         private void CheckClothes()
         {
-            if (!_clothesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.CurrentName))
+            if (_userDataModel.Clothes.ClothesName != null && !_clothesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ClothesName))
             {
-                _userDataModel.Clothes.CurrentName = _clothesRepository.GetAll().FirstOrDefault()?.Name;
+                _userDataModel.Clothes.ClothesName = null;
             }
-        }
-
-        /// <summary>
-        /// 获取当前服装索引
-        /// </summary>
-        /// <returns></returns>
-        public int GetCurrentClothesIndex()
-        {
-            var list = _clothesRepository.GetAll();
-            return list.IndexOf(list.FirstOrDefault(s => s.Name == _userDataModel.Clothes.CurrentName));
-        }
-
-        /// <summary>
-        /// 设置当前服装
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public async Task SetCurrentClothesIndex(int index)
-        {
-            _userDataModel.Clothes.CurrentName = _clothesRepository.GetAll()[index].Name;
-            await SaveAsync();
+            if (_userDataModel.Clothes.StockingsName != null && !_strockingsRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.StockingsName))
+            {
+                _userDataModel.Clothes.StockingsName = null;
+            }
+            if (_userDataModel.Clothes.ShoesName != null && !_shoesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ShoesName))
+            {
+                _userDataModel.Clothes.ShoesName = null;
+            }
         }
     }
 }

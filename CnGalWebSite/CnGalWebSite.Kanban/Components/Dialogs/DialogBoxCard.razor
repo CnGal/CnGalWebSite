@@ -53,7 +53,7 @@
             await _live2DService.SetMotion(model.MotionGroup, model.Motion);
         }
         //表情
-        if (model.Expression >= 0)
+        if (string.IsNullOrWhiteSpace(model.Expression)==false)
         {
             await _live2DService.SetExpression(model.Expression);
         }
@@ -100,8 +100,15 @@
         //关闭对话框
         _model = null;
         _show = false;
-        await _live2DService.CleanExpression();
-        await _live2DService.CleanMotion();
+        if (string.IsNullOrWhiteSpace(model.Expression) == false)
+        {
+            await _live2DService.CleanExpression();
+        }
+        if (model.Motion >= 0)
+        {
+            await _live2DService.CleanMotion();
+        }
+       
         await InvokeAsync(StateHasChanged);
     }
 

@@ -923,14 +923,13 @@ html {
     padding: 0;
 }
 /*Masa卡片*/
-.theme--light.m-card, .theme--light.m-sheet {
-    background-color: var(--md-sys-color-surface-1);
-    color: var(--md-sys-color-on-surface);
-    border-color: var(--md-sys-color-surface-1);
+.theme--light.m-card {
+    background-color: transparent;
+    color: inherit;
 }
 
     .theme--light.m-card > .m-card__subtitle, .theme--light.m-card > .m-card__text, .m-toast-detail {
-        color: var(--md-sys-color-on-surface);
+        color: inherit
     }
 
 .m-alert:not(.m-sheet--tile) {
@@ -944,8 +943,8 @@ html {
 .m-tabs {
     border-radius: var(--md-card-border-radius) !important;
 }
-/*菜单*/
-.m-menu__content, .theme--light.m-picker__body {
+/*下拉列表*/
+.m-sheet.theme--light.m-list.m-select-list {
     background-color: var(--md-sys-color-background);
 }
 /*步骤条*/
@@ -1013,7 +1012,7 @@ html {
 }
 
 .theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
-    color: inherit;
+    color: var(--md-sys-color-on-background);
 }
 
 .theme--light.m-icon {
@@ -1130,9 +1129,7 @@ html {
 }
 /*树状列表*/
 .theme--light.m-treeview {
-    background-color: var(--md-sys-color-surface-1);
-    color: var(--md-sys-color-on-surface);
-    border-radius: 24px;
+    color:inherit;
 }
 /*背景透明*/
 .m-main__wrap {

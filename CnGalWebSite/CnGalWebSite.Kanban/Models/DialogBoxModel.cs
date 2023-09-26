@@ -10,7 +10,7 @@ namespace CnGalWebSite.Kanban.Models
     {
         public string Content { get; set; }
 
-        public int Expression { get; set; } = -1;
+        public string Expression { get; set; }
 
         public string MotionGroup { get; set; }
 

@@ -5,34 +5,35 @@
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/motion.png" ShowMenu Tooltip="动作">
      <MenuContent>
-         <MList Dense>
-            @foreach (var item in _motionGroupRepository.GetAll())
-            {
-                <MSubheader>@item.DisplayName</MSubheader>
-                <MListItemGroup Value="null" ValueChanged="@((e)=>ValueChanged(item,e))"
-                                Color="primary">
-                    @foreach (var info in item.Motions)
-                    {
-                        <MListItem>
-                            <MListItemContent>
-                                <MListItemTitle>@info.Name</MListItemTitle>
-                            </MListItemContent>
-                        </MListItem>
-                    }
-                    @if (_motionGroupRepository.GetAll().IndexOf(item) == _motionGroupRepository.GetAll().Count - 1)
-                    {
-                        <MListItem>
-                            <MListItemContent>
-                                <MListItemTitle>清空</MListItemTitle>
-                            </MListItemContent>
-                        </MListItem>
-                    }
+         <MDCard>
+             <MList Dense>
+                @foreach (var item in _motionGroupRepository.GetAll())
+                {
+                    <MSubheader>@item.DisplayName</MSubheader>
+                    <MListItemGroup Value="null" ValueChanged="@((e)=>ValueChanged(item,e))"
+                                    Color="primary">
+                        @foreach (var info in item.Motions)
+                        {
+                            <MListItem>
+                                <MListItemContent>
+                                    <MListItemTitle>@info.Name</MListItemTitle>
+                                </MListItemContent>
+                            </MListItem>
+                        }
+                        @if (_motionGroupRepository.GetAll().IndexOf(item) == _motionGroupRepository.GetAll().Count - 1)
+                        {
+                            <MListItem>
+                                <MListItemContent>
+                                    <MListItemTitle>清空</MListItemTitle>
+                                </MListItemContent>
+                            </MListItem>
+                        }
 
-                </MListItemGroup>
-            }
+                    </MListItemGroup>
+                }
 
-        </MList>
-
+            </MList>
+         </MDCard>
     </MenuContent>
 </CnGalWebSite.Kanban.Components.Shared.FloatButton>
 

@@ -5,20 +5,29 @@
 @inject IEventService _eventService
 @implements IDisposable
 
-<div class="kanban-live2d" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
+<div class="@($"kanban-live2d {(isReady?"":"d-none")}")" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
     <CnGalWebSite.Kanban.Components.MainCard />
-    <CnGalWebSite.Kanban.Components.Buttons.ButtonGroupCard />
+    <CnGalWebSite.Kanban.Components.Buttons.ButtonGroupCard ChildContent="@ChildContent" />
     <CnGalWebSite.Kanban.Components.Dialogs.DialogBoxCard/>
 </div>
 
 @code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+
     Task _task;
     CancellationTokenSource tokenSource;
+
+    bool isReady;
 
     protected override void OnInitialized()
     {
         _settingService.OnSettingChanged -= OnSettingChanged;
         _settingService.OnSettingChanged += OnSettingChanged;
+
+        _live2DService.Live2DInitialized -=OnLive2DInitialized;
+        _live2DService.Live2DInitialized +=OnLive2DInitialized;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -45,11 +54,19 @@
         StateHasChanged();
     }
 
+    public void OnLive2DInitialized()
+    {
+        isReady = true;
+        StateHasChanged();
+    }
+
     public void Dispose()
     {
         tokenSource?.Cancel();
         tokenSource?.Dispose();
         _settingService.OnSettingChanged -= OnSettingChanged;
+        _live2DService.ReleaseLive2D();
+        _live2DService.Live2DInitialized -= OnLive2DInitialized;
         GC.SuppressFinalize(this);
     }
 }

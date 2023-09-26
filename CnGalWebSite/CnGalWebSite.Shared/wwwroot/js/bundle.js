@@ -846,8 +846,11 @@ var backImageName = ''; // 指定背景图片
 //var modelDir = '波奇酱2.0,Hiyori,Haru,Mao,Mark,Natori,Rice';  // 指定需要加载的模型
 var canvasId = 'live2d';//画布Id
 
+var live2d_dotNetHelper;
+
 function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
     var modelDirs = modelDir.split(',');
+    live2d_dotNetHelper = dotNetHelper;
 
     setLive2dDefine(resourcesPath, backImageName, modelDirs, canvasId, modelIndex);
     initLive2d();
@@ -857,6 +860,11 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
     listenLive2dCanvasChange();
    
     console.log("初始化Live2D")
+}
+
+// 初始化完成回调
+window.Live2dInitCallback = function () {
+    live2d_dotNetHelper.invokeMethodAsync("Live2dInitCallback")
 }
 
 function getWindowSize() {
@@ -1176,7 +1184,43 @@ function switchLiv2DExpression(id) {
     }
 }
 
-//切换表情
+//切换衣服
+function switchLiv2DClothes(id) {
+    var manger = getLive2dManager();
+    var model = manger.getCurrentModel();
+    if (id) {
+        model.setClothes(id);
+    }
+    else {
+        model.cleanClothes();
+    }
+}
+
+//切换丝袜
+function switchLiv2DStockings(id) {
+    var manger = getLive2dManager();
+    var model = manger.getCurrentModel();
+    if (id) {
+        model.setStockings(id);
+    }
+    else {
+        model.cleanStockings();
+    }
+}
+
+//切换鞋子
+function switchLiv2DShoes(id) {
+    var manger = getLive2dManager();
+    var model = manger.getCurrentModel();
+    if (id) {
+        model.setShoes(id);
+    }
+    else {
+        model.cleanShoes();
+    }
+}
+
+//切换动作
 function switchLiv2DMotion(group,id) {
     var manger = getLive2dManager();
     var model = manger.getCurrentModel();
@@ -1211,3 +1255,5 @@ function scrollToTop() {
         behavior: "smooth"
     })
 }
+
+

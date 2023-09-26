@@ -3,30 +3,77 @@
 @inject ILive2DService _live2DService
 @inject IJSRuntime JS
 @inject IRepository<ClothesModel> _clothesRepository;
+@inject IRepository<StockingsModel> _stockingsRepository;
+@inject IRepository<ShoesModel> _shoesRepository;
 
-<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/clothes.png" ShowMenu Tooltip="换衣服">
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/clothes.png" ShowMenu Tooltip="换衣服" >
     <MenuContent>
-         <MList Dense>
-            <MListItemGroup Value="@(_userDataService.GetCurrentClothesIndex())" ValueChanged="SwitchClothes"
-                            Color="primary">
+         <MDCard Class="pa-4 pb-0" Style="width: 350px;">
+             <div class="title-medium">衣服</div>
+            <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
                 @foreach (var item in _clothesRepository.GetAll())
                 {
-                    <MListItem>
-                        <MListItemContent>
-                            <MListItemTitle>@item.DisplayName</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
                 }
-            </MListItemGroup>
-        </MList>
-
+            </MRadioGroup>
+            <div class="title-medium">丝袜</div>
+            <MRadioGroup Value=" _userDataService.UserData.Clothes.StockingsName" TValue="string" ValueChanged="StockingsChanged" Row Mandatory>
+                 @foreach (var item in _stockingsRepository.GetAll())
+                {
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
+                }
+            </MRadioGroup>
+            <div class="title-medium">鞋子</div>
+            <MRadioGroup Value=" _userDataService.UserData.Clothes.ShoesName" TValue="string" ValueChanged="ShoesChanged" Row Mandatory>
+                 @foreach (var item in _shoesRepository.GetAll())
+                {
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
+                }
+            </MRadioGroup>
+        </MDCard>
     </MenuContent>
 </CnGalWebSite.Kanban.Components.Shared.FloatButton>
 
 @code {
-
-    public async Task SwitchClothes(StringNumber index)
+    public int GetValue()
     {
-        await _live2DService.SetClothesAsync(index.ToInt32());
+        var clothes=   _clothesRepository.GetAll().FirstOrDefault(s => s.Name == _userDataService.UserData.Clothes.ClothesName);
+        return _clothesRepository.GetAll().IndexOf(clothes);
+    }
+
+    public async Task ClothesChanged(string name)
+    {
+        if (name == null)
+        {
+            await _live2DService.CleanClothes();
+        }
+        else
+        {
+            await _live2DService.SetClothes(name);
+        }        
+    }
+
+    public async Task StockingsChanged(string name)
+    {
+        if (name == null)
+        {
+            await _live2DService.CleanStockings();
+        }
+        else
+        {
+            await _live2DService.SetStockings(name);
+        }
+    }
+
+    public async Task ShoesChanged(string name)
+    {
+        if (name == null)
+        {
+            await _live2DService.CleanShoes();
+        }
+        else
+        {
+            await _live2DService.SetShoes(name);
+        }
     }
 }

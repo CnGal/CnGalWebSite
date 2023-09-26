@@ -5,25 +5,21 @@
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/face.png" ShowMenu Tooltip="表情">
      <MenuContent>
-         <MList Dense>
-            <MListItemGroup Value="_index" ValueChanged="SwitchExpression"
-                            Color="primary">
-                @foreach (var item in _expressionRepository.GetAll())
-                {
-                    <MListItem>
-                        <MListItemContent>
-                            <MListItemTitle>@item.DisplayName</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                }
-                <MListItem>
-                    <MListItemContent>
-                        <MListItemTitle>清空</MListItemTitle>
-                    </MListItemContent>
-                </MListItem>
-            </MListItemGroup>
-        </MList>
-
+         <MDCard>
+             <MList Dense>
+                <MListItemGroup Value="_index" ValueChanged="SwitchExpression"
+                                Color="primary">
+                    @foreach (var item in _expressionRepository.GetAll())
+                    {
+                        <MListItem>
+                            <MListItemContent>
+                                <MListItemTitle>@item.DisplayName</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                    }
+                </MListItemGroup>
+            </MList>
+         </MDCard>
     </MenuContent>
 </CnGalWebSite.Kanban.Components.Shared.FloatButton>
 
@@ -33,13 +29,13 @@
     public async Task SwitchExpression(StringNumber index)
     {
         _index = index;
-        if (index.ToInt32() == _expressionRepository.GetAll().Count)
+        if (index == null)
         {
             await _live2DService.CleanExpression();
         }
         else
         {
-            await _live2DService.SetExpression(index.ToInt32());
+            await _live2DService.SetExpression( _expressionRepository.GetAll()[index.ToInt32()].Name);
         }
     }
 }

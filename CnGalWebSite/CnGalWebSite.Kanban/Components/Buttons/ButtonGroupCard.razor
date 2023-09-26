@@ -9,16 +9,19 @@
 
 <div id="kanban-button-group" class="button-group user-select-none" style="@_settingService.Setting.Button.GetStyles()">
     <QuitButton/>
+    @ChildContent
     <MotionButton/>
     <ExpressionButton/>
     <ClothesButton/>
     <ChatButton/>
-    <ToolButton/>
     <SettingButton/>
     <TopButton/>
 </div>
 
 @code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
 
     protected override void OnInitialized()
     {

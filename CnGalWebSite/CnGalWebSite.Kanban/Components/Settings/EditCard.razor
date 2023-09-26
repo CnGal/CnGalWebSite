@@ -2,14 +2,10 @@
 
 <MDialog @bind-Value="Dialog"
          Width="800">
-    <MCard>
+    <MDCard>
             <MCardTitle>设置</MCardTitle>
         <MCardText>
-            <MAlert Outlined
-                     Border="Borders.Left" Color="primary"
-                     Type="AlertTypes.Info">
-                 看板娘Live2D
-             </MAlert>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="看板娘Live2D" Title="看板娘Live2D" />
             <MRow>
                 <MCol Cols="12" Md="6">
                     <MTextField Label="高度" @bind-Value="_settingService.Setting.Kanban.Size.Height" />
@@ -24,13 +20,8 @@
                     <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.Kanban.Position.Top" />
                 </MCol>
             </MRow>
-        </MCardText>
-        <MCardText>
-             <MAlert Outlined
-                     Border="Borders.Left" Color="primary"
-                     Type="AlertTypes.Info">
-                 按钮组
-             </MAlert>
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="按钮组" Title="按钮组" />
             <MRow>
                 <MCol Cols="12" Md="6">
                     <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Button.Position.Left" />
@@ -42,14 +33,9 @@
                      <MTextField Label="图标大小" @bind-Value="_settingService.Setting.Button.Size" />
                  </MCol>
              </MRow>
-        </MCardText>
-         <MCardText>
-             <MAlert Outlined
-                     Border="Borders.Left" Color="primary"
-                     Type="AlertTypes.Info">
-                 对话框
-             </MAlert>
-             <MRow>
+    
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="对话框" Title="对话框" />
+            <MRow>
                  <MCol Cols="12" Md="6">
                      <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Left" />
                  </MCol>
@@ -74,7 +60,7 @@
                 保存
             </MButton>
         </MCardActions>
-    </MCard>
+    </MDCard>
 </MDialog>
 
 @code {

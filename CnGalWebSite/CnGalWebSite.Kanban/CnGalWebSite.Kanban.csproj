@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SupportedPlatform Include="browser" />
+    <ProjectReference Include="..\CnGalWebSite.Shared.MasaComponent\CnGalWebSite.Shared.MasaComponent.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CnGalWebSite.Shared.Common\CnGalWebSite.Shared.Common.csproj" />
+    <SupportedPlatform Include="browser" />
   </ItemGroup>
 
 </Project>

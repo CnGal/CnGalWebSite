@@ -16,9 +16,5 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
         void Reset();
 
         UserDataModel UserData { get; }
-
-        int GetCurrentClothesIndex();
-
-        Task SetCurrentClothesIndex(int index);
     }
 }

@@ -12,4 +12,8 @@ namespace CnGalWebSite.Kanban.Models
 
         public string DisplayName { get; set; }
     }
+
+    public class StockingsModel : ClothesModel;
+
+    public class ShoesModel : ClothesModel;
 }

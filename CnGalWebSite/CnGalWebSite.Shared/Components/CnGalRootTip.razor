@@ -5,12 +5,11 @@
 @implements IDisposable
 
 <ErrorHandler IsSSR="ToolHelper.IsSSR" ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor">
-    <CnGalWebSite.Kanban.KanbanLive2D/>
+    <KanbanCard @ref="KanbanCard" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImagesLargeViewTip />
-    <FloatToolTip @ref="FloatTool" />
-    <UserLicenseAgreementTip />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.UserLicenseAgreementTip />
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
-    <BackgroundImageTip/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip/>
     <audio id="bgMusic"></audio>
     <CascadingValue Value=this IsFixed="true">
         @ChildContent
@@ -24,7 +23,7 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    public FloatToolTip FloatTool { get; set; }
+    public KanbanCard KanbanCard { get; set; }
 
 
     [CascadingParameter]
