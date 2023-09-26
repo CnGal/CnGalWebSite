@@ -1,0 +1,11 @@
+﻿
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/setting.png" OnClick="ShowEditCard"  Tooltip="设置"/>
+<CnGalWebSite.Kanban.Components.Settings.EditCard @ref="_editCard" />
+@code {
+    CnGalWebSite.Kanban.Components.Settings.EditCard _editCard;
+
+    public void ShowEditCard()
+    {
+        _editCard?.Show();
+    }
+}

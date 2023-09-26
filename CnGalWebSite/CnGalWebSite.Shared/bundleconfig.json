@@ -6,7 +6,8 @@
       "wwwroot/js/tools-inline.js",
       "wwwroot/js/lottery.js",
       "wwwroot/js/home.js",
-      "wwwroot/js/check.js"
+      "wwwroot/js/check.js",
+      "../CnGalWebSite.Kanban/wwwroot/js/live2d-core.js"
     ]
   },
   {
@@ -33,7 +34,8 @@
       "wwwroot/css/share/edit-record.css",
       "wwwroot/css/share/article.css",
       "wwwroot/css/share/error.css",
-      "wwwroot/css/share/loading.css"
+      "wwwroot/css/share/loading.css",
+      "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
     ]
   },
   {

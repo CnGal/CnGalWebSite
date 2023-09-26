@@ -1,0 +1,32 @@
+﻿@inject ISettingService _settingService
+@inject IUserDataService _userDataService
+@inject ILive2DService _live2DService
+@inject IJSRuntime JS
+@inject IRepository<ClothesModel> _clothesRepository;
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/clothes.png" ShowMenu Tooltip="换衣服">
+    <MenuContent>
+         <MList Dense>
+            <MListItemGroup Value="@(_userDataService.GetCurrentClothesIndex())" ValueChanged="SwitchClothes"
+                            Color="primary">
+                @foreach (var item in _clothesRepository.GetAll())
+                {
+                    <MListItem>
+                        <MListItemContent>
+                            <MListItemTitle>@item.DisplayName</MListItemTitle>
+                        </MListItemContent>
+                    </MListItem>
+                }
+            </MListItemGroup>
+        </MList>
+
+    </MenuContent>
+</CnGalWebSite.Kanban.Components.Shared.FloatButton>
+
+@code {
+
+    public async Task SwitchClothes(StringNumber index)
+    {
+        await _live2DService.SetClothesAsync(index.ToInt32());
+    }
+}

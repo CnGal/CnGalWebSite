@@ -22,6 +22,9 @@
 
 
   <ItemGroup>
+    <Content Update="bundleconfig.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
     <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

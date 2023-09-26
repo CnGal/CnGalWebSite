@@ -44,16 +44,12 @@
     <link href="@("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&display=swap")" rel="stylesheet">
  *@
     <!--自定义样式-->
-    @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css"> *@
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css">
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css"> *@
 
     <!--不同屏幕大小自适应样式-->
     @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
-
-    <!--跟随系统-->
-    @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/theme.css" /> *@
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/theme.css" />
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
     <component type="typeof(StructuredDataTip)" render-mode="ServerPrerendered" />
@@ -90,8 +86,8 @@
     </div>
 
     <!--自定义脚本-->
-    @* <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script> *@
-    <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script>
+    <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script>
+    @* <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script> *@
 
     <!--图片裁剪-->
     <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
@@ -104,6 +100,11 @@
 
     <!--图表-->
     <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/echarts/5.1.1/echarts.min.js"></script>
+
+    <!--Live2D-->
+    <script src="http://localhost:5000/Core/live2dcubismcore.js"></script>
+    <script src="http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js"></script>
+    <script src="https://unpkg.com/core-js-bundle@3.6.1/minified.js"></script>
 
     <!--埋点数据采集-->
     <script async src="https://umami.cngal.top/script.js" data-website-id="c190d5e2-f859-430c-8463-be388f6875b0"></script>

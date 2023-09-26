@@ -1,0 +1,13 @@
+﻿@inject IDialogBoxService _dialogBoxService
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/message.png" OnClick="Chat" Tooltip="聊天" />
+
+@code {
+    public void Chat()
+    {
+        _dialogBoxService.ShowDialogBox(new DialogBoxModel
+            {
+                Content = $"这是你的幸运数字：{new Random().Next()}"
+            });
+    }
+}

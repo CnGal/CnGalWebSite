@@ -1,0 +1,23 @@
+﻿@inject ISettingService _settingService
+@implements IDisposable
+
+<canvas id="live2d" width="@_settingService.Setting.Kanban.Size.Width" height="@_settingService.Setting.Kanban.Size.Height"  class="live2d"></canvas>
+
+@code {
+    protected override void OnInitialized()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        _settingService.OnSettingChanged += OnSettingChanged;
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+}

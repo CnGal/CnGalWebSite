@@ -1,0 +1,55 @@
+﻿@inject IJSRuntime JS
+@inject ISettingService _settingService
+@inject IDialogBoxService _dialogBoxService
+@inject ILive2DService _live2DService
+@inject IEventService _eventService
+@implements IDisposable
+
+<div class="kanban-live2d" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
+    <CnGalWebSite.Kanban.Components.MainCard />
+    <CnGalWebSite.Kanban.Components.Buttons.ButtonGroupCard />
+    <CnGalWebSite.Kanban.Components.Dialogs.DialogBoxCard/>
+</div>
+
+@code {
+    Task _task;
+    CancellationTokenSource tokenSource;
+
+    protected override void OnInitialized()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        _settingService.OnSettingChanged += OnSettingChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            await _live2DService.InitAsync();
+            StateHasChanged();
+
+            tokenSource = new CancellationTokenSource();
+            _task = Task.Factory.StartNew(async (obj) =>
+            {
+                CancellationToken ct = (CancellationToken)obj;
+                await _eventService.RunAsync(ct);
+
+            }, tokenSource.Token);
+
+        }
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        tokenSource?.Cancel();
+        tokenSource?.Dispose();
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+}

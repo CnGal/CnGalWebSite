@@ -1,0 +1,10 @@
+﻿@inject IJSRuntime JS
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/top.png" OnClick="OnClick" Tooltip="回到顶部" />
+
+@code {
+    public async Task OnClick()
+    {
+        await JS.InvokeVoidAsync("scrollToTop");
+    }
+}

@@ -322,3 +322,7 @@ html {
 .m-card > :first-child:not(.m-btn):not(.m-chip):not(.m-avatar) {
     border-radius: var(--md-card-border-radius) !important;
 }
+/*tab标签*/
+.m-window-item.m-window {
+    padding: 3px;
+}

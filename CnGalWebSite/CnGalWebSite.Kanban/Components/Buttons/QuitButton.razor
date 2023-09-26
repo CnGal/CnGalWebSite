@@ -1,0 +1,13 @@
+﻿@inject IDialogBoxService _dialogBoxService
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/quit.png" OnClick="OnClick" Tooltip="退出" />
+
+@code {
+    public void OnClick()
+    {
+        _dialogBoxService.ShowDialogBox(new DialogBoxModel
+            {
+                Content = $"真的要离开我吗？"
+            });
+    }
+}

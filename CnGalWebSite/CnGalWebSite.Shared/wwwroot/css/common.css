@@ -333,3 +333,11 @@ ins {
 .variable.container {
     padding-top: 24px;
 }
+/*输入框*/
+input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--md-sys-color-on-background);
+}
+
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: var(--md-sys-color-on-background);
+}

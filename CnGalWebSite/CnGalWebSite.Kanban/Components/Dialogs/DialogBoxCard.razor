@@ -1,0 +1,126 @@
+﻿@inject ISettingService _settingService
+@inject IDialogBoxService _dialogBoxService
+@inject ILive2DService _live2DService
+@implements IDisposable
+
+<div class="kanban-dialogbox" id="kanban-dialogbox" style="@_settingService.Setting.DialogBox.GetStyles()">
+    <div style="@_settingService.Setting.DialogBox.GetContentStyles()">
+        <MAlert Text Value="_show" ValueChanged="ValueChanged" Style="width:100%" Class="mb-0"
+                    Dismissible
+                 Color="@_color"
+                 Elevation="3"
+                 Border="Borders.Left"
+                 Type="@_type">
+             @_model?.Content
+         </MAlert>
+    </div>
+</div>
+
+
+ @code {
+    DialogBoxModel _model;
+    Task _task;
+    CancellationTokenSource tokenSource = new CancellationTokenSource();
+    /// <summary>
+    /// 单位 0.1 秒
+    /// </summary>
+    int _delayTime = 0;
+    bool _show;
+    string _color;
+    AlertTypes _type;
+
+    protected override void OnInitialized()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        _settingService.OnSettingChanged += OnSettingChanged;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dialogBoxService.Init(this);
+        }
+    }
+
+    public async Task ShowDialogBox(DialogBoxModel model)
+    {
+        _show = true;
+        _model = model;
+        //动作
+        if (model.Motion >= 0)
+        {
+            await _live2DService.SetMotion(model.MotionGroup, model.Motion);
+        }
+        //表情
+        if (model.Expression >= 0)
+        {
+            await _live2DService.SetExpression(model.Expression);
+        }
+        //背景色
+        if (model.Type == DialogBoxType.Text)
+        {
+            _color = "primary";
+            _type = AlertTypes.Info;
+        }
+        else if (model.Type == DialogBoxType.Success)
+        {
+            _color = "success";
+            _type = AlertTypes.Success;
+        }
+        else if (model.Type == DialogBoxType.Warning)
+        {
+            _color = "warning";
+            _type = AlertTypes.Warning;
+        }
+        else if (model.Type == DialogBoxType.Info)
+        {
+            _color = "info";
+            _type = AlertTypes.Info;
+        }
+        else if (model.Type == DialogBoxType.Error)
+        {
+            _color = "error";
+            _type = AlertTypes.Error;
+        }
+        //显示对话框
+        await InvokeAsync(StateHasChanged);
+        //等待一定时间
+        tokenSource?.Dispose();
+        tokenSource = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(model.Content.Length * 400, tokenSource.Token);
+        }
+        catch
+        {
+
+        }
+
+        //关闭对话框
+        _model = null;
+        _show = false;
+        await _live2DService.CleanExpression();
+        await _live2DService.CleanMotion();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void ValueChanged(bool show)
+    {
+        _show = show;
+        tokenSource.Cancel();
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        tokenSource?.Cancel();
+        tokenSource.Dispose();
+        GC.SuppressFinalize(this);
+    }
+}

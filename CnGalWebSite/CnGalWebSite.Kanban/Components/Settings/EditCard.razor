@@ -1,0 +1,102 @@
+﻿@inject ISettingService _settingService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+            <MCardTitle>设置</MCardTitle>
+        <MCardText>
+            <MAlert Outlined
+                     Border="Borders.Left" Color="primary"
+                     Type="AlertTypes.Info">
+                 看板娘Live2D
+             </MAlert>
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="高度" @bind-Value="_settingService.Setting.Kanban.Size.Height" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="宽度" @bind-Value="_settingService.Setting.Kanban.Size.Width" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Kanban.Position.Left" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.Kanban.Position.Top" />
+                </MCol>
+            </MRow>
+        </MCardText>
+        <MCardText>
+             <MAlert Outlined
+                     Border="Borders.Left" Color="primary"
+                     Type="AlertTypes.Info">
+                 按钮组
+             </MAlert>
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Button.Position.Left" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.Button.Position.Top" />
+                </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="图标大小" @bind-Value="_settingService.Setting.Button.Size" />
+                 </MCol>
+             </MRow>
+        </MCardText>
+         <MCardText>
+             <MAlert Outlined
+                     Border="Borders.Left" Color="primary"
+                     Type="AlertTypes.Info">
+                 对话框
+             </MAlert>
+             <MRow>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Left" />
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Top" />
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="宽度" @bind-Value="_settingService.Setting.DialogBox.Width" />
+                 </MCol>
+             </MRow>
+         </MCardText>
+
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MButton Text Color="primary" OnClick="ResetAsync">
+                 <MIcon Left>mdi-refresh</MIcon>
+                重置
+            </MButton>
+
+            <MSpacer></MSpacer>
+            <MButton Text Color="primary" OnClick="SaveAsync">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+    bool Dialog { get; set; }
+
+    public async Task SaveAsync()
+    {
+        await _settingService.SaveAsync();
+        Dialog = false;
+        StateHasChanged();
+    }
+    public async Task ResetAsync()
+    {
+        await _settingService.ResetAsync();
+        Dialog=false;
+        StateHasChanged();
+    }
+
+    public void Show()
+    {
+        Dialog = true;
+        StateHasChanged();
+    }
+
+}
