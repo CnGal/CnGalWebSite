@@ -161,7 +161,6 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return !isError;
         }
 
-
         public async Task<List<SteamUserInforModel>> GetSteamUserInfors(List<string> steamids, ApplicationUser user)
         {
             var steams = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
@@ -200,7 +199,6 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             return model;
         }
-
 
         public async Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId)
         {
