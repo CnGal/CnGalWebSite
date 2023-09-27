@@ -19,10 +19,10 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.ThemeMode" ValueChanged="ThemeModeValueChanged" TValue="ThemeMode" Label="主题模式" />
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组，刷新页面后生效" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
             <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban?"浮动按钮组":"看板娘Live2D")" Class="m-0"></MSwitch>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
             <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")" Class="m-0"></MSwitch>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="扩展显示范围" Text="选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小" />

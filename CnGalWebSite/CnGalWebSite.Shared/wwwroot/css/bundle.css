@@ -3641,7 +3641,7 @@ a.user-info-card {
 /*最外层卡片*/
 .kanban-live2d {
     position: fixed;
-    z-index: 20;
+    z-index: 4;
 }
 
     .kanban-live2d .live2d {
