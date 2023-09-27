@@ -1,0 +1,181 @@
+﻿@using CnGalWebSite.DataModel.Helper;
+@using CnGalWebSite.DataModel.ViewModel.Articles;
+@using CnGalWebSite.DataModel.ViewModel.Others;
+@using Microsoft.AspNetCore.Components.Routing;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@implements IDisposable
+@inject CnGalWebSite.Shared.Service.IEventService _eventService
+@inject IJSRuntime JS
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" Kanban />
+@if (showEntryStyle)
+{
+    <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/entrystyle.png" Tooltip="切换词条样式模板" OnClick="_eventService.OnSwitchStyle" Class="cngal-switch-entry-style" />
+}
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/tool.png" ShowMenu Tooltip="工具箱">
+     <MenuContent>
+         <div class="tool-menu">
+             <div>
+                 <MButton Text Block Color="primary" OnClick="OnRepostVideos">
+                     <MIcon Left>mdi-animation-play</MIcon>
+                    转载视频
+                </MButton>
+                @if (ToolHelper.IsSSR)
+                {
+                    <MButton Text Block Color="primary" OnClick="OnRepostArticles">
+                         <MIcon Left>mdi-script-text</MIcon>
+                     转载文章
+                 </MButton>
+                }
+                <MButton Text Block Color="primary" OnClick="OnMergeEntries">
+                     <MIcon Left>mdi-archive</MIcon>
+                    合并词条
+                </MButton>
+            </div>
+        </div>
+
+    </MenuContent>
+</CnGalWebSite.Kanban.Components.Shared.FloatButton>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
+
+ @code {
+    private bool fab;
+    private bool showEntryStyle;
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton masaCatalogButton;
+
+    public async Task OnClickFly()
+    {
+        await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
+    }
+
+    public async Task OnNav(string url)
+    {
+        await _eventService.OpenNewPage(url);
+    }
+
+    public string ComputeIcon()
+    {
+        return fab ? "mdi-close" : " mdi-account-circle";
+    }
+
+    public bool Login()
+    {
+        if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.Id))
+        {
+            OnLogin();
+            return false;
+        }
+
+        return true;
+    }
+    protected void OnLogin()
+    {
+        InteractiveRequestOptions requestOptions = new()
+            {
+                Interaction = InteractionType.SignIn,
+                ReturnUrl = NavigationManager.Uri,
+            };
+
+
+        if (ToolHelper.IsSSR)
+        {
+            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        }
+        else
+        {
+            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        }
+    }
+    public async Task OnMergeEntries()
+    {
+        if (Login() == false)
+        {
+            return;
+        }
+        if (mergeEntriesCard != null)
+        {
+            await mergeEntriesCard.Refresh(true);
+        }
+    }
+
+    public async Task OnRepostArticles()
+    {
+        if (Login() == false)
+        {
+            return;
+        }
+        if (repostArticlesCard != null)
+        {
+            await repostArticlesCard.Refresh(true);
+        }
+    }
+
+    public async Task OnRepostVideos()
+    {
+        if (Login() == false)
+        {
+            return;
+        }
+        if (repostVideosCard != null)
+        {
+            await repostVideosCard.Refresh(true);
+        }
+    }
+
+    public void DisplayArticleCatalogButton(ArticleViewModel model)
+    {
+        if (masaCatalogButton != null)
+        {
+            masaCatalogButton.Refresh(model.MainPage, $"/articles/index/{model.Id}");
+        }
+
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+        NavigationManager.LocationChanged += LocationChanged;
+        LocationChanged(null, null);
+
+    }
+
+    public void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (NavigationManager.Uri.Contains("articles/index") == false)
+        {
+
+            if (masaCatalogButton != null)
+            {
+                masaCatalogButton.Refresh(null, null);
+            }
+            StateHasChanged();
+        }
+
+        var temp = NavigationManager.Uri.Contains("entries/index");
+        if (temp != showEntryStyle)
+        {
+            showEntryStyle = temp;
+            StateHasChanged();
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

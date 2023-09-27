@@ -13,7 +13,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Fab Small @attributes="@attrs" Class="@Class" Color="primary">
+                <MButton Fab Small @attributes="@attrs" Class="@($"cngal-edit-button{Class}")" Color="primary">
                     <MIcon>@IconType.Edit.ToIconString()</MIcon>
                 </MButton>
             </ActivatorContent>

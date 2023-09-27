@@ -4,28 +4,31 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<LatestVideoItemModel>>  _pageModelCatche
 
-<section class="latest-videoes-card">
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新视频" Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
-        <div class="group">
-            @foreach (var item in context)
-            {
-                <MDCard Class="item" Href="@item.Url">
-                    <img class="image" src="@item.Image" alt="@item.Name" loading="lazy" />
-                    <div class="head">
-                        <div class="content">
-                            <div class="name text-truncate-2">@item.Name</div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <section class="latest-videoes-card">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新视频" Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
+            <div class="group">
+                @foreach (var item in context)
+                {
+                    <MDCard Class="item" Href="@item.Url">
+                        <img class="image" src="@item.Image" alt="@item.Name" loading="lazy" />
+                        <div class="head">
+                            <div class="content">
+                                <div class="name text-truncate-2">@item.Name</div>
+                            </div>
+                            <div class="addinfo">
+                                <div class="name text-truncate-1  label-large">@item.OriginalAuthor</div>
+                                <div class="time text-truncate-1  label-large">@item.PublishTime</div>
+                            </div>
                         </div>
-                        <div class="addinfo">
-                            <div class="name text-truncate-1  label-large">@item.OriginalAuthor</div>
-                            <div class="time text-truncate-1  label-large">@item.PublishTime</div>
-                        </div>
-                    </div>
-                </MDCard>
-            }
+                    </MDCard>
+                }
 
-        </div>
-    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
-</section>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+    </section>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 @code {
 

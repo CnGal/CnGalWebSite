@@ -1,0 +1,33 @@
+﻿@inject ISettingService _settingService
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/tool.png" ShowMenu Tooltip="工具">
+     <MenuContent>
+         <div class="tool-menu">
+             <div>
+                 <MButton Text Block Color="primary">
+                     <MIcon Left>mdi-animation-play</MIcon>
+                    转载视频
+                </MButton>
+                <MButton Text Block Color="primary">
+                     <MIcon Left>mdi-script-text</MIcon>
+                    转载文章
+                </MButton>
+                <MButton Text Block Color="primary">
+                     <MIcon Left>mdi-archive</MIcon>
+                    合并词条
+                </MButton>
+            </div>
+        </div>
+
+    </MenuContent>
+</CnGalWebSite.Kanban.Components.Shared.FloatButton>
+
+@code {
+    [Parameter]
+    public EventCallback<ToolModel> OnClickTool { get; set; }
+
+    public async Task ValueChanged(StringNumber index)
+    {
+        await OnClickTool.InvokeAsync(ToolModel.GetAllTools()[index.ToInt32()]);
+    }
+}

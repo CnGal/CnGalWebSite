@@ -1,0 +1,42 @@
+﻿@inject ISettingService _settingService
+@implements IDisposable
+
+<style>
+    .float-button{
+        @_settingService.Setting.Button.GetFloatButtonStyles()
+    }
+</style>
+
+<div id="kanban-button-group" class="button-group user-select-none" style="@_settingService.Setting.Button.GetStyles()">
+    <QuitButton/>
+    @ChildContent
+@*     <MotionButton/>
+ *@    <ExpressionButton/>
+    <ClothesButton/>
+    <ChatButton/>
+    <SettingButton/>
+    <TopButton/>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        _settingService.OnSettingChanged += OnSettingChanged;
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+}

@@ -3,25 +3,27 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <section class="weekly-news-card">
+        <h2>每周速报</h2>
+        <div class="group">
+            @foreach (var item in _items.Take(_dataCacheService.IsApp ? 3 : 5))
+            {
+                <MDCard Class="item" Href="@($"articles/index/{item.Id}")">
+                    @if (GetIcon(item) != null)
+                    {
+                        <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
+                    }
 
-<section class="weekly-news-card">
-    <h2>每周速报</h2>
-    <div class="group">
-        @foreach (var item in _items.Take(_dataCacheService.IsApp ? 3 : 5))
-        {
-            <MDCard Class="item" Href="@($"articles/index/{item.Id}")">
-                @if (GetIcon(item) != null)
-                {
-                    <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
-                }
+                    <div class="content">
+                        <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name.MidStrEx("CnGal每周速报（", "）")</div>
+                    </div>
+                </MDCard>
+            }
+        </div>
+    </section>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-                <div class="content">
-                    <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name.MidStrEx("CnGal每周速报（", "）")</div>
-                </div>
-            </MDCard>
-        }
-    </div>
-</section>
 
 @code {
 

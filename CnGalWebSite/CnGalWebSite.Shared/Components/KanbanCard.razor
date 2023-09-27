@@ -1,0 +1,70 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+@inject ILive2DService _live2DService
+
+@implements IDisposable
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (isReady)
+    {
+        @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
+        }
+        else
+        {
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <CnGalWebSite.Kanban.KanbanLive2D>
+                        <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
+                    </CnGalWebSite.Kanban.KanbanLive2D>
+                </Authorized>
+                <NotAuthorized>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+    }
+
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+@code {
+    bool isReady;
+    bool hide;
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip FloatTool;
+    CnGalWebSite.Kanban.Components.Buttons.ExternalButton ExternalButton;
+
+    protected override void OnInitialized()
+    {
+        _eventService.KanbanChanged -= OnKanbanChanged;
+        _eventService.KanbanChanged += OnKanbanChanged;
+    }
+
+    public void DisplayArticleCatalogButton(ArticleViewModel model)
+    {
+        if (FloatTool != null)
+        {
+            FloatTool?.DisplayArticleCatalogButton(model);
+        }
+        else if (ExternalButton != null)
+        {
+            ExternalButton?.DisplayArticleCatalogButton(model);
+        }
+
+    }
+
+    public async void OnKanbanChanged()
+    {
+        isReady = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _eventService.KanbanChanged -= OnKanbanChanged;
+        GC.SuppressFinalize(this);
+    }
+
+}

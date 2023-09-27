@@ -18,6 +18,8 @@ namespace CnGalWebSite.Shared.Service
         public event Action<bool?, bool?, bool?,string> TempEffectTheme;
         public event Action ToggleMiniMode;
         public event Action<string> ChangeTitle;
+        public event Action SwitchEntryStyle;
+        public event Action KanbanChanged;
 
         private readonly IMauiService _mauiService;
         private readonly IJSRuntime JS;
@@ -28,6 +30,18 @@ namespace CnGalWebSite.Shared.Service
             _mauiService = mauiService;
             JS = js;
             _logger = logger;
+        }
+
+        //切换看板娘
+        public void OnKanbanChanged()
+        {
+            KanbanChanged?.Invoke();
+        }
+
+        //切换词条样式
+        public void OnSwitchStyle()
+        {
+            SwitchEntryStyle?.Invoke();
         }
 
         /// <summary>

@@ -71,8 +71,6 @@ else
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Article" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
                                                                 ObjectName="@Model.Name" />
-
-
 @if (isFirstLoad == false)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NavLoadingCard IsLoading="isLoading" />
@@ -101,7 +99,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
-    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+    private CnGalWebSite.Shared.Components.CnGalRootTip CnGalRootTip { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -133,10 +131,7 @@ else
 
 
             //展示目录
-            if (CnGalRootTip != null)
-            {
-                CnGalRootTip.FloatTool.DisplayArticleCatalogButton(Model);
-            }
+            CnGalRootTip?.KanbanCard?.DisplayArticleCatalogButton(Model);
 
             var userState = await authenticationStateTask;
             var user = userState.User;

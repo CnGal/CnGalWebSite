@@ -22,6 +22,9 @@
 
 
   <ItemGroup>
+    <Content Update="bundleconfig.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
     <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -29,6 +32,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Kanban\CnGalWebSite.Kanban.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Layout\CnGalWebSite.Shared.Layout.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared.Service\CnGalWebSite.Shared.Service.csproj" />
   </ItemGroup>

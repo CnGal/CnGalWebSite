@@ -1,0 +1,91 @@
+﻿@inject ISettingService _settingService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MDCard>
+            <MCardTitle>设置</MCardTitle>
+        <MCardText>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="看板娘Live2D" Title="看板娘Live2D" />
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="高度" @bind-Value="_settingService.Setting.Kanban.Size.Height" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="宽度" @bind-Value="_settingService.Setting.Kanban.Size.Width" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Kanban.Position.Left" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.Kanban.Position.Top" />
+                </MCol>
+            </MRow>
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="按钮组" Title="按钮组" />
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Button.Position.Left" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.Button.Position.Top" />
+                </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="图标大小" @bind-Value="_settingService.Setting.Button.Size" />
+                 </MCol>
+             </MRow>
+    
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="对话框" Title="对话框" />
+            <MRow>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Left" />
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="Y轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Top" />
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField Label="宽度" @bind-Value="_settingService.Setting.DialogBox.Width" />
+                 </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="_settingService.Setting.DialogBox.Hide" Label="隐藏对话框" TValue="bool" />
+                </MCol>
+            </MRow>
+         </MCardText>
+
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MButton Text Color="primary" OnClick="ResetAsync">
+                 <MIcon Left>mdi-refresh</MIcon>
+                重置
+            </MButton>
+
+            <MSpacer></MSpacer>
+            <MButton Rounded Color="primary" OnClick="SaveAsync">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MDCard>
+</MDialog>
+
+@code {
+    bool Dialog { get; set; }
+
+    public async Task SaveAsync()
+    {
+        await _settingService.SaveAsync();
+        Dialog = false;
+        StateHasChanged();
+    }
+    public async Task ResetAsync()
+    {
+        await _settingService.ResetAsync();
+        Dialog=false;
+        StateHasChanged();
+    }
+
+    public void Show()
+    {
+        Dialog = true;
+        StateHasChanged();
+    }
+
+}

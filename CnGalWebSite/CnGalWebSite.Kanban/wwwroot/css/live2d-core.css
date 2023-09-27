@@ -1,0 +1,73 @@
+﻿/*全局*/
+
+/*最外层卡片*/
+.kanban-live2d {
+    position: fixed;
+    z-index: 20;
+}
+
+    .kanban-live2d .live2d {
+    }
+
+    /*按钮组*/
+    .kanban-live2d .button-group {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        gap: 1rem;
+        padding: 2rem;
+    }
+
+    /*浮动按钮*/
+    .kanban-live2d .float-button {
+    }
+
+        .kanban-live2d .float-button img {
+            height: 100%;
+            width: 100%;
+        }
+
+/*禁用移动选中*/
+.user-select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/*对话框*/
+.kanban-live2d .kanban-dialogbox {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 100%;
+}
+
+.kanban-dialogbox .content-card {
+    margin-left: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.kanban-dialogbox button {
+    position: absolute;
+    left: 360px;
+    top: 5px;
+}
+
+.kanban-dialogbox .content-card .name {
+    display: flex;
+    align-items: center;
+}
+
+/*工具菜单*/
+.tool-menu {
+    width: 200px;
+    background-color: white;
+    padding: 1rem;
+}
+
+    .tool-menu > div {
+        width: 100%;
+    }

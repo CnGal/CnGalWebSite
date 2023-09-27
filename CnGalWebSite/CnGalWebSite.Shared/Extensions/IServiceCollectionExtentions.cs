@@ -2,6 +2,7 @@
 using Blazored.SessionStorage;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.Helper.Services;
+using CnGalWebSite.Kanban.Extensions;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared.DataRepositories;
@@ -55,7 +56,8 @@ namespace CnGalWebSite.Shared.Extentions
             _ = services.AddScoped<IStructuredDataService, StructuredDataService>();
             //Query
             services.AddScoped<IQueryService, QueryService>();
-            
+            // 看板娘Live2D
+            services.AddKanbanLive2D();
 
 
             return services;

@@ -13,6 +13,10 @@ namespace CnGalWebSite.Shared.Service
         event Action<bool?, bool?,bool?, string> TempEffectTheme;
         event Action ToggleMiniMode;
         event Action<string> ChangeTitle;
+        event Action SwitchEntryStyle;
+        event Action KanbanChanged;
+
+        void OnKanbanChanged();
 
         void OnSavaTheme();
 
@@ -25,5 +29,7 @@ namespace CnGalWebSite.Shared.Service
         void OnToggleMiniMode();
 
         void OnChangeTitle(string title);
+
+        void OnSwitchStyle();
     }
 }

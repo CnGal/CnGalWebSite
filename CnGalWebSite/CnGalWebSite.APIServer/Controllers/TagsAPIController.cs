@@ -876,12 +876,11 @@ namespace CnGalWebSite.APIServer.Controllers
                         Id = item.Id,
                         Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && ((item.Name.Contains("社团") == false && item.Name.Contains("城市群") == false &&
                                         item.Name.Contains("公司") == false) || s.Entries.Any(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)))
-                        .OrderByDescending(s => s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false))
+                        .OrderByDescending(s => s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false&& s.Tags.Any(s => s.Name == "配音")))
                         .Select(s => new TagTreeModel
                         {
                             Id = s.Id,
-                            Title = s.Name,
-                            EntryCount = s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                            Title = s.Name
                         }).ToList()
                     };
 
@@ -896,6 +895,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //删除没有二级标签的标签
             model.Tags.RemoveAll(s => s.Children.Any() == false);
+
+
            
             //获取CV
             var now = DateTime.Now.ToCstTime();
@@ -909,7 +910,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.Name == "配音")
                 .Select(s => new
                 {
-                    Entries = s.Entries.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).Select(s => new
+                    Entries = s.Entries.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false && s.Tags.Any(s => s.Name == "配音")).Select(s => new
                     {
                         s.Id,
                         s.Name,
@@ -982,6 +983,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //打乱CV顺序
             model.CVInfors.Random();
+
+            //计算二级标签包含的词条数
+            foreach (var item in model.Tags)
+            {
+                foreach (var info in item.Children)
+                {
+                    info.EntryCount = model.CVInfors.Count(s => s.Tags.Any(s=>s.Id==info.Id));
+                }
+            }
 
             //获取轮播图
             var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => s.Type == CarouselType.ThematicPage).OrderByDescending(s => s.Priority).ToListAsync();

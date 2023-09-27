@@ -2,45 +2,48 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
-@if (OverviewModel != null)
-{
-    <div class="row">
-        <div class="col-12 col-md-6">
-            <HasMostGamesUsersCard Model="OverviewModel.HasMostGamesUsers" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (OverviewModel != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <HasMostGamesUsersCard Model="OverviewModel.HasMostGamesUsers" />
+            </div>
+            <div class="col-12 col-md-6">
+                <PossessionRateHighestGamesCard Model="OverviewModel.PossessionRateHighestGames" />
+            </div>
         </div>
-        <div class="col-12 col-md-6">
-            <PossessionRateHighestGamesCard Model="OverviewModel.PossessionRateHighestGames" />
-        </div>
-    </div>
-    <AuthorizeView>
-        <Authorized>
-            @if (Model != null)
-            {
-                <div id="game-library-card">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary TotalCount="OverviewModel.Count" UserInfoModel="Model" />
-                 </div>
-            }
-        </Authorized>
-        <NotAuthorized>
-            <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-3 mb-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
-            </MDCard>
-        </NotAuthorized>
-    </AuthorizeView>
-}
-else
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill Class="mb-4"/>
-}
+        <AuthorizeView>
+            <Authorized>
+                @if (Model != null)
+                {
+                    <div id="game-library-card">
+                        <CnGalWebSite.Shared.MasaComponent.PC.Users.UserPlayedGameListView IsCurrentUser="true" SteamId="@Model.SteamId" UserId="@Model.Id" IsAnniversary TotalCount="OverviewModel.Count" UserInfoModel="Model" />
+                     </div>
+                }
+            </Authorized>
+            <NotAuthorized>
+                <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                 </MDCard>
+             </NotAuthorized>
+         </AuthorizeView>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill Class="mb-4" />
+    }
 
 
-@if (isReady)
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4" Color="tertiary">
-        晒出的你的游戏库吧
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc />
-}
+    @if (isReady)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4" Color="tertiary">
+            晒出的你的游戏库吧
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc />
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
 
 @code {
 

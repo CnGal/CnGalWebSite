@@ -11,7 +11,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" />
         @if (showEntryStyle)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Style.ToIconString()" Tooltip="切换词条样式模板" OnClick="OnSwitchStyle"  Class="mb-4"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Style.ToIconString()" Tooltip="切换词条样式模板" OnClick="_eventService.OnSwitchStyle"  Class="mb-4"/>
         }
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="left" Text="社区交流" Class="mb-4">
@@ -40,9 +40,6 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
 
  @code {
-    public event Action SwitchEntryStyle;
-
-
     private bool fab;
     private bool showEntryStyle;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
@@ -53,11 +50,6 @@
     public async Task OnClickFly()
     {
         await JS.InvokeVoidAsync("window.scrollTo", new { top = 0, behavior = "smooth" });
-    }
-
-    public void OnSwitchStyle()
-    {
-        SwitchEntryStyle?.Invoke();
     }
 
     public async Task OnNav(string url)

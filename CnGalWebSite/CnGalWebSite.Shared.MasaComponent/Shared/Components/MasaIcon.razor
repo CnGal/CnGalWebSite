@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<MIcon Small="Large==false&&XSmall==false" Large="Large" XSmall="XSmall" Color="@Color" Class="@Class">@(string.IsNullOrWhiteSpace(IconString)?Type.ToIconString(): IconString)</MIcon>
+<MIcon Small="Small" Large="Large" XSmall="XSmall" Color="@Color" Class="@Class">@(string.IsNullOrWhiteSpace(IconString) ? Type.ToIconString() : IconString)</MIcon>
 
 @code {
     [Parameter]
@@ -11,6 +11,8 @@
     public bool Large { get; set; }
     [Parameter]
     public bool XSmall { get; set; }
+    [Parameter]
+    public bool Small { get; set; } = true;
     [Parameter]
     public string Class { get; set; } = "me-2";
     [Parameter]

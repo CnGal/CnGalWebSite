@@ -45,6 +45,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         /// </summary>
         public bool IsHiddeArticleCatalog { get; set; }
 
+        /// <summary>
+        /// 隐藏看板娘
+        /// </summary>
+        public bool HideKanban { get; set; }
+
+        /// <summary>
+        /// 使用Markdown编辑器编辑评论
+        /// </summary>
         public bool IsCommentUseMarkdown { get; set; }
 
         /// <summary>

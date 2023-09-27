@@ -41,15 +41,4 @@
 
 @code {
 
-
-    public async Task Nav(string url)
-    {
-        var cur = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-        if (string.IsNullOrWhiteSpace(cur) == false && cur.StartsWith('#') == false)
-        {
-            NavigationManager.NavigateTo("/");
-            await Task.Delay(500);
-        }
-        await JS.InvokeAsync<string>("navigateTo", url);
-    }
 }

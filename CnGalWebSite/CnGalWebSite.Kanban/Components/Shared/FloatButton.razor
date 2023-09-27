@@ -1,0 +1,63 @@
+﻿
+
+<div class="float-button-card">
+    @if (ShowMenu)
+    {
+        <MMenu Top CloseOnContentClick="false">
+            <ActivatorContent Context="m">
+                <MTooltip Bottom>
+                 <ActivatorContent Context="c">
+                     @{
+                            var attrs = new Dictionary<string, object>();
+                            m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                            c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        }
+                        <button class="@($"float-button {Class}")" @attributes="@attrs">
+                            <img src="@Image" draggable="false" />
+                        </button>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <span>@Tooltip</span>
+                    </ChildContent>
+                </MTooltip>
+            </ActivatorContent>
+            <ChildContent>
+                @MenuContent
+            </ChildContent>
+        </MMenu>
+    }
+    else
+    {
+        <MTooltip Bottom>
+         <ActivatorContent>
+             <button class="@($"float-button {Class}")" @onclick="OnClick" @attributes="@context.Attrs">
+                 <img src="@Image" draggable="false" />
+             </button>
+         </ActivatorContent>
+         <ChildContent>
+             <span>@Tooltip</span>
+         </ChildContent>
+     </MTooltip>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public string Image { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Tooltip { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public bool ShowMenu { get; set; }
+
+    [Parameter]
+    public RenderFragment MenuContent { get; set; }
+}

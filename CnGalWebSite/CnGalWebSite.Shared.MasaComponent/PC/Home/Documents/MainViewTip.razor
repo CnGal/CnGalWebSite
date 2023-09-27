@@ -10,28 +10,23 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture" />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 }
 
-    <div>
-        @if (isReady == false)
-        {
+<div>
+    @if (isReady == false)
+    {
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Outline />
-
-        }
-        else
-        {
-
-        <MDCard Outline="Outline" Class="@(Outline?"":"mb-4 pa-4")">
-                <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model"  HiddenImage HiddenTitle="HiddenTitle" Outline="Outline" HiddenCatalog/>
-            </MDCard>
-
-        }
-    </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Articles.MainInforCard Model="Model" HiddenImage HiddenTitle="HiddenTitle" Outline="Outline" HiddenCatalog />
+    }
+</div>
 
 
 @code {
@@ -52,7 +47,7 @@ else
             isReady = false;
             //获取文章信息
             Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache(Id.ToString());
-           
+
             isReady = true;
             StateHasChanged();
 

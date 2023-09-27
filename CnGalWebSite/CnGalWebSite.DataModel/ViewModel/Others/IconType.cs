@@ -187,7 +187,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Point,
         Certification,
         Light,
-        Dark
+        Dark,
+        Success,
+        Warning,
     }
 
     public static class IconTypeHelper
@@ -196,6 +198,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Success:
+                    return "mdi-check-circle";
+                case IconType.Warning:
+                    return "mdi-alert-circle";
                 case IconType.Light:
                     return "mdi-weather-sunny";
                 case IconType.Dark:

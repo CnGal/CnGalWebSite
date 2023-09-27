@@ -1,0 +1,41 @@
+﻿@inject ISettingService _settingService
+@inject IRepository<ExpressionModel> _expressionRepository
+@inject IJSRuntime JS
+@inject ILive2DService _live2DService
+
+<CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/face.png" ShowMenu Tooltip="表情" Class="cngal-kanban-set-expression">
+     <MenuContent>
+         <MDCard>
+             <MList Dense>
+                <MListItemGroup Value="_index" ValueChanged="SwitchExpression"
+                                Color="primary">
+                    @foreach (var item in _expressionRepository.GetAll())
+                    {
+                        <MListItem>
+                            <MListItemContent>
+                                <MListItemTitle>@item.DisplayName</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                    }
+                </MListItemGroup>
+            </MList>
+         </MDCard>
+    </MenuContent>
+</CnGalWebSite.Kanban.Components.Shared.FloatButton>
+
+@code {
+    public StringNumber _index;
+
+    public async Task SwitchExpression(StringNumber index)
+    {
+        _index = index;
+        if (index == null)
+        {
+            await _live2DService.CleanExpression();
+        }
+        else
+        {
+            await _live2DService.SetExpression( _expressionRepository.GetAll()[index.ToInt32()].Name);
+        }
+    }
+}
