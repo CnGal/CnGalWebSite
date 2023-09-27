@@ -16,8 +16,8 @@ namespace CnGalWebSite.Kanban.Models
 
     public class ClothesDataModel
     {
-        public string ClothesName { get; set; } 
-        public string StockingsName { get; set; }
-        public string ShoesName { get; set; } 
+        public string ClothesName { get; set; }
+        public string StockingsName { get; set; } = "stocking2";
+        public string ShoesName { get; set; } = "shoes1";
     }
 }

@@ -858,7 +858,7 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
     initButtonGroupMoveAction(dotNetHelper);
     initDialogBoxMoveAction(dotNetHelper);
     listenLive2dCanvasChange();
-   
+
     console.log("初始化Live2D")
 }
 
@@ -942,7 +942,7 @@ function initKanbanMoveAction(dotNetHelper) {
             /** 相减即可得到相对于父元素移动的位置 */
             dx = cx - deltaLeft
             dy = cy - deltaTop
-            var rect = live2dItem.getBoundingClientRect();            
+            var rect = live2dItem.getBoundingClientRect();
             //console.log("坐标", cx, cy)
             //console.log("移动", dx, dy)
             //console.log("位移", rect.x + dx, rect.y + dy);
@@ -972,7 +972,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
     const itemId = 'kanban-button-group';
     const live2dItem = document.getElementById('kanban-live2d');
     const groupItem = document.getElementById(itemId);
-    
+
     let move = false;
     let deltaLeft = 0, deltaTop = 0;
     let x_org, y_org;
@@ -1097,7 +1097,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
                 var rect_w = live2dItem.getBoundingClientRect();
                 var rect_n = groupItem.getBoundingClientRect();
                 x_org = rect_w.x - rect_n.x;
-                y_org = rect_w.y- rect_n.y;
+                y_org = rect_w.y - rect_n.y;
                 move = true;
                 document.body.classList.add('user-select-none');
             }
@@ -1153,16 +1153,22 @@ function listenLive2dCanvasChange() {
     var _h = -1;
     var interval = setInterval(function () {
         const live2dItem = document.getElementById(canvasId);
-        var rect = live2dItem.getBoundingClientRect();
-        if (_w > 0 && _h > 0) {
-            if (_w != rect.width || _h != rect.height) {
-                resizeLive2d();
+        if (live2dItem) {
+            var rect = live2dItem.getBoundingClientRect();
+            if (_w > 0 && _h > 0) {
+                if (_w != rect.width || _h != rect.height) {
+                    resizeLive2d();
+                }
+            }
+            else {
+                _w = rect.width;
+                _h = rect.height;
             }
         }
         else {
-            _w = rect.width;
-            _h = rect.height;
+            clearInterval(interval);
         }
+
     }, 500);
 }
 
@@ -1176,7 +1182,7 @@ function switchLiv2DModel(id) {
 function switchLiv2DExpression(id) {
     var manger = getLive2dManager();
     var model = manger.getCurrentModel();
-    if (id) {    
+    if (id) {
         model.setExpression(id);
     }
     else {
@@ -1221,7 +1227,7 @@ function switchLiv2DShoes(id) {
 }
 
 //切换动作
-function switchLiv2DMotion(group,id) {
+function switchLiv2DMotion(group, id) {
     var manger = getLive2dManager();
     var model = manger.getCurrentModel();
     if (id) {
@@ -1257,3 +1263,11 @@ function scrollToTop() {
 }
 
 
+/*获取当前看板娘图片*/
+function startKanbanImageGeneration(dotNetHelper) {
+    document.getElementById('live2d').toBlob((res) => {
+        let blobUrl = URL.createObjectURL(res);
+        console.log(blobUrl)
+        dotNetHelper.invokeMethodAsync('OnKanbanImageGenerated', blobUrl);
+    });
+}

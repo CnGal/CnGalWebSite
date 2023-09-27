@@ -4,20 +4,30 @@
 
 @implements IDisposable
 
-@if (isReady)
-{
-    @if (_dataCacheService.ThemeSetting.HideKanban)
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (isReady)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
+        @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
+        }
+        else
+        {
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <CnGalWebSite.Kanban.KanbanLive2D>
+                        <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
+                    </CnGalWebSite.Kanban.KanbanLive2D>
+                </Authorized>
+                <NotAuthorized>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
+                </NotAuthorized>
+            </AuthorizeView>
+        }
     }
-    else
-    {
-        <CnGalWebSite.Kanban.KanbanLive2D>
-            <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton"/>
-        </CnGalWebSite.Kanban.KanbanLive2D>
-    }
-}
 
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 @code {
     bool isReady;
@@ -34,15 +44,15 @@
 
     public void DisplayArticleCatalogButton(ArticleViewModel model)
     {
-        if (FloatTool!=null)
+        if (FloatTool != null)
         {
             FloatTool?.DisplayArticleCatalogButton(model);
         }
-        else if(ExternalButton!=null)
+        else if (ExternalButton != null)
         {
             ExternalButton?.DisplayArticleCatalogButton(model);
         }
-       
+
     }
 
     public async void OnKanbanChanged()

@@ -2,26 +2,28 @@
 @inject IPageModelCatche<List< AnnouncementItemModel>> _pageModelCatche
 @inject NavigationManager NavigationManager
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <section class="announcements-card">
+        <h2>公告</h2>
+        <div class="group">
+            @foreach (var item in _items)
+            {
+                <MDCard Class="item" Href="@item.Url">
+                    @if (GetIcon(item) != null)
+                    {
+                        <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
+                    }
 
-<section class="announcements-card">
-    <h2>公告</h2>
-    <div class="group">
-        @foreach (var item in _items)
-        {
-            <MDCard Class="item" Href="@item.Url">
-                @if (GetIcon(item) != null)
-                {
-                    <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
-                }
+                    <div class="content">
+                        <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name</div>
+                    </div>
 
-                <div class="content">
-                    <div class="name text-truncate-1 @(GetIcon(item) != null?"active":"")">@item.Name</div>
-                </div>
+                </MDCard>
+            }
+        </div>
+    </section>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-            </MDCard>
-        }
-    </div>
-</section>
 
 @code {
 

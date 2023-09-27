@@ -24,7 +24,7 @@ namespace CnGalWebSite.Kanban.Models
     public class BaseEventModel
     {
         public int Id { get; set; }
-        public int Priority { get; set; }
+        public int Priority { get; set; } = -1;
         public string Note { get; set; }
         public List<string> Contents { get; set; } = new List<string>();
         public DateTime LastTriggerTime { get; set; }
@@ -40,11 +40,21 @@ namespace CnGalWebSite.Kanban.Models
     {
         public TimeOnly AfterTime { get; set; }
         public TimeOnly BeforeTime { get; set; }
+
+        public TimeEventModel()
+        {
+            Priority = 0;
+        }
     }
 
     public class DateEventModel : BaseEventModel
     {
         public DateOnly Date { get; set; }
+
+        public DateEventModel()
+        {
+            Priority = 0;
+        }
     }
 
     public class MouseOverEventModel : BaseEventModel

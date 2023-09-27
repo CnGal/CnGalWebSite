@@ -14,7 +14,7 @@ namespace Live2DTest.DataRepositories
     {
         private List<TEntity> _repository = new();
 
-        private readonly string _index = typeof(TEntity).ToString().Split('.').Last().ToLower().Replace("model","")+ ".json";
+        private readonly string _index = typeof(TEntity).ToString().Split('.').Last().Replace("Model","")+ ".json";
 
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;

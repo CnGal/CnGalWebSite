@@ -12,7 +12,7 @@
                             m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                             c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         }
-                        <button class="float-button" @attributes="@attrs">
+                        <button class="@($"float-button {Class}")" @attributes="@attrs">
                             <img src="@Image" draggable="false" />
                         </button>
                     </ActivatorContent>
@@ -30,7 +30,7 @@
     {
         <MTooltip Bottom>
          <ActivatorContent>
-             <button class="float-button" @onclick="OnClick" @attributes="@context.Attrs">
+             <button class="@($"float-button {Class}")" @onclick="OnClick" @attributes="@context.Attrs">
                  <img src="@Image" draggable="false" />
              </button>
          </ActivatorContent>
@@ -45,6 +45,9 @@
 @code {
     [Parameter]
     public string Image { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
 
     [Parameter]
     public string Tooltip { get; set; }

@@ -146,9 +146,9 @@ namespace CnGalWebSite.Kanban.Services.Settings
                 _settingModel.DialogBox.Position.Left = -_settingModel.Kanban.Size.Width;
             }
 
-            if (_settingModel.DialogBox.Position.Left > _settingModel.Kanban.Size.Width * 2)
+            if (_settingModel.DialogBox.Position.Left > _settingModel.Kanban.Size.Width * 4)
             {
-                _settingModel.DialogBox.Position.Left = _settingModel.Kanban.Size.Width * 2;
+                _settingModel.DialogBox.Position.Left = _settingModel.Kanban.Size.Width * 4;
             }
 
             if (_settingModel.DialogBox.Position.Bottom < -_settingModel.Kanban.Size.Height)
@@ -156,9 +156,9 @@ namespace CnGalWebSite.Kanban.Services.Settings
                 _settingModel.DialogBox.Position.Bottom = -_settingModel.Kanban.Size.Height;
             }
 
-            if (_settingModel.DialogBox.Position.Bottom > _settingModel.Kanban.Size.Height * 2)
+            if (_settingModel.DialogBox.Position.Bottom > _settingModel.Kanban.Size.Height * 4)
             {
-                _settingModel.DialogBox.Position.Bottom = _settingModel.Kanban.Size.Height * 2;
+                _settingModel.DialogBox.Position.Bottom = _settingModel.Kanban.Size.Height * 4;
             }
         }
 

@@ -21,7 +21,10 @@
          <MTab Value="4">
              审核<MIcon>mdi-pencil</MIcon>
          </MTab>
-     </MTabs>
+        <MTab Value="5">
+            编辑记录<MIcon>mdi-script-text-outline</MIcon>
+        </MTab>
+    </MTabs>
     </MDCard>
 
 <MTabsItems @bind-Value="TabIndex">
@@ -38,6 +41,9 @@
     <MTabItem Value="4">
        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.Examines.ListCard/>
     </MTabItem>
+    <MTabItem Value="5">
+        <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@_dataCacheService.UserInfor.Id" />
+    </MTabItem>
 </MTabsItems>
 
 
@@ -49,7 +55,7 @@
 
     public StringNumber TabIndex { get; set; } = 1;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
@@ -58,20 +64,21 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
         LocationChanged(null, null);
 
     }
 
-    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    public void LocationChanged(object sender, LocationChangedEventArgs args)
     {
         TabIndex = Tab switch
         {
             "monitor" => 2,
             "review" => 3,
             "editrecord" => 4,
+            "examines" => 5,
             _ => 1
         };
         StateHasChanged();
@@ -86,6 +93,7 @@
             2 => "/contentcenter?Tab=monitor",
             3 => "/contentcenter?Tab=review",
             4 => "/contentcenter?Tab=editrecord",
+            5 => "/contentcenter?Tab=examines",
             _ => "/contentcenter"
         });
 

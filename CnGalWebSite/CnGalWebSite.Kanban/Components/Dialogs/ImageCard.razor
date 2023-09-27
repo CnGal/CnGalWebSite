@@ -1,0 +1,33 @@
+﻿@inject ILive2DService _live2DService
+@inject ISettingService _settingService
+@implements IDisposable
+
+@if (string.IsNullOrWhiteSpace(_image) == false)
+{
+    <div class="image-card pa-3">
+        <img src="@_image" alt="看板娘表情" style="@_settingService.Setting.Kanban.GetDialogKanbanImageStyles()" />
+    </div>
+}
+
+
+@code {
+    string _image = null;
+
+    protected override void OnInitialized()
+    {
+        _live2DService.KanbanImageGenerated -= OnKanbanImageGenerated;
+        _live2DService.KanbanImageGenerated += OnKanbanImageGenerated;
+    }
+
+    public void OnKanbanImageGenerated(string url)
+    {
+        _image = url;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _live2DService.KanbanImageGenerated -= OnKanbanImageGenerated;
+        GC.SuppressFinalize(this);
+    }
+}

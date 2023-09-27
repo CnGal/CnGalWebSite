@@ -31,16 +31,16 @@
          </ButtonContent>
      </DataTableCard>
 
-</MDCard>
+ </MDCard>
 
-<MDialog @bind-Value="_editDialog"
-         MaxWidth="800">
+ <MDialog @bind-Value="_editDialog"
+          MaxWidth="800">
      <EditCard Staffs="Staffs" OnEdited="OnEdited" @ref="editCard" Model="_editedItem" />
-</MDialog>
-<MDialog @bind-Value="_batchDialog"
-         MaxWidth="800">
-    <BatchCard OnBatched="OnBatched" @ref="batchCard" />
-</MDialog>
+ </MDialog>
+ <MDialog @bind-Value="_batchDialog"
+          MaxWidth="800">
+     <BatchCard OnBatched="OnBatched" @ref="batchCard" />
+ </MDialog>
  @code {
 
     [Parameter]
@@ -122,7 +122,14 @@
             }
             else
             {
-                item.Id = Staffs.Max(s => s.Id) + 1;
+                if (Staffs.Any())
+                {
+                    item.Id = Staffs.Max(s => s.Id) + 1;
+                }
+                else
+                {
+                    item.Id = 0;
+                }
                 Staffs.Add(item);
             }
         }

@@ -27,12 +27,11 @@ namespace CnGalWebSite.Kanban.Services.Events
         private DotNetObjectReference<EventService>? objRef;
         private readonly IJSRuntime _jSRuntime;
 
-        private bool _processing;
         private Random _random;
         private EventGroupModel _eventGroupModel = new();
 
         private const string _localKey = "kanban_events";
-        private const string _remoteKey = "eventGroup.json";
+        private const string _remoteKey = "EventGroup.json";
 
         public EventGroupModel EventGroup
         {
@@ -136,15 +135,10 @@ namespace CnGalWebSite.Kanban.Services.Events
         /// <returns></returns>
         private async Task TriggerEventAsync(BaseEventModel model, CancellationToken token)
         {
-            if (_processing && model.Priority < 1)
-            {
-                return;
-            }
-            _processing = true;
             try
             {
                 var content = model.Contents[_random.Next(0, model.Contents.Count)];
-                await _dialogBoxService.ShowDialogBox(content);
+                _dialogBoxService.ShowDialogBox(content,model.Priority);
             }
             catch (Exception ex)
             {
@@ -152,7 +146,6 @@ namespace CnGalWebSite.Kanban.Services.Events
             }
             model.LastTriggerTime = DateTime.Now;
             await SaveAsync();
-            _processing = false;
         }
 
         /// <summary>
@@ -170,7 +163,7 @@ namespace CnGalWebSite.Kanban.Services.Events
             //初始化鼠标悬停
             await InitMouseOverEvent();
             //初始化完毕
-            await TriggerCustomEventAsync("加载完毕");
+            await Task.Delay(2000);
             //循环
             while (true)
             {

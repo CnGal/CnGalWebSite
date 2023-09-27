@@ -16,6 +16,11 @@ namespace CnGalWebSite.Kanban.Models
 
         public int Motion { get; set; } = -1;
 
+        /// <summary>
+        /// 清空队列 显示当前消息
+        /// </summary>
+        public int Priority { get; set; }
+
         public DialogBoxType Type { get; set; }
     }
 

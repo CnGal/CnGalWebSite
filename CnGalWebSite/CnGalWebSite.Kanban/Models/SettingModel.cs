@@ -47,7 +47,7 @@ namespace CnGalWebSite.Kanban.Models
     {
         public Position Position { get; set; } = new Position
         {
-            Left = 350,
+            Left = 220,
             Top = 130
         };
 
@@ -58,11 +58,13 @@ namespace CnGalWebSite.Kanban.Models
     {
         public Position Position { get; set; } = new Position
         {
-            Left = 0,
-            Bottom = 400
+            Left = -110,
+            Bottom = 525
         };
 
         public int Width { get; set; } = 400;
+
+        public bool Hide { get; set; }
     }
 
     public class Position

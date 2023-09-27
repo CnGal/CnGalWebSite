@@ -8,7 +8,7 @@
     {
         <div class="col-12">
             <MDCard Class="mb-4">
-                <MTabs @bind-Value="selected" IconsAndText GrowCenterActive>
+                <MTabs @bind-Value="selected" IconsAndText Grow CenterActive>
 
                  <MTab Value="0">
                      回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
@@ -20,41 +20,44 @@
                      编辑驳回提醒<MIcon>mdi-alert-circle-outline</MIcon>
                  </MTab>
              </MTabs>
-            </MDCard>
-           
+         </MDCard>
+
      </div>
     }
     else
     {
         <div class="col-12 col-lg-3 mb-4">
-            <MList Class="p-0">
-                <MListItemGroup @bind-Value="selected" Color="primary">
-                    <MListItem @key="0">
-                        <MListItemIcon>
-                            <MIcon>mdi-comment-text-multiple-outline </MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>回复我的</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem @key="1">
-                        <MListItemIcon>
-                            <MIcon>mdi-checkbox-marked-circle-outline</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>编辑通过提醒</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem @key="2">
-                        <MListItemIcon>
-                            <MIcon>mdi-alert-circle-outline</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>编辑驳回提醒</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                </MListItemGroup>
-            </MList>
+            <MDCard Class="pa-4">
+                <MList Class="pa-0">
+                    <MListItemGroup @bind-Value="selected" Color="primary">
+                        <MListItem @key="0">
+                            <MListItemIcon>
+                                <MIcon>mdi-comment-text-multiple-outline </MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>回复我的</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                        <MListItem @key="1">
+                            <MListItemIcon>
+                                <MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>编辑通过提醒</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                        <MListItem @key="2">
+                            <MListItemIcon>
+                                <MIcon>mdi-alert-circle-outline</MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>编辑驳回提醒</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                    </MListItemGroup>
+                </MList>
+            </MDCard>
+
         </div>
     }
 
@@ -96,7 +99,7 @@
         }
         else
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
 
         }
 

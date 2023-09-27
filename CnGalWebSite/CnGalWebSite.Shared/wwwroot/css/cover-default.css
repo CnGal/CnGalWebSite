@@ -301,7 +301,7 @@ html {
 }
 /*树状列表*/
 .theme--light.m-treeview {
-    color:inherit;
+    color: inherit;
 }
 /*背景透明*/
 .m-main__wrap {
@@ -320,6 +320,11 @@ html {
     border-radius: var(--md-card-border-radius) !important;
 }
 /*tab标签*/
-.m-window-item.m-window {
+.m-window-item {
     padding: 3px;
+}
+/*列表*/
+.theme--light.m-list {
+    background-color: inherit;
+    color: inherit;
 }

@@ -6,10 +6,22 @@
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/quit.png" OnClick="OnClick" Tooltip="退出" />
 
 @code {
+    DateTime _lastClick;
+
     public async void OnClick()
     {
-        await _kanbanEventService.TriggerCustomEventAsync("关闭");
-        _dataCacheService.ThemeSetting.HideKanban = true;
-        _eventService.OnSavaTheme();
+        if((DateTime.Now- _lastClick).TotalSeconds<5)
+        {
+            await _kanbanEventService.TriggerCustomEventAsync("关闭");
+            await Task.Delay(4000);
+            _dataCacheService.ThemeSetting.HideKanban = true;
+            _eventService.OnSavaTheme();
+        }
+        else
+        {
+            _lastClick = DateTime.Now;
+            await _kanbanEventService.TriggerCustomEventAsync("挽留");
+        }
+
     }
 }

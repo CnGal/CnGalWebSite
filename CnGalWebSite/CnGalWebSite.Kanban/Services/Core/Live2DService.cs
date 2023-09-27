@@ -28,6 +28,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         private readonly IConfiguration _configuration;
 
         public event Action Live2DInitialized;
+        public event Action<string> KanbanImageGenerated;
 
         public Live2DService(IJSRuntime jSRuntime, IRepository<ClothesModel> clothesRepository, ISettingService settingService, IUserDataService userDataService, IRepository<ExpressionModel> expressionRepository, IRepository<MotionGroupModel> motionGroupRepository,
              IConfiguration configuration, IRepository<ShoesModel> shoesRepository, IRepository<StockingsModel> strockingsRepository)
@@ -72,12 +73,14 @@ namespace CnGalWebSite.Kanban.Services.Core
         [JSInvokable]
         public async Task Live2dInitCallback()
         {
-            //触发事件
-            Live2DInitialized.Invoke();
             //设置上次的衣服
             await SetClothes(_userDataService.UserData.Clothes.ClothesName);
+            await Task.Delay(100);
             await SetShoes(_userDataService.UserData.Clothes.ShoesName);
+            await Task.Delay(100);
             await SetStockings(_userDataService.UserData.Clothes.StockingsName);
+            //触发事件
+            Live2DInitialized?.Invoke();
         }
 
         /// <summary>
@@ -256,6 +259,25 @@ namespace CnGalWebSite.Kanban.Services.Core
             _settingService.Setting.DialogBox.Position.Bottom = bottom;
 
             await _settingService.SaveAsync();
+        }
+
+        /// <summary>
+        /// 开始生成看板娘图片
+        /// </summary>
+        /// <returns></returns>
+        public async Task StartKanbanImageGeneration()
+        {
+            await _jSRuntime.InvokeVoidAsync("startKanbanImageGeneration", objRef);
+        }
+
+        /// <summary>
+        /// 看板娘生成图片成功回调
+        /// </summary>
+        /// <param name="url"></param>
+        [JSInvokable]
+        public void OnKanbanImageGenerated(string url)
+        {
+            KanbanImageGenerated?.Invoke(url);
         }
 
         public void ReleaseLive2D()

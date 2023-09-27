@@ -10,9 +10,9 @@ namespace CnGalWebSite.Kanban.Services.Dialogs
 {
     public interface IDialogBoxService
     {
-        Task ShowDialogBox(DialogBoxModel model);
+        void ShowDialogBox(DialogBoxModel model);
 
-        Task ShowDialogBox(string content);
+        void ShowDialogBox(string content, int priority);
 
         void Init(DialogBoxCard dialogBoxCard);
     }

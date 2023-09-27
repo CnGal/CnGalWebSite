@@ -45,7 +45,10 @@
                  <MCol Cols="12" Md="6">
                      <MTextField Label="宽度" @bind-Value="_settingService.Setting.DialogBox.Width" />
                  </MCol>
-             </MRow>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="_settingService.Setting.DialogBox.Hide" Label="隐藏对话框" TValue="bool" />
+                </MCol>
+            </MRow>
          </MCardText>
 
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
@@ -55,7 +58,7 @@
             </MButton>
 
             <MSpacer></MSpacer>
-            <MButton Text Color="primary" OnClick="SaveAsync">
+            <MButton Rounded Color="primary" OnClick="SaveAsync">
                 <MIcon Left>mdi-check</MIcon>
                 保存
             </MButton>

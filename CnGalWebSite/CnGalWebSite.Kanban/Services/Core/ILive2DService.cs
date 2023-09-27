@@ -35,5 +35,9 @@ namespace CnGalWebSite.Kanban.Services.Core
         Task CleanMotion();
 
         void ReleaseLive2D();
+
+        Task StartKanbanImageGeneration();
+
+        event Action<string> KanbanImageGenerated;
     }
 }

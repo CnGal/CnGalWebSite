@@ -33,19 +33,22 @@ namespace CnGalWebSite.Kanban.Services.Dialogs
             _dialogBoxCard = dialogBoxCard;
         }
 
-        public async Task ShowDialogBox(DialogBoxModel model)
+        public void ShowDialogBox(DialogBoxModel model)
         {
-            await _dialogBoxCard?.ShowDialogBox(model);
+            _dialogBoxCard?.ShowDialogBox(model);
         }
 
-        public async Task ShowDialogBox(string content)
+        public void ShowDialogBox(string content, int priority)
         {
-           await ShowDialogBox(StringToDialogModel(content));
+            ShowDialogBox(StringToDialogModel(content, priority));
         }
 
-        public DialogBoxModel StringToDialogModel(string content)
+        public DialogBoxModel StringToDialogModel(string content,int priority)
         {
-            var model=new DialogBoxModel();
+            var model = new DialogBoxModel
+            {
+                Priority = priority
+            };
 
             while(content.StartsWith('['))
             {
