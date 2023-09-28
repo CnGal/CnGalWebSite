@@ -16,8 +16,23 @@ namespace CnGalWebSite.APIServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("ApplicationUserCommodity", b =>
+                {
+                    b.Property<long>("CommoditiesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("CommoditiesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("ApplicationUserCommodity");
+                });
 
             modelBuilder.Entity("ArticleEntry", b =>
                 {
@@ -153,6 +168,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("GCoins")
+                        .HasColumnType("int");
+
                     b.Property<long>("GroupQQ")
                         .HasColumnType("bigint");
 
@@ -258,12 +276,13 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "3beabf58-21ea-4372-ba91-0d6d42e2c6ce",
+                            ConcurrencyStamp = "f7625f82-d8a0-47c9-bab2-4b9a3799cd4b",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
                             Email = "123456789@qq.com",
                             EmailConfirmed = true,
+                            GCoins = 0,
                             GroupQQ = 0L,
                             Integral = 0,
                             IsPassedVerification = false,
@@ -279,7 +298,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2023, 8, 22, 12, 9, 47, 181, DateTimeKind.Utc).AddTicks(5178),
+                            RegistTime = new DateTime(2023, 9, 28, 19, 21, 13, 20, DateTimeKind.Utc).AddTicks(9432),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -712,6 +731,71 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Commodity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BriefIntroduction")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("LastEditTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Commodities");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.CommodityApplicationUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<long>("CommodityId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("CommodityId");
+
+                    b.ToTable("CommodityApplicationUsers");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Disambig", b =>
                 {
                     b.Property<int>("Id")
@@ -882,12 +966,15 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Types")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("EntryInformationTypes");
                 });
@@ -2816,6 +2903,12 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("SourceType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -3912,6 +4005,21 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("VoteOptionVoteUser");
                 });
 
+            modelBuilder.Entity("ApplicationUserCommodity", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Commodity", null)
+                        .WithMany()
+                        .HasForeignKey("CommoditiesId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ArticleEntry", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.Article", null)
@@ -4141,6 +4249,24 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Video");
 
                     b.Navigation("Vote");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.CommodityApplicationUser", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
+                        .WithMany("CommodityApplicationUsers")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Commodity", "Commodity")
+                        .WithMany("CommodityApplicationUsers")
+                        .HasForeignKey("CommodityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Commodity");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Entry", b =>
@@ -5044,6 +5170,8 @@ namespace CnGalWebSite.APIServer.Migrations
                 {
                     b.Navigation("Certification");
 
+                    b.Navigation("CommodityApplicationUsers");
+
                     b.Navigation("Examines");
 
                     b.Navigation("FavoriteFolders");
@@ -5116,6 +5244,11 @@ namespace CnGalWebSite.APIServer.Migrations
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Comment", b =>
                 {
                     b.Navigation("InverseParentCodeNavigation");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Commodity", b =>
+                {
+                    b.Navigation("CommodityApplicationUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Disambig", b =>

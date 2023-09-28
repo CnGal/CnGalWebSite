@@ -15,6 +15,8 @@ namespace CnGalWebSite.Shared.Service
         event Action<string> ChangeTitle;
         event Action SwitchEntryStyle;
         event Action KanbanChanged;
+        event Action UserInfoChanged;
+        event Action UserCommodityChanged;
 
         void OnKanbanChanged();
 
@@ -31,5 +33,9 @@ namespace CnGalWebSite.Shared.Service
         void OnChangeTitle(string title);
 
         void OnSwitchStyle();
+
+        void OnUserInfoChanged();
+
+        void OnUserCommodityChanged();
     }
 }

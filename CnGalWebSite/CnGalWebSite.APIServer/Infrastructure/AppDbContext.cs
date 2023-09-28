@@ -99,6 +99,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<Recommend> Recommends { get; set; }
         public DbSet<EntryInformationType> EntryInformationTypes { get; set; }
         public DbSet<BasicEntryInformation> BasicEntryInformation { get; set; }
+        public DbSet<Commodity> Commodities { get; set; }
+        public DbSet<CommodityApplicationUser> CommodityApplicationUsers { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -148,6 +150,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Video>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<EntryInformationType>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Commodity>().HasIndex(g => g.Name).IsUnique();
 
             //限定外键唯一
             modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();
@@ -163,6 +166,12 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Periphery>().Property(b => b.CanComment).HasDefaultValue(true);
             modelBuilder.Entity<Vote>().Property(b => b.CanComment).HasDefaultValue(true);
             modelBuilder.Entity<Lottery>().Property(b => b.CanComment).HasDefaultValue(true);
+
+            //多对多链接关系
+            modelBuilder.Entity<Commodity>()
+                    .HasMany(e => e.Users)
+                    .WithMany(e => e.Commodities)
+                    .UsingEntity<CommodityApplicationUser>();
 
             //设置周边自身多对多关系
             modelBuilder.Entity<PeripheryRelation>(entity =>

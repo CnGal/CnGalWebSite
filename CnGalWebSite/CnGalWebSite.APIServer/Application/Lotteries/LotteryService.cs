@@ -55,7 +55,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _logger = logger;
         }
 
-        public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award)
+        public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award,long lotteryId)
         {
             user.LotteryAwardId = award.Id;
             if (award.Type == LotteryAwardType.ActivationCode)
@@ -71,9 +71,10 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 await _userService.AddUserIntegral(new DataModel.ViewModel.Space.AddUserIntegralModel
                 {
                     Count = award.Integral,
-                    Note = "抽奖赠送",
+                    Note = $"抽奖Id：{lotteryId}",
                     Type = UserIntegralType.Integral,
-                    UserId = user.ApplicationUserId
+                    UserId = user.ApplicationUserId,
+                    SourceType= UserIntegralSourceType.Lottery
                 });
                 //更新用户积分
                 await _userService.UpdateUserIntegral(await _userRepository.FirstOrDefaultAsync(s => s.Id == user.ApplicationUserId));
@@ -106,7 +107,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                         item.WinningUsers.Add(winnningUser);
                         _ = NotWinnningUser.Remove(winnningUser);
 
-                        await SendPrizeToWinningUser(winnningUser, item);
+                        await SendPrizeToWinningUser(winnningUser, item,lottery.Id);
                     }
                     else
                     {

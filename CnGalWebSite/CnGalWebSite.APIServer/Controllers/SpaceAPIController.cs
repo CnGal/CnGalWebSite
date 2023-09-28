@@ -59,11 +59,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IEditRecordService _editRecordService;
         private readonly IQueryService _queryService;
+        private readonly IRepository<UserIntegral, string> _userIntegralRepository;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
          IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
-        ISteamInforService steamInforService, IQueryService queryService)
+        ISteamInforService steamInforService, IQueryService queryService, IRepository<UserIntegral, string> userIntegralRepository)
         {
             _examineRepository = examineRepository;
             _examineService = examineService;
@@ -83,6 +84,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryRepository = entryRepository;
             _videoRepository = videoRepository;
             _queryService = queryService;
+            _userIntegralRepository = userIntegralRepository;
         }
 
         /// <summary>
@@ -110,6 +112,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     DisplayIntegral = s.DisplayIntegral,
                     SBgImage = s.SBgImage,
                     MBgImage=s.MBgImage,
+                    GCoins=s.GCoins
                 }).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -461,6 +464,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         return new Result { Successful = false, Error = "无法获取Steam信息，请检查SteamId是否正确；也可能是服务器网络波动，不填写该项以保存其他修改的内容" };
                     }
+                    //尝试添加G币
+                    await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
                 }
             }
             user.IsShowGameRecord = model.IsShowGameRecord;
@@ -583,21 +588,47 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _messageRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsReaded == false);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<DailyTaskModel>> GetUserDailyTask(string id)
+        /// <summary>
+        /// 获取每日任务
+        /// </summary>
+        [HttpGet]
+        public async Task<ActionResult<UserTaskModel>> GetUserTasks()
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            user = await _userRepository.GetAll().Include(s => s.SignInDays).FirstOrDefaultAsync(s => s.Id == user.Id);
+
             var dateTime = DateTime.Now.ToCstTime();
-            var dailyTaskModel = new DailyTaskModel
+            var model = new UserTaskModel
             {
                 IsSignIn = await _signInDayRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.Time.Date == dateTime.Date),
                 IsComment = await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.ApplyTime.Date == dateTime.Date && s.Operation == Operation.PubulishComment),
-                IsEdit = await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.ApplyTime.Date == dateTime.Date
-                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishImages)),
+                IsEdit = await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.ApplyTime.Date == dateTime.Date && s.Operation != Operation.PubulishComment),
             };
 
-            return dailyTaskModel;
+            //获取签到信息
+            var sign =_userService.GetUserSignInDays(user);
+            model.IsSignIn = sign.IsSignIn;
+            model.SignInDays = sign.SignInDays;
+
+            //绑定SteamId
+            if (await _userIntegralRepository.AnyAsync(s=>s.ApplicationUserId==user.Id))
+            {
+                model.IsBindSteamId = true;
+            }
+           else
+            {
+                if (string.IsNullOrWhiteSpace(user.SteamId))
+                {
+                    model.IsBindSteamId = false;
+                }
+                else
+                {
+                    await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
+                }
+            }
+
+            return model;
 
         }
 
@@ -666,7 +697,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin")]

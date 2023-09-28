@@ -6,13 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="PC\新文件夹\**" />
-    <Content Remove="PC\新文件夹\**" />
-    <EmbeddedResource Remove="PC\新文件夹\**" />
-    <None Remove="PC\新文件夹\**" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

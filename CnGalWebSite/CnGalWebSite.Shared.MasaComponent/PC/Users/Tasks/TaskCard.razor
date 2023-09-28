@@ -1,0 +1,38 @@
+﻿
+<MDCard Class="user-task-card">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="Icon" XLarge Small=false />
+     <div class="content-card">
+         <div class="name title-large">@Name</div>
+         <div class="biref">@Text</div>
+         <div class="reward label-large primary-text">@Reward</div>
+     </div>
+     <div class="action-card">
+         @if (Finished)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成"/>
+        }
+        else
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
+        }
+    </div>
+</MDCard>
+
+@code {
+    [Parameter]
+    public IconType Icon { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Reward { get; set; }
+    [Parameter]
+    public IconType ButtonIcon { get; set; }
+    [Parameter]
+    public string ButtonText { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public bool Finished { get; set; }
+}

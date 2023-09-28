@@ -1,0 +1,16 @@
+﻿
+.commodity-kanban-card {
+    align-items: center;
+    gap: .5rem;
+}
+
+    .commodity-kanban-card img {
+        width: 70%;
+    }
+
+.commodity-item-card .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
+}

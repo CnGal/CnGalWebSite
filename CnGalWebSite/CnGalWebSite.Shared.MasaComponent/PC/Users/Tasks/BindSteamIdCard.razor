@@ -1,0 +1,26 @@
+﻿@inject IHttpService _httpService
+
+<TaskCard ButtonIcon="@IconType.Link" ButtonText="绑定" Finished="Model.IsBindSteamId" Icon="@IconType.Steam" Name="绑定Steam账号" OnClick="OnEditSteam" Reward="G币+10" Text="可以导入Steam库存，还可以分享游玩记录" />
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
+
+@code {
+    [Parameter]
+    public UserTaskModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
+
+    public void OnEditSteam()
+    {
+        editUserSteamInforTip?.Refresh(true);
+    }
+
+    public void OnChanged(string steamId)
+    {
+        Model.IsBindSteamId = true;
+        StateHasChanged();
+    }
+
+}

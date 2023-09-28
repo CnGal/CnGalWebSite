@@ -1,0 +1,30 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+
+<TaskCard ButtonIcon="@IconType.SignIn" ButtonText="签到" Finished="Model.IsSignIn" Icon="@IconType.SignIn" Name="每日签到" OnClick="SignIn" Text="@(Model.IsSignIn?$"连续签到 {Model.SignInDays} 天":"快来签到吧~")" Reward="经验值+5" />
+
+@code {
+    [Parameter]
+    public UserTaskModel Model{ get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task SignIn()
+    {
+        try
+        {
+            var result = await _httpService.GetAsync<Result>("api/space/signIn");
+            if (result.Successful == true)
+            {
+                Model.IsSignIn = true;
+                Model.SignInDays++;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "签到失败");
+        }
+    }
+}

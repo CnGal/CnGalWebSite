@@ -32,6 +32,7 @@
         new MenuItemModel { Text = "审核", Icon = "mdi-order-bool-ascending-variant" , Url = "contentcenter"},
         new MenuItemModel { Text = "工具", Icon = "mdi-hammer-screwdriver", Url = "admin/tools" },
         new MenuItemModel { Text = "备份", Icon = "mdi-cloud-upload", Url = "admin/listbackuparchives" },
+        new MenuItemModel { Text = "看板娘的小卖铺", Icon = "mdi-shape", Url = "admin/listcommodities" },
         new MenuItemModel { Text = "定时任务", Icon = "mdi-calendar-check", Url = "admin/listtimedtasks" },
         new MenuItemModel { Text = "动态采集", Icon = IconType.News.ToIconString(), Url = "admin/listnews"  },
         new MenuItemModel { Text = "商店信息", Icon = IconType.Store.ToIconString() , Url = "admin/liststoreinfo"},
@@ -54,7 +55,7 @@
     bool offset;
     StringNumber selectedItem = "概览";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         var item = items.FirstOrDefault(s => s.Url == NavigationManager.Uri.Replace(NavigationManager.BaseUri, ""));
 

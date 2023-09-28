@@ -20,6 +20,8 @@ namespace CnGalWebSite.Shared.Service
         public event Action<string> ChangeTitle;
         public event Action SwitchEntryStyle;
         public event Action KanbanChanged;
+        public event Action UserInfoChanged;
+        public event Action UserCommodityChanged;
 
         private readonly IMauiService _mauiService;
         private readonly IJSRuntime JS;
@@ -30,6 +32,18 @@ namespace CnGalWebSite.Shared.Service
             _mauiService = mauiService;
             JS = js;
             _logger = logger;
+        }
+
+        //用户购买商品
+        public void OnUserCommodityChanged()
+        {
+            UserCommodityChanged?.Invoke();
+        }
+
+        //用户信息更改
+        public void OnUserInfoChanged()
+        {
+            UserInfoChanged?.Invoke();
         }
 
         //切换看板娘

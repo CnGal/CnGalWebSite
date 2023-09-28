@@ -8,7 +8,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 {
     public interface ILotteryService
     {
-        Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award);
+        Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award, long lotteryId);
 
         Task DrawAllLottery();
 

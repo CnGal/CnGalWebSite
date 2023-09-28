@@ -328,3 +328,8 @@ html {
     background-color: inherit;
     color: inherit;
 }
+/*图标按钮*/
+.m-btn--fab {
+    display: flex;
+    justify-content: center;
+}

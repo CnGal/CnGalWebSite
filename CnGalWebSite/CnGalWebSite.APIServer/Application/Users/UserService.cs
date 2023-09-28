@@ -61,7 +61,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             _rankService = rankService;
             _articleRepository = articleRepository;
             _favoriteObjectRepository = favoriteObjectRepository;
-            
+
             _signInDayRepository = signInDayRepository;
             _playedGameRepository = playedGameRepository;
             _entryRepository = entryRepository;
@@ -122,7 +122,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             user.MBgImage = examine.MBgImage;
             return Task.CompletedTask;
         }
-       
+
         public Task UpdateUserDataMainPage(ApplicationUser user, string examine)
         {
             user.MainPageContext = examine;
@@ -198,24 +198,27 @@ namespace CnGalWebSite.APIServer.Application.Users
                 Count = model.Count,
                 Note = model.Note,
                 Type = model.Type,
+                SourceType = model.SourceType,
+                Time = DateTime.Now.ToCstTime()
             });
         }
 
-        public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user,bool ignoreAddinfor=false)
+        public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user, bool ignoreAddinfor = false)
         {
             var model = new UserInforViewModel
             {
                 Id = user.Id,
                 PersonalSignature = user.PersonalSignature,
                 Name = user.UserName,
-                SBgImage=user.SBgImage,
-                MBgImage=user.MBgImage,
+                SBgImage = user.SBgImage,
+                MBgImage = user.MBgImage,
+                GCoins = user.GCoins,
                 PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
                 BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
                 Ranks = await _rankService.GetUserRanks(user),
             };
 
-            if(ignoreAddinfor)
+            if (ignoreAddinfor)
             {
                 return model;
             }
@@ -224,11 +227,12 @@ namespace CnGalWebSite.APIServer.Application.Users
             model.EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true);
             model.ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
             model.VideoCount = await _videoRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
-            model.ArticleReadCount = await _articleRepository.GetAll().AsNoTracking().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s=>s.ReaderCount) + await _videoRepository.GetAll().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s => s.ReaderCount);
+            model.ArticleReadCount = await _articleRepository.GetAll().AsNoTracking().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s => s.ReaderCount) + await _videoRepository.GetAll().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s => s.ReaderCount);
 
             //计算连续签到天数和今天是否签到
-            model.IsSignIn = false;
-            model.SignInDays = 0;
+            var sign = GetUserSignInDays(user);
+            model.IsSignIn = sign.IsSignIn;
+            model.SignInDays = sign.SignInDays;
 
             //东八区转换
             var now = DateTime.Now.ToCstTime();//.AddHours(8);
@@ -258,10 +262,43 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         }
 
+        public (bool IsSignIn, int SignInDays) GetUserSignInDays(ApplicationUser user)
+        {
+            //计算连续签到天数和今天是否签到
+            var IsSignIn = false;
+            var SignInDays = 0;
+
+            //东八区转换
+            var now = DateTime.Now.ToCstTime();//.AddHours(8);
+
+            if (user.SignInDays != null)
+            {
+                if (user.SignInDays.Any(s => s.Time.Date == now.Date))
+                {
+                    IsSignIn = true;
+                    while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-SignInDays).Date))
+                    {
+                        SignInDays++;
+                    }
+                }
+                else
+                {
+                    if (user.SignInDays.Any(s => s.Time.Date == now.Date.AddDays(-1)))
+                    {
+                        while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-SignInDays - 1).Date))
+                        {
+                            SignInDays++;
+                        }
+                    }
+                }
+            }
+            return (IsSignIn, SignInDays);
+        }
+
 
         public async Task<string> GenerateBindGroupQQCode(ApplicationUser user)
         {
-            return await _appHelper.SetUserLoginKeyAsync(ToolHelper.Base64EncodeString(user.Id),true);
+            return await _appHelper.SetUserLoginKeyAsync(ToolHelper.Base64EncodeString(user.Id), true);
         }
 
         public async Task<Result> BindGroupQQ(string code, long groupQQ)
@@ -271,8 +308,8 @@ namespace CnGalWebSite.APIServer.Application.Users
             {
                 return new Result { Successful = false, Error = $"身份验证失败" };
             }
-            var user  = await _userRepository.FirstOrDefaultAsync(s=>s.Id==userId);
-            if(user == null)
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == userId);
+            if (user == null)
             {
                 return new Result { Successful = false, Error = $"找不到该用户" };
             }
@@ -284,7 +321,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public async Task UpdateUserIntegral(ApplicationUser user)
         {
-            //计算积分
+            //计算经验值
             //编辑 词条  标签  消歧义页  评论  发表文章 游玩记录
             //积分  10    8      2         5     50       50
             //
@@ -316,9 +353,8 @@ namespace CnGalWebSite.APIServer.Application.Users
                                   + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
                                             .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited);
 
-
                 //发表文章
-                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false) * articleIntegral;
+                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false) * articleIntegral;
                 //签到
                 var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
 
@@ -328,14 +364,16 @@ namespace CnGalWebSite.APIServer.Application.Users
                 //发表文章
                 var integral_6 = await _videoRepository.CountAsync(s => s.CreateUserId == user.Id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false) * videoIntegral;
 
-                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5+integral_6;
+                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5 + integral_6;
 
 
                 //计算贡献值
-
                 var contributionValue_1 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.ContributionValue).Select(s => s.Count).SumAsync();
 
                 user.DisplayContributionValue = contributionValue_1 + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
+
+                //计算G币
+                user.GCoins = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.GCoins).Select(s => s.Count).SumAsync();
 
                 _ = await _userRepository.UpdateAsync(user);
             }
@@ -347,7 +385,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public bool CheckCurrentUserRole(string role)
         {
-            if(_accessor.HttpContext==null)
+            if (_accessor.HttpContext == null)
             {
                 //无法获取http上下文即为内部调用 默认拥有全部权限
                 return true;
@@ -358,14 +396,14 @@ namespace CnGalWebSite.APIServer.Application.Users
                 return false;
             }
 
-            return _accessor.HttpContext.User.Claims.Any(s => (s.Type == JwtClaimTypes.Role|| s.Type == ClaimTypes.Role) && s.Value == role);
+            return _accessor.HttpContext.User.Claims.Any(s => (s.Type == JwtClaimTypes.Role || s.Type == ClaimTypes.Role) && s.Value == role);
         }
 
         #region 用户认证
 
         public async Task UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
         {
-            if(examine.EntryId==0)
+            if (examine.EntryId == 0)
             {
                 userCertification.EntryId = null;
                 userCertification.Entry = null;
@@ -401,7 +439,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public async Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null)
         {
-            var entryIds =await _userCertificationRepository.GetAll().Include(s => s.Entry).Where(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
+            var entryIds = await _userCertificationRepository.GetAll().Include(s => s.Entry).Where(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
 
             var temp = _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && entryIds.Contains(s.Id) == false);
             if (type != null)
@@ -475,6 +513,46 @@ namespace CnGalWebSite.APIServer.Application.Users
             ds.VisualMap.Max = data.Any() ? (int)data.Max(s => s.Count) : 1;
 
             return ds;
+        }
+
+        /// <summary>
+        /// 尝试添加GCoins 会内部查重
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="count"></param>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        public async Task TryAddGCoins(string userId, UserIntegralSourceType sourceType, int count, string note)
+        {
+            if (sourceType == UserIntegralSourceType.BindSteamId)
+            {
+                if (await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == userId && s.SourceType == UserIntegralSourceType.BindSteamId && s.Type == UserIntegralType.GCoins))
+                {
+                    return;
+                }
+            }
+            else if (sourceType == UserIntegralSourceType.BuyCommodity)
+            {
+
+            }
+            else
+            {
+                throw new InvalidOperationException("不支持的来源类型");
+            }
+
+            await _userIntegralRepository.InsertAsync(new UserIntegral
+            {
+                SourceType = sourceType,
+                ApplicationUserId = userId,
+                Count = count,
+                Note = note,
+                Type = UserIntegralType.GCoins,
+                Time = DateTime.Now.ToCstTime()
+            });
+
+            var coins = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == userId && s.Type == UserIntegralType.GCoins).Select(s => s.Count).SumAsync();
+            await _userRepository.GetAll().Where(s => s.Id == userId).ExecuteUpdateAsync(s => s.SetProperty(a => a.GCoins, b => coins));
         }
 
     }

@@ -2,7 +2,7 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
-
+@inject IEventService _eventService
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
@@ -71,6 +71,7 @@
                     await GetUserUnreadedMessages();
 
                     _dataCacheService.UserInfor = model;
+                    _eventService.OnUserInfoChanged();
                     StateHasChanged();
                 }
             }

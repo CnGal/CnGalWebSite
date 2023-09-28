@@ -71,3 +71,9 @@
     .tool-menu > div {
         width: 100%;
     }
+    /*换衣服*/
+.kanban-switch-clothes-card .action-card {
+    display: flex;
+    justify-content: center;
+    padding-bottom: .5rem;
+}

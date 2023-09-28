@@ -62,6 +62,10 @@ namespace CnGalWebSite.DataModel.Model
         [Obsolete("此项已不计入积分统计，请在积分列表中添加")]
         public int ContributionValue { get; set; } = 0;
         /// <summary>
+        /// G币 缓存项，请向积分列表添加
+        /// </summary>
+        public int GCoins { get; set; }
+        /// <summary>
         /// 显示积分 = 附加 + 计算
         /// </summary>
         public int DisplayIntegral { get; set; } = 0;
@@ -148,6 +152,10 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<UserMonitor> Monitors { get; set; }
 
         public virtual ICollection<UserReviewEditRecord> ReviewEntries { get; set; }
+
+        public virtual ICollection<Commodity> Commodities { get; set; }
+        public virtual ICollection<CommodityApplicationUser> CommodityApplicationUsers { get; set; }
+
     }
 
     public class UserCertification
@@ -176,9 +184,6 @@ namespace CnGalWebSite.DataModel.Model
         public Entry Entry { get; set; }
     }
 
-
-
-
     public class UserIntegral
     {
         public long Id { get; set; }
@@ -189,16 +194,34 @@ namespace CnGalWebSite.DataModel.Model
 
         public UserIntegralType Type { get; set; }
 
+        public UserIntegralSourceType SourceType { get; set; }
+
+        public DateTime Time { get; set; }
+
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
     }
 
+    public enum UserIntegralSourceType
+    {
+        [Display(Name = "其他")]
+        Other,
+        [Display(Name = "绑定SteamId")]
+        BindSteamId,
+        [Display(Name = "抽奖")]
+        Lottery,
+        [Display(Name = "购买商品")]
+        BuyCommodity
+    }
+
     public enum UserIntegralType
     {
-        [Display(Name = "积分")]
+        [Display(Name = "经验值")]
         Integral,
         [Display(Name = "贡献值")]
         ContributionValue,
+        [Display(Name = "G币")]
+        GCoins,
     }
 
     public class SignInDay

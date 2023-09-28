@@ -33,3 +33,18 @@
 a.user-info-card {
     color: var(--md-sys-color-on-background) !important;
 }
+/*每日任务*/
+.user-task-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+    .user-task-card .content-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .2rem;
+    }

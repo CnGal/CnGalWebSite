@@ -460,3 +460,7 @@
     width: 0;
     height: 0;
 }
+
+#official-website .container {
+    max-width: 900px;
+}

@@ -1,0 +1,47 @@
+﻿@inject IHttpService _httpService
+
+
+@if (isReady)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="新手任务" Icon="@IconType.NewbieTask.ToIconString()" Collapable Outline>
+     <MRow>
+         <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
+             <BindSteamIdCard Model="Model" />
+         </MCol>
+     </MRow>
+ </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="日常任务" Icon="@IconType.DailyTask.ToIconString()" Collapable Outline>
+     <MRow>
+         <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
+             <SignInCard Model="Model" />
+         </MCol>
+     </MRow>
+ </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+}
+
+@code {
+    bool isReady;
+
+    public UserTaskModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<UserTaskModel>("api/space/GetUserTasks");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取用户任务列表失败");
+        }
+    }
+}

@@ -17,12 +17,15 @@
          <MTab Href="/sharegames">晒库存</MTab>
     </MTabs>
     <MSpacer></MSpacer>
-
+    <AuthorizeView>
+        <Authorized>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="任务" Icon="@IconType.Task.ToIconString()" Class="mr-6" Href="/tasks" />
+        </Authorized>
+    </AuthorizeView>
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.SwitchThemeModeButton Class="mr-6" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="@IconType.Search.ToIconString()" Class="mr-6" Href="/search" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
-
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 </MAppBar>
 
