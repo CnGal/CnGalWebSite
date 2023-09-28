@@ -1,4 +1,5 @@
 ﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
 
 <TaskCard ButtonIcon="@IconType.Link" ButtonText="绑定" Finished="Model.IsBindSteamId" Icon="@IconType.Steam" Name="绑定Steam账号" OnClick="OnEditSteam" Reward="G币+10" Text="可以导入Steam库存，还可以分享游玩记录" />
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
@@ -19,6 +20,7 @@
 
     public void OnChanged(string steamId)
     {
+        _dataCacheService.UserInfor.GCoins += 10;
         Model.IsBindSteamId = true;
         StateHasChanged();
     }
