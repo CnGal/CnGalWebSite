@@ -5,7 +5,8 @@
 @inject ILive2DService _live2DService
 @implements IDisposable
 
-<div class="kanban-dialogbox" id="kanban-dialogbox" style="@_settingService.Setting.DialogBox.GetStyles()">
+
+<div class="@($"kanban-dialogbox {(_sleep?"d-none":"")}")" id="kanban-dialogbox" style="@_settingService.Setting.DialogBox.GetStyles()">
     <MDCard Style="@($"width: fit-content;{((_show && !_settingService.Setting.DialogBox.Hide)?"":"opacity: 0;")}")">
         <MDCard Color="surface" Style="@_settingService.Setting.DialogBox.GetContentStyles()">
             <ImageCard />
@@ -40,6 +41,7 @@
     string _context;
     IconType _type;
     DateTime _lastEnd;
+    bool _sleep;
 
     private System.Threading.Timer mytimer;
 
@@ -82,6 +84,12 @@
 
         if (_queue.Count == 0)
         {
+            if (!_sleep && (DateTime.Now - _lastEnd).TotalSeconds > 1)
+            {
+                _sleep = true;
+                _ = InvokeAsync(StateHasChanged);
+                return;
+            }
             return;
         }
 
@@ -95,6 +103,7 @@
 
     public async Task Start(DialogBoxModel model)
     {
+        _sleep = false;
         _show = true;
         _model = model;
         _context = model.Content;

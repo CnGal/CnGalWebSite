@@ -1,0 +1,36 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+@implements IDisposable
+
+
+<MDCard Class="commodity-kanban-card pa-4">
+    <img src="https://image.cngal.org/images/upload/20230928/a8206180d6d4c5f08dc0fc560f25557f366e8513.png" alt="看板娘" />
+    <div class="title-large">看板娘的小卖铺</div>
+    <div class="text-center">
+        欢迎光临看板娘的小卖铺！<br />
+        看板娘不需要新衣服，看板娘就是最可爱的！
+    </div>
+    <div class="label-large primary-text">
+        @($"目前拥有G币：{_dataCacheService.UserInfor.GCoins}")
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@IconType.Task.ToIconString()" Text="获取G币" Href="/tasks"/>
+</MDCard>
+
+@code {
+    protected override void OnInitialized()
+    {
+        _eventService.UserInfoChanged -= OnUserInfoChanged;
+        _eventService.UserInfoChanged += OnUserInfoChanged;
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _eventService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
+    }
+}

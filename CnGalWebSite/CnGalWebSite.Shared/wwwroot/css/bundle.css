@@ -1156,6 +1156,11 @@ html {
     background-color: inherit;
     color: inherit;
 }
+/*图标按钮*/
+.m-btn--fab {
+    display: flex;
+    justify-content: center;
+}
 
 
 /*分享库存*/
@@ -2748,6 +2753,10 @@ div.prizeTips {
     height: 0;
 }
 
+#official-website .container {
+    max-width: 900px;
+}
+
 
 /*背景透明*/
 .bg-opacity {
@@ -3428,6 +3437,21 @@ div.prizeTips {
 a.user-info-card {
     color: var(--md-sys-color-on-background) !important;
 }
+/*每日任务*/
+.user-task-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+    .user-task-card .content-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .2rem;
+    }
 
 
 .periphery-overview-card a {
@@ -3469,6 +3493,7 @@ a.user-info-card {
 }
 
     .article-page-card > div {
+        width: 100%;
         max-width: 1000px;
     }
 
@@ -3636,6 +3661,23 @@ a.user-info-card {
     }
 }
 
+
+.commodity-kanban-card {
+    align-items: center;
+    gap: .5rem;
+}
+
+    .commodity-kanban-card img {
+        width: 70%;
+    }
+
+.commodity-item-card .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
+}
+
 /*全局*/
 
 /*最外层卡片*/
@@ -3709,3 +3751,9 @@ a.user-info-card {
     .tool-menu > div {
         width: 100%;
     }
+    /*换衣服*/
+.kanban-switch-clothes-card .action-card {
+    display: flex;
+    justify-content: center;
+    padding-bottom: .5rem;
+}

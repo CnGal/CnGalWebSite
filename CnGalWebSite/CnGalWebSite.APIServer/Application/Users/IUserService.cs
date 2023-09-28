@@ -46,5 +46,9 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<EChartsHeatMapOptionModel> GetUserSignInDaysHeatMap(string id, DateTime afterTime, DateTime beforeTime);
 
+        Task TryAddGCoins(string userId, UserIntegralSourceType sourceType, int count, string note);
+
+        (bool IsSignIn, int SignInDays) GetUserSignInDays(ApplicationUser user);
+
     }
 }

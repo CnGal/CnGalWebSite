@@ -11,5 +11,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public string Note { get; set; }
 
         public UserIntegralType Type { get; set; }
+
+        public UserIntegralSourceType SourceType { get; set; }
+
     }
 }

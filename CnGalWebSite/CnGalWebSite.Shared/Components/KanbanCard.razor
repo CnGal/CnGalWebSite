@@ -15,9 +15,12 @@
         {
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                    <CnGalWebSite.Kanban.KanbanLive2D>
-                        <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
-                    </CnGalWebSite.Kanban.KanbanLive2D>
+                    <ErrorHandler IsSSR="ToolHelper.IsSSR" ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor">
+
+                        <CnGalWebSite.Kanban.KanbanLive2D>
+                            <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
+                        </CnGalWebSite.Kanban.KanbanLive2D>
+                    </ErrorHandler>
                 </Authorized>
                 <NotAuthorized>
                     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />

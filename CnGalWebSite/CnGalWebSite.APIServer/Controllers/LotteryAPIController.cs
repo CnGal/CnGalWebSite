@@ -746,7 +746,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前奖项人数已满，或未找到该奖项，请核对抽奖Id" };
             }
 
-            await _lotteryService.SendPrizeToWinningUser(userAward, award);
+            await _lotteryService.SendPrizeToWinningUser(userAward, award, model.LotteryId);
 
             return new Result { Successful = true };
         }

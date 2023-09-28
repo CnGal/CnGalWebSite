@@ -190,6 +190,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Dark,
         Success,
         Warning,
+        SignIn,
+        NewbieTask,
+        DailyTask,
+        Task,
+        Buy
     }
 
     public static class IconTypeHelper
@@ -198,6 +203,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Buy:
+                    return "mdi-shopping";
+                case IconType.Task:
+                    return "mdi-clipboard-check-outline";
+                case IconType.DailyTask:
+                    return "mdi-calendar-today";
+                case IconType.NewbieTask:
+                    return "mdi-new-box";
+                case IconType.SignIn:
+                    return "mdi-clipboard-check";
                 case IconType.Success:
                     return "mdi-check-circle";
                 case IconType.Warning:

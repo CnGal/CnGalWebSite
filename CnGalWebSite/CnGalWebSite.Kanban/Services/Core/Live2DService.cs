@@ -75,9 +75,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         {
             //设置上次的衣服
             await SetClothes(_userDataService.UserData.Clothes.ClothesName);
-            await Task.Delay(100);
             await SetShoes(_userDataService.UserData.Clothes.ShoesName);
-            await Task.Delay(100);
             await SetStockings(_userDataService.UserData.Clothes.StockingsName);
             //触发事件
             Live2DInitialized?.Invoke();

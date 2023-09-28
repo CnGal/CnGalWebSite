@@ -12,6 +12,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public string Name { get; set; }
         public string PersonalSignature { get; set; }
         public int Integral { get; set; }
+        public int GCoins { get; set; }
 
         public int EditCount { get; set; }
         public int ArticleCount { get; set; }

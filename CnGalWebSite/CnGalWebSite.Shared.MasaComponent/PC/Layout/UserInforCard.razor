@@ -19,7 +19,10 @@
     </div>
     <MDivider Class="w-100 mt-2 mb-2"></MDivider>
     <div class="w-100">
-        <SignInButton Model="Model" />
+         <MButton Text Block Color="primary" OnClick="@(()=>OnNav("/tasks"))">
+             <MIcon Left>@IconType.Task.ToIconString()</MIcon>
+            每日任务
+        </MButton>
 
         <AuthorizeView Roles="Admin">
             <Authorized>

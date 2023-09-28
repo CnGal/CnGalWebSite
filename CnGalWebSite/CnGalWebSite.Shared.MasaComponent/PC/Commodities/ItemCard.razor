@@ -1,0 +1,62 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IEventService _eventService
+@inject IDataCacheService _dataCacheService
+
+
+<MDCard Class="commodity-item-card h-100">
+    <img src="@Model.Image" alt="@Model.Name" class="w-100" />
+    <div class="content-card">
+        <div class="head">
+            <div class="name title-medium">@Model.Name</div>
+            <div class="biref  label-large">@Model.BriefIntroduction</div>
+            <div class="price label-large primary-text">@($"花费 {Model.Price} G币")</div>
+        </div>
+        @if (Model.IsOwned)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已解锁" />
+        }
+        else
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@IconType.Buy.ToIconString()" Text="解锁" IsAsync OnClick="Buy" />
+        }
+    </div>
+
+</MDCard>
+@code {
+    [Parameter]
+    public CommodityUserModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task Buy()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<BuyCommodityModel, Result>("api/commodities/BuyCommodity", new BuyCommodityModel
+                {
+                    Id = Model.Id
+                });
+
+            if (result.Successful)
+            {
+                Model.IsOwned = true;
+                _dataCacheService.UserInfor.GCoins -= Model.Price;
+                await PopupService.ToastSuccessAsync("购买商品成功", $"成功为看板娘购买：{Model.Name}");
+                _eventService.OnUserCommodityChanged();
+                _eventService.OnUserInfoChanged();
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastErrorAsync("购买商品失败", result.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "购买商品失败");
+        }
+    }
+}

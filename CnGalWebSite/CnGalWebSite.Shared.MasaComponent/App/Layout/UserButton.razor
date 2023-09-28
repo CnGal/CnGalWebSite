@@ -28,7 +28,10 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Class="mt-2 mb-2" />
 
-            <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
+            <MButton Text Block Color="primary" OnClick="@(()=>OnClickUrl("/task"))">
+                 <MIcon Left>@IconType.Task.ToIconString() </MIcon>
+             每日任务
+         </MButton>
 
             <AuthorizeView Roles="Admin">
                 <Authorized>

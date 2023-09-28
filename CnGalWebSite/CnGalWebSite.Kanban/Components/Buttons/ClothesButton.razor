@@ -1,44 +1,80 @@
-﻿@inject ISettingService _settingService
+﻿@using CnGalWebSite.Components.Errors;
+@using CnGalWebSite.DataModel.ViewModel.Commodities;
+@using CnGalWebSite.DataModel.ViewModel.Others;
+@inject ISettingService _settingService
 @inject IUserDataService _userDataService
 @inject ILive2DService _live2DService
 @inject IJSRuntime JS
 @inject IRepository<ClothesModel> _clothesRepository;
 @inject IRepository<StockingsModel> _stockingsRepository;
 @inject IRepository<ShoesModel> _shoesRepository;
+@inject IPageModelCatche<List<CommodityUserModel>> _pageModelCatche
+@inject CnGalWebSite.Shared.Service.IEventService _eventService
+@implements IDisposable
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/clothes.png" ShowMenu Tooltip="换衣服" Class="cngal-kanban-switch-clothes">
-    <MenuContent>
-         <MDCard Class="pa-4 pb-0" Style="width: 350px;">
+     <MenuContent>
+         <MDCard Class="pa-4 pb-0 kanban-switch-clothes-card" Style="width: 300px;">
              <div class="title-medium">衣服</div>
-            <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
+             <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
                 @foreach (var item in _clothesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??true))" />
                 }
             </MRadioGroup>
             <div class="title-medium">丝袜</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.StockingsName" TValue="string" ValueChanged="StockingsChanged" Row Mandatory>
-                 @foreach (var item in _stockingsRepository.GetAll())
+                @foreach (var item in _stockingsRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??true))" />
                 }
             </MRadioGroup>
             <div class="title-medium">鞋子</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.ShoesName" TValue="string" ValueChanged="ShoesChanged" Row Mandatory>
-                 @foreach (var item in _shoesRepository.GetAll())
+                @foreach (var item in _shoesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??true))" />
                 }
             </MRadioGroup>
+            <div class="action-card">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="前往小卖铺解锁更多服装" Icon="@IconType.Buy.ToIconString()" Href="/commodities" />
+            </div>
         </MDCard>
     </MenuContent>
 </CnGalWebSite.Kanban.Components.Shared.FloatButton>
 
-@code {
-    public int GetValue()
+ @code {
+    public List<CommodityUserModel> Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
     {
-        var clothes=   _clothesRepository.GetAll().FirstOrDefault(s => s.Name == _userDataService.UserData.Clothes.ClothesName);
-        return _clothesRepository.GetAll().IndexOf(clothes);
+        _eventService.UserCommodityChanged -= OnUserCommodityChanged;
+        _eventService.UserCommodityChanged += OnUserCommodityChanged;
+
+
+        try
+        {
+            Model = await _pageModelCatche.GetCache("api/commodities/GetAllCommodities");
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取看板娘的小卖铺商品列表失败");
+        }
+    }
+
+    public void OnUserCommodityChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _eventService.UserCommodityChanged -= OnUserCommodityChanged;
+        GC.SuppressFinalize(this);
     }
 
     public async Task ClothesChanged(string name)
@@ -50,7 +86,7 @@
         else
         {
             await _live2DService.SetClothes(name);
-        }        
+        }
     }
 
     public async Task StockingsChanged(string name)
