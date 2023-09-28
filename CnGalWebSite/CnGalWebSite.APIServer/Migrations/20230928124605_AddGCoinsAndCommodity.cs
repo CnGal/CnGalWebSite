@@ -72,33 +72,7 @@ namespace CnGalWebSite.APIServer.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUserCommodity",
-                columns: table => new
-                {
-                    CommoditiesId = table.Column<long>(type: "bigint", nullable: false),
-                    UsersId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicationUserCommodity", x => new { x.CommoditiesId, x.UsersId });
-                    table.ForeignKey(
-                        name: "FK_ApplicationUserCommodity_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ApplicationUserCommodity_Commodities_CommoditiesId",
-                        column: x => x.CommoditiesId,
-                        principalTable: "Commodities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CommodityApplicationUsers",
+                name: "ApplicationUserCommodities",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -109,15 +83,15 @@ namespace CnGalWebSite.APIServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommodityApplicationUsers", x => x.Id);
+                    table.PrimaryKey("PK_ApplicationUserCommodities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CommodityApplicationUsers_AspNetUsers_ApplicationUserId",
+                        name: "FK_ApplicationUserCommodities_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CommodityApplicationUsers_Commodities_CommodityId",
+                        name: "FK_ApplicationUserCommodities_Commodities_CommodityId",
                         column: x => x.CommodityId,
                         principalTable: "Commodities",
                         principalColumn: "Id",
@@ -130,7 +104,7 @@ namespace CnGalWebSite.APIServer.Migrations
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 columns: new[] { "ConcurrencyStamp", "GCoins", "RegistTime" },
-                values: new object[] { "f7625f82-d8a0-47c9-bab2-4b9a3799cd4b", 0, new DateTime(2023, 9, 28, 19, 21, 13, 20, DateTimeKind.Utc).AddTicks(9432) });
+                values: new object[] { "00dfc3c2-8d7e-4938-ad11-6b3de1305bf5", 0, new DateTime(2023, 9, 28, 20, 46, 4, 578, DateTimeKind.Utc).AddTicks(5257) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntryInformationTypes_Name",
@@ -139,35 +113,27 @@ namespace CnGalWebSite.APIServer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserCommodity_UsersId",
-                table: "ApplicationUserCommodity",
-                column: "UsersId");
+                name: "IX_ApplicationUserCommodities_ApplicationUserId",
+                table: "ApplicationUserCommodities",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserCommodities_CommodityId",
+                table: "ApplicationUserCommodities",
+                column: "CommodityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Commodities_Name",
                 table: "Commodities",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommodityApplicationUsers_ApplicationUserId",
-                table: "CommodityApplicationUsers",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommodityApplicationUsers_CommodityId",
-                table: "CommodityApplicationUsers",
-                column: "CommodityId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationUserCommodity");
-
-            migrationBuilder.DropTable(
-                name: "CommodityApplicationUsers");
+                name: "ApplicationUserCommodities");
 
             migrationBuilder.DropTable(
                 name: "Commodities");

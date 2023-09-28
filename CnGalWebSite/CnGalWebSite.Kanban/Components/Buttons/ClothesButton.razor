@@ -14,7 +14,7 @@
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/clothes.png" ShowMenu Tooltip="换衣服" Class="cngal-kanban-switch-clothes">
      <MenuContent>
-         <MDCard Class="pa-4 pb-0 kanban-switch-clothes-card" Style="width: 350px;">
+         <MDCard Class="pa-4 pb-0 kanban-switch-clothes-card" Style="width: 300px;">
              <div class="title-medium">衣服</div>
              <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
                 @foreach (var item in _clothesRepository.GetAll())

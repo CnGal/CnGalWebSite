@@ -19,21 +19,6 @@ namespace CnGalWebSite.APIServer.Migrations
                 .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("ApplicationUserCommodity", b =>
-                {
-                    b.Property<long>("CommoditiesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("CommoditiesId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ApplicationUserCommodity");
-                });
-
             modelBuilder.Entity("ArticleEntry", b =>
                 {
                     b.Property<long>("ArticlesId")
@@ -276,7 +261,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "f7625f82-d8a0-47c9-bab2-4b9a3799cd4b",
+                            ConcurrencyStamp = "00dfc3c2-8d7e-4938-ad11-6b3de1305bf5",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -298,11 +283,32 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2023, 9, 28, 19, 21, 13, 20, DateTimeKind.Utc).AddTicks(9432),
+                            RegistTime = new DateTime(2023, 9, 28, 20, 46, 4, 578, DateTimeKind.Utc).AddTicks(5257),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUserCommodity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<long>("CommodityId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("CommodityId");
+
+                    b.ToTable("ApplicationUserCommodities");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Article", b =>
@@ -773,27 +779,6 @@ namespace CnGalWebSite.APIServer.Migrations
                         .IsUnique();
 
                     b.ToTable("Commodities");
-                });
-
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.CommodityApplicationUser", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<long>("CommodityId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("CommodityId");
-
-                    b.ToTable("CommodityApplicationUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Disambig", b =>
@@ -4005,21 +3990,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("VoteOptionVoteUser");
                 });
 
-            modelBuilder.Entity("ApplicationUserCommodity", b =>
-                {
-                    b.HasOne("CnGalWebSite.DataModel.Model.Commodity", null)
-                        .WithMany()
-                        .HasForeignKey("CommoditiesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ArticleEntry", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.Article", null)
@@ -4063,6 +4033,24 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasForeignKey("VotesId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUserCommodity", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserCommodities")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Commodity", "Commodity")
+                        .WithMany("ApplicationUserCommodities")
+                        .HasForeignKey("CommodityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Commodity");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Article", b =>
@@ -4249,24 +4237,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Video");
 
                     b.Navigation("Vote");
-                });
-
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.CommodityApplicationUser", b =>
-                {
-                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
-                        .WithMany("CommodityApplicationUsers")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CnGalWebSite.DataModel.Model.Commodity", "Commodity")
-                        .WithMany("CommodityApplicationUsers")
-                        .HasForeignKey("CommodityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Commodity");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Entry", b =>
@@ -5168,9 +5138,9 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUser", b =>
                 {
-                    b.Navigation("Certification");
+                    b.Navigation("ApplicationUserCommodities");
 
-                    b.Navigation("CommodityApplicationUsers");
+                    b.Navigation("Certification");
 
                     b.Navigation("Examines");
 
@@ -5248,7 +5218,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Commodity", b =>
                 {
-                    b.Navigation("CommodityApplicationUsers");
+                    b.Navigation("ApplicationUserCommodities");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Disambig", b =>

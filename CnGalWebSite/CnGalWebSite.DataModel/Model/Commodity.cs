@@ -38,10 +38,10 @@ namespace CnGalWebSite.DataModel.Model
         public int Priority { get; set; }
 
         public virtual ICollection<ApplicationUser> Users { get; set; }
-        public virtual ICollection<CommodityApplicationUser> CommodityApplicationUsers { get; set; }
+        public virtual ICollection<ApplicationUserCommodity> ApplicationUserCommodities { get; set; }
     }
 
-    public class CommodityApplicationUser
+    public class ApplicationUserCommodity
     {
         public long Id { get; set; }
 

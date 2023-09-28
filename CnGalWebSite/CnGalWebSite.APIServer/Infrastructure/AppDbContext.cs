@@ -100,7 +100,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<EntryInformationType> EntryInformationTypes { get; set; }
         public DbSet<BasicEntryInformation> BasicEntryInformation { get; set; }
         public DbSet<Commodity> Commodities { get; set; }
-        public DbSet<CommodityApplicationUser> CommodityApplicationUsers { get; set; }
+        public DbSet<ApplicationUserCommodity> ApplicationUserCommodities { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -171,7 +171,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Commodity>()
                     .HasMany(e => e.Users)
                     .WithMany(e => e.Commodities)
-                    .UsingEntity<CommodityApplicationUser>();
+                    .UsingEntity<ApplicationUserCommodity>();
 
             //设置周边自身多对多关系
             modelBuilder.Entity<PeripheryRelation>(entity =>

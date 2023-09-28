@@ -625,6 +625,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 else
                 {
                     await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
+                    model.IsBindSteamId = true;
                 }
             }
 

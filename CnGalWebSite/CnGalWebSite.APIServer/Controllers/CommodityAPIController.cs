@@ -21,14 +21,14 @@ namespace CnGalWebSite.APIServer.Controllers
     public class CommodityAPIController : ControllerBase
     {
         private readonly IRepository<Commodity, long> _commodityRepository;
-        private readonly IRepository<CommodityApplicationUser, long> _commodityUserRepository;
+        private readonly IRepository<ApplicationUserCommodity, long> _commodityUserRepository;
         private readonly IQueryService _queryService;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<ApplicationUser, long> _userRepository;
         private readonly IRepository<UserIntegral, string> _userIntegralRepository;
         private readonly IUserService _userService;
 
-        public CommodityAPIController(IRepository<Commodity, long> commodityRepository, IQueryService queryService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<CommodityApplicationUser, long> commodityUserRepository,
+        public CommodityAPIController(IRepository<Commodity, long> commodityRepository, IQueryService queryService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<ApplicationUserCommodity, long> commodityUserRepository,
             IRepository<UserIntegral, string> userIntegralRepository, IUserService userService)
         {
             _commodityRepository= commodityRepository;
@@ -191,7 +191,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BuyCommodity, -commodity.Price, $"给看板娘买{commodity.Name}");
-            await _commodityUserRepository.InsertAsync(new CommodityApplicationUser
+            await _commodityUserRepository.InsertAsync(new ApplicationUserCommodity
             {
                 ApplicationUserId = user.Id,
                 CommodityId = commodity.Id,

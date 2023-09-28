@@ -154,7 +154,7 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<UserReviewEditRecord> ReviewEntries { get; set; }
 
         public virtual ICollection<Commodity> Commodities { get; set; }
-        public virtual ICollection<CommodityApplicationUser> CommodityApplicationUsers { get; set; }
+        public virtual ICollection<ApplicationUserCommodity> ApplicationUserCommodities { get; set; }
 
     }
 
