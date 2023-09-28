@@ -54,6 +54,7 @@ using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -62,8 +63,8 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/admin/[action]")]
     public class AdminAPIController : ControllerBase
     {
-        
-        
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -130,11 +131,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, 
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
-        IRepository<Message, long> messageRepository,IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment,
+        IRepository<Message, long> messageRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment,
          IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
-        IArticleService articleService, IUserService userService,  IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
+        IArticleService articleService, IUserService userService, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
@@ -143,14 +144,14 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository,
         IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository, IRepository<EntryInformationType, long> entryInformationTypeRepository, IRepository<BasicEntryInformation, long> basicEntryInformationRepository)
         {
-            
+
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _examineService = examineService;
-            
+
             _userService = userService;
             _entryService = entryService;
             _articleService = articleService;
@@ -204,7 +205,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _videoService = videoService;
             _videoRepository = videoRepository;
-            _perfectionOverviewRepository= perfectionOverviewRepository;
+            _perfectionOverviewRepository = perfectionOverviewRepository;
             _storeInfoRepository = storeInfoRepository;
             _entryInformationTypeRepository = entryInformationTypeRepository;
             _basicEntryInformationRepository = basicEntryInformationRepository;
@@ -242,7 +243,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Birthday = user.Birthday,
                 IsPassedVerification = user.IsPassedVerification
             };
-           
+
             return model;
         }
 
@@ -310,57 +311,16 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var entries = await _entryRepository.GetAll()
-                    .Include(s=>s.Information)
-                    .Include(s=>s.Outlinks)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Outlinks)
-                    .Where(s => s.Type == EntryType.Game&&string.IsNullOrWhiteSpace(s.Name)==false)
-                    .ToListAsync();
+                var users = await _userRepository.GetAll().AsNoTracking().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false)
+                .Select(s => s.Id)
+                .ToListAsync();
 
-                foreach (var item in entries)
+                foreach (var item in users)
                 {
-                    var flag = false;
-                    foreach (var info in item.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.ProductionGroup).Select(s => s.ToEntryNavigation))
-                    {
-                        var qq = info.Information.FirstOrDefault(s => s.DisplayName == "QQ群")?.DisplayValue;
-                        if (string.IsNullOrWhiteSpace(qq) == false)
-                        {
-                            var list = item.Information.ToList();
-                            if (list.RemoveAll(s => s.DisplayValue == qq) > 0)
-                            {
-                                flag = true;
-                            }
-                            item.Information = list;
-
-                        }
-
-                        if (item.Outlinks.Any())
-                        {
-                            var outlinks = item.Outlinks.ToList();
-
-                            foreach (var temp in info.Outlinks)
-                            {
-                                if (outlinks.RemoveAll(s => s.Link == temp.Link) > 0)
-                                {
-                                    flag = true;
-                                }
-                            }
-                            item.Outlinks = outlinks;
-
-                        }
-
-                    }
-
-                    if (flag)
-                    {
-                        await _entryRepository.UpdateAsync(item);
-                    }
-
-
-
-                    _logger.LogInformation("词条 {name}(Id:{id}) 处理成功", item.Name, item.Id);
+                    await _userService.TryAddGCoins(item, UserIntegralSourceType.BindSteamId, 10, null);
                 }
+
+                _logger.LogInformation("已给{number}个用户发放G币",users.Count);
 
                 return new Result { Successful = true };
             }
