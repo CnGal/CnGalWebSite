@@ -1033,7 +1033,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
                 //检查对话框是否被按下
                 if (dialogbox_mousedown) {
                     return;
-                }
+                } 
 
                 //执行逻辑
                 deltaLeft = touch.clientX - touch.target.offsetLeft;
