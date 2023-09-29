@@ -3,7 +3,14 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="每日任务" />
 
-<CnGalWebSite.Shared.MasaComponent.PC.Users.Tasks.TaskGroupCard/>
+<AuthorizeView>
+    <Authorized>
+        <CnGalWebSite.Shared.MasaComponent.PC.Users.Tasks.TaskGroupCard />
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedTipView/>
+</NotAuthorized>
+</AuthorizeView>
 
 @code {
 
