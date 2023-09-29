@@ -1,6 +1,6 @@
 ﻿
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="附加信息" Class="@Class" Collapable Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="附加信息" Class="@Class" Collapable Outline>
     <MDCard Class="@($"pa-3 {Class}")">
         <div>
             <MRow>
@@ -26,11 +26,11 @@
 
             @if (Model.Type == EntryType.Game)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="发行列表" Text="游戏的各个发行版本" />
+                <SectionTitleCard Title="发行列表" Text="游戏的各个发行版本" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.GameReleases.MainCard Model="Model.Releases" />
                 <AuthorizeView Roles="Admin">
                     <Authorized>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="预约" Text="发布前的预约活动" />
+                        <SectionTitleCard Title="预约" Text="发布前的预约活动" />
                         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.BookingCard Model="Model.Booking" LotteryItems="LotteryItems" />
                     </Authorized>
                 </AuthorizeView>
@@ -46,7 +46,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Staffs.StaffEditorChartListTip Staffs="Model.Staffs" />
     </div>
 }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

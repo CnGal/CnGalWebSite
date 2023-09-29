@@ -8,4 +8,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0-rc.1.23421.29" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
+  </ItemGroup>
 </Project>

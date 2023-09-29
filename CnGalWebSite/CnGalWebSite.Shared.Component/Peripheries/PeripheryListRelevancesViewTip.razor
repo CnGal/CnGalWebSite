@@ -1,24 +1,24 @@
 ﻿
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Collapable Outline Class="mb-4">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Collapable Outline Class="mb-4">
          @foreach (var item in Model.Entries)
         {
             <div class="mb-3">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" BigCardStyle />
              </div>
         }
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
     @if ((Model.Peripheries.Count > 0 && (Model.Type != PeripheryType.Set || ShowRelatedPeripheries)))
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Periphery.ToIconString()" Title="相关周边" Collapable Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Periphery.ToIconString()" Title="相关周边" Collapable Outline>
          @foreach (var item in Model.Peripheries)
             {
                 <div class="mb-3">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.PeripheryInforViewTip Model="item" BigCardStyle="!ShowRelatedPeripheries" ShowAddInfors="false" />
                  </div>
             }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 
 

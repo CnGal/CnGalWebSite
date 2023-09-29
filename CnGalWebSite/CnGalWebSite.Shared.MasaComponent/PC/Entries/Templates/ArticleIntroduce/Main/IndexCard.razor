@@ -23,15 +23,15 @@
         <StaffCard Model="Model" OnRevoke="OnRevoke" />
         <RelevanceCard Model="Model" OnRevoke="OnRevoke" />
 </MDCard>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
     @if (Model.Audio.Any())
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Components.Containers.MiniModeContainer>
             <div class="mb-4">
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="Model" OnRevoke="OnRevoke"/>
             </div>
 
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        </CnGalWebSite.Components.Containers.MiniModeContainer>
     }
     @if (Model.Booking != null && Model.Booking.Goals.Any())
     {
@@ -45,7 +45,7 @@
         <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="Model.Id" Class="mb-4" Large />
 
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="Model.Id" IsEdit="Model.IsEdit" Class="mb-4" IsGameView="Model.Type == EntryType.Game" />
 <div>
     @if (Model.CanComment)

@@ -3,7 +3,7 @@
 
 @if (Model.Releases.Any() && Model.IsHideOutlink == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
         <section id="release">
             <h2>发行列表</h2>
             @foreach (var item in Model.Releases)
@@ -175,7 +175,7 @@
 
             }
         </section>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
 
 }
 

@@ -3,7 +3,7 @@
     关联信息可以帮助我们建立详细的知识图谱，更好地展示相关内容；请确保关联信息存在，也可以先去创建再来关联哦~
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
     @if (Model.Type != EntryType.Game)
     {
@@ -25,11 +25,11 @@
             </span>
 
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="外部平台Id/链接" Text="请填写Id，并仔细阅读上方的提示" />
+        <SectionTitleCard Title="外部平台Id/链接" Text="请填写Id，并仔细阅读上方的提示" />
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard Model="Model" />
     </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 
 @code {

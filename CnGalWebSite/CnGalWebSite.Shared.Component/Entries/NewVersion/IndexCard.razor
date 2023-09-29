@@ -59,9 +59,9 @@
 
                 @if (EntryView.Type == EntryType.Game)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    <CnGalWebSite.Components.Containers.MiniModeContainer>
                         <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    </CnGalWebSite.Components.Containers.MiniModeContainer>
                 }
             </div>
             <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
@@ -87,7 +87,7 @@
                 <div>
                     <MTabsItems @bind-Value="TabIndex">
                         <MTabItem Value="1">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <CnGalWebSite.Components.Containers.MiniModeContainer>
                                 @if (EntryView.Audio.Any())
                                 {
                                     <div class="mb-4">
@@ -95,7 +95,7 @@
                                     </div>
                                 }
 
-                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            </CnGalWebSite.Components.Containers.MiniModeContainer>
                             @if (EntryView.Pictures.Count != 0)
                             {
                                 <div class="mb-4">
@@ -155,12 +155,12 @@
                 <div>
                     @if (EntryView.Audio.Any())
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                        <CnGalWebSite.Components.Containers.MiniModeContainer>
                             <div class="mb-4">
                                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
                             </div>
 
-                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                        </CnGalWebSite.Components.Containers.MiniModeContainer>
                     }
                     @if (EntryView.Pictures.Count != 0)
                     {
@@ -171,10 +171,10 @@
                     <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
                     @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                        <CnGalWebSite.Components.Containers.MiniModeContainer>
                             <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
 
-                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                         </CnGalWebSite.Components.Containers.MiniModeContainer>
                     }
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
                     @if (EntryView.NewsOfEntry.Count != 0)
@@ -199,7 +199,7 @@
             </div>
 
             <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                <CnGalWebSite.Components.Containers.MiniModeContainer>
                     @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
                     {
                         <div class="mb-4">
@@ -212,7 +212,7 @@
                         <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
 
                     }
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                </CnGalWebSite.Components.Containers.MiniModeContainer>
                 @if (EntryView.Information.Any())
                 {
                     <div class="mb-4">

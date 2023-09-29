@@ -1,4 +1,4 @@
-﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="上传图片" Outline Icon="@IconType.Image.ToIconString()" Collapable Class="@Class">
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="上传图片" Outline Icon="@IconType.Image.ToIconString()" Collapable Class="@Class">
      <MRow>
          <MCol Cols="12" Md="6" Lg="3">
              <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.PhotoName" Type="ImageAspectType._1_1" Text="上传头像" Class="mb-4"/>
@@ -13,7 +13,7 @@
              <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SBgImageName" Type="ImageAspectType.None" Text="上传小背景" Class="mb-4" />
          </MCol>
      </MRow>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

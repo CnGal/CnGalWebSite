@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@GetIcon()" Title="@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())"
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@GetIcon()" Title="@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())"
 Class="entry-card-default store-info-card mb-4">
     @if (Model.StoreInfor.State != StoreState.None&& Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
     {
@@ -104,7 +104,7 @@ Class="entry-card-default store-info-card mb-4">
         <TimeChip Model="Model" />
         <EvaluationChip Model="Model" />
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
 

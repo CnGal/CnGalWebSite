@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()">
      <div class="overflow-y-auto overflow-x-hidden" style="max-height: 600px;">
          <div class="row">
             @foreach (var item in Model.Examines.OrderByDescending(s => s.Id))
@@ -12,7 +12,7 @@
             }
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="登入QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="登入QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         <span>@(string.IsNullOrWhiteSpace(Model.QQAccountName) ? "绑定后可以使用QQ进行登入" : ("QQ昵称：" + Model.QQAccountName))</span>
 
@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

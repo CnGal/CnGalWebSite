@@ -1,5 +1,6 @@
 ﻿
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;

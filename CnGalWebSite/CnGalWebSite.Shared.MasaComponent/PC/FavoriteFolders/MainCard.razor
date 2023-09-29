@@ -10,11 +10,11 @@
     <ButtonContent>
         @if (HiddenButton == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+            <CnGalWebSite.Components.Containers.MiniModeContainer>
                 <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
                     @if (Model.Authority)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil" Tooltip="编辑" OnClick="@(() =>  NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects?FolderId="+Model.Id))" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-pencil" Tooltip="编辑" OnClick="@(() =>  NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects?FolderId="+Model.Id))" />
                     }
 
                     @if (ToolHelper.IsMaui)
@@ -22,7 +22,7 @@
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@("目录 - "+Model.Name)" Class="ms-4" Text="@($"《{Model.Name}》\n{Model.BriefIntroduction}")" />
                     }
                 </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+            </CnGalWebSite.Components.Containers.MiniModeContainer>
 
         }
     </ButtonContent>

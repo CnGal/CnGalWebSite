@@ -482,6 +482,55 @@
   text-decoration: var(--md-sys-typescale-title-small-text-decoration);
 }
 
+/*错误提示*/
+#blazor-error-ui {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+    #blazor-error-ui .background-card {
+        width: calc(100%);
+        height: calc(100%);
+        position: fixed;
+        background-color: rgba(0,0,0,.5);
+        top: 0;
+        left: 0;
+    }
+
+    #blazor-error-ui .main-card {
+        background-color: var( --md-sys-color-error-container);
+        color: var(--md-sys-color-on-error-container) !important;
+        position: fixed;
+        top: 50%;
+        bottom: 50%;
+        left: 50%;
+        right: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        border-radius: var( --md-card-border-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        justify-content: space-between;
+    }
+
+    #blazor-error-ui .content-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    /*重连*/
+.components-reconnect-show {
+    height: 1rem;
+    width: 1rem;
+    background-color: var(--md-sys-color-on-background);
+    position: fixed;
+    top: 0;
+    z-index: 200;
+}
+
 /*参数*/
 :root {
     --md-card-border-radius: 12px;
@@ -990,6 +1039,10 @@ html {
     display: flex;
     justify-content: center;
 }
+/*tab栏*/
+.theme--light.m-sheet {
+    color: inherit;
+}
 
 /*卡片*/
 .md-card {
@@ -1103,4 +1156,34 @@ html {
     .not-found-card img {
         width: 70%;
         margin-bottom: .5rem;
+    }
+/*颜色选择器*/
+.color-selector-card {
+    background-color: transparent !important;
+}
+
+/*包含标题的卡片*/
+.title-container-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .title-container-card .title-card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .title-container-card .title-card h2 {
+            display: flex;
+        }
+
+        .title-container-card .title-card i {
+            color: var(--md-sys-color-primary);
+        }
+
+    .title-container-card .content-card {
+        display: flex;
+        flex-direction: column;
     }

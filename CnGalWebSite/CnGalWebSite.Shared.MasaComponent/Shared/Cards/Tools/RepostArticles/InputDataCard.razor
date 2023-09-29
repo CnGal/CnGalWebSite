@@ -25,7 +25,7 @@
 
         </MCol>
         <MCol Cols="12">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostArticleModel(); })" Icon="mdi-plus" />
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostArticleModel(); })" Icon="mdi-plus" />
          </MCol>
      </MRow>
 
@@ -54,14 +54,14 @@
                     <td>@item.Title</td>
                     <td>@item.Url</td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
                     </td>
                 </tr>
             }
         </tbody>
     </MSimpleTable>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+    <CnGalWebSite.Components.Buttons.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
 </div>
 <ImportCard @ref="importCard" OnImported="OnImported" />
 

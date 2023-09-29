@@ -1,5 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using CnGalWebSite.Components.Extensions;
+using CnGalWebSite.Components.Service;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.Helper.Services;
 using CnGalWebSite.Kanban.Extensions;
@@ -31,8 +33,8 @@ namespace CnGalWebSite.Shared.Extentions
 
             //本地储存
             services.AddBlazoredLocalStorage().AddBlazoredSessionStorage();
-            //按类型缓存数据
-            services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
+            //添加公共组件
+            services.AddCnGalComponents();
             //全局缓存数据
             services.AddScoped<IDataCacheService, DataCatcheService>();
             //查看大图

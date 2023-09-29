@@ -1,0 +1,41 @@
+﻿
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="401 Unauthorized" />
+
+<CnGalWebSite.Components.Errors.NotFoundCard>
+    @if (NoPermissions)
+    {
+        <h1 class="text-center title-large">权限不足</h1>
+        <div class="text-center">抱歉哦，查看不了这个页面，不过你可以 <a @onclick="OnLogin">登入其他账号</a> 试一试</div>
+    }
+    else
+    {
+        <h1 class="text-center title-large">仅登入可见</h1>
+        <div class="text-center">哎呀，目前还不能访问此部分哦，不过你可以 <a @onclick="OnLogin">登入</a> 试一试</div>
+    }
+</CnGalWebSite.Components.Errors.NotFoundCard>
+
+@code {
+    [Parameter]
+    public bool NoPermissions { get; set; }
+
+    protected void OnLogin()
+    {
+        // InteractiveRequestOptions requestOptions = new()
+        // {
+        //     Interaction = InteractionType.SignIn,
+        //     ReturnUrl = NavigationManager.Uri,
+        // };
+
+
+        // if (ToolHelper.IsSSR)
+        // {
+        //     NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
+        // }
+        // else
+        // {
+        //     NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+        // }
+    }
+}

@@ -9,25 +9,25 @@
 
     @if (Model.RelatedEntries.Any())
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Outline Collapable>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Outline Collapable>
          @foreach (var item in Model.RelatedEntries)
             {
                 <div class="mb-3">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
                  </div>
             }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     @if (Model.RelatedArticles.Any())
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="相关文章" Outline Collapable>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="相关文章" Outline Collapable>
          @foreach (var item in Model.RelatedArticles)
             {
                 <div class="mb-3">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" />
                 </div>
             }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 
 

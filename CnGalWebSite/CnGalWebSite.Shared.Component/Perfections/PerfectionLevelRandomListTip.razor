@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="@Title" Icon="@TitleIcon" Class="mb-4">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="@Title" Icon="@TitleIcon" Class="mb-4">
     <ButtonContent>
 
         <MButton Rounded Color="primary"  OnClick="GetNewRandomList">
@@ -22,7 +22,7 @@
         </div>
     </ChildContent>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 @code {
 
     public List<PerfectionInforTipViewModel> Model { get; set; } = new List<PerfectionInforTipViewModel>();

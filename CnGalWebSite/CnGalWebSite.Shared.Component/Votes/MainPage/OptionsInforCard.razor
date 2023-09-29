@@ -26,7 +26,7 @@
     }
 
 </style>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票选项" Icon="@IconType.Vote.ToIconString()" Class="mb-4">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="投票选项" Icon="@IconType.Vote.ToIconString()" Class="mb-4">
         <div class="mb-4">@( Model.Type==VoteType.MultipleChoice?(Model.MaximumSelectionCount==Model.MinimumSelectionCount?($"每人投{Model.MaximumSelectionCount}票"):($"最多投{Model.MaximumSelectionCount}票，最少投{Model.MinimumSelectionCount}票")):"每人只能投1票")</div>
     @if (IsShowResult)
     {
@@ -55,7 +55,7 @@
             }
         </div>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

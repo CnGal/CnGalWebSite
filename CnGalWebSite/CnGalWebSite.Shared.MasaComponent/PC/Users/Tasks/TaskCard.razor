@@ -9,11 +9,11 @@
      <div class="action-card">
          @if (Finished)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成"/>
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成"/>
         }
         else
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
         }
     </div>
 </MDCard>

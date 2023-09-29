@@ -4,7 +4,7 @@
 
 @foreach (var item in _dataCacheService.RandomTagsCatche.Take(1))
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="@item.Name" Icon="@IconType.Tag.ToIconString()" ShowMoreButton OnClickMore="@(()=>OnClickMore("/tags/index/"+item.Id))">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="@item.Name" Icon="@IconType.Tag.ToIconString()" ShowMoreButton OnClickMore="@(()=>OnClickMore("/tags/index/"+item.Id))">
             <MSlideGroup ShowArrows="true" Class="slide-group-garp">
                 <ChildContent>
                     @foreach (var temp in item.Entries)
@@ -16,7 +16,7 @@
                 </ChildContent>
 
             </MSlideGroup>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 

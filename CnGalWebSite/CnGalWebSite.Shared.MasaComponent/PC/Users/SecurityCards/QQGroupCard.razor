@@ -4,7 +4,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="@IconType.QQ.ToIconString()" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="群聊QQ号" Icon="@IconType.QQ.ToIconString()" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
         {
@@ -37,7 +37,7 @@
 
     </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
 <MDialog @bind-Value="Dialog"
          Width="600">
@@ -60,7 +60,7 @@
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="success" TextStyle />
         </MCardActions>
     </MDCard>
 </MDialog>

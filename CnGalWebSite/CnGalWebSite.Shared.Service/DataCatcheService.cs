@@ -1,4 +1,5 @@
 ﻿
+using CnGalWebSite.Components.Service;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;

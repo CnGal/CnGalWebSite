@@ -4,7 +4,7 @@
 @inject IJSRuntime JS
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" OnClickMore="OnClickMore" Class="mb-2" Outline SectionId="cv-news">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" OnClickMore="OnClickMore" Class="mb-2" Outline SectionId="cv-news">
      @foreach (var item in Model.Take(MaxCount))
     {
         <MDCard Class="item">
@@ -20,7 +20,7 @@
             </a>
         </MDCard>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 

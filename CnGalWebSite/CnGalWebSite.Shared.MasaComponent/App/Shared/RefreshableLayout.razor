@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@Icon" Outline Class="@Class" Small>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Title" Icon="@Icon" Outline Class="@Class" Small>
     <ButtonContent>
         <MButton Text Block XSmall  OnClick="@(()=>NavigationManager.NavigateTo(MoreUrl))">
             <MIcon Left>mdi-share-all-outline</MIcon>
@@ -16,14 +16,14 @@
         {
             <div style="display: flex; justify-content: center;" class="pb-3">
                 <div style="max-width:200px;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="@RefreshText" XSmall Icon="mdi-refresh" IsAsync="true" OnClick="OnClickRefresh" Class="w-100" Rounded Depressed />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="@RefreshText" XSmall Icon="mdi-refresh" IsAsync="true" OnClick="OnClickRefresh" Class="w-100" Rounded Depressed />
 
                 </div>
             </div>
         }
 
     </ChildContent>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

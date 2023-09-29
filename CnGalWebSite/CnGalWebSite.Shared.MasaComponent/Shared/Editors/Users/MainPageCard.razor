@@ -3,9 +3,9 @@
     可以在这里随便写一写自己想说的话，这个页面会占据最大的版面
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="介绍" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="介绍" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.MainPage" />
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 @code {
     [Parameter]
     public EditUserMainPageViewModel Model { get; set; }

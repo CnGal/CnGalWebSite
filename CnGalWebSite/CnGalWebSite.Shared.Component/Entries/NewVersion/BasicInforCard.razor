@@ -16,14 +16,14 @@
 
 @if (Model.Information.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
         <div class="basic-info-group-card">
             @foreach (var item in Model.Information)
             {
                 <BasicInforAloneTip IconString="@item.Icon" Title="@item.Name" Text="@item.Value" />
             }
         </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 }
 

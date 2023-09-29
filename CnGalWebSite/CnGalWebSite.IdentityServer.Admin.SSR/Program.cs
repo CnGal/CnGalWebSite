@@ -30,6 +30,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //自定义服务
 builder.Services.AddScoped<IHttpService, HttpService>();
+//令牌储存
 builder.Services.AddSingleton<ITokenStoreService, TokenStoreService>();
 builder.Services.AddScoped<INavigationService, NavigationService> ();
 //添加Query

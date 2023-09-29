@@ -25,8 +25,8 @@
 
         </MCol>
         <MCol Cols="12">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="批量导入" OnClick="OnImport" Icon="mdi-database-import" />
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
+             <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="批量导入" OnClick="OnImport" Icon="mdi-database-import" />
          </MCol>
      </MRow>
      <MSimpleTable Class="mb-4">
@@ -67,14 +67,14 @@
                     <td>@item.Title</td>
                     <td>@item.Url</td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
                      </td>
                  </tr>
             }
         </tbody>
     </MSimpleTable>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+    <CnGalWebSite.Components.Buttons.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
  </div>
  <ImportCard @ref="importCard" OnImported="OnImported" />
 

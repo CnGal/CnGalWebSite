@@ -11,14 +11,14 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditRelatedPeripheries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedPeripheries" OnClickRevoke="OnRevoke"/>
     </div>
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边合集" Icon="@IconType.Periphery.ToIconString()" Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="周边合集" Icon="@IconType.Periphery.ToIconString()" Outline>
     @foreach (var item in Model.PeripheryOverviewModels)
     {
         <div class="mb-4">
             <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip Model="item" OnlyShowContext/>
         </div>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 
 @code {

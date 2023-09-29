@@ -1,4 +1,6 @@
 ﻿@inject IHttpService _httpService
+@using CnGalWebSite.Core.Helpers;
+@using CnGalWebSite.Core.Models;
 
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
@@ -7,7 +9,7 @@
 {
     <AuthorizeView Roles="Admin">
         <Authorized>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Blazor Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="Blazor Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
                 <div class="row">
                     @foreach (var item in Items)
                     {
@@ -17,7 +19,7 @@
 
                     }
                 </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
         </Authorized>
     </AuthorizeView>
 }

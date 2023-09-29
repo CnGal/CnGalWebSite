@@ -9,7 +9,7 @@
 {
     @if (Template == EntryStyleTemplate.Default)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
+        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
     }
     else
     {
@@ -21,7 +21,7 @@
         </MButton>
     }
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -42,7 +42,7 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

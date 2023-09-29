@@ -4,8 +4,8 @@
 
 @if (Model.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="相关视频" Icon="@IconType.Video.ToIconString()" Class="mb-4">
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="相关视频" Icon="@IconType.Video.ToIconString()" Class="mb-4">
             <ChildContent>
                  <MSlideGroup ShowArrows="true" Class="slide-group-garp mb-4">
                     <ChildContent>
@@ -22,8 +22,8 @@
                 </MSlideGroup>
             </ChildContent>
 
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
 }
 
 

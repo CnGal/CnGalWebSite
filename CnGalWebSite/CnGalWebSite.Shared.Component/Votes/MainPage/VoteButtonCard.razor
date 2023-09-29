@@ -12,19 +12,19 @@
         {
             <MCheckbox TValue="bool" @bind-Value="IsAnonymous" Label="匿名参与投票"></MCheckbox>
             <div style=" display: flex; justify-content: center; ">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted"/>
+                <CnGalWebSite.Components.Buttons.MasaButton Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted"/>
             </div>
         }
         else
         {
             <div style=" display: flex; justify-content: center; ">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="fa fa-refresh" Text="重新投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickReVoted"/>
+                <CnGalWebSite.Components.Buttons.MasaButton Icon="fa fa-refresh" Text="重新投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickReVoted"/>
             </div>
         }
     </div>
 
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -38,7 +38,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
 
     [CascadingParameter]

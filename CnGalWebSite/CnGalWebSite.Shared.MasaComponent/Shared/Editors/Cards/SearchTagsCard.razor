@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="@IconType.Search.ToIconString()" Collapable Class="@Class">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="可选标签" Icon="@IconType.Search.ToIconString()" Collapable Class="@Class">
     <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
                 Label="可以搜索标签哦~"
                 Clearable
@@ -26,7 +26,7 @@
             }
         </PrependContent>
     </MTreeview>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 
 

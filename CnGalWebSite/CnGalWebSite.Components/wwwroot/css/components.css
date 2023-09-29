@@ -111,3 +111,33 @@
         width: 70%;
         margin-bottom: .5rem;
     }
+/*颜色选择器*/
+.color-selector-card {
+    background-color: transparent !important;
+}
+
+/*包含标题的卡片*/
+.title-container-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .title-container-card .title-card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .title-container-card .title-card h2 {
+            display: flex;
+        }
+
+        .title-container-card .title-card i {
+            color: var(--md-sys-color-primary);
+        }
+
+    .title-container-card .content-card {
+        display: flex;
+        flex-direction: column;
+    }

@@ -64,6 +64,12 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
             _userDataModel = new UserDataModel();
         }
 
+        public async Task ResetAsync()
+        {
+            Reset();
+            await SaveAsync();
+        }
+
         /// <summary>
         /// 检查服装是否存在
         /// </summary>

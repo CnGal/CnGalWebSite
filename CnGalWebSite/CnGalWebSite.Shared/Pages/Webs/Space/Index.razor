@@ -93,32 +93,32 @@ else
                             @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                             {
                                 <div class="mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="@IconType.Home.ToIconString()">
+                                    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="个人介绍" Icon="@IconType.Home.ToIconString()">
                                          <ChildContent>
                                              <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPageContext" />
                                          </ChildContent>
                                          <ButtonContent>
                                              @if (Model.IsCurrentUser)
                                             {
-                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@IconType.Edit.ToIconString()" Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+                                                <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="@IconType.Edit.ToIconString()" Tooltip="编辑个人介绍" OnClick="EditMainPage" />
 
                                             }
                                         </ButtonContent>
-                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
                                 </div>
                             }
 
                             <div class="mb-4">
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
+                                <CnGalWebSite.Components.Containers.MasaTitleContainer Title="签到记录" Icon="@IconType.DeterminedTime.ToIconString()" Collapable>
                                  <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.SignInDays" Id="@Model.Id" />
-                             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                             </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
                          </div>
                          <div class="mb-4">
-                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
+                             <CnGalWebSite.Components.Containers.MasaTitleContainer Title="编辑概览" Icon="@IconType.Edit.ToIconString()" Collapable>
                                  <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaHeatMapChart Type="UserHeatMapType.EditRecords" ShowScrollBar Id="@Model.Id" />
-                                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                 </CnGalWebSite.Components.Containers.MasaTitleContainer>
                              </div>
 
 

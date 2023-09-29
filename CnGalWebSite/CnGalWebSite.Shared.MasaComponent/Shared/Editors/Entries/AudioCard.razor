@@ -3,7 +3,7 @@
     音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="音频试听" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="音频试听" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
     @if(Model.Audio.Any())
     {
@@ -38,8 +38,8 @@
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url" Class="w-100" />
                     </td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.EditRecord.ToIconString()" Color="success" />
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.EditRecord.ToIconString()" Color="success" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
                     </td>
 
                 </tr>
@@ -49,7 +49,7 @@
 
     }
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard @ref="editAudioCard" OnChanged="OnChanged" />
 @code {
     [Parameter]

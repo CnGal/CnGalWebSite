@@ -1,29 +1,4 @@
 ﻿
-/*包含标题的卡片*/
-.title-container-card {
-    display: flex;
-    flex-direction: column;
-}
-
-    .title-container-card .title-card {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-        .title-container-card .title-card h2 {
-            display: flex;
-        }
-
-        .title-container-card .title-card i {
-            color: var(--md-sys-color-primary);
-        }
-
-    .title-container-card .content-card {
-        display: flex;
-        flex-direction: column;
-    }
 /*主要信息卡片模板*/
 .md-main-info-card {
     flex-direction: row;
@@ -209,10 +184,7 @@
         justify-content: flex-end;
         gap: .5rem;
     }
-/*颜色选择器*/
-.color-selector-card {
-    background-color: transparent !important;
-}
+
 /*日历*/
 .masa-calendar-card .title-card {
     display: flex;

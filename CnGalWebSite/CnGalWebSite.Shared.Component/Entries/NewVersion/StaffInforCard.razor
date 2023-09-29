@@ -1,8 +1,8 @@
 ﻿@if (Model.Staffs != null && Model.Staffs.Count != 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" Icon="@IconType.Staff.ToIconString()" Collapable>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="Staff" Icon="@IconType.Staff.ToIconString()" Collapable>
         <ButtonContent>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
+            <CnGalWebSite.Components.Buttons.MasaButton Fab XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
         </ButtonContent>
         <ChildContent>
             <div>
@@ -37,7 +37,7 @@
 
             </div>
         </ChildContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 @if (export)
 {

@@ -44,47 +44,47 @@
             <MTabItem Value="1">
                 @if (entries.Any(s => s.Type == EntryType.Game))
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Game.ToIconString()" Title="@("游戏"+(entries.Count(s => s.Type == EntryType.Game)>4?$" ({entries.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Game.ToIconString()" Title="@("游戏"+(entries.Count(s => s.Type == EntryType.Game)>4?$" ({entries.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
                             @foreach (var item in entries.Where(s => s.Type == EntryType.Game))
                             {
                                 <div class="mb-3">
                                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
                                 </div>
                             }
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
                 }
                 @if (entries.Any(s => s.Type == EntryType.ProductionGroup))
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Group.ToIconString()" Title="@("制作组"+(entries.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({entries.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Group.ToIconString()" Title="@("制作组"+(entries.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({entries.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
                             @foreach (var item in entries.Where(s => s.Type == EntryType.ProductionGroup))
                             {
                                 <div class="mb-3">
                                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
                                 </div>
                             }
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
                 }
                 @if (entries.Any(s => s.Type == EntryType.Staff))
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="@("STAFF"+(entries.Count(s => s.Type == EntryType.Staff)>4?$" ({entries.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="@("STAFF"+(entries.Count(s => s.Type == EntryType.Staff)>4?$" ({entries.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
                             @foreach (var item in entries.Where(s => s.Type == EntryType.Staff))
                             {
                                 <div class="mb-3">
                                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
                                 </div>
                             }
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
                 }
                 @if (entries.Any(s => s.Type == EntryType.Role))
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Role.ToIconString()" Title="@("角色"+(entries.Count(s => s.Type == EntryType.Role)>4?$" ({entries.Count(s => s.Type == EntryType.Role)})":""))" Outline Collapable>
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Role.ToIconString()" Title="@("角色"+(entries.Count(s => s.Type == EntryType.Role)>4?$" ({entries.Count(s => s.Type == EntryType.Role)})":""))" Outline Collapable>
                             @foreach (var item in entries.Where(s => s.Type == EntryType.Role))
                             {
                                 <div class="mb-3">
                                     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType />
                                 </div>
                             }
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
                 }
 
             </MTabItem>

@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="筛选" Icon="@IconType.Filter.ToIconString()" Collapable IsCollapsed="true">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="筛选" Icon="@IconType.Filter.ToIconString()" Collapable @bind-IsCollapsed="_isCollapsed">
     <div class="row">
         <div class="col-12 col-lg-6">
             <SortChipsList Model="Model" OnChanged="OnChanged" />
@@ -26,13 +26,15 @@
 
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
-@code {
+ @code {
     [Parameter]
     public SearchInputModel Model { get; set; }
     [Parameter]
     public EventCallback OnChanged { get; set; }
+
+    bool _isCollapsed = true;
 
     List<SearchType> EntryTypes { get; set; } = SearchInputModel.GetEntryTypes();
     List<SearchType> ArticleTypes { get; set; } = SearchInputModel.GetArticleTypes();

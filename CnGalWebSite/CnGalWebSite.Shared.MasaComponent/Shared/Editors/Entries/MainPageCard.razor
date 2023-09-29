@@ -3,9 +3,9 @@
     可以在这里填写遗漏的信息、游戏的剧情、人物的性格......总之，你可以在最大范围内自由发挥，不过需要遵守排版规范哦~
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="介绍" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="介绍" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownEditorTip @bind-Context="@Model.Context" />
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 @code {
     [Parameter]
     public EditMainPageViewModel Model { get; set; }

@@ -4,7 +4,7 @@
         @foreach (var item in _items)
         {
             <div class="button-item">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@item.Item1.ToIconString()" Href="@item.Item3" OnClick="@(()=>OnClick(item))" />
+                <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="@item.Item1.ToIconString()" Href="@item.Item3" OnClick="@(()=>OnClick(item))" />
                 <div class="name label-large">@item.Item2</div>
             </div>
         }

@@ -3,7 +3,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.DataModel.ViewModel.Videos;
-using CnGalWebSite.Helper.Helper;
+
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;

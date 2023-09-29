@@ -9,7 +9,7 @@
 
     @if (Model.Peripheries.Count != 0)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
              <MDCard Outline="Outline" Class="@($"periphery-overview-card {Class}")">
                  <MDCard Outline Href="@GetUrl()" OnClick="OnClick" Style="flex-direction: row;">
                          @if (Model.IsThumbnail)
@@ -53,27 +53,27 @@
 
                 </MSlideGroup>
             </MDCard>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     else
     {
         if (IsGameView)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline>
 
                 <AuthorizeView>
                     <Authorized>
                      <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
-                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
+                         <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
                         </MDCard>
                     </Authorized>
                     <NotAuthorized>
                      <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
-                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                             <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
                      </MDCard>
                  </NotAuthorized>
                 </AuthorizeView>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
         }
     }
 

@@ -8,7 +8,7 @@
 @inject IPopupService PopupService
 
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@(IsAnniversary?"我的游戏库":"游玩记录")" Icon="@((IsAnniversary?IconType.Steam: IconType.GameRecord).ToIconString())" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
@@ -21,7 +21,7 @@
                 }
                 else
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
 
                 }
             }
@@ -37,7 +37,7 @@
                     @if (IsAnniversary && string.IsNullOrWhiteSpace(SteamId) && IsCurrentUser)
                     {
                         <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
                          </div>
                     }
                     else
@@ -58,7 +58,7 @@
                 <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
             }
         </ChildContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
    
 </div>
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />

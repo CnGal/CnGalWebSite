@@ -333,3 +333,7 @@ html {
     display: flex;
     justify-content: center;
 }
+/*tab栏*/
+.theme--light.m-sheet {
+    color: inherit;
+}

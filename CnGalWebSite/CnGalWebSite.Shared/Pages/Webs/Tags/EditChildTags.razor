@@ -24,10 +24,10 @@ else
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Tag.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Tag.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Tags.ChildTagsCard Model="Model" Class="mb-4" TagItems="TagItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 </div>
 

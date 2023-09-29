@@ -6,7 +6,7 @@
     {
         <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
     }
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
         @if (HiddenTitle == false)
         {
             <h1 class="fw-bold  h3" itemprop="headline">@Model.DisplayName</h1>
@@ -25,7 +25,7 @@
 
             }
         }
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
     <div>
         @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
         {

@@ -8,7 +8,7 @@
             主题设置
         </MCardTitle>
         <MCardText>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="主题颜色" Text="你可以从下方选择一个喜欢的颜色作为主题颜色" />
+            <SectionTitleCard Title="主题颜色" Text="你可以从下方选择一个喜欢的颜色作为主题颜色" />
             <MButtonGroup Borderless Value="@_dataCacheService.ThemeSetting.ThemeColor" ValueChanged="ColorValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; " Class="color-selector-card">
                  @foreach (var item in ThemeModel.AvailableColors)
                 {
@@ -16,28 +16,28 @@
                 }
             </MButtonGroup>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
+            <SectionTitleCard Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.ThemeMode" ValueChanged="ThemeModeValueChanged" TValue="ThemeMode" Label="主题模式" />
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
+            <SectionTitleCard Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
             <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban?"浮动按钮组":"看板娘Live2D")" Class="m-0"></MSwitch>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
+            <SectionTitleCard Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
             <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")" Class="m-0"></MSwitch>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="扩展显示范围" Text="选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小" />
+            <SectionTitleCard Title="扩展显示范围" Text="选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小" />
             <MSwitch Value="_dataCacheService.ThemeSetting.IsExtendEntireScreen" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_dataCacheService.ThemeSetting.IsExtendEntireScreen?"扩展显示范围":"限制显示范围")" Class="m-0"></MSwitch>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="词条样式模板" Text="选择词条页面的布局排版样式" />
+            <SectionTitleCard Title="词条样式模板" Text="选择词条页面的布局排版样式" />
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.EntryTemplate" ValueChanged="EntryTemplateValueChanged" TValue="EntryStyleTemplate" Label="词条样式模板" />
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="字体" Text=" 自定义渲染的字体，具体参见更新日志" />
+            <SectionTitleCard Title="字体" Text=" 自定义渲染的字体，具体参见更新日志" />
             <MTextField Label="字体" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string"></MTextField>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="自动保存编辑" Text="在编辑页面时间隔10秒自动保存一次数据" />
+            <SectionTitleCard Title="自动保存编辑" Text="在编辑页面时间隔10秒自动保存一次数据" />
             <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Class="m-0"></MSwitch>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="显示错误详情" Text="展示网站发生错误时的详细信息" />
+            <SectionTitleCard Title="显示错误详情" Text="展示网站发生错误时的详细信息" />
             <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Class="m-0"></MSwitch>
 
         </MCardText>

@@ -22,11 +22,12 @@
 @using CnGalWebSite.Shared.Service
 
 @using System.Net.Http.Headers
+@using CnGalWebSite.Components.Models
 
 @using Microsoft.AspNetCore.Authorization
 @using System.Threading
 @using Blazored.LocalStorage;
-
+@using CnGalWebSite.Components.Service
 @using Microsoft.AspNetCore.Components;
 @using System.Collections.Generic;
 @using System.Diagnostics.CodeAnalysis;
@@ -89,7 +90,7 @@
 @using CnGalWebSite.DataModel.ViewModel.Others
 @using CnGalWebSite.PublicToolbox.Models
 @using CnGalWebSite.PublicToolbox.PostTools
-@using CnGalWebSite.Helper.Helper
+
 @using CnGalWebSite.DataModel.ViewModel.Anniversaries
 @using CnGalWebSite.DataModel.ViewModel.OperationRecords
 @using CnGalWebSite.Helper.ViewModel.Comments
@@ -123,4 +124,4 @@
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 
-@using IconType = CnGalWebSite.DataModel.ViewModel.Others.IconType
+@using IconType = CnGalWebSite.Components.Models.IconType

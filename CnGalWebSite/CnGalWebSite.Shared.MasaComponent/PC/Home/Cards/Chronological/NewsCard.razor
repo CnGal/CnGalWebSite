@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<HomeNewsAloneViewModel>>  _pageModelCatche
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
     <section class="news-card">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新动态" Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news" ForceShowMore>
             <div class="group">
@@ -28,7 +28,7 @@
     </section>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 
 @code {
 

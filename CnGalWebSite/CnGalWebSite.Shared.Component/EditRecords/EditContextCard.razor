@@ -2,29 +2,29 @@
 @inject NavigationManager NavigationManager
 
 <MDCard Outline>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
         <ButtonContent>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="mdi-share" Text="查看详情" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation />
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-share" Text="查看详情" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation />
          </ButtonContent>
          <ChildContent>
              <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.EditOverview" Class="overflow-y-auto" Style="max-height: 420px;" />
          </ChildContent>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
      @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="批注" Class="mb-4" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="批注" Class="mb-4" Outline>
          <div style=" white-space: break-spaces;">
              @Model.Comments
          </div>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     @if (string.IsNullOrWhiteSpace(Model.Note) == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="备注" Class="mb-4" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="备注" Class="mb-4" Outline>
          <div style=" white-space: break-spaces;">
              @Model.Note
          </div>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 </MDCard>
 

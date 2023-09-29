@@ -13,7 +13,7 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
 
         Task SaveAsync();
 
-        void Reset();
+        Task ResetAsync();
 
         UserDataModel UserData { get; }
     }

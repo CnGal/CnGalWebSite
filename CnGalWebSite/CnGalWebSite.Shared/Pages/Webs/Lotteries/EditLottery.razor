@@ -24,7 +24,7 @@ else
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Lottery.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Lottery.ToIconString()" Outline>
          <MDCard Class="mb-4">
              <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
@@ -54,7 +54,7 @@ else
                  <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListWinnerCard Id="Model.Id" />
              </MTabItem>
          </MTabsItems>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
             
     }
 </div>

@@ -3,7 +3,7 @@
 
 <div class="@Class">
     <InputRelevanceListTitle Title="自定义链接" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加" OnClick="AddOther" Icon="@IconType.Create.ToIconString()" Class="mb-4" />
+    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="AddOther" Icon="@IconType.Create.ToIconString()" Class="mb-4" />
 
     @if (Model.Any(s => Check(s.DisplayName)))
     {
@@ -32,8 +32,8 @@
                     <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.Link</td>
                     <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.DisPlayValue</td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>EditOther(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>DeleteOther(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="编辑" OnClick="@(()=>EditOther(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>DeleteOther(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
                     </td>
                 </tr>
             }

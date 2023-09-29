@@ -22,15 +22,15 @@
             <CnGalWebSite.Shared.Component.Admin.Examines.Cards.OverviewCard Model="Model" Class="mb-4" />
             <div class="row">
                 <div class="col-12 col-lg-6">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Key.ToIconString()" Title="@(Model.IsPassed==null? "修改前" : "编辑后")" Class="mb-4" Collapable Outline>
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Key.ToIconString()" Title="@(Model.IsPassed==null? "修改前" : "编辑后")" Class="mb-4" Collapable Outline>
                         <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.BeforeModel"/>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
                 </div>
                 <div class="col-12 col-lg-6">
-                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="@(Model.IsPassed==null? "修改后" : "当前状态")" Class="mb-4" Collapable Outline>
+                 <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="@(Model.IsPassed==null? "修改后" : "当前状态")" Class="mb-4" Collapable Outline>
                         <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.AfterModel" />
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
                 </div>
             </div>

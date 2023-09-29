@@ -4,7 +4,7 @@
 
 @implements IDisposable
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
     @if (isReady)
     {
         @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp)
@@ -30,7 +30,7 @@
     }
 
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 
 @code {
     bool isReady;

@@ -25,17 +25,17 @@
             <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
                 <div class="title-large mb-3">游戏发售时间汇总</div>
                 <div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
                 </div>
             </div>
             <div style="display: flex; align-items: center; justify-content: center;">
                 @if (Type == PublishGamesDisplayType.CardList)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft" />
                     <div style="max-width:170px" class="ps-2 pe-2">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMonthPick Date="Date" DateChanged="DateChanged" />
                     </div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下个月" Icon="mdi-arrow-right-thick" TextStyle OnClick="OnClickRight" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="下个月" Icon="mdi-arrow-right-thick" TextStyle OnClick="OnClickRight" />
                 }
                 else
                 {

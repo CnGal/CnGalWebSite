@@ -13,7 +13,7 @@
     <div class="label-large primary-text">
         @($"目前拥有G币：{_dataCacheService.UserInfor.GCoins}")
     </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@IconType.Task.ToIconString()" Text="获取G币" Href="/tasks"/>
+    <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Task.ToIconString()" Text="获取G币" Href="/tasks"/>
 </MDCard>
 
 @code {

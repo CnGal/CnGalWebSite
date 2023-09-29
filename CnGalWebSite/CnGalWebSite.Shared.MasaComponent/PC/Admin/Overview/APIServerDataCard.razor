@@ -1,11 +1,12 @@
-﻿@inject IHttpService _httpService
+﻿@using CnGalWebSite.Core.Models;
+@inject IHttpService _httpService
 
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 
 @if (IsReady)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="API Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="API Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
         <div class="row">
             @foreach (var item in Items)
             {
@@ -17,7 +18,7 @@
 
 
         </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 @code {

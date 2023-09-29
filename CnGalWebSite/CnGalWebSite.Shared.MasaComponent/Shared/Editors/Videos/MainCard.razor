@@ -1,6 +1,6 @@
 ﻿
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
     <MRow>
         <MCol Cols="12" Md="6" Lg="4">
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
@@ -44,7 +44,7 @@
              <MCheckbox @bind-Value="Model.IsCreatedByCurrentUser" Label="本人创作" TValue="bool" />
          </MCol>
      </MRow>
- </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+ </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
  @code {
     [Parameter]

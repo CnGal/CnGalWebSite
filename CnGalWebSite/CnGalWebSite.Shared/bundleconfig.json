@@ -2,20 +2,15 @@
   {
     "outputFileName": "wwwroot/js/bundle.js",
     "inputFiles": [
-      "wwwroot/js/gt.js",
-      "wwwroot/js/tools-inline.js",
       "wwwroot/js/lottery.js",
       "wwwroot/js/home.js",
-      "wwwroot/js/check.js",
+      "../CnGalWebSite.Components/wwwroot/js/bundle.js",
       "../CnGalWebSite.Kanban/wwwroot/js/live2d-core.js"
     ]
   },
   {
     "outputFileName": "wwwroot/css/bundle.css",
     "inputFiles": [
-      "wwwroot/css/material-theme/colors.module.css",
-      "wwwroot/css/material-theme/typography-tokens.css",
-      "wwwroot/css/material-theme/typography.module.css",
       "../CnGalWebSite.Components/wwwroot/css/bundle.css",
       "wwwroot/css/common.css",
       "wwwroot/css/cover-default.css",

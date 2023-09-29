@@ -63,18 +63,18 @@
             {
                 <AuthorizeView>
                     <Authorized>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnClickEditGameRecored" Icon="mdi-plus" TextStyle />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="添加游玩记录" OnClick="OnClickEditGameRecored" Icon="mdi-plus" TextStyle />
 
                     </Authorized>
                     <NotAuthorized>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
 
                     </NotAuthorized>
                 </AuthorizeView>
             }
             @if (ShowNav)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="OnNav" Icon="mdi-share-all-outline" TextStyle />
+                <CnGalWebSite.Components.Buttons.MasaButton Text="查看词条页面" OnClick="OnNav" Icon="mdi-share-all-outline" TextStyle />
             }
         </MCardActions>
 

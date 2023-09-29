@@ -6,13 +6,13 @@
 {
     @if (Large)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
             <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="10" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
             <TotalScoreCard Model="Model" Outline />
              <div style="align-self: center;">
 
@@ -31,7 +31,7 @@
                     </NotAuthorized>
                 </AuthorizeView>
             </div>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 
     @if (Model.GameTotalScores.IsScored)

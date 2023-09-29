@@ -14,11 +14,11 @@
         </div>
         @if (Model.IsOwned)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已解锁" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Check.ToIconString()" Text="已解锁" />
         }
         else
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Icon="@IconType.Buy.ToIconString()" Text="解锁" IsAsync OnClick="Buy" />
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Buy.ToIconString()" Text="解锁" IsAsync OnClick="Buy" />
         }
     </div>
 

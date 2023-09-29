@@ -2,10 +2,10 @@
 
 @if (Model.Any(s => s.Users.Any()))
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="中奖用户" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline Collapable>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="中奖用户" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline Collapable>
         @foreach (var item in Model.Where(s => s.Users.Any()))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="@IconType.Gift.ToIconString()" Class="mb-4" Outline Small Collapable>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@item.Name" Icon="@IconType.Gift.ToIconString()" Class="mb-4" Outline Small Collapable>
                 <div class="row">
                     @foreach (var infor in item.Users)
                     {
@@ -14,10 +14,10 @@
                         </div>
                     }
                 </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
         }
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 @code {

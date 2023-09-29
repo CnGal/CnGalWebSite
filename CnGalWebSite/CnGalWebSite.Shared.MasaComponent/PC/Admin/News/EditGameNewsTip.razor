@@ -33,23 +33,23 @@
             {
                 @if (Model.State == GameNewsState.Edit)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" TextStyle />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" TextStyle />
                 }
                 else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" TextStyle />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" TextStyle />
 
                 }
             }
             <MSpacer></MSpacer>
             @if (Model.State == GameNewsState.Edit)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" Rounded />
+                <CnGalWebSite.Components.Buttons.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" Rounded />
 
             }
 
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Rounded/>
+            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Rounded/>
         </MCardActions>
     </MDCard>
 </MDialog>

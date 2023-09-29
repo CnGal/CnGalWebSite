@@ -2,26 +2,26 @@
 
 
 <MDCard Class="@Class" Outline>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
          <ChildContent>
              <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.EditOverview"/>
          </ChildContent>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
      @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="批注" Class="mb-4" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="批注" Class="mb-4" Outline>
          <div style=" white-space: break-spaces;">
              @Model.Comments
          </div>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     @if (string.IsNullOrWhiteSpace(Model.Note) == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="备注" Class="mb-4" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Note.ToIconString()" Title="备注" Class="mb-4" Outline>
          <div style=" white-space: break-spaces;">
              @Model.Note
          </div>
-     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 </MDCard>
 

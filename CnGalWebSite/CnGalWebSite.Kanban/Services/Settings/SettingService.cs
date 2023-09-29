@@ -49,7 +49,7 @@ namespace CnGalWebSite.Kanban.Services.Settings
             //没有数据则重置
             if (_settingModel == null)
             {
-                await ResetAsync();
+                await _resetAsync();
             }
 
             //检查看板娘是否超出屏幕范围
@@ -65,7 +65,7 @@ namespace CnGalWebSite.Kanban.Services.Settings
             OnSettingChanged.Invoke();
         }
 
-        public async Task ResetAsync()
+        private async Task _resetAsync()
         {
             _settingModel = new SettingModel();
 
@@ -74,8 +74,12 @@ namespace CnGalWebSite.Kanban.Services.Settings
 
             _settingModel.Kanban.Position.Left = size.Width - _settingModel.Kanban.Size.Width;
             _settingModel.Kanban.Position.Top = size.Height - _settingModel.Kanban.Size.Height;
+        }
 
-            OnSettingChanged.Invoke();
+        public async Task ResetAsync()
+        {
+            await _resetAsync();
+            await SaveAsync();
         }
 
         /// <summary>
