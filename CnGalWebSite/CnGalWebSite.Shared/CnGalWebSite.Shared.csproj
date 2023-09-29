@@ -7,17 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AppComponent\**" />
-    <Compile Remove="Pages\Normal\Ranks\**" />
-    <Content Remove="AppComponent\**" />
-    <Content Remove="Pages\Normal\Ranks\**" />
-    <EmbeddedResource Remove="AppComponent\**" />
-    <EmbeddedResource Remove="Pages\Normal\Ranks\**" />
-    <None Remove="AppComponent\**" />
-    <None Remove="Pages\Normal\Ranks\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 

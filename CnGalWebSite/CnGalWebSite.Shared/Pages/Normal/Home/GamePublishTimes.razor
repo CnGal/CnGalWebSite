@@ -17,7 +17,7 @@
 <div>
     @if (isReady == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page />
     }
     else
     {
@@ -98,7 +98,7 @@
 
         @if (isFirst == false && ((Type == PublishGamesDisplayType.CardList && CardModel.Any() == false) || (Type == PublishGamesDisplayType.Timeline && TimelineModel.Any() == false)))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
+            <NotFoundCard  />
         }
     }
 </div>

@@ -1,0 +1,13 @@
+﻿[
+  {
+    "outputFileName": "wwwroot/css/bundle.css",
+    "inputFiles": [
+      "wwwroot/css/material-theme/colors.module.css",
+      "wwwroot/css/material-theme/typography-tokens.css",
+      "wwwroot/css/material-theme/typography.module.css",
+      "wwwroot/css/common.css",
+      "wwwroot/css/cover-default.css",
+      "wwwroot/css/components.css"
+    ]
+  }
+]

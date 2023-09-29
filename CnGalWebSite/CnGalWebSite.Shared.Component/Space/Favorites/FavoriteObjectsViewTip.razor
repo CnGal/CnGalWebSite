@@ -47,13 +47,13 @@
 @if (pagedResultDto.Data.Count == 0&&isReady)
 {
     <div class="mb-3">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
+        <NotFoundCard  />
     </div>
 }
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill/>
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill/>
 }
 
 @code {

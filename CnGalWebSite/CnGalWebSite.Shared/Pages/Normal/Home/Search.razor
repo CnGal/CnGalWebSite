@@ -22,7 +22,7 @@
 
          @if (isReady == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+            <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
         }
         else
         {
@@ -56,10 +56,10 @@
 
             @if (DataModel.pagedResultDto.Data.Count == 0)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill>
+                <NotFoundCard Fill>
                  <h1 class="text-center title-large">搜索不到呢......</h1>
                  <div class="text-center">不过你可以在这里<a href="/entries/establishentry">创建词条</a>或者<a href="/articles/createarticle">发布文章</a></div>
-             </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+             </NotFoundCard>
             }
             else
             {

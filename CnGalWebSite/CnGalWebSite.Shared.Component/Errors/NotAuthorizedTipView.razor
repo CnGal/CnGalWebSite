@@ -3,7 +3,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="401 Unauthorized" />
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+<NotFoundCard>
     @if (NoPermissions)
     {
         <h1 class="text-center title-large">权限不足</h1>
@@ -14,7 +14,7 @@
         <h1 class="text-center title-large">仅登入可见</h1>
         <div class="text-center">哎呀，目前还不能访问此部分哦，不过你可以 <a @onclick="OnLogin">登入</a> 试一试</div>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+</NotFoundCard>
 
 @code {
     [Parameter]

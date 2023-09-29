@@ -6,16 +6,16 @@
     <MDCard Class="out-card w-100" Outline="!Fill">
         <MDCard Outline="Fill" Class="inner-card">
             <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
-            @if (ChildContent==null)
+            @if (ChildContent == null)
             {
-                 @if (Page)
-            {
-                <h1 class="text-center title-large">404 Not Found</h1>
-                <div class="text-center">@("我们会在 " + seconds + " 秒后帮你返回") <a href="/home" class="alert-link">主页</a> 哦~</div>
-            }
-            else
-            {
-                <div class="text-center title-large">这里似乎没有东西呢......</div>
+                @if (Page)
+                {
+                    <h1 class="text-center title-large">404 Not Found</h1>
+                    <div class="text-center">@("我们会在 " + seconds + " 秒后帮你返回") <a href="/">主页</a> 哦~</div>
+                }
+                else
+                {
+                    <div class="text-center title-large">这里似乎没有东西呢......</div>
                 }
             }
             else
@@ -24,11 +24,11 @@
             }
 
         </MDCard>
-     </MDCard>
- </div>
+    </MDCard>
+</div>
 
 
- @code {
+@code {
     [Parameter]
     public bool Fill { get; set; }
     [Parameter]
@@ -64,9 +64,9 @@
 
     public void Dispose()
     {
-            mytimer?.Dispose();
+        mytimer?.Dispose();
 
-            mytimer = null;
-        
+        mytimer = null;
+
     }
 }

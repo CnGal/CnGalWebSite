@@ -16,6 +16,7 @@
       "wwwroot/css/material-theme/colors.module.css",
       "wwwroot/css/material-theme/typography-tokens.css",
       "wwwroot/css/material-theme/typography.module.css",
+      "../CnGalWebSite.Components/wwwroot/css/bundle.css",
       "wwwroot/css/common.css",
       "wwwroot/css/cover-default.css",
       "wwwroot/css/share/anniversary.css",
@@ -49,8 +50,8 @@
     "outputFileName": "wwwroot/css/light/bundle-light.css",
     "inputFiles": [
       "wwwroot/css/light/common-light.css",
-      "wwwroot/css/material-theme/theme.light.css",
-      "wwwroot/css/markdown/github-markdown.css"
+      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.light.css",
+      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown.css"
     ]
   },
   {
@@ -58,8 +59,8 @@
     "inputFiles": [
       "wwwroot/css/dark/common-dark.css",
       "wwwroot/css/dark/home.css",
-      "wwwroot/css/material-theme/theme.dark.css",
-      "wwwroot/css/markdown/github-markdown-dark.css"
+      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.dark.css",
+      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown-dark.css"
     ]
   },
   {
