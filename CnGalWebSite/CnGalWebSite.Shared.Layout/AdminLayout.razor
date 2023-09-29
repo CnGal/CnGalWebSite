@@ -45,23 +45,23 @@
                     }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+                        <CnGalWebSite.Components.Containers.MasaContainer>
                         <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
                                 @Body
                             </ErrorHandler>
-                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+                        </CnGalWebSite.Components.Containers.MasaContainer>
                     }
             </CascadingValue>
         </MMain>
     </Authorized>
     <NotAuthorized>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Page/>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+        <CnGalWebSite.Components.Containers.MasaContainer>
+            <NotFoundCard Page/>
+        </CnGalWebSite.Components.Containers.MasaContainer>
     </NotAuthorized>
 </AuthorizeView>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.SynchronousAuthStateCard />
+<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
 @code {
     CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu navButton;
 

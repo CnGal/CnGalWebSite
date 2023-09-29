@@ -1,8 +1,5 @@
-﻿using CnGalWebSite.Helper.Helper;
+﻿using CnGalWebSite.Core.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace CnGalWebSite.HealthCheck.Checks
 {

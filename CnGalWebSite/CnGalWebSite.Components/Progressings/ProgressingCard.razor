@@ -1,17 +1,43 @@
-﻿
-<div class="@Class" style="@Style">
-    <div class="d-flex" style="justify-content: center;">
-        <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
+﻿@if (Page)
+{
+    <div class="@($"progressing-card {Class}")">
+        <MDCard Class="out-card w-100" Outline="!Fill||Outline">
+            <MDCard Outline="Fill||Outline" Class="inner-card">
+            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+            <div class="d-flex" style="justify-content: center;">
+                <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
+             </div>
+             <div class="mt-3 text-center">正在加载......</div>
+         </MDCard>
+         </MDCard>
+
+    </div>
+
+}
+else
+{
+    <div class="@Class" style="@Style">
+        <div class="d-flex" style="justify-content: center;">
+            <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
+         </div>
+         <div class="mt-3 text-center">正在加载......</div>
+
      </div>
-     <div class="mt-3 text-center">正在加载......</div>
+}
 
- </div>
 
- @code {
+
+@code {
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
     [Parameter]
     public string Style { get; set; }
     [Parameter]
     public string Color { get; set; } = "primary";
+    [Parameter]
+    public bool Page { get; set; }
+    [Parameter]
+    public bool Fill { get; set; }
 }

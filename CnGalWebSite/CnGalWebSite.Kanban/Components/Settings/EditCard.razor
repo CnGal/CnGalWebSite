@@ -5,7 +5,7 @@
     <MDCard>
             <MCardTitle>设置</MCardTitle>
         <MCardText>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="看板娘Live2D" Title="看板娘Live2D" />
+            <SectionTitleCard Text="看板娘Live2D" Title="看板娘Live2D" />
             <MRow>
                 <MCol Cols="12" Md="6">
                     <MTextField Label="高度" @bind-Value="_settingService.Setting.Kanban.Size.Height" />
@@ -21,7 +21,7 @@
                 </MCol>
             </MRow>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="按钮组" Title="按钮组" />
+            <SectionTitleCard Text="按钮组" Title="按钮组" />
             <MRow>
                 <MCol Cols="12" Md="6">
                     <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.Button.Position.Left" />
@@ -34,7 +34,7 @@
                  </MCol>
              </MRow>
     
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Text="对话框" Title="对话框" />
+            <SectionTitleCard Text="对话框" Title="对话框" />
             <MRow>
                  <MCol Cols="12" Md="6">
                      <MTextField Label="X轴坐标" @bind-Value="_settingService.Setting.DialogBox.Position.Left" />

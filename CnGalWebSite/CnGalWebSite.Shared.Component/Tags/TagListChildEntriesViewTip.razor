@@ -5,7 +5,7 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildEntries/" + Model.Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke" />
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子词条" Icon="@IconType.Entry.ToIconString()" Collapable Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="子词条" Icon="@IconType.Entry.ToIconString()" Collapable Outline>
     <div class="row">
         @foreach (var item in Model.ChildrenEntries.Skip((Model.CurrentPage - 1) * MaxCount).Take(MaxCount))
         {
@@ -22,7 +22,7 @@
         }
     </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

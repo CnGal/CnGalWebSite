@@ -3,7 +3,6 @@ using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.HealthCheck.Checks
 {

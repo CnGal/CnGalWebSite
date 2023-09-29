@@ -15,17 +15,17 @@
                 <div style=" display: flex; justify-content: flex-end; ">
                     @if (IsReplying)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" Icon="@IconType.Close.ToIconString()" Rounded />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="取消回复" OnClick="OnUnReplyClick" Icon="@IconType.Close.ToIconString()" Rounded />
                     }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" Icon="@IconType.Comment.ToIconString()" IsAsync Rounded />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="回复" OnClick="OnReplyClick" Icon="@IconType.Comment.ToIconString()" IsAsync Rounded />
                     }
 
 
                     @if (CanDeleted)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" OnClick="OnDeleteClick" Icon="@IconType.Delete.ToIconString()"  IsAsync Rounded Class="ms-4" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="删除" OnClick="OnDeleteClick" Icon="@IconType.Delete.ToIconString()"  IsAsync Rounded Class="ms-4" />
                     }
                 </div>
             </Authorized>

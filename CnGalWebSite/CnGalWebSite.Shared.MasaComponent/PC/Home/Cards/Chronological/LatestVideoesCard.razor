@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<LatestVideoItemModel>>  _pageModelCatche
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
     <section class="latest-videoes-card">
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新视频" Items="_items.Take(_dataCacheService.IsApp?2:4)" MoreLink="/search/?Types=Video">
             <div class="group">
@@ -28,7 +28,7 @@
         </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
     </section>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
 
 @code {
 

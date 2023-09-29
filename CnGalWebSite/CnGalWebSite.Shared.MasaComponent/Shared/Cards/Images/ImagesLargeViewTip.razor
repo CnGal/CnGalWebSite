@@ -22,12 +22,12 @@
             <p class="text-center mb-0" style=" line-break: anywhere; font-size: x-large; font-weight: bold; color: white;">@((Model.Index+1).ToString()+" / "+Model.Pictures.Count.ToString())</p>
         </div>
          <div class="largeimage-btn-close">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="关闭" Fab Icon="@IconType.Close.ToIconString()" OnClick="OnClose" />
+             <CnGalWebSite.Components.Buttons.MasaButton Tooltip="关闭" Fab Icon="@IconType.Close.ToIconString()" OnClick="OnClose" />
          </div>                <div class="largeimage-btn-left">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="上一张" Fab Icon="@IconType.Left.ToIconString()" OnClick="OnMoveLeft" />
+             <CnGalWebSite.Components.Buttons.MasaButton Tooltip="上一张" Fab Icon="@IconType.Left.ToIconString()" OnClick="OnMoveLeft" />
          </div>
          <div class="largeimage-btn-right">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="下一张" Fab Icon="@IconType.Right.ToIconString()" OnClick="OnMoveRight" />
+             <CnGalWebSite.Components.Buttons.MasaButton Tooltip="下一张" Fab Icon="@IconType.Right.ToIconString()" OnClick="OnMoveRight" />
          </div>
     </div>
 }

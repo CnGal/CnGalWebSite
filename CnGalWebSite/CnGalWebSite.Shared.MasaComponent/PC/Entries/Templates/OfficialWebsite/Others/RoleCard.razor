@@ -10,7 +10,7 @@
             {
                 <div class="cv">CV： @Model.CV</div>
             }
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Components.Containers.MiniModeContainer>
             @if (Model.Audio.Any())
             {
                 <div class="audio">
@@ -20,7 +20,7 @@
                     }
                 </div>
             }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        </CnGalWebSite.Components.Containers.MiniModeContainer>
           
 
             @if (string.IsNullOrWhiteSpace(Model.Age) == false || string.IsNullOrWhiteSpace(Model.Height) == false || string.IsNullOrWhiteSpace(Model.Birthday) == false)

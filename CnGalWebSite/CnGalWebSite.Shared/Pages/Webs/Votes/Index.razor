@@ -32,10 +32,10 @@ else
 
 @if (isNotFound == true)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+    <NotFoundCard>
         <h1 class="text-center title-large">找不到这个投票哦......</h1>
         <div class="text-center">如果链接没有错的话，可以试试联系管理员</div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+    </NotFoundCard>
 }
 else
 {
@@ -82,7 +82,7 @@ else
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page />
 
     }
 }

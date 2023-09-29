@@ -5,7 +5,7 @@
 @inject IPopupService PopupService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="@IconType.Certification.ToIconString()" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="用户认证" Icon="@IconType.Certification.ToIconString()" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {
@@ -42,7 +42,7 @@
 
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -82,7 +82,7 @@
 
         <MCardActions Class="pb-6 pe-6 ps-6">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="提交" IsAsync="true" OnClick="OnClickBind" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="提交" IsAsync="true" OnClick="OnClickBind" Icon="mdi-check" Color="success" TextStyle />
          </MCardActions>
      </MDCard>
  </MDialog>

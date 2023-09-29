@@ -1,8 +1,8 @@
 ﻿@if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Outline Title="@(Model.Type==EntryType.Role? "立绘" : "主图")" Icon="@IconType.Image.ToIconString()">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="@(Model.Type==EntryType.Role? "立绘" : "主图")" Icon="@IconType.Image.ToIconString()">
              <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 

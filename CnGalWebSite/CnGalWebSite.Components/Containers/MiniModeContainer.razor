@@ -1,0 +1,35 @@
+﻿@inject IMiniModeService _miniModeService
+@implements IDisposable
+
+@if (_miniModeService.IsMiniMode == false)
+{
+    <ErrorHandler ShowDetailedErrorInfor>
+     @ChildContent
+ </ErrorHandler>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override void  OnInitialized()
+    {
+        _miniModeService.MiniModeChanged -= OnMiniModeChanged;
+        _miniModeService.MiniModeChanged += OnMiniModeChanged;
+    }
+
+    public void OnMiniModeChanged()
+    {
+        StateHasChanged();
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+        _miniModeService.MiniModeChanged -= OnMiniModeChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

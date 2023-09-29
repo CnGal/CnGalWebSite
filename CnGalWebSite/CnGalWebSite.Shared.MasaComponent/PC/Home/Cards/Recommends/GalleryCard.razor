@@ -31,19 +31,19 @@
              </MImage>
          </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
      </div>
-     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+     <CnGalWebSite.Components.Containers.MiniModeContainer>
          <div class="actions">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="详情" TextStyle Rounded Icon="@IconType.Infor.ToIconString()" OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))" />
+             <CnGalWebSite.Components.Buttons.MasaButton Text="详情" TextStyle Rounded Icon="@IconType.Infor.ToIconString()" OnClick="@(()=>NavigationManager.NavigateTo($"/entries/index/{Model.Id}"))" />
              @if (_dataCatcheService.IsApp == false)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Type="FavoriteObjectType.Entry" Id="Model.Id" PlainText />
             }
             @if (string.IsNullOrWhiteSpace(Model.SteamId) == false)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="Steam" Icon="@IconType.Steam.ToIconString()" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))" />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="Steam" Icon="@IconType.Steam.ToIconString()" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.SteamId}"))" />
             }
         </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
 </MDCard>
 
 

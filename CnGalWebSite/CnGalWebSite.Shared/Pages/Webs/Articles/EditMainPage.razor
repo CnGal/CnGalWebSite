@@ -14,14 +14,14 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" />
     @if (isReady == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Article.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Article.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainPageCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 
 </div>

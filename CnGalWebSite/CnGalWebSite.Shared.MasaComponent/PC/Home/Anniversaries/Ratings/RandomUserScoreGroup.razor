@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4" Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4" Outline>
 
     <ButtonContent>
         <MButton Text Block Color="primary"  OnClick="OnClickMore">
@@ -21,7 +21,7 @@
         </div>
     </ChildContent>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreDialog @ref="userScoreDialog" />
 @code {

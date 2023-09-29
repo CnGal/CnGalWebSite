@@ -22,6 +22,8 @@ using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Model;
+using CnGalWebSite.Core.Helpers;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
@@ -36,7 +38,6 @@ using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.Helper.Extensions;
-using CnGalWebSite.Helper.Helper;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,7 @@ using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {

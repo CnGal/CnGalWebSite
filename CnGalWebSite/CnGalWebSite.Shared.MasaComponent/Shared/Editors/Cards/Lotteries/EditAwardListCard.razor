@@ -6,8 +6,8 @@
 
 <div class="">
     <div class="mb-3">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" IsAsync="true" OnClick="AddAward" Icon="mdi-plus" Color="success" />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" IsAsync="true" OnClick="BatchItems" Icon="mdi-database-import-outline " Color="info" Class="ms-3" />
+        <CnGalWebSite.Components.Buttons.MasaButton Text="添加" IsAsync="true" OnClick="AddAward" Icon="mdi-plus" Color="success" />
+        <CnGalWebSite.Components.Buttons.MasaButton Text="导入" IsAsync="true" OnClick="BatchItems" Icon="mdi-database-import-outline " Color="info" Class="ms-3" />
 
     </div>
 
@@ -45,8 +45,8 @@
                         </p>
                     </div>
                     <div class="ms-3" style=" display: flex; flex-direction: column; ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab IsAsync="true" OnClick="@(()=> DeleteAward(item))" Icon="mdi-trash-can-outline" Color="error" />
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab IsAsync="true" OnClick="@(()=> EditAward(item))" Icon="mdi-pencil" Color="success" Class="mt-3"/>
+                        <CnGalWebSite.Components.Buttons.MasaButton Fab IsAsync="true" OnClick="@(()=> DeleteAward(item))" Icon="mdi-trash-can-outline" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Fab IsAsync="true" OnClick="@(()=> EditAward(item))" Icon="mdi-pencil" Color="success" Class="mt-3"/>
                     </div>
                 </div>
                 @if (item.Type == LotteryAwardType.ActivationCode)

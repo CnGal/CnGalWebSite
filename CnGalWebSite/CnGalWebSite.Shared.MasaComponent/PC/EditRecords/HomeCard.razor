@@ -6,9 +6,9 @@
     <div>
         @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false && _dataCacheService.UserPendingDataCatche.Items.Any()==false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard Fill>
+            <NotFoundCard Fill>
                 <h1 class="text-center title-large">貌似没有待办事项，可以一起快乐摸鱼了呢</h1>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+            </NotFoundCard>
 
         }
 
@@ -20,7 +20,7 @@
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
 }
 
 

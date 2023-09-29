@@ -18,7 +18,7 @@
                 }
                 else
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后参与抽奖" Icon="@IconType.Login.ToIconString()" OnClick="OnLogin" Class="mt-3 mb-4" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后参与抽奖" Icon="@IconType.Login.ToIconString()" OnClick="OnLogin" Class="mt-3 mb-4" />
                 }
             }
             else
@@ -39,7 +39,7 @@
                     }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync Class="mt-4 mb-4" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync Class="mt-4 mb-4" />
                     }
                 }
                 else if (StateModel.State == UserLotteryState.NoCondition)
@@ -113,7 +113,7 @@
     </MDCard>
 }
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 <CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip @ref="lookPrizeTip" Id="ViewModel.Id"/>
 <CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard @ref="editAddressCard" />
 @code {
@@ -127,7 +127,7 @@
     public ErrorHandler ErrorHandler { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
     CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip lookPrizeTip;
     CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard editAddressCard;
     protected override async Task OnInitializedAsync()

@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<DiscountGameItemModel>> _pageModelCatche
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
 <section class="discount-games-card">
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="折扣中的游戏" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/discount">
             <MDCard Class="item" Href="@context.Url">
@@ -21,7 +21,7 @@
 
     </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
 </section>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 @code {
 
     List<DiscountGameItemModel> _items { get; set; } = new List<DiscountGameItemModel>();

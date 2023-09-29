@@ -9,7 +9,7 @@
 
     @if (Model.Peripheries.Count != 0)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline OnlyShowContext="OnlyShowContext">
 
             <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity " +Class)">
                 <a class="a-font-color" @onclick="OnClick">
@@ -59,27 +59,27 @@
 
                 </MSlideGroup>
             </div>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
     else
     {
         if (IsGameView)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周边" Icon="@IconType.Periphery.ToIconString()" Outline>
 
                 <AuthorizeView>
                     <Authorized>
                         <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4 ">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="@IconType.Create.ToIconString()" />
                         </div>
                     </Authorized>
                     <NotAuthorized>
                         <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
                         </div>
                     </NotAuthorized>
                 </AuthorizeView>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
         }
     }
 

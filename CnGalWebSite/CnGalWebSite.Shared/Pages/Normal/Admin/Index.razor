@@ -3,6 +3,8 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
+@using CnGalWebSite.Core.Helpers;
+@using CnGalWebSite.Core.Models;
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="网站数据概览"/>

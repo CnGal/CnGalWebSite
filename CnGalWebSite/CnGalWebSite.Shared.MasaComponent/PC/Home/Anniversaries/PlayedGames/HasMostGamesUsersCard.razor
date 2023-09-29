@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="库存排行榜" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="库存排行榜" Icon="@IconType.Users.ToIconString()" Class="mb-4" Outline Collapable>
     @foreach (var item in Model)
     {
         <MDCard Href="@("/space/index/"+item.Id)" Class=" w-100 mb-4">
@@ -26,7 +26,7 @@
              </div>
          </MDCard>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

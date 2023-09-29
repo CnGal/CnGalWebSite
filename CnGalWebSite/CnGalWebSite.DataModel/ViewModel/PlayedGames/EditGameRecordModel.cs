@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using System;
 using System.ComponentModel.DataAnnotations;

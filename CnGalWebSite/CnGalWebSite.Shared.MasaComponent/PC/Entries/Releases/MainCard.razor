@@ -1,15 +1,15 @@
 ﻿
 @if (Model.Releases.Any() && Model.IsHideOutlink == false)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发行列表" Icon="@IconType.Publisher.ToIconString()" Outline Collapable>
+    <CnGalWebSite.Components.Containers.MiniModeContainer>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="发行列表" Icon="@IconType.Publisher.ToIconString()" Outline Collapable>
             @foreach (var item in Model.Releases.OrderByDescending(s=>s.Time))
             {
                 <InforCard Model="item" />
             }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
 
 }
 

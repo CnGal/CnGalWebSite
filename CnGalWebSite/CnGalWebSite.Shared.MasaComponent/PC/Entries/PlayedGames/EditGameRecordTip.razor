@@ -65,18 +65,18 @@
             }
             else
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" Class="mt-8" />
+                <CnGalWebSite.Components.Progressings.ProgressingCard Style="min-height:200px;" Class="mt-8" />
 
             }
         </MCardText>
 
         <MCardActions Class="pa-6 pt-0">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Text="保存"/>
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Text="保存"/>
         </MCardActions>
     </MDCard>
 </MDialog>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
 
@@ -98,7 +98,7 @@
     bool isReady = false;
     bool isDubbing;
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
 
     public void ValueChanged(StringNumber index)

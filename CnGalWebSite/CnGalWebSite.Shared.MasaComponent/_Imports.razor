@@ -26,11 +26,12 @@
 @using System.Threading
 @using Blazored.LocalStorage;
 
+@using CnGalWebSite.Components.Models
 @using Microsoft.AspNetCore.Components;
 @using System.Collections.Generic;
 @using System.Diagnostics.CodeAnalysis;
 @using System.Threading.Tasks;
-
+@using CnGalWebSite.Components.Service
 @using CnGalWebSite.Shared.Models.Entries
 @using CnGalWebSite.DataModel.ViewModel.Commodities
 @using CnGalWebSite.DataModel.Helper;
@@ -72,7 +73,7 @@
 @using CnGalWebSite.DataModel.ViewModel.Others
 @using CnGalWebSite.PublicToolbox.Models
 @using CnGalWebSite.PublicToolbox.PostTools
-@using CnGalWebSite.Helper.Helper
+
 @using CnGalWebSite.DataModel.ViewModel.Anniversaries
 @using CnGalWebSite.DataModel.ViewModel.OperationRecords
 @using CnGalWebSite.Helper.ViewModel.Comments
@@ -88,6 +89,7 @@
 @using CnGalWebSite.DrawingBed.Helper.Services
 @using CnGalWebSite.Shared.Models.Articles
 @using CnGalWebSite.DataModel.ViewModel.Recommends
+@using CnGalWebSite.Components.Cards
 @using CnGalWebSite.Shared.MasaComponent.Shared.MaterialDesigns
 @using CnGalWebSite.Components.Errors
 @using CnGalWebSite.Components.DataTables
@@ -106,4 +108,4 @@
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 
-@using IconType = CnGalWebSite.DataModel.ViewModel.Others.IconType
+@using IconType = CnGalWebSite.Components.Models.IconType

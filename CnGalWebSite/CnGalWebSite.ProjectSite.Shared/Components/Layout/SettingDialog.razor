@@ -1,0 +1,65 @@
+﻿@inject ISettingService _settingService
+
+<MDialog @bind-Value="Dialog"
+         MaxWidth="440">
+    <MDCard>
+        <MCardTitle>
+            主题设置
+        </MCardTitle>
+        <MCardText>
+            <SectionTitleCard Title="主题颜色" Text="你可以从下方选择一个喜欢的颜色作为主题颜色" />
+            <MButtonGroup Borderless Value="@_settingService.Settings.ThemeColor" ValueChanged="ColorValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; " Class="color-selector-card">
+                 @foreach (var item in SettingModel.AvailableColors)
+                {
+                    <MButton Value="@item" Color="@item" Small Style="min-width: 28px;" />
+                }
+            </MButtonGroup>
+
+            <SectionTitleCard Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
+            <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_settingService.Settings.ThemeMode" ValueChanged="ThemeModeValueChanged" TValue="ThemeMode" Label="主题模式" />
+
+            <SectionTitleCard Title="字体" Text=" 自定义渲染的字体，具体参见更新日志" />
+            <MTextField Label="字体" Value="@_settingService.Settings.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string"></MTextField>
+        </MCardText>
+    </MDCard>
+</MDialog>
+
+@code {
+    bool Dialog { get; set; }
+
+    public void Refresh()
+    {
+        Dialog = true;
+        StateHasChanged();
+
+    }
+
+    public async Task ColorValueChanged(StringNumber value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        _settingService.Settings.ThemeColor = value.ToString();
+
+        await _settingService.SaveAsync();
+    }
+
+
+    public async Task FontFamilyValueChanged(string value)
+    {
+        _settingService.Settings.FontFamily = value;
+
+        await _settingService.SaveAsync();
+    }
+
+
+    public async Task ThemeModeValueChanged(ThemeMode temp)
+    {
+        _settingService.Settings.ThemeMode = temp;
+
+        await _settingService.SaveAsync();
+    }
+}
+

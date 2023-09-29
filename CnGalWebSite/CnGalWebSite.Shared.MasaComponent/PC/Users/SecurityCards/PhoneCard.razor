@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="手机号" Icon="fa fa-fw fa-mobile-phone" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="手机号" Icon="fa fa-fw fa-mobile-phone" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         <span>@(string.IsNullOrWhiteSpace(Model.Phone)? "绑定手机号可以提供账户安全性" : ("手机号："+ Model.Phone))</span>
 
@@ -15,7 +15,7 @@
 
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
 

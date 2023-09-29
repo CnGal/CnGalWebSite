@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关推荐" Icon="fa fa-fw fa-codepen" Outline Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="相关推荐" Icon="fa fa-fw fa-codepen" Outline Collapable>
     <div>
         @foreach (var item in Model.Entries)
         {
@@ -26,7 +26,7 @@
             </div>
         }
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 @code {
     [Parameter]
     public VoteViewModel Model { get; set; }

@@ -9,15 +9,15 @@
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="@IconType.Favorite.ToIconString()" Class="mb-4" Outline>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="收藏夹" Icon="@IconType.Favorite.ToIconString()" Class="mb-4" Outline>
         <ButtonContent>
             @if (IsCurrentUser)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
 
             }
         </ButtonContent>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
     @if (Model.Any())
     {
         foreach (var item in Model)

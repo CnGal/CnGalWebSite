@@ -3,11 +3,11 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@IconType.Folder.ToIconString()" Class="mb-4" Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Title" Icon="@IconType.Folder.ToIconString()" Class="mb-4" Outline>
     <ButtonContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
     </ButtonContent>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 
 @if(isReady)
@@ -47,13 +47,13 @@
 @if (pagedResultDto.Data.Count == 0&&isReady)
 {
     <div class="mb-3">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard  />
+        <NotFoundCard  />
     </div>
 }
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill/>
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill/>
 }
 
 @code {

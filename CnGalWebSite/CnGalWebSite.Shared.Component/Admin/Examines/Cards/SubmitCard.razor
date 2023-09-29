@@ -10,9 +10,9 @@
         <MTextarea Label="批注" Rows="3" @bind-Value="Model.Comments"/>
     </MCardText>
     <MCardActions>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="通过" IsAsync="true" OnClick="()=>OnExamine(true)" Icon="mdi-check" Rounded />
+        <CnGalWebSite.Components.Buttons.MasaButton Text="通过" IsAsync="true" OnClick="()=>OnExamine(true)" Icon="mdi-check" Rounded />
         <MSpacer />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="驳回" IsAsync="true" OnClick="()=>OnExamine(false)" Icon="mdi-close" TextStyle />
+        <CnGalWebSite.Components.Buttons.MasaButton Text="驳回" IsAsync="true" OnClick="()=>OnExamine(false)" Icon="mdi-close" TextStyle />
     </MCardActions>
 </MDCard>
 

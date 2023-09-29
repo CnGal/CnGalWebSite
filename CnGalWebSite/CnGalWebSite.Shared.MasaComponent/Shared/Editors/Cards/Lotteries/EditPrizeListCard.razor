@@ -4,10 +4,10 @@
 @inject NavigationManager NavigationManager
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevanceListTitle Title="激活码列表" Text="奖品的激活码，也可用占位符替代" />
+<SectionTitleCard Title="激活码列表" Text="奖品的激活码，也可用占位符替代" />
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="AddPrize" Icon="@IconType.Create.ToIconString()" Color="info" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" OnClick="BatchItems" Icon="@IconType.Import.ToIconString()" Class="ms-2" Color="success" />
+    <CnGalWebSite.Components.Buttons.MasaButton Text="添加" OnClick="AddPrize" Icon="@IconType.Create.ToIconString()" Color="info" />
+    <CnGalWebSite.Components.Buttons.MasaButton Text="导入" OnClick="BatchItems" Icon="@IconType.Import.ToIconString()" Class="ms-2" Color="success" />
 </div>
 @if (Prizes.Any())
 {
@@ -28,8 +28,8 @@
                 <tr @key="Prizes.IndexOf(item)">
                     <td style="min-width: 50px; ">@item.Context</td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>EditPrize(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>DeletePrize(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="编辑" OnClick="@(()=>EditPrize(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>DeletePrize(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
                     </td>
                 </tr>
             }

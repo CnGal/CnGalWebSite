@@ -41,7 +41,7 @@
     <ButtonContent>
         @if (HiddenButton == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+            <CnGalWebSite.Components.Containers.MiniModeContainer>
                 <div class="options-card">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" />
 
@@ -51,7 +51,7 @@
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
                     }
                 </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+            </CnGalWebSite.Components.Containers.MiniModeContainer>
 
         }
     </ButtonContent>

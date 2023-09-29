@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<SteamGamesOverviewModel> _pageModelCatche
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
     @if (OverviewModel != null)
     {
         <div class="row">
@@ -24,14 +24,14 @@
             </Authorized>
             <NotAuthorized>
                 <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后分享游戏库" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
                  </MDCard>
              </NotAuthorized>
          </AuthorizeView>
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill Class="mb-4" />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill Class="mb-4" />
     }
 
 
@@ -42,7 +42,7 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="2796" Type="CommentType.CommentArticle" Desc />
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 
 
 @code {

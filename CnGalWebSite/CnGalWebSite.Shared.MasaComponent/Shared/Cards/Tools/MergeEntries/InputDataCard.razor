@@ -14,7 +14,7 @@
                 <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@model.HostName" Label="合并到的词条" AutoCompleteItems="EntryItems" />
             </MCol>
             <MCol Cols="12">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Rounded Text="添加" OnClick="OnAdd" Icon="mdi-plus" Class="mb-4" />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="OnAdd" Icon="mdi-plus" Class="mb-4" />
              </MCol>
         </MRow>
 
@@ -40,20 +40,20 @@
                         <td>@item.SubName</td>
                         <td>@item.HostName</td>
                         <td>
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
                         </td>
                     </tr>
                 }
             </tbody>
         </MSimpleTable>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+        <CnGalWebSite.Components.Buttons.MasaButton Text="下一步" Rounded Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
     </div>
 
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+    <CnGalWebSite.Components.Progressings.ProgressingCard />
 }
 
 

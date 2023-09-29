@@ -12,16 +12,16 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" Creating/>
     @if (isReady == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="发表文章" Icon="@IconType.Article.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="发表文章" Icon="@IconType.Article.ToIconString()" Outline>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainCard Model="Model.Main" Class="mb-4" />
          <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model.Relevances" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" VideoItems="VideoItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainPageCard Model="Model.MainPage" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 
 </div>

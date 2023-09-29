@@ -1,3 +1,94 @@
+
+function slotMachineTrigger(luckyNum) {
+    let slot1 = $("div.slot1 > ul");
+    let slot2 = $("div.slot2 > ul");
+    let slot3 = $("div.slot3 > ul");
+    let slot4 = $("div.slot4 > ul");
+    if ($(slot1).find('li').length > 1) {
+        $(slot1).find('li:lt(30)').remove();
+        $(slot2).find('li:lt(30)').remove();
+        $(slot3).find('li:lt(30)').remove();
+        $(slot4).find('li:lt(30)').remove();
+        $(slot1).removeClass("slotAnimation");
+        $(slot2).removeClass("slotAnimation");
+        $(slot3).removeClass("slotAnimation");
+        $(slot4).removeClass("slotAnimation");
+        $(slot1).css("transform", "translateY(0px)");
+        $(slot2).css("transform", "translateY(0px)");
+        $(slot3).css("transform", "translateY(0px)");
+        $(slot4).css("transform", "translateY(0px)");
+        void document.getElementById('slot1').offsetHeight;
+        void document.getElementById('slot2').offsetHeight;
+        void document.getElementById('slot3').offsetHeight;
+        void document.getElementById('slot4').offsetHeight;
+    }
+    for (let i = 0; i < 29; i++) {
+        let n1 = Math.floor(Math.random() * 10);
+        let n2 = Math.floor(Math.random() * 10);
+        let n3 = Math.floor(Math.random() * 10);
+        let n4 = Math.floor(Math.random() * 10);
+        $(slot1).append('<li>' + n1 + '</li>');
+        $(slot2).append('<li>' + n2 + '</li>');
+        $(slot3).append('<li>' + n3 + '</li>');
+        $(slot4).append('<li>' + n4 + '</li>');
+    }
+    luckyNum = luckyNum.toString();
+    while (luckyNum.length < 4) {
+        luckyNum = '0' + luckyNum;
+    }
+    $(slot1).append('<li>' + luckyNum[0] + '</li>');
+    $(slot2).append('<li>' + luckyNum[1] + '</li>');
+    $(slot3).append('<li>' + luckyNum[2] + '</li>');
+    $(slot4).append('<li>' + luckyNum[3] + '</li>');
+    $(slot1).addClass("slotAnimation");
+    $(slot2).addClass("slotAnimation");
+    $(slot3).addClass("slotAnimation");
+    $(slot4).addClass("slotAnimation");
+    let fin = function () {
+        $(slot1).css("transform", "translateY(-4890px)");
+        $(slot2).css("transform", "translateY(-4890px)");
+        $(slot3).css("transform", "translateY(-4890px)");
+        $(slot4).css("transform", "translateY(-4890px)");
+    };
+    setTimeout(fin, 1000);
+};
+
+// Js代码
+var onscrolling = false;
+
+var dotNetHelper;
+
+function initInfiniteScroll(helper) {
+    dotNetHelper = helper;
+
+    onscrolling = false;
+    window.onscroll = async function () {
+        if (onscrolling == true || dotNetHelper == null) {
+            return;
+        }
+        onscrolling = true;
+
+        //文档内容实际高度（包括超出视窗的溢出部分）
+        var scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+        //滚动条滚动距离
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        //窗口可视范围高度
+        var clientHeight = window.innerHeight || Math.min(document.documentElement.clientHeight, document.body.clientHeight);
+
+        if (clientHeight + scrollTop + 400 >= scrollHeight) {
+            if (dotNetHelper != null) {
+                await dotNetHelper.invokeMethodAsync('LoadMore');
+            }
+        }
+
+        onscrolling = false;
+    }
+}
+function deinitInfiniteScroll() {
+    dotNetHelper = null;
+    window.onscroll = null;
+}
+
 "v0.4.8 Geetest Inc.";
 
 (function (window) {
@@ -651,97 +742,6 @@ function checkSystemThemeIsDark() {
     }
 }
 
-
-function slotMachineTrigger(luckyNum) {
-    let slot1 = $("div.slot1 > ul");
-    let slot2 = $("div.slot2 > ul");
-    let slot3 = $("div.slot3 > ul");
-    let slot4 = $("div.slot4 > ul");
-    if ($(slot1).find('li').length > 1) {
-        $(slot1).find('li:lt(30)').remove();
-        $(slot2).find('li:lt(30)').remove();
-        $(slot3).find('li:lt(30)').remove();
-        $(slot4).find('li:lt(30)').remove();
-        $(slot1).removeClass("slotAnimation");
-        $(slot2).removeClass("slotAnimation");
-        $(slot3).removeClass("slotAnimation");
-        $(slot4).removeClass("slotAnimation");
-        $(slot1).css("transform", "translateY(0px)");
-        $(slot2).css("transform", "translateY(0px)");
-        $(slot3).css("transform", "translateY(0px)");
-        $(slot4).css("transform", "translateY(0px)");
-        void document.getElementById('slot1').offsetHeight;
-        void document.getElementById('slot2').offsetHeight;
-        void document.getElementById('slot3').offsetHeight;
-        void document.getElementById('slot4').offsetHeight;
-    }
-    for (let i = 0; i < 29; i++) {
-        let n1 = Math.floor(Math.random() * 10);
-        let n2 = Math.floor(Math.random() * 10);
-        let n3 = Math.floor(Math.random() * 10);
-        let n4 = Math.floor(Math.random() * 10);
-        $(slot1).append('<li>' + n1 + '</li>');
-        $(slot2).append('<li>' + n2 + '</li>');
-        $(slot3).append('<li>' + n3 + '</li>');
-        $(slot4).append('<li>' + n4 + '</li>');
-    }
-    luckyNum = luckyNum.toString();
-    while (luckyNum.length < 4) {
-        luckyNum = '0' + luckyNum;
-    }
-    $(slot1).append('<li>' + luckyNum[0] + '</li>');
-    $(slot2).append('<li>' + luckyNum[1] + '</li>');
-    $(slot3).append('<li>' + luckyNum[2] + '</li>');
-    $(slot4).append('<li>' + luckyNum[3] + '</li>');
-    $(slot1).addClass("slotAnimation");
-    $(slot2).addClass("slotAnimation");
-    $(slot3).addClass("slotAnimation");
-    $(slot4).addClass("slotAnimation");
-    let fin = function () {
-        $(slot1).css("transform", "translateY(-4890px)");
-        $(slot2).css("transform", "translateY(-4890px)");
-        $(slot3).css("transform", "translateY(-4890px)");
-        $(slot4).css("transform", "translateY(-4890px)");
-    };
-    setTimeout(fin, 1000);
-};
-
-// Js代码
-var onscrolling = false;
-
-var dotNetHelper;
-
-function initInfiniteScroll(helper) {
-    dotNetHelper = helper;
-
-    onscrolling = false;
-    window.onscroll = async function () {
-        if (onscrolling == true || dotNetHelper == null) {
-            return;
-        }
-        onscrolling = true;
-
-        //文档内容实际高度（包括超出视窗的溢出部分）
-        var scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-        //滚动条滚动距离
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        //窗口可视范围高度
-        var clientHeight = window.innerHeight || Math.min(document.documentElement.clientHeight, document.body.clientHeight);
-
-        if (clientHeight + scrollTop + 400 >= scrollHeight) {
-            if (dotNetHelper != null) {
-                await dotNetHelper.invokeMethodAsync('LoadMore');
-            }
-        }
-
-        onscrolling = false;
-    }
-}
-function deinitInfiniteScroll() {
-    dotNetHelper = null;
-    window.onscroll = null;
-}
-
 /*以下为加载时自动执行的代码*/
 if (typeof Blazor != "undefined") {
     Blazor.start({
@@ -894,11 +894,17 @@ function initKanbanMoveAction(dotNetHelper) {
     var time;
 
     // 拖动开始事件，要绑定在被移动元素上
-    live2dItem.addEventListener('mousedown', function (e) {
+    const mousedown_fun = function (event) {
         /*
         * @des deltaLeft 即移动过程中不变的值
         */
         //获取鼠标按下时的时间
+        var touch;
+        if (event.touches) {
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        } else {
+            touch = event;
+        }
         timeStart = getTimeNow();
 
         kanban_mousedown = true;
@@ -920,8 +926,8 @@ function initKanbanMoveAction(dotNetHelper) {
                     return;
                 }
                 //执行逻辑
-                deltaLeft = e.clientX - e.target.offsetLeft;
-                deltaTop = e.clientY - e.target.offsetTop;
+                deltaLeft = touch.clientX - touch.target.offsetLeft;
+                deltaTop = touch.clientY - touch.target.offsetTop;
                 //console.log("初始", deltaLeft, deltaTop);
                 var rect = live2dItem.getBoundingClientRect();
                 x_org = rect.x;
@@ -930,15 +936,28 @@ function initKanbanMoveAction(dotNetHelper) {
                 document.body.classList.add('user-select-none');
             }
         }, 100);
-    })
+    }
+
+
+    live2dItem.addEventListener('mousedown', mousedown_fun)
+    live2dItem.addEventListener('touchstart', mousedown_fun, { passive: false })
 
     // 移动触发事件要放在，区域控制元素上
-    window.addEventListener('mousemove', function (e) {
+    const mousemove_fun = function (event) {
         kanban_mousedown = false;
+        var touch;
+        if (event.touches) {
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        } else {
+            touch = event;
+        }
 
         if (move) {
-            const cx = e.clientX;
-            const cy = e.clientY;
+            //阻止页面的滑动默认事件
+            event.preventDefault();
+
+            const cx = touch.clientX;
+            const cy = touch.clientY;
             /** 相减即可得到相对于父元素移动的位置 */
             dx = cx - deltaLeft
             dy = cy - deltaTop
@@ -951,10 +970,12 @@ function initKanbanMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
 
-    // 拖动结束触发要放在，区域控制元素上
-    window.addEventListener('mouseup', function (e) {
+    window.addEventListener('mousemove', mousemove_fun)
+    window.addEventListener('touchmove', mousemove_fun, { passive: false })
+
+    const mouseup_fun = function (event) {
         if (move) {
             move = false;
             //console.log('mouseup');
@@ -964,7 +985,11 @@ function initKanbanMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
+
+    // 拖动结束触发要放在，区域控制元素上
+    window.addEventListener('mouseup', mouseup_fun)
+    window.addEventListener('touchend', mouseup_fun, { passive: false })
 }
 
 
@@ -980,11 +1005,17 @@ function initButtonGroupMoveAction(dotNetHelper) {
     let dy = 0;
     var time;
 
-    // 拖动开始事件，要绑定在被移动元素上
-    groupItem.addEventListener('mousedown', function (e) {
+    const mousedown_fun = function (event) {
         /*
         * @des deltaLeft 即移动过程中不变的值
         */
+        //获取鼠标按下时的时间
+        var touch;
+        if (event.touches) {
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        } else {
+            touch = event;
+        }
         //获取鼠标按下时的时间
         timeStart = getTimeNow();
 
@@ -1002,30 +1033,45 @@ function initButtonGroupMoveAction(dotNetHelper) {
                 //检查对话框是否被按下
                 if (dialogbox_mousedown) {
                     return;
-                }
+                } 
 
                 //执行逻辑
-                deltaLeft = e.clientX - e.target.offsetLeft;
-                deltaTop = e.clientY - e.target.offsetTop;
+                deltaLeft = touch.clientX - touch.target.offsetLeft;
+                deltaTop = touch.clientY - touch.target.offsetTop;
                 //console.log("初始", deltaLeft, deltaTop);
                 var rect_w = live2dItem.getBoundingClientRect();
                 var rect_n = groupItem.getBoundingClientRect();
-                x_org = rect_w.x - rect_n.x;
-                y_org = rect_w.y - rect_n.y;
+                x_org = rect_w.x;
+                y_org = rect_w.y;
                 move = true;
                 document.body.classList.add('user-select-none');
             }
         }, 100);
-    })
+    }
 
-    // 移动触发事件要放在，区域控制元素上
-    window.addEventListener('mousemove', function (e) {
+    // 拖动开始事件，要绑定在被移动元素上
+    groupItem.addEventListener('mousedown', mousedown_fun)
+    groupItem.addEventListener('touchstart', mousedown_fun, { passive: false })
+
+    const mousemove_fun = function (event) {
         if (move) {
-            const cx = e.clientX;
-            const cy = e.clientY;
+            //获取鼠标按下时的时间
+            var touch;
+            if (event.touches) {
+                touch = event.touches[0];//多个鼠标|手指事件取第一个
+            } else {
+                touch = event;
+            }
+            //阻止页面的滑动默认事件
+            event.preventDefault();
+
+
+
+            const cx = touch.clientX;
+            const cy = touch.clientY;
             /** 相减即可得到相对于父元素移动的位置 */
-            dx = cx - deltaLeft;
-            dy = cy - deltaTop;
+            dx = cx - x_org;
+            dy = cy - y_org;
             //console.log("坐标", cx, cy)
             //console.log("移动", dx, dy)
             var rect = live2dItem.getBoundingClientRect();
@@ -1041,10 +1087,13 @@ function initButtonGroupMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
 
-    // 拖动结束触发要放在，区域控制元素上
-    window.addEventListener('mouseup', function (e) {
+    // 移动触发事件要放在，区域控制元素上
+    window.addEventListener('mousemove', mousemove_fun )
+    window.addEventListener('touchmove', mousemove_fun, { passive: false })
+
+    const mouseup_fun = function () {
         buttongroup_mousedown = false;
         var rect_w = live2dItem.getBoundingClientRect();
         var rect_n = groupItem.getBoundingClientRect();
@@ -1057,7 +1106,12 @@ function initButtonGroupMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
+
+    // 拖动结束触发要放在，区域控制元素上
+    window.addEventListener('mouseup', mouseup_fun)
+    window.addEventListener('touchend', mouseup_fun, { passive: false })
+
 }
 
 function initDialogBoxMoveAction(dotNetHelper) {
@@ -1072,11 +1126,17 @@ function initDialogBoxMoveAction(dotNetHelper) {
     let dy = 0;
     var time;
 
-    // 拖动开始事件，要绑定在被移动元素上
-    groupItem.addEventListener('mousedown', function (e) {
+    const mousedown_fun = function (event) {
         /*
         * @des deltaLeft 即移动过程中不变的值
         */
+       
+        var touch;
+        if (event.touches) {
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        } else {
+            touch = event;
+        }
         //获取鼠标按下时的时间
         timeStart = getTimeNow();
 
@@ -1091,8 +1151,8 @@ function initDialogBoxMoveAction(dotNetHelper) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
                 //执行逻辑
-                deltaLeft = e.clientX - e.target.offsetLeft;
-                deltaTop = e.clientY - e.target.offsetTop;
+                deltaLeft = touch.clientX - touch.target.offsetLeft;
+                deltaTop = touch.clientY - touch.target.offsetTop;
                 //console.log("初始", deltaLeft, deltaTop);
                 var rect_w = live2dItem.getBoundingClientRect();
                 var rect_n = groupItem.getBoundingClientRect();
@@ -1102,13 +1162,27 @@ function initDialogBoxMoveAction(dotNetHelper) {
                 document.body.classList.add('user-select-none');
             }
         }, 100);
-    })
+    }
 
-    // 移动触发事件要放在，区域控制元素上
-    window.addEventListener('mousemove', function (e) {
+    // 拖动开始事件，要绑定在被移动元素上
+    groupItem.addEventListener('mousedown', mousedown_fun)
+    groupItem.addEventListener('touchstart', mousedown_fun, { passive: false })
+
+    const mousemove_fun = function (event) {
         if (move) {
-            const cx = e.clientX;
-            const cy = e.clientY;
+            var touch;
+            if (event.touches) {
+                touch = event.touches[0];//多个鼠标|手指事件取第一个
+            } else {
+                touch = event;
+            }
+            //阻止页面的滑动默认事件
+            event.preventDefault();
+
+
+
+            const cx = touch.clientX;
+            const cy = touch.clientY;
             /** 相减即可得到相对于父元素移动的位置 */
             dx = cx - deltaLeft - x_org;
             dy = cy - deltaTop - y_org;
@@ -1127,10 +1201,13 @@ function initDialogBoxMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
 
-    // 拖动结束触发要放在，区域控制元素上
-    window.addEventListener('mouseup', function (e) {
+    // 移动触发事件要放在，区域控制元素上
+    window.addEventListener('mousemove', mousemove_fun )
+    window.addEventListener('touchmove', mousemove_fun, { passive: false })
+
+    const mouseup_fun = function () {
         dialogbox_mousedown = false;
 
         if (move) {
@@ -1144,7 +1221,12 @@ function initDialogBoxMoveAction(dotNetHelper) {
         else {
             clearInterval(time);
         }
-    })
+    }
+
+    // 拖动结束触发要放在，区域控制元素上
+    window.addEventListener('mouseup', mouseup_fun)
+    window.addEventListener('touchend', mouseup_fun, { passive: false })
+
 }
 
 //监听画布大小改变事件

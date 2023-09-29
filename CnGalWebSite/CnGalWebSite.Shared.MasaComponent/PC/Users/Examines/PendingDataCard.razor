@@ -4,7 +4,7 @@
 
 @if (_dataCacheService.UserPendingDataCatche.Items.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="待审核的编辑" Icon="fa fa-fw  fa-pencil" Class="mb-4" Outline Collapable>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="待审核的编辑" Icon="fa fa-fw  fa-pencil" Class="mb-4" Outline Collapable>
         <div class="row">
             @foreach (var item in Model.Where(s => s.DisplayMode == UserPendingDataDisplayMode.Main))
             {
@@ -34,7 +34,7 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.UserPendingDataCatche.CurrentPage" Length="@_dataCacheService.UserPendingDataCatche.TotalPages" ValueChanged="OnPageClick" />
         }
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 @code {

@@ -1,6 +1,6 @@
 ﻿@using CnGalWebSite.Shared.MasaComponent.Shared.Buttons
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="@Class" Collapable>
         <MRow>
             <MCol Cols="12" Md="6" Lg="3">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.MainPicture" ShowCropper Class="mb-4"
@@ -39,7 +39,7 @@
 
          </MRow>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

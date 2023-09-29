@@ -3,7 +3,7 @@
 @inject IEventService _eventService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="奖品" Icon="@IconType.Gift.ToIconString()" Class="mb-4" Collapable Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="奖品" Icon="@IconType.Gift.ToIconString()" Class="mb-4" Collapable Outline>
     <div class="row">
         @foreach (var item in Model)
         {
@@ -14,7 +14,7 @@
         }
     </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
 

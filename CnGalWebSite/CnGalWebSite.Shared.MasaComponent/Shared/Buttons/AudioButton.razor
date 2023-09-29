@@ -1,14 +1,14 @@
 ﻿@inject IJSRuntime JS
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
     @if (string.IsNullOrWhiteSpace(Url) == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="@Class" XSmall="XSmall"/>
+        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="@Class" XSmall="XSmall"/>
     }
     else if (ForceDisplay)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="@Class" XSmall="XSmall"/>
+        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="@Class" XSmall="XSmall"/>
     }
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 
 @code {
     [Parameter]

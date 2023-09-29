@@ -1,0 +1,143 @@
+﻿/*卡片*/
+.md-card {
+    display: flex;
+    border-radius: var( --md-card-border-radius);
+    transition: .3s;
+    white-space: normal;
+    flex-direction: column;
+}
+    /*primary颜色*/
+    .md-card.color-primary {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-primary:hover {
+        background-color: var( --md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+    /*surface颜色*/
+    .md-card.color-surface {
+        background-color: var(--md-sys-color-surface-1);
+        color: var( --md-sys-color-on-surface) !important;
+    }
+
+    .md-card.show-hover-style.color-surface:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    /*tertiary颜色*/
+    .md-card.color-tertiary {
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container) !important;
+    }
+
+    .md-card.show-hover-style.color-tertiary:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+    /*background颜色*/
+    .md-card.color-background {
+        background-color: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-background) !important;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12) !important;
+    }
+
+    .md-card.show-hover-style.color-background:hover {
+        background-color: var( --md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container) !important;
+    }
+
+    .md-card.show-hover-style:active {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+    .md-card img, .md-card .image {
+        transition: .3s;
+        border-radius: var( --md-card-border-radius);
+        height: min-content;
+    }
+
+    .md-card.show-hover-style:active img, .md-card.show-hover-style:active .image {
+        border-radius: var( --md-card-active-border-radius);
+    }
+
+
+/*正在加载*/
+.progressing-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .progressing-card .out-card {
+        align-items: center;
+    }
+
+    .progressing-card .inner-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .progressing-card img {
+        width: 70%;
+        margin-bottom: 1rem;
+    }
+/*找不到*/
+.not-found-card {
+    display: flex;
+    justify-content: center;
+}
+
+    .not-found-card .out-card {
+        align-items: center;
+    }
+
+    .not-found-card .inner-card {
+        display: flex;
+        max-width: 400px;
+        width: 100%;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .not-found-card img {
+        width: 70%;
+        margin-bottom: .5rem;
+    }
+/*颜色选择器*/
+.color-selector-card {
+    background-color: transparent !important;
+}
+
+/*包含标题的卡片*/
+.title-container-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .title-container-card .title-card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .title-container-card .title-card h2 {
+            display: flex;
+        }
+
+        .title-container-card .title-card i {
+            color: var(--md-sys-color-primary);
+        }
+
+    .title-container-card .content-card {
+        display: flex;
+        flex-direction: column;
+    }

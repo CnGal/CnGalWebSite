@@ -7,14 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AppComponent\**" />
-    <Compile Remove="Pages\Normal\Ranks\**" />
-    <Content Remove="AppComponent\**" />
-    <Content Remove="Pages\Normal\Ranks\**" />
-    <EmbeddedResource Remove="AppComponent\**" />
-    <EmbeddedResource Remove="Pages\Normal\Ranks\**" />
-    <None Remove="AppComponent\**" />
-    <None Remove="Pages\Normal\Ranks\**" />
+    <Content Remove="bundleconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bundleconfig.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,9 +22,6 @@
 
 
   <ItemGroup>
-    <Content Update="bundleconfig.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
     <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

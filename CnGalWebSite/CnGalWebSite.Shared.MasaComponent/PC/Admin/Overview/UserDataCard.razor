@@ -3,7 +3,7 @@
 
 @if (Model.UserTotalNumber != 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户" Icon="@IconType.Users.ToIconString()">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="用户" Icon="@IconType.Users.ToIconString()">
         <div class="row">
             @foreach (var item in Items)
             {
@@ -21,7 +21,7 @@
 
 
         </div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 }
 

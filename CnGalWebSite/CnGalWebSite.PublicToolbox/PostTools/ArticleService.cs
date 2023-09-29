@@ -4,7 +4,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.PublicToolbox.Models;
 using CnGalWebSite.Helper.Extensions;
-using CnGalWebSite.Helper.Helper;
+
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.Helpers;
 using HtmlAgilityPack;

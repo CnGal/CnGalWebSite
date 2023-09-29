@@ -21,17 +21,17 @@
         <div class="col-12 p-0 pt-2" style="display: flex; justify-content: flex-end;">
             @if (string.IsNullOrWhiteSpace(Model.Link) == false)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall />
+                <CnGalWebSite.Components.Buttons.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall />
             }
             @if (CommentId != 0)
             {
                 @if (IsReplying)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall Class="ms-3" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall Class="ms-3" />
                 }
                 else
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" XSmall Class="ms-3" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="回复" OnClick="OnReplyClick" XSmall Class="ms-3" />
                 }
             }
 

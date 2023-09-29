@@ -31,7 +31,7 @@
                         <span> - @item.RoleIdentity</span>
                     }
                 </div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                <CnGalWebSite.Components.Containers.MiniModeContainer>
                     @if (item.Audio.Any())
                     {
                         <div class="audio">
@@ -41,7 +41,7 @@
                             }
                         </div>
                     }
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                </CnGalWebSite.Components.Containers.MiniModeContainer>
 
                 <dl>
                     @if (item.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))

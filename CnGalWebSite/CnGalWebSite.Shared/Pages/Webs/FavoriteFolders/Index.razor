@@ -18,10 +18,10 @@ else
 
 @if (isNotFound)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+    <NotFoundCard>
         <h1 class="text-center title-large">找不到这个收藏夹哦......</h1>
         <div class="text-center">可以在前往个人空间->收藏夹->编辑->设置收藏夹公开</div>
-    </CnGalWebSite.Shared.MasaComponent.Shared.Cards.Errors.NotFoundCard>
+    </NotFoundCard>
 }
 else
 {
@@ -75,7 +75,7 @@ else
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page />
 
     }
 

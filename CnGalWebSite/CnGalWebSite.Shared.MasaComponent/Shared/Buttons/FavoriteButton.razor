@@ -14,7 +14,7 @@
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
+    <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="@(IsUserFavorited?IconType.Favorite.ToIconString():IconType.UnFavorite.ToIconString())" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Favorites.ChooseFavoriteFolderTip @ref="chooseFavoriteFolderTip" ObjectId="Id" Type="Type" OnFavorited="@(() => {  IsUserFavorited = true; StateHasChanged();})" />

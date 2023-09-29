@@ -1,0 +1,13 @@
+﻿@inject IUserService _userService
+
+<AuthorizeView>
+    <Authorized>
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Logout.ToIconString()" Tooltip="退出登入" OnClick="_userService.Logout" />
+    </Authorized>
+    <NotAuthorized>
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Login.ToIconString()" Tooltip="登入" OnClick="_userService.Login" />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+}

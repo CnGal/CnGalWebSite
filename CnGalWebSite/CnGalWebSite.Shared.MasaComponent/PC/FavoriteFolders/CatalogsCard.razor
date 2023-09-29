@@ -4,7 +4,7 @@
 
 @if (Model.Any())
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Catalogs.ToIconString()" Title="相关目录" Outline Collapable>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Catalogs.ToIconString()" Title="相关目录" Outline Collapable>
      @foreach (var item in Model)
         {
             <div class="mb-3">
@@ -22,7 +22,7 @@
             </div>
         }
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 @code {

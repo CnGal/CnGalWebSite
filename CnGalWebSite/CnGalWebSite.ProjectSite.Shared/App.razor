@@ -1,0 +1,108 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject IJSRuntime JS
+@inject I18n I18n
+@inject CnGalWebSite.Components.Services.IMiniModeService _miniModeService
+@inject IEventService _eventService
+@inject ISettingService _settingService
+
+@attribute [StreamRendering(true)]
+
+<MApp>
+    <CascadingValue Value="connectionInfo" IsFixed="true">
+        <CascadingAuthenticationState>
+            <CnGalWebSite.Components.Errors.ErrorHandler ShowDetailedErrorInfor>
+                <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+                    <Found Context="routeData">
+                        @if (!OperatingSystem.IsBrowser())
+                        {
+                            <RouteView RouteData="@routeData" DefaultLayout="LayoutType" />
+                        }
+                        else
+                        {
+                            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
+                                <NotAuthorized>
+                                    <CnGalWebSite.ProjectSite.Shared.Components.Errors.NotAuthorizedCard NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                </NotAuthorized>
+                                <Authorizing>
+
+                                </Authorizing>
+                            </AuthorizeRouteView>
+                        }
+                        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                    </Found>
+                    <NotFound>
+                        <LayoutView Layout="LayoutType">
+                            <CnGalWebSite.Components.Errors.NotFoundCard Page />
+                         </LayoutView>
+                     </NotFound>
+                 </Router>
+             </CnGalWebSite.Components.Errors.ErrorHandler>
+         </CascadingAuthenticationState>
+     </CascadingValue>
+ </MApp>
+
+
+ @code {
+    [Parameter]
+    public ConnectionInfo? connectionInfo { get; set; }
+    [Parameter]
+    public bool? Mobile { get; set; }
+
+
+    private System.Threading.Timer mytimer;
+    public Type LayoutType
+    {
+        get
+        {
+            return NavigationManager.Uri.Contains("/admin") ? typeof(AdminLayout) : (_settingService.IsApp ? typeof(AppLayout) : typeof(PCLayout));
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<bool?>(nameof(Mobile), out var value))
+        {
+            //SSR 预置值
+            if (value != null)
+            {
+                _settingService.IsApp = value.Value;
+            }
+        }
+
+        //判断来源
+        if (NavigationManager.Uri.Contains("ref=gov"))
+        {
+            _miniModeService.IsMiniMode = true;
+        }
+        //将语言切换成zh-CN
+        I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            var needRefresh = false;
+            //检查是否为移动设备
+            if (OperatingSystem.IsBrowser())
+            {
+                _settingService.IsApp = await JS.InvokeAsync<bool>("isMobile");
+                await _settingService.SaveAsync();
+            }
+            //检查迷你模式
+            await _miniModeService.CheckAsync();
+        }
+    }
+}

@@ -17,15 +17,15 @@
 
 <MMain Class="pb-0">
     <CascadingValue Value="this" IsFixed="true">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+            <CnGalWebSite.Components.Containers.MasaContainer>
              <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
                     @Body
                 </ErrorHandler>
 
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+            </CnGalWebSite.Components.Containers.MasaContainer>
     </CascadingValue>
 </MMain>
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.SynchronousAuthStateCard />
+<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
 
 @code {
     bool drawer { get; set; }

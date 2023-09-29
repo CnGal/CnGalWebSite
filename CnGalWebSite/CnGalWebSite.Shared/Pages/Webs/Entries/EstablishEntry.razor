@@ -16,7 +16,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" Creating />
     @if (isReady == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
     }
     else
     {
@@ -31,7 +31,7 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.SynchronousSteamInforCard AddInforModel="Model.AddInfor" ImagesModel="Model.Images" MainModel="Model.Main" MainPageModel="Model.MainPage" OnSynchronized="OnSynchronized" />
         }
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建词条" Icon="@IconType.Entry.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="创建词条" Icon="@IconType.Entry.ToIconString()" Outline>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainCard Model="Model.Main" Class="mb-4" TypeChanged="TypeChanged" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model.AddInfor" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" LotteryItems="LotteryItems" Class="mb-4" />
@@ -43,7 +43,7 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.WebsiteCard Model="Model.Website" Class="mb-4" />
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 </div>
 @code {

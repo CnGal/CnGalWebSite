@@ -1,0 +1,339 @@
+﻿
+/*去掉下划线*/
+a {
+    text-decoration: none;
+}
+
+/*黑白*/
+/*
+html {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
+    filter: progid: DXImageTransform. Microsoft. BasicImage(grayscale=1);
+    filter: gray;
+}*/
+
+/*修正Masa样式的影响*/
+.m-application {
+    font-family: inherit !important;
+}
+
+.theme--light.m-application {
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+}
+
+.row {
+    margin-bottom: 0px;
+    margin-top: 0;
+}
+
+.col-xl, .col-xl-auto, .col-xl-12, .col-xl-11, .col-xl-10, .col-xl-9, .col-xl-8, .col-xl-7, .col-xl-6, .col-xl-5, .col-xl-4, .col-xl-3, .col-xl-2, .col-xl-1, .col-lg, .col-lg-auto, .col-lg-12, .col-lg-11, .col-lg-10, .col-lg-9, .col-lg-8, .col-lg-7, .col-lg-6, .col-lg-5, .col-lg-4, .col-lg-3, .col-lg-2, .col-lg-1, .col-md, .col-md-auto, .col-md-12, .col-md-11, .col-md-10, .col-md-9, .col-md-8, .col-md-7, .col-md-6, .col-md-5, .col-md-4, .col-md-3, .col-md-2, .col-md-1, .col-sm, .col-sm-auto, .col-sm-12, .col-sm-11, .col-sm-10, .col-sm-9, .col-sm-8, .col-sm-7, .col-sm-6, .col-sm-5, .col-sm-4, .col-sm-3, .col-sm-2, .col-sm-1, .col, .col-auto, .col-12, .col-11, .col-10, .col-9, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3, .col-2, .col-1 {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.theme--light.m-application code {
+    background-color: transparent;
+}
+
+.m-card__title {
+    font-weight: bold;
+}
+
+.theme--dark.m-application code {
+    background-color: transparent;
+    text-shadow: none;
+}
+
+.theme--light.m-application {
+    background-color: transparent;
+}
+
+.m-toast-detail {
+    white-space: pre-line;
+}
+
+.m-rating .m-icon {
+    padding: 0.1rem;
+}
+
+.theme--light.m-tabs > .m-tabs-bar {
+    background-color: transparent;
+}
+
+.theme--light.m-tabs-items {
+    background-color: transparent;
+}
+
+/*页脚*/
+.img-fluid {
+    width: 100%;
+}
+
+/*步骤条*/
+.m-stepper__wrapper.active {
+    height: auto !important;
+}
+/*Toast*/
+.m-enqueued-snackbars .error {
+    height: unset !important;
+}
+
+.m-snack__content > div {
+    white-space: pre-line;
+}
+
+.nav-loading .m-snack__content > div {
+    white-space: normal !important;
+}
+/*页面跳转Alert*/
+.nav-loading .m-snack__content {
+    padding: 0;
+}
+/*Masa卡片*/
+.theme--light.m-card {
+    background-color: transparent;
+    color: inherit;
+}
+
+    .theme--light.m-card > .m-card__subtitle, .theme--light.m-card > .m-card__text, .m-toast-detail {
+        color: inherit
+    }
+
+.m-alert:not(.m-sheet--tile) {
+    border-radius: var( --md-card-border-radius);
+}
+
+.m-sheet.m-card, .m-dialog, .m-menu__content {
+    border-radius: var(--md-card-border-radius);
+}
+
+.m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
+/*下拉列表*/
+.m-sheet.theme--light.m-list.m-select-list {
+    background-color: var(--md-sys-color-background);
+}
+/*步骤条*/
+.m-stepper.theme--light.m-card, .m-stepper.theme--light.m-sheet {
+    background: transparent;
+}
+/*对话框*/
+.m-dialog, .m-snack__wrapper.m-sheet.theme--light {
+    background-color: var(--md-sys-color-background);
+}
+/*Markdown*/
+.markdown-body h1, .markdown-body h2 {
+    border-bottom: 2px solid var(--md-sys-color-primary) !important;
+}
+
+.markdown-body blockquote {
+    color: var(--md-sys-color-secondary) !important;
+    border-left: .25em solid var(--md-sys-color-secondary) !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.markdown-body hr {
+    height: .1em !important;
+    background-color: var(--md-sys-color-primary) !important;
+}
+
+.markdown-body li > p {
+    margin-top: 0 !important;
+    margin-bottom: 0;
+}
+
+.markdown-body ol, .markdown-body ul {
+    display: flex;
+    flex-direction: column;
+}
+
+/*输入框*/
+.m-text-field input {
+    line-height: unset;
+}
+/*卡片标题字体*/
+.m-application .text-h5, .m-application .text-h6 {
+    font-family: inherit !important;
+}
+/*警告条*/
+.tertiary--text {
+    color: var(--md-sys-color-tertiary) !important;
+}
+/*默认字体颜色*/
+.theme--light.m-expansion-panels .m-expansion-panel-header .m-expansion-panel-header__icon .m-icon, .theme--light.m-tabs > .m-tabs-bar .m-tab--disabled, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active), .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-btn, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-icon {
+    color: var(--md-sys-color-on-surface);
+}
+
+.theme--light.m-label {
+    color: inherit;
+}
+
+.theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
+    color: inherit;
+}
+
+.theme--light.m-select .m-select__selections {
+    color: inherit;
+}
+
+.theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
+    color: var(--md-sys-color-on-background);
+}
+
+.theme--light.m-icon {
+    color: inherit;
+}
+
+.m-chip:not(.m-chip--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+
+.m-btn:not(.m-btn--outlined).primary {
+    color: var(--md-sys-color-on-primary)
+}
+/*边框颜色*/
+.theme--light.m-text-field > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+
+.theme--light.m-text-field:not(.m-input--has-state):hover > .m-input__control > .m-input__slot:before {
+    border-color: inherit;
+}
+/*表格*/
+.theme--light.m-data-table {
+    background-color: inherit;
+    color: inherit;
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-toolbar.m-sheet {
+    background-color: inherit;
+}
+
+.m-data-table .m-toolbar__content, .m-tabs {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > thead > tr > th {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table-header th.sortable.active, .theme--light.m-data-table .m-data-table-header th.sortable.active .m-data-table-header__icon, .theme--light.m-data-table .m-data-table-header th.sortable:hover {
+    color: inherit;
+}
+
+.theme--light.m-data-table .m-data-table__empty-wrapper {
+    color: inherit;
+}
+
+.theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+/*步骤条*/
+.theme--light.m-stepper .m-stepper__label {
+    color: inherit;
+}
+
+.theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
+    background-color: var(--md-sys-color-surface-1);
+}
+/*底部导航栏激活样式*/
+.nav-bottom-tab-active {
+    color: var(--md-sys-color-primary) !important;
+}
+
+.theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
+    color: inherit !important;
+}
+
+.theme--light.m-bottom-navigation {
+    background-color: var(--md-sys-color-background);
+    color: inherit !important;
+}
+/*icon按钮*/
+.theme--light.m-btn.m-btn--icon {
+    color: inherit;
+}
+
+.theme--light.m-btn {
+    color: inherit;
+}
+
+/*侧边导航栏*/
+
+.theme--light.m-navigation-drawer .m-navigation-drawer__content {
+    background-color: var(--md-sys-color-surface-1);
+}
+
+/*溢出的tab栏*/
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__wrapper {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.m-tabs:not(.cngal-main-tab-card) .m-slide-group__content {
+    border-radius: var(--md-card-border-radius) !important;
+}
+
+.cngal-main-tab-card .m-toolbar__content, .m-tabs {
+    background-color: transparent;
+}
+/*扩展卡片*/
+.theme--light.m-expansion-panels .m-expansion-panel {
+    background-color: var(--md-sys-color-surface-1);
+    color: var(--md-sys-color-on-surface);
+}
+
+.m-expansion-panels:not(.m-expansion-panels--accordion):not(.m-expansion-panels--tile) > .m-expansion-panel--active {
+    border-radius: var(--md-card-border-radius);
+}
+
+.m-expansion-panels {
+    border-radius: var(--md-card-border-radius);
+    padding-bottom: 1rem;
+}
+/*树状列表*/
+.theme--light.m-treeview {
+    color: inherit;
+}
+/*背景透明*/
+.m-main__wrap {
+    background-color: transparent;
+}
+/*错误按钮*/
+.m-btn:not(.m-btn--outlined).error {
+    color: var(--md-sys-color-on-error);
+}
+/*下拉框*/
+.m-select__selection--comma {
+    overflow: inherit;
+}
+/*相册*/
+.m-card > :first-child:not(.m-btn):not(.m-chip):not(.m-avatar) {
+    border-radius: var(--md-card-border-radius) !important;
+}
+/*tab标签*/
+.m-window-item {
+    padding: 3px;
+}
+/*列表*/
+.theme--light.m-list {
+    background-color: inherit;
+    color: inherit;
+}
+/*图标按钮*/
+.m-btn--fab {
+    display: flex;
+    justify-content: center;
+}
+/*tab栏*/
+.theme--light.m-sheet {
+    color: inherit;
+}

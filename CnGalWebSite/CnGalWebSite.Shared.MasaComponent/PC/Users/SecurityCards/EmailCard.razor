@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="电子邮箱" Icon="fa fa-fw fa-envelope" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="电子邮箱" Icon="fa fa-fw fa-envelope" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         <span>电子邮箱：@Model.Email</span>
 
@@ -15,7 +15,7 @@
 
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
     [Parameter]

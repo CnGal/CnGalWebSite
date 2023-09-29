@@ -14,18 +14,18 @@
 <div>
     @if (isReady == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Page Fill />
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
     }
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建抽奖" Icon="@IconType.Lottery.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="创建抽奖" Icon="@IconType.Lottery.ToIconString()" Outline>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" EntryGameItems="EntryGameItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }
 </div>
 @code {

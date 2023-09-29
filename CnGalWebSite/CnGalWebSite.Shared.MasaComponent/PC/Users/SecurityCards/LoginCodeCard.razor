@@ -2,7 +2,7 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="授权" Icon="fa fa-fw  fa-key" Class="h-100">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="授权" Icon="fa fa-fw  fa-key" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         <span>如果将一次性授权码泄露，你的账户可能会被他人恶意控制，请谨慎授权</span>
 
@@ -16,7 +16,7 @@
 
         </div>
     </div>
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
 <MDialog @bind-Value="Dialog"
@@ -35,7 +35,7 @@
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="success" TextStyle />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="success" TextStyle />
         </MCardActions>
     </MDCard>
 </MDialog>

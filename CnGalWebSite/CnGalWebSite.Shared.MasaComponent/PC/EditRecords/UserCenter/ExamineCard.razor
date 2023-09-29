@@ -7,8 +7,8 @@
     <div style="display:flex;">
         @if (InReview)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="已读" Icon="mdi-read" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="忽略" Icon="mdi-bell-off" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Ignored))" />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="已读" Icon="mdi-read" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="忽略" Icon="mdi-bell-off" Rounded OnClick="@(()=>OnReview( EditRecordReviewState.Ignored))" />
         }
     </div>
 </MDCard>

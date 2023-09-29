@@ -1,0 +1,72 @@
+﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<div class="not-found-card">
+    <MDCard Class="out-card w-100" Outline="!Fill">
+        <MDCard Outline="Fill" Class="inner-card">
+            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+            @if (ChildContent == null)
+            {
+                @if (Page)
+                {
+                    <h1 class="text-center title-large">404 Not Found</h1>
+                    <div class="text-center">@("我们会在 " + seconds + " 秒后帮你返回") <a href="/">主页</a> 哦~</div>
+                }
+                else
+                {
+                    <div class="text-center title-large">这里似乎没有东西呢......</div>
+                }
+            }
+            else
+            {
+                @ChildContent
+            }
+
+        </MDCard>
+    </MDCard>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool Fill { get; set; }
+    [Parameter]
+    public bool Page { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    System.Threading.Timer mytimer;
+    int seconds = 10;
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && Page)
+        {
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000);
+        }
+    }
+
+    public async void Send(object o)
+    {
+        await InvokeAsync(() =>
+        {
+            seconds--;
+            if (seconds <= 0)
+            {
+                mytimer.Dispose();
+                mytimer = null;
+                NavigationManager.NavigateTo("/");
+            }
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        mytimer?.Dispose();
+
+        mytimer = null;
+
+    }
+}

@@ -54,7 +54,7 @@
 @if (Model.Any(s => s.IsHidden) && IsCurrentUser)
 {
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="折叠的项目" Icon="fa fa-fw fa-star" @bind-IsCollapsed="IsCollapsed" Class="mb-3" Collapable>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="折叠的项目" Icon="fa fa-fw fa-star" @bind-IsCollapsed="IsCollapsed" Class="mb-3" Collapable>
 
         <div class="row">
             @foreach (var item in Model.Where(s => s.IsHidden))
@@ -65,7 +65,7 @@
             }
         </div>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
 
 

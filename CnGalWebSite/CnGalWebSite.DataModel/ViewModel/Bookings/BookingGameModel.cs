@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using System;
 using System.Collections.Generic;
 using System.Text;

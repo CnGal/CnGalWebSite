@@ -7,18 +7,18 @@
 <div style="display: flex; justify-content: center;">
     @if (Model.Type == LotteryType.Manual && Model.IsEnd == false)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-wallet-giftcard " Tooltip="抽奖" OnClick="OnDraw" Color="info" Class="me-3"/>
+        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-wallet-giftcard " Tooltip="抽奖" OnClick="OnDraw" Color="info" Class="me-3"/>
     }
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil" Tooltip="编辑" OnClick="OnEdit" Color="success"  Class="me-3"/>
+    <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-pencil" Tooltip="编辑" OnClick="OnEdit" Color="success"  Class="me-3"/>
     @if (Model.IsHidden)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-eye" Tooltip="显示" OnClick="@(()=>OnClickLottery(false))" Color="info" />
+        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-eye" Tooltip="显示" OnClick="@(()=>OnClickLottery(false))" Color="info" />
 
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-eye-off" Tooltip="隐藏" OnClick="@(()=>OnClickLottery(true))" Color="error"  />
+        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-eye-off" Tooltip="隐藏" OnClick="@(()=>OnClickLottery(true))" Color="error"  />
     }
 </div>
 

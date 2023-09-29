@@ -1,6 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.PublicToolbox.Models;
-using CnGalWebSite.Helper.Helper;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System;

@@ -3,7 +3,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/space/EditMain/EditSpaceFavoriteObjects?FolderId=" + Model.Id)" ExamineType="Operation.EditVideoMain" OnClickRevoke="OnRevoke" />
 }
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()">
     <div class="basic-info-group-card">
         <div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />总数：@Model.Objects.Count
@@ -20,7 +20,7 @@
         </div>
     </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
 

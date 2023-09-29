@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-12 col-lg-6">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="对比的版本" Icon="@IconType.Key.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="对比的版本" Icon="@IconType.Key.ToIconString()" Outline>
             <ButtonContent>
                 <div style="width:220px">
                     <CnGalWebSite.Components.Inputs.MasaTextSelect Items="ContrastItems" ValueChanged="OnContrastChanged" Value="ContrastItem" HideDetails="true"/>
@@ -11,10 +11,10 @@
             <ChildContent>
                 @ContrastView
             </ChildContent>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     </div>
     <div class="col-12 col-lg-6">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="当前的版本" Icon="@IconType.Lock.ToIconString()" Outline>
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="当前的版本" Icon="@IconType.Lock.ToIconString()" Outline>
             <ButtonContent>
                 <div style="width:220px">
                     <CnGalWebSite.Components.Inputs.MasaTextSelect Items="CurrentItems" ValueChanged="OnCurrentChanged" Value="CurrentItem" HideDetails="true" />
@@ -23,7 +23,7 @@
             <ChildContent>
                 @CurrentView
             </ChildContent>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
     </div>
 </div>
 

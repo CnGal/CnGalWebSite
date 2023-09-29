@@ -22,7 +22,7 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Clients
 
         public string Description { get; set; }
 
-        public bool RequirePkce { get; set; }
+        public bool RequirePkce { get; set; } = true;
 
         public bool AllowAccessTokensViaBrowser { get; set; }
     }
