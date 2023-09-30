@@ -1,6 +1,7 @@
 ﻿@inject IHttpService _httpService
 
 @inject IPopupService PopupService
+@inject IUserService _userService
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCatcheService
@@ -76,28 +77,9 @@ else
         }
         else
         {
-            OnLogin();
+            _userService.Login();
         }
 
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
     }
 
     public async Task GetUserIsFavorited()

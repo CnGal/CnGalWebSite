@@ -22,9 +22,15 @@
                  <MCardText Style=" white-space: break-spaces;">
                      @item.BriefIntroduction
                  </MCardText>
-             </MDCard>
-         </ChildContent>
-     </MTimelineItem>
+                 @if (Model.Count() < 3)
+                    {
+                        <MCardText Class="pt-0" Style=" white-space: break-spaces;">
+                            @item.HappenedTime.ToString("yyyy-MM-dd HH:mm")
+                        </MCardText>
+                    }
+                </MDCard>
+            </ChildContent>
+        </MTimelineItem>
     }
 </MTimeline>
 

@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject IEventService _eventService
 @inject IJSRuntime JS
+@inject IUserService _userService
 
 
 <div style=" position: fixed; z-index: 4; bottom: 7rem; right: 2rem;" class="@(_dataCacheService.IsApp?"d-none":"")">
@@ -66,30 +67,13 @@
     {
         if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.Id))
         {
-            OnLogin();
+            _userService.Login();
             return false;
         }
 
         return true;
     }
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
 
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
-    }
     public async Task OnMergeEntries()
     {
         if (Login() == false)

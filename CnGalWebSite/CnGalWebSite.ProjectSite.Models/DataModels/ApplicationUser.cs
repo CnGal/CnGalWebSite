@@ -23,6 +23,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 用户空间头图
         /// </summary>
         public string BackgroundImage { get; set; }
+
+        /// <summary>
+        /// 企划
+        /// </summary>
+        public List<Project> Projects { get; set; }
     }
 
    

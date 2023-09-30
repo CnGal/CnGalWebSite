@@ -1187,3 +1187,70 @@ html {
         display: flex;
         flex-direction: column;
     }
+/*大图预览*/
+.largeimage-bg {
+    width: 100%;
+    height: calc(100vh);
+    background-color: rgba(0,0,0,.7);
+    position: fixed;
+    z-index: 1050;
+}
+
+
+
+.largeimage-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.largeimage-btn-close {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+}
+
+.largeimage-layout-in {
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+}
+
+.largeimage-btn-left {
+    position: fixed;
+    left: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
+}
+
+.largeimage-btn-right {
+    position: fixed;
+    right: 1rem;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(0, -50%);
+}
+
+.largeimage-img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    /*height: fit-content;*/
+    align-self: center;
+}
+
+.largeimage-a {
+    max-height: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.largeimage-layout-img {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

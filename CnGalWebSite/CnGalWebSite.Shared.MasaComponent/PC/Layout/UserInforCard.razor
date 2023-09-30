@@ -1,7 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IUserService _userService
 
-<MDCard Class="pa-3" style="flex-direction: column; align-items: center; ">
+<MDCard Class="pa-3" Style="flex-direction: column; align-items: center; ">
     <div class="d-flex" style="align-items: center; flex-direction: column; ">
         <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
         <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
@@ -69,7 +70,7 @@
         </MButton>
 
 
-        <MButton Text Block Color="primary" OnClick="BeginSignOut">
+        <MButton Text Block Color="primary" OnClick="_userService.Logout">
             <MIcon Left>mdi-logout</MIcon>
             退出登入
         </MButton>
@@ -103,17 +104,6 @@
         StateHasChanged();
         NavigationManager.NavigateTo("/space/messages");
         await OnClosed.InvokeAsync();
-    }
-    private void BeginSignOut()
-    {
-        @if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo("Account/Logout", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogout("authentication/logout", "/");
-        }
     }
 
 }

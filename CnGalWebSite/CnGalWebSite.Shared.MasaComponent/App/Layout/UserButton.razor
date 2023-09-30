@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
+@inject IUserService _userService
 
 
 @if (string.IsNullOrWhiteSpace(Model.PhotoPath) == false)
@@ -62,7 +63,7 @@
                 <MIcon Left>mdi-plus  </MIcon>
                 创建投稿
             </MButton>
-            <MButton Text Block Color="primary" OnClick="BeginSignOut">
+         <MButton Text Block Color="primary" OnClick="_userService.Logout">
                 <MIcon Left>mdi-logout</MIcon>
                 退出登入
             </MButton>
@@ -160,17 +161,6 @@
             await createObjectCard.Refresh(true);
         }
         await OnClosed.InvokeAsync();
-    }
-    private void BeginSignOut()
-    {
-        @if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo("Account/Logout", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogout("authentication/logout", "/");
-        }
     }
 
 }

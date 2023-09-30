@@ -1,0 +1,21 @@
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="基础信息" Icon="@IconType.Home.ToIconString()" Collapable Class="mb-4">
+    <MRow>
+        <MCol Cols="12">
+            <MTextarea Rows="3" @bind-Value="Model.Name" Label="企划名称" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextarea Rows="3" @bind-Value="Model.Contact" Label="联系方式" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextarea Rows="3" @bind-Value="Model.BudgetRange" Label="预算区间" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextarea Rows="3" @bind-Value="Model.EndTime" Label="截止时间" />
+        </MCol>
+    </MRow>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public ProjectEditModel Model{ get; set; }
+}

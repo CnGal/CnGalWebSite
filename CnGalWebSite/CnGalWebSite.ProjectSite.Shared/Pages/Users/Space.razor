@@ -1,0 +1,67 @@
+﻿@page "/user/space"
+@inject IUserService _userService
+@inject IPageModelCatche<UserSpaceViewModel> _pageModelCatche
+@implements IDisposable
+
+<MRow>
+    <MCol Cols="12" Md="5" Lg="4" Xl="3">
+        <CnGalWebSite.ProjectSite.Shared.Components.Users.UserInfoCard Model="_userService.UserInfo" />
+    </MCol>
+    <MCol Cols="12" Md="7" Lg="8" Xl="9">
+        <MDCard Class="mb-4">
+            <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+                 <MTab Value="0">
+                     企划<MIcon>mdi-home</MIcon>
+                 </MTab>
+                 <MTab Value="1">
+                     合作<MIcon>mdi-script-text-outline</MIcon>
+                 </MTab>
+                 <MTab Value="2">
+                     收藏<MIcon>@IconType.Favorite.ToIconString()</MIcon>
+                 </MTab>
+             </MTabs>
+        </MDCard>
+    </MCol>
+</MRow>
+
+@code {
+    UserSpaceViewModel Model = new UserSpaceViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        _userService.UserInfoChanged += OnUserInfoChanged;
+
+        try
+        {
+            Model = await _pageModelCatche.GetCache("api/user/GetUserSpace");
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取用户空间数据失败");
+
+        }
+    }
+
+    public void TabValueChanged(StringNumber index)
+    {
+        Model.TabIndex = index.ToInt32();
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

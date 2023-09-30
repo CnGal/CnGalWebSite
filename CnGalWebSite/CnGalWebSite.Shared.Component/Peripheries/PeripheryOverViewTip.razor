@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
-
+@inject IUserService _userService
 @inject IDataCacheService _dataCatcheService
 
 
@@ -75,7 +75,7 @@
                     </Authorized>
                     <NotAuthorized>
                         <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
-                            <CnGalWebSite.Components.Buttons.MasaButton Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                         <CnGalWebSite.Components.Buttons.MasaButton Text="登入后创建周边" OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
                         </div>
                     </NotAuthorized>
                 </AuthorizeView>
@@ -146,30 +146,11 @@
 
         if(string.IsNullOrWhiteSpace(url))
         {
-            OnLogin();
+            _userService.Login();
         }
         else
         {
             NavigationManager.NavigateTo(url);
-        }
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
     }
 }

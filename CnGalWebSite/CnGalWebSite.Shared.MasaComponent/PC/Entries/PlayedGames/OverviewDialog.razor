@@ -2,7 +2,7 @@
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-
+@inject IUserService _userService
 
 <MDialog @bind-Value="Dialog"
          Width="1200">
@@ -67,7 +67,7 @@
 
                     </Authorized>
                     <NotAuthorized>
-                        <CnGalWebSite.Components.Buttons.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="登入后添加游玩记录" OnClick="_userService.Login" Icon="mdi-login" TextStyle />
 
                     </NotAuthorized>
                 </AuthorizeView>
@@ -122,25 +122,6 @@
         showChart = true;
 
         StateHasChanged();
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
     }
 
     public async Task OnClickEditGameRecored()

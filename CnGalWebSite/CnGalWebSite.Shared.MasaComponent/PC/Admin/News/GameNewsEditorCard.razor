@@ -5,7 +5,7 @@
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
+                <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
              </MCol>
              <MCol Cols="12">
                  <MTextField @bind-Value="Model.Title" Label="标题" />

@@ -1,0 +1,37 @@
+﻿
+<img src="@GetSrc()" alt="@Alt" class="@Class" style="@Style" />
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string Src { get; set; }
+    [Parameter]
+    public string Alt { get; set; }
+    [Parameter]
+    public bool ShowNull { get; set; }
+    [Parameter]
+    public ImageType Type { get; set; }
+
+    public string GetSrc()
+    {
+        if (string.IsNullOrWhiteSpace(Src) && !ShowNull)
+        {
+            return Type switch
+            {
+                ImageType.Avatar => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/user.png",
+                ImageType.Vertical=> null,
+                ImageType.Horizontal => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png",
+                ImageType.Background => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/userbackground.jpg",
+                ImageType.None => null,
+                _ => null
+            };
+        }
+        else
+        {
+            return Src;
+        }
+    }
+}

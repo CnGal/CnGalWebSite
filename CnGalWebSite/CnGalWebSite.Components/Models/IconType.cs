@@ -196,7 +196,8 @@ namespace CnGalWebSite.Components.Models
         DailyTask,
         Task,
         Buy,
-        Logout
+        Logout,
+        Project
     }
 
     public static class IconTypeHelper
@@ -205,6 +206,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Project:
+                    return "mdi-text-box-multiple";
                 case IconType.Logout:
                     return "mdi-logout";
                 case IconType.Buy:

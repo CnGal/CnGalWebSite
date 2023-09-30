@@ -14,6 +14,8 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         }
 
         public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectPosition> ProjectPositions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,7 +30,6 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
 
             //限定名称唯一
             modelBuilder.Entity<ApplicationUser>().HasIndex(g => g.UserName).IsUnique();
-
         }
     }
 }

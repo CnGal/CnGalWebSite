@@ -1,10 +1,12 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Base;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.DataModel.ViewModel
 {

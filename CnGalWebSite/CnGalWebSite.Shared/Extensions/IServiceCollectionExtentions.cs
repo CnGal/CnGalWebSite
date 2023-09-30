@@ -37,8 +37,8 @@ namespace CnGalWebSite.Shared.Extentions
             services.AddCnGalComponents();
             //全局缓存数据
             services.AddScoped<IDataCacheService, DataCatcheService>();
-            //查看大图
-            services.AddScoped(x => new ImagesLargeViewService());
+            //用户
+            services.AddScoped<IUserService, Userservice>();
 
 
             //工具箱
@@ -50,8 +50,7 @@ namespace CnGalWebSite.Shared.Extentions
 
             //空白MAUI服务 
             services.AddScoped<IMauiService, MauiService>();
-            //文件上传
-            services.AddScoped<IFileUploadService, FileUploadService>();
+
             //事件
             services.AddScoped<IEventService, EventService>();
             //结构化数据

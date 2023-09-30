@@ -1,0 +1,27 @@
+﻿<MDCard Class="mb-4">
+    <a href="@("/user/profiles?id="+Model.Id)">
+        <CnGalWebSite.Components.Images.MasaImage Src="@Model.BackgroundImage" Alt="@Model.Name" Class="w-100" Type="ImageType.Background"/>
+        <div style="display: flex; margin-top: -40px; justify-content: center;">
+            <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Style="width:80px; border-radius: 50%;" Alt="@Model.Name" Type="ImageType.Avatar"/>
+        </div>
+    </a>
+    <div class="pa-3 pt-2" style=" display: flex; flex-direction: column; align-items: center;">
+        @if (Main)
+        {
+            <h1 class=" text-center title-large mb-1" style=" word-break: break-all;">@Model.Name</h1>
+        }
+        else
+        {
+            <div class="text-center title-large fw-bold mb-1" style=" word-break: break-all;">@Model.Name</div>
+        }
+
+        <span class="label-large text-center mt-1">@Model.BriefIntroduction</span>
+    </div>
+</MDCard>
+
+@code {
+    [Parameter]
+    public UserInfoViewModel Model { get; set; }
+    [Parameter]
+    public bool Main { get; set; }
+}
