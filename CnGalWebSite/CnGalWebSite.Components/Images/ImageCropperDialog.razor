@@ -1,7 +1,8 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using Blazor.Cropper;
+@using CnGalWebSite.DrawingBed.Helper.Services;
+@using CnGalWebSite.DrawingBed.Models.DataModels;
+@inject IJSRuntime JSRuntime
 @inject IFileUploadService _fileUploadService
-
-@inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
 
 <MDialog Value="Dialog" ValueChanged="DialogChanged"
@@ -19,14 +20,14 @@
             {
                 <Cropper @bind-Ratio="@ImageRatio" CropperHeight="500" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
                          @ref="cropper"
-                         PureCSharpProcessing="ToolHelper.IsSSR"
+                         PureCSharpProcessing="!OperatingSystem.IsBrowser()"
                          AspectRatio="AspectRatio"
                          RequireAspectRatio="@IsAspectRatioEnabled"
                          ImageFile="File"
                          IsImageLocked="false"
                          OnLoad="OnLoad"
                          AnimeGifEnable></Cropper>
-                <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline "  Track Class="mt-3" OnPrependClick="OnReset"></MSlider>
+                <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline "  Class="mt-3" OnPrependClick="OnReset"></MSlider>
                 <CnGalWebSite.Components.Progressings.ProgressingCard Class="@(isReady?"d-none":"")" Color="white" Style="position: absolute; top: 0; bottom: 0;left: 0;right: 0; display: flex;justify-content: center;flex-direction: column;align-items: center;color:white;" />
             }
 

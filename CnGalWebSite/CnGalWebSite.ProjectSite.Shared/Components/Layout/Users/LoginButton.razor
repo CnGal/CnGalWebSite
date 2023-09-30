@@ -2,7 +2,8 @@
 
 <AuthorizeView>
     <Authorized>
-        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Logout.ToIconString()" Tooltip="退出登入" OnClick="_userService.Logout" />
+        <UserButton Class="me-4"/>
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Create.ToIconString()" Text="创建企划" Rounded Href="/project/edit?id=0"/>
     </Authorized>
     <NotAuthorized>
         <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Login.ToIconString()" Tooltip="登入" OnClick="_userService.Login" />

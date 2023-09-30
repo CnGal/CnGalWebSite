@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.DataModel.ViewModel.Entries
 {

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Base;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.ViewModel.Base;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Admin

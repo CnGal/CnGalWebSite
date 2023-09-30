@@ -1,6 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IPopupService PopupService
-
+@inject IUserService _userService
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
@@ -55,7 +55,7 @@
         var user = await authenticationStateTask;
         if (user.User.Identity.IsAuthenticated == false)
         {
-            OnLogin();
+            _userService.Login();
             return;
         }
         try
@@ -82,25 +82,6 @@
         catch (Exception ex)
         {
             await ErrorHandler.ProcessError(ex, "投票失败");
-        }
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
         }
     }
 }

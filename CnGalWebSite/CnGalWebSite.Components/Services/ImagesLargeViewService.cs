@@ -1,26 +1,26 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Files.Images;
+﻿using CnGalWebSite.Components.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace CnGalWebSite.Shared.Service
+namespace CnGalWebSite.Components.Services
 {
     public class ImagesLargeViewService
     {
         /// <summary>
         /// 获得 回调委托缓存集合
         /// </summary>
-        private List<(IComponent Key, Func<ImagesLargeViewModel, ValueTask> Callback)> Cache { get; set; } = new();
+        private List<(IComponent Key, Func<List< ImagesLargeViewModel>,int, ValueTask> Callback)> Cache { get; set; } = new();
 
         /// <summary>
         /// 设置当前页面 Title 方法
         /// </summary>
         /// <param name="title"></param>
         /// <returns></returns>
-        public async ValueTask ViewLargeImages(ImagesLargeViewModel model)
+        public async ValueTask ViewLargeImages(List<ImagesLargeViewModel> model, int index)
         {
             var cb = Cache.FirstOrDefault().Callback;
             if (cb != null)
             {
-                await cb.Invoke(model);
+                await cb.Invoke(model,index);
             }
         }
 
@@ -29,7 +29,7 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         /// <param name="key"></param>
         /// <param name="callback"></param>
-        public void Register(IComponent key, Func<ImagesLargeViewModel, ValueTask> callback)
+        public void Register(IComponent key, Func<List<ImagesLargeViewModel>, int, ValueTask> callback)
         {
             Cache.Add((key, callback));
         }

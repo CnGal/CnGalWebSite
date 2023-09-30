@@ -16,7 +16,11 @@
         <MTab Href="/sharegames">晒库存</MTab>
     </MTabs>
     <MSpacer></MSpacer>
-    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Setting.ToIconString()" Tooltip="设置" OnClick="OnClickSetting" Class="me-2"/>
+    <AuthorizeView>
+        <NotAuthorized>
+            <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Setting.ToIconString()" Tooltip="设置" OnClick="OnClickSetting" Class="me-2" />
+        </NotAuthorized>
+    </AuthorizeView>
     <CnGalWebSite.ProjectSite.Shared.Components.Layout.Users.LoginButton/>
 </MAppBar>
 

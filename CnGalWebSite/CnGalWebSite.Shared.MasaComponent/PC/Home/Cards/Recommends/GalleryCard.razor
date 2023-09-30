@@ -1,4 +1,5 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using CnGalWebSite.Components.Services;
+@inject NavigationManager NavigationManager
 @inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
 @inject IEventService _eventService
@@ -59,14 +60,10 @@
         }
         else
         {
-            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            await ImagesLargeViewService.ViewLargeImages(Model.Images.Select(s => new ImagesLargeViewModel
                 {
-                    Index = Model.Images.IndexOf(image),
-                    Pictures = Model.Images.Select(s => new EditImageAloneModel
-                    {
-                        Image = s,
-                    }).ToList()
-                });
+                    Image = s,
+                }).ToList(), Model.Images.IndexOf(image));
         }
 
     }

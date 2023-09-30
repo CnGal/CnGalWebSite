@@ -1,4 +1,5 @@
-﻿@inject ImagesLargeViewService ImagesLargeViewService
+﻿@using CnGalWebSite.Components.Services;
+@inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
 @inject IEventService _eventService
 
@@ -48,11 +49,11 @@
         }
         else
         {
-            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            await ImagesLargeViewService.ViewLargeImages(Model.Select(s=>new ImagesLargeViewModel
             {
-                Index = Index.ToInt32(),
-                Pictures = Model
-            });
+                Image=s.Image,
+                Note=s.Note
+            }).ToList(),Index.ToInt32());
         }
 
     }

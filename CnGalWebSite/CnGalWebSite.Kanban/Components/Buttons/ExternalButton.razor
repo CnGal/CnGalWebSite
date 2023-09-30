@@ -7,6 +7,7 @@
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
 @inject CnGalWebSite.Shared.Service.IEventService _eventService
+@inject CnGalWebSite.Shared.Service.IUserService _userService
 @inject IJSRuntime JS
 
 
@@ -72,30 +73,13 @@
     {
         if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.Id))
         {
-            OnLogin();
+            _userService.Login();
             return false;
         }
 
         return true;
     }
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-            {
-                Interaction = InteractionType.SignIn,
-                ReturnUrl = NavigationManager.Uri,
-            };
 
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
-    }
     public async Task OnMergeEntries()
     {
         if (Login() == false)

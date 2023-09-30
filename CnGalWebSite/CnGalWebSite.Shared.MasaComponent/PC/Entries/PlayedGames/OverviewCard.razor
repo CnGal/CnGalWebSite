@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-
+@inject IUserService _userService
 
 @if (isReady)
 {
@@ -24,7 +24,7 @@
                         </MButton>
                     </Authorized>
                     <NotAuthorized>
-                        <MButton Rounded OnClick="OnLogin" Color="primary">
+                     <MButton Rounded OnClick="_userService.Login" Color="primary">
                             <MIcon Left>mdi-login</MIcon>
                             登入后添加游玩记录
                         </MButton>
@@ -87,24 +87,7 @@
             await ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
         }
     }
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
 
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
-    }
     public async Task OnClickEditGameRecored()
     {
         if (editGameRecordTip != null)

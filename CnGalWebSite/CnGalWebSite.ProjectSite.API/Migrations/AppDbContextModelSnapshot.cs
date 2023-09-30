@@ -85,6 +85,144 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
 
                     b.ToTable("Users");
                 });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BudgetRange")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Contact")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreateUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(10000000)
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EndTime")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateUserId");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectImage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectImage");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPosition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BudgetRange")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("DeadLine")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PositionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PositionTypeName")
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectPositions");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", "CreateUser")
+                        .WithMany("Projects")
+                        .HasForeignKey("CreateUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateUser");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectImage", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.Project", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPosition", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.Project", "Project")
+                        .WithMany("Positions")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Positions");
+                });
 #pragma warning restore 612, 618
         }
     }

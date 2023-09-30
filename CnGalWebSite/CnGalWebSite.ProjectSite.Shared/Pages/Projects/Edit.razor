@@ -1,0 +1,80 @@
+﻿@page "/project/edit"
+
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPopupService PopupService
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@_name" />
+
+<div>
+    @if (Model ==null)
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+    }
+    else
+    {
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Project.ToIconString()" Outline>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.MainCard Model="Model"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.ImageCard Model="Model"/>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public long Id { get; set; }
+
+    private ProjectEditModel Model { get; set; }
+
+    string _name = "创建企划";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _name = Id == 0 ? "创建企划" : "编辑企划";
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                //获取所有词条
+                Model = await _httpService.GetAsync<ProjectEditModel>($"api/project/edit?id={Id}");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
+            }
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var obj = await _httpService.PostAsync<ProjectEditModel, Result>("api/project/edit", Model);
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                NavigationManager.NavigateTo("/project?id=" + obj.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+    }
+}

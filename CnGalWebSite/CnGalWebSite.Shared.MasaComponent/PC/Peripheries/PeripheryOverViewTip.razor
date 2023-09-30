@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 
 @inject IDataCacheService _dataCatcheService
+@inject IUserService _userService
 
 
 @if (isReady)
@@ -69,7 +70,7 @@
                     </Authorized>
                     <NotAuthorized>
                      <MDCard Class="pa-3 mb-4 w-100" Style="align-items: center;">
-                             <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后创建周边" OnClick="OnLogin" Icon="@IconType.Login.ToIconString()" />
+                             <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后创建周边" OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
                      </MDCard>
                  </NotAuthorized>
                 </AuthorizeView>
@@ -145,26 +146,7 @@
     {
         if(GetUrl()==null)
         {
-            OnLogin();
-        }
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
+            _userService.Login();
         }
     }
 }

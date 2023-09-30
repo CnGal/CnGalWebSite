@@ -1,5 +1,5 @@
-﻿
-
+﻿@using CnGalWebSite.DrawingBed.Helper.Services;
+@using CnGalWebSite.DrawingBed.Models.DataModels;
 @inject IFileUploadService _fileUploadService
 @inject IPopupService PopupService
 
@@ -19,13 +19,13 @@
     {
         <div style="display: flex;">
             <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" style="width: 100%;border-radius: var( --md-card-border-radius);" alt="预览图" class="elevation-2">
-            <div class="ps-4 pt-4" style="position: absolute;">
+            <div class="ps-4 pt-4" style="position: absolute;display: flex;">
                 <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3 @(Rounded?"m-btn--rounded":"")">
                     <span class="m-btn__content">
                         @if (isUploading)
                         {
                             <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="var(--md-sys-color-on-primary)">
-                            </MProgressCircular>
+                             </MProgressCircular>
                         }
                         else
                         {
@@ -37,7 +37,7 @@
                 </label>
                 @if (string.IsNullOrWhiteSpace(ImagePath) == false)
                 {
-                    <CnGalWebSite.Components.Buttons.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Fab Tooltip="删除"/>
+                    <CnGalWebSite.Components.Buttons.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Fab Tooltip="删除" />
                 }
 
             </div>
@@ -50,7 +50,7 @@
                 @if (isUploading)
                 {
                     <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="var(--md-sys-color-on-primary)">
-                    </MProgressCircular>
+                     </MProgressCircular>
                 }
                 else
                 {
@@ -64,7 +64,7 @@
 </div>
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImageCropperViewTip OnUploadedImage="OnCropperUploaded" @ref="imageCropperViewTip" Gallery="Gallery" />
+<ImageCropperDialog OnUploadedImage="OnCropperUploaded" @ref="imageCropperViewTip" Gallery="Gallery" />
 
 @code {
     [Parameter]
@@ -95,7 +95,7 @@
     private readonly string Id = "input" + new Random().Next();
     bool isUploading;
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Images.ImageCropperViewTip imageCropperViewTip;
+    ImageCropperDialog imageCropperViewTip;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -134,7 +134,7 @@
     {
         try
         {
-            var obj = await _fileUploadService.UploadImagesAsync(file, Type,Gallery);
+            var obj = await _fileUploadService.UploadImagesAsync(file, Type, Gallery);
             if (obj.Uploaded == true)
             {
                 await ChangeImageUrl(obj.Url);

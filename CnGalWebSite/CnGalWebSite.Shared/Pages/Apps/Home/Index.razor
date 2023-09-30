@@ -1,4 +1,5 @@
-﻿
+﻿@inject IUserService _userService
+
 @inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject IStructuredDataService _structuredDataService
@@ -53,7 +54,7 @@
             </Authorized>
             <NotAuthorized>
                 <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
-                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后进入个人空间" Icon="mdi-login" OnClick="_userService.Login" />
                 </div>
             </NotAuthorized>
         </AuthorizeView>
@@ -97,25 +98,6 @@
         }
     }
 
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
-    }
     public void ValueChanged(StringNumber value)
     {
         _dataCacheService.HomeTabIndex = value.ToInt32();

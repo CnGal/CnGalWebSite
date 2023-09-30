@@ -1,6 +1,6 @@
-﻿@inject NavigationManager NavigationManager
+﻿@inject IUserService _userService
 
-<a class="d-flex pointer a-font-color" style="align-items: center; flex-direction: column; " @onclick="OnLogin">
+<a class="d-flex pointer a-font-color" style="align-items: center; flex-direction: column; " @onclick="_userService.Login">
     <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/apps/user.png" alt="默认头像" style="width: 60px; border-radius: 50%; aspect-ratio: 1;" />
     <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
         <span class="h6 fw-bold">点击头像登录</span>
@@ -11,24 +11,5 @@
 </a>
 
 @code {
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
-    }
 
 }

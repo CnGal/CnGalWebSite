@@ -3,6 +3,7 @@
 
 @inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
+@inject IUserService _userService
 
 
 
@@ -55,7 +56,7 @@
             }
         </Authorized>
         <NotAuthorized>
-            <MButton Text Block Color="primary" OnClick="OnLogin">
+            <MButton Text Block Color="primary" OnClick="_userService.Login">
                 <MIcon Left>mdi-login </MIcon>
                 登入后编辑
             </MButton>
@@ -230,25 +231,6 @@ else
             return;
         }
 
-    }
-
-    protected void OnLogin()
-    {
-        InteractiveRequestOptions requestOptions = new()
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = NavigationManager.Uri,
-        };
-
-
-        if (ToolHelper.IsSSR)
-        {
-            NavigationManager.NavigateTo($"Account/Login?returnUrl={NavigationManager.Uri}", true);
-        }
-        else
-        {
-            NavigationManager.NavigateToLogin("authentication/login", requestOptions);
-        }
     }
 
     public async Task SetMonitor(bool open)

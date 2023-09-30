@@ -13,30 +13,32 @@
         <div class="largeimage-layout">
             <div class="d-flex p-3 largeimage-layout-in">
                 <div class="ps-3 pe-3 largeimage-layout-img">
-                    <a href="@Model.Pictures[Model.Index].Image" target="_blank" class="largeimage-a ">
-                        <img class="largeimage-img" src="@Model.Pictures[Model.Index].Image" alt="@Model.Pictures[Model.Index].Note" />
+                    <a href="@Model[_index].Image" target="_blank" class="largeimage-a ">
+                        <img class="largeimage-img" src="@Model[_index].Image" alt="@Model[_index].Note" />
                     </a>
                 </div>
             </div>
-            <p class="text-center m-0" style="line-break: anywhere; font-size: medium;color:white">@Model.Pictures[Model.Index].Note</p>
-            <p class="text-center mb-0" style=" line-break: anywhere; font-size: x-large; font-weight: bold; color: white;">@((Model.Index+1).ToString()+" / "+Model.Pictures.Count.ToString())</p>
+            <p class="text-center m-0" style="line-break: anywhere; font-size: medium;color:white">@Model[_index].Note</p>
+            <p class="text-center mb-0" style=" line-break: anywhere; font-size: x-large; font-weight: bold; color: white;">@((_index + 1).ToString() + " / " + Model.Count.ToString())</p>
         </div>
-         <div class="largeimage-btn-close">
-             <CnGalWebSite.Components.Buttons.MasaButton Tooltip="关闭" Fab Icon="@IconType.Close.ToIconString()" OnClick="OnClose" />
+        <div class="largeimage-btn-close">
+            <CnGalWebSite.Components.Buttons.MasaButton Tooltip="关闭" Fab Icon="@IconType.Close.ToIconString()" OnClick="OnClose" />
          </div>                <div class="largeimage-btn-left">
              <CnGalWebSite.Components.Buttons.MasaButton Tooltip="上一张" Fab Icon="@IconType.Left.ToIconString()" OnClick="OnMoveLeft" />
          </div>
          <div class="largeimage-btn-right">
              <CnGalWebSite.Components.Buttons.MasaButton Tooltip="下一张" Fab Icon="@IconType.Right.ToIconString()" OnClick="OnMoveRight" />
          </div>
-    </div>
+     </div>
 }
 
 
 @code {
 
     [Parameter]
-    public ImagesLargeViewModel Model { get; set; } = new ImagesLargeViewModel();
+    public List<ImagesLargeViewModel> Model { get; set; } = new List<ImagesLargeViewModel>();
+
+    int _index;
 
     private bool isOpen = false;
 
@@ -52,7 +54,7 @@
 
     public void Blank()
     {
-        
+
     }
 
     /// <summary>
@@ -60,13 +62,14 @@
     /// </summary>
     /// <param name="title"></param>
     /// <returns></returns>
-    private ValueTask ViewLargeImages(ImagesLargeViewModel model)
+    private ValueTask ViewLargeImages(List<ImagesLargeViewModel> model,int index)
     {
-        if (model.Pictures == null || model.Pictures.Count == 0)
+        if (model == null || model.Count == 0)
         {
             return ValueTask.CompletedTask;
         }
         Model = model;
+        _index = index;
         isOpen = true;
         StateHasChanged();
         return ValueTask.CompletedTask;
@@ -74,23 +77,23 @@
 
     public void OnMoveLeft()
     {
-        Model.Index = (Model.Index - 1) < 0 ? (Model.Pictures.Count - 1) : (Model.Index - 1);
+        _index = (_index - 1) < 0 ? (Model.Count - 1) : (_index - 1);
         StateHasChanged();
-        
+
     }
 
     public void OnMoveRight()
     {
-        Model.Index = (Model.Index + 1) >= Model.Pictures.Count ? 0 : (Model.Index + 1);
+        _index = (_index + 1) >= Model.Count ? 0 : (_index + 1);
         StateHasChanged();
-        
+
     }
 
     public void OnClose()
     {
         isOpen = false;
         StateHasChanged();
-        
+
     }
 
     /// <summary>
