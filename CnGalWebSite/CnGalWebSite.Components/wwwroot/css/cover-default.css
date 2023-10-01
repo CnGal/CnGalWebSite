@@ -176,7 +176,7 @@ html {
 }
 
 .theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
-    color: inherit;
+    color: var(--md-sys-color-on-background) !important;
 }
 
 .theme--light.m-select .m-select__selections {

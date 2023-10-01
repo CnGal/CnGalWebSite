@@ -197,7 +197,11 @@ namespace CnGalWebSite.Components.Models
         Task,
         Buy,
         Logout,
-        Project
+        Project,
+        Security,
+        Music,
+        Programmer,
+        Writer
     }
 
     public static class IconTypeHelper
@@ -206,6 +210,14 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Writer:
+                    return "mdi-bookshelf";
+                case IconType.Programmer:
+                    return "mdi-music-accidental-sharp";
+                case IconType.Music:
+                    return " mdi-music";
+                case IconType.Security:
+                    return "mdi-security";
                 case IconType.Project:
                     return "mdi-text-box-multiple";
                 case IconType.Logout:

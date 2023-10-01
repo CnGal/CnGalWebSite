@@ -1,27 +1,97 @@
-﻿<MDCard Class="mb-4">
-    <a href="@("/user/profiles?id="+Model.Id)">
-        <CnGalWebSite.Components.Images.MasaImage Src="@Model.BackgroundImage" Alt="@Model.Name" Class="w-100" Type="ImageType.Background"/>
-        <div style="display: flex; margin-top: -40px; justify-content: center;">
-            <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Style="width:80px; border-radius: 50%;" Alt="@Model.Name" Type="ImageType.Avatar"/>
-        </div>
-    </a>
-    <div class="pa-3 pt-2" style=" display: flex; flex-direction: column; align-items: center;">
-        @if (Main)
-        {
-            <h1 class=" text-center title-large mb-1" style=" word-break: break-all;">@Model.Name</h1>
-        }
-        else
-        {
-            <div class="text-center title-large fw-bold mb-1" style=" word-break: break-all;">@Model.Name</div>
-        }
+﻿@inject IUserService _userService
+@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@implements IDisposable
 
-        <span class="label-large text-center mt-1">@Model.BriefIntroduction</span>
+<MDCard Class="mb-4 user-info-card">
+    <CnGalWebSite.Components.Images.MasaImage Src="@Model.BackgroundImage" Alt="@Model.Name" Class="w-100" Type="ImageType.Background" />
+    <div class="head-card">
+        <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Alt="@Model.Name" Type="ImageType.Avatar" />
+        <div class="name-card">
+            <div class="name">
+                <div class="headline-large">@GetName()</div>
+                <MChip Small Color="primary">@Model.Type.GetDisplayName()</MChip>
+            </div>
+            <div class="action-card">
+                 <CnGalWebSite.Components.Buttons.MasaButton Rounded Small Outlined Text="切换身份" Icon="@IconType.Refresh.ToIconString()" OnClick="ChangeType" />
+                 @if (_userService.UserInfo.Id == Model.Id)
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Small Outlined Text="编辑资料" Icon="@IconType.Edit.ToIconString()" Href="@($"/user/edit/{_userService.UserInfo.Id}")" />
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="content-card">
+        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Infor" Title="@(Model.Type == UserType.Person ? "个人简介" : "组织简介")" />
+        <div>@(Model.Type == UserType.Person ? Model.PersonDescription : Model.OrganizationDescription)</div>
     </div>
 </MDCard>
 
 @code {
     [Parameter]
     public UserInfoViewModel Model { get; set; }
-    [Parameter]
-    public bool Main { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        _userService.UserInfoChanged += OnUserInfoChanged;
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
+    }
+
+    public string GetName()
+    {
+        if (Model.Type == UserType.Organization)
+        {
+            return Model.OrganizationName ?? Model.Name;
+        }
+        else
+        {
+            return Model.PersonName ?? Model.Name;
+        }
+    }
+
+    public async Task ChangeType()
+    {
+        if (_userService.UserInfo.Id==Model.Id)
+        {
+            try
+            {
+                var obj = await _httpService.PostAsync<UserSwitchTypeModel, Result>("api/user/SwitchType", new UserSwitchTypeModel
+                    {
+                        Id = Model.Id,
+                        Type = Model.Type == UserType.Organization ? UserType.Person : UserType.Organization
+                    });
+                //判断结果
+                if (obj.Success == false)
+                {
+                    await PopupService.ToastErrorAsync($"切换身份失败", obj.Message);
+                }
+                else
+                {
+                    await _userService.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, $"切换身份失败");
+            }
+        }
+        NavigationManager.NavigateTo($"/user/space/{Model.Id}/{(Model.Type == UserType.Person ? 1 : 0)}");
+    }
+
+    public void Dispose()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
+    }
 }

@@ -1,0 +1,71 @@
+﻿@page "/project/{Id}"
+
+@inject IPageModelCatche<ProjectViewModel> _pageModelCatche
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@if (Model != null)
+{
+    <MRow>
+        <MCol Cols="12" Md="4" Lg="3">
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.UserCard Model="Model.CreateUser"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.InfoCard Model="Model"/>
+        </MCol>
+        <MCol Cols="12" Md="8" Lg="9">
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.DescriptionCard Model="Model"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.ImageCard Model="Model"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.PositionGroupCard Model="Model"/>
+        </MCol>
+    </MRow>
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Type { get; set; }
+
+    ProjectViewModel Model;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/project/get?id={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取企划数据失败");
+        }
+    }
+
+    public async void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        await Refresh();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        GC.SuppressFinalize(this);
+    }
+
+}

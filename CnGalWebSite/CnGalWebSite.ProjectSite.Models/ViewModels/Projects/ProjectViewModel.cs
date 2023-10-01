@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
-{
-    public class ProjectBaseModel
+{ 
+    public class ProjectViewModel
     {
         public long Id { get; set; }
 
@@ -29,29 +29,19 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public string Contact { get; set; }
 
         /// <summary>
-        /// 预算区间
-        /// </summary>
-        public string BudgetRange { get; set; }
-
-        /// <summary>
         /// 截止时间
         /// </summary>
-        public string EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// 预览图
         /// </summary>
         public List<ProjectImageViewModel> Images { get; set; } = new List<ProjectImageViewModel>();
 
-
         /// <summary>
         /// 需求职位
         /// </summary>
         public List<ProjectPositionViewModel> Positions { get; set; } = new List<ProjectPositionViewModel>();
-    }
-
-    public class ProjectViewModel
-    {
         /// <summary>
         /// 创建者
         /// </summary>
@@ -71,7 +61,7 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
 
     public class ProjectImageViewModel : BaseImageEditModel
     {
-        public long Id { get; set; }
+
     }
 
     public class ProjectPositionViewModel
@@ -82,12 +72,12 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public string Description { get; set; }
 
         /// <summary>
-        /// 预算区间
+        /// 预算区间备注
         /// </summary>
-        public string BudgetRange { get; set; }
+        public string BudgetNote { get; set; }
 
         /// <summary>
-        /// 职位类型
+        /// 职位类型 大类型
         /// </summary>
         public ProjectPositionType PositionType { get; set; }
         /// <summary>
@@ -101,8 +91,33 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public DateTime DeadLine { get; set; }
 
         /// <summary>
-        /// 职位类型
+        /// 职位类型 小类型
         /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// 紧急程度
+        /// </summary>
+        public PositionUrgencyType UrgencyType { get; set; }
+
+        /// <summary>
+        /// 预算类型
+        /// </summary>
+        public BudgetType BudgetType { get; set; }
+
+        /// <summary>
+        /// 预算区间上限
+        /// </summary>
+        public int BudgetMax { get; set; }
+
+        /// <summary>
+        /// 预算区间下限
+        /// </summary>
+        public int BudgetMin { get; set; }
+
+        /// <summary>
+        /// 分成比例
+        /// </summary>
+        public int Percentage { get; set; }
     }
 }

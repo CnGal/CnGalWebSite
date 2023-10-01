@@ -2,7 +2,7 @@
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Href="@Href" Icon="!Fab" Fab="Fab" Small="(!XSmall)&&Fab" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+        <MButton Outlined="Outlined" Href="@Href" Target="@Target" Icon="!Fab" Fab="Fab" Small="Small||((!XSmall)&&Fab)" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
             <MIcon XSmall="XSmall">@Icon</MIcon>
         </MButton>
 
@@ -11,7 +11,7 @@
     {
         <MTooltip Bottom>
          <ActivatorContent>
-             <MButton Href="@Href" Icon="!Fab" Small="(!XSmall)&&Fab" Fab="Fab" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+             <MButton Outlined="Outlined" Href="@Href" Target="@Target" Icon="!Fab" Small="Small||((!XSmall)&&Fab)" Fab="Fab" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
                  <MIcon XSmall="XSmall">@Icon</MIcon>
              </MButton>
          </ActivatorContent>
@@ -26,7 +26,7 @@ else
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Href="@Href" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+        <MButton Outlined="Outlined" Href="@Href" Target="@Target" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
             @if (string.IsNullOrWhiteSpace(Icon) == false)
             {
                 <MIcon XSmall="XSmall" Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
@@ -39,7 +39,7 @@ else
     {
         <MTooltip Bottom>
          <ActivatorContent>
-             <MButton Href="@Href" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+             <MButton Outlined="Outlined" Target="@Target" Href="@Href" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
                  @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
                         <MIcon XSmall="XSmall">@Icon</MIcon>
@@ -61,13 +61,19 @@ else
     [Parameter]
     public string Href { get; set; }
     [Parameter]
+    public string Target { get; set; }
+    [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Outlined { get; set; }
     [Parameter]
     public bool StopPropagation { get; set; }
     [Parameter]
     public bool IsAsync { get; set; }
     [Parameter]
     public bool Fab { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
     [Parameter]
     public bool XSmall { get; set; }
     [Parameter]

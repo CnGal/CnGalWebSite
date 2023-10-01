@@ -10,7 +10,10 @@
     "outputFileName": "wwwroot/css/bundle.css",
     "inputFiles": [
       "../CnGalWebSite.Components/wwwroot/css/bundle.css",
-      "wwwroot/css/share/common.css"
+      "wwwroot/css/share/common.css",
+      "wwwroot/css/share/user.css",
+      "wwwroot/css/share/edit.css",
+      "wwwroot/css/share/project.css"
     ]
   },
   {

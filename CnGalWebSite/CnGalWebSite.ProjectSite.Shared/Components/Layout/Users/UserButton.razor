@@ -17,7 +17,7 @@
                  </MButton>
              </ActivatorContent>
              <ChildContent>
-                 <span>@_userService.UserInfo.Name</span>
+                 <span>@GetName()</span>
              </ChildContent>
          </MTooltip>
      </ActivatorContent>
@@ -28,7 +28,7 @@
                  <CnGalWebSite.Components.Images.MasaImage Src="@_userService.UserInfo.Avatar" Alt="@_userService.UserInfo.Name" Style="width:60px;border-radius:50%;" Type="ImageType.Avatar" />
                  <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
                      <span class="title-large mb-1">@_userService.UserInfo.Name</span>
-                     <span class="text-center label-large mb-1">@_userService.UserInfo.BriefIntroduction</span>
+                     <MChip Small Color="primary">@_userService.UserInfo.Type.GetDisplayName()</MChip>
                  </div>
              </div>
              <MDivider Class="w-100 mt-2 mb-2"></MDivider>
@@ -38,8 +38,8 @@
                          <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="管理员后台" Icon="mdi-car-traction-control" Href="/admin/index" Color="secondary" />
                      </Authorized>
                 </AuthorizeView>
-                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="个人空间" Icon="mdi-star" Href="@($"/user/space")" />
-                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="编辑资料" Icon="@IconType.Edit.ToIconString()" Href="/space/editdata" />
+                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="个人空间" Icon="mdi-star" Href="@($"/user/space/{_userService.UserInfo.Id}")" />
+                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="编辑资料" Icon="@IconType.Edit.ToIconString()" Href="@($"/user/edit/{_userService.UserInfo.Id}")" />
                  <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="主题设置" Icon="@IconType.Setting.ToIconString()" OnClick="OnClickSetting" />
                  <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="退出登入" Icon="@IconType.Logout.ToIconString()" OnClick="_userService.Logout" />
             </div>
@@ -85,7 +85,17 @@
         }
     }
 
-
+    public string GetName()
+    {
+        if (_userService.UserInfo.Type == UserType.Organization)
+        {
+            return _userService.UserInfo.OrganizationName ?? _userService.UserInfo.Name;
+        }
+        else
+        {
+            return _userService.UserInfo.PersonName ?? _userService.UserInfo.Name;
+        }
+    }
 
     public void OnClickSetting()
     {

@@ -1,0 +1,58 @@
+﻿@inject IUserService _userService
+@implements IDisposable
+
+<MDCard Class="project-info-card mb-4 pa-4">
+    <div class="item-card">
+        <div class="label-large">截止日期</div>
+        <div class="title-large primary-text">@Model.EndTime.ToString("yyyy-MM-dd")</div>
+    </div>
+    @if (Model.Positions.Sum(s => s.BudgetMax) > 0)
+    {
+        <div class="item-card">
+            <div class="label-large">总体预算区间</div>
+            <div class="title-large primary-text">@($"￥ {Model.Positions.Sum(s => s.BudgetMin)} ~ {Model.Positions.Sum(s => s.BudgetMax)}")</div>
+        </div>
+    }
+    @if (Model.Positions.Average(s => s.Percentage) > 0)
+    {
+        <div class="item-card">
+            <div class="label-large">总体分成比例</div>
+            <div class="title-large primary-text">@($"{Model.Positions.Average(s => s.Percentage)} %")</div>
+        </div>
+    }
+    @if (Model.Positions.Sum(s => s.BudgetMax) == 0 && Model.Positions.Average(s => s.Percentage) == 0)
+    {
+        <div class="item-card">
+            <div class="label-large">报酬</div>
+            <div class="title-large primary-text">为爱发电</div>
+        </div>
+    }
+    @if (_userService.UserInfo.Id== Model.CreateUser.Id)
+    {
+        <div class="action-card">
+            <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Edit.ToIconString()" Text="编辑企划" Rounded Href="@($"/project/edit/{Model.Id}")"/>
+        </div>
+    }
+</MDCard>
+
+@code {
+    [Parameter]
+    public ProjectViewModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        _userService.UserInfoChanged += OnUserInfoChanged;
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
+    }
+}

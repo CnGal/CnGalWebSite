@@ -1,0 +1,53 @@
+﻿
+<MRow>
+    <MCol Cols="12" Md="6">
+        <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.PositionType" TValue="ProjectPositionType" Label="分类" />
+    </MCol>
+    @if (Model.PositionType == ProjectPositionType.Other)
+    {
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.PositionTypeName" Label="其他分类名" />
+        </MCol>
+    }
+    <MCol Cols="12">
+        <MTextField @bind-Value="Model.Type" Label="细分类型" />
+    </MCol>
+    <MCol Cols="12" Md="6">
+        <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.UrgencyType" TValue="PositionUrgencyType" Label="紧急程度" />
+    </MCol>
+    <MCol Cols="12" Md="6">
+        <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.DeadLine" Nullable="false" ShowDate ShowTime="false" Label="截稿日期" />
+     </MCol>
+
+     <MCol Cols="12" Md="6">
+         <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.BudgetType" TValue="BudgetType" Label="回报方式" />
+     </MCol>
+     @if (Model.BudgetType == BudgetType.Divide || Model.BudgetType == BudgetType.IntervalAndDivide)
+    {
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.Percentage" Label="分成比例 %" />
+        </MCol>
+    }
+    @if (Model.BudgetType == BudgetType.Interval || Model.BudgetType == BudgetType.IntervalAndDivide)
+    {
+        <MCol Cols="12"></MCol>
+      
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.BudgetMin" Label="预算区间下限" />
+        </MCol>
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.BudgetMax" Label="预算区间上限" />
+        </MCol>
+    }
+    <MCol Cols="12">
+        <MTextField @bind-Value="Model.BudgetNote" Label="预算备注" />
+    </MCol>
+    <MCol Cols="12">
+        <MTextarea Rows="6" @bind-Value="Model.Description" Label="约稿详情" />
+    </MCol>
+</MRow>
+
+@code {
+    [Parameter]
+    public ProjectPositionEditModel Model { get; set; }
+}

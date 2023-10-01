@@ -1,8 +1,5 @@
 ﻿@using CnGalWebSite.Components.Services;
 @inject ImagesLargeViewService ImagesLargeViewService
-@inject IDataCacheService _dataCatcheService
-@inject IEventService _eventService
-
 
 <div class="image-slide-group-card">
     <MWindow @bind-Value="Index">
@@ -12,7 +9,6 @@
                 <MResponsive AspectRatio="16/9D">
                     <MCard Style=" display: contents; " OnClick="OnClickImage">
                         <div style="@($"background-image: url({item.Image});")" class="image-contain">
-
                         </div>
                     </MCard>
                 </MResponsive>
@@ -38,23 +34,15 @@
     private StringNumber Index { get; set; } = 0;
 
     [Parameter]
-    public List<EditImageAloneModel> Model { get; set; }
+    public List<ImagesLargeViewModel> Model { get; set; }
 
 
     public async void OnClickImage()
     {
-        if (_dataCatcheService.IsApp)
-        {
-            await _eventService.OpenNewPage(Model[Index.ToInt32()].Image);
-        }
-        else
-        {
-            await ImagesLargeViewService.ViewLargeImages(Model.Select(s=>new ImagesLargeViewModel
+        await ImagesLargeViewService.ViewLargeImages(Model.Select(s => new ImagesLargeViewModel
             {
-                Image=s.Image,
-                Note=s.Note
-            }).ToList(),Index.ToInt32());
-        }
-
+                Image = s.Image,
+                Note = s.Note
+            }).ToList(), Index.ToInt32());
     }
 }

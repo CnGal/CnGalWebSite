@@ -1,67 +1,96 @@
-﻿@page "/user/space"
-@inject IUserService _userService
+﻿@page "/user/space/{Id}/{Type}"
+@page "/user/space/{Id}"
+
 @inject IPageModelCatche<UserSpaceViewModel> _pageModelCatche
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
-<MRow>
-    <MCol Cols="12" Md="5" Lg="4" Xl="3">
-        <CnGalWebSite.ProjectSite.Shared.Components.Users.UserInfoCard Model="_userService.UserInfo" />
-    </MCol>
-    <MCol Cols="12" Md="7" Lg="8" Xl="9">
-        <MDCard Class="mb-4">
-            <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
-                 <MTab Value="0">
-                     企划<MIcon>mdi-home</MIcon>
-                 </MTab>
-                 <MTab Value="1">
-                     合作<MIcon>mdi-script-text-outline</MIcon>
-                 </MTab>
-                 <MTab Value="2">
-                     收藏<MIcon>@IconType.Favorite.ToIconString()</MIcon>
-                 </MTab>
-             </MTabs>
-        </MDCard>
-    </MCol>
-</MRow>
+@if (Model != null)
+{
+    <CnGalWebSite.ProjectSite.Shared.Components.Users.UserInfoCard Model="Model.UserInfo" />
+
+    <MDCard Class="mb-4">
+        <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+             <MTab Value="0">
+                 企划<MIcon>@IconType.Project.ToIconString()</MIcon>
+             </MTab>
+             <MTab Value="1">
+                 作品<MIcon>@IconType.Shape.ToIconString()</MIcon>
+             </MTab>
+             <MTab Value="2">
+                 约稿<MIcon>mdi-script-text-outline</MIcon>
+             </MTab>
+         </MTabs>
+     </MDCard>
+    <MTabsItems Value="Model.TabIndex">
+        <MTabItem Value="0">
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.ProjectGroupCard Model="Model.projects"/>
+        </MTabItem>
+    </MTabsItems>
+
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
 
 @code {
-    UserSpaceViewModel Model = new UserSpaceViewModel();
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Type { get; set; }
+
+    UserSpaceViewModel Model;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-
     protected override async Task OnInitializedAsync()
     {
-        _userService.UserInfoChanged -= OnUserInfoChanged;
-        _userService.UserInfoChanged += OnUserInfoChanged;
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        NavigationManager.LocationChanged += OnLocationChanged;
 
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
         try
         {
-            Model = await _pageModelCatche.GetCache("api/user/GetUserSpace");
+            Model = await _pageModelCatche.GetCache($"api/user/GetUserSpace?id={Id}");
+            if (Type == "0")
+            {
+                Model.UserInfo.Type = UserType.Person;
+            }
+            else if (Type == "1")
+            {
+                Model.UserInfo.Type = UserType.Organization;
+            }
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             await ErrorHandler.ProcessError(ex, "获取用户空间数据失败");
-
         }
     }
+
+    public async void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        await Refresh();
+    }
+
 
     public void TabValueChanged(StringNumber index)
     {
         Model.TabIndex = index.ToInt32();
     }
 
-    public void OnUserInfoChanged()
-    {
-        StateHasChanged();
-    }
-
-    #region 释放实例
     public void Dispose()
     {
-        _userService.UserInfoChanged -= OnUserInfoChanged;
+        NavigationManager.LocationChanged -= OnLocationChanged;
         GC.SuppressFinalize(this);
     }
-    #endregion
+
 }

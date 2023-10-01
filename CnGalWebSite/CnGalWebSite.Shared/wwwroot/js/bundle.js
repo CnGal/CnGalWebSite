@@ -914,7 +914,7 @@ function initKanbanMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 500) {
+            if (timeEnd - timeStart > 100) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
                 //检查按钮组是否被按下
@@ -935,7 +935,7 @@ function initKanbanMoveAction(dotNetHelper) {
                 move = true;
                 document.body.classList.add('user-select-none');
             }
-        }, 100);
+        }, 10);
     }
 
 
@@ -1026,7 +1026,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 500) {
+            if (timeEnd - timeStart > 100) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
 
@@ -1046,7 +1046,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
                 move = true;
                 document.body.classList.add('user-select-none');
             }
-        }, 100);
+        }, 10);
     }
 
     // 拖动开始事件，要绑定在被移动元素上
@@ -1147,7 +1147,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 500) {
+            if (timeEnd - timeStart > 100) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
                 //执行逻辑
@@ -1161,7 +1161,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
                 move = true;
                 document.body.classList.add('user-select-none');
             }
-        }, 100);
+        }, 10);
     }
 
     // 拖动开始事件，要绑定在被移动元素上

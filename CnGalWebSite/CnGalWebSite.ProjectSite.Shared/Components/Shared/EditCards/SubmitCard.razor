@@ -1,0 +1,26 @@
+﻿@inject IPopupService PopupService
+
+<MDCard Class="mb-4 pa-4 edit-submit-card">
+    <CnGalWebSite.Components.Buttons.MasaButton Text="完成" IsAsync="true" OnClick="OnClickSubmit" Icon="mdi-check" Rounded />
+ </MDCard>
+
+
+ @code {
+    [Parameter]
+    public BaseEditModel Model { get; set; }
+    [Parameter]
+    public EventCallback<string> OnSubmit { get; set; }
+
+    public async Task OnClickSubmit()
+    {
+        var result = Model.Validate();
+        if (result.Success)
+        {
+            await OnSubmit.InvokeAsync();
+        }
+        else
+        {
+            await PopupService.ToastErrorAsync("某个地方填写有误哦~", result.Message ?? "某个地方填写有误哦~");
+        }
+    }
+}

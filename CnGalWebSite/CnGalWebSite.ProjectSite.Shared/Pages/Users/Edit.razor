@@ -1,0 +1,75 @@
+﻿@page "/user/edit/{Id}"
+
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPopupService PopupService
+@inject IPageModelCatche<UserSpaceViewModel> _pageModelCatche
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@_name" />
+
+<div>
+    @if (Model == null)
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+    }
+    else
+    {
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Infor.ToIconString()" Outline>
+         <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.MainCard Model="Model" />
+         <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.SecurityCard/>
+         <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private UserEditModel Model { get; set; }
+
+    string _name = "编辑个人资料";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                Model = await _httpService.GetAsync<UserEditModel>($"api/user/edit?id={Id}");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            }
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var obj = await _httpService.PostAsync<UserEditModel, Result>("api/user/edit", Model);
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                _pageModelCatche.Clean($"api/user/GetUserSpace?id={Id}");
+                NavigationManager.NavigateTo("/user/space/" + obj.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+    }
+}
