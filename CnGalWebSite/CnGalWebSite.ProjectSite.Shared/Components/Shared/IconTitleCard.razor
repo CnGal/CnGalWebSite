@@ -1,0 +1,13 @@
+﻿<div class="@($"{Class} icon-title-card")">
+    <MIcon Color="primary">@Icon.ToIconString()</MIcon>
+    <div class="fw-bold">@Title</div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public IconType Icon { get; set; }
+}

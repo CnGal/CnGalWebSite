@@ -1,0 +1,50 @@
+﻿@using CnGalWebSite.DrawingBed.Models.DataModels;
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="mb-4" Collapable>
+    <MRow>
+        <MCol Cols="12" Md="3" Lg="2">
+            <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.Avatar" Type="ImageAspectType._1_1" ImageType="ImageType.Avatar" Text="上传头像" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12" Md="6" Lg="5">
+             <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.BackgroundImage" Type="ImageAspectType._4_1A2" ImageType="ImageType.Background" Text="上传空间主图" Class="mb-4" />
+         </MCol>
+         <MCol Cols="12">
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="UserType" Label="身份" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Name" Label="用户名" />
+         </MCol>
+     </MRow>
+ </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+ @if (Model.Type == UserType.Person)
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.User.ToIconString()" Title="创作者" Class="mb-4" Collapable>
+     <MRow>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.PersonName" Label="网名" />
+         </MCol>
+         <MCol Cols="12">
+             <MTextarea Rows="6" @bind-Value="Model.PersonDescription" Label="个人简介" />
+         </MCol>
+     </MRow>
+ </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+else if (Model.Type == UserType.Organization)
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Group.ToIconString()" Title="组织" Class="mb-4" Collapable>
+     <MRow>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.OrganizationName" Label="组织名称" />
+         </MCol>
+         <MCol Cols="12">
+             <MTextarea Rows="6" @bind-Value="Model.OrganizationDescription" Label="组织简介" />
+         </MCol>
+     </MRow>
+ </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+@code {
+    [Parameter]
+    public UserEditModel Model { get; set; }
+}

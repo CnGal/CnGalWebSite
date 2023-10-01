@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.Extensions;
 using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.Models.DataModels;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using IdentityModel;
 using System.Security.Claims;
 
@@ -58,7 +59,6 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
                 NormalizedEmail = email.ToUpper(),
                 RegistTime = DateTime.Now.ToCstTime(),
                 Avatar=cngal?.PhotoPath,
-                BriefIntroduction=cngal?.PersonalSignature,
                 BackgroundImage=cngal?.BackgroundImage,
             };
 
@@ -106,5 +106,38 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
 
             return _httpContextAccessor.HttpContext.User.Claims.Any(s => (s.Type == JwtClaimTypes.Role || s.Type == ClaimTypes.Role) && s.Value == role);
         }
+
+        public async Task<UserInfoViewModel> GetUserInfo(string id)
+        {
+            ApplicationUser user = null;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                user = await GetCurrentUserAsync();
+            }
+            else
+            {
+                user = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
+            }
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserInfoViewModel
+            {
+                Avatar = user.Avatar,
+                BackgroundImage = user.BackgroundImage,
+                Id = user.Id,
+                Name = user.UserName,
+                RegistTime = user.RegistTime,
+                OrganizationDescription = user.OrganizationDescription,
+                OrganizationName = user.OrganizationName,
+                PersonDescription = user.PersonDescription,
+                PersonName = user.PersonName,
+                Type = user.Type,
+            };
+        }
+
     }
 }

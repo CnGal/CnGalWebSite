@@ -704,6 +704,11 @@ input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color: var(--md-sys-color-on-background);
 }
 
+/*鼠标悬停样式*/
+.pointer {
+    cursor: pointer !important;
+}
+
 
 /*去掉下划线*/
 a {
@@ -882,7 +887,7 @@ html {
 }
 
 .theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
-    color: inherit;
+    color: var(--md-sys-color-on-background) !important;
 }
 
 .theme--light.m-select .m-select__selections {
@@ -1242,7 +1247,7 @@ html {
 }
 
 .largeimage-a {
-    max-height: 100%;
+    max-height: calc(100% - 100px);
     display: flex;
     align-content: center;
     justify-content: center;
@@ -1253,4 +1258,9 @@ html {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+/*图片裁剪*/
+.image-cropper-card img {
+    transition: none !important;
+    height: 100% !important;
 }

@@ -1,0 +1,55 @@
+﻿
+/*个人信息卡片*/
+.user-info-card .head-card {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-top: -6rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+    .user-info-card .head-card img {
+        width: 12rem;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12) !important;
+    }
+
+    .user-info-card .head-card .name-card {
+        display: flex;
+        gap: .5rem;
+        flex-direction: column;
+        padding-bottom: .5rem;
+    }
+
+        .user-info-card .head-card .name-card .name {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+.user-info-card .content-card {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding-top: 2rem;
+    white-space: break-spaces;
+}
+
+.user-info-card .head-card .action-card {
+    display: flex;
+    gap: 1rem;
+}
+/*账户安全*/
+.edit-user-security-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+    .edit-user-security-card .content-card {
+        width: 100%;
+    }

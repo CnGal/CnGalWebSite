@@ -12,15 +12,16 @@ using IdentityModel.Client;
 using CnGalWebSite.Core.Services;
 using System.Text.Json.Serialization;
 using IdentityModel.AspNetCore.AccessTokenManagement;
+using CnGalWebSite.ProjectSite.Shared.Extentions;
 
 namespace CnGalWebSite.Server.Services
 {
     public class HttpService: IHttpService
     {
+
         private readonly HttpClient _client;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly IUserAccessTokenManagementService _tokenManagementService;
-        private readonly IUserAccessTokenStore _userAccessTokenStore;
 
         public bool IsAuth { get; set; }
 
@@ -29,15 +30,20 @@ namespace CnGalWebSite.Server.Services
             PropertyNameCaseInsensitive = true,
         };
 
-        public HttpService(HttpClient client, IUserAccessTokenStore userAccessTokenStore, AuthenticationStateProvider authenticationStateProvider,
+        public HttpService(
+               HttpClient client,
+               AuthenticationStateProvider authenticationStateProvider,
                IUserAccessTokenManagementService tokenManagementService)
         {
             _client = client;
             _authenticationStateProvider = authenticationStateProvider;
             _tokenManagementService = tokenManagementService;
-            _userAccessTokenStore = userAccessTokenStore;
-        }
 
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+        }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
             var client = await GetClientAsync();

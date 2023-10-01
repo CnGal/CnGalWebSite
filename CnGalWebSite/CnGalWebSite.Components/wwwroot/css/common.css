@@ -170,3 +170,8 @@ input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
     color: var(--md-sys-color-on-background);
 }
+
+/*鼠标悬停样式*/
+.pointer {
+    cursor: pointer !important;
+}

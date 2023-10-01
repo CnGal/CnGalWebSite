@@ -14,8 +14,8 @@
             <MCol Cols="12" Md="6" Lg="4" Xl="3">
                 <img src="@item.Image" alt="@item.Note" class="w-100 mb-3">
                 <div class="mb-4" style="display: flex;justify-content: space-between;">
-                    <CnGalWebSite.Components.Buttons.MasaButton Color="success" Text="编辑" Icon="@IconType.Edit.ToIconString()" OnClick="@(()=> EditImage(item))" />
-                    <CnGalWebSite.Components.Buttons.MasaButton Color="error" Text="删除" Icon="@IconType.Delete.ToIconString()" OnClick="@(()=> DeleteImage(item))" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Color="secondary" Text="编辑" Icon="@IconType.Edit.ToIconString()" OnClick="@(()=> EditImage(item))" />
+                     <CnGalWebSite.Components.Buttons.MasaButton Rounded Color="primary" Text="删除" Icon="@IconType.Delete.ToIconString()" OnClick="@(()=> DeleteImage(item))" />
                 </div>
             </MCol>
         }

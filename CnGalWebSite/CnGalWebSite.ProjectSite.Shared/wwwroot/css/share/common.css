@@ -79,3 +79,18 @@
     .cngal-about-card a:hover {
         text-decoration: underline;
     }
+/*标题图标卡片*/
+.icon-title-card {
+    display: flex;
+    gap: .5rem;
+}
+/*企划小卡片*/
+.info-card-project {
+    gap: .5rem;
+}
+
+.info-card-project .info-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}

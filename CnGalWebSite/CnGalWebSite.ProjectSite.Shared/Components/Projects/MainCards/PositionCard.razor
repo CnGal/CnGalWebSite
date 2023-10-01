@@ -1,0 +1,73 @@
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@GetName()" Icon="@GetIcon()" Class=" h-100">
+    <div class="project-position-card">
+        <div class="name-card">
+            @if(string.IsNullOrWhiteSpace(Model.Type)==false)
+            {
+                  <MChip Small Color="primary">@Model.Type</MChip>
+            }
+            @if (Model.UrgencyType != PositionUrgencyType.None)
+            {
+                <MChip Small Color="primary">@Model.UrgencyType.GetDisplayName()</MChip>
+            }
+        </div>
+        <div class="info-card">
+            <div class="item-card">
+                <div class="label-large">回报方式</div>
+                <div class="title-large primary-text">@Model.BudgetType.GetDisplayName()</div>
+            </div>
+
+            @if (Model.BudgetType == BudgetType.Divide || Model.BudgetType == BudgetType.IntervalAndDivide)
+            {
+                <div class="item-card">
+                    <div class="label-large">分成比例</div>
+                    <div class="title-large primary-text">@($"{Model.Percentage} %")</div>
+
+                </div>
+            }
+            @if (Model.BudgetType == BudgetType.Interval || Model.BudgetType == BudgetType.IntervalAndDivide)
+            {
+                <div class="item-card">
+                    <div class="label-large">预算区间</div>
+                    <div class="title-large primary-text">@($"￥ {Model.BudgetMin} ~ {Model.BudgetMax}")</div>
+
+                </div>
+            }
+
+            <div class="item-card">
+                <div class="label-large">截稿日期</div>
+                <div class="title-large primary-text">@($"{Model.DeadLine:yyyy-MM-dd}")</div>
+            </div>
+        </div>
+        <div class="content-card">
+            <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Class="mb-2" Icon="IconType.Infor" Title="详细需求" />
+            <div>
+                @Model.Description
+            </div>
+        </div>
+
+    </div>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public ProjectPositionViewModel Model { get; set; }
+
+    public string GetName()
+    {
+        return Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName();
+    }
+
+    public string GetIcon()
+    {
+        return Model.PositionType switch
+        {
+            ProjectPositionType.Music => IconType.Music.ToIconString(),
+            ProjectPositionType.Painter=> IconType.Style.ToIconString(),
+            ProjectPositionType.Programmer=> IconType.Programmer.ToIconString(),
+            ProjectPositionType.Writer => IconType.Writer.ToIconString(),
+            ProjectPositionType.CV => IconType.Dub.ToIconString(),
+            ProjectPositionType.Other => IconType.Shape.ToIconString(),
+            _ => IconType.Shape.ToIconString()
+        };
+    }
+}

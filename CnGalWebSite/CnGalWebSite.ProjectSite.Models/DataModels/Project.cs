@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.ProjectSite.Models.DataModels
 {
-    public class Project
+    public class Project: BaseModel
     {
         public long Id { get; set; }
 
@@ -28,29 +28,14 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public string Contact { get; set; }
 
         /// <summary>
-        /// 预算区间
+        /// 截止日期
         /// </summary>
-        public string BudgetRange { get; set; }
-
-        /// <summary>
-        /// 截止时间
-        /// </summary>
-        public string EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// 预览图
         /// </summary>
         public List<ProjectImage> Images { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateTime { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdateTime { get; set; }
 
         /// <summary>
         /// 需求职位
@@ -86,12 +71,32 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public string Description { get; set; }
 
         /// <summary>
-        /// 预算区间
+        /// 预算备注
         /// </summary>
-        public string BudgetRange { get; set; }
+        public string BudgetNote { get; set; }
 
         /// <summary>
-        /// 职位类型
+        /// 预算类型
+        /// </summary>
+        public BudgetType BudgetType { get; set; }
+
+        /// <summary>
+        /// 预算区间上限
+        /// </summary>
+        public int BudgetMax { get; set; }
+
+        /// <summary>
+        /// 预算区间下限
+        /// </summary>
+        public int BudgetMin { get; set; }
+
+        /// <summary>
+        /// 分成比例
+        /// </summary>
+        public int Percentage { get; set; }
+
+        /// <summary>
+        /// 职位类型 大类
         /// </summary>
         public ProjectPositionType PositionType { get; set; }
         /// <summary>
@@ -105,7 +110,12 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public DateTime DeadLine { get; set; }
 
         /// <summary>
-        /// 职位类型
+        /// 紧急程度
+        /// </summary>
+        public PositionUrgencyType UrgencyType { get; set; }
+
+        /// <summary>
+        /// 职位类型 小类
         /// </summary>
         public string Type { get; set; }
 
@@ -113,12 +123,41 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public Project Project { get; set; }
     }
 
+    public enum PositionUrgencyType
+    {
+        [Display(Name ="无")]
+        None,
+        [Display(Name = "随缘")]
+        Low,
+        [Display(Name = "紧急")]
+        High
+    }
+
+    public enum BudgetType
+    {
+        [Display(Name = "销售分成")]
+        Divide,
+        [Display(Name = "一次性报酬+销售分成")]
+        IntervalAndDivide,
+        [Display(Name = "一次性报酬")]
+        Interval,
+        [Display(Name = "用爱发电")]
+        Afadian,
+    }
+
     public enum ProjectPositionType
     {
+        [Display(Name ="其他")]
         Other,
+        [Display(Name = "配音")]
         CV,
+        [Display(Name = "画师")]
         Painter,
+        [Display(Name = "程序")]
         Programmer,
-        Writer
+        [Display(Name = "剧本")]
+        Writer,
+        [Display(Name = "音乐")]
+        Music
     }
 }

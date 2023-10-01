@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.ProjectSite.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230930061433_AddProject")]
-    partial class AddProject
+    [Migration("20231001053124_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,9 +36,6 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.Property<string>("BackgroundImage")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("BriefIntroduction")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("longtext");
 
@@ -46,6 +43,9 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("Hide")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -60,7 +60,19 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("OrganizationDescription")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OrganizationName")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PersonDescription")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PersonName")
                         .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
@@ -77,6 +89,12 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("UserName")
                         .HasColumnType("varchar(255)");
@@ -95,9 +113,6 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("BudgetRange")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Contact")
                         .HasColumnType("longtext");
 
@@ -111,8 +126,11 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .HasMaxLength(10000000)
                         .HasColumnType("longtext");
 
-                    b.Property<string>("EndTime")
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
@@ -158,14 +176,26 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("BudgetRange")
+                    b.Property<int>("BudgetMax")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BudgetMin")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BudgetNote")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("BudgetType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DeadLine")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Percentage")
+                        .HasColumnType("int");
 
                     b.Property<int>("PositionType")
                         .HasColumnType("int");
@@ -178,6 +208,9 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
 
                     b.Property<string>("Type")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("UrgencyType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

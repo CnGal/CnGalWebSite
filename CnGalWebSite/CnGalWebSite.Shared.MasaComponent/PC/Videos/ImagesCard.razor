@@ -6,7 +6,7 @@
     </div>
 }
 <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="预览图" Icon="@IconType.PhotoAlbum.ToIconString()">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="imagesList" />
+    <CnGalWebSite.Components.Images.ImageSlideGroup Model="imagesList" />
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 @code {
@@ -17,18 +17,17 @@
     public EventCallback<Operation> OnRevoke { get; set; }
 
 
-    public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
+    public List<ImagesLargeViewModel> imagesList = new List<ImagesLargeViewModel>();
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         imagesList.Clear();
         foreach (var item in Model.Pictures)
         {
             foreach (var infor in item.Pictures)
             {
-                imagesList.Add(new EditImageAloneModel
+                imagesList.Add(new ImagesLargeViewModel
                 {
-                    Modifier = item.Modifier,
                     Note = infor.Note,
                     Image = infor.Url
                 });

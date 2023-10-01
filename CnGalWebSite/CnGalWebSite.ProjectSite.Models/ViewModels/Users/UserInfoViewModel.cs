@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.ProjectSite.Models.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,22 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// <summary>
         /// 个人介绍
         /// </summary>
-        public string BriefIntroduction { get; set; }
+        public string PersonDescription { get; set; }
+
+        /// <summary>
+        /// 组织介绍
+        /// </summary>
+        public string OrganizationDescription { get; set; }
+
+        /// <summary>
+        /// 个人网名
+        /// </summary>
+        public string PersonName { get; set; }
+
+        /// <summary>
+        /// 组织名称
+        /// </summary>
+        public string OrganizationName { get; set; }
 
         /// <summary>
         /// 注册时间
@@ -31,5 +47,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// 用户空间头图
         /// </summary>
         public string BackgroundImage { get; set; }
+
+        /// <summary>
+        /// 身份
+        /// </summary>
+        public UserType Type { get; set; }
     }
 }

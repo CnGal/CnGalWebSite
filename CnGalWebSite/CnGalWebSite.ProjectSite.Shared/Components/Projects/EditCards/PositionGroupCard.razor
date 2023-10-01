@@ -1,0 +1,28 @@
+﻿
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="约稿列表" Class="mb-4" Collapable Outline>
+    <MRow>
+        @foreach (var item in Model.Positions)
+        {
+            <MCol Cols="12" Md="6" Class="mb-4">
+                <MDCard Class="pa-4 h-100">
+                    <PositionCard Model="item"/>
+                    <div style="display:flex;justify-content: flex-end;">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Delete.ToIconString()" Text="删除" OnClick="@(()=>Model.Positions.Remove(item))" />
+                    </div>
+                </MDCard>
+            </MCol>
+        }
+        <MCol Cols="12" Md="6" Class="mb-4 ">
+            <MDCard Class="h-100" Style="min-height: 200px;display: flex;justify-content: center;flex-direction: column;align-items: center;">
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Create.ToIconString()" Text="添加约稿" OnClick="@(()=>Model.Positions.Add(new ProjectPositionEditModel{DeadLine=DateTime.Now.AddDays(60)}))" />
+            </MDCard>
+        </MCol>
+    </MRow>
+   
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public ProjectEditModel Model { get; set; }
+
+}
