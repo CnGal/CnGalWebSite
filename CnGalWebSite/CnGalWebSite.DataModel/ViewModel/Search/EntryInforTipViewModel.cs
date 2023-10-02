@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,7 +31,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
 
         public List<EntryInforTipAddInforModel> AddInfors { get; set; } = new List<EntryInforTipAddInforModel>() { };
 
-        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+        public List<EditAudioAloneModel> Audio { get; set; } = new List<EditAudioAloneModel>();
     }
 
     public class EntryInforTipAddInforModel

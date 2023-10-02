@@ -1,0 +1,67 @@
+﻿@using CnGalWebSite.Core.Models;
+
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@($"{Name} 基本信息")" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
+    <div class="row">
+        @foreach (var item in Items)
+        {
+            <div class="col-12 col-md-6 col-xxl-3 d-flex mt-2" style=" align-items: center;">
+
+                <MIcon  Large Color="primary">@item.Icon</MIcon>
+
+                <div style="display: flex; flex-direction: column;" class="ms-4">
+                    <div class="h6 mb-1 fw-bold text-truncate-1">@item.Name</div>
+                    <div class="text-truncate-1">@item.Value</div>
+                </div>
+            </div>
+        }
+
+
+    </div>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+
+@code {
+    [Parameter]
+    public ServerStaticOverviewModel Model { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+
+    private List<InforModel> Items { get; set; } = new List<InforModel>();
+
+    class InforModel
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string Icon { get; set; }
+    }
+
+    protected override void OnParametersSet()
+    {
+        Items.Clear();
+        Items.Add(new InforModel
+        {
+            Name = "服务器名称",
+            Value = Model.ServerName,
+            Icon = "mdi-server "
+        });
+        Items.Add(new InforModel
+        {
+            Name = "系统",
+            Value = Model.SystemName,
+            Icon = "mdi-cpu-64-bit"
+        });
+        Items.Add(new InforModel
+        {
+            Name = "运行时",
+            Value = Model.SDKVersion,
+            Icon = "mdi-hammer-screwdriver"
+        });
+        Items.Add(new InforModel
+        {
+            Name = "最后更新时间",
+            Value = Model.LastUpdateTime.ToString("yyyy-MM-dd HH:mm"),
+            Icon = "mdi-clock-outline"
+        });
+    }
+
+}

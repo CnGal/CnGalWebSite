@@ -1,0 +1,10 @@
+﻿
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="预览音频" Class="mb-4" Collapable>
+    <CnGalWebSite.Components.Audios.AudioListEditorCard Model="Model.Audios"/>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public StallEditModel Model { get; set; }
+
+}

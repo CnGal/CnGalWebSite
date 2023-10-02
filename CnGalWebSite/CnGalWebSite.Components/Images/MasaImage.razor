@@ -1,5 +1,7 @@
-﻿
-<img src="@GetSrc()" alt="@Alt" class="@Class" style="@Style" />
+﻿@if (string.IsNullOrWhiteSpace(@GetSrc())==false)
+{
+    <img src="@GetSrc()" alt="@Alt" class="@Class" style="@Style" />
+}
 
 @code {
     [Parameter]
@@ -25,6 +27,7 @@
                 ImageType.Vertical=> null,
                 ImageType.Horizontal => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png",
                 ImageType.Background => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/userbackground.jpg",
+                ImageType.Audio => "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png",
                 ImageType.None => null,
                 _ => null
             };

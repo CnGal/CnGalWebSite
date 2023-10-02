@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -161,7 +162,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 音频列表
         /// </summary>
-        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+        public List<EditAudioAloneModel> Audio { get; set; } = new List<EditAudioAloneModel>();
 
         /// <summary>
         /// 标签列表
@@ -344,21 +345,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public int Id { get; set; }
         public string Name { get; set; }
     }
-    public class AudioViewModel
-    {
-        [Display(Name = "名称")]
-        public string Name { get; set; }
-        [Display(Name = "简介")]
-        public string BriefIntroduction { get; set; }
-        [Display(Name = "链接")]
-        public string Url { get; set; }
-        [Display(Name = "优先级")]
-        public int Priority { get; set; }
-        [Display(Name = "时长")]
-        public TimeSpan Duration { get; set; }
-        [Display(Name = "缩略图")]
-        public string Thumbnail { get; set; }
-    }
+
     public class PicturesViewModel
     {
         public string Modifier { get; set; }

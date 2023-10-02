@@ -53,3 +53,7 @@
     .edit-user-security-card .content-card {
         width: 100%;
     }
+/*剧本卡片*/
+.user-space-text-card .content-card {
+    white-space: break-spaces;
+}

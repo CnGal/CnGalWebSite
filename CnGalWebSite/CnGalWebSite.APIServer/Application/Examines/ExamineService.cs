@@ -15,7 +15,7 @@ using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Extentions;
-
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ExamineModel.Articles;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
@@ -1297,7 +1297,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             foreach (var item in entry.Audio)
             {
-                model.Audio.Add(new AudioViewModel
+                model.Audio.Add(new EditAudioAloneModel
                 {
                     Url = item.Url,
                     BriefIntroduction = item.BriefIntroduction,

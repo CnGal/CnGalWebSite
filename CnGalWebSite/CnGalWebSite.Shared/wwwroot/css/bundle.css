@@ -1049,6 +1049,10 @@ html {
     color: inherit;
 }
 
+.m-toolbar {
+    transition: none;
+}
+
 /*卡片*/
 .md-card {
     display: flex;

@@ -4,11 +4,13 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@Model?.Name" />
+
+
 @if (Model != null)
 {
     <MRow>
         <MCol Cols="12" Md="4" Lg="3">
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.UserCard Model="Model.CreateUser"/>
             <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.InfoCard Model="Model"/>
         </MCol>
         <MCol Cols="12" Md="8" Lg="9">

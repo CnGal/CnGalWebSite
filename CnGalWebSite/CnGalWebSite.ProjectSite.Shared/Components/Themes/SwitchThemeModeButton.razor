@@ -1,0 +1,33 @@
+﻿@inject IEventService _eventService
+@inject ISettingService _settingService
+@implements IDisposable
+
+<CnGalWebSite.Components.Buttons.MasaButton Icon="@((_settingService.Settings.IsDark?IconType.Light:IconType.Dark).ToIconString())" Tooltip="切换主题" OnClick="OnClick" Class="@Class" />
+
+@code {
+    [Parameter]
+    public string Class{ get; set; }
+
+    public async Task OnClick()
+    {
+        _settingService.Settings.ThemeMode = _settingService.Settings.IsDark ? ThemeMode.Light : ThemeMode.Dark;
+        await _settingService.SaveAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        _settingService.SettingChanged -= OnSettingChanged;
+        _settingService.SettingChanged += OnSettingChanged;
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.SettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+}

@@ -1,118 +1,16 @@
-﻿@inject IPopupService PopupService
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3" Color="tertiary">
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
     音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="音频试听" Class="@Class" Collapable>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
-    @if(Model.Audio.Any())
-    {
-            <MSimpleTable Class="mb-4">
-        <thead>
-            <tr>
-                <th class="text-left">
-                    缩略图
-                </th>
-                <th class="text-left">
-                    名称
-                </th>
-                <th class="text-left">
-                    简介
-                </th>
-                <th class="text-left">
-                    预览
-                </th>
-                <th class="text-left">
-                    操作
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Audio.OrderByDescending(s => s.Priority))
-            {
-                <tr @key="item.Url">
-                    <td><img src="@(string.IsNullOrWhiteSpace(item.Thumbnail)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png":item.Thumbnail)" class="h-100 p-1" alt="@item.Name" /></td>
-                    <td style="min-width: 100px; ">@item.Name</td>
-                    <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.BriefIntroduction</td>
-                    <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url" Class="w-100" />
-                    </td>
-                    <td>
-                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.EditRecord.ToIconString()" Color="success" />
-                        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
-                    </td>
-
-                </tr>
-            }
-        </tbody>
-    </MSimpleTable>
-
-    }
-
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Image.ToIconString()" Title="相册" Class="@Class" Collapable>
+    <CnGalWebSite.Components.Audios.AudioListEditorCard Model="Model.Audio"/>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
-<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard @ref="editAudioCard" OnChanged="OnChanged" />
+
 @code {
     [Parameter]
     public EditAudioViewModel Model { get; set; }
     [Parameter]
     public string Class { get; set; }
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard editAudioCard;
-
-    public async Task OnUploaded(UploadResult result)
-    {
-        if (Model.Audio.Any(s => s.Url == result.Url))
-        {
-            await PopupService.ToastAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
-            return;
-        }
-
-        string name = "音频" + (Model.Audio.Count + 1).ToString();
-        if (string.IsNullOrWhiteSpace(result.FileName) == false)
-        {
-            var temp = result.FileName.Split('.').LastOrDefault();
-            if (string.IsNullOrWhiteSpace(temp) == false)
-            {
-                name = result.FileName.Replace("." + temp, "");
-            }
-            else
-            {
-                name = result.FileName;
-            }
-
-        }
-
-        Model.Audio.Add(new EditAudioAloneModel
-        {
-            Name = name,
-            Url = result.Url,
-            Duration = result.Duration ?? new TimeSpan(0)
-        });
-
-        StateHasChanged();
-        return;
-    }
-
-    public void OnDelete(EditAudioAloneModel model)
-    {
-        Model.Audio.Remove(model);
-        
-    }
-
-    public void OnEdit(EditAudioAloneModel model)
-    {
-        if (editAudioCard != null)
-        {
-            editAudioCard.Refresh(model);
-        }
-
-        
-    }
-
-    public void OnChanged()
-    {
-        StateHasChanged();
-
-        
-    }
 }

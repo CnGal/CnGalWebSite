@@ -9,7 +9,10 @@
         <div class="mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)" />
         </div>
-
+         <div class="mb-2 d-flex" style="justify-content: flex-end;">
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime"/>
+             @Model.CommentTime.ToString("yyyy-MM-dd HH:mm")
+         </div>
         <AuthorizeView>
             <Authorized>
                 <div style=" display: flex; justify-content: flex-end; ">

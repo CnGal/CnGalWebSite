@@ -1,0 +1,14 @@
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Model.Name" Icon="@IconType.Article.ToIconString()" Collapable>
+    <div class="user-space-text-card">
+        <div class="content-card">
+            <div>
+                @Model.Content
+            </div>
+        </div>
+    </div>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public UserTextViewModel Model { get; set; }
+}

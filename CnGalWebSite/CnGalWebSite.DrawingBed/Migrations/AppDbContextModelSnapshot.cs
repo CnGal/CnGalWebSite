@@ -48,7 +48,7 @@ namespace CnGalWebSite.DrawingBed.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UploadRecords");
+                    b.ToTable("UploadRecords", (string)null);
                 });
 #pragma warning restore 612, 618
         }

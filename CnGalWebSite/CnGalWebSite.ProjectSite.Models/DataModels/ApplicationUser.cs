@@ -46,9 +46,34 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public UserType Type { get; set; }
 
         /// <summary>
+        /// 标签
+        /// </summary>
+        public string Tags { get; set; }
+
+        /// <summary>
         /// 企划
         /// </summary>
         public List<Project> Projects { get; set; }
+
+        /// <summary>
+        /// 橱窗
+        /// </summary>
+        public List<Stall> Stalls { get; set; }
+
+        /// <summary>
+        /// 橱窗
+        /// </summary>
+        public List<UserImage> Images { get; set; }
+
+        /// <summary>
+        /// 橱窗
+        /// </summary>
+        public List<UserAudio> Audios { get; set; }
+
+        /// <summary>
+        /// 橱窗
+        /// </summary>
+        public List<UserText> Texts { get; set; }
 
         /// <summary>
         /// 更新时间
@@ -59,6 +84,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 隐藏
         /// </summary>
         public bool Hide { get; set; }
+
+        /// <summary>
+        /// 既往作品
+        /// </summary>
+        public string PreviousWorks { get; set; }
     }
 
     public enum UserType
@@ -68,5 +98,78 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         [Display(Name ="组织")]
         Organization
     }
-   
+
+    public class UserImage : BaseModel
+    {
+        public long Id { get; set; }
+
+        public string Note { get; set; }
+
+        public string Image { get; set; }
+
+        public int Priority { get; set; }
+
+        /// <summary>
+        /// 创建者
+        /// </summary>
+        public ApplicationUser CreateUser { get; set; }
+        public string CreateUserId { get; set; }
+    }
+
+    public class UserAudio : BaseModel
+    {
+        public long Id { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// 简介
+        /// </summary>
+        public string BriefIntroduction { get; set; }
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Url { get; set; }
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+        /// <summary>
+        /// 时长
+        /// </summary>
+        public TimeSpan Duration { get; set; }
+        /// <summary>
+        /// 缩略图
+        /// </summary>
+        public string Thumbnail { get; set; }
+
+        /// <summary>
+        /// 创建者
+        /// </summary>
+        public ApplicationUser CreateUser { get; set; }
+        public string CreateUserId { get; set; }
+    }
+
+    public class UserText : BaseModel
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 内容
+        /// </summary>
+        public string Content { get; set; }
+
+        /// <summary>
+        /// 创建者
+        /// </summary>
+        public ApplicationUser CreateUser { get; set; }
+        public string CreateUserId { get; set; }
+    }
+
 }

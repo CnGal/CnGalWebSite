@@ -1,0 +1,66 @@
+﻿@page "/admin"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IHttpService _httpService
+@using CnGalWebSite.Core.Helpers;
+@using CnGalWebSite.Core.Models;
+
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="网站数据概览"/>
+
+<div class="row">
+    <div class="col-12">
+        <CnGalWebSite.ProjectSite.Shared.Components.Admin.Overview.ServerInforCard Model="APIServerModel" Name="API Server" />
+
+    </div>
+    @if (!OperatingSystem.IsBrowser())
+    {
+        <div class="col-12">
+            <CnGalWebSite.ProjectSite.Shared.Components.Admin.Overview.ServerInforCard Model="BlazorServerModel" Name="Blazor Server" />
+
+        </div>
+    }
+    <div class="@(!OperatingSystem.IsBrowser() ?"col-12 col-lg-6":"col-12")">
+        <CnGalWebSite.ProjectSite.Shared.Components.Admin.Overview.APIServerDataCard/>
+
+    </div>
+    @if (!OperatingSystem.IsBrowser())
+    {
+        <div class="col-12 col-lg-6">
+            <CnGalWebSite.ProjectSite.Shared.Components.Admin.Overview.BlazorServerDataCard />
+        </div>
+    }
+</div>
+
+@code {
+
+    public ServerStaticOverviewModel APIServerModel = new ServerStaticOverviewModel();
+    public ServerStaticOverviewModel BlazorServerModel = new ServerStaticOverviewModel();
+    bool IsReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                APIServerModel = await _httpService.GetAsync<ServerStaticOverviewModel>("api/admin/GetServerStaticDataOverview");
+                if (!OperatingSystem.IsBrowser())
+                {
+                    BlazorServerModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
+                }
+                IsReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "刷新网站数据概览失败");
+            }
+
+        }
+    }
+
+
+}

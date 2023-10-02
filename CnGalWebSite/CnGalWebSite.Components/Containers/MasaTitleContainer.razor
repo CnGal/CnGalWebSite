@@ -1,9 +1,7 @@
 ﻿
 @if (OnlyShowContext)
 {
-    <ErrorHandler ShowDetailedErrorInfor>
         @ChildContent
-    </ErrorHandler>
 }
 else
 {
@@ -14,7 +12,7 @@ else
                     <MIcon Color="@ButtonColor" Class="me-4" Small="Small">@Icon</MIcon>
                     @Title
                 </h2>
-                <div>
+                <div class="d-flex">
                     @ButtonContent
                     @if (ShowMoreButton)
                     {
@@ -32,18 +30,14 @@ else
             @if (Outline == false)
             {
                 <div class="@((IsCollapsed ? "d-none " : "") + " content-card "+(HideContentPadding?"":"pa-3 pt-0"))">
-                    <ErrorHandler ShowDetailedErrorInfor>
                      @ChildContent
-                 </ErrorHandler>
              </div>
             }
         </MDCard>
         @if (Outline)
         {
             <MDCard Outline Class="@((IsCollapsed ? "d-none " : "") + " content-card mt-3")">
-                 <ErrorHandler ShowDetailedErrorInfor>
                  @ChildContent
-             </ErrorHandler>
          </MDCard>
         }
     </section>

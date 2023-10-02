@@ -1,0 +1,20 @@
+﻿
+@if(Model.Texts.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="预览剧本" Collapable Outline>
+    <MRow>
+        @foreach(var item in Model.Texts)
+        {
+            <MCol Cols="12" Class="mb-4">
+                <TextCard Model="item"/>
+            </MCol>
+        }
+    </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+}
+
+@code {
+    [Parameter]
+    public StallViewModel Model{ get; set; }
+}

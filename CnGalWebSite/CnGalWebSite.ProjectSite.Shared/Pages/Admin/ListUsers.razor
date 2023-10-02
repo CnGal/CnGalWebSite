@@ -1,0 +1,67 @@
+﻿@page "/admin/listusers"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == nameof(UserOverviewModel.Name))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(UserOverviewModel.Type))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.TypeChip Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(UserOverviewModel.Type))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.TypeChip Type="context.Item.Type" />
+            }
+            else if (context.Header.Value == nameof(UserOverviewModel.Avatar))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.ImageChip Image="@context.Item.Avatar" />
+            }
+            else if (context.Header.Value == nameof(UserOverviewModel.BackgroundImage))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.ImageChip Image="@context.Item.BackgroundImage" />
+            }
+            else if (context.Header.Value == nameof(UserOverviewModel.RegistTime))
+            {
+                @context.Item.RegistTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+
+@code {
+    private string _baseUrl = "api/user/list";
+    private string _name = "用户";
+
+    private List<DataTableHeader<UserOverviewModel>> _headers = new List<DataTableHeader<UserOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(UserOverviewModel.Id)
+          },
+          new (){ Text= "用户名", Value= nameof(UserOverviewModel.Name)},
+          new (){ Text= "类型", Value= nameof(UserOverviewModel.Type)},
+          new (){ Text= "邮箱", Value= nameof(UserOverviewModel.Email)},
+          new (){ Text= "头像", Value= nameof(UserOverviewModel.Avatar)},
+          new (){ Text= "背景图", Value= nameof(UserOverviewModel.BackgroundImage)},
+          new (){ Text= "标签", Value= nameof(UserOverviewModel.Tags)},
+          new (){ Text= "注册时间", Value= nameof(UserOverviewModel.RegistTime)},
+    };
+
+    DataTableCard<UserOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+}

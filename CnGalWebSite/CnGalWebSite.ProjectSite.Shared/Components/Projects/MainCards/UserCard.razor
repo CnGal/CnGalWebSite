@@ -1,9 +1,0 @@
-﻿<MDCard Class="mb-4 project-user-card pa-4" Href="@($"/user/space/{Model.Id}/1")">
-    <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Alt="@Model.Name" Type="ImageType.Avatar"/>
-    <div class="title-large">@(Model.OrganizationName??Model.Name)</div>
-</MDCard>
-
-@code {
-    [Parameter]
-    public UserInfoViewModel Model{ get; set; }
-}

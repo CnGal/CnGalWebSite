@@ -201,7 +201,8 @@ namespace CnGalWebSite.Components.Models
         Security,
         Music,
         Programmer,
-        Writer
+        Writer,
+        Stall
     }
 
     public static class IconTypeHelper
@@ -210,6 +211,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Stall:
+                    return "mdi-tree";
                 case IconType.Writer:
                     return "mdi-bookshelf";
                 case IconType.Programmer:

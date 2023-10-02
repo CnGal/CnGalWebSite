@@ -16,7 +16,13 @@
     {
         <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Infor.ToIconString()" Outline>
          <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.MainCard Model="Model" />
-         <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.SecurityCard/>
+         <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.SecurityCard />
+         <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Shape.ToIconString()" Title="我的作品" Collapable Outline>
+             <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.ImageCard Model="Model" />
+             <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.AudioCard Model="Model" />
+             <CnGalWebSite.ProjectSite.Shared.Components.Users.EditCards.TextGroupCard Model="Model" />
+
+         </CnGalWebSite.Components.Containers.MasaTitleContainer>
          <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
      </CnGalWebSite.Components.Containers.MasaTitleContainer>
     }

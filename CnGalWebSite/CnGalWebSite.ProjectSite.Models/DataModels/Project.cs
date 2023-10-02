@@ -61,7 +61,7 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public int Priority { get; set; }
     }
 
-    public class ProjectPosition
+    public class ProjectPosition : BaseModel
     {
         public long Id { get; set; }
 

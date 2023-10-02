@@ -1,0 +1,45 @@
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="基础信息" Icon="@IconType.Home.ToIconString()" Collapable Class="mb-4">
+     <MRow>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Name" Label="橱窗名称" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-Value="Model.EndTime" Nullable="false" ShowDate ShowTime="false" Label="截止日期" />
+         </MCol>
+         <MCol Cols="12" Md="6">
+             <MTextField @bind-Value="Model.Price" Label="报价" />
+         </MCol>
+         <MCol Cols="12"></MCol>
+         <MCol Cols="12" Md="6">
+             <CnGalWebSite.Components.Inputs.MasaSelecte Value="Model.PositionType" TValue="ProjectPositionType" ValueChanged="ValueChanged" Label="分类" />
+         </MCol>
+         @if (Model.PositionType == ProjectPositionType.Other)
+        {
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.PositionTypeName" Label="其他分类名" />
+            </MCol>
+        }
+        <MCol Cols="12" Md="6">
+            <MTextField @bind-Value="Model.Type" Label="细分类型" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextarea Rows="6" @bind-Value="Model.Description" Label="橱窗详情" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextField @bind-Value="Model.Contact" Label="联系方式" />
+        </MCol>
+    </MRow>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public StallEditModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnTypeChanged { get; set; }
+
+    public async Task ValueChanged(ProjectPositionType type)
+    {
+        Model.PositionType = type;
+        await OnTypeChanged.InvokeAsync();
+    }
+}

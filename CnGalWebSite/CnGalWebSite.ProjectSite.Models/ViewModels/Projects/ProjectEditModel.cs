@@ -92,6 +92,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
     {
         public long Id { get; set; }
 
+        /// <summary>
+        /// 隐藏
+        /// </summary>
+        public bool Hide { get; set; }
+
         public Result Validate()
         {
             if (BudgetType == DataModels.BudgetType.Afadian)

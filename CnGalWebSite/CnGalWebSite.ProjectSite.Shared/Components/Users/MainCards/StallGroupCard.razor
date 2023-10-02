@@ -1,0 +1,49 @@
+﻿@if (Model.Any())
+{
+    <MRow>
+
+        @foreach (var item in _items)
+        {
+            <MCol Cols="12" Md="6" Lg="4" Xl="3">
+                @foreach (var info in item)
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.StallInfoCard Model="info" />
+                    </div>
+                }
+            </MCol>
+        }
+
+    </MRow>
+}
+else
+{
+    <NotFoundCard Fill />
+}
+
+
+@code {
+    [Parameter]
+    public List<StallInfoViewModel> Model { get; set; }
+
+    List<StallInfoViewModel>[] _items = new List<StallInfoViewModel>[4];
+
+    protected override void OnInitialized()
+    {
+        for (var i = 0; i < 4; i++)
+        {
+            _items[i] = new List<StallInfoViewModel>();
+        }
+        var index = 0;
+        foreach (var item in Model)
+        {
+            _items[index].Add(item);
+            index++;
+            if (index == 4)
+            {
+                index = 0;
+            }
+        }
+    }
+
+}

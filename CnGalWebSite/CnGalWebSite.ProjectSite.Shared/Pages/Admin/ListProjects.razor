@@ -1,0 +1,57 @@
+﻿@page "/admin/listprojects"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="ProjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == nameof(ProjectOverviewModel.UserName))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(ProjectOverviewModel.Name))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.ProjectChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(ProjectOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(ProjectOverviewModel.EndTime))
+            {
+                @context.Item.EndTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+
+
+@code {
+    private string _baseUrl = "api/project/list";
+    private string _name = "企划";
+
+    private List<DataTableHeader<ProjectOverviewModel>> _headers = new List<DataTableHeader<ProjectOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ProjectOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(ProjectOverviewModel.Name)},
+          new (){ Text= "结束时间", Value= nameof(ProjectOverviewModel.EndTime)},
+          new (){ Text= "创建时间", Value= nameof(ProjectOverviewModel.CreateTime)},
+          new (){ Text= "创建者", Value= nameof(ProjectOverviewModel.UserName),Sortable=false},
+    };
+
+    DataTableCard<ProjectOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+}

@@ -45,6 +45,10 @@
     <MCol Cols="12">
         <MTextarea Rows="6" @bind-Value="Model.Description" Label="约稿详情" />
     </MCol>
+    <MCol Cols="12" Md="6">
+        <MCheckbox @bind-Value="Model.Hide" Label="隐藏" TValue="bool" />
+    </MCol>
+
 </MRow>
 
 @code {

@@ -1,16 +1,18 @@
-﻿
-<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="约稿列表" Collapable Outline>
-    <MRow>
-        @foreach(var item in Model.Positions)
-        {
-            <MCol Cols="12" Md="6" Xl="4" Class="mb-4">
-                <PositionCard Model="item"/>
-            </MCol>
-        }
-    </MRow>
-</CnGalWebSite.Components.Containers.MasaTitleContainer>
+﻿@if (Model.Positions.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="约稿列表" Collapable Outline>
+     <MRow>
+         @foreach (var item in Model.Positions)
+            {
+                <MCol Cols="12" Md="6" Xl="4" Class="mb-4">
+                    <PositionCard Model="item" />
+                </MCol>
+            }
+        </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
 
 @code {
     [Parameter]
-    public ProjectViewModel Model{ get; set; }
+    public ProjectViewModel Model { get; set; }
 }

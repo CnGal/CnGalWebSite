@@ -132,7 +132,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     /// <summary>
     /// 检查主题设置
     /// </summary>
-    public async void CheckTheme()
+    public async Task CheckTheme()
     {
         if (_dataCacheService.ThemeSetting == null)
         {
@@ -159,7 +159,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     /// <returns></returns>
     public async Task SaveTheme()
     {
-        CheckTheme();
+        await CheckTheme();
         await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
     }
 

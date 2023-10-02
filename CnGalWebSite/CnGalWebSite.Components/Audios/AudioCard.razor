@@ -1,17 +1,16 @@
-﻿@inject IDataCacheService _dataCacheService
-@inject IJSRuntime JS
+﻿@inject IJSRuntime JS
 
 @if (currentAudio != null)
 {
-    <div class="@(_dataCacheService.IsApp?"":"d-flex")">
-        @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default"))==false || _dataCacheService.IsApp== false)
+    <div class="d-flex">
+        @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default"))==false)
         {
-            <div class="@(_dataCacheService.IsApp?"mb-4":"me-4")">
-                <img src="@currentAudio.Thumbnail" alt="@currentAudio.Name" style="width:150px;height:150px;" />
+            <div class="me-4">
+                <CnGalWebSite.Components.Images.MasaImage Src="@currentAudio.Thumbnail" Alt="@currentAudio.Name" Style="width:150px;height:150px;" Type="ImageType.Audio"/>
             </div>
         }
 
-        <div class="@(_dataCacheService.IsApp?"":"w-100")">
+        <div class="w-100">
             <div class="mb-4">
                 <MBorder  Style="border-radius:0;margin: auto 0;" Width="@("4px")">
                     <div class="ms-4">
@@ -47,19 +46,19 @@
         </div>
     </div>
     <hr class="mt-3 mb-3">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@currentAudio.Url" AutoPlay="AutoPlay" Class="w-100" />
+    <MasaAudio Src="@currentAudio.Url" AutoPlay="AutoPlay" Class="w-100" />
 
 }
 @code {
     [Parameter]
-    public List<AudioViewModel> Model { get; set; }
+    public List<EditAudioAloneModel> Model { get; set; }
 
     public bool AutoPlay { get; set; } = false;
 
-    AudioViewModel currentAudio;
+    EditAudioAloneModel currentAudio;
 
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         if (currentAudio == null)
         {
@@ -83,7 +82,7 @@
         }
 
     }
-    public void OnClick(AudioViewModel model)
+    public void OnClick(EditAudioAloneModel model)
     {
         if (currentAudio == model)
         {

@@ -1,0 +1,11 @@
+﻿@if (string.IsNullOrWhiteSpace(Image) == false)
+{
+    <img src="@Image" style="@Style" class="pt-1 pb-1" />
+}
+
+@code {
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public string Style { get; set; } = "height:80px;width:fit-content;";
+}
