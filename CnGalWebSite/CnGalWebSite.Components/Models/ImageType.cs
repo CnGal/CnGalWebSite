@@ -19,6 +19,7 @@ namespace CnGalWebSite.Components.Models
         Vertical,
         [Display(Name = "背景")]
         Background,
-
+        [Display(Name = "音乐")]
+        Audio,
     }
 }

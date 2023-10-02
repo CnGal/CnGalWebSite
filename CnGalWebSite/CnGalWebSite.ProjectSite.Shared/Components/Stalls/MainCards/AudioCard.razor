@@ -1,0 +1,14 @@
+﻿
+@if (Model.Audios.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Audio.ToIconString()" Title="预览音频" Class="mb-4">
+         <CnGalWebSite.Components.Audios.AudioCard Model="Model.Audios" />
+     </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+
+
+@code {
+    [Parameter]
+    public StallViewModel Model { get; set; }
+
+}

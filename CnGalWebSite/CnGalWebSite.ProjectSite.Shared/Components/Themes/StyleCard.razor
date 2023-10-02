@@ -57,11 +57,9 @@ else if (_settingService.Settings.ThemeMode == ThemeMode.Light)
         StateHasChanged();
     }
 
-    #region 释放实例
     public void Dispose()
     {
         _settingService.SettingChanged -= OnSettingChanged;
         GC.SuppressFinalize(this);
     }
-    #endregion
 }

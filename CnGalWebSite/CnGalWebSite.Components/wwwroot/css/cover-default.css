@@ -337,3 +337,7 @@ html {
 .theme--light.m-sheet {
     color: inherit;
 }
+
+.m-toolbar {
+    transition: none;
+}

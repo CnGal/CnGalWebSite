@@ -16,6 +16,10 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectPosition> ProjectPositions { get; set; }
+        public DbSet<Stall> Stalls { get; set; }
+        public DbSet<UserImage> UserImages { get; set; }
+        public DbSet<UserAudio> UserAudios { get; set; }
+        public DbSet<UserText> UserTexts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

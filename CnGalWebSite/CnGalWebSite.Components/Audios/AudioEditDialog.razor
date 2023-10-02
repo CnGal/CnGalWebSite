@@ -1,0 +1,73 @@
+﻿@using CnGalWebSite.DrawingBed.Models.DataModels;
+@using CnGalWebSite.DrawingBed.Models.ViewModels;
+
+<MDialog Value="Dialog" ValueChanged="ValueChanged"
+         Width="600">
+    <MDCard>
+        <MCardTitle Class="text-h5">
+            编辑音频
+        </MCardTitle>
+        <MCardText>
+            音频的名称和简介会在词条页面展示，优先级会影响展示顺序
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图" ImageType="ImageType.Audio" Class="mb-4"/>
+                 </MCol>
+                 <MCol Cols="12">
+                     <div class="d-flex mb-4" style="justify-content: space-between;align-items: center;gap: 1rem;">
+                         <MasaAudio Src="@Model.Url"  />
+                         <AudioUploadButton Multiple="false" OnUploaded="OnUploaded"  Text="重新上传" Icon="mdi-refresh" />
+                     </div>
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField @bind-Value="Model.Name" Label="名称" />
+                 </MCol>
+                 <MCol Cols="12" Md="6">
+                     <MTextField @bind-Value="Model.Priority" Label="优先级" />
+                 </MCol>
+                 <MCol Cols="12">
+                     <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" />
+                 </MCol>
+             </MRow>
+         </MCardText>
+     </MDCard>
+ </MDialog>
+ @code {
+
+    private EditAudioAloneModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool Dialog { get; set; }
+
+    public void OnUploaded(UploadResult result)
+    {
+        Model.Url = result.Url;
+        Model.Duration = result.Duration ?? new TimeSpan(0);
+
+
+        StateHasChanged();
+
+    }
+    public void Refresh(EditAudioAloneModel model)
+    {
+        Model = model;
+        Dialog = true;
+
+        StateHasChanged();
+
+    }
+
+    public async Task ValueChanged(bool dialog)
+    {
+        Dialog = dialog;
+        StateHasChanged();
+        await OnChanged.InvokeAsync();
+    }
+
+}

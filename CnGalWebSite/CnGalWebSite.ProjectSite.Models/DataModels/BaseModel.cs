@@ -22,5 +22,10 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 隐藏
         /// </summary>
         public bool Hide { get; set; }
+
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Home;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using System;
@@ -41,7 +42,7 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
         /// </summary>
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel>();
 
-        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+        public List<EditAudioAloneModel> Audio { get; set; } = new List<EditAudioAloneModel>();
 
         public DateTime? LastUploadAudioTime { get; set; }
 

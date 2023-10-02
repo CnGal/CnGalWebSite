@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.ProjectSite.API.Services.Users;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -19,14 +20,16 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     {
         private readonly IRepository<Project, long> _projectRepository;
         private readonly IUserService _userService;
+        private readonly IQueryService _queryService;
 
-
-        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService)
+        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService)
         {
             _projectRepository = projectRepository;
             _userService = userService;
+            _queryService = queryService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<ProjectViewModel>> GetAsync([FromQuery] long id)
         {
@@ -56,7 +59,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Priority = s.Priority,
                 }).ToList(),
 
-                Positions = item.Positions.Select(s => new ProjectPositionViewModel
+                Positions = item.Positions.Where(s=>s.Hide==false).Select(s => new ProjectPositionViewModel
                 {
                     BudgetNote = s.BudgetNote,
                     DeadLine = s.DeadLine,
@@ -130,6 +133,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Percentage = s.Percentage,
                     UrgencyType = s.UrgencyType,
                     Type = s.Type,
+                    Hide=s.Hide
                 }).ToList()
             };
 
@@ -217,6 +221,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     info.Percentage = temp.Percentage;
                     info.UrgencyType = temp.UrgencyType;
                     info.BudgetNote = temp.BudgetNote;
+                    info.Hide = temp.Hide;
+                    info.UpdateTime = DateTime.Now.ToCstTime();
                 }
             }
             item.Positions.AddRange(model.Positions.Where(s => s.Id == 0).Select(s => new ProjectPosition
@@ -233,7 +239,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Percentage = s.Percentage,
                 UrgencyType = s.UrgencyType,
                 BudgetNote = s.BudgetNote,
-                ProjectId = model.Id
+                Hide = s.Hide,
+                UpdateTime = DateTime.Now.ToCstTime(),
+                CreateTime = DateTime.Now.ToCstTime(),
+                ProjectId = model.Id,
             }));
 
             item.UpdateTime = DateTime.Now.ToCstTime();
@@ -241,6 +250,29 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             await _projectRepository.UpdateAsync(item);
 
             return new Result { Success = true ,Message=model.Id.ToString()};
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<ProjectOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<Project, long>(_projectRepository.GetAll().AsSingleQuery().Include(s=>s.CreateUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.CreateUser.UserName.Contains(model.SearchText)));
+
+            return new QueryResultModel<ProjectOverviewModel>
+            {
+                Items = await items.Select(s => new ProjectOverviewModel
+                {
+                    Id = s.Id,
+                    CreateTime = s.CreateTime,
+                    EndTime = s.EndTime,
+                    Name = s.Name,
+                    UserId = s.CreateUser.Id,
+                    UserName = s.CreateUser.UserName,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

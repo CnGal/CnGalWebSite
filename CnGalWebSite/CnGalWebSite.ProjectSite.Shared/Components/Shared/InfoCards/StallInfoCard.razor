@@ -1,0 +1,34 @@
+﻿<MDCard Class="info-card-stall" Href="@($"/stall/{Model.Id}")">
+    <CnGalWebSite.Components.Images.MasaImage Src="@Model.Image" Alt="@Model.Name" />
+    <div class="content-card pa-4 ">
+        <div class="name-card">
+            <div class="title-medium">@Model.Name</div>
+            <div class="tag-card">
+                <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+                 @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+                {
+                    <MChip Small Color="primary">@Model.Type</MChip>
+                }
+            </div>
+        </div>
+        
+        <div class="info-card">
+            @if (Model.UserInfo != null)
+            {
+                <div class="user-card">
+                     <CnGalWebSite.Components.Images.MasaImage Src="@Model.UserInfo.Avatar" Alt="@Model.UserInfo.Name" />
+                     <div class="label-large">@Model.UserInfo.Name</div>
+                 </div>
+            }
+            <div class="price-card primary-text">
+                <div class="label-large">￥</div>
+                <div class="title-large">@Model.Price</div>
+            </div>
+        </div>
+       
+    </div>
+</MDCard>
+@code {
+    [Parameter]
+    public StallInfoViewModel Model { get; set; }
+}

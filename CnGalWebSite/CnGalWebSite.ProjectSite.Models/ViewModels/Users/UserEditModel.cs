@@ -1,5 +1,7 @@
-﻿using CnGalWebSite.ProjectSite.Models.Base;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.ProjectSite.Models.Base;
 using CnGalWebSite.ProjectSite.Models.DataModels;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Stalls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,5 +48,30 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// 身份
         /// </summary>
         public UserType Type { get; set; }
+
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public List<UserImageEditModel> Images { get; set; } = new List<UserImageEditModel>();
+
+        /// <summary>
+        /// 音频
+        /// </summary>
+        public List<EditAudioAloneModel> Audios { get; set; } = new List<EditAudioAloneModel>();
+
+        /// <summary>
+        /// 预览文本
+        /// </summary>
+        public List<UserTextEditModel> Texts { get; set; } = new List<UserTextEditModel>();
+    }
+
+    public class UserTextEditModel : UserTextViewModel
+    {
+        public long Id { get; set; }
+    }
+
+    public class UserImageEditModel : BaseImageEditModel
+    {
+        public long Id { get; set; }
     }
 }

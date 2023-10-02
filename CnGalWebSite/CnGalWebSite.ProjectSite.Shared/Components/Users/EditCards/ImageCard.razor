@@ -1,0 +1,9 @@
+﻿
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Style.ToIconString()" Title="图片" Class="mb-4" Collapable>
+    <CnGalWebSite.Components.Images.ImageListEditorCard Model="Model.Images" TValue="UserImageEditModel" />
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public UserEditModel Model { get; set; }
+}

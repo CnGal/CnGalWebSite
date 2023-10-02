@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.ProjectSite.Shared.Models.Themes;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace CnGalWebSite.ProjectSite.Shared.Services.Themes
     public class SettingService:ISettingService
     {
         private readonly ILocalStorageService _localStorageService;
+        private readonly IJSRuntime _jsruntime;
 
         private SettingModel _settings = new();
 
@@ -25,9 +27,10 @@ namespace CnGalWebSite.ProjectSite.Shared.Services.Themes
         /// </summary>
         public bool IsApp { get; set; }
 
-        public SettingService(ILocalStorageService localStorageService)
+        public SettingService(ILocalStorageService localStorageService, IJSRuntime jsruntime)
         {
             _localStorageService = localStorageService;
+            _jsruntime = jsruntime;
         }
 
         public async Task LoadAsync()
@@ -46,10 +49,28 @@ namespace CnGalWebSite.ProjectSite.Shared.Services.Themes
                 Reset();
             }
 
+            await CheckTheme();
+
             //保存
             await _localStorageService.SetItemAsync(_key, _settings);
 
             OnSettingChanged();
+        }
+
+        /// <summary>
+        /// 检查主题设置
+        /// </summary>
+        public async Task CheckTheme()
+        {
+            //获取系统主题
+            if (_settings.ThemeMode == ThemeMode.System)
+            {
+                _settings.IsDark = await _jsruntime.InvokeAsync<bool>("checkSystemThemeIsDark");
+            }
+            else
+            {
+                _settings.IsDark = _settings.ThemeMode == ThemeMode.Dark;
+            }
         }
 
         private void Reset()

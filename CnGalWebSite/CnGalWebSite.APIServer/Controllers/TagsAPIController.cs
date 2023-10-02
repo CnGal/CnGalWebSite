@@ -954,7 +954,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             Id=item.Id,
                             ReaderCount=item.ReaderCount
                         }),
-                        Audio = item.Audio.Select(s => new AudioViewModel
+                        Audio = item.Audio.Select(s => new EditAudioAloneModel
                         {
                             BriefIntroduction = s.BriefIntroduction,
                             Duration = s.Duration,

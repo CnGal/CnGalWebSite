@@ -1,0 +1,84 @@
+﻿/*橱窗小卡片*/
+.info-card-stall .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.info-card-stall .info-card {
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-card-stall .user-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+}
+
+.info-card-stall .info-card img {
+    width: 2rem;
+    border-radius: 50%;
+}
+
+.info-card-stall .price-card {
+    display: flex;
+    align-items: flex-end;
+}
+
+.info-card-stall .name-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+    .info-card-stall .name-card .tag-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+/*信息卡片*/
+.stall-info-card {
+    gap: 1rem;
+}
+
+    .stall-info-card .user-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+
+
+        .stall-info-card .user-card img {
+            width: 3rem;
+            border-radius: 50%;
+        }
+/*介绍卡片*/
+.stall-description-card {
+    gap: 2rem;
+}
+
+    .stall-description-card .head-card {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
+
+    .stall-description-card .content-card {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        white-space: break-spaces;
+    }
+
+    .stall-description-card .tag-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+/*剧本卡片*/
+.stall-text-card .content-card{
+    white-space: break-spaces;
+}

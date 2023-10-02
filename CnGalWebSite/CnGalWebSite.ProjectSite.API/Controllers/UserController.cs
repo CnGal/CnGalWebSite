@@ -9,6 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.Core.Models;
 using System.Xml.Linq;
 using CnGalWebSite.ProjectSite.API.Services.Projects;
+using CnGalWebSite.ProjectSite.API.Services.Stalls;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Stalls;
+using System.Collections.Generic;
+using CnGalWebSite.DataModel.ViewModel.Space;
+using CnGalWebSite.Core.Services.Query;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -20,14 +25,18 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IProjectService _projectService;
+        private readonly IStallService _stallService;
+        private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IRepository<ApplicationUser, string> userRepository, IProjectService projectService)
+        public UserController(ILogger<UserController> logger, IUserService userService, IRepository<ApplicationUser, string> userRepository, IProjectService projectService, IStallService stallService, IQueryService queryService)
         {
             _logger = logger;
             _userService = userService;
             _userRepository = userRepository;
             _projectService=projectService;
+            _stallService = stallService;
+            _queryService = queryService;
         }
 
         [HttpGet]
@@ -57,6 +66,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var admin = _userService.CheckCurrentUserRole("Admin");
 
             var item = await _userRepository.GetAll()
+                .Include(s => s.Images)
+                .Include(s => s.Texts)
+                .Include(s => s.Audios)
                 .FirstOrDefaultAsync(s => s.Id == id && (s.Id == user.Id || admin));
 
             if (item == null)
@@ -74,7 +86,30 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 PersonDescription = item.PersonDescription,
                 PersonName = item.PersonName,
                 Type = item.Type,
-                Id = item.Id
+                Id = item.Id,
+                Images = item.Images.Select(s => new UserImageEditModel
+                {
+                    Id = s.Id,
+                    Image = s.Image,
+                    Note = s.Note,
+                    Priority = s.Priority,
+                }).ToList(),
+                Audios = item.Audios.Select(s => new EditAudioAloneModel
+                {
+                    BriefIntroduction = s.BriefIntroduction,
+                    Duration = s.Duration,
+                    Id = s.Id,
+                    Name = s.Name,
+                    Priority = s.Priority,
+                    Thumbnail = s.Thumbnail,
+                    Url = s.Url,
+                }).ToList(),
+                Texts = item.Texts.Select(s => new UserTextEditModel
+                {
+                    Name = s.Name,
+                    Content = s.Content,
+                    Id = s.Id
+                }).ToList(),
             };
 
             return model;
@@ -87,6 +122,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var admin = _userService.CheckCurrentUserRole("Admin");
 
             var item = await _userRepository.GetAll()
+                .Include(s => s.Images)
+                .Include(s => s.Texts)
+                .Include(s => s.Audios)
                 .FirstOrDefaultAsync(s => s.Id == model.Id && (s.Id == user.Id || admin));
 
             if (item == null)
@@ -102,6 +140,78 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             item.PersonDescription = model.PersonDescription;
             item.PersonName = model.PersonName;
 
+            //相册
+            item.Images.RemoveAll(s => model.Images.Select(s => s.Id).Contains(s.Id) == false);
+            foreach (var info in item.Images)
+            {
+                var temp = model.Images.FirstOrDefault(s => s.Id == info.Id);
+                if (temp != null)
+                {
+                    info.Image = temp.Image;
+                    info.Note = temp.Note;
+                    info.Priority = temp.Priority;
+                    info.UpdateTime = DateTime.Now.ToCstTime();
+                }
+            }
+            item.Images.AddRange(model.Images.Where(s => s.Id == 0).Select(s => new UserImage
+            {
+                Image = s.Image,
+                Note = s.Note,
+                Priority = s.Priority,
+                UpdateTime = DateTime.Now.ToCstTime(),
+                CreateTime = DateTime.Now.ToCstTime(),
+                CreateUserId = user.Id,
+            }));
+            //音频
+            item.Audios.RemoveAll(s => model.Audios.Select(s => s.Id).Contains(s.Id) == false);
+            foreach (var info in item.Audios)
+            {
+                var temp = model.Audios.FirstOrDefault(s => s.Id == info.Id);
+                if (temp != null)
+                {
+                    info.BriefIntroduction = temp.BriefIntroduction;
+                    info.Duration = temp.Duration;
+                    info.Name = temp.Name;
+                    info.Priority = temp.Priority;
+                    info.Thumbnail = temp.Thumbnail;
+                    info.Url = temp.Url;
+                    info.UpdateTime = DateTime.Now.ToCstTime();
+                }
+            }
+            item.Audios.AddRange(model.Audios.Where(s => s.Id == 0).Select(s => new UserAudio
+            {
+                BriefIntroduction = s.BriefIntroduction,
+                Duration = s.Duration,
+                Id = s.Id,
+                Name = s.Name,
+                Priority = s.Priority,
+                Thumbnail = s.Thumbnail,
+                Url = s.Url,
+                UpdateTime = DateTime.Now.ToCstTime(),
+                CreateTime = DateTime.Now.ToCstTime(),
+                CreateUserId = user.Id,
+            }));
+            //文本
+            item.Texts.RemoveAll(s => model.Texts.Select(s => s.Id).Contains(s.Id) == false);
+            foreach (var info in item.Texts)
+            {
+                var temp = model.Texts.FirstOrDefault(s => s.Id == info.Id);
+                if (temp != null)
+                {
+                    info.Name = temp.Name;
+                    info.Content = temp.Content;
+                    info.UpdateTime = DateTime.Now.ToCstTime();
+                }
+            }
+            item.Texts.AddRange(model.Texts.Where(s => s.Id == 0).Select(s => new UserText
+            {
+                Name = s.Name,
+                Content = s.Content,
+                UpdateTime = DateTime.Now.ToCstTime(),
+                CreateTime= DateTime.Now.ToCstTime(),
+                CreateUserId=user.Id,
+            }));
+
             item.UpdateTime = DateTime.Now.ToCstTime();
 
             await _userRepository.UpdateAsync(item);
@@ -115,7 +225,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var user = await _userService.GetCurrentUserAsync();
             var admin = _userService.CheckCurrentUserRole("Admin");
 
-            if (model.Id != user.Id &&! admin)
+            if (model.Id != user.Id && !admin)
             {
                 return new Result { Success = false, Message = "权限不足" };
             }
@@ -125,6 +235,22 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             return new Result { Success = true };
         }
 
+        [Authorize(Roles ="Admin")]
+        [HttpPost]
+        public async Task<Result> ChangeTagsAsync(UserChangeTagsModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+            var admin = _userService.CheckCurrentUserRole("Admin");
+
+            if ( !admin)
+            {
+                return new Result { Success = false, Message = "权限不足" };
+            }
+
+            await _userRepository.GetAll().Where(s => s.Id == model.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.Tags, b => model.Tags));
+
+            return new Result { Success = true };
+        }
 
         [AllowAnonymous]
         [HttpGet]
@@ -139,12 +265,64 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
            var user = await _userRepository.GetAll().AsNoTracking()
                 .Include(s => s.Projects).ThenInclude(s=>s.Positions)
+                .Include(s=>s.Stalls).ThenInclude(s=>s.Images)
+                .Include(s => s.Images)
+                .Include(s => s.Texts)
+                .Include(s => s.Audios)
                 .FirstOrDefaultAsync(s => s.Id == userinfo.Id);
 
             return new UserSpaceViewModel
             {
+                TabIndex= user.Type== UserType.Person? 2 : 0,
                 UserInfo = userinfo,
-                projects = user.Projects.Select(s => _projectService.GetProjectInfoViewModel(s)).ToList()
+                Projects = user.Projects.Select(s => _projectService.GetProjectInfoViewModel(s)).ToList(),
+                Stalls = user.Stalls.Select(s => _stallService.GetStallInfoViewModel(s, user)).ToList(),
+                Images = user.Images.Select(s => new UserImageViewModel
+                {
+                    Image = s.Image,
+                    Note = s.Note,
+                    Priority = s.Priority,
+                }).ToList(),
+                Audios = user.Audios.Select(s => new EditAudioAloneModel
+                {
+                    BriefIntroduction = s.BriefIntroduction,
+                    Duration = s.Duration,
+                    Id = s.Id,
+                    Name = s.Name,
+                    Priority = s.Priority,
+                    Thumbnail = s.Thumbnail,
+                    Url = s.Url,
+                }).ToList(),
+                Texts = user.Texts.Select(s => new UserTextViewModel
+                {
+                    Name = s.Name,
+                    Content = s.Content
+                }).ToList(),
+            };
+        }
+
+        [Authorize(Roles ="Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<UserOverviewModel>> List(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText)));
+
+            return new QueryResultModel<UserOverviewModel>
+            {
+                Items = await items.Select(s => new UserOverviewModel
+                {
+                    Id = s.Id,
+                    Avatar = s.Avatar,
+                    BackgroundImage = s.BackgroundImage,
+                    Name = s.UserName,
+                    RegistTime = s.RegistTime,
+                    Email = s.Email,
+                    Type = s.Type,
+                    Tags=s.Tags,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
             };
         }
     }

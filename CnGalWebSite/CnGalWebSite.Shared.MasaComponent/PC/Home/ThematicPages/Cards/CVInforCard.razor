@@ -8,7 +8,7 @@
             <img class="w-100 mb-2 ps-2 pe-2" src="@Model.Infor.MainImage" style="border-radius: 50%;">
             <div class="mb-1 text-truncate-2 on-surface-text" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
         </a>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2"/>
+        <CnGalWebSite.Components.Audios.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2"/>
 
        
     </MDCard>
@@ -21,7 +21,7 @@ else
         <img class="w-100 mb-2" src="@Model.Infor.MainImage" style="border-radius: 50%;">
             <div class="title-large mb-2 text-truncate-2 on-surface-text" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
     </a>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2" />
+    <CnGalWebSite.Components.Audios.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2" />
 
 </MDCard>
 

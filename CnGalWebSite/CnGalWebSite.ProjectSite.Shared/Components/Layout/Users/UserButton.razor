@@ -2,6 +2,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IUserService _userService
+@implements IDisposable
 
 <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
      <ActivatorContent Context="m">
@@ -12,7 +13,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Icon Class="@Class" @attributes="@attrs">
+                <MButton Icon Class="me-4" @attributes="@attrs">
                      <CnGalWebSite.Components.Images.MasaImage Style="width: 35px; border-radius: 50%; aspect-ratio: 1" Src="@_userService.UserInfo.Avatar" Alt="@_userService.UserInfo.Name" Type="ImageType.Avatar" />
                  </MButton>
              </ActivatorContent>
@@ -35,7 +36,7 @@
              <div class="w-100" style="display: flex;flex-direction: column;">
                  <AuthorizeView Roles="Admin">
                      <Authorized>
-                         <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="管理员后台" Icon="mdi-car-traction-control" Href="/admin/index" Color="secondary" />
+                         <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="管理员后台" Icon="mdi-car-traction-control" Href="/admin" Color="secondary" />
                      </Authorized>
                 </AuthorizeView>
                  <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="个人空间" Icon="mdi-star" Href="@($"/user/space/{_userService.UserInfo.Id}")" />
@@ -47,14 +48,19 @@
     </ChildContent>
 </MMenu>
 
+@if(_userService.UserInfo.Type== UserType.Person)
+{
+    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Create.ToIconString()" Text="创建橱窗" Rounded Href="/stall/edit" />
+}
+else
+{
+    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Create.ToIconString()" Text="创建企划" Rounded Href="/project/edit" />
+}
+
 <CnGalWebSite.ProjectSite.Shared.Components.Layout.SettingDialog @ref="settingDialog" />
 
 
  @code {
-
-    [Parameter]
-    public string Class { get; set; }
-
     private bool menu { get; set; }
 
     CnGalWebSite.ProjectSite.Shared.Components.Layout.SettingDialog settingDialog;
@@ -67,6 +73,14 @@
     protected override async Task OnInitializedAsync()
     {
         await RefreshUserInfor();
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        _userService.UserInfoChanged += OnUserInfoChanged;
+
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
     }
 
     public async Task RefreshUserInfor()
@@ -100,5 +114,11 @@
     public void OnClickSetting()
     {
         settingDialog?.Refresh();
+    }
+
+    public void Dispose()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
     }
 }

@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Models;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
@@ -1446,7 +1447,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //读取音频信息
             var audioImage = entry.Audio.OrderByDescending(s => s.Priority).FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false)?.Thumbnail;
-            model.Audio.AddRange(entry.Audio.OrderByDescending(s => s.Priority).Select(s => new AudioViewModel
+            model.Audio.AddRange(entry.Audio.OrderByDescending(s => s.Priority).Select(s => new EditAudioAloneModel
             {
                 BriefIntroduction = s.BriefIntroduction,
                 Name = s.Name,

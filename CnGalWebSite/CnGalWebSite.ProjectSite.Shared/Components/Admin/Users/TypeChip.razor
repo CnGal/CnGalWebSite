@@ -1,0 +1,28 @@
+﻿
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Outlined Color="@GetColor(Type)" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()"/>
+
+
+ @code {
+    [Parameter]
+    public UserType Type { get; set; }
+
+    public string GetColor(UserType type)
+    {
+        return type switch
+        {
+            UserType.Person => "success",
+            UserType.Organization => "info",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(UserType type)
+    {
+        return type switch
+        {
+            UserType.Person => IconType.User,
+            UserType.Organization => IconType.Group,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

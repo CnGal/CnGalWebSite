@@ -34,6 +34,7 @@ using System.Threading.Tasks;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Operation = CnGalWebSite.DataModel.Model.Operation;
 using Microsoft.AspNetCore.Authentication;
+using CnGalWebSite.Core.Models;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {
@@ -546,7 +547,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             //处理音频
             if(entry.Audio!=null&&entry.Audio.Any())
             {
-                model.Audio.AddRange(entry.Audio.Select(s => new AudioViewModel
+                model.Audio.AddRange(entry.Audio.Select(s => new EditAudioAloneModel
                 {
                     BriefIntroduction = s.BriefIntroduction,
                     Duration = s.Duration,

@@ -17,6 +17,8 @@ namespace CnGalWebSite.Components.Extensions
             services.AddScoped(x => new ImagesLargeViewService());
             //文件上传
             services.AddScoped<IFileUploadService, FileUploadService>();
+            //Query
+            services.AddScoped<IQueryService, QueryService>();
             return services;
         }
     }

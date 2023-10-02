@@ -1,0 +1,15 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Color="info" Icon="IconType.User" Text="@Name" Outlined OnClick="OnClick" />
+
+ @code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo($"/user/space/{Id}");
+    }
+}

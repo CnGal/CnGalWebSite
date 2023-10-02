@@ -1,0 +1,14 @@
+﻿
+<MRow>
+    <MCol Cols="12">
+        <MTextField @bind-Value="Model.Name" Label="剧本名称" />
+    </MCol>
+    <MCol Cols="12">
+        <MTextarea Rows="6" @bind-Value="Model.Content" Label="剧本内容" />
+    </MCol>
+</MRow>
+
+@code {
+    [Parameter]
+    public StallTextEditModel Model { get; set; }
+}

@@ -9,22 +9,60 @@
 {
     <CnGalWebSite.ProjectSite.Shared.Components.Users.UserInfoCard Model="Model.UserInfo" />
 
-    <MDCard Class="mb-4">
-        <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
-             <MTab Value="0">
-                 企划<MIcon>@IconType.Project.ToIconString()</MIcon>
-             </MTab>
-             <MTab Value="1">
-                 作品<MIcon>@IconType.Shape.ToIconString()</MIcon>
-             </MTab>
-             <MTab Value="2">
-                 约稿<MIcon>mdi-script-text-outline</MIcon>
-             </MTab>
-         </MTabs>
-     </MDCard>
+    @if (Model.UserInfo.Type == UserType.Person)
+    {
+        <MDCard Class="mb-4">
+            <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+
+                 <MTab Value="2">
+                     橱窗<MIcon>@IconType.Stall.ToIconString()</MIcon>
+                 </MTab>
+                 <MTab Value="1">
+                     作品<MIcon>@IconType.Shape.ToIconString()</MIcon>
+                 </MTab>
+                 <MTab Value="0">
+                     企划<MIcon>@IconType.Project.ToIconString()</MIcon>
+                 </MTab>
+
+             </MTabs>
+         </MDCard>
+    }
+    else
+    {
+        <MDCard Class="mb-4">
+            <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+                 <MTab Value="0">
+                     企划<MIcon>@IconType.Project.ToIconString()</MIcon>
+                 </MTab>
+                 <MTab Value="1">
+                     作品<MIcon>@IconType.Shape.ToIconString()</MIcon>
+                 </MTab>
+                 <MTab Value="2">
+                     橱窗<MIcon>@IconType.Stall.ToIconString()</MIcon>
+                 </MTab>
+             </MTabs>
+         </MDCard>
+    }
+
     <MTabsItems Value="Model.TabIndex">
         <MTabItem Value="0">
-            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.ProjectGroupCard Model="Model.projects"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.ProjectGroupCard Model="Model.Projects" />
+        </MTabItem>
+        <MTabItem Value="1">
+            @if(Model.Texts.Any()||Model.Images.Any()||Model.Images.Any())
+            {
+                            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.ImageCard Model="Model" />
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.AudioCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.TextGroupCard Model="Model" />
+
+            }
+            else
+            {
+                <NotFoundCard Fill/>
+            }
+        </MTabItem>
+        <MTabItem Value="2">
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.StallGroupCard Model="Model.Stalls" />
         </MTabItem>
     </MTabsItems>
 

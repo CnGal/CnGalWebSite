@@ -48,7 +48,7 @@
         {
             try
             {
-                Model = await _httpService.GetAsync<ProjectEditModel>($"api/project/edit?id={Id}");
+                Model = await _httpService.GetAsync<ProjectEditModel>($"api/project/edit?id={Id??"0"}");
                 StateHasChanged();
             }
             catch (Exception ex)

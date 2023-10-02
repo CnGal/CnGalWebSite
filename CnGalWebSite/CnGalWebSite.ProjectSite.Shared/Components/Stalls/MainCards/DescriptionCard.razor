@@ -1,0 +1,25 @@
+﻿<MDCard Class="stall-description-card mb-4 pa-4">
+    <div class="head-card">
+        <div class="headline-large">@Model.Name</div>
+        <div class="tag-card">
+            <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+             @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+            {
+                <MChip Small Color="primary">@Model.Type</MChip>
+            }
+        </div>
+    </div>
+    <div class="content-card">
+        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Stall" Title="橱窗详情" />
+        <div>@Model.Description</div>
+    </div>
+    <div class="content-card">
+        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Link" Title="联系方式" />
+        <div>@Model.Contact</div>
+    </div>
+</MDCard>
+
+@code {
+    [Parameter]
+    public StallViewModel Model { get; set; }
+}

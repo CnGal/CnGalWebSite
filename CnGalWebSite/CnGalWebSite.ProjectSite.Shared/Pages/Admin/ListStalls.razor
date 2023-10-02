@@ -1,0 +1,58 @@
+﻿@page "/admin/liststalls"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="StallOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == nameof(StallOverviewModel.UserName))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(StallOverviewModel.Name))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.StallChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(StallOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(StallOverviewModel.EndTime))
+            {
+                @context.Item.EndTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+
+
+@code {
+    private string _baseUrl = "api/stall/list";
+    private string _name = "橱窗";
+
+    private List<DataTableHeader<StallOverviewModel>> _headers = new List<DataTableHeader<StallOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(StallOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(StallOverviewModel.Name)},
+          new (){ Text= "结束时间", Value= nameof(StallOverviewModel.EndTime)},
+          new (){ Text= "创建时间", Value= nameof(StallOverviewModel.CreateTime)},
+          new (){ Text= "报价 ￥", Value= nameof(StallOverviewModel.Price)},
+          new (){ Text= "创建者", Value= nameof(StallOverviewModel.UserName),Sortable=false},
+    };
+
+    DataTableCard<StallOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+}

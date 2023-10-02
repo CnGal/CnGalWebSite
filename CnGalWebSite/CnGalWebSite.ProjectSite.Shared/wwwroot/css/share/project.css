@@ -1,19 +1,21 @@
-﻿/*用户卡片*/
-.project-user-card {
-    align-items: center;
-    gap: .5rem;
-}
-
-    .project-user-card img {
-        width: 7rem;
-        border-radius: 50%;
-    }
-
+﻿
 /*信息卡片*/
 .project-info-card {
     gap: 1rem;
 }
 
+    .project-info-card .user-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+
+
+        .project-info-card .user-card img {
+            width: 3rem;
+            border-radius: 50%;
+        }
 /*介绍卡片*/
 .project-description-card {
     gap: 2rem;
@@ -54,4 +56,14 @@
         gap: .5rem;
         display: flex;
         flex-wrap: wrap;
+    }
+/*企划小卡片*/
+.info-card-project {
+    gap: .5rem;
+}
+
+    .info-card-project .info-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
     }

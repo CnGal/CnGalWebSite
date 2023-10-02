@@ -1,0 +1,61 @@
+﻿@inject NavigationManager NavigationManager
+
+<MList Dense Shaped Style="@Style" Class="@Class">
+     <MListItemGroup Value="selectedItem" ValueChanged="ValueChanged">
+         @foreach (var item in items)
+        {
+            <MBorder Value="@(selectedItem == item.Text)" Offset="false" Width="4">
+                <MListItem Value="@item.Text">
+                    <MListItemIcon>
+                        <MIcon Color="primary">@item.Icon.ToIconString()</MIcon>
+                    </MListItemIcon>
+                    <MListItemContent>
+                        <MListItemTitle>@item.Text</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MBorder>
+        }
+    </MListItemGroup>
+</MList>
+
+@code {
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    readonly (string Text, IconType Icon, string Url)[] items = new[]
+    {
+        ( "概览",IconType.Data ,"admin"),
+        ( "用户",IconType.User ,"admin/listusers"),
+        ( "企划",IconType.Project ,"admin/listprojects"),
+        ( "橱窗",IconType.Stall ,"admin/liststalls"),
+    };
+
+    bool offset;
+    StringNumber selectedItem = "概览";
+
+    protected override void OnInitialized()
+    {
+        var item = items.FirstOrDefault(s => s.Url == NavigationManager.Uri.Replace(NavigationManager.BaseUri, ""));
+
+        selectedItem = item.Text ?? "概览";
+    }
+
+    public void ValueChanged(StringNumber index)
+    {
+        if (index != null)
+        {
+            selectedItem = index;
+
+            var item = items.FirstOrDefault(s => s.Text == index.ToString());
+            if (string.IsNullOrWhiteSpace(item.Url) == false)
+            {
+                NavigationManager.NavigateTo(item.Url);
+            }
+        }
+
+
+    }
+
+}

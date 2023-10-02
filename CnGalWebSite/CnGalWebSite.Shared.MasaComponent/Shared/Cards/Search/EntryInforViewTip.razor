@@ -2,7 +2,7 @@
 <InfoCard Href="@(AllowNav?("/entries/index/" + Model.Id):null)" BriefIntroduction="@Model.BriefIntroduction" Image="@Model.MainImage" InfoItems="GetInfoItems()" Name="@Model.Name" Type="@(ShowType?Model.Type.GetDisplayName():"")" Outline="Outline"
           Thumbnail="Model.Type == EntryType.Role || Model.Type == EntryType.Staff" BigCardStyle="BigCardStyle" AddInfors="Model.AddInfors" ShowAddInfors="ShowAddInfors" IsEdit="IsEdit">
     <TitleContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
+        <CnGalWebSite.Components.Audios.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
     </TitleContent>
 </InfoCard>
 

@@ -1,0 +1,35 @@
+﻿@using CnGalWebSite.Components.Services;
+@inject ImagesLargeViewService ImagesLargeViewService
+
+
+@if (Model.Images.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Image.ToIconString()" Title="图片" Outline Collapable>
+         <MRow>
+             @foreach (var item in Model.Images)
+            {
+                <MCol Cols="12" Sm="6" Md="4" Lg="3" Xl="2" Class="mb-4">
+                    <MDCard OnClick="@(()=>OnClickImage(item))" Class="pointer">
+                        <CnGalWebSite.Components.Images.MasaImage Src="@item.Image" Alt="@item.Note" Class="w-100 " />
+                    </MDCard>
+                </MCol>
+            }
+
+        </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+
+
+@code {
+    [Parameter]
+    public UserSpaceViewModel Model { get; set; }
+
+    public async void OnClickImage(UserImageViewModel model)
+    {
+        await ImagesLargeViewService.ViewLargeImages(Model.Images.Select(s => new ImagesLargeViewModel
+            {
+                Image = s.Image,
+                Note = s.Note
+            }).ToList(), Model.Images.IndexOf(model));
+    }
+}

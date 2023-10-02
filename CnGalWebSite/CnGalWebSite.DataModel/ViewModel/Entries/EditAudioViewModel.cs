@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.DataModel.ViewModel.Entries
 {
@@ -30,20 +32,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         }
     }
 
-    public class EditAudioAloneModel
-    {
-        [Display(Name = "名称")]
-        public string Name { get; set; }
-        [Display(Name = "简介")]
-        public string BriefIntroduction { get; set; }
-        [Display(Name = "链接")]
-        public string Url { get; set; }
-        [Display(Name = "优先级")]
-        public int Priority { get; set; }
-        [Display(Name = "时长")]
-        public TimeSpan Duration { get; set; }
-        [Display(Name = "缩略图")]
-        public string Thumbnail { get; set; }
-    }
+
 
 }
