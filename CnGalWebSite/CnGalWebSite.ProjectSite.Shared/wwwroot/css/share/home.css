@@ -1,0 +1,50 @@
+﻿/*访谈*/
+.home-interview-card .item {
+    height: 100%;
+}
+
+    .home-interview-card .item .head {
+        padding: 1rem;
+        height: 100%;
+    }
+
+    .home-interview-card .item .content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: .5rem;
+        justify-content: space-around;
+    }
+/*友情链接*/
+.home-friend-links-card .group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.home-friend-links-card .item {
+    display: flex;
+    flex-direction: column;
+    width: 11rem;
+}
+
+.home-friend-links-card .content {
+    padding: .7rem;
+}
+/*流浪*/
+.home-article-card {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+    .home-article-card img {
+        width: 20rem;
+    }
+
+    .home-article-card .content-card {
+        display: flex;
+        gap: .5rem;
+        flex-direction: column;
+    }

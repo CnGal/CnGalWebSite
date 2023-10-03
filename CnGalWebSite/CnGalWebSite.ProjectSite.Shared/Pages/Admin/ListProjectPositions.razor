@@ -1,0 +1,141 @@
+﻿@page "/admin/listprojectpositions"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="ProjectPositionOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 130px;">
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.Hide)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+
+                </div>
+            }
+            else if (context.Header.Value == nameof(ProjectPositionOverviewModel.ProjectId))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.ProjectChip Id="@context.Item.ProjectId" Name="@context.Item.ProjectName" />
+            }
+            else if (context.Header.Value == nameof(ProjectPositionOverviewModel.Hide))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.HideChip Hide="@context.Item.Hide" />
+            }
+            else if (context.Header.Value == nameof(ProjectPositionOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(ProjectPositionOverviewModel.DeadLine))
+            {
+                @context.Item.DeadLine.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(ProjectPositionOverviewModel.PositionType))
+            {
+                @context.Item.PositionType.GetDisplayName()
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+
+
+@code {
+    private string _baseUrl = "api/project/listpositions";
+    private string _name = "约稿";
+
+    private List<DataTableHeader<ProjectPositionOverviewModel>> _headers = new List<DataTableHeader<ProjectPositionOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ProjectPositionOverviewModel.Id)
+          },
+          new (){ Text= "企划", Value= nameof(ProjectPositionOverviewModel.ProjectId)},
+          new (){ Text= "截止日期", Value= nameof(ProjectPositionOverviewModel.DeadLine)},
+          new (){ Text= "创建时间", Value= nameof(ProjectPositionOverviewModel.CreateTime)},
+          new (){ Text= "类型", Value= nameof(ProjectPositionOverviewModel.PositionType)},
+          new (){ Text= "类型名称", Value= nameof(ProjectPositionOverviewModel.PositionTypeName)},
+          new (){ Text= "细分类型", Value= nameof(ProjectPositionOverviewModel.Type)},
+          new (){ Text= "优先级", Value= nameof(ProjectPositionOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(ProjectPositionOverviewModel.Hide)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<ProjectPositionOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task EditItemPriority(ProjectPositionOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditPriorityModel, Result>("api/project/EditPositionPriority", new EditPriorityModel { Id = model.Id, PlusPriority = up ? 1 : -1 });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(ProjectPositionOverviewModel model, bool isHidden)
+    {
+        string operationName = isHidden ? "隐藏" : "显示";
+        try
+        {
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/project/HidePosition", new HideModel { Id = model.Id, Hide = isHidden });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+}

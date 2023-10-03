@@ -1,0 +1,131 @@
+﻿@page "/admin/listfriendlinks"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="FriendLinkOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 130px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(CarouselOverviewModel.Image))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.ImageChip Image="@context.Item.Image" />
+            }
+            else if (context.Header.Value == nameof(CarouselOverviewModel.Link))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Carousels.LinkChip Link="@context.Item.Link" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.ProjectSite.Shared.Components.Admin.FriendLinks.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+@code {
+    private string _baseUrl = "api/admin/ListFriendLinks";
+    private string _name = "友情链接";
+
+    private List<DataTableHeader<FriendLinkOverviewModel>> _headers = new List<DataTableHeader<FriendLinkOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(FriendLinkOverviewModel.Id)
+          },
+          new (){ Text= "图片", Value= nameof(FriendLinkOverviewModel.Image)},
+          new (){ Text= "备注", Value= nameof(FriendLinkOverviewModel.Name)},
+          new (){ Text= "链接", Value= nameof(FriendLinkOverviewModel.Link)},
+          new (){ Text= "优先级", Value= nameof(FriendLinkOverviewModel.Priority)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<FriendLinkOverviewModel> dataTableCard;
+
+    CnGalWebSite.ProjectSite.Shared.Components.Admin.FriendLinks.EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void EditItem(FriendLinkOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public async Task EditItemPriority(FriendLinkOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditPriorityModel, Result>("api/admin/EditFriendLinkPriority", new EditPriorityModel { Id = model.Id, PlusPriority = up ? 1 : -1 });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

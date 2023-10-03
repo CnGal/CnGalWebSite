@@ -16,7 +16,7 @@ else
                     @ButtonContent
                     @if (ShowMoreButton)
                     {
-                        <MButton Small="Small" Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore">
+                        <MButton Small="Small" Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore" Href="@Href" Target="@Target">
                              <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
                          查看详情
                      </MButton>
@@ -78,6 +78,10 @@ else
     public bool Small { get; set; }
     [Parameter]
     public string SectionId { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
+    public string Target { get; set; } = "_self";
     [Parameter]
     public EventCallback<bool> IsCollapsedChanged { get; set; }
     [Parameter]

@@ -14,6 +14,7 @@
       "wwwroot/css/share/user.css",
       "wwwroot/css/share/edit.css",
       "wwwroot/css/share/project.css",
+      "wwwroot/css/share/home.css",
       "wwwroot/css/share/stall.css"
     ]
   },

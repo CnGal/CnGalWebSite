@@ -1,0 +1,120 @@
+﻿@page "/project"
+
+@inject IPageModelCatche<List<ProjectInfoViewModel>> _pageModelCatche
+@inject ISettingService _settingService
+@inject IProjectService _projectService
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划" />
+
+
+@if (Items != null)
+{
+    <MDCard Class="mb-4">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" display: flex; width: 100%; align-items: center;")">
+                <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_projectService.SearchString" ValueChanged="SearchValueChanged" OnKeyDown="OnKeyDown" Class="pt-0" Label="搜索"></MTextField>
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_projectService.SortType" ValueChanged="SortValueChanged" TValue="ProjectSortType" Class="pt-0" Label="排序" />
+            </div>
+        </div>
+    </MDCard>
+    @if (Items.Any())
+    {
+            <MRow>
+        @foreach (var item in Items)
+        {
+            <MCol Cols="12" Md="6" Class="mb-4">
+                <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.ProjectInfoCard Model="item" />
+            </MCol>
+        }
+    </MRow>
+    }
+    else
+    {
+        <NotFoundCard Fill/>
+    }
+
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
+
+@code {
+
+    List<ProjectInfoViewModel> Model;
+    List<ProjectInfoViewModel> Items;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/project/getall");
+            Refresh();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取企划列表数据失败");
+        }
+    }
+
+    public void Refresh()
+    {
+        Items = Model;
+
+        var searchString = _projectService.SearchString;
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+            
+        }
+        else
+        {
+            Items = Items.Where(s => (s.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Name) == false && (searchString?.Contains(s.Name) ?? false)) ||
+                      (s.Description?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Description) == false && (searchString?.Contains(s.Description) ?? false)) ||
+                      (s.UserInfo.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.UserInfo.Name) == false && (searchString?.Contains(s.UserInfo.Name) ?? false)))
+                       .ToList();
+        }
+
+
+        Items = _projectService.SortType switch
+        {
+            ProjectSortType.Default => Items.OrderByDescending(s => s.Priority).ToList(),
+            ProjectSortType.BudgetMax => Items.OrderByDescending(s => s.BudgetMax).ToList(),
+            ProjectSortType.BudgetMin => Items.OrderByDescending(s => s.BudgetMin).ToList(),
+            ProjectSortType.UpdateTime => Items.OrderByDescending(s => s.UpdateTime).ToList(),
+            ProjectSortType.CreateTime => Items.OrderByDescending(s => s.CreateTime).ToList(),
+            ProjectSortType.Percentage => Items.OrderByDescending(s => s.Percentage).ToList(),
+            _ => Items
+        };
+
+        StateHasChanged();
+    }
+
+    public void SortValueChanged(ProjectSortType type)
+    {
+        _projectService.SortType = type;
+        Refresh();
+    }
+
+    public void SearchValueChanged(string str)
+    {
+        _projectService.SearchString = str;
+        Refresh();
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Refresh();
+        }
+    }
+
+}

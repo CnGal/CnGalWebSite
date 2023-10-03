@@ -1,0 +1,161 @@
+﻿@page "/stall"
+
+@inject IPageModelCatche<List<StallInfoViewModel>> _pageModelCatche
+@inject ISettingService _settingService
+@inject IStallService _stallService
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划" />
+
+
+@if (Items != null)
+{
+    <MDCard Class="mb-4">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" display: flex; width: 100%; align-items: center;")">
+                <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_stallService.SearchString" ValueChanged="SearchValueChanged" OnKeyDown="OnKeyDown" Class="pt-0" Label="搜索"></MTextField>
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_stallService.SortType" ValueChanged="SortValueChanged" TValue="StallSortType" Class="pt-0" Label="排序" />
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_stallService.ScreenType" ValueChanged="ScreenTypeValueChanged" TValue="StallScreenType" Class="pt-0" Label="分类" />
+            </div>
+        </div>
+    </MDCard>
+    @if (Items.Any())
+    {
+    <MRow>
+        @foreach (var item in _items)
+        {
+            <MCol Cols="@(_settingService.IsApp?6:4)">
+                @foreach (var info in item)
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.StallInfoCard Model="info" />
+                    </div>
+                }
+            </MCol>
+        }
+    </MRow>
+    }
+    else
+    {
+        <NotFoundCard Fill />
+    }
+
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
+
+@code {
+
+    List<StallInfoViewModel> Model;
+    List<StallInfoViewModel> Items;
+    List<List<StallInfoViewModel>> _items = new List<List<StallInfoViewModel>>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/stall/getall");
+            Refresh();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取企划列表数据失败");
+        }
+    }
+
+    public void Refresh()
+    {
+        Items = Model;
+
+        var searchString = _stallService.SearchString;
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+
+        }
+        else
+        {
+            Items = Items.Where(s => (s.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Name) == false && (searchString?.Contains(s.Name) ?? false)) ||
+                      (s.Description?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Description) == false && (searchString?.Contains(s.Description) ?? false)) ||
+                      (s.UserInfo.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.UserInfo.Name) == false && (searchString?.Contains(s.UserInfo.Name) ?? false)))
+                       .ToList();
+        }
+
+
+        Items = _stallService.ScreenType switch
+        {
+            StallScreenType.Programmer => Items.Where(s => s.PositionType == ProjectPositionType.Programmer).ToList(),
+            StallScreenType.CV => Items.Where(s => s.PositionType == ProjectPositionType.CV).ToList(),
+            StallScreenType.Other => Items.Where(s => s.PositionType == ProjectPositionType.Other).ToList(),
+            StallScreenType.Writer => Items.Where(s => s.PositionType == ProjectPositionType.Writer).ToList(),
+            StallScreenType.Music => Items.Where(s => s.PositionType == ProjectPositionType.Music).ToList(),
+            StallScreenType.Painter => Items.Where(s => s.PositionType == ProjectPositionType.Painter).ToList(),
+            _ => Items
+        };
+
+        Items = _stallService.SortType switch
+        {
+            StallSortType.Default => Items.OrderByDescending(s => s.Priority).ToList(),
+            StallSortType.Price => Items.OrderByDescending(s => s.Price).ToList(),
+            StallSortType.UpdateTime => Items.OrderByDescending(s => s.UpdateTime).ToList(),
+            StallSortType.CreateTime => Items.OrderByDescending(s => s.CreateTime).ToList(),
+            _ => Items
+        };
+
+        var count = (_settingService.IsApp ? 2 : 3);
+        _items.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            _items.Add(new List<StallInfoViewModel>());
+        }
+        var index = 0;
+        foreach (var item in Items)
+        {
+            _items[index].Add(item);
+            index++;
+            if (index == count)
+            {
+                index = 0;
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    public void SortValueChanged(StallSortType type)
+    {
+        _stallService.SortType = type;
+        Refresh();
+    }
+
+    public void ScreenTypeValueChanged(StallScreenType type)
+    {
+        _stallService.ScreenType = type;
+        Refresh();
+    }
+
+    public void SearchValueChanged(string str)
+    {
+        _stallService.SearchString = str;
+        Refresh();
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Refresh();
+        }
+    }
+
+}

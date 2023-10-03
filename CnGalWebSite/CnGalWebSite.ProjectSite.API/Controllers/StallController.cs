@@ -10,6 +10,8 @@ using CnGalWebSite.Core.Models;
 using System.Xml.Linq;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Projects;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
+using CnGalWebSite.ProjectSite.API.Services.Stalls;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -20,13 +22,15 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     {
         private readonly IRepository<Stall, long> _stallRepository;
         private readonly IUserService _userService;
+        private readonly IStallService _stallService;
         private readonly IQueryService _queryService;
 
-        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService)
+        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService)
         {
             _stallRepository = stallRepository;
             _userService = userService;
             _queryService= queryService;
+            _stallService = stallService;
         }
 
         [AllowAnonymous]
@@ -283,13 +287,46 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     CreateTime = s.CreateTime,
                     EndTime = s.EndTime,
                     Name = s.Name,
-                    UserId = s.CreateUser.Id,
+                    UserId = s.CreateUserId,
                     UserName = s.CreateUser.UserName,
                     Price = s.Price,
+                    Hide = s.Hide,
+                    Priority = s.Priority,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
             };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> HideAsync(HideModel model)
+        {
+            await _stallRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Hide, b => model.Hide));
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditPriorityAsync(EditPriorityModel model)
+        {
+            await _stallRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Success = true };
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<List<StallInfoViewModel>> GetAll()
+        {
+            var now = DateTime.Now.ToCstTime();
+            var projects = await _stallRepository.GetAll()
+                .Where(s => s.Priority > 0 && s.Hide == false && s.EndTime > now)
+                .Include(s => s.Images)
+                .Include(s => s.CreateUser)
+                .ToListAsync();
+
+            return projects.Select(s => _stallService.GetStallInfoViewModel(s)).ToList();
         }
     }
 }

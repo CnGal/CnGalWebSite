@@ -1,0 +1,15 @@
+﻿@inject IEventService _eventService
+@inject IJSRuntime JS
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Outlined Color="info" Icon="@IconType.Link" Text="@Link" OnClick="OnClick" />
+
+
+ @code {
+    [Parameter]
+    public string Link { get; set; }
+
+    public async Task OnClick()
+    {
+        await JS.InvokeAsync<string>("openNewPage", Link);
+    }
+}

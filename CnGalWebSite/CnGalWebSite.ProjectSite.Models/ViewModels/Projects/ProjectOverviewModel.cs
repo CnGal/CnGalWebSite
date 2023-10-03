@@ -28,5 +28,16 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public string UserName { get; set; }
 
         public string UserId { get; set; }
+
+        /// <summary>
+        /// 隐藏
+        /// </summary>
+        public bool Hide { get; set; }
+
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+
     }
 }

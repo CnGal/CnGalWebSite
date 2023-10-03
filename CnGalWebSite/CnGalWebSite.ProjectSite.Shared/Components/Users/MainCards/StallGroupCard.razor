@@ -1,10 +1,12 @@
-﻿@if (Model.Any())
+﻿@inject ISettingService _settingService
+
+@if (Model.Any())
 {
     <MRow>
 
         @foreach (var item in _items)
         {
-            <MCol Cols="12" Md="6" Lg="4" Xl="3">
+            <MCol Cols="@(_settingService.IsApp?6:4)">
                 @foreach (var info in item)
                 {
                     <div class="mb-4">
@@ -26,20 +28,22 @@ else
     [Parameter]
     public List<StallInfoViewModel> Model { get; set; }
 
-    List<StallInfoViewModel>[] _items = new List<StallInfoViewModel>[4];
+    List<List<StallInfoViewModel>> _items = new List<List<StallInfoViewModel>>();
 
     protected override void OnInitialized()
     {
-        for (var i = 0; i < 4; i++)
+        var count = (_settingService.IsApp ? 2 : 3);
+        _items.Clear();
+        for (var i = 0; i < count; i++)
         {
-            _items[i] = new List<StallInfoViewModel>();
+            _items.Add(new List<StallInfoViewModel>());
         }
         var index = 0;
         foreach (var item in Model)
         {
             _items[index].Add(item);
             index++;
-            if (index == 4)
+            if (index == count)
             {
                 index = 0;
             }

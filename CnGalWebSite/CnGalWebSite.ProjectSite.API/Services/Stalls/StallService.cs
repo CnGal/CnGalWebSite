@@ -17,6 +17,9 @@ namespace CnGalWebSite.ProjectSite.API.Services.Stalls
                 PositionTypeName = model.PositionTypeName,
                 Price = model.Price,
                 Type = model.Type,
+                CreateTime = model.CreateTime,
+                Priority = model.Priority,
+                UpdateTime = model.UpdateTime,
                 UserInfo=new Models.ViewModels.Users.UserInfoViewModel
                 {
                     Avatar=user?.Avatar??model.CreateUser?.Avatar,

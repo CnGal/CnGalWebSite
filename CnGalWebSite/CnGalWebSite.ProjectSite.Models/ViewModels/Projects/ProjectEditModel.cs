@@ -61,6 +61,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
             {
                 return new Result { Success = false, Message = "请填写企划名称" };
             }
+            if (string.IsNullOrWhiteSpace(Contact))
+            {
+                return new Result { Success = false, Message = "请填写联系方式" };
+            }
             if (string.IsNullOrWhiteSpace(Description) || Description.Length < 30)
             {
                 return new Result { Success = false, Message = "请填写企划详情，并不少于30个字" };

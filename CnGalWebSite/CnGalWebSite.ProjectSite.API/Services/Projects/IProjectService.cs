@@ -5,6 +5,7 @@ namespace CnGalWebSite.ProjectSite.API.Services.Projects
 {
     public interface IProjectService
     {
+        ProjectPositionInfoViewModel GetProjectPositionInfoViewModel(ProjectPosition model);
 
         ProjectInfoViewModel GetProjectInfoViewModel(Project model);
     }

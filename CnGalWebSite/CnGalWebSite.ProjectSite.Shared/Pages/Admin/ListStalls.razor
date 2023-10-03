@@ -7,13 +7,41 @@
 <MDCard>
     <DataTableCard TModel="StallOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
-            @if (context.Header.Value == nameof(StallOverviewModel.UserName))
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 130px;">
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.Hide)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+
+                </div>
+            }
+            else if (context.Header.Value == nameof(StallOverviewModel.UserId))
             {
                 <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
             }
             else if (context.Header.Value == nameof(StallOverviewModel.Name))
             {
                 <CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.StallChip Id="@context.Item.Id" Name="@context.Item.Name" />
+            }
+            else if (context.Header.Value == nameof(StallOverviewModel.Hide))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.HideChip Hide="@context.Item.Hide" />
             }
             else if (context.Header.Value == nameof(StallOverviewModel.CreateTime))
             {
@@ -48,11 +76,64 @@
           new (){ Text= "结束时间", Value= nameof(StallOverviewModel.EndTime)},
           new (){ Text= "创建时间", Value= nameof(StallOverviewModel.CreateTime)},
           new (){ Text= "报价 ￥", Value= nameof(StallOverviewModel.Price)},
-          new (){ Text= "创建者", Value= nameof(StallOverviewModel.UserName),Sortable=false},
+          new (){ Text= "创建者", Value= nameof(StallOverviewModel.UserId)},
+          new (){ Text= "优先级", Value= nameof(ProjectOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(ProjectOverviewModel.Hide)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
     DataTableCard<StallOverviewModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task EditItemPriority(StallOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditPriorityModel, Result>("api/stall/EditPriority", new EditPriorityModel { Id = model.Id, PlusPriority = up ? 1 : -1 });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(StallOverviewModel model, bool isHidden)
+    {
+        string operationName = isHidden ? "隐藏" : "显示";
+        try
+        {
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/stall/Hide", new HideModel { Id = model.Id, Hide = isHidden });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
 }

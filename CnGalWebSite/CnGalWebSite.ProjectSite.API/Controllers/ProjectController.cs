@@ -10,6 +10,8 @@ using System.Xml.Linq;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.ProjectSite.API.Services.Users;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
+using CnGalWebSite.ProjectSite.API.Services.Projects;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -19,14 +21,18 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IRepository<Project, long> _projectRepository;
+        private readonly IRepository<ProjectPosition, long> _projectPositionRepository;
         private readonly IUserService _userService;
+        private readonly IProjectService _projectService;
         private readonly IQueryService _queryService;
 
-        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService)
+        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService, IProjectService projectService, IRepository<ProjectPosition, long> projectPositionRepository)
         {
             _projectRepository = projectRepository;
             _userService = userService;
             _queryService = queryService;
+            _projectService = projectService;
+            _projectPositionRepository = projectPositionRepository;
         }
 
         [AllowAnonymous]
@@ -267,12 +273,105 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     CreateTime = s.CreateTime,
                     EndTime = s.EndTime,
                     Name = s.Name,
-                    UserId = s.CreateUser.Id,
+                    UserId = s.CreateUserId,
                     UserName = s.CreateUser.UserName,
+                    Hide=s.Hide,
+                    Priority = s.Priority,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
             };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> HideAsync(HideModel model)
+        {
+            await _projectRepository.GetAll().Where(s => model.Id==s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Hide, b => model.Hide));
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditPriorityAsync(EditPriorityModel model)
+        {
+            await _projectRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Success = true };
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<List<ProjectInfoViewModel>> GetAll()
+        {
+            var now = DateTime.Now.ToCstTime();
+            var projects = await _projectRepository.GetAll()
+                .Where(s => s.Priority > 0 && s.Hide == false&&s.EndTime> now)
+                .Include(s => s.Positions)
+                .Include(s=>s.CreateUser)
+                .ToListAsync();
+
+            return projects.Select(s => _projectService.GetProjectInfoViewModel(s)).ToList();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<List<ProjectPositionInfoViewModel>> GetAllPositions()
+        {
+            var now = DateTime.Now.ToCstTime();
+            var projects = await _projectPositionRepository.GetAll()
+                .Where(s => s.Priority > 0 && s.Hide == false && s.DeadLine > now)
+                .Include(s => s.Project).ThenInclude(s => s.CreateUser)
+                .ToListAsync();
+
+            return projects.Select(s => _projectService.GetProjectPositionInfoViewModel(s)).ToList();
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<QueryResultModel<ProjectPositionOverviewModel>> ListPositions(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<ProjectPosition, long>(_projectPositionRepository.GetAll().AsSingleQuery().Include(s => s.Project), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Description.Contains(model.SearchText) || s.Project.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<ProjectPositionOverviewModel>
+            {
+                Items = await items.Select(s => new ProjectPositionOverviewModel
+                {
+                    Id = s.Id,
+                    CreateTime = s.CreateTime,
+                    DeadLine = s.DeadLine,
+                    Description = s.Description,
+                    PositionType = s.PositionType,
+                    PositionTypeName = s.PositionTypeName,
+                    Type = s.Type,
+                    ProjectId=s.ProjectId,
+                    ProjectName=s.Project.Name,
+                    Hide = s.Hide,
+                    Priority = s.Priority,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> HidePositionAsync(HideModel model)
+        {
+            await _projectPositionRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Hide, b => model.Hide));
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditPositionPriorityAsync(EditPriorityModel model)
+        {
+            await _projectPositionRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Success = true };
         }
     }
 }

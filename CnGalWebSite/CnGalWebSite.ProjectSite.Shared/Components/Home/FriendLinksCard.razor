@@ -1,0 +1,43 @@
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<FriendLinkViewModel>> _pageModelCatche
+
+<div class="home-friend-links-card">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="友情链接" Icon="@IconType.Link.ToIconString()" Outline>
+
+        <div class="group">
+            @foreach (var item in _items)
+            {
+                <MDCard Class="item" Href="@item.Url" Target="_blank">
+                    <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                    <div class="content">
+                        <div class="name title-medium">@item.Name</div>
+                    </div>
+                </MDCard>
+            }
+        </div>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+</div>
+
+@code {
+
+    List<FriendLinkViewModel> _items { get; set; } = new List<FriendLinkViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListFriendLinks");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取主页友情链接列表失败");
+        }
+    }
+}

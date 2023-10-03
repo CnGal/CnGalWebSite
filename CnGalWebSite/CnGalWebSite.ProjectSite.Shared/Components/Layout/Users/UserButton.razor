@@ -28,7 +28,7 @@
              <div class="d-flex" style="align-items: center; flex-direction: column; ">
                  <CnGalWebSite.Components.Images.MasaImage Src="@_userService.UserInfo.Avatar" Alt="@_userService.UserInfo.Name" Style="width:60px;border-radius:50%;" Type="ImageType.Avatar" />
                  <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-                     <span class="title-large mb-1">@_userService.UserInfo.Name</span>
+                     <span class="title-large mb-1">@GetName()</span>
                      <MChip Small Color="primary">@_userService.UserInfo.Type.GetDisplayName()</MChip>
                  </div>
              </div>

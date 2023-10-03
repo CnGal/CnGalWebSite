@@ -5,6 +5,8 @@ using CnGalWebSite.Components.Extensions;
 using CnGalWebSite.ProjectSite.Shared.Services.Themes;
 using CnGalWebSite.ProjectSite.Shared.Services.Events;
 using CnGalWebSite.ProjectSite.Shared.Services.Users;
+using CnGalWebSite.ProjectSite.Shared.Services.Projects;
+using CnGalWebSite.ProjectSite.Shared.Services.Stalls;
 
 namespace CnGalWebSite.ProjectSite.Shared.Extensions
 {
@@ -36,6 +38,12 @@ namespace CnGalWebSite.ProjectSite.Shared.Extensions
             services.AddScoped<IEventService, EventService>();
             //用户
             services.AddScoped<IUserService, Userservice>();
+            //企划
+            services.AddScoped<IProjectService, ProjectService>();
+            //企划职位
+            services.AddScoped<IProjectPositionService, ProjectPositionService>();
+            //橱窗
+            services.AddScoped<IStallService, StallService>();
             return services;
         }
     }
