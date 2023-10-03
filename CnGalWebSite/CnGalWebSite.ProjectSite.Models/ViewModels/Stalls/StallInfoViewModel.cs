@@ -39,6 +39,21 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         public string Type { get; set; }
 
         /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdateTime { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateTime { get; set; }
+
+        /// <summary>
         /// 创建用户
         /// </summary>
         public UserInfoViewModel UserInfo { get; set; }=new UserInfoViewModel();

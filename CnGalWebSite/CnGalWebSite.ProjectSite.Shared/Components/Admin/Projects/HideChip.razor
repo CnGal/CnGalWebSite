@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(Hide?"隐藏":"展示")" />
+
+@code {
+    [Parameter]
+    public bool Hide { get; set; }
+
+    public string GetColor()
+    {
+        return Hide switch
+        {
+            false => "success",
+            true => "error"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return Hide switch
+        {
+            false => IconType.Read,
+            true => IconType.Hide,
+        };
+    }
+}

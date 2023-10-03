@@ -2,9 +2,14 @@
     <div class="title-large">@Model.Name</div>
     <div class="label-large text-truncate-3">@Model.Description</div>
     <div class="info-card">
-        <div class="d-flex label-large">
-            <MIcon Small Color="primary" Class="me-2">@IconType.DeterminedTime.ToIconString()</MIcon>@Model.EndTime.ToString("yyyy-MM-dd")
-         </div>
+
+        @if (Model.UserInfo != null)
+        {
+            <div class="user-card">
+                <CnGalWebSite.Components.Images.MasaImage Src="@Model.UserInfo.Avatar" Alt="@Model.UserInfo.Name" />
+                <div class="label-large fw-bold">@Model.UserInfo.Name</div>
+            </div>
+        }
 
         @if (Model.Percentage > 0)
         {
@@ -18,7 +23,15 @@
 
         @if (Model.BudgetMax == 0 && Model.Percentage == 0)
         {
-            <div class="title-large primary-text">为爱发电</div>
+            if(Model.PositionCount==0)
+            {
+                <div class="title-large primary-text">暂无约稿</div>
+            }
+            else
+            {
+                <div class="title-large primary-text">为爱发电</div>
+            }
+            
         }
     </div>
 </MDCard>

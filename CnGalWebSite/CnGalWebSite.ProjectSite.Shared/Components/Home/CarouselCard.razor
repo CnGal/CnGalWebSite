@@ -1,0 +1,44 @@
+﻿@inject IHttpService _httpService
+@inject IEventService _eventService
+@inject IPageModelCatche<List<CarouselViewModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+
+<div class="home-carousels-card mb-4">
+    <CnGalWebSite.ProjectSite.Shared.Components.Shared.MasaCarousel Model="Images"/>
+</div>
+
+@code {
+
+    private List<CarouselViewModel> Images = new List<CarouselViewModel>();
+    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Carousels = await _pageModelCatche.GetCache("api/home/GetHomeCarouselsView");
+
+            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
+            if (Carousels.Count >= 6)
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false).ToList().Random().Take(3));
+
+            }
+            else
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false));
+            }
+
+            //生成轮播结构数据
+            //await GenerateCarouselStructuredDataJson();
+
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
+        }
+    }
+}

@@ -1,0 +1,58 @@
+﻿@using CnGalWebSite.ProjectSite.Shared.Models.Home
+
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<SearchViewModel> _pageModelCatche
+@inject IConfiguration _configuration
+
+@if (Model != null)
+{
+    <div class="home-interview-card mb-4">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="访谈" Icon="@IconType.Article.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?Sort=PubulishTime%20desc&Types=Interview" Target="_blank">
+            <MSlideGroup ShowArrows="true" Class="slide-group-garp">
+                <ChildContent>
+                    @foreach (var item in Model.pagedResultDto.Data)
+                    {
+                        <MSlideItem>
+                            <div style="width:300px;">
+                                <MDCard Class="item" Href="@($"https://www.cngal.org/articles/index/{item.Article.Id}")" Target="_blank">
+                                    <img class="image" src="@item.Article.MainImage" alt="@item.Article.Name" loading="lazy" />
+                                    <div class="head">
+                                        <div class="content">
+                                            <div class="name text-truncate-2 title-medium">@item.Article.Name</div>
+                                            <div class="brief text-truncate-3  label-large">@item.Article.BriefIntroduction</div>
+                                        </div>
+                                    </div>
+                                </MDCard>
+                            </div>
+
+                        </MSlideItem>
+                    }
+                </ChildContent>
+            </MSlideGroup>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    </div>
+
+}
+
+@code {
+
+    SearchViewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<SearchViewModel>(_configuration["CnGalAPI"] + "api/home/Search?Types=Interview&Sort=PubulishTime%20desc");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取访谈文章列表失败");
+        }
+    }
+}

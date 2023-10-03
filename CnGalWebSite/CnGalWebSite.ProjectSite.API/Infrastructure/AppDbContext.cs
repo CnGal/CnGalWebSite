@@ -20,6 +20,8 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<UserImage> UserImages { get; set; }
         public DbSet<UserAudio> UserAudios { get; set; }
         public DbSet<UserText> UserTexts { get; set; }
+        public DbSet<Carousel> Carousels { get; set; }
+        public DbSet<FriendLink> FriendLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -61,11 +61,57 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// </summary>
         public List<StallTextEditModel> Texts { get; set; } = new List<StallTextEditModel>();
 
+        public override Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                return new Result { Success = false, Message = "请填写橱窗名称" };
+            }
+            if (string.IsNullOrWhiteSpace(Contact))
+            {
+                return new Result { Success = false, Message = "请填写联系方式" };
+            }
+            if (string.IsNullOrWhiteSpace(Description) || Description.Length < 10)
+            {
+                return new Result { Success = false, Message = "请填写橱窗详情，并不少于10个字" };
+            }
+
+            if (EndTime <= DateTime.Now)
+            {
+                return new Result { Success = false, Message = "截止日期必须大于当前日期" };
+            }
+
+
+            foreach (var item in Texts)
+            {
+                var result = item.Validate();
+                if (!result.Success)
+                {
+                    return result;
+                }
+            }
+
+            return new Result { Success = true };
+        }
     }
 
     public class StallTextEditModel:StallTextViewModel
     {
         public long Id { get; set; }
+
+        public Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                return new Result { Success = false, Message = "请填写剧本名称" };
+            }
+           
+            if (string.IsNullOrWhiteSpace(Content) || Content.Length < 30)
+            {
+                return new Result { Success = false, Message = "请填写剧本内容，并不少于30个字" };
+            }
+            return new Result { Success = true };
+        }
     }
 
     public class StallImageEditModel:BaseImageEditModel

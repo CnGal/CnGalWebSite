@@ -110,6 +110,70 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Carousel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Carousels");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.FriendLink", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FriendLinks");
+                });
+
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
                 {
                     b.Property<long>("Id")

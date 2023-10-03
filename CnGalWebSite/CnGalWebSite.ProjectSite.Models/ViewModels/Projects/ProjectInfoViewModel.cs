@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.ProjectSite.Models.DataModels;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,5 +35,30 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// 截止时间
         /// </summary>
         public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// 约稿数量
+        /// </summary>
+        public int PositionCount { get; set; }
+
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdateTime { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateTime { get; set; }
+
+        /// <summary>
+        /// 创建用户
+        /// </summary>
+        public UserInfoViewModel UserInfo { get; set; } = new UserInfoViewModel();
     }
 }

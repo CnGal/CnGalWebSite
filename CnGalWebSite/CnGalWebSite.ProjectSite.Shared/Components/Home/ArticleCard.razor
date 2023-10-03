@@ -1,0 +1,54 @@
+﻿@using CnGalWebSite.ProjectSite.Shared.Models.Home
+@inject IPageModelCatche<ArticleViewModel> _pageModelCatche
+@inject IConfiguration _configuration
+
+@if (Model != null)
+{
+    <MDCard Class="home-article-card pa-4 mb-4" Style="gap: 1rem;" Href="@Model.OriginalLink" Target="_blank">
+        @if (Left)
+        {
+              <div class="image-card">
+            <CnGalWebSite.Components.Images.MasaImage Src="@Image" Alt="@Model.DisplayName"/>
+        </div>
+        }
+        
+      
+        <div class="content-card">
+            <div class="title-large">@Model.DisplayName</div>
+            <div class="title-medium">原文作者：@Model.OriginalAuthor</div>
+            <div class="label-large">  @((MarkupString)Model.MainPage)</div>
+        </div>
+        @if (!Left)
+        {
+            <div class="image-card">
+                <CnGalWebSite.Components.Images.MasaImage Src="@Image" Alt="@Model.DisplayName" />
+            </div>
+        }
+    </MDCard>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public bool Left { get; set; }
+
+    ArticleViewModel Model;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache(_configuration["CnGalAPI"] + "api/articles/GetArticleView/"+Id);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取CnGal文章失败失败");
+        }
+    }
+}

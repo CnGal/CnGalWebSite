@@ -1,0 +1,177 @@
+﻿@page "/position"
+
+@inject IPageModelCatche<List<ProjectPositionInfoViewModel>> _pageModelCatche
+@inject ISettingService _settingService
+@inject IProjectPositionService _projectPositionService
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划" />
+
+
+@if (Items != null)
+{
+    <MDCard Class="mb-4">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" display: flex; width: 100%; align-items: center;")">
+                <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_projectPositionService.SearchString" ValueChanged="SearchValueChanged" OnKeyDown="OnKeyDown" Class="pt-0" Label="搜索"></MTextField>
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_projectPositionService.SortType" ValueChanged="SortValueChanged" TValue="ProjectPositionSortType" Class="pt-0" Label="排序" />
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_projectPositionService.TypeScreenType" ValueChanged="TypeScreenTypeValueChanged" TValue="ProjectPositionTypeScreenType" Class="pt-0" Label="分类" />
+            </div>
+
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_projectPositionService.BudgetScreenType" ValueChanged="BudgetScreenTypeValueChanged" TValue="ProjectPositionBudgetScreenType" Class="pt-0" Label="回报方式" />
+            </div>
+            <div class="ps-4 pe-4" style="@((_settingService.IsApp?" max-width: 400px;":" max-width: 200px;")+" width: 100%;")">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_projectPositionService.UrgencyScreenType" ValueChanged="UrgencyScreenTypeValueChanged" TValue="ProjectPositionUrgencyScreenType" Class="pt-0" Label="紧急程度" />
+            </div>
+        </div>
+    </MDCard>
+    @if (Items.Any())
+    {
+    <MRow>
+        @foreach (var item in Items)
+        {
+            <MCol Cols="12" Md="6" Class="mb-4">
+                <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.ProjectPositionInfoCard Model="item" />
+            </MCol>
+        }
+    </MRow>
+    }
+    else
+    {
+        <NotFoundCard Fill />
+    }
+
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
+
+@code {
+
+    List<ProjectPositionInfoViewModel> Model;
+    List<ProjectPositionInfoViewModel> Items;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/project/getallpositions");
+            Refresh();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取企划职位列表数据失败");
+        }
+    }
+
+    public void Refresh()
+    {
+        Items = Model;
+
+        var searchString = _projectPositionService.SearchString;
+        if (string.IsNullOrWhiteSpace(searchString))
+        {
+
+        }
+        else
+        {
+            Items = Items.Where(s => (s.Description?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Description) == false && (searchString?.Contains(s.Description) ?? false)) ||
+                      (s.UserInfo.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.UserInfo.Name) == false && (searchString?.Contains(s.UserInfo.Name) ?? false)))
+                       .ToList();
+        }
+
+
+        Items = _projectPositionService.SortType switch
+        {
+            ProjectPositionSortType.Default => Items.OrderByDescending(s => s.Priority).ToList(),
+            ProjectPositionSortType.BudgetMax => Items.OrderByDescending(s => s.BudgetMax).ToList(),
+            ProjectPositionSortType.BudgetMin => Items.OrderByDescending(s => s.BudgetMin).ToList(),
+            ProjectPositionSortType.UpdateTime => Items.OrderByDescending(s => s.UpdateTime).ToList(),
+            ProjectPositionSortType.CreateTime => Items.OrderByDescending(s => s.CreateTime).ToList(),
+            ProjectPositionSortType.Percentage => Items.OrderByDescending(s => s.Percentage).ToList(),
+            _ => Items
+        };
+
+        Items = _projectPositionService.BudgetScreenType switch
+        {
+            ProjectPositionBudgetScreenType.Interval => Items.Where(s => s.BudgetType== BudgetType.Interval).ToList(),
+            ProjectPositionBudgetScreenType.IntervalAndDivide => Items.Where(s => s.BudgetType == BudgetType.IntervalAndDivide).ToList(),
+            ProjectPositionBudgetScreenType.Divide => Items.Where(s => s.BudgetType == BudgetType.Divide).ToList(),
+            ProjectPositionBudgetScreenType.Afadian => Items.Where(s => s.BudgetType == BudgetType.Afadian).ToList(),
+            _ => Items
+        };
+
+        Items = _projectPositionService.UrgencyScreenType switch
+        {
+            ProjectPositionUrgencyScreenType.None => Items.Where(s => s.UrgencyType == PositionUrgencyType.None).ToList(),
+            ProjectPositionUrgencyScreenType.High => Items.Where(s => s.UrgencyType == PositionUrgencyType.High).ToList(),
+            ProjectPositionUrgencyScreenType.Low => Items.Where(s => s.UrgencyType == PositionUrgencyType.Low).ToList(),
+            _ => Items
+        };
+
+        Items = _projectPositionService.TypeScreenType switch
+        {
+            ProjectPositionTypeScreenType.Programmer => Items.Where(s => s.PositionType == ProjectPositionType.Programmer).ToList(),
+            ProjectPositionTypeScreenType.CV => Items.Where(s => s.PositionType == ProjectPositionType.CV).ToList(),
+            ProjectPositionTypeScreenType.Other => Items.Where(s => s.PositionType == ProjectPositionType.Other).ToList(),
+            ProjectPositionTypeScreenType.Writer => Items.Where(s => s.PositionType == ProjectPositionType.Writer).ToList(),
+            ProjectPositionTypeScreenType.Music => Items.Where(s => s.PositionType == ProjectPositionType.Music).ToList(),
+            ProjectPositionTypeScreenType.Painter => Items.Where(s => s.PositionType == ProjectPositionType.Painter).ToList(),
+            _ => Items
+        };
+
+
+        StateHasChanged();
+    }
+
+    public void SortValueChanged(ProjectPositionSortType type)
+    {
+        _projectPositionService.SortType = type;
+        Refresh();
+    }
+
+    public void BudgetScreenTypeValueChanged(ProjectPositionBudgetScreenType type)
+    {
+        _projectPositionService.BudgetScreenType = type;
+        Refresh();
+    }
+
+
+    public void TypeScreenTypeValueChanged(ProjectPositionTypeScreenType type)
+    {
+        _projectPositionService.TypeScreenType = type;
+        Refresh();
+    }
+
+    public void UrgencyScreenTypeValueChanged(ProjectPositionUrgencyScreenType type)
+    {
+        _projectPositionService.UrgencyScreenType = type;
+        Refresh();
+    }
+
+    public void SearchValueChanged(string str)
+    {
+        _projectPositionService.SearchString = str;
+        Refresh();
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Refresh();
+        }
+    }
+
+}
