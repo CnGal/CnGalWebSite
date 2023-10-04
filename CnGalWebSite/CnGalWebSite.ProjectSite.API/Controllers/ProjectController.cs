@@ -12,6 +12,7 @@ using CnGalWebSite.ProjectSite.API.Services.Users;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
 using CnGalWebSite.ProjectSite.API.Services.Projects;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -350,6 +351,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     ProjectName=s.Project.Name,
                     Hide = s.Hide,
                     Priority = s.Priority,
+                    Tags = s.Tags,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
@@ -373,5 +375,23 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             return new Result { Success = true };
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<Result> ChangeTagsAsync(ProjectPositionChangeTagsModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+            var admin = _userService.CheckCurrentUserRole("Admin");
+
+            if (!admin)
+            {
+                return new Result { Success = false, Message = "权限不足" };
+            }
+
+            await _projectPositionRepository.GetAll().Where(s => s.Id == model.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.Tags, b => model.Tags));
+
+            return new Result { Success = true };
+        }
+
     }
 }

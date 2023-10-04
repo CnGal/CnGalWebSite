@@ -852,3 +852,19 @@
         gap: .5rem;
         width: 20%;
     }
+/*滚动卡片组*/
+#home-page .slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding-bottom: .5rem;
+    gap: 1rem;
+}
+
+    #home-page .slide-group::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+    }
+
+#home-page .slide-item {
+    display: flex;
+}

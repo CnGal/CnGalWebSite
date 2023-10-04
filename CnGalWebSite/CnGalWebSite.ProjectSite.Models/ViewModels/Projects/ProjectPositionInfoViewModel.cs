@@ -70,6 +70,12 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public PositionUrgencyType UrgencyType { get; set; }
 
         /// <summary>
+        /// 标签
+        /// </summary>
+        public string Tags { get; set; }
+
+
+        /// <summary>
         /// 创建用户
         /// </summary>
         public UserInfoViewModel UserInfo { get; set; } = new UserInfoViewModel();

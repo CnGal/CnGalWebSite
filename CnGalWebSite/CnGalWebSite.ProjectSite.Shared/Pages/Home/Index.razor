@@ -1,14 +1,87 @@
 ﻿@page "/"
 
 @inject IHttpService _httpService
+@inject ISettingService _settingService
+@inject IUserService _userService
+@inject IHomeService _homeService
 
 
-<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard/>
+@if (_settingService.IsApp)
+{
+    <MTabsItems Value="_homeService.TabIndex" Class="pb-12">
+        <MTabItem Value="0">
+            <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard />
 
-<CnGalWebSite.ProjectSite.Shared.Components.Home.CarouselCard/>
-<CnGalWebSite.ProjectSite.Shared.Components.Home.InterviewCard/>
-<CnGalWebSite.ProjectSite.Shared.Components.Home.ArticleGroupCard />
-<CnGalWebSite.ProjectSite.Shared.Components.Home.FriendLinksCard/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Home.CarouselCard />
+            <CnGalWebSite.ProjectSite.Shared.Components.Home.InterviewCard />
+            <MDCard Class="pa-4 mb-4" Style="flex-direction: row;justify-content: space-evenly;">
+                <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Stall.ToIconString()" Text="创建橱窗" Rounded Href="/stall/edit" />
+                 <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Project.ToIconString()" Text="创建企划" Rounded Href="/project/edit" />
+             </MDCard>
+             <CnGalWebSite.ProjectSite.Shared.Components.Home.ArticleGroupCard />
+             <CnGalWebSite.ProjectSite.Shared.Components.Home.FriendLinksCard />
+         </MTabItem>
+         <MTabItem Value="1">
+             <CnGalWebSite.ProjectSite.Shared.Pages.Stalls.Home />
+         </MTabItem>
+         <MTabItem Value="2">
+             <CnGalWebSite.ProjectSite.Shared.Pages.Projects.Position />
+         </MTabItem>
+         <MTabItem Value="3">
+             <CnGalWebSite.ProjectSite.Shared.Pages.Projects.Home />
+         </MTabItem>
+         <MTabItem Value="4">
+             <AuthorizeView>
+                 <Authorized>
+                     <CnGalWebSite.ProjectSite.Shared.Pages.Users.Space Id="@_userService.UserInfo.Id"></CnGalWebSite.ProjectSite.Shared.Pages.Users.Space>
+                 </Authorized>
+                 <NotAuthorized>
+                     <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
+                         <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后进入个人空间" Icon="mdi-login" OnClick="_userService.Login" />
+                     </div>
+                 </NotAuthorized>
+             </AuthorizeView>
+         </MTabItem>
+     </MTabsItems>
+
+    <MFooter Fixed Padless>
+     <MBottomNavigation Value="_homeService.TabIndex" ValueChanged="ValueChanged" Shift Grow>
+         <MButton ActiveClass="nav-bottom-tab-active" Value="0">
+             <span>主页</span>
+             <MIcon>@IconType.Home.ToIconString()</MIcon>
+         </MButton>
+         <MButton ActiveClass="nav-bottom-tab-active" Value="1">
+             <span>橱窗</span>
+             <MIcon>@IconType.Stall.ToIconString()</MIcon>
+         </MButton>
+         <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+             <span>约稿</span>
+             <MIcon>@IconType.Staff.ToIconString()</MIcon>
+         </MButton>
+         <MButton ActiveClass="nav-bottom-tab-active" Value="3">
+             <span>企划</span>
+             <MIcon>@IconType.Project.ToIconString()</MIcon>
+         </MButton>
+         <MButton ActiveClass="nav-bottom-tab-active" Value="4">
+             <span>空间</span>
+             <MIcon>@IconType.User.ToIconString()</MIcon>
+         </MButton>
+     </MBottomNavigation>
+ </MFooter>
+}
+else
+{
+    <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard />
+
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.CarouselCard />
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.InterviewCard />
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.ArticleGroupCard />
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.FriendLinksCard />
+
+}
 @code {
-
+    public void ValueChanged(StringNumber index)
+    {
+        _homeService.TabIndex = index.ToInt32();
+    }
 }

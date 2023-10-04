@@ -1,0 +1,70 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+
+
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
+    <MDCard Class="pa-4 h-100" Style="border-radius: 0;">
+        <div>
+             <AuthorizeView>
+                 <Authorized>
+
+                     <CnGalWebSite.ProjectSite.Shared.Components.Layout.Users.UserButton />
+                 </Authorized>
+                 <NotAuthorized>
+                     <CnGalWebSite.Components.Containers.MiniModeContainer>
+                         <CnGalWebSite.ProjectSite.Shared.Components.Layout.Users.LoginButton />
+                         <MDivider Class="mt-2 mb-2" />
+
+                     </CnGalWebSite.Components.Containers.MiniModeContainer>
+                    <MButton Text Block Color="primary" Left Href="/">
+                         <MIcon Left>mdi-home</MIcon>
+                        主页
+                    </MButton>
+                    <MDivider Class="mt-2 mb-2" />
+                    <MButton Text Block Color="primary" Left OnClick="OnOpenSetting">
+                         <MIcon Left>mdi-cog</MIcon>
+                        主题设置
+                    </MButton>
+                    <MButton Text Block Color="primary" Left Href="/about">
+                         <MIcon Left>mdi-information-outline</MIcon>
+                        关于我们
+                    </MButton>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+       
+    </MDCard>
+</MNavigationDrawer>
+
+    <SettingDialog @ref="themeSettingCard" />
+
+@code {
+    [Parameter]
+    public bool Drawer { get; set; }
+
+    SettingDialog themeSettingCard;
+
+    public void SetDrawer(bool drawer)
+    {
+        Drawer = drawer;
+        StateHasChanged();
+
+    }
+
+    private void OnClose()
+    {
+        Drawer = false;
+        StateHasChanged();
+
+    }
+
+    public void OnOpenSetting()
+    {
+        OnClose();
+
+        if (themeSettingCard != null)
+        {
+            themeSettingCard.Refresh();
+        }
+    }
+}

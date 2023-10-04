@@ -235,23 +235,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             return new Result { Success = true };
         }
 
-        [Authorize(Roles ="Admin")]
-        [HttpPost]
-        public async Task<Result> ChangeTagsAsync(UserChangeTagsModel model)
-        {
-            var user = await _userService.GetCurrentUserAsync();
-            var admin = _userService.CheckCurrentUserRole("Admin");
-
-            if ( !admin)
-            {
-                return new Result { Success = false, Message = "权限不足" };
-            }
-
-            await _userRepository.GetAll().Where(s => s.Id == model.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.Tags, b => model.Tags));
-
-            return new Result { Success = true };
-        }
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<UserSpaceViewModel>> GetUserSpace([FromQuery] string id)

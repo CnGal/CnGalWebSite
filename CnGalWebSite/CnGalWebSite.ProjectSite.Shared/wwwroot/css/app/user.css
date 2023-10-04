@@ -1,27 +1,4 @@
-body {
-}
-
-.home-article-card {
-    flex-direction: column;
-}
-
-.home-interview-card .item {
-    width: 250px;
-}
-
-.home-article-card img {
-    width: 100%;
-}
-
-.info-card-stall .info-card {
-    flex-direction: column;
-}
-
-.info-card-stall .price-card {
-    justify-content: flex-end;
-}
-
-.user-info-card .head-card img {
+﻿.user-info-card .head-card img {
     width: 5rem;
 }
 

@@ -9,29 +9,20 @@
 {
     <div class="home-interview-card mb-4">
         <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="访谈" Icon="@IconType.Article.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?Sort=PubulishTime%20desc&Types=Interview" Target="_blank">
-            <MSlideGroup ShowArrows="true" Class="slide-group-garp">
-                <ChildContent>
-                    @foreach (var item in Model.pagedResultDto.Data)
-                    {
-                        <MSlideItem>
-                            <div style="width:300px;">
-                                <MDCard Class="item" Href="@($"https://www.cngal.org/articles/index/{item.Article.Id}")" Target="_blank">
-                                    <img class="image" src="@item.Article.MainImage" alt="@item.Article.Name" loading="lazy" />
-                                    <div class="head">
-                                        <div class="content">
-                                            <div class="name text-truncate-2 title-medium">@item.Article.Name</div>
-                                            <div class="brief text-truncate-3  label-large">@item.Article.BriefIntroduction</div>
-                                        </div>
-                                    </div>
-                                </MDCard>
-                            </div>
-
-                        </MSlideItem>
-                    }
-                </ChildContent>
-            </MSlideGroup>
-        </CnGalWebSite.Components.Containers.MasaTitleContainer>
-    </div>
+             <CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup Items="Model.pagedResultDto.Data.Select(s=>s.Article)">
+                     <MDCard Class="item" Href="@($"https://www.cngal.org/articles/index/{context.Id}")" Target="_blank">
+                         <img class="image" src="@context.MainImage" alt="@context.Name" loading="lazy" />
+                         <div class="head">
+                             <div class="content">
+                                 <div class="name text-truncate-2 title-medium">@context.Name</div>
+                                 <div class="brief text-truncate-3  label-large">@context.BriefIntroduction</div>
+                             </div>
+                         </div>
+                     </MDCard>
+                    
+             </CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup>
+         </CnGalWebSite.Components.Containers.MasaTitleContainer>
+     </div>
 
 }
 

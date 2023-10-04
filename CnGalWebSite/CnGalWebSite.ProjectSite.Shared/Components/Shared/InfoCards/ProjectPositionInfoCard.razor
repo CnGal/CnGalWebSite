@@ -1,14 +1,21 @@
 ﻿<MDCard Class="info-card-project-position pa-4" Href="@($"/project/{Model.Id}")">
     <div class="title-large text-truncate-1">@Model.Description</div>
     <div class="tag-card">
+        @if(string.IsNullOrWhiteSpace( Model.Tags)==false)
+        {
+            foreach(var item in Model.Tags.Split(','))
+            {
+                <MChip Small Color="primary">@item</MChip>
+            }
+        }
         @if (Model.UrgencyType != PositionUrgencyType.None)
         {
-            <MChip Small Color="primary">@Model.UrgencyType.GetDisplayName()</MChip>
+            <MChip Outlined Small Color="primary">@Model.UrgencyType.GetDisplayName()</MChip>
         }
-        <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+        <MChip Outlined Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
          @if (string.IsNullOrWhiteSpace(Model.Type) == false)
         {
-            <MChip Small Color="primary">@Model.Type</MChip>
+            <MChip Outlined Small Color="primary">@Model.Type</MChip>
         }
     </div>
     <div class="label-large text-truncate-3">@Model.Description</div>

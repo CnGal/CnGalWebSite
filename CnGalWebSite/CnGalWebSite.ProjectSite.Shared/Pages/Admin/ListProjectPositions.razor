@@ -9,7 +9,10 @@
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
-                <div style="width: 130px;">
+                <div style="width: 140px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditTags(context.Item)">@IconType.Edit.ToIconString()</MIcon>
                     <MIcon Color="info"
                            Class="mr-2"
                            OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
@@ -58,11 +61,31 @@
         </ItemColContent>
     </DataTableCard>
 </MDCard>
+@if(_editItem!=null)
+{
+    <MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <MDCard>
+        <MCardTitle>编辑标签</MCardTitle>
+        <MCardText>@_editItem.ProjectName</MCardText>
+        <MCardText>
+            <MTextField @bind-Value="_editItem.Tags" Label="标签" />
+        </MCardText>
+        <MCardActions Class="pa-6 pt-0">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Save.ToIconString()" Text="保存" OnClick="OnClick" />
+         </MCardActions>
+     </MDCard>
+ </MDialog>
+}
 
 
-@code {
+ @code {
     private string _baseUrl = "api/project/listpositions";
     private string _name = "约稿";
+
+    bool _editDialog;
+    ProjectPositionOverviewModel _editItem;
 
     private List<DataTableHeader<ProjectPositionOverviewModel>> _headers = new List<DataTableHeader<ProjectPositionOverviewModel>>
 {
@@ -77,6 +100,7 @@
           new (){ Text= "创建时间", Value= nameof(ProjectPositionOverviewModel.CreateTime)},
           new (){ Text= "类型", Value= nameof(ProjectPositionOverviewModel.PositionType)},
           new (){ Text= "类型名称", Value= nameof(ProjectPositionOverviewModel.PositionTypeName)},
+          new (){ Text= "标签", Value= nameof(ProjectPositionOverviewModel.Tags)},
           new (){ Text= "细分类型", Value= nameof(ProjectPositionOverviewModel.Type)},
           new (){ Text= "优先级", Value= nameof(ProjectPositionOverviewModel.Priority)},
           new (){ Text= "状态", Value= nameof(ProjectPositionOverviewModel.Hide)},
@@ -135,6 +159,38 @@
         catch (Exception ex)
         {
             await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public void EditTags(ProjectPositionOverviewModel model)
+    {
+        _editDialog=true;
+        _editItem = model;
+        StateHasChanged();
+    }
+
+    public async Task OnClick()
+    {
+        try
+        {
+            var obj = await _httpService.PostAsync<ProjectPositionChangeTagsModel, Result>("api/project/ChangeTags", new ProjectPositionChangeTagsModel { Id = _editItem.Id, Tags = _editItem.Tags });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync("编辑标签失败", AlertTypes.Error);
+            }
+            else
+            {
+                _editDialog = false;
+                StateHasChanged ();
+                await PopupService.ToastAsync("编辑标签成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "编辑标签失败");
         }
     }
 

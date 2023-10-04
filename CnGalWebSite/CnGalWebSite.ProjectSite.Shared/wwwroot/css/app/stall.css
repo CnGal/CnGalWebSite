@@ -1,0 +1,7 @@
+﻿.info-card-stall .info-card {
+    flex-direction: column;
+}
+
+.info-card-stall .price-card {
+    justify-content: flex-end;
+}

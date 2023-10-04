@@ -1,0 +1,38 @@
+﻿@typeparam TItem
+@inject NavigationManager NavigationManager
+@inject ISettingService _settingService
+
+
+
+@if (_settingService.IsApp)
+{
+    <div class="slide-group">
+        @foreach (var item in Items)
+        {
+            <div class="slide-item">
+                @ChildContent(item)
+            </div>
+
+        }
+    </div>
+}
+else
+{
+    <MSlideGroup ShowArrows="true" Class="slide-group-garp">
+        @foreach (var item in Items)
+        {
+            <MSlideItem>
+                @ChildContent(item)
+            </MSlideItem>
+
+        }
+    </MSlideGroup>
+
+}
+
+@code {
+    [Parameter]
+    public RenderFragment<TItem> ChildContent { get; set; }
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+}

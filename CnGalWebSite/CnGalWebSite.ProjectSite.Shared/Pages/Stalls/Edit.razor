@@ -8,29 +8,37 @@
 
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@_name" />
 
-<div>
-    @if (Model == null)
-    {
-        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
-    }
-    else
-    {
-        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Stall.ToIconString()" Outline>
-         <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.MainCard Model="Model" OnTypeChanged="OnTypeChanged" />
-         <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.ImageCard Model="Model" />
-         @if (Model.PositionType == ProjectPositionType.CV)
+<AuthorizeView>
+    <Authorized>
+        <div>
+            @if (Model == null)
             {
-                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.AudioCard Model="Model" />
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
             }
-            @if (Model.PositionType == ProjectPositionType.Writer)
+            else
             {
-                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.TextGroupCard Model="Model" />
+                <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Stall.ToIconString()" Outline>
+                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.MainCard Model="Model" OnTypeChanged="OnTypeChanged" />
+                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.ImageCard Model="Model" />
+                 @if (Model.PositionType == ProjectPositionType.CV)
+                    {
+                        <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.AudioCard Model="Model" />
+                    }
+                    @if (Model.PositionType == ProjectPositionType.Writer)
+                    {
+                        <CnGalWebSite.ProjectSite.Shared.Components.Stalls.EditCards.TextGroupCard Model="Model" />
+                    }
+                    <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
+                </CnGalWebSite.Components.Containers.MasaTitleContainer>
             }
-            <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
-        </CnGalWebSite.Components.Containers.MasaTitleContainer>
-    }
 
-</div>
+        </div>
+</Authorized>
+<NotAuthorized>
+    <CnGalWebSite.ProjectSite.Shared.Components.Errors.NotAuthorizedCard/>
+</NotAuthorized>
+</AuthorizeView>
+
 
 @code {
     [Parameter]
@@ -60,7 +68,7 @@
             }
             catch (Exception ex)
             {
-                await ErrorHandler.ProcessError(ex, "获取橱窗信息失败");
+                //await ErrorHandler.ProcessError(ex, "获取橱窗信息失败");
             }
         }
     }
