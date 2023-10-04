@@ -7,23 +7,30 @@
 @inject IPageModelCatche<ProjectViewModel> _pageModelCatche
 
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@_name" />
+<AuthorizeView>
+    <Authorized>
+        <div>
+            @if (Model == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+            }
+            else
+            {
+                <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Project.ToIconString()" Outline>
+                 <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.MainCard Model="Model" />
+                 <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.ImageCard Model="Model" />
+                 <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.PositionGroupCard Model="Model" />
+                 <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
+             </CnGalWebSite.Components.Containers.MasaTitleContainer>
+            }
 
-<div>
-    @if (Model ==null)
-    {
-        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
-    }
-    else
-    {
-        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Project.ToIconString()" Outline>
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.MainCard Model="Model"/>
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.ImageCard Model="Model"/>
-         <CnGalWebSite.ProjectSite.Shared.Components.Projects.EditCards.PositionGroupCard Model="Model" />
-         <CnGalWebSite.ProjectSite.Shared.Components.Shared.EditCards.SubmitCard Model="Model" OnSubmit="OnSubmit" />
-        </CnGalWebSite.Components.Containers.MasaTitleContainer>
-    }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <CnGalWebSite.ProjectSite.Shared.Components.Errors.NotAuthorizedCard />
+    </NotAuthorized>
+</AuthorizeView>
 
-</div>
 
 @code {
     [Parameter]
@@ -53,7 +60,7 @@
             }
             catch (Exception ex)
             {
-                await ErrorHandler.ProcessError(ex, "获取企划信息失败");
+                //await ErrorHandler.ProcessError(ex, "获取企划信息失败");
             }
         }
     }

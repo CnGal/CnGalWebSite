@@ -53,5 +53,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// 优先级
         /// </summary>
         public int Priority { get; set; }
+
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string Tags { get; set; }
+
     }
 }

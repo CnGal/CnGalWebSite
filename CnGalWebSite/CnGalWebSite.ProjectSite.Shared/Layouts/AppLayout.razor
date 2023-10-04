@@ -1,5 +1,42 @@
-﻿<h3>AppLayout</h3>
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+
+<MAppBar App Style="background-color: var(--md-sys-color-background)!important;" Dense>
+    <div style="color: var(--md-sys-color-primary)!important;">
+        <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+    </div>
+
+    <CnGalWebSite.ProjectSite.Shared.Components.Layout.TitleCard />
+    <MSpacer></MSpacer>
+
+    <MButton Icon Href="/" Color="primary">
+        <MIcon>mdi-home</MIcon>
+    </MButton>
+</MAppBar>
+<CnGalWebSite.ProjectSite.Shared.Components.Layout.NavButton Drawer="drawer" @ref="navButton" />
+
+<MMain Class="pb-0">
+    <CascadingValue Value="this" IsFixed="true">
+            <CnGalWebSite.Components.Containers.MasaContainer>
+             <ErrorHandler ShowDetailedErrorInfor>
+                    @Body
+                </ErrorHandler>
+
+            </CnGalWebSite.Components.Containers.MasaContainer>
+    </CascadingValue>
+</MMain>
+<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
 
 @code {
+    bool drawer { get; set; }
+    CnGalWebSite.ProjectSite.Shared.Components.Layout.NavButton navButton;
 
+    public void SetDrawer()
+    {
+        if (navButton != null)
+        {
+            navButton.SetDrawer(true);
+        }
+    }
 }

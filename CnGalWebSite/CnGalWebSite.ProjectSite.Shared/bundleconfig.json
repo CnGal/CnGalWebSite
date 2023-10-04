@@ -44,7 +44,10 @@
   {
     "outputFileName": "wwwroot/css/app/bundle-app.css",
     "inputFiles": [
-      "wwwroot/css/app/common.css"
+      "wwwroot/css/app/common.css",
+      "wwwroot/css/app/home.css",
+      "wwwroot/css/app/stall.css",
+      "wwwroot/css/app/user.css"
     ]
   }
 ]

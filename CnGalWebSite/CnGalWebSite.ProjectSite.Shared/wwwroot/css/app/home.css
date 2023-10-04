@@ -1,0 +1,11 @@
+﻿.home-article-card {
+    flex-direction: column;
+}
+
+.home-interview-card .item {
+    width: 250px;
+}
+
+.home-article-card img {
+    width: 100%;
+}

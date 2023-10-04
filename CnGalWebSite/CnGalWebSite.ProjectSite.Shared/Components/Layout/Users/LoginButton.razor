@@ -1,13 +1,30 @@
 ﻿@inject IUserService _userService
+@inject ISettingService _settingService
+@if (_settingService.IsApp)
+{
+    <a class="d-flex pointer a-font-color" style="align-items: center; flex-direction: column; " @onclick="_userService.Login">
+        <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/apps/user.png" alt="默认头像" style="width: 60px; border-radius: 50%; aspect-ratio: 1;" />
+        <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
+            <span class="h6 fw-bold">点击头像登录</span>
+            <span>
+                登入后可编辑网站内容
+            </span>
+        </div>
+    </a>
+}
+else
+{
+    <AuthorizeView>
+        <Authorized>
+            <UserButton />
+        </Authorized>
+        <NotAuthorized>
 
-<AuthorizeView>
-    <Authorized>
-        <UserButton/>
-    </Authorized>
-    <NotAuthorized>
-        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Login.ToIconString()" Tooltip="登入" OnClick="_userService.Login" />
-    </NotAuthorized>
-</AuthorizeView>
+            <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Login.ToIconString()" Tooltip="登入" OnClick="_userService.Login" />
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
 
 @code {
 }

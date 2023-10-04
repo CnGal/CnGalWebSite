@@ -1,6 +1,7 @@
 ﻿/*访谈*/
 .home-interview-card .item {
     height: 100%;
+    width: 300px;
 }
 
     .home-interview-card .item .head {

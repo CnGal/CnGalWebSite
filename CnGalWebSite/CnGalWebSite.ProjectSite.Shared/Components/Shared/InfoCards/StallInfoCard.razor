@@ -2,7 +2,7 @@
     <CnGalWebSite.Components.Images.MasaImage Src="@Model.Image" Alt="@Model.Name" />
     <div class="content-card pa-4 ">
         <div class="name-card">
-            <div class="title-medium">@Model.Name</div>
+            <div class="">@Model.Name</div>
             <div class="tag-card">
                 <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
                  @if (string.IsNullOrWhiteSpace(Model.Type) == false)

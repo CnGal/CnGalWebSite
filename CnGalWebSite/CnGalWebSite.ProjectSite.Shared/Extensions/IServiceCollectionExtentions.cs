@@ -7,6 +7,7 @@ using CnGalWebSite.ProjectSite.Shared.Services.Events;
 using CnGalWebSite.ProjectSite.Shared.Services.Users;
 using CnGalWebSite.ProjectSite.Shared.Services.Projects;
 using CnGalWebSite.ProjectSite.Shared.Services.Stalls;
+using CnGalWebSite.ProjectSite.Shared.Services.Home;
 
 namespace CnGalWebSite.ProjectSite.Shared.Extensions
 {
@@ -44,6 +45,8 @@ namespace CnGalWebSite.ProjectSite.Shared.Extensions
             services.AddScoped<IProjectPositionService, ProjectPositionService>();
             //橱窗
             services.AddScoped<IStallService, StallService>();
+            //主页
+            services.AddScoped<IHomeService, HomeService>();
             return services;
         }
     }

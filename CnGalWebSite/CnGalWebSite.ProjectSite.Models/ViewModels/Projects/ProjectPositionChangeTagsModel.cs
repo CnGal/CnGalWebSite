@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
+namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
 {
-    public class UserChangeTagsModel
+    public class ProjectPositionChangeTagsModel
     {
-        public string Id { get; set; }
+        public long Id { get; set; }
 
         public string Tags { get; set; }
     }

@@ -5,6 +5,8 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@Model?.UserInfo?.Name" />
+
 @if (Model != null)
 {
     <CnGalWebSite.ProjectSite.Shared.Components.Users.UserInfoCard Model="Model.UserInfo" />

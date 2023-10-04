@@ -51,6 +51,7 @@ namespace CnGalWebSite.ProjectSite.API.Services.Projects
                 Type=model.Type,
                 Description = model.Description,
                 Id = model.Project.Id,
+                Tags=model.Tags,
                 CreateTime = model.CreateTime,
                 Priority = model.Priority,
                 UpdateTime = model.UpdateTime,

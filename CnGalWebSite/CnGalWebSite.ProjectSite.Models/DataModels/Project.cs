@@ -66,6 +66,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public long Id { get; set; }
 
         /// <summary>
+        /// 标签
+        /// </summary>
+        public string Tags { get; set; }
+
+        /// <summary>
         /// 职位详情
         /// </summary>
         public string Description { get; set; }

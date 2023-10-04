@@ -24,22 +24,7 @@
         padding-bottom: 1rem;
     }
 
-        /*滚动卡片组*/
-        #home-page .slide-group {
-            display: flex;
-            width: 100%;
-            overflow: scroll;
-            padding-bottom: .5rem;
-            gap: 1rem;
-        }
 
-            #home-page .slide-group::-webkit-scrollbar {
-                display: none; /* Chrome Safari */
-            }
-
-        #home-page .slide-item {
-            display: flex;
-        }
         /*最新动态*/
         #home-page .news-card .item {
             width: 20rem;

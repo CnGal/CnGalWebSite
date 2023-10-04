@@ -8,7 +8,7 @@
          <MRow>
              @foreach (var item in Model.Images)
             {
-                <MCol Cols="12" Sm="6" Md="4" Lg="3" Xl="2" Class="mb-4">
+                <MCol Cols="6" Md="4" Lg="3" Xl="2" Class="mb-4">
                     <MDCard OnClick="@(()=>OnClickImage(item))" Class="pointer">
                         <CnGalWebSite.Components.Images.MasaImage Src="@item.Image" Alt="@item.Note" Class="w-100 " />
                     </MDCard>

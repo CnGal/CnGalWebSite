@@ -1,5 +1,4 @@
 ﻿.markdown-body {
-    white-space: break-spaces;
     display: flex;
     flex-direction: column;
 }
