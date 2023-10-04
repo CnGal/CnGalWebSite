@@ -1,0 +1,34 @@
+version: "3"
+services:
+  robotclientx:
+    image: littlefishtentears/cngalwebsite-project-ssr:latest
+    container_name: project-ssr
+    environment:
+      - TZ=${TZ}
+      # 鉴权中心
+      - Authority=${Authority}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+      # 令牌储存
+      - TokenAPI=${TokenAPI}
+      - TokenAPISecret=${TokenAPISecret}
+      # 后端API
+      - WebApiPath=${WebApiPath}
+      # 图床API
+      - ImageApiPath=${ImageApiPath}
+      # CnGal
+      - CnGalAPI=${CnGalAPI}
+    hostname: project-ssr
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+    ports:
+      - "2006:8080"
