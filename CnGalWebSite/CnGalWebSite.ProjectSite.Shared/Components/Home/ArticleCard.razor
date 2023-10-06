@@ -16,7 +16,7 @@
         <div class="content-card">
             <div class="title-large">@Model.DisplayName</div>
             <div class="title-medium">原文作者：@Model.OriginalAuthor</div>
-            <div class="label-large">  @((MarkupString)Model.MainPage)</div>
+            <div class="label-large" style="white-space: break-spaces">  @Model.BriefIntroduction</div>
         </div>
         @if (!Left)
         {

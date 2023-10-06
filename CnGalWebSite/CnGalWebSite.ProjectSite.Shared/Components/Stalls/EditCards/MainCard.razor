@@ -23,7 +23,10 @@
             <MTextField @bind-Value="Model.Type" Label="细分类型" />
         </MCol>
         <MCol Cols="12">
-            <MTextarea Rows="6" @bind-Value="Model.Description" Label="橱窗详情" />
+            <TemplateButton Model="Model" OnChanged="OnChanged" />
+        </MCol>
+        <MCol Cols="12">
+            <MTextarea Rows="12" @bind-Value="Model.Description" Label="橱窗详情" />
         </MCol>
         <MCol Cols="12">
             <MTextField @bind-Value="Model.Contact" Label="联系方式" />
@@ -41,5 +44,10 @@
     {
         Model.PositionType = type;
         await OnTypeChanged.InvokeAsync();
+    }
+
+    public void OnChanged()
+    {
+        StateHasChanged();
     }
 }
