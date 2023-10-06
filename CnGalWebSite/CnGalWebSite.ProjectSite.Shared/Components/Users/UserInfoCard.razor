@@ -12,8 +12,8 @@
             <div class="name">
                 <div class="headline-large">@GetName()</div>
                 <MChip Small Color="primary">@Model.Type.GetDisplayName()</MChip>
-            </div>
-            <div class="action-card">
+             </div>
+             <div class="action-card">
                  <CnGalWebSite.Components.Buttons.MasaButton Rounded Small Outlined Text="切换身份" Icon="@IconType.Refresh.ToIconString()" OnClick="ChangeType" />
                  @if (_userService.UserInfo.Id == Model.Id)
                 {
@@ -23,10 +23,17 @@
             </div>
         </div>
     </div>
-    <div class="content-card">
-        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Infor" Title="@(Model.Type == UserType.Person ? "个人简介" : "组织简介")" />
-        <div>@(Model.Type == UserType.Person ? Model.PersonDescription : Model.OrganizationDescription)</div>
-    </div>
+    @if (string.IsNullOrWhiteSpace(Model.Type == UserType.Person ? Model.PersonDescription : Model.OrganizationDescription) == false)
+    {
+        <div class="content-card">
+            <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Infor" Title="@(Model.Type == UserType.Person ? "个人简介" : "组织简介")" />
+            <div>@(Model.Type == UserType.Person ? Model.PersonDescription : Model.OrganizationDescription)</div>
+        </div>
+    }
+    else
+    {
+        <div class="pt-8"></div>
+    }
 </MDCard>
 
 @code {
@@ -62,7 +69,7 @@
 
     public async Task ChangeType()
     {
-        if (_userService.UserInfo.Id==Model.Id)
+        if (_userService.UserInfo.Id == Model.Id)
         {
             try
             {
