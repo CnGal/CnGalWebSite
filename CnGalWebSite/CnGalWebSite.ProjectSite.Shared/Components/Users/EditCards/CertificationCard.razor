@@ -1,0 +1,18 @@
+﻿@inject IUserService _userService
+
+<MDCard Class="pa-4 edit-user-link-card mb-4">
+    <div class="icon-card">
+        <MIcon Large Color="primary">@IconType.Certification.ToIconString()</MIcon>
+     </div>
+     <div class="content-card">
+         <div class="title-large">用户认证</div>
+         <div class="label-large">认证后可以显示CnGal资料站已收录的作品</div>
+     </div>
+     <div class="action-card">
+         <CnGalWebSite.Components.Buttons.MasaButton Rounded Href="@($"https://app.cngal.org/space/editdata/{_userService.UserInfo.Id}")" Target="_blank" Text="前往CnGal资料站" />
+     </div>
+ </MDCard>
+
+ @code {
+
+}

@@ -25,6 +25,9 @@
                  <MTab Value="0">
                      企划<MIcon>@IconType.Project.ToIconString()</MIcon>
                  </MTab>
+                 <MTab Value="3">
+                     认证<MIcon>@IconType.Certification.ToIconString()</MIcon>
+                 </MTab>
 
              </MTabs>
          </MDCard>
@@ -42,6 +45,10 @@
                  <MTab Value="2">
                      橱窗<MIcon>@IconType.Stall.ToIconString()</MIcon>
                  </MTab>
+                 <MTab Value="3">
+                     认证<MIcon>@IconType.Certification.ToIconString()</MIcon>
+                 </MTab>
+
              </MTabs>
          </MDCard>
     }
@@ -65,6 +72,9 @@
         </MTabItem>
         <MTabItem Value="2">
             <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.StallGroupCard Model="Model.Stalls" />
+        </MTabItem>
+        <MTabItem Value="3">
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.CertificationCard Model="Model"/>
         </MTabItem>
     </MTabsItems>
 

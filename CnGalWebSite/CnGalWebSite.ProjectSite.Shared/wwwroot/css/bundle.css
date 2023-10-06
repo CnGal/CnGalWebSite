@@ -1416,20 +1416,56 @@ html {
     display: flex;
     gap: 1rem;
 }
-/*账户安全*/
-.edit-user-security-card {
+/*跳转外部卡片*/
+.edit-user-link-card {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
 }
 
-    .edit-user-security-card .content-card {
+    .edit-user-link-card .content-card {
         width: 100%;
     }
 /*剧本卡片*/
 .user-space-text-card .content-card {
     white-space: break-spaces;
+}
+/*用户认证*/
+.user-certification-staff-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+    .user-certification-staff-card .content-card {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
+
+    .user-certification-staff-card .image-card, .user-certification-game-card .image-card {
+        display: flex;
+    }
+
+        .user-certification-staff-card .image-card.staff img {
+            width: 5rem;
+            border-radius: 50%;
+        }
+
+        .user-certification-staff-card .image-card.group img {
+            width: 10rem;
+        }
+
+.user-certification-game-card img {
+    width: 100%;
+}
+
+.user-certification-game-card .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
 }
 
 .edit-submit-card {
