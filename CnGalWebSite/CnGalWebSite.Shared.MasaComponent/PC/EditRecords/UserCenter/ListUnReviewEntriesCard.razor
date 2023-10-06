@@ -1,25 +1,24 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-@if(Model.Any())
-            {
+@if (Model.Any())
+{
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Edit.ToIconString()" Title="最近编辑" Class="mb-4" Collapable Outline>
-    <div class="row">
-        @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
-        {
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.InforCard Model="item" />
-            </div>
-        }
-    </div>
-
-
-    @if (TotalPages > 1)
-    {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick" />
-    }
-
-</CnGalWebSite.Components.Containers.MasaTitleContainer>
+     <div class="row">
+         @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip BigCardStyle Model="item" />
+                </div>
             }
+        </div>
+
+        @if (TotalPages > 1)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick" />
+        }
+
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
 
 
 @code {
@@ -39,6 +38,6 @@
     {
         CurrentPage = pageIndex;
         StateHasChanged();
-        
+
     }
 }
