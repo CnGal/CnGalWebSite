@@ -521,7 +521,7 @@
         flex-direction: column;
         align-items: center;
     }
-    /*重连*/
+/*重连*/
 .components-reconnect-show {
     height: 1rem;
     width: 1rem;
@@ -529,6 +529,120 @@
     position: fixed;
     top: 0;
     z-index: 200;
+}
+/*错误提示*/
+#app-laoding {
+    width: 100%;
+    display: flex;
+    position: fixed;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+    #app-laoding .main-card {
+        width: 500px;
+        border-radius: var( --md-card-border-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        justify-content: space-between;
+        max-width: 100%;
+        gap: .5rem;
+        height: min-content;
+        margin: 1rem;
+    }
+
+    #app-laoding .content-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    /*wasm加载进度条*/
+    #app-laoding .loading-progress {
+        position: relative;
+        display: block;
+        width: 6rem;
+        height: 6rem;
+    }
+
+        #app-laoding .loading-progress circle {
+            fill: none;
+            stroke-width: 0.3rem;
+            transform-origin: 50% 50%;
+            transform: rotate(-90deg);
+        }
+
+            #app-laoding .loading-progress circle:last-child {
+                stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+                transition: stroke-dasharray 0.05s ease-in-out;
+            }
+
+    #app-laoding .loading-progress-text {
+        position: absolute;
+        font-weight: bold;
+    }
+
+        #app-laoding .loading-progress-text:after {
+            content: var(--blazor-load-percentage-text, "Loading");
+        }
+
+    #app-laoding .beian {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        right: 50%;
+        width: max-content;
+        padding: 0 1rem;
+        border-radius: 10px;
+        transform: translate(-50%,0);
+    }
+
+@media (prefers-color-scheme: light) or (prefers-color-scheme: no-preference) {
+    #app-laoding .main-card, #app-laoding .beian {
+        background-color: #ffd9de;
+        color: #400014 !important;
+    }
+
+    .loading-progress circle {
+        stroke: #ffffff;
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #bc004b;
+        }
+
+    .loading-progress-text {
+        color: #bc004b;
+    }
+
+    #app-laoding {
+        background-color: #fffbff;
+    }
+}
+
+@media(prefers-color-scheme: dark) {
+    #app-laoding .main-card, #app-laoding .beian {
+        background-color: #900038;
+        color: #ffd9de !important;
+    }
+
+    .loading-progress circle {
+        stroke: #660025;
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #ffb2be;
+        }
+
+    .loading-progress-text {
+        color: #ffb2be;
+    }
+
+    #app-laoding {
+        background-color: #201a1b;
+    }
 }
 
 /*参数*/
@@ -3581,120 +3695,6 @@ a.user-info-card {
         max-width: 1000px;
     }
 
-/*错误提示*/
-#app-laoding {
-    width: 100%;
-    display: flex;
-    position: fixed;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-}
-
-    #app-laoding .main-card {
-        width: 500px;
-        border-radius: var( --md-card-border-radius);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1rem;
-        justify-content: space-between;
-        max-width: 100%;
-        gap: .5rem;
-        height: min-content;
-        margin: 1rem;
-    }
-
-    #app-laoding .content-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    /*wasm加载进度条*/
-    #app-laoding .loading-progress {
-        position: relative;
-        display: block;
-        width: 6rem;
-        height: 6rem;
-    }
-
-        #app-laoding .loading-progress circle {
-            fill: none;
-            stroke-width: 0.3rem;
-            transform-origin: 50% 50%;
-            transform: rotate(-90deg);
-        }
-
-            #app-laoding .loading-progress circle:last-child {
-                stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-                transition: stroke-dasharray 0.05s ease-in-out;
-            }
-
-    #app-laoding .loading-progress-text {
-        position: absolute;
-        font-weight: bold;
-    }
-
-        #app-laoding .loading-progress-text:after {
-            content: var(--blazor-load-percentage-text, "Loading");
-        }
-
-    #app-laoding .beian {
-        position: fixed;
-        bottom: 10px;
-        left: 50%;
-        right: 50%;
-        width: max-content;
-        padding: 0 1rem;
-        border-radius: 10px;
-        transform: translate(-50%,0);
-    }
-
-@media (prefers-color-scheme: light) or (prefers-color-scheme: no-preference) {
-    #app-laoding .main-card, #app-laoding .beian {
-        background-color: #ffd9de;
-        color: #400014 !important;
-    }
-
-    .loading-progress circle {
-        stroke: #ffffff;
-    }
-
-        .loading-progress circle:last-child {
-            stroke: #bc004b;
-        }
-
-    .loading-progress-text {
-        color: #bc004b;
-    }
-
-    #app-laoding {
-        background-color: #fffbff;
-    }
-}
-
-@media(prefers-color-scheme: dark) {
-    #app-laoding .main-card, #app-laoding .beian {
-        background-color: #900038;
-        color: #ffd9de !important;
-    }
-
-    .loading-progress circle {
-        stroke: #660025;
-    }
-
-        .loading-progress circle:last-child {
-            stroke: #ffb2be;
-        }
-
-    .loading-progress-text {
-        color: #ffb2be;
-    }
-
-    #app-laoding {
-        background-color: #201a1b;
-    }
-}
 
 
 .commodity-kanban-card {

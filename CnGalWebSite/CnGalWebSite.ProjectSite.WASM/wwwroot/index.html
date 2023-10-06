@@ -1,36 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>CnGalWebSite.ProjectSite.WASM</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
+
     <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="CnGalWebSite.ProjectSite.WASM.styles.css" rel="stylesheet" />
+
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+
+    <!--组件库-->
+    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <!--<link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" />-->
+    <!--Markdown编辑器-->
+    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
+
+    <!--图标-->
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
+
+    <!--自定义样式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.ProjectSite.Shared/css/bundle.css">
+    <!--<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">-->
+
+    <!--不同屏幕大小自适应样式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.ProjectSite.Shared/css/break-point.css">
+    <!--<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">-->
+
 </head>
 
 <body>
+    <div id="global-style"></div>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
+        <div id="app-laoding" class="background-card" data-nosnippet>
+            <div class="main-card">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1 class="headline-large">CnGal资料站</h1>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+                </div>
+                <div>正在载入APP模式，努力初始化相关资源中，APP模式将会带来更加稳定的编辑体验，还请耐心等待哦</div>
+                <div class="action-card">
+                    <div style="display: flex;justify-content: center;align-items: center;" class="mt-2">
+                        <svg class="loading-progress">
+                            <circle r="40%" cx="50%" cy="50%"></circle>
+                            <circle r="40%" cx="50%" cy="50%"></circle>
+                        </svg>
+                        <div class="loading-progress-text"></div>
+                    </div>
+                </div>
+            </div>
+            <a class="beian" target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备2023071243号</a>
+        </div>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <div id="blazor-error-ui" data-nosnippet>
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面，如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
+                        </div>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--自定义脚本-->
+    <script src="_content/CnGalWebSite.ProjectSite.Shared/js/bundle.js"></script>
+    <!--<script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script>-->
+    <!--图片裁剪-->
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+
+    <!--代码语法高亮-->
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
+
+    <!--Markdown编辑器-->
+    <script src="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.min.js"></script>
+
+    <!--图表-->
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/echarts/5.1.1/echarts.min.js"></script>
+
+    <!--埋点数据采集-->
+    <script async src="https://umami.cngal.top/script.js" data-website-id="744d79fe-d18f-416b-893a-48f55f7a1012"></script>
+
+    <!--身份验证-->
+    <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
+
+    <!--压缩程序集下载并解压-->
+    <script src="decode.js"></script>
+
+    <!--运行时-->
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
+    <!--组件库-->
+    <!-- <script src="_content/BlazorComponent/js/blazor-component.js"></script> -->
+    <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+
+    <!--服务工作进程-->
+    <script src="service-worker-register.js"></script>
+
+    <!--解压-->
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost' && name != '../appsettings.json') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type ===
+                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray,
+                            { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
+
 </body>
 
-</html>
+    </html>

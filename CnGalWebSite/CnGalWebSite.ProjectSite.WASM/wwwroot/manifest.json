@@ -1,10 +1,10 @@
-{
-  "name": "CnGalWebSite.ProjectSite.WASM",
-  "short_name": "CnGalWebSite.ProjectSite.WASM",
+﻿{
+  "name": "CnGal企划站",
+  "short_name": "CnGal企划站",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "theme_color": "#ffffff",
   "prefer_related_applications": false,
   "icons": [
     {

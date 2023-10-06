@@ -1,0 +1,32 @@
+﻿@if (Model.PositionType== ProjectPositionType.Writer)
+{
+    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="使用模板" Icon="@IconType.Shape.ToIconString()" OnClick="OnClick" Class="mb-4" />
+
+}
+@code {
+    [Parameter]
+    public StallEditModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    public async Task OnClick()
+    {
+        if (Model.PositionType == ProjectPositionType.Writer)
+        {
+            Model.Description = "（填好后请删除括号及其文字）\n\n笔名(网名)：（填写写手常用笔名）\n\n\n" +
+    "擅长业务范围：（如世界观架构，大纲编纂，剧本编写，广播剧、填词等）\n\n\n" +
+    "擅长写作题材：（如推理、悬疑、古风、BMG（Boy meet girl)、废萌或全能等）\n\n\n" +
+    "写作风格：（如感情细腻，善于发糖or精于架构、擅长诡计叙事等等）\n\n\n" +
+    "写作偏好：（偏好写什么样的文章，内容，风格，长篇还是短篇可与题材和业务范围重复）\n\n\n" +
+    "写作禁区：（绝对不会写的内容）\n\n\n" +
+    "交稿速度：（无修改状态下一周一万，or一周两万，以此类推）\n\n\n" +
+    "签约方式：（是否需要纸质合同，或是电子合同就行，还是说不用合同）\n\n\n" +
+    "支付稿费方式：（是否接受分成，还是说领死稿费。是否接受支付宝转账，是否能开具发票，又或是是否需要预付款，是否需要按阶段结算稿费）\n\n\n" +
+    "特殊要求：（如不接受修改，或是不接受三次以上修改之类，三次以上修改涨价的特殊要求，没有的可以忽略）\n\n\n" +
+    "既往作品：（既往作品罗列）\n\n\n" +
+    "个人简介：(简短的自我简介，请为自己打个广告吧）\n\n";
+
+            await OnChanged.InvokeAsync();
+        }
+    }
+}
