@@ -60,7 +60,7 @@ else
     {
         try
         {
-            _space = await _personalSpace.GetCache($"{_configuration["CnGalAPI"]}api/space/GetUserView/0381a7ed-7f60-4787-8f0c-3e28f529657b");
+            _space = await _personalSpace.GetCache($"{_configuration["CnGalAPI"]}api/space/GetUserView/{Model.UserInfo.Id}");
             if (_space.UserCertification == null)
             {
                 _notFound = true;

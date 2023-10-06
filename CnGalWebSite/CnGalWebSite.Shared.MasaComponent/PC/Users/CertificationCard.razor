@@ -1,7 +1,7 @@
 ﻿@if (Model.UserCertification != null)
 {
-    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Certification.ToIconString()" Title="用户认证" Class="mb-4">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.InforCard Model="Model.UserCertification" Outline/>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Certification.ToIconString()" Outline Title="用户认证" Class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip BigCardStyle Model="Model.UserCertification" />
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 }
