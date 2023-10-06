@@ -1,0 +1,79 @@
+﻿@inject IUserService _userService
+@inject IConfiguration _configuration
+@inject IPageModelCatche<PersonalSpaceViewModel> _personalSpace
+@inject IPageModelCatche<EntryIndexViewModel> _entryIndex
+
+@if (_notFound)
+{
+    <NotFoundCard Fill />
+}
+else
+{
+    @if (_space != null && _entry != null)
+    {
+        <MDCard Class="mb-4 pa-4 user-certification-staff-card" Href="@($"https://www.cngal.org/entries/index/{_space.UserCertification.Id}")" Target="_blank">
+            <div class="@($"image-card {(_space.UserCertification.Type== EntryType.Staff?"staff":"group")}")">
+                <CnGalWebSite.Components.Images.MasaImage Src="@_space.UserCertification.MainImage" Alt="@_space.UserCertification.Name"/>
+            </div>
+            <div class="content-card">
+                <div class="title-large">@_space.UserCertification.Name</div>
+                <div class="label-large text-truncate-2">@_space.UserCertification.BriefIntroduction</div>
+            </div>
+        </MDCard>
+        <MRow>
+            @foreach (var item in _entry.StaffGames)
+            {
+                <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
+                    <MDCard Class="h-100 user-certification-game-card" Href="@($"https://www.cngal.org/entries/index/{item.Id}")" Target="_blank">
+                        <div class="image-card">
+                            <CnGalWebSite.Components.Images.MasaImage Src="@item.MainImage" Alt="@item.Name" Type="ImageType.Horizontal" />
+                        </div>
+                        <div class="content-card">
+                            <div class="title-large">@item.Name</div>
+                            <div class="label-large text-truncate-4">@item.BriefIntroduction</div>
+                        </div>
+                    </MDCard>
+                </MCol>
+            }
+        </MRow>
+    }
+    else
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Fill Page />
+    }
+
+}
+
+@code {
+    [Parameter]
+    public UserSpaceViewModel Model { get; set; }
+
+    PersonalSpaceViewModel _space;
+    EntryIndexViewModel _entry;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool _notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _space = await _personalSpace.GetCache($"{_configuration["CnGalAPI"]}api/space/GetUserView/0381a7ed-7f60-4787-8f0c-3e28f529657b");
+            if (_space.UserCertification == null)
+            {
+                _notFound = true;
+                return;
+            }
+            _entry = await _entryIndex.GetCache($"{_configuration["CnGalAPI"]}api/entries/GetEntryView/{_space.UserCertification.Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _notFound = true;
+            await ErrorHandler.ProcessError(ex, "获取认证信息失败");
+        }
+    }
+
+}
