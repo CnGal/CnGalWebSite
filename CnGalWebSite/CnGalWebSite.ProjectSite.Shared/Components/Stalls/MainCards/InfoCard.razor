@@ -2,11 +2,11 @@
 @implements IDisposable
 
 <MDCard Class="stall-info-card mb-4 pa-4">
-    <MDCard Outline Class="user-card on-background-text" Href="@($"/user/space/{Model.CreateUser.Id}/1")">
+    <MDCard Outline Class="user-card on-background-text" Href="@($"/user/space/{Model.CreateUser.Id}/0")">
          <CnGalWebSite.Components.Images.MasaImage Src="@Model.CreateUser.Avatar" Alt="@Model.CreateUser.Name" Type="ImageType.Avatar" />
          <div class="name-card">
-             <div class="title-medium">@(Model.CreateUser.OrganizationName ?? Model.CreateUser.Name)</div>
-             <div class="label-large text-truncate-1">@(Model.CreateUser.OrganizationDescription)</div>
+             <div class="title-medium">@(Model.CreateUser.PersonName ?? Model.CreateUser.Name)</div>
+             <div class="label-large text-truncate-1">@(Model.CreateUser.PersonDescription)</div>
          </div>
      </MDCard>
      <div class="item-card">
