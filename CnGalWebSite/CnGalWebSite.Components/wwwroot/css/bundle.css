@@ -1076,12 +1076,12 @@ html {
 }
 
 .theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
-    color: inherit !important;
+    color: var(--md-sys-color-secondary) !important;
 }
 
 .theme--light.m-bottom-navigation {
     background-color: var(--md-sys-color-background);
-    color: inherit !important;
+    color: var(--md-sys-color-primary) !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -1381,4 +1381,20 @@ html {
 .image-cropper-card img {
     transition: none !important;
     height: 100% !important;
+}
+/*滚动卡片组*/
+.slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding: 3px;
+    gap: 1rem;
+}
+
+.slide-group::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+    }
+
+.slide-item {
+    display: flex;
 }

@@ -11,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor().AddHubOptions(options =>
+{
+    options.MaximumReceiveMessageSize = int.MaxValue;
+});
 builder.Services.AddProjectSite();
 // Http
 builder.Services.AddHttpClient<IHttpService, HttpService>(client =>

@@ -9,3 +9,11 @@
 .home-article-card img {
     width: 100%;
 }
+
+.home-projct-position-group-card .info-card-project-position {
+    width: 20rem;
+}
+
+.home-stall-group-card .info-card-stall {
+    width: 250px;
+}

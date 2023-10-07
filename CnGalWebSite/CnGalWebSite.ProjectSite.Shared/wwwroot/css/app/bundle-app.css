@@ -13,12 +13,28 @@ body {
     width: 100%;
 }
 
+.home-projct-position-group-card .info-card-project-position {
+    width: 20rem;
+}
+
+.home-stall-group-card .info-card-stall {
+    width: 250px;
+}
+
 .info-card-stall .info-card {
     flex-direction: column;
 }
 
 .info-card-stall .price-card {
     justify-content: flex-end;
+}
+
+.info-card-project-position .title-large {
+    font-size: 1rem;
+}
+
+.info-card-project .title-large {
+    font-size: 1rem;
 }
 
 .user-info-card .head-card img {

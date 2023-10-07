@@ -310,6 +310,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Where(s => s.Priority > 0 && s.Hide == false&&s.EndTime> now)
                 .Include(s => s.Positions)
                 .Include(s=>s.CreateUser)
+                 .OrderByDescending(s => s.Priority)
                 .ToListAsync();
 
             return projects.Select(s => _projectService.GetProjectInfoViewModel(s)).ToList();
@@ -323,6 +324,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var projects = await _projectPositionRepository.GetAll()
                 .Where(s => s.Priority > 0 && s.Hide == false && s.DeadLine > now)
                 .Include(s => s.Project).ThenInclude(s => s.CreateUser)
+                .OrderByDescending(s=>s.Priority)
                 .ToListAsync();
 
             return projects.Select(s => _projectService.GetProjectPositionInfoViewModel(s)).ToList();
