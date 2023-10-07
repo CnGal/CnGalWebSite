@@ -6,13 +6,12 @@
 @if (Model != null)
 {
     <div class="home-stall-group-card mb-4">
-        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="橱窗" Icon="@IconType.Stall.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?Sort=PubulishTime%20desc&Types=Interview" Target="_blank">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="橱窗" Icon="@IconType.Stall.ToIconString()" ShowMoreButton Href="/stall">
              <CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup Items="Model">
                  <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.StallInfoCard Model="context"/>
              </CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup>
          </CnGalWebSite.Components.Containers.MasaTitleContainer>
      </div>
-
 }
 
 @code {
