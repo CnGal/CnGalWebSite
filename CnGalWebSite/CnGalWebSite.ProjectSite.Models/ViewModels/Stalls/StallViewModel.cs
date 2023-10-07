@@ -93,6 +93,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// 内容
         /// </summary>
         public string Content { get; set; }
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Link { get; set; }
     }
 
     public class StallImageViewModel : BaseImageEditModel

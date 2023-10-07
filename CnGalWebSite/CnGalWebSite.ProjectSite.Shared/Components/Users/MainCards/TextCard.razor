@@ -1,10 +1,11 @@
-﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Model.Name" Icon="@IconType.Article.ToIconString()" Collapable>
+﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Model.Name" Icon="@IconType.Shape.ToIconString()">
     <div class="user-space-text-card">
-        <div class="content-card">
-            <div>
+            <div class="content-card">
                 @Model.Content
             </div>
-        </div>
+            <div class="link-card">
+                链接：<a href="@Model.Link" target="_blank">@Model.Link</a>
+            </div>
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 

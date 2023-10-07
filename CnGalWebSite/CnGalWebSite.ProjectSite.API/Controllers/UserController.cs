@@ -200,6 +200,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     info.Name = temp.Name;
                     info.Content = temp.Content;
+                    info.Link = temp.Link;
                     info.UpdateTime = DateTime.Now.ToCstTime();
                 }
             }
@@ -207,6 +208,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             {
                 Name = s.Name,
                 Content = s.Content,
+                Link = s.Link,
                 UpdateTime = DateTime.Now.ToCstTime(),
                 CreateTime= DateTime.Now.ToCstTime(),
                 CreateUserId=user.Id,
@@ -279,7 +281,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Texts = user.Texts.Select(s => new UserTextViewModel
                 {
                     Name = s.Name,
-                    Content = s.Content
+                    Content = s.Content,
+                    Link = s.Link,
                 }).ToList(),
             };
         }

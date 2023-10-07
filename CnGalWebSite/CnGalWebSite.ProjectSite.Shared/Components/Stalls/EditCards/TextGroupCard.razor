@@ -1,5 +1,5 @@
 ﻿
-<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="预览剧本" Class="mb-4" Collapable Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Shape.ToIconString()" Title="已有作品" Class="mb-4" Collapable Outline>
     <MRow>
         @foreach (var item in Model.Texts)
         {
@@ -14,7 +14,7 @@
         }
         <MCol Cols="12" Md="6" Class="mb-4 ">
             <MDCard Class="h-100" Style="min-height: 200px;display: flex;justify-content: center;flex-direction: column;align-items: center;">
-                <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Create.ToIconString()" Text="添加剧本" OnClick="@(()=>Model.Texts.Add(new StallTextEditModel()))" />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Create.ToIconString()" Text="添加已有作品" OnClick="@(()=>Model.Texts.Add(new StallTextEditModel()))" />
             </MDCard>
         </MCol>
     </MRow>

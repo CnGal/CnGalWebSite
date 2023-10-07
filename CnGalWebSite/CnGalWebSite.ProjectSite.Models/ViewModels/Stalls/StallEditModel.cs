@@ -103,12 +103,17 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
-                return new Result { Success = false, Message = "请填写剧本名称" };
+                return new Result { Success = false, Message = "请填写作品名称" };
             }
            
-            if (string.IsNullOrWhiteSpace(Content) || Content.Length < 30)
+            if (string.IsNullOrWhiteSpace(Content))
             {
-                return new Result { Success = false, Message = "请填写剧本内容，并不少于30个字" };
+                return new Result { Success = false, Message = "请填写作品描述" };
+            }
+
+            if (string.IsNullOrWhiteSpace(Link))
+            {
+                return new Result { Success = false, Message = "请填写作品链接" };
             }
             return new Result { Success = true };
         }

@@ -80,7 +80,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Texts = item.Texts.Select(s => new StallTextViewModel
                 {
                     Name = s.Name,
-                    Content=s.Content
+                    Content=s.Content,
+                    Link=s.Link,
                 }).ToList(),
                 CreateUser = await _userService.GetUserInfo(item.CreateUserId)
             };
@@ -257,12 +258,14 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     info.Name = temp.Name;
                     info.Content = temp.Content;
+                    info.Link = temp.Link;
                 }
             }
             item.Texts.AddRange(model.Texts.Where(s => s.Id == 0).Select(s => new StallText
             {
                 Name = s.Name,
                 Content = s.Content,
+                Link = s.Link,
             }));
 
             item.UpdateTime = DateTime.Now.ToCstTime();
