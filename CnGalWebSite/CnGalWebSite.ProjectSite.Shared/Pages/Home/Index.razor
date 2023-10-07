@@ -19,6 +19,9 @@
                  <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Project.ToIconString()" Text="创建企划" Rounded Href="/project/edit" />
              </MDCard>
              <CnGalWebSite.ProjectSite.Shared.Components.Home.ArticleGroupCard />
+             <CnGalWebSite.ProjectSite.Shared.Components.Home.StallGroupCard />
+             <CnGalWebSite.ProjectSite.Shared.Components.Home.PositionGroupCard />
+
              <CnGalWebSite.ProjectSite.Shared.Components.Home.FriendLinksCard />
          </MTabItem>
          <MTabItem Value="1">
@@ -45,24 +48,24 @@
      </MTabsItems>
 
     <MFooter Fixed Padless>
-     <MBottomNavigation Value="_homeService.TabIndex" ValueChanged="ValueChanged" Shift Grow>
-         <MButton ActiveClass="nav-bottom-tab-active" Value="0">
+     <MBottomNavigation Value="_homeService.TabIndex" ValueChanged="ValueChanged" Grow>
+         <MButton  Value="0">
              <span>主页</span>
              <MIcon>@IconType.Home.ToIconString()</MIcon>
          </MButton>
-         <MButton ActiveClass="nav-bottom-tab-active" Value="1">
+         <MButton Value="1">
              <span>橱窗</span>
              <MIcon>@IconType.Stall.ToIconString()</MIcon>
          </MButton>
-         <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+         <MButton Value="2">
              <span>约稿</span>
              <MIcon>@IconType.Staff.ToIconString()</MIcon>
          </MButton>
-         <MButton ActiveClass="nav-bottom-tab-active" Value="3">
+         <MButton Value="3">
              <span>企划</span>
              <MIcon>@IconType.Project.ToIconString()</MIcon>
          </MButton>
-         <MButton ActiveClass="nav-bottom-tab-active" Value="4">
+         <MButton Value="4">
              <span>空间</span>
              <MIcon>@IconType.User.ToIconString()</MIcon>
          </MButton>
@@ -76,6 +79,8 @@ else
     <CnGalWebSite.ProjectSite.Shared.Components.Home.CarouselCard />
     <CnGalWebSite.ProjectSite.Shared.Components.Home.InterviewCard />
     <CnGalWebSite.ProjectSite.Shared.Components.Home.ArticleGroupCard />
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.StallGroupCard/>
+    <CnGalWebSite.ProjectSite.Shared.Components.Home.PositionGroupCard/>
     <CnGalWebSite.ProjectSite.Shared.Components.Home.FriendLinksCard />
 
 }

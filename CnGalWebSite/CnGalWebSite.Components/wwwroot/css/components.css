@@ -213,3 +213,19 @@
     transition: none !important;
     height: 100% !important;
 }
+/*滚动卡片组*/
+.slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding: 3px;
+    gap: 1rem;
+}
+
+.slide-group::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+    }
+
+.slide-item {
+    display: flex;
+}

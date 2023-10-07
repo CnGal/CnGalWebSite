@@ -1076,12 +1076,12 @@ html {
 }
 
 .theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
-    color: inherit !important;
+    color: var(--md-sys-color-secondary) !important;
 }
 
 .theme--light.m-bottom-navigation {
     background-color: var(--md-sys-color-background);
-    color: inherit !important;
+    color: var(--md-sys-color-primary) !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -1382,6 +1382,22 @@ html {
     transition: none !important;
     height: 100% !important;
 }
+/*滚动卡片组*/
+.slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding: 3px;
+    gap: 1rem;
+}
+
+.slide-group::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+    }
+
+.slide-item {
+    display: flex;
+}
 
 /*关于我们*/
 
@@ -1468,22 +1484,6 @@ html {
 .icon-title-card {
     display: flex;
     gap: .5rem;
-}
-/*滚动卡片组*/
- .slide-group {
-    display: flex;
-    width: 100%;
-    overflow: scroll;
-    padding-bottom: .5rem;
-    gap: 1rem;
-}
-
-.slide-group::-webkit-scrollbar {
-        display: none; /* Chrome Safari */
-    }
-
- .slide-item {
-    display: flex;
 }
 
 
@@ -1748,6 +1748,28 @@ html {
         gap: .5rem;
         flex-direction: column;
     }
+/*橱窗*/
+.home-stall-group-card .info-card-stall {
+    height: 100%;
+    justify-content: space-around;
+    width: 300px;
+}
+
+    .home-stall-group-card .info-card-stall > img {
+        height: 10rem;
+        width: min-content;
+        align-self: center;
+    }
+/*企划职位*/
+.home-projct-position-group-card .info-card-project-position {
+    width: 25rem;
+    justify-content: space-around;
+}
+
+
+.home-projct-position-group-card .title-large {
+    font-size: 1rem;
+}
 
 /*橱窗小卡片*/
 .info-card-stall .content-card {

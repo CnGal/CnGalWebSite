@@ -324,6 +324,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Where(s => s.Priority > 0 && s.Hide == false && s.EndTime > now)
                 .Include(s => s.Images)
                 .Include(s => s.CreateUser)
+                .OrderByDescending(s => s.Priority)
                 .ToListAsync();
 
             return projects.Select(s => _stallService.GetStallInfoViewModel(s)).ToList();

@@ -1076,12 +1076,12 @@ html {
 }
 
 .theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
-    color: inherit !important;
+    color: var(--md-sys-color-secondary) !important;
 }
 
 .theme--light.m-bottom-navigation {
     background-color: var(--md-sys-color-background);
-    color: inherit !important;
+    color: var(--md-sys-color-primary) !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -1381,6 +1381,22 @@ html {
 .image-cropper-card img {
     transition: none !important;
     height: 100% !important;
+}
+/*滚动卡片组*/
+.slide-group {
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    padding: 3px;
+    gap: 1rem;
+}
+
+.slide-group::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+    }
+
+.slide-item {
+    display: flex;
 }
 
 
@@ -2519,22 +2535,6 @@ html {
         gap: .5rem;
         width: 20%;
     }
-/*滚动卡片组*/
-#home-page .slide-group {
-    display: flex;
-    width: 100%;
-    overflow: scroll;
-    padding-bottom: .5rem;
-    gap: 1rem;
-}
-
-    #home-page .slide-group::-webkit-scrollbar {
-        display: none; /* Chrome Safari */
-    }
-
-#home-page .slide-item {
-    display: flex;
-}
 
 .slotMachine-box {
     min-height: calc(100% - 341px);

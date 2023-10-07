@@ -1,0 +1,37 @@
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<ProjectPositionInfoViewModel>> _pageModelCatche
+@inject IConfiguration _configuration
+
+@if (Model != null)
+{
+    <div class="home-projct-position-group-card mb-4">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="企划" Icon="@IconType.Project.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?Sort=PubulishTime%20desc&Types=Interview" Target="_blank">
+             <CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup Items="Model">
+                <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.ProjectPositionInfoCard Model="context"/>
+             </CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup>
+         </CnGalWebSite.Components.Containers.MasaTitleContainer>
+     </div>
+
+}
+
+@code {
+    List<ProjectPositionInfoViewModel> Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<List<ProjectPositionInfoViewModel>>("api/project/GetAllPositions");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取企划列表失败");
+        }
+    }
+}
