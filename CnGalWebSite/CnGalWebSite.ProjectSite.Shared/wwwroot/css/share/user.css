@@ -42,6 +42,11 @@
     display: flex;
     gap: 1rem;
 }
+
+.user-info-card .blank-card {
+    padding-top: 2rem;
+}
+
 /*跳转外部卡片*/
 .edit-user-link-card {
     display: flex;
