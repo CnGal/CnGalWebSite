@@ -993,7 +993,7 @@ html {
 }
 /*默认字体颜色*/
 .theme--light.m-expansion-panels .m-expansion-panel-header .m-expansion-panel-header__icon .m-icon, .theme--light.m-tabs > .m-tabs-bar .m-tab--disabled, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active), .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-btn, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-icon {
-    color: var(--md-sys-color-on-surface);
+    color: var(--md-sys-color-secondary);
 }
 
 .theme--light.m-label {
