@@ -1762,8 +1762,9 @@ html {
 }
 
     .home-stall-group-card .info-card-stall > img {
-        height: 10rem;
+        max-height: 10rem;
         width: min-content;
+        max-width: 100%;
         align-self: center;
     }
 /*企划职位*/
