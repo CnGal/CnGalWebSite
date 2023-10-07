@@ -53,3 +53,7 @@ body {
 .user-info-card .content-card {
     padding-top: 3rem;
 }
+
+.user-info-card .blank-card {
+    padding-top: 4rem;
+}
