@@ -38,7 +38,7 @@ namespace CnGalWebSite.APIServer.Application.Recommends
         {
             var gameIds = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Entry)
-                .Where(s =>s.EntryId!=null &&  s.Entry.IsHidden == false&&s.EstimationOwnersMax >= 200000)
+                .Where(s =>s.EntryId!=null &&  s.Entry.IsHidden == false&&s.EstimationOwnersMin >= 200000)
                 .Select(s => s.EntryId.Value)
                 .ToListAsync();
 
