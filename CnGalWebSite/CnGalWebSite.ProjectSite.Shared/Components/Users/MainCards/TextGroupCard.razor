@@ -1,10 +1,10 @@
 ﻿@if (Model.Texts.Any())
 {
-    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="剧本" Collapable Outline>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Shape.ToIconString()" Title="已有作品" Collapable Outline>
      <MRow>
          @foreach (var item in Model.Texts)
             {
-                <MCol Cols="12" Class="mb-4">
+                <MCol Cols="12" Md="6" Class="mb-4">
                     <TextCard Model="item" />
                 </MCol>
             }

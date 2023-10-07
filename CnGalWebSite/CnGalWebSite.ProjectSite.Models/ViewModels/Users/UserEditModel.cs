@@ -63,11 +63,45 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// 预览文本
         /// </summary>
         public List<UserTextEditModel> Texts { get; set; } = new List<UserTextEditModel>();
+
+
+        public override Result Validate()
+        {
+            foreach (var item in Texts)
+            {
+                var result = item.Validate();
+                if (!result.Success)
+                {
+                    return result;
+                }
+            }
+
+            return new Result { Success = true };
+        }
     }
 
     public class UserTextEditModel : UserTextViewModel
     {
         public long Id { get; set; }
+
+        public Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                return new Result { Success = false, Message = "请填写作品名称" };
+            }
+
+            if (string.IsNullOrWhiteSpace(Content))
+            {
+                return new Result { Success = false, Message = "请填写作品描述" };
+            }
+
+            if (string.IsNullOrWhiteSpace(Link))
+            {
+                return new Result { Success = false, Message = "请填写作品链接" };
+            }
+            return new Result { Success = true };
+        }
     }
 
     public class UserImageEditModel : BaseImageEditModel

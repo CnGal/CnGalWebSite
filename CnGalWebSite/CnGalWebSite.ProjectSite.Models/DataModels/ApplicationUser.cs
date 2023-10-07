@@ -107,8 +107,6 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
 
         public string Image { get; set; }
 
-        public int Priority { get; set; }
-
         /// <summary>
         /// 创建者
         /// </summary>
@@ -131,10 +129,6 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 链接
         /// </summary>
         public string Url { get; set; }
-        /// <summary>
-        /// 优先级
-        /// </summary>
-        public int Priority { get; set; }
         /// <summary>
         /// 时长
         /// </summary>
@@ -164,6 +158,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 内容
         /// </summary>
         public string Content { get; set; }
+
+        /// <summary>
+        /// 链接
+        /// </summary>
+        public string Link { get; set; }
 
         /// <summary>
         /// 创建者

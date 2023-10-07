@@ -1542,9 +1542,15 @@ html {
         width: 100%;
     }
 /*剧本卡片*/
-.user-space-text-card .content-card {
-    white-space: break-spaces;
+.user-space-text-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
+
+    .user-space-text-card .content-card {
+        white-space: break-spaces;
+    }
 /*用户认证*/
 .user-certification-staff-card {
     flex-direction: row;
@@ -1852,6 +1858,12 @@ html {
         gap: .5rem;
     }
 /*剧本卡片*/
-.stall-text-card .content-card{
-    white-space: break-spaces;
+.stall-text-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
+
+    .stall-text-card .content-card {
+        white-space: break-spaces;
+    }

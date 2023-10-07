@@ -79,6 +79,12 @@
         gap: .5rem;
     }
 /*剧本卡片*/
-.stall-text-card .content-card{
-    white-space: break-spaces;
+.stall-text-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
+
+    .stall-text-card .content-card {
+        white-space: break-spaces;
+    }

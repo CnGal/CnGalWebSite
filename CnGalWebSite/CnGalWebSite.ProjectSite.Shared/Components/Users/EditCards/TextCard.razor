@@ -1,10 +1,13 @@
 ﻿
 <MRow>
     <MCol Cols="12">
-        <MTextField @bind-Value="Model.Name" Label="剧本名称" />
+        <MTextField @bind-Value="Model.Name" Label="作品名称" />
     </MCol>
     <MCol Cols="12">
-        <MTextarea Rows="6" @bind-Value="Model.Content" Label="剧本内容" />
+        <MTextarea Rows="6" @bind-Value="Model.Content" Label="描述" />
+    </MCol>
+    <MCol Cols="12">
+        <MTextField @bind-Value="Model.Link" Label="链接" />
     </MCol>
 </MRow>
 
