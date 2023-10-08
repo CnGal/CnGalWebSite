@@ -3437,6 +3437,10 @@ div.prizeTips {
         white-space: break-spaces;
     }
 
+    .entry-card-default.relevance-card .add-info-card {
+        display:flex;
+        gap:1rem;
+    }
     /*大卡片样式*/
     .entry-card-default.relevance-card.big-card-style {
         padding: 0;
