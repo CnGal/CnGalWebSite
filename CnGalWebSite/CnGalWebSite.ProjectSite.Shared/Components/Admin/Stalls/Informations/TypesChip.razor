@@ -1,0 +1,38 @@
+﻿
+@foreach (var item in Types)
+{
+    <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Outlined Color="@GetColor(item)" Icon="@GetIcon(item)" Text="@item.GetDisplayName()" />
+
+}
+
+@code {
+    [Parameter]
+    public List<ProjectPositionType> Types { get; set; }
+
+    public string GetColor(ProjectPositionType type)
+    {
+        return type switch
+        {
+            ProjectPositionType.Programmer => "success",
+            ProjectPositionType.Writer => "info",
+            ProjectPositionType.Painter => "warning",
+            ProjectPositionType.CV => "primary",
+            ProjectPositionType.Music => "error",
+            _ => "purple",
+        };
+    }
+
+    public IconType GetIcon(ProjectPositionType type)
+    {
+        return type switch
+        {
+            ProjectPositionType.Music => IconType.Music,
+            ProjectPositionType.Painter => IconType.Style,
+            ProjectPositionType.Programmer => IconType.Programmer,
+            ProjectPositionType.Writer => IconType.Writer,
+            ProjectPositionType.CV => IconType.Dub,
+            ProjectPositionType.Other => IconType.Shape,
+            _ => IconType.UnknowTime,
+        };
+    }
+}

@@ -80,6 +80,20 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// </summary>
         public List<StallTextViewModel> Texts { get; set; } = new List<StallTextViewModel>();
 
+        /// <summary>
+        /// 附加信息
+        /// </summary>
+        public List<StallInformationViewModel> Informations { get; set; }=new List<StallInformationViewModel>();
+
+    }
+
+    public class StallInformationViewModel
+    {
+        public string Name { get; set; }
+
+        public string Value { get; set; }
+
+        public string Icon { get; set; }
     }
 
     public class StallTextViewModel

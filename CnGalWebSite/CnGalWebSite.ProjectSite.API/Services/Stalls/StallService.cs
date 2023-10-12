@@ -25,7 +25,11 @@ namespace CnGalWebSite.ProjectSite.API.Services.Stalls
                     Avatar=user?.Avatar??model.CreateUser?.Avatar,
                     Name= user?.PersonName ?? user?.UserName ?? model.CreateUser?.PersonName ?? model.CreateUser?.UserName,
                     Id=user?.Id ?? model.CreateUser?.Id,
-                }
+                },
+                Informations=model.Informations.Where(s => s.Type != null && s.Type.Hide == false&&s.Type.HideInfoCard==false).Select(s => new StallInformationViewModel
+                {
+                    Value = s.Value
+                }).ToList(),
             };
         }
     }

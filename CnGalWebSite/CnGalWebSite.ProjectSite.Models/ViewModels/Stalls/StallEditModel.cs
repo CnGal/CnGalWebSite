@@ -61,6 +61,12 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// </summary>
         public List<StallTextEditModel> Texts { get; set; } = new List<StallTextEditModel>();
 
+        /// <summary>
+        /// 附加信息
+        /// </summary>
+        public List<StallInformationEditModel> Informations { get; set; } = new List<StallInformationEditModel>();
+
+
         public override Result Validate()
         {
             if (string.IsNullOrWhiteSpace(Name))
@@ -70,10 +76,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
             if (string.IsNullOrWhiteSpace(Contact))
             {
                 return new Result { Success = false, Message = "请填写联系方式" };
-            }
-            if (string.IsNullOrWhiteSpace(Description) || Description.Length < 10)
-            {
-                return new Result { Success = false, Message = "请填写橱窗详情，并不少于10个字" };
             }
 
             if (EndTime <= DateTime.Now)
@@ -122,5 +124,23 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
     public class StallImageEditModel:BaseImageEditModel
     {
         public long Id { get; set; }
+    }
+
+    public class StallInformationEditModel
+    {
+        public long Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Value { get; set; }
+
+        public List<ProjectPositionType> Types { get; set; } =new List<ProjectPositionType>();
+
+        public string Description { get; set; }
+
+        public string Icon { get; set; }
+
+        public long TypeId { get; set; }
+
     }
 }

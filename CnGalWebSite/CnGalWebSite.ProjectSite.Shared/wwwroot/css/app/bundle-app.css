@@ -29,6 +29,10 @@ body {
     justify-content: flex-end;
 }
 
+.info-card-stall .content-card {
+    padding: .5rem;
+}
+
 .info-card-project-position .title-large {
     font-size: 1rem;
 }

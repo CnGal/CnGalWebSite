@@ -1013,7 +1013,7 @@ html {
 }
 
 .theme--light.m-icon {
-    color: inherit;
+    color: var(--md-sys-color-secondary);
 }
 
 .m-chip:not(.m-chip--outlined).primary {
@@ -1788,6 +1788,7 @@ html {
     display: flex;
     flex-direction: column;
     gap: .5rem;
+    padding: 1rem;
 }
 
 .info-card-stall .info-card {
@@ -1821,7 +1822,6 @@ html {
     .info-card-stall .name-card .tag-card {
         display: flex;
         flex-wrap: wrap;
-        gap: .5rem;
     }
 /*信息卡片*/
 .stall-info-card {
