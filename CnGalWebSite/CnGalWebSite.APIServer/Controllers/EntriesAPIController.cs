@@ -1655,6 +1655,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<EntryInformationTypeEditModel>> EditEntryInformationType(long id)
         {
             var item = await _entryInformationTypeRepository.GetAll()
@@ -1684,6 +1685,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<Result> EditEntryInformationType(EntryInformationTypeEditModel model)
         {
 

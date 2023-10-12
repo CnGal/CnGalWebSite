@@ -5,3 +5,7 @@
 .info-card-stall .price-card {
     justify-content: flex-end;
 }
+
+.info-card-stall .content-card {
+    padding: .5rem;
+}

@@ -1,5 +1,5 @@
 ﻿<div class="@($"{Class} icon-title-card")">
-    <MIcon Color="primary">@Icon.ToIconString()</MIcon>
+    <MIcon Color="primary">@(string.IsNullOrWhiteSpace(IconString) ? Icon.ToIconString() : IconString)</MIcon>
     <div class="fw-bold">@Title</div>
 </div>
 
@@ -10,4 +10,6 @@
     public string Class { get; set; }
     [Parameter]
     public IconType Icon { get; set; }
+    [Parameter]
+    public string IconString { get; set; }
 }

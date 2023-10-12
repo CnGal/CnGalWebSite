@@ -188,7 +188,7 @@ html {
 }
 
 .theme--light.m-icon {
-    color: inherit;
+    color: var(--md-sys-color-secondary);
 }
 
 .m-chip:not(.m-chip--outlined).primary {

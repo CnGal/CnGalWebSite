@@ -1,8 +1,10 @@
 ﻿using CnGalWebSite.ProjectSite.Models.DataModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
+using System.Text.Json;
 
 namespace CnGalWebSite.ProjectSite.API.Infrastructure
 {
@@ -22,6 +24,7 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<UserText> UserTexts { get; set; }
         public DbSet<Carousel> Carousels { get; set; }
         public DbSet<FriendLink> FriendLinks { get; set; }
+        public DbSet<StallInformationType> StallInformationTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +39,17 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
 
             //限定名称唯一
             modelBuilder.Entity<ApplicationUser>().HasIndex(g => g.UserName).IsUnique();
+
+            //设置枚举数组转换
+            modelBuilder.Entity<StallInformationType>()
+                .Property(e => e.Types)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<ProjectPositionType[]>(v, (JsonSerializerOptions)null),
+                    new ValueComparer<ProjectPositionType[]>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToArray()));
         }
     }
 }

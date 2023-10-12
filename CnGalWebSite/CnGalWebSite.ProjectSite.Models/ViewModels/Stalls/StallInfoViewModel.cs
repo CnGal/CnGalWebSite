@@ -57,5 +57,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// 创建用户
         /// </summary>
         public UserInfoViewModel UserInfo { get; set; }=new UserInfoViewModel();
+
+        /// <summary>
+        /// 附加信息
+        /// </summary>
+        public List<StallInformationViewModel> Informations { get; set; } = new List<StallInformationViewModel>();
     }
 }

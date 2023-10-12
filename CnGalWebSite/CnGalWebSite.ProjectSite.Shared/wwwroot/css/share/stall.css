@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     gap: .5rem;
+    padding: 1rem;
 }
 
 .info-card-stall .info-card {
@@ -36,7 +37,6 @@
     .info-card-stall .name-card .tag-card {
         display: flex;
         flex-wrap: wrap;
-        gap: .5rem;
     }
 /*信息卡片*/
 .stall-info-card {

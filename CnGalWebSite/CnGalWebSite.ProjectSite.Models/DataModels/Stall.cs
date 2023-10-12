@@ -63,10 +63,64 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public List<StallText> Texts { get; set; }
 
         /// <summary>
+        /// 附加信息
+        /// </summary>
+        public List<StallInformation> Informations { get; set; }
+
+        /// <summary>
         /// 创建者
         /// </summary>
         public ApplicationUser CreateUser { get; set; }
         public string CreateUserId { get; set; }
+    }
+
+    public class StallInformationType
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 支持的类型
+        /// </summary>
+        public ProjectPositionType[] Types { get; set; } = Array.Empty<ProjectPositionType>();
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 介绍
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public string Icon { get; set; }
+
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool Hide { get; set; }
+
+        /// <summary>
+        /// 在小卡片上隐藏
+        /// </summary>
+        public bool HideInfoCard { get; set; }
+    }
+
+    public class StallInformation
+    {
+        public long Id { get; set; }
+
+        public string Value { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public StallInformationType Type { get; set; }
+        public long TypeId { get; set; }
+
     }
 
     public class StallImage

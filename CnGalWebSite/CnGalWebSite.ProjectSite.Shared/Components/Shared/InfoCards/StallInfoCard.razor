@@ -1,13 +1,22 @@
-﻿<MDCard Class="info-card-stall" Href="@($"/stall/{Model.Id}")">
+﻿@inject ISettingService _settingService
+
+<MDCard Class="info-card-stall" Href="@($"/stall/{Model.Id}")">
     <CnGalWebSite.Components.Images.MasaImage Src="@Model.Image" Alt="@Model.Name" />
-    <div class="content-card pa-4 ">
+    <div class="content-card">
         <div class="name-card">
-            <div class="">@Model.Name</div>
+            <div class="title-medium">@Model.Name</div>
             <div class="tag-card">
-                <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+                <IconChip Color="primary" Text="@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())"></IconChip>
                  @if (string.IsNullOrWhiteSpace(Model.Type) == false)
                 {
-                    <MChip Small Color="primary">@Model.Type</MChip>
+                    <IconChip Color="primary" Text="@Model.Type"></IconChip>
+                }
+                @foreach(var item in Model.Informations.Where(s=>string.IsNullOrWhiteSpace(s.Value)==false&& s.Value.Length<5))
+                {
+                    @foreach (var info in item.Value.Replace("，",",").Replace("、",",").Split(","))
+                    {
+                        <IconChip Outlined Color="primary" Text="@info"></IconChip>
+                    }
                 }
             </div>
         </div>

@@ -3,6 +3,7 @@ using System;
 using CnGalWebSite.ProjectSite.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.ProjectSite.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231012061150_AddInformationType")]
+    partial class AddInformationType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -421,6 +424,9 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
                     b.Property<long?>("StallId")
                         .HasColumnType("bigint");
 
@@ -449,9 +455,6 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("Hide")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("HideInfoCard")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Icon")

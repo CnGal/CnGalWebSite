@@ -22,18 +22,24 @@
         <MCol Cols="12" Md="6">
             <MTextField @bind-Value="Model.Type" Label="细分类型" />
         </MCol>
+    </MRow>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="附加信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="mb-4">
+     <MRow>
+        @foreach(var item in Model.Informations.Where(s=>s.Types.Contains(Model.PositionType)))
+        {
+            <MCol Cols="12">
+                <MTextField @bind-Value="item.Value" Label="@($"{item.Name}（{item.Description}）")" PrependIcon="@item.Icon"/>
+            </MCol>
+        }
         <MCol Cols="12">
-            <TemplateButton Model="Model" OnChanged="OnChanged" />
-        </MCol>
-        <MCol Cols="12">
-            <MTextarea Rows="12" @bind-Value="Model.Description" Label="橱窗详情" />
+            <MTextarea Rows="6" @bind-Value="Model.Description" Label="橱窗详情" />
         </MCol>
         <MCol Cols="12">
             <MTextField @bind-Value="Model.Contact" Label="联系方式" />
         </MCol>
     </MRow>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
-
 @code {
     [Parameter]
     public StallEditModel Model { get; set; }

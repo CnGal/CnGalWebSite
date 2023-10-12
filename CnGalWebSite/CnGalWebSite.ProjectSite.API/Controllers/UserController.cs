@@ -251,6 +251,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
            var user = await _userRepository.GetAll().AsNoTracking()
                 .Include(s => s.Projects).ThenInclude(s=>s.Positions)
                 .Include(s=>s.Stalls).ThenInclude(s=>s.Images)
+                .Include(s => s.Stalls).ThenInclude(s => s.Informations).ThenInclude(s => s.Type)
                 .Include(s => s.Images)
                 .Include(s => s.Texts)
                 .Include(s => s.Audios)

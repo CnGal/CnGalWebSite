@@ -1,0 +1,109 @@
+﻿@page "/admin/liststallinformationtypes"
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<MDCard>
+    <DataTableCard TModel="StallInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <MIcon Color="success"
+                       Class="mr-2"
+                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            }
+            else if (context.Header.Value == nameof(StallInformationTypeOverviewModel.Hide))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.HideChip Hide="context.Item.Hide" />
+            }
+            else if (context.Header.Value == nameof(StallInformationTypeOverviewModel.HideInfoCard))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.HideChip Hide="context.Item.HideInfoCard" />
+            }
+            else if (context.Header.Value == nameof(StallInformationTypeOverviewModel.Icon))
+            {
+                <MIcon>@context.Item.Icon</MIcon>
+            }
+            else if (context.Header.Value == nameof(StallInformationTypeOverviewModel.Types))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.Informations.TypesChip Types="context.Item.Types" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.Informations.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+@code {
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+    private string _baseUrl = "api/stall/ListEntryInformationTypes";
+    private string _name = "基础信息类型";
+
+    CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.Informations.EditCard editCard;
+
+    private List<DataTableHeader<StallInformationTypeOverviewModel>> _headers = new List<DataTableHeader<StallInformationTypeOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(StallInformationTypeOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(StallInformationTypeOverviewModel.Name)},
+          new (){ Text= "描述", Value= nameof(StallInformationTypeOverviewModel.Description)},
+          new (){ Text= "图标", Value= nameof(StallInformationTypeOverviewModel.Icon)},
+          new (){ Text= "支持的类型", Value= nameof(StallInformationTypeOverviewModel.Types)},
+          new (){ Text= "状态", Value= nameof(StallInformationTypeOverviewModel.Hide)},
+          new (){ Text= "小卡片", Value= nameof(StallInformationTypeOverviewModel.HideInfoCard)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<StallInformationTypeOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void EditItem(StallInformationTypeOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+}
