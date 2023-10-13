@@ -4,7 +4,7 @@
         <MTimeline AlignTop Dense="Dense" Class="me-2">
             @foreach (var item in Model.Booking.Goals)
             {
-                <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"orange":"green")"
+                <MTimelineItem Color="@(item.Target>Model.Booking.BookingCount?"secondary":"primary")"
                                Icon="@(item.Target>Model.Booking.BookingCount?IconType.IndeterminateTime.ToIconString():IconType.Check.ToIconString())"
                                FillDot>
                     <MDCard>

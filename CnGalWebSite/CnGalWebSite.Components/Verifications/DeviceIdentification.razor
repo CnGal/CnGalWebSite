@@ -35,7 +35,7 @@
             else
             {
                 var client = await _httpService.GetClientAsync();
-                Model.Ip = await client.GetStringAsync("https://www.cngal.org/api/account/GetIp");
+                Model.Ip = await client.GetStringAsync("https://api.cngal.org/api/account/GetIp");
             }
 
         }

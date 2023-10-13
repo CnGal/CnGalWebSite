@@ -51,7 +51,7 @@
         @if (Model.Releases.Any(s=>s.PublishPlatformType== PublishPlatformType.Steam))
         {
             <div>
-                <MButton Rounded Color="primary" Block XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.Releases.FirstOrDefault(s=>s.PublishPlatformType== PublishPlatformType.Steam)?.Link}"))">
+                <MButton Rounded Color="primary" XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.Releases.FirstOrDefault(s=>s.PublishPlatformType== PublishPlatformType.Steam)?.Link}"))">
                     <MIcon Left Class="me-4">
                         @IconType.Steam.ToIconString()
                     </MIcon>
