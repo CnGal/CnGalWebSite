@@ -9,11 +9,11 @@
 {
     @if (Template == EntryStyleTemplate.Default)
     {
-        <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
     }
     else
     {
-        <MButton Rounded Color="primary" Block  XLarge="@(_dataCacheService.IsApp?false:true)"  OnClick="OnClick">
+        <MButton Rounded Color="primary"  XLarge="@(_dataCacheService.IsApp?false:true)"  OnClick="OnClick">
             <MIcon Left Class="me-4">
                 @(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())
             </MIcon>
