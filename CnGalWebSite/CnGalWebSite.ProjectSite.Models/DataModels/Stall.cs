@@ -107,6 +107,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 在小卡片上隐藏
         /// </summary>
         public bool HideInfoCard { get; set; }
+
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
     }
 
     public class StallInformation

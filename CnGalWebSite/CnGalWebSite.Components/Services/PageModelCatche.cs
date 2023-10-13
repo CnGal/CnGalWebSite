@@ -1,5 +1,4 @@
-﻿using CnGalWebSite.Components.Extentions;
-using CnGalWebSite.Components.Services;
+﻿using CnGalWebSite.Components.Services;
 using CnGalWebSite.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
@@ -9,10 +8,9 @@ using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.Components.Service
 {
-    public class PageModelCatche<TModel> : IDisposable,IPageModelCatche<TModel> where TModel : class
+    public class PageModelCatche<TModel> : IDisposable, IPageModelCatche<TModel> where TModel : class
     {
         private readonly IHttpService _httpService;
-        private readonly ISettingService _settingService;
         private readonly PersistentComponentState ApplicationState;
         private readonly IServiceProvider _serviceProvider;
         /// <summary>
@@ -29,13 +27,12 @@ namespace CnGalWebSite.Components.Service
 
         private PersistingComponentStateSubscription persistingSubscription;
 
-        public PageModelCatche(IServiceProvider serviceProvider, IHttpService httpService, IConfiguration configuration, ISettingService settingService)
+        public PageModelCatche(IServiceProvider serviceProvider, IHttpService httpService, IConfiguration configuration)
         {
             _httpService = httpService;
             _serviceProvider = serviceProvider;
-            _settingService = settingService;
 
-            _token =typeof( TModel).ToString();
+            _token = typeof(TModel).ToString();
             _baseUrl = configuration["WebApiPath"];
 
             if (!OperatingSystem.IsBrowser())
@@ -47,7 +44,7 @@ namespace CnGalWebSite.Components.Service
 
         public void Init(string name, string baseUrl)
         {
-            _baseUrl = baseUrl ?? string.Empty ;
+            _baseUrl = baseUrl ?? string.Empty;
         }
 
         string GetUrl(string apiUrl) => apiUrl.Contains("://") ? apiUrl : _baseUrl + apiUrl;
@@ -70,9 +67,8 @@ namespace CnGalWebSite.Components.Service
             else
             {
                 //获取数据
-                var client = await _httpService.GetClientAsync();
-                TModel temp = await client.GetFromJsonAsync<TModel>(url, _settingService.JsonOptions);
-                
+                TModel temp = await _httpService.GetAsync<TModel>(url);
+
                 return temp;
             }
         }
@@ -109,7 +105,7 @@ namespace CnGalWebSite.Components.Service
                 }
             }
 
-           var temp = await GetCacheFromMemory(apiUrl);
+            var temp = await GetCacheFromMemory(apiUrl);
 
             //保存数据
             if (_catches.Any(s => s.Key == url))
@@ -122,20 +118,13 @@ namespace CnGalWebSite.Components.Service
             }
 
 
-
             return temp;
         }
 
-        private async Task PersistData()
+        private Task PersistData()
         {
-            try
-            {
-                ApplicationState.PersistAsJson(_token, _catches);
-            }
-            catch
-            {
-
-            }
+            ApplicationState.PersistAsJson(_token, _catches);
+            return Task.CompletedTask;
         }
 
         void IDisposable.Dispose()

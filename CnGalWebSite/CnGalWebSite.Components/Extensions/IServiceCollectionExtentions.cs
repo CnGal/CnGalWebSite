@@ -11,7 +11,6 @@ namespace CnGalWebSite.Components.Extensions
         public static IServiceCollection AddCnGalComponents(this IServiceCollection services)
         {
             services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
-            services.AddScoped(typeof(ISettingService), typeof(SettingService));
             services.AddScoped(typeof(IMiniModeService), typeof(MiniModeService));
             //查看大图
             services.AddScoped(x => new ImagesLargeViewService());

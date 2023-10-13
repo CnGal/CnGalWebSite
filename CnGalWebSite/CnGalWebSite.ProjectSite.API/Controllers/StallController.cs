@@ -87,11 +87,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Content = s.Content,
                     Link = s.Link,
                 }).ToList(),
-                Informations = item.Informations.Where(s => s.Type != null && s.Type.Hide == false).Select(s => new StallInformationViewModel
+                Informations = item.Informations.Where(s => s.Type != null && s.Type.Hide == false).OrderByDescending(s=>s.Type.Priority).Select(s => new StallInformationViewModel
                 {
                     Icon = s.Type.Icon,
                     Name = s.Type.Name,
-                    Value = s.Value
+                    Value = s.Value,
+                    Priority=s.Type.Priority
                 }).ToList(),
                 CreateUser = await _userService.GetUserInfo(item.CreateUserId)
             };
@@ -413,6 +414,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Description = s.Description,
                     Id = s.Id,
                     HideInfoCard = s.HideInfoCard,
+                    Priority=s.Priority,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
@@ -522,6 +524,16 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                                  Icon = s.Icon,
                                  Name = s.Name,
                              }).ToList();
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditStallInformationTypePriorityAsync(EditPriorityModel model)
+        {
+            await _stallInformationTypeRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Success = true };
         }
     }
 }

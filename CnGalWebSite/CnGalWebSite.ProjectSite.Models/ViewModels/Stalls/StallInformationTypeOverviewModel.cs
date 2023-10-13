@@ -55,6 +55,9 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         public bool Hide { get; set; }
 
         public bool HideInfoCard { get; set; }
+
+        public int Priority { get; set; }
+
     }
 
     public class StallInformationTypeEditModel: StallInformationTypeOverviewModel
