@@ -1167,6 +1167,10 @@ html {
     transition: none;
 }
 
+.m-tab--active, .m-tab--active .m-btn.m-btn--flat, .m-tab--active .m-icon, .m-tab.m-tab {
+    color: inherit;
+}
+
 /*卡片*/
 .md-card {
     display: flex;

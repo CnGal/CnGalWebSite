@@ -94,6 +94,8 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         public string Value { get; set; }
 
         public string Icon { get; set; }
+
+        public int Priority { get; set; }
     }
 
     public class StallTextViewModel

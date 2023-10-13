@@ -8,9 +8,17 @@
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
-                <MIcon Color="success"
-                       Class="mr-2"
-                       OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+                <div style="width: 130px;">
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                        <MIcon Color="info"
+                               Class="mr-2"
+                               OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+                    </div>
             }
             else if (context.Header.Value == nameof(StallInformationTypeOverviewModel.Hide))
             {
@@ -62,6 +70,7 @@
           },
           new (){ Text= "名称", Value= nameof(StallInformationTypeOverviewModel.Name)},
           new (){ Text= "描述", Value= nameof(StallInformationTypeOverviewModel.Description)},
+          new (){ Text= "优先级", Value= nameof(StallInformationTypeOverviewModel.Priority)},
           new (){ Text= "图标", Value= nameof(StallInformationTypeOverviewModel.Icon)},
           new (){ Text= "支持的类型", Value= nameof(StallInformationTypeOverviewModel.Types)},
           new (){ Text= "状态", Value= nameof(StallInformationTypeOverviewModel.Hide)},
@@ -103,6 +112,31 @@
         if (editCard != null)
         {
             await editCard.Refresh();
+        }
+    }
+
+    public async Task EditItemPriority(StallInformationTypeOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditPriorityModel, Result>("api/stall/EditStallInformationTypePriority", new EditPriorityModel { Id = model.Id, PlusPriority = up ? 1 : -1 });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
     }
 

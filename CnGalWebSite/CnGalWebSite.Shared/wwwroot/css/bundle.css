@@ -1013,7 +1013,7 @@ html {
 }
 
 .theme--light.m-icon {
-    color: inherit;
+    color: var(--md-sys-color-secondary);
 }
 
 .m-chip:not(.m-chip--outlined).primary {
@@ -1165,6 +1165,10 @@ html {
 
 .m-toolbar {
     transition: none;
+}
+
+.m-tab--active, .m-tab--active .m-btn.m-btn--flat, .m-tab--active .m-icon, .m-tab.m-tab {
+    color: inherit;
 }
 
 /*卡片*/
