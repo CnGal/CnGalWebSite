@@ -1,0 +1,15 @@
+﻿@inject NavigationManager NavigationManager
+
+
+<MDCard Class="pa-3 mb-4" Style="flex-direction: row;">
+    <MSpacer></MSpacer>
+    <CnGalWebSite.GameSite.Shared.Components.Layout.TitleCard Min />
+     <MSpacer></MSpacer>
+     <CnGalWebSite.GameSite.Shared.Components.Theme.SwitchThemeModeButton Class="mr-6" />
+     <CnGalWebSite.Components.Buttons.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
+
+     <CnGalWebSite.GameSite.Shared.Components.Layout.Users.LoginButton />
+</MDCard>
+
+@code {
+}

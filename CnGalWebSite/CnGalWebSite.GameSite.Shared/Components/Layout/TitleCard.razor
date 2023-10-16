@@ -1,0 +1,44 @@
+﻿@inject IEventService _eventService
+@implements IDisposable
+
+@if (Min)
+{
+    <div class="ps-3 pe-3 text-truncate-1 font-color" style="font-size: large; font-weight: bold; align-self: center;">@Title</div>
+
+}
+else
+{
+    <div class="ps-3 pe-3 text-truncate-1" style="font-size: large;">@Title</div>
+
+}
+
+
+@code {
+    [Parameter]
+
+    public bool Min { get; set; }
+
+    private string Title { get; set; }
+
+    public void ChangeTitle(string title)
+    {
+        Title = title;
+        StateHasChanged();
+        
+    }
+
+    protected override void OnInitialized()
+    {
+        _eventService.TitleChanged -= ChangeTitle;
+        _eventService.TitleChanged += ChangeTitle;
+    }
+
+
+    #region 释放实例
+    public void Dispose()
+    {
+        _eventService.TitleChanged -= ChangeTitle;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

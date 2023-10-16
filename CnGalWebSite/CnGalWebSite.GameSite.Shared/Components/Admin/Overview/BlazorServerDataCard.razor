@@ -1,0 +1,150 @@
+﻿@inject IHttpService _httpService
+@using CnGalWebSite.Core.Helpers;
+@using CnGalWebSite.Core.Models;
+@implements IDisposable
+
+@if (IsReady)
+{
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="Blazor Server" Icon="@IconType.Data.ToIconString()" Class="mb-4">
+                <div class="row">
+                    @foreach (var item in Items)
+                    {
+                        <div class="col-12 col-md-6 d-flex mt-2">
+                            <HardwareInforCard Model="item" />
+                        </div>
+
+                    }
+                </div>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
+        </Authorized>
+    </AuthorizeView>
+}
+
+@code {
+
+    public ServerRealTimeOverviewModel Model { get; set; } = new ServerRealTimeOverviewModel();
+
+    List<HardwareInforCard.HardwareModel> Items { get; set; } = new List<HardwareInforCard.HardwareModel>();
+
+    bool IsReady;
+    TimeSpan NetworkLatency;
+    private System.Threading.Timer mytimer;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool IsRefresh = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 2);
+        }
+    }
+
+    public async void Send(object o)
+    {
+        await InvokeAsync(async () =>
+        {
+            await GetData();
+            ProcData();
+            StateHasChanged();
+        });
+
+    }
+
+    public async Task GetData()
+    {
+        if (IsRefresh)
+        {
+            return;
+        }
+        IsRefresh = true;
+        try
+        {
+            Model = SystemEnvironmentHelper.GetServerRealTimeDataOverview();
+
+            IsReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取Blazor API服务器动态数据失败");
+        }
+
+        IsRefresh = false;
+    }
+
+    public void ProcData()
+    {
+        Items.Clear();
+        if(Model.CPUUtilization>=0)
+        {
+            Items.Add(new HardwareInforCard.HardwareModel
+            {
+                Name = "CPU利用率",
+                Percentage = Model.CPUUtilization,
+                Items = new List<HardwareInforCard.InforModel>
+{
+                new HardwareInforCard.InforModel
+                {
+                    Name="核心数",
+                    Value=$"{ Model.CPUCoreNumber} 个"
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="活动时长",
+                    Value=Model.TotalProcessorTime.ToOmitString()
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="计算耗时",
+                    Value=Model.TimeSpanGetData.ToOmitString()
+                }
+            }
+            });
+        }
+
+
+
+        if (Model.Memory.Total != 0)
+        {
+            Items.Add(new HardwareInforCard.HardwareModel
+            {
+                Name = "内存利用率",
+                Percentage = 100 * (double)Model.Memory.Used / Model.Memory.Total,
+                Items = new List<HardwareInforCard.InforModel>
+            {
+                new HardwareInforCard.InforModel
+                {
+                    Name="工作集",
+                    Value=Model.Memory.TotalString
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="已使用",
+                    Value=Model.Memory.UsedString
+                }
+            }
+            });
+        }
+
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer.Dispose();
+            mytimer = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

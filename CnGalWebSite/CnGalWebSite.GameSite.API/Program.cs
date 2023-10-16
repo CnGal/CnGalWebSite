@@ -1,29 +1,28 @@
-﻿using CnGalWebSite.Core.Services.Query;
-using CnGalWebSite.ProjectSite.API.DataReositories;
-using CnGalWebSite.ProjectSite.API.Infrastructure;
+﻿using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using System.Text.Json.Serialization;
+using CnGalWebSite.GameSite.API.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
-using System.Text.Json.Serialization;
-using CnGalWebSite.ProjectSite.API.Extentions;
 using NetCore.AutoRegisterDi;
+using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.Core.Services;
-using CnGalWebSite.ProjectSite.API.Services;
-using Microsoft.AspNetCore.HttpOverrides;
+using CnGalWebSite.GameSite.API.Services;
+using Microsoft.IdentityModel.Tokens;
 using CnGalWebSite.HealthCheck.Models;
+using CnGalWebSite.GameSite.API.DataReositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers().AddJsonOptions(options =>
- {
-     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
-     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
-     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
- });
+{
+    options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+    options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 //添加数据库连接池
 builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseMySql(builder.Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(builder.Configuration["DefaultDBConnection"]),
@@ -39,7 +38,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "CnGal企划站 - API",
+        Title = "CnGal游戏站 - API",
         Description = "我们欢迎开发者使用这些API开发各个平台应用，如有困难请咨询网站管理人员",
         Contact = new OpenApiContact
         {
@@ -106,7 +105,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "ProjectAPI");
+        policy.RequireClaim("scope", "GameAPI");
     });
 });
 var app = builder.Build();

@@ -1,0 +1,57 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+
+
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
+    <MDCard Outline Class="pa-4">
+         <AuthorizeView>
+             <Authorized>
+                 <CnGalWebSite.GameSite.Shared.Components.Layout.Users.UserButton Admin />
+                 <MDivider Class="mt-2 mb-2" />
+
+                 <LeftMenu Style="background-color: transparent;" />
+
+             </Authorized>
+             <NotAuthorized>
+                 <CnGalWebSite.GameSite.Shared.Components.Layout.Users.LoginButton />
+                 <MDivider Class="mt-2 mb-2" />
+                 <MButton Text Block Left OnClick="OnRefresh">
+                     <MIcon Left>mdi-home</MIcon>
+                    主页
+                </MButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MDCard>
+</MNavigationDrawer>
+
+@code {
+    [Parameter]
+    public bool Drawer { get; set; }
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    bool isOpen;
+
+    public void SetDrawer(bool drawer)
+    {
+        Drawer = drawer;
+        StateHasChanged();
+
+    }
+    private void OnClickUrl(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        Drawer = false;
+        StateHasChanged();
+
+    }
+
+    private void OnClose()
+    {
+        Drawer = false;
+        StateHasChanged();
+
+    }
+
+
+}

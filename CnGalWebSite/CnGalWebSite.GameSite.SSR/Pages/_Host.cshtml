@@ -1,0 +1,120 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using CnGalWebSite.GameSite.Shared
+@using CnGalWebSite.GameSite.Shared.Components.Theme
+@namespace CnGalWebSite.GameSite.SSR.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using CnGalWebSite.Core.Models;
+@using Microsoft.AspNetCore.Authentication
+@using CnGalWebSite.Extensions
+
+@{
+    var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+    if (string.IsNullOrWhiteSpace(ip))
+    {
+        ip = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+    }
+    var connectionInfo = new ConnectionInfo()
+            {
+                RemoteIpAddress = ip
+            };
+
+    var mobile = HttpContext.Request.IsMobileBrowser();
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <base href="~/" />
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <!--组件库-->
+    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    @* <link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" /> *@
+
+    <!--Markdown编辑器-->
+    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
+
+    <!--图标-->
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
+
+    <!--字体-->
+    @*     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="@("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&display=swap")" rel="stylesheet">
+    *@
+    <!--自定义样式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.GameSite.Shared/css/bundle.css">
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css"> *@
+
+    <!--不同屏幕大小自适应样式-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.GameSite.Shared/css/break-point.css">
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css"> *@
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <component type="typeof(StyleCard)" render-mode="ServerPrerendered" />
+
+    <component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo" param-Mobile="mobile" />
+
+    <div id="blazor-error-ui" data-nosnippet>
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面，如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
+                        </div>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="components-reconnect-modal">
+    </div>
+
+    <!--自定义脚本-->
+    <script src="_content/CnGalWebSite.GameSite.Shared/js/bundle.js"></script>
+    @* <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script> *@
+
+    <!--图片裁剪-->
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+
+    <!--代码语法高亮-->
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
+
+    <!--Markdown编辑器-->
+    <script src="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.min.js"></script>
+
+    <!--图表-->
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/echarts/5.1.1/echarts.min.js"></script>
+
+    <!--埋点数据采集-->
+    @* <script async src="https://umami.cngal.top/script.js" data-website-id="744d79fe-d18f-416b-893a-48f55f7a1012"></script> *@
+
+    <!--运行时-->
+    @* <script src="_framework/blazor.server.js"></script> *@
+    <script src="https://res.cngal.org/_framework/blazor.server.8.0-rc2.js"></script>
+
+    <!--组件库-->
+    @* <script src="_content/BlazorComponent/js/blazor-component.js"></script> *@
+    <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+    <persist-component-state />
+</body>
+</html>

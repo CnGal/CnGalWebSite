@@ -1,0 +1,142 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IUserService _userService
+@inject ISettingService _settingService
+
+@implements IDisposable
+
+@if (_settingService.IsApp)
+{
+
+    <div style="display: flex;flex-direction: column;">
+        <CnGalWebSite.Components.Containers.MiniModeContainer>
+            <a class="d-flex on-surface-text" href="@("user/space/"+_userService.UserInfo.Id)" style="align-items: center; flex-direction: column; ">
+                <img src="@_userService.UserInfo.PhotoPath" alt="@_userService.UserInfo.Name" style="width:60px;border-radius:50%;" />
+                <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
+                    <span class="title-large mb-1">@_userService.UserInfo.Name</span>
+                 </div>
+             </a>
+             <MDivider Class="mt-2 mb-2" />
+         </CnGalWebSite.Components.Containers.MiniModeContainer>
+
+         <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="主页" Icon="@IconType.Home.ToIconString()" Href="/" />
+         @if (Admin == false)
+        {
+            <MDivider Class="mt-2 mb-2" />
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="管理员后台" Icon="mdi-car-traction-control" Href="/admin" Color="secondary" />
+                 </Authorized>
+             </AuthorizeView>
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="个人空间" Icon="mdi-star" Href="@($"/user/space/{_userService.UserInfo.Id}")" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="编辑资料" Icon="@IconType.Edit.ToIconString()" Href="@($"/user/edit/{_userService.UserInfo.Id}")" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="主题设置" Icon="@IconType.Setting.ToIconString()" OnClick="OnClickSetting" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="退出登入" Icon="@IconType.Logout.ToIconString()" OnClick="_userService.Logout" />
+        }
+    </div>
+   
+}
+else
+{
+    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+         <ActivatorContent Context="m">
+             <MTooltip Bottom>
+             <ActivatorContent Context="c">
+                 @{
+                        var attrs = new Dictionary<string, object>();
+                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    }
+                    <MButton Icon Class="me-4" @attributes="@attrs">
+                         <CnGalWebSite.Components.Images.MasaImage Style="width: 35px; border-radius: 50%; aspect-ratio: 1" Src="@_userService.UserInfo.PhotoPath" Alt="@_userService.UserInfo.Name" Type="ImageType.Avatar" />
+                     </MButton>
+                 </ActivatorContent>
+                 <ChildContent>
+                     <span>@_userService.UserInfo.Name</span>
+                 </ChildContent>
+             </MTooltip>
+         </ActivatorContent>
+
+         <ChildContent>
+             <MDCard Class="pa-3" Style="width:300px;flex-direction: column; align-items: center; ">
+                 <div class="d-flex" style="align-items: center; flex-direction: column; ">
+                    <CnGalWebSite.Components.Images.MasaImage Src="@_userService.UserInfo.PhotoPath" Alt="@_userService.UserInfo.Name" Style="width:60px;border-radius:50%;" Type="ImageType.Avatar" />
+                     <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
+                        <span class="title-large mb-1">@_userService.UserInfo.Name</span>
+                     </div>
+                 </div>
+                 <MDivider Class="w-100 mt-2 mb-2"></MDivider>
+                 <div class="w-100" style="display: flex;flex-direction: column;">
+                     <AuthorizeView Roles="Admin">
+                         <Authorized>
+                             <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="管理员后台" Icon="mdi-car-traction-control" Href="/admin" Color="secondary" />
+                         </Authorized>
+                     </AuthorizeView>
+                     <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="个人空间" Icon="mdi-star" Href="@($"/user/space/{_userService.UserInfo.Id}")" />
+                     <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="编辑资料" Icon="@IconType.Edit.ToIconString()" Href="@($"/user/edit/{_userService.UserInfo.Id}")" />
+                     <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="主题设置" Icon="@IconType.Setting.ToIconString()" OnClick="OnClickSetting" />
+                     <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="退出登入" Icon="@IconType.Logout.ToIconString()" OnClick="_userService.Logout" />
+                 </div>
+             </MDCard>
+         </ChildContent>
+     </MMenu>
+
+}
+
+<CnGalWebSite.GameSite.Shared.Components.Layout.SettingDialog @ref="settingDialog" />
+
+
+@code {
+    [Parameter]
+    public bool Admin { get; set; }
+
+    private bool menu { get; set; }
+
+    CnGalWebSite.GameSite.Shared.Components.Layout.SettingDialog settingDialog;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshUserInfor();
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        _userService.UserInfoChanged += OnUserInfoChanged;
+
+    }
+
+    public void OnUserInfoChanged()
+    {
+        StateHasChanged();
+    }
+
+    public async Task RefreshUserInfor()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                await _userService.Refresh(user.User.Claims.GetUserId());
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            }
+        }
+    }
+
+    public void OnClickSetting()
+    {
+        settingDialog?.Refresh();
+    }
+
+    public void Dispose()
+    {
+        _userService.UserInfoChanged -= OnUserInfoChanged;
+        GC.SuppressFinalize(this);
+    }
+}
