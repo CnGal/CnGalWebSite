@@ -28,6 +28,9 @@
                  <MTab Value="3">
                      认证<MIcon>@IconType.Certification.ToIconString()</MIcon>
                  </MTab>
+                    <MTab Value="4">
+                        应征<MIcon>@IconType.Flag.ToIconString()</MIcon>
+                    </MTab>
 
              </MTabs>
          </MDCard>
@@ -48,7 +51,9 @@
                  <MTab Value="3">
                      认证<MIcon>@IconType.Certification.ToIconString()</MIcon>
                  </MTab>
-
+                    <MTab Value="4">
+                        应征<MIcon>@IconType.Flag.ToIconString()</MIcon>
+                    </MTab>
              </MTabs>
          </MDCard>
     }
@@ -75,6 +80,9 @@
         </MTabItem>
         <MTabItem Value="3">
             <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.CertificationCard Model="Model"/>
+        </MTabItem>
+        <MTabItem Value="4">
+            <CnGalWebSite.ProjectSite.Shared.Components.Users.MainCards.PositionGroupCard Model="Model.Positions" />
         </MTabItem>
     </MTabsItems>
 

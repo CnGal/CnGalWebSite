@@ -1,0 +1,21 @@
+﻿@if (Model.Any())
+{
+    <MRow>
+        @foreach (var item in Model)
+        {
+            <MCol Cols="12" Md="6" Class="mb-4">
+                <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.ProjectPositionInfoCard Model="item" />
+            </MCol>
+        }
+    </MRow>
+
+}
+else
+{
+    <NotFoundCard Fill />
+}
+
+@code {
+    [Parameter]
+    public List<ProjectPositionInfoViewModel> Model { get; set; }
+}
