@@ -45,6 +45,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// 预览文本
         /// </summary>
         public List<UserTextViewModel> Texts { get; set; } = new List<UserTextViewModel>();
+
+        /// <summary>
+        /// 应征约稿列表
+        /// </summary>
+        public List<ProjectPositionInfoViewModel> Positions { get; set; } = new List<ProjectPositionInfoViewModel>();
     }
 
     public class UserTextViewModel

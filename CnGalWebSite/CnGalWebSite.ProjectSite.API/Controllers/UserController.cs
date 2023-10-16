@@ -28,8 +28,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IStallService _stallService;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IRepository<ApplicationUser, string> userRepository, IProjectService projectService, IStallService stallService, IQueryService queryService)
+        public UserController(ILogger<UserController> logger, IUserService userService, IRepository<ApplicationUser, string> userRepository, IProjectService projectService, IStallService stallService, IQueryService queryService,
+            IRepository<ProjectPositionUser, long> projectPositionUserRepository)
         {
             _logger = logger;
             _userService = userService;
@@ -37,6 +39,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _projectService=projectService;
             _stallService = stallService;
             _queryService = queryService;
+            _projectPositionUserRepository = projectPositionUserRepository;
         }
 
         [HttpGet]
@@ -264,6 +267,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Include(s => s.Audios)
                 .FirstOrDefaultAsync(s => s.Id == userinfo.Id);
 
+            var positions = await _projectPositionUserRepository.GetAll().AsNoTracking().Include(s => s.Position).ThenInclude(s=>s.Project).ThenInclude(s=>s.CreateUser).Where(s => s.UserId == user.Id && s.Passed==true).Select(s=>s.Position).ToListAsync();
+
             return new UserSpaceViewModel
             {
                 TabIndex= user.Type== UserType.Person? 2 : 0,
@@ -292,6 +297,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Content = s.Content,
                     Link = s.Link,
                 }).ToList(),
+                Positions= positions.Select(s=>_projectService.GetProjectPositionInfoViewModel(s)).ToList(),
             };
         }
 
