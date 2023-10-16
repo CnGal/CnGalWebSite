@@ -1,0 +1,149 @@
+﻿@page "/admin/listcomments"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="留言版块" />
+
+<MDCard>
+    <DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 140px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>Read(context.Item)">@IconType.Read.ToIconString()</MIcon>
+                        <MIcon Color="info"
+                               Class="mr-2"
+                               OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                        <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.Hide)
+                    {
+                        <MIcon Color="warning"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+                </div>
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.Hide))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Projects.HideChip Hide="context.Item.Hide" />
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.UserName))
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(CommentOverviewModel.Text))
+            {
+                <div style="white-space: pre-line;width: 300px;word-break: break-all;">
+                    @context.Item.Text
+                </div>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
+
+@code {
+    private string _baseUrl = "api/comment/List";
+    private string _name = "留言";
+
+    private List<DataTableHeader<CommentOverviewModel>> _headers = new List<DataTableHeader<CommentOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(CommentOverviewModel.Id)
+          },
+          new (){ Text= "时间", Value= nameof(CommentOverviewModel.CreateTime)},
+          new (){ Text= "用户", Value= nameof(CommentOverviewModel.UserName)},
+          new (){ Text= "内容", Value= nameof(CommentOverviewModel.Text)},
+          new (){ Text= "状态", Value= nameof(CommentOverviewModel.Hide)},
+          new (){ Text= "优先级", Value= nameof(CommentOverviewModel.Priority)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<CommentOverviewModel> dataTableCard;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void Read(CommentOverviewModel model)
+    {
+        if (model.PageType == PageType.Project)
+        {
+            NavigationManager.NavigateTo($"/project/{model.PageId}");
+        }
+    }
+
+    public async Task EditItemPriority(CommentOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            var obj = await _httpService.PostAsync<EditPriorityModel, Result>("api/comment/EditPriority", new EditPriorityModel { Id = model.Id, PlusPriority = up ? 1 : -1 });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+
+    public async Task HideItem(CommentOverviewModel model, bool isHidden)
+    {
+        string operationName = isHidden ? "隐藏评论" : "显示评论";
+        try
+        {
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/comment/Hide", new HideModel { Id = model.Id , Hide = isHidden });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

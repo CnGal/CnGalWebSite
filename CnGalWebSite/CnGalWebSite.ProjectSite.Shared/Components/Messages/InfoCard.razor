@@ -1,0 +1,73 @@
+﻿@inject IUserService _userService
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard Class="message-info-card pa-4 mb-4">
+    <div class="title-medium">@Model.Type.GetDisplayName()</div>
+    <div class="d-flex">
+        <MIcon Small Class="me-2" Color="primary">@IconType.DeterminedTime.ToIconString()</MIcon>
+            @Model.CreateTime.ToString("yyyy-MM-dd HH:mm")
+    </div>
+    <div class="conten-card">
+        @Model.Text
+    </div>
+    <div class="action-card">
+        @if (!Model.Read)
+        {
+            <CnGalWebSite.Components.Buttons.MasaButton Text="忽略" OnClick="OnIgnore" Small TextStyle />
+        }
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-share-all-outline" Text="查看" Rounded OnClick="OnRead" Small />
+     </div>
+ </MDCard>
+
+ @code {
+    [Parameter]
+    public MessageViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnIgnore()
+    {
+        var _name = "忽略消息";
+        try
+        {
+            var obj = await _httpService.PostAsync<ReadMessageModel, Result>("api/message/read", new ReadMessageModel
+                {
+                    Id = Model.Id,
+                    Read = true
+                });
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                //await PopupService.ToastSuccessAsync($"{_name}成功");
+                Model.Read = true;
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+    }
+
+    public async Task OnRead()
+    {
+        if (Model.Read == false)
+        {
+            await OnIgnore();
+        }
+
+        if(Model.PageType== PageType.Project)
+        {
+            NavigationManager.NavigateTo($"/project/{Model.PageId}");
+        }
+    }
+}

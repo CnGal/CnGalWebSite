@@ -1,0 +1,146 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+@inject IUserService _userService
+
+<MDCard Class="@($"pa-4 mb-3  {(IsChild?"elevation-2":"")}")" Color="@(IsChild?"primary":"background")">
+    <div>
+        <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.UserInfoCard Model="Model.UserInfor" Outline Class="mb-2"/>
+        <div class="mb-2">
+             @(ReplyTip + Model.Text)
+        </div>
+         <div class="mb-2 d-flex" style="justify-content: flex-end;">
+             <MIcon Small Class="me-2" Color="primary">@IconType.DeterminedTime.ToIconString()</MIcon>
+                @Model.CreateTime.ToString("yyyy-MM-dd HH:mm")
+         </div>
+        <AuthorizeView>
+            <Authorized>
+                <div style=" display: flex; justify-content: flex-end; ">
+                    @if (IsReplying)
+                    {
+                        <CnGalWebSite.Components.Buttons.MasaButton Small Text="取消回复" OnClick="OnUnReplyClick" Icon="@IconType.Close.ToIconString()" Rounded />
+                    }
+                    else
+                    {
+                        <CnGalWebSite.Components.Buttons.MasaButton Small Text="回复" OnClick="OnReplyClick" Icon="@IconType.Comment.ToIconString()" IsAsync Rounded />
+                    }
+
+
+                    @if (_userService.UserInfo.Id==Model.UserInfor.Id)
+                    {
+                        <CnGalWebSite.Components.Buttons.MasaButton Small Text="删除" OnClick="OnDeleteClick" Icon="@IconType.Delete.ToIconString()" IsAsync Rounded Class="ms-4" />
+                    }
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</MDCard>
+    @if (IsReplying)
+    {
+        <div class="@($"mb-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
+        <ReplyCommentTip ObjectId="@Model.Id" IsChild="true" Type="CommentType.Comment" OnRefresh="OnRely" PageType="PageType" PageId="PageId"></ReplyCommentTip>
+
+        </div>
+    }
+    @foreach (var item in Model.Children)
+    {
+        <div class="@($"mb-3 {(Deepth >= MaxDeepth?"":"ms-4")}")">
+        <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment" PageType="PageType" PageId="PageId"
+                            Deepth="Deepth+1" ParentCommentModel="@Model"></CommentPartTip>
+            </div>
+    }
+
+@code {
+    [Parameter]
+    public CommentViewModel Model { get; set; }
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+    [Parameter]
+    public PageType PageType { get; set; }
+    [Parameter]
+    public long PageId { get; set; }
+
+    [Parameter]
+    public CommentViewModel ParentCommentModel { get; set; }
+
+    public long LastId { get; set; }
+
+    [Parameter]
+    public int Deepth { get; set; }
+
+    private int MaxDeepth = 3;
+
+    bool isRead = false;
+
+    private bool IsReplying { get; set; }
+
+    private string StringMarked { get; set; }
+
+    public string ReplyTip { get { return Deepth > MaxDeepth ? $"回复 {ParentCommentModel.UserInfor.GetName()}：\n" : ""; } }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void OnReplyClick()
+    {
+        IsReplying = true;
+        StateHasChanged();
+    }
+
+    public void OnUnReplyClick()
+    {
+        IsReplying = false;
+        StateHasChanged();
+    }
+
+    public async Task OnRely()
+    {
+        //这是回复组件的事件回调
+        IsReplying = false;
+        await OnRefresh.InvokeAsync();
+    }
+
+    public async Task OnRely_Comment()
+    {
+        //这是级联传递的事件回调
+        await OnRefresh.InvokeAsync();
+    }
+
+    int count = 0;
+
+    private async Task OnDeleteClick()
+    {
+
+        //调用API
+        try
+        {
+            count++;
+            if (count < 2)
+            {
+                await PopupService.ToastAsync("你确定要删除这条评论吗？确认删除请再次点击删除按钮", AlertTypes.Info);
+                return;
+            }
+
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/comment/hide", new HideModel { Id =  Model.Id , Hide = true });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync("删除评论失败", obj.Message);
+            }
+            else
+            {
+
+                await PopupService.ToastAsync("删除评论成功", AlertTypes.Success);
+                await OnRefresh.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "删除评论失败");
+        }
+    }
+}

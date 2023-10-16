@@ -50,6 +50,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         public UserType Type { get; set; }
 
         /// <summary>
+        /// 联系方式
+        /// </summary>
+        public string Contact { get; set; }
+
+        /// <summary>
         /// 图片
         /// </summary>
         public List<UserImageEditModel> Images { get; set; } = new List<UserImageEditModel>();
@@ -96,10 +101,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
                 return new Result { Success = false, Message = "请填写作品描述" };
             }
 
-            if (string.IsNullOrWhiteSpace(Link))
-            {
-                return new Result { Success = false, Message = "请填写作品链接" };
-            }
             return new Result { Success = true };
         }
     }

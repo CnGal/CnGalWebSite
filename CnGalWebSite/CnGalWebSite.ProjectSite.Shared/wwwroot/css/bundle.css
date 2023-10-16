@@ -1596,6 +1596,42 @@ html {
     gap: .5rem;
     padding: 1rem;
 }
+/*用户小卡片*/
+.info-card-user {
+    flex-direction: row;
+    gap: .7rem;
+    width: fit-content;
+}
+
+    .info-card-user .image-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .info-card-user.small .image-card img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .info-card-user .image-card {
+        display: flex;
+        align-items: center;
+    }
+
+    .info-card-user .content-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+        .info-card-user .content-card .name {
+            word-break: keep-all;
+        }
+
+a.info-card-user {
+    color: var(--md-sys-color-on-background) !important;
+}
 
 .edit-submit-card {
     display: flex;
@@ -1656,6 +1692,10 @@ html {
         white-space: break-spaces;
     }
 
+    .project-position-card .action-card {
+        align-self: flex-end;
+    }
+
     .project-position-card .name-card {
         gap: .5rem;
         display: flex;
@@ -1710,6 +1750,21 @@ html {
         display: flex;
         flex-wrap: wrap;
         gap: .5rem;
+    }
+/*企划约稿应征用户*/
+.position-user-card {
+    padding: 1rem;
+    gap: .5rem;
+}
+
+    .position-user-card .action-card {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .position-user-card .contact-card > div {
+        white-space: pre;
     }
 
 /*访谈*/
@@ -1876,4 +1931,14 @@ html {
 
     .stall-text-card .content-card {
         white-space: break-spaces;
+    }
+
+.message-info-card {
+    gap: .5rem;
+}
+
+    .message-info-card .action-card {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
     }

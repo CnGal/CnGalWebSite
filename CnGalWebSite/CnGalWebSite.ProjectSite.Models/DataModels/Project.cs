@@ -124,8 +124,29 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// </summary>
         public string Type { get; set; }
 
+        /// <summary>
+        /// 应征用户
+        /// </summary>
+        public List<ProjectPositionUser> Users { get; set; }
+
         public long ProjectId { get; set; }
         public Project Project { get; set; }
+    }
+
+    public class ProjectPositionUser
+    {
+        public long Id { get; set; }
+
+        public long PositionId { get; set; }
+        public ProjectPosition Position { get; set; }
+
+        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 是否通过
+        /// </summary>
+        public bool? Passed { get; set; }
     }
 
     public enum PositionUrgencyType

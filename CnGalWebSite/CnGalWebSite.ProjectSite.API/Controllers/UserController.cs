@@ -87,6 +87,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 PersonName = item.PersonName,
                 Type = item.Type,
                 Id = item.Id,
+                Contact = item.Contact,
                 Images = item.Images.Select(s => new UserImageEditModel
                 {
                     Id = s.Id,
@@ -108,6 +109,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     Name = s.Name,
                     Content = s.Content,
+                    Link=s.Link,
                     Id = s.Id
                 }).ToList(),
             };
@@ -131,6 +133,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             {
                 return new Result { Success = false, Message = "项目不存在" };
             }
+            if(await _userRepository.AnyAsync(s=>s.Id!=model.Id&&s.UserName==model.Name))
+            {
+                return new Result { Success = false, Message = "用户名重复" };
+            }
 
             item.Avatar = model.Avatar;
             item.BackgroundImage = model.BackgroundImage;
@@ -139,6 +145,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             item.OrganizationName = model.OrganizationName;
             item.PersonDescription = model.PersonDescription;
             item.PersonName = model.PersonName;
+            item.Contact = model.Contact;
 
             //相册
             item.Images.RemoveAll(s => model.Images.Select(s => s.Id).Contains(s.Id) == false);

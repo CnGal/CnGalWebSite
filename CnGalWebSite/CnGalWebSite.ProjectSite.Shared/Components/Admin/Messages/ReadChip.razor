@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(Read?"已读":"未读")" />
+
+ @code {
+    [Parameter]
+    public bool Read { get; set; }
+
+    public string GetColor()
+    {
+        return Read switch
+        {
+            true => "success",
+            false => "error"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return Read switch
+        {
+            false => IconType.MessageUnRead,
+            true => IconType.MessageRead,
+        };
+    }
+}

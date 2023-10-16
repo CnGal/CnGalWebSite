@@ -13,6 +13,8 @@ using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
 using CnGalWebSite.ProjectSite.API.Services.Projects;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
+using CnGalWebSite.ProjectSite.API.Services.Messages;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -23,26 +25,34 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     {
         private readonly IRepository<Project, long> _projectRepository;
         private readonly IRepository<ProjectPosition, long> _projectPositionRepository;
+        private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
         private readonly IUserService _userService;
         private readonly IProjectService _projectService;
         private readonly IQueryService _queryService;
+        private readonly IMessageService _messageService;
 
-        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService, IProjectService projectService, IRepository<ProjectPosition, long> projectPositionRepository)
+        public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService, IProjectService projectService, IRepository<ProjectPosition, long> projectPositionRepository,
+            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IMessageService messageService)
         {
             _projectRepository = projectRepository;
             _userService = userService;
             _queryService = queryService;
             _projectService = projectService;
             _projectPositionRepository = projectPositionRepository;
+            _projectPositionUserRepository = projectPositionUserRepository;
+            _messageService = messageService;
         }
 
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<ProjectViewModel>> GetAsync([FromQuery] long id)
         {
-            var item = await _projectRepository.GetAll()
+            var user = await _userService.GetCurrentUserAsync();
+
+            var item = await _projectRepository.GetAll().AsNoTracking()
+                .Include(s=>s.CreateUser)
                 .Include(s => s.Images)
-                .Include(s => s.Positions)
+                .Include(s => s.Positions).ThenInclude(s=>s.Users).ThenInclude(s=>s.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (item == null)
@@ -52,7 +62,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             var model = new ProjectViewModel
             {
-                Contact = item.Contact,
+                Contact = item.Positions.Any(s => s.Users.Any(s => s.UserId == user?.Id && s.Passed == true)) ? item.Contact : null,
                 Description = item.Description,
                 Name = item.Name,
                 EndTime = item.EndTime,
@@ -66,7 +76,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Priority = s.Priority,
                 }).ToList(),
 
-                Positions = item.Positions.Where(s=>s.Hide==false).Select(s => new ProjectPositionViewModel
+                Positions = item.Positions.Where(s => s.Hide == false).Select(s => new ProjectPositionViewModel
                 {
                     BudgetNote = s.BudgetNote,
                     DeadLine = s.DeadLine,
@@ -79,8 +89,16 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Percentage = s.Percentage,
                     UrgencyType = s.UrgencyType,
                     Type = s.Type,
+                    Id = s.Id,
+                    Users = s.Users.Select(s => new ProjectPositionUserViewModel
+                    {
+                        User = _userService.GetUserInfo(s.User),
+                        Id = s.Id,
+                        Passed = s.Passed,
+                        Contact = item.CreateUserId == user?.Id && s.Passed == true ? s.User.Contact : null
+                    }).ToList()
                 }).ToList(),
-                CreateUser = await _userService.GetUserInfo(item.CreateUserId)
+                CreateUser = _userService.GetUserInfo(item.CreateUser)
             };
 
             return model;
@@ -330,7 +348,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             return projects.Select(s => _projectService.GetProjectPositionInfoViewModel(s)).ToList();
         }
 
-
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<ProjectPositionOverviewModel>> ListPositions(QueryParameterModel model)
@@ -359,7 +376,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Parameter = model
             };
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -395,5 +411,100 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             return new Result { Success = true };
         }
 
+        [HttpPost]
+        public async Task<Result> ApplyProjectPosition(ApplyProjectPositionModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+
+            var position = await _projectPositionRepository.GetAll().AsNoTracking().Include(s=>s.Project).FirstOrDefaultAsync(s => s.Id == model.PositionId);
+            if (position == null)
+            {
+                return new Result { Success = false, Message = "找不到这个约稿" };
+            }
+
+            if(position.DeadLine<DateTime.Now.ToCstTime())
+            {
+                return new Result { Success = false, Message = "已经过了截止日期" };
+            }
+
+            if(await _projectPositionUserRepository.AnyAsync(s=>s.PositionId==model.PositionId&&s.UserId==user.Id))
+            {
+                if(model.Apply)
+                {
+                    return new Result { Success = false, Message = "你已经应征了" };
+                }
+                else
+                {
+                    await _projectPositionUserRepository.DeleteAsync(s => s.PositionId == model.PositionId && s.UserId == user.Id);
+
+                    //向用户发送消息
+                    await _messageService.PutMessage(new PutMessageModel
+                    {
+                        PageId = position.Project.Id,
+                        PageType = PageType.Project,
+                        Text = $"“{user.GetName()}”取消应征你的企划“{position.Project.Name}”",
+                        Type = MessageType.ApplyProjectPosition,
+                        UserId = position.Project.CreateUserId,
+                    });
+
+                    return new Result { Success = true };
+                }
+            }
+
+            await _projectPositionUserRepository.InsertAsync(new ProjectPositionUser
+            {
+                PositionId = model.PositionId,
+                UserId = user.Id,
+            });
+
+            //向用户发送消息
+            await _messageService.PutMessage(new PutMessageModel
+            {
+                PageId = position.Project.Id,
+                PageType = PageType.Project,
+                Text = $"“{user.GetName()}”应征你的企划“{position.Project.Name}”",
+                Type = MessageType.ApplyProjectPosition,
+                UserId = position.Project.CreateUserId,
+            });
+
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        public async Task<Result> ProcProjectPosition(ProcProjectPositionModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+
+            var positionUser = await _projectPositionUserRepository.GetAll()
+                .Include(s=>s.Position).ThenInclude(s=>s.Project)
+                .FirstOrDefaultAsync(s => s.Id == model.UserId);
+
+            if (positionUser == null)
+            {
+                return new Result { Success = false, Message = "找不到这个应征用户" };
+            }
+
+            if(positionUser.Position.Project.CreateUserId!=user.Id&&! _userService.CheckCurrentUserRole("Admin"))
+            {
+                return new Result { Success = false, Message = "权限不足" };
+            }
+
+            positionUser.Passed = model.Passed;
+
+            await _projectPositionUserRepository.UpdateAsync(positionUser);
+
+            //向用户发送消息
+            await _messageService.PutMessage(new PutMessageModel
+            {
+                PageId = positionUser.Position.Project.Id,
+                PageType = PageType.Project,
+                Text = $"应征的企划“{positionUser.Position.Project.Name}”{(model.Passed==true?"选定":"取消选定")}了你",
+                Type = MessageType.PassedPositionUser,
+                UserId = positionUser.UserId,
+            });
+
+
+            return new Result { Success = true };
+        }
     }
 }

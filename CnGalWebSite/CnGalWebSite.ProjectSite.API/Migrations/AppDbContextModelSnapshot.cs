@@ -36,6 +36,9 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Contact")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
 
@@ -142,6 +145,49 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.ToTable("Carousels");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Comment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("ObjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("PageType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.FriendLink", b =>
                 {
                     b.Property<long>("Id")
@@ -172,6 +218,49 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FriendLinks");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Message", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("PageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("PageType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
@@ -302,6 +391,30 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectPositions");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPositionUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("Passed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("PositionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectPositionUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Stall", b =>
@@ -610,6 +723,26 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.ToTable("UserTexts");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Comment", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Message", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Project", b =>
                 {
                     b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", "CreateUser")
@@ -637,6 +770,24 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPositionUser", b =>
+                {
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPosition", "Position")
+                        .WithMany("Users")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.ProjectSite.Models.DataModels.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Position");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Stall", b =>
@@ -737,6 +888,11 @@ namespace CnGalWebSite.ProjectSite.API.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Positions");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.ProjectPosition", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("CnGalWebSite.ProjectSite.Models.DataModels.Stall", b =>

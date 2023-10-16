@@ -1,0 +1,78 @@
+﻿@page "/user/messages"
+
+@inject IPageModelCatche<MessagePageModel> _pageModelCatche
+
+@if (Model == null)
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+else
+{
+    <MDCard Class="mb-4">
+        <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+             <MTab Value="0">
+                 未读<MIcon>@IconType.MessageUnRead.ToIconString()</MIcon>
+                </MTab>
+                <MTab Value="1">
+                    已读<MIcon>@IconType.MessageRead.ToIconString()</MIcon>
+                </MTab>
+            </MTabs>
+        </MDCard>
+    <MTabsItems Value="Model.TabIndex">
+        <MTabItem Value="0">
+            @foreach(var item in Model.UnRead.Items)
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Messages.InfoCard Model="item" OnChanged="@(()=>Read(item))" />
+            }
+            @if(!Model.UnRead.Items.Any())
+            {
+                <NotFoundCard Fill/>
+            }
+        </MTabItem>
+        <MTabItem Value="1">
+            @foreach (var item in Model.Read.Items)
+            {
+                <CnGalWebSite.ProjectSite.Shared.Components.Messages.InfoCard Model="item" />
+            }
+            @if (!Model.Read.Items.Any())
+            {
+                <NotFoundCard Fill />
+            }
+        </MTabItem>
+    </MTabsItems>
+}
+
+@code {
+    MessagePageModel Model;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/message/get");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取消息列表失败");
+        }
+    }
+
+    public void TabValueChanged(StringNumber index)
+    {
+        if (index != null)
+        {
+            Model.TabIndex = index.ToInt32();
+        }
+    }
+
+    public void Read(MessageViewModel model)
+    {
+        Model.Read.Items.Add(model);
+        Model.UnRead.Items.Remove(model);
+        StateHasChanged();
+    }
+}

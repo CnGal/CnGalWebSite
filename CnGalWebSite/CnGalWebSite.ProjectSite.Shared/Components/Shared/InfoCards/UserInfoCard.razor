@@ -1,0 +1,45 @@
+﻿@if (Model != null)
+{
+    <MDCard Outline="Outline" ShowHoverStyle="!Outline" Href="@($"{(string.IsNullOrWhiteSpace(Href)?$"/user/space/{Model.Id}/{(int)Type}":Href)}")" Class="@($"info-card-user {Class} {(Small?"small":"")} {(Outline?"":"pa-3 pt-2 pb-2")}" )">
+         <div class="image-card">
+             <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Alt="@Model.Name" Type="ImageType.Avatar"/>
+         </div>
+         <div class="content-card">
+             <div style="display: flex;align-items: center;gap: 1rem;">
+                <span class="@($"name title-medium")" itemprop="name">
+                    @GetName()
+                 </span>
+            </div>
+            <div class="label-large  text-truncate-1">
+                @(Type == UserType.Person ? Model.PersonDescription : Model.OrganizationDescription)
+            </div>
+        </div>
+    </MDCard>
+}
+
+@code {
+    [Parameter]
+    public UserInfoViewModel Model { get; set; }
+    [Parameter]
+    public UserType Type { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+
+    public string GetName()
+    {
+        if (Type == UserType.Organization)
+        {
+            return Model.OrganizationName ?? Model.Name;
+        }
+        else
+        {
+            return Model.PersonName ?? Model.Name;
+        }
+    }
+}

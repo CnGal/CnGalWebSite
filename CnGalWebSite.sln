@@ -107,7 +107,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.GameSite.Share
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.GameSite.Models", "CnGalWebSite\CnGalWebSite.GameSite.Models\CnGalWebSite.GameSite.Models.csproj", "{34A5E2DA-ADB5-4D20-9113-DC6AD6564A79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.GameSite.API", "CnGalWebSite\CnGalWebSite.GameSite.API\CnGalWebSite.GameSite.API.csproj", "{12416B28-47CE-40DC-92E3-FCFD36E40D0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.GameSite.API", "CnGalWebSite\CnGalWebSite.GameSite.API\CnGalWebSite.GameSite.API.csproj", "{12416B28-47CE-40DC-92E3-FCFD36E40D0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -52,6 +52,10 @@
         white-space: break-spaces;
     }
 
+    .project-position-card .action-card {
+        align-self: flex-end;
+    }
+
     .project-position-card .name-card {
         gap: .5rem;
         display: flex;
@@ -106,4 +110,19 @@
         display: flex;
         flex-wrap: wrap;
         gap: .5rem;
+    }
+/*企划约稿应征用户*/
+.position-user-card {
+    padding: 1rem;
+    gap: .5rem;
+}
+
+    .position-user-card .action-card {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .position-user-card .contact-card > div {
+        white-space: pre;
     }

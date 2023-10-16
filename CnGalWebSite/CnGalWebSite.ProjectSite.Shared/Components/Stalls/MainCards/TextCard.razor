@@ -3,9 +3,13 @@
         <div class="content-card">
             @Model.Content
         </div>
-        <div class="link-card">
-            链接：<a href="@Model.Link" target="_blank">@Model.Link</a>
-        </div>
+        @if (string.IsNullOrWhiteSpace(Model.Link) == false)
+        {
+            <div class="link-card">
+                链接：<a href="@Model.Link" target="_blank">@Model.Link</a>
+            </div>
+        }
+
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 

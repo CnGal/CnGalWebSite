@@ -202,7 +202,11 @@ namespace CnGalWebSite.Components.Models
         Music,
         Programmer,
         Writer,
-        Stall
+        Stall,
+        Flag,
+        Message,
+        MessageRead,
+        MessageUnRead,
     }
 
     public static class IconTypeHelper
@@ -211,6 +215,14 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.MessageUnRead:
+                    return "mdi-message-badge";
+                case IconType.MessageRead:
+                    return "mdi-message-outline";
+                case IconType.Message:
+                    return "mdi-bell-outline";
+                case IconType.Flag:
+                    return "mdi-flag";
                 case IconType.Stall:
                     return "mdi-tree";
                 case IconType.Writer:

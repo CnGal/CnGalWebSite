@@ -1,0 +1,91 @@
+﻿@inject IUserService _userService
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<MDCard Class="position-user-card mb-4">
+    <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.UserInfoCard Model="Model.User" Outline />
+     @if (string.IsNullOrWhiteSpace(Model.Contact) == false && Model.showComment)
+    {
+        <div class="contact-card">
+            <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Link" Title="联系方式" />
+            <div>@Model.Contact</div>
+        </div>
+    }
+
+    <div class="action-card">
+        @if (Creator || _userService.UserInfo.Id == Model.User.Id)
+        {
+            <CnGalWebSite.Components.Buttons.MasaButton Small Text="@( Model.showComment?"折叠":"展开")" OnClick="OnShowComment" TextStyle />
+            <MSpacer />
+        }
+        @if (Creator)
+        {
+            <CnGalWebSite.Components.Buttons.MasaButton Small Rounded="@(!(Model.Passed??false))" TextStyle="@((Model.Passed??false))"
+                                                         Text="@((Model.Passed??false)?"取消选定":"选定")" Icon="@((Model.Passed??false)?IconType.Close.ToIconString():IconType.Check.ToIconString())" OnClick="@Proc" />
+        }
+        @if (Creator || _userService.UserInfo.Id == Model.User.Id)
+        {
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Small Text="留言" Icon="@IconType.Comment.ToIconString()" OnClick="@OnShowReply" />
+        }
+    </div>
+
+</MDCard>
+
+<div class="ms-4 @(Model.showComment?"":"d-none")">
+    <CnGalWebSite.ProjectSite.Shared.Components.Comments.CommentTip ObjectId="@Model.Id" Type="CommentType.PositionUser" ShowReply=" Model.showReply" PageType="PageType.Project" PageId="Id" />
+</div>
+
+
+@code {
+    [Parameter]
+    public ProjectPositionUserViewModel Model { get; set; }
+    [Parameter]
+    public bool Creator { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void OnShowReply()
+    {
+        Model.showReply = !Model.showReply;
+        StateHasChanged();
+    }
+
+    public void OnShowComment()
+    {
+        Model.showComment = !Model.showComment;
+        StateHasChanged();
+    }
+
+    public async Task Proc()
+    {
+        var passed = !(Model.Passed ?? false);
+        var _name = passed ? "选定" : "取消选定";
+        try
+        {
+            var obj = await _httpService.PostAsync<ProcProjectPositionModel, Result>("api/project/ProcProjectPosition", new ProcProjectPositionModel
+                {
+                    UserId = Model.Id,
+                    Passed = passed
+                });
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+    }
+}
