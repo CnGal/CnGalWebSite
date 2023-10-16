@@ -1,0 +1,115 @@
+﻿/*关于我们*/
+
+.cngal-about-card {
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+    .cngal-about-card .head {
+        display: flex;
+        gap: 6rem;
+        flex-wrap: wrap;
+    }
+
+    .cngal-about-card .links-groups {
+        display: flex;
+        gap: 4rem;
+        margin-top: 1rem;
+    }
+
+    .cngal-about-card .links-item {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .cngal-about-card .links-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+
+
+    .cngal-about-card .quote-card {
+        max-width: 68rem;
+    }
+
+    .cngal-about-card .links-group h3 {
+        font-size: inherit;
+    }
+
+    .cngal-about-card .links-item a {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .cngal-about-card .introduce img {
+        height: 50px;
+        aspect-ratio: 23/5;
+    }
+
+    .cngal-about-card .introduce {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        max-width: 40rem;
+        gap: 1rem;
+    }
+
+    .cngal-about-card .text {
+        line-height: 1.3rem;
+    }
+
+    .cngal-about-card .addinfo {
+        display: flex;
+        justify-content: flex-start;
+        gap: 2rem;
+        align-items: center;
+    }
+
+        .cngal-about-card .addinfo div {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+    .cngal-about-card a:hover {
+        text-decoration: underline;
+    }
+/*标题图标卡片*/
+.icon-title-card {
+    display: flex;
+    gap: .5rem;
+}
+/*dd*/
+dl {
+    margin: 0
+}
+
+dd {
+    margin: 0
+}
+
+    dd a {
+        word-break: break-all
+    }
+
+dt {
+    font-weight: bold;
+}
+
+dl div {
+    display: flex;
+    flex-wrap: wrap
+}
+
+dt::after {
+    content: "："
+}
+
+dd + dd::before {
+    content: "："
+}

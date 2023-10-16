@@ -1,0 +1,65 @@
+﻿@inject ISettingService _settingService
+@implements IDisposable
+
+<!--主题颜色-->
+<link rel="stylesheet" href="@($"_content/CnGalWebSite.Components/css/material-theme/color-tokens/color-{_settingService.Settings.ThemeColor}-tokens.css")">
+
+<!--主题模式-->
+@if (_settingService.Settings.ThemeMode == ThemeMode.System)
+{
+    <!--跟随系统-->
+    <link rel="stylesheet" href="_content/CnGalWebSite.GameSite.Shared/css/theme.css" />
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/theme.css" /> *@
+}
+else if (_settingService.Settings.ThemeMode == ThemeMode.Dark)
+{
+    <!--暗色模式-->
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/dark/bundle-dark.min.css" /> *@
+    <link rel="stylesheet" href="_content/CnGalWebSite.GameSite.Shared/css/dark/bundle-dark.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/vs2015.min.css" />
+}
+else if (_settingService.Settings.ThemeMode == ThemeMode.Light)
+{
+    <!--亮色模式-->
+    @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/light/bundle-light.css" /> *@
+    <link rel="stylesheet" href="_content/CnGalWebSite.GameSite.Shared/css/light/bundle-light.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" />
+}
+
+<!--字体-->
+@if (string.IsNullOrWhiteSpace(_settingService.Settings.FontFamily) == false)
+{
+    <style>
+        body {
+            font-family: @_settingService.Settings.FontFamily !important;
+        }
+    </style>
+}
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        _settingService.SettingChanged -= OnSettingChanged;
+        _settingService.SettingChanged += OnSettingChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _settingService.LoadAsync();
+        }
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.SettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+}

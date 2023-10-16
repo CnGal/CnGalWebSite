@@ -1,0 +1,54 @@
+﻿@page "/"
+
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+
+
+<AuthorizeView Context="userContext">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="本地获取到的信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="mb-4">
+        <dl>
+            @foreach (var prop in userContext.User.Claims)
+            {
+                <div>
+                    <dt>@prop.Type</dt>
+                    <dd>@prop.Value</dd>
+                </div>
+            }
+        </dl>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+</AuthorizeView>
+@if (Claims != null && Claims.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="API远端获取到的信息" Icon="@IconType.Shape.ToIconString()" Collapable Class="mb-4">
+     <dl>
+         @foreach (var prop in Claims)
+            {
+                <div>
+                    <dt>@prop.Key</dt>
+                    <dd>@prop.Value</dd>
+                </div>
+            }
+        </dl>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+
+@code {
+    List<KeyValuePair<string, string>> Claims;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Claims = await _httpService.GetAsync<List<KeyValuePair<string, string>>>("api/user/GetUserClaims");
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取用户信息失败");
+        }
+    }
+}

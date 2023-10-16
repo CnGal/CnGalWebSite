@@ -1,0 +1,44 @@
+﻿[
+  {
+    "outputFileName": "wwwroot/js/bundle.js",
+    "inputFiles": [
+      "wwwroot/js/common.js",
+      "../CnGalWebSite.Components/wwwroot/js/bundle.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bundle.css",
+    "inputFiles": [
+      "../CnGalWebSite.Components/wwwroot/css/bundle.css",
+      "wwwroot/css/share/common.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/pc/bundle-pc.css",
+    "inputFiles": [
+      "wwwroot/css/pc/common.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/light/bundle-light.css",
+    "inputFiles": [
+      "wwwroot/css/light/common.css",
+      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.light.css",
+      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/dark/bundle-dark.css",
+    "inputFiles": [
+      "wwwroot/css/dark/common.css",
+      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.dark.css",
+      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown-dark.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/app/bundle-app.css",
+    "inputFiles": [
+      "wwwroot/css/app/common.css"
+    ]
+  }
+]

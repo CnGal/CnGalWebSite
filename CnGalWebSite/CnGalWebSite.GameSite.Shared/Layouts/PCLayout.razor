@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IPopupService PopupService
+
+<MAppBar App Class="elevation-2" Style="background-color: var(--md-sys-color-background)!important;">
+     <div style=" word-break: keep-all;" class="ms-4 me-8">
+        <CnGalWebSite.GameSite.Shared.Components.Layout.LogoCard />
+    </div>
+     <MTabs Class="cngal-main-tab-card" Routable>
+        <MTab Href="/">首页</MTab>
+    </MTabs>
+    <MSpacer></MSpacer>
+    <CnGalWebSite.GameSite.Shared.Components.Theme.SwitchThemeModeButton Class="mr-2" />
+
+    <AuthorizeView>
+        <NotAuthorized>
+            <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Setting.ToIconString()" Tooltip="设置" OnClick="OnClickSetting" Class="me-2" />
+        </NotAuthorized>
+    </AuthorizeView>
+    <CnGalWebSite.GameSite.Shared.Components.Layout.Users.LoginButton/>
+</MAppBar>
+
+<MMain>
+    <CnGalWebSite.Components.Containers.MasaContainer>
+        @Body
+    </CnGalWebSite.Components.Containers.MasaContainer>
+</MMain>
+<MFooter App Padless Absolute>
+    <CnGalWebSite.GameSite.Shared.Components.Layout.FooterCard />
+</MFooter>
+<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
+
+
+<CnGalWebSite.GameSite.Shared.Components.Layout.SettingDialog @ref="settingDialog" />
+
+@code {
+    CnGalWebSite.GameSite.Shared.Components.Layout.SettingDialog settingDialog;
+
+    public void OnClickSetting()
+    {
+        settingDialog?.Refresh();
+    }
+}

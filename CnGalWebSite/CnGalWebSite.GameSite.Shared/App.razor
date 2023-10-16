@@ -1,4 +1,5 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using CnGalWebSite.GameSite.Shared.Layouts
+@inject NavigationManager NavigationManager
 @inject IHttpService _httpService
 @inject IJSRuntime JS
 @inject I18n I18n
@@ -24,7 +25,7 @@
                         {
                             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="LayoutType">
                                 <NotAuthorized>
-                                    <CnGalWebSite.ProjectSite.Shared.Components.Errors.NotAuthorizedCard NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
+                                    <CnGalWebSite.GameSite.Shared.Components.Errors.NotAuthorizedCard NoPermissions="@(context.User.Identity?.IsAuthenticated == true)" />
                                 </NotAuthorized>
                                 <Authorizing>
 
