@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace CnGalWebSite.ProjectSite.Models.DataModels
 {
@@ -51,6 +52,11 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         public string Tags { get; set; }
 
         /// <summary>
+        /// 联系方式
+        /// </summary>
+        public string Contact { get; set; }
+
+        /// <summary>
         /// 企划
         /// </summary>
         public List<Project> Projects { get; set; }
@@ -89,6 +95,18 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// 既往作品
         /// </summary>
         public string PreviousWorks { get; set; }
+
+        public string GetName()
+        {
+            if (Type == UserType.Organization)
+            {
+                return OrganizationName ?? UserName;
+            }
+            else
+            {
+                return PersonName ?? UserName;
+            }
+        }
     }
 
     public enum UserType

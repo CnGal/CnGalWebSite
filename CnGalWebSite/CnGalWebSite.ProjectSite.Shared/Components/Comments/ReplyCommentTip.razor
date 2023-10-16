@@ -1,0 +1,74 @@
+﻿@inject IHttpService _httpService
+@inject IEventService _eventService
+@inject IPopupService PopupService
+@inject IUserService _userService
+
+<MDCard Class="@($"comment-reply-card pa-4  pt-3 mb-4  {(IsChild?"elevation-2":"")}")" Color="@(IsChild?"primary":"background")">
+    @if (string.IsNullOrWhiteSpace(_userService.UserInfo.Id) == false)
+    {
+        <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.UserInfoCard Model="_userService.UserInfo" Outline />
+    }
+        <MTextarea Rows="3"  Placeholder="请在留言板中友善发言，理性讨论"
+                   @bind-Value="Text">
+        </MTextarea>
+    
+
+    <div style="display: flex !important; flex-wrap: wrap; gap: 1rem;justify-content: flex-end;">
+        <CnGalWebSite.Components.Buttons.MasaButton Small Text="发布" IsAsync="true" OnClick="OnComment" Icon="@IconType.Published.ToIconString()" Rounded />
+    </div>
+</MDCard>
+@code {
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public CommentType Type { get; set; }
+
+    [Parameter]
+    public long ObjectId { get; set; }
+
+    [Parameter]
+    public PageType PageType { get; set; }
+
+    [Parameter]
+    public long PageId { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    public string Text { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public async void OnComment()
+    {
+        //上传
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Text))
+            {
+                await PopupService.ToastErrorAsync("发表评论失败", "你还什么都没说呢，我们不能发表空的评论哦");
+                return;
+            }
+            var obj = await _httpService.PostAsync<CommentEditModel, Result>("api/comment/edit", new CommentEditModel { ObjectId = ObjectId, Text = Text, Type = Type, PageType = PageType, PageId = PageId });
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync("发表评论失败", obj.Message);
+            }
+            else
+            {
+                Text = "";
+                await PopupService.ToastSuccessAsync("发表评论成功");
+                await OnRefresh.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "发表评论失败");
+        }
+    }
+}

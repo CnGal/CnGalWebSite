@@ -11,12 +11,13 @@
 {
     <MRow>
         <MCol Cols="12" Md="4" Lg="3">
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.InfoCard Model="Model"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.InfoCard Model="Model" />
         </MCol>
         <MCol Cols="12" Md="8" Lg="9">
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.DescriptionCard Model="Model"/>
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.ImageCard Model="Model"/>
-            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.PositionGroupCard Model="Model"/>
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.DescriptionCard Model="Model" />
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.ImageCard Model="Model" />
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.PositionGroupCard Model="Model" OnChanged="OnChanged" />
+            <CnGalWebSite.ProjectSite.Shared.Components.Projects.MainCards.PositionUserGroupCard Model="Model" OnChanged="OnChanged" />
         </MCol>
     </MRow>
 }
@@ -46,11 +47,15 @@ else
         await Refresh();
     }
 
-    public async Task Refresh()
+    public async Task Refresh(int tab = 0)
     {
         try
         {
             Model = await _pageModelCatche.GetCache($"api/project/get?id={Id}");
+            if (tab != 0)
+            {
+                Model.TabIndex = tab;
+            }
             StateHasChanged();
         }
         catch (Exception ex)
@@ -59,10 +64,19 @@ else
         }
     }
 
+    public async Task OnChanged()
+    {
+        var model = await _pageModelCatche.GetCache($"api/project/get?id={Id}");
+        var tab = model.TabIndex;
+        _pageModelCatche.Clean($"api/project/get?id={Id}");
+        await Refresh(tab);
+    }
+
     public async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
         await Refresh();
     }
+
 
     public void Dispose()
     {

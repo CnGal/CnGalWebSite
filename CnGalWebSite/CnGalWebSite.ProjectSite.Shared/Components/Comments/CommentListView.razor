@@ -1,0 +1,17 @@
+﻿@foreach (var item in Model)
+{
+    <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRefrsh" PageType="PageType" PageId="PageId"></CommentPartTip>
+}
+
+
+@code {
+    [Parameter]
+    public List<CommentViewModel> Model { get; set; }
+    [Parameter]
+    public EventCallback OnRefrsh { get; set; }
+    [Parameter]
+    public PageType PageType { get; set; }
+    [Parameter]
+    public long PageId { get; set; }
+
+}

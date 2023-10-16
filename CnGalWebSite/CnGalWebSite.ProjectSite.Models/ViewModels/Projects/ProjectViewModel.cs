@@ -4,6 +4,7 @@ using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +58,7 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// </summary>
         public DateTime UpdateTime { get; set; }
 
+        public int TabIndex { get; set; }
     }
 
     public class ProjectImageViewModel : BaseImageEditModel
@@ -66,6 +68,7 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
 
     public class ProjectPositionViewModel
     {
+        public long Id { get; set; }
         /// <summary>
         /// 职位详情
         /// </summary>
@@ -119,5 +122,31 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// 分成比例
         /// </summary>
         public int Percentage { get; set; }
+
+        /// <summary>
+        /// 应征用户
+        /// </summary>
+        public List<ProjectPositionUserViewModel> Users { get; set; } = new List<ProjectPositionUserViewModel>();
+
+    }
+
+    public class ProjectPositionUserViewModel
+    {
+        public long Id { get; set; }
+
+        public string Contact { get; set; }
+
+        public bool? Passed { get; set; }
+
+        public bool showReply { get; set; }
+
+        public bool showComment { get; set; } = true;
+
+        /// <summary>
+        /// 应征用户
+        /// </summary>
+        public UserInfoViewModel User { get; set; } = new UserInfoViewModel();
+
+
     }
 }

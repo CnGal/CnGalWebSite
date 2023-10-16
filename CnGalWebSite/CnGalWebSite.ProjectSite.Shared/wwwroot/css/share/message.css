@@ -1,0 +1,9 @@
+﻿.message-info-card {
+    gap: .5rem;
+}
+
+    .message-info-card .action-card {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }

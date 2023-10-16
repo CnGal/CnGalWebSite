@@ -25,6 +25,9 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<Carousel> Carousels { get; set; }
         public DbSet<FriendLink> FriendLinks { get; set; }
         public DbSet<StallInformationType> StallInformationTypes { get; set; }
+        public DbSet<ProjectPositionUser> ProjectPositionUsers { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

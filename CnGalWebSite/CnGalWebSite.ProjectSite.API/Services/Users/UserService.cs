@@ -124,6 +124,11 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
                 return null;
             }
 
+            return GetUserInfo(user);
+        }
+
+        public UserInfoViewModel GetUserInfo(ApplicationUser user)
+        {
             return new UserInfoViewModel
             {
                 Avatar = user.Avatar,

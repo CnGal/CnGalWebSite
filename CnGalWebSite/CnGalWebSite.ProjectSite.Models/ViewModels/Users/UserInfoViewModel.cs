@@ -52,5 +52,18 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// 身份
         /// </summary>
         public UserType Type { get; set; }
+
+
+        public string GetName()
+        {
+            if (Type == UserType.Organization)
+            {
+                return OrganizationName ?? Name;
+            }
+            else
+            {
+                return PersonName ?? Name;
+            }
+        }
     }
 }

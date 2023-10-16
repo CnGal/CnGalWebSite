@@ -1,4 +1,9 @@
-﻿<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@GetName()" Icon="@GetIcon()" Class=" h-100">
+﻿
+@inject IUserService _userService
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="@Model.GetPositionName()" Icon="@Model.GetPositionIcon()" Class=" h-100">
     <div class="project-position-card">
         <div class="name-card">
             @if(string.IsNullOrWhiteSpace(Model.Type)==false)
@@ -37,6 +42,10 @@
                 <div class="label-large">截稿日期</div>
                 <div class="title-large primary-text">@($"{Model.DeadLine:yyyy-MM-dd}")</div>
             </div>
+            <div class="item-card">
+                <div class="label-large">应征人数</div>
+                <div class="title-large primary-text">@($"{Model.Users.Count} 人")</div>
+            </div>
         </div>
         <div class="content-card">
             <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Class="mb-2" Icon="IconType.Infor" Title="详细需求" />
@@ -44,17 +53,36 @@
                 @Model.Description
             </div>
         </div>
+        <div class="action-card">
+            <AuthorizeView>
+                <Authorized>
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded="!Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" TextStyle="Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)"
+                                                        Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消应征":"应征")"
+                                                                Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
 
+                </Authorized>
+                <NotAuthorized>
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后应征" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
+                </NotAuthorized>
+            </AuthorizeView>
+           
+        </div>
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
-@code {
+ @code {
     [Parameter]
     public ProjectPositionViewModel Model { get; set; }
 
+    [Parameter]
+    public EventCallback OnChanged{ get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
     public string GetName()
     {
-        return Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName();
+        return (Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName()) + " #" + Model.Id;
     }
 
     public string GetIcon()
@@ -69,5 +97,33 @@
             ProjectPositionType.Other => IconType.Shape.ToIconString(),
             _ => IconType.Shape.ToIconString()
         };
+    }
+
+    public async Task OnClick()
+    {
+        var apply = !Model.Users.Any(s => s.User.Id == _userService.UserInfo.Id);
+        var _name=apply?"应征":"取消应征";
+        try
+        {
+            var obj = await _httpService.PostAsync<ApplyProjectPositionModel, Result>("api/project/ApplyProjectPosition", new ApplyProjectPositionModel
+                {
+                    PositionId = Model.Id,
+                    Apply = apply
+                });
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
     }
 }

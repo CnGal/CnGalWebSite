@@ -1,0 +1,69 @@
+﻿@inject IHttpService _httpService
+@inject IPageModelCatche<List<CommentViewModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+@inject IUserService _userService
+
+<CnGalWebSite.Components.Containers.MiniModeContainer>
+    <AuthorizeView>
+        <Authorized>
+            @if (ShowReply)
+            {
+                <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" OnRefresh="OnOutComment" PageType="PageType" PageId="PageId"></ReplyCommentTip>
+            }
+            <CommentListView Model="Model" OnRefrsh="Refresh" @ref="commentListView" PageType="PageType" PageId="PageId"></CommentListView>
+        </Authorized>
+    </AuthorizeView>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
+
+@code {
+    [Parameter]
+    public long ObjectId { get; set; }
+    [Parameter]
+    public CommentType Type { get; set; }
+    [Parameter]
+    public bool ShowReply { get; set; }
+    [Parameter]
+    public PageType PageType { get; set; }
+    [Parameter]
+    public long PageId { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public List<CommentViewModel> Model = new List<CommentViewModel>();
+    CommentListView commentListView;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            await GetData();
+        }
+    }
+
+    private async Task Refresh()
+    {
+        _pageModelCatche.Clean($"api/comment/GetComments?type={(int)Type}&id={ObjectId}");
+        await GetData();
+    }
+    private async Task OnOutComment()
+    {
+        await Refresh();
+    }
+    private async Task GetData()
+    {
+        try
+        {
+            Model = await _pageModelCatche.GetCache($"api/comment/GetComments?type={(int)Type}&id={ObjectId}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取评论列表失败");
+        }
+    }
+}
