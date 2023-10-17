@@ -22,6 +22,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public int SignInDays { get; set; }
         public bool IsSignIn { get; set; }
 
+        public long QQ { get; set; }
+
         /// <summary>
         /// 用户背景图 大屏幕
         /// </summary>

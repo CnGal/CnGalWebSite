@@ -12,6 +12,7 @@ using CnGalWebSite.ProjectSite.Models.ViewModels.Projects;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
 using CnGalWebSite.ProjectSite.API.Services.Stalls;
+using CnGalWebSite.ProjectSite.API.Services.Notices;
 
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
@@ -26,14 +27,16 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IUserService _userService;
         private readonly IStallService _stallService;
         private readonly IQueryService _queryService;
+        private readonly INoticeService _noticeService;
 
-        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService, IRepository<StallInformationType, long> stallInformationTypeRepository)
+        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService, IRepository<StallInformationType, long> stallInformationTypeRepository, INoticeService noticeService)
         {
             _stallRepository = stallRepository;
             _userService = userService;
             _queryService = queryService;
             _stallService = stallService;
             _stallInformationTypeRepository = stallInformationTypeRepository;
+            _noticeService = noticeService;
         }
 
         [AllowAnonymous]
@@ -221,6 +224,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 });
                 model.Id = item.Id;
                 _stallRepository.Clear();
+
+                //通知
+                _noticeService.PutNotice($"【橱窗上新】\n“{user.GetName()}”发布了“{model.Name}”橱窗\nhttps://www.cngal.org.cn/stall/{model.Id}");
             }
 
             var admin = _userService.CheckCurrentUserRole("Admin");

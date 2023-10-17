@@ -170,7 +170,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         {
                             PageId = model.PageId,
                             PageType = model.PageType,
-                            Text = $"“{user.GetName()}”回复了你：『{model.Text}』",
+                            Text = $"“{user.GetName()}”回复了你：“{model.Text}”",
                             Type = MessageType.Reply,
                             UserId = temp.UserId,
                         });
@@ -186,7 +186,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         {
                             PageId = model.PageId,
                             PageType = model.PageType,
-                            Text = $"“{user.GetName()}”在你的应征请求下留言：『{model.Text}』",
+                            Text = $"“{user.GetName()}”在你的应征请求下留言：“{model.Text}”",
                             Type = MessageType.Reply,
                             UserId = temp.Position.Project.CreateUserId,
                         });

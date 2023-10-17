@@ -40,7 +40,16 @@
 }
 else
 {
-    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Message.ToIconString()" Class="me-2" Tooltip="消息" Href="/user/messages" />
+    @if(count!=0)
+    {
+        <MBadge Color="primary" Content="@count.ToString()" OffsetX="20" OffsetY="20">
+            <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Message.ToIconString()" Class="me-2" Tooltip="消息" Href="/user/messages" />
+        </MBadge>
+    }
+    else
+    {
+               <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Message.ToIconString()" Class="me-2" Tooltip="消息" Href="/user/messages" />     
+    }
 
     <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
          <ActivatorContent Context="m">
@@ -106,6 +115,8 @@ else
 
     private bool menu { get; set; }
 
+    int count;
+
     CnGalWebSite.ProjectSite.Shared.Components.Layout.SettingDialog settingDialog;
 
     [CascadingParameter]
@@ -134,6 +145,7 @@ else
             try
             {
                 await _userService.Refresh();
+                count = await _httpService.GetAsync<int>("api/message/GetUnReadMessageCount");
             }
             catch (Exception ex)
             {

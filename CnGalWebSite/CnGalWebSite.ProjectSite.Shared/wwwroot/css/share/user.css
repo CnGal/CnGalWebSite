@@ -140,3 +140,9 @@
 a.info-card-user {
     color: var(--md-sys-color-on-background) !important;
 }
+/*编辑用户信息*/
+.edit-user-link-card .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}

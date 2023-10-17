@@ -15,6 +15,7 @@ using CnGalWebSite.ProjectSite.API.Services.Projects;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using CnGalWebSite.ProjectSite.API.Services.Messages;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
+using CnGalWebSite.ProjectSite.API.Services.Notices;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -30,9 +31,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IProjectService _projectService;
         private readonly IQueryService _queryService;
         private readonly IMessageService _messageService;
+        private readonly INoticeService _noticeService;
 
         public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService, IProjectService projectService, IRepository<ProjectPosition, long> projectPositionRepository,
-            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IMessageService messageService)
+            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IMessageService messageService, INoticeService noticeService)
         {
             _projectRepository = projectRepository;
             _userService = userService;
@@ -41,6 +43,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _projectPositionRepository = projectPositionRepository;
             _projectPositionUserRepository = projectPositionUserRepository;
             _messageService = messageService;
+            _noticeService=noticeService;
         }
 
         [AllowAnonymous]
@@ -189,6 +192,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 });
                 model.Id = item.Id;
                 _projectRepository.Clear();
+
+                //通知
+                _noticeService.PutNotice($"【新企划】\n“{user.GetName()}”发布了“{model.Name}”企划\nhttps://www.cngal.org.cn/project/{model.Id}");
             }
 
             var admin = _userService.CheckCurrentUserRole("Admin");
