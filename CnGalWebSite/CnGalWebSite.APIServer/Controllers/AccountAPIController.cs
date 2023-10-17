@@ -257,5 +257,26 @@ namespace CnGalWebSite.APIServer.Controllers
                 Parameter = model
             };
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<GetQQResultModel> GetQQ(GetQQModel model)
+        {
+            if (_configuration["JwtSecurityKey"]!=model.Token)
+            {
+                return new GetQQResultModel();
+            }
+
+            var user =await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId);
+            if(user == null)
+            {
+                return new GetQQResultModel();
+            }
+
+            return new GetQQResultModel
+            {
+                QQ = user.GroupQQ
+            };
+        }
     }
 }

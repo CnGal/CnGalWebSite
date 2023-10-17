@@ -13,6 +13,7 @@ using CnGalWebSite.Core.Services;
 using CnGalWebSite.ProjectSite.API.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using CnGalWebSite.HealthCheck.Models;
+using CnGalWebSite.EventBus.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,8 @@ builder.Services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>))
 //添加HTTP请求
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IHttpService, HttpService>();
+//事件总线
+builder.Services.AddEventBus();
 
 //添加真实IP
 builder.Services.Configure<ForwardedHeadersOptions>(options =>

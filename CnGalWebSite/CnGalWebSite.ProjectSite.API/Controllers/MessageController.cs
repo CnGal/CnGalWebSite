@@ -63,7 +63,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             return new Result { Success = true };
         }
 
-
         [HttpPost]
         public async Task<ActionResult<Result>> ReadAsync(ReadMessageModel model)
         {
@@ -99,6 +98,16 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Total = total,
                 Parameter = model
             };
+        }
+
+        [HttpGet]
+        public async Task<int> GetUnReadMessageCount()
+        {
+            var user = await _userService.GetCurrentUserAsync();
+
+            return await _messageRepository.GetAll().AsNoTracking()
+                .Where(s => s.UserId == user.Id && s.Hide == false && s.Read == false)
+                .CountAsync();
         }
 
     }

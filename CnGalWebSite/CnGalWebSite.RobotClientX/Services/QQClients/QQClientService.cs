@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Message = MeowMiraiLib.Msg.Type.Message;
 using CnGalWebSite.RobotClientX.DataModels;
+using CnGalWebSite.EventBus.Services;
+using RabbitMQ.Client.Events;
 
 namespace CnGalWebSite.RobotClientX.Services.QQClients
 {
@@ -23,6 +25,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private readonly IConfiguration _configuration;
         private readonly IMessageService _messageService;
         private readonly IEventService _eventService;
+        private readonly IEventBusService _eventBusService;
         private readonly ILogger<QQClientService> _logger;
         public MasudaBot MasudaClient { get; set; }
         public Client MiraiClient { get; set; }
@@ -32,7 +35,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         System.Timers.Timer t2 = new(1000 * 60);
 
         public QQClientService(IRepository<RobotGroup> robotGroupRepository, IRepository<PostLog> postLogRepository,
-            IConfiguration configuration, ILogger<QQClientService> logger, IEventService eventService,
+            IConfiguration configuration, ILogger<QQClientService> logger, IEventService eventService, IEventBusService eventBusService,
         IMessageService messageService, IRepository<RobotEvent> robotEventRepository)
         {
             _robotGroupRepository = robotGroupRepository;
@@ -42,6 +45,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             _logger = logger;
             _eventService = eventService;
             _robotEventRepository = robotEventRepository;
+            _eventBusService = eventBusService;
         }
 
         public void InitMasuda()
@@ -54,7 +58,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             try
             {
                 MasudaClient = new MasudaBot(appId, _configuration["ChannelAppKey"], _configuration["ChannelToken"], BotType.Private);
-             
+
                 _logger.LogInformation("成功初始化 Masuda 客户端");
             }
             catch (Exception ex)
@@ -63,13 +67,14 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             }
 
         }
+
         public async Task InitMirai()
         {
             try
             {
                 MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
                 MiraiClient._OnServeiceConnected += MiraiClient__OnServeiceConnected; ;
-                if(await MiraiClient.ConnectAsync())
+                if (await MiraiClient.ConnectAsync())
                 {
                     _logger.LogInformation("成功初始化 Mirai 客户端");
                 }
@@ -77,7 +82,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 {
                     _logger.LogError("初始化 Mirai 客户端失败");
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -86,10 +91,25 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
         }
 
+        public void InitEventBus()
+        {
+            if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
+            {
+                _eventBusService.RecieveQQMessage(async (e) =>
+                {
+                    await SendMessage(RobotReplyRange.Friend, e.QQ, e.Message);
+                });
+                _eventBusService.RecieveQQGroupMessage(async (e) =>
+                {
+                    await SendMessage(RobotReplyRange.Group, e.GroupId, e.Message);
+                });
+            }
+        }
+
         private void MiraiClient__OnServeiceConnected(string e)
         {
-           
-            if(string.IsNullOrWhiteSpace(e))
+
+            if (string.IsNullOrWhiteSpace(e))
             {
                 return;
             }
@@ -98,14 +118,16 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             {
                 return;
             }
-            _miraiSession= session;
+            _miraiSession = session;
             _logger.LogInformation("成功连接Mirai服务器，Session：{Session}", session);
         }
 
         public async Task Init()
         {
             //初始化QQ群
-           await InitMirai();
+            await InitMirai();
+            //初始化事件总线
+            InitEventBus();
 
             if (MiraiClient != null)
             {
@@ -389,7 +411,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 await SendMessage(result, msg);
                 return true;
             }
-            
+
             if (totalCount == totalLimit)
             {
                 SendMessageModel result = await _messageService.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName);
@@ -403,7 +425,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 return true;
             }
 
-             if (totalCount > totalLimit)
+            if (totalCount > totalLimit)
             {
                 return true;
             }

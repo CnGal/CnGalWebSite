@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.Components\CnGalWebSite.Components.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.EventBus\CnGalWebSite.EventBus.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
     <ProjectReference Include="..\CnGalWebSite.RobotClientX.Models\CnGalWebSite.RobotClientX.Models.csproj" />
   </ItemGroup>

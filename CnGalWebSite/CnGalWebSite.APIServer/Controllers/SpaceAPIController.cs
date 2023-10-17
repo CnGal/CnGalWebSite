@@ -207,7 +207,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new PersonalSpaceViewModel
             {
-                Email = user.Email,
                 MainPageContext = user.MainPageContext,
                 Id = user.Id,
                 IsCurrentUser = isCurrentUser,
