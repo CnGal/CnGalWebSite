@@ -1,8 +1,6 @@
-﻿@inject IDataCacheService _dataCacheService
-
+﻿
 @if (Length > 1)
 {
-
     <MPagination Value="@Value" Class="my-4" Length="@Length" ValueChanged="OnPageClick" ></MPagination>
 }
 @code {

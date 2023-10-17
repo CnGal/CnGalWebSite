@@ -20,20 +20,29 @@ else
         </MDCard>
     <MTabsItems Value="Model.TabIndex">
         <MTabItem Value="0">
-            @foreach(var item in Model.UnRead.Items)
+            @foreach (var item in Model.UnRead.Items.Skip((Model.UnRead.CurrentPage - 1) * Model.UnRead.MaxCount).Take(Model.UnRead.MaxCount))
             {
                 <CnGalWebSite.ProjectSite.Shared.Components.Messages.InfoCard Model="item" OnChanged="@(()=>Read(item))" />
             }
-            @if(!Model.UnRead.Items.Any())
+            @if (Model.UnRead.TotalPages > 1)
             {
-                <NotFoundCard Fill/>
+                <CnGalWebSite.Components.Paginations.MasaPagination Value="@Model.UnRead.CurrentPage" Length="@Model.UnRead.TotalPages" ValueChanged="OnUnReadPageClick" />
+            }
+            @if (!Model.UnRead.Items.Any())
+            {
+                <NotFoundCard Fill />
             }
         </MTabItem>
         <MTabItem Value="1">
-            @foreach (var item in Model.Read.Items)
+            @foreach (var item in Model.Read.Items.Skip((Model.Read.CurrentPage - 1) * Model.Read.MaxCount).Take(Model.Read.MaxCount))
             {
                 <CnGalWebSite.ProjectSite.Shared.Components.Messages.InfoCard Model="item" />
             }
+            @if (Model.Read.TotalPages > 1)
+            {
+                <CnGalWebSite.Components.Paginations.MasaPagination Value="@Model.Read.CurrentPage" Length="@Model.Read.TotalPages" ValueChanged="OnReadPageClick" />
+            }
+
             @if (!Model.Read.Items.Any())
             {
                 <NotFoundCard Fill />
@@ -61,6 +70,17 @@ else
         }
     }
 
+    private void OnUnReadPageClick(int pageIndex)
+    {
+        Model.UnRead.CurrentPage = pageIndex;
+        StateHasChanged();
+    }
+
+    private void OnReadPageClick(int pageIndex)
+    {
+        Model.Read.CurrentPage = pageIndex;
+        StateHasChanged();
+    }
     public void TabValueChanged(StringNumber index)
     {
         if (index != null)

@@ -1,4 +1,8 @@
 ﻿@inject IUserService _userService
+@inject IPopupService PopupService
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+
 @implements IDisposable
 
 <MDCard Class="project-info-card mb-4 pa-4">
@@ -48,6 +52,7 @@
     {
         <div class="action-card">
             <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Edit.ToIconString()" Text="编辑企划" Rounded Href="@($"/project/edit/{Model.Id}")" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Delete.ToIconString()" Text="删除" OnClick="OnDelete" />
          </div>
     }
 </MDCard>
@@ -55,6 +60,9 @@
 @code {
     [Parameter]
     public ProjectViewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override void OnInitialized()
     {
@@ -65,6 +73,36 @@
     public void OnUserInfoChanged()
     {
         StateHasChanged();
+    }
+    
+    public async Task OnDelete()
+    {
+        var confirmed = await PopupService.ConfirmAsync("删除企划", "删除企划将会清空所有相关数据，确定要删除吗？", AlertTypes.Error);
+        if (confirmed == false)
+        {
+            return;
+        }
+
+        string operationName = "删除企划";
+        try
+        {
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/project/Hide", new HideModel { Id = Model.Id, Hide = true });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                NavigationManager.NavigateTo("/project");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+
     }
 
     public void Dispose()

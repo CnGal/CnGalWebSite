@@ -40,7 +40,7 @@
         @if (TotalPages > 1)
         {
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick" />
+            <CnGalWebSite.Components.Paginations.MasaPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick" />
 
 
         }

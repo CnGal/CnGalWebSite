@@ -6,35 +6,38 @@
         <div class="name-card">
             <div class="title-medium">@Model.Name</div>
             <div class="tag-card">
-                <IconChip Color="primary" Text="@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())"></IconChip>
-                 @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+                @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false)
+                {
+                    <IconChip Color="primary" Text="@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())"></IconChip>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.Type) == false)
                 {
                     <IconChip Color="primary" Text="@Model.Type"></IconChip>
                 }
-                @foreach(var item in Model.Informations.Where(s=>string.IsNullOrWhiteSpace(s.Value)==false&& s.Value.Length<5))
+                @foreach (var item in Model.Informations.Where(s => string.IsNullOrWhiteSpace(s.Value) == false && s.Value.Length < 5))
                 {
-                    @foreach (var info in item.Value.Replace("，",",").Replace("、",",").Split(","))
+                    @foreach (var info in item.Value.Replace("，", ",").Replace("、", ",").Split(","))
                     {
                         <IconChip Outlined Color="primary" Text="@info"></IconChip>
                     }
                 }
             </div>
         </div>
-        
+
         <div class="info-card">
             @if (Model.UserInfo != null)
             {
                 <div class="user-card">
-                     <CnGalWebSite.Components.Images.MasaImage Src="@Model.UserInfo.Avatar" Alt="@Model.UserInfo.Name" />
-                     <div class="label-large fw-bold">@Model.UserInfo.Name</div>
-                 </div>
+                    <CnGalWebSite.Components.Images.MasaImage Src="@Model.UserInfo.Avatar" Alt="@Model.UserInfo.Name" />
+                    <div class="label-large fw-bold">@Model.UserInfo.Name</div>
+                </div>
             }
             <div class="price-card primary-text">
                 <div class="label-large">￥</div>
                 <div class="title-large">@Model.Price</div>
             </div>
         </div>
-       
+
     </div>
 </MDCard>
 @code {

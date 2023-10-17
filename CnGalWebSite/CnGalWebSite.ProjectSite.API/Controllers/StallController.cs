@@ -46,7 +46,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var item = await _stallRepository.GetAll()
                 .Include(s => s.Images)
                 .Include(s => s.Audios)
-                .Include(s => s.Informations).ThenInclude(s=>s.Type)
+                .Include(s => s.Informations).ThenInclude(s => s.Type)
                 .Include(s => s.Texts)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
@@ -90,12 +90,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Content = s.Content,
                     Link = s.Link,
                 }).ToList(),
-                Informations = item.Informations.Where(s => s.Type != null && s.Type.Hide == false).OrderByDescending(s=>s.Type.Priority).Select(s => new StallInformationViewModel
+                Informations = item.Informations.Where(s => s.Type != null && s.Type.Hide == false).OrderByDescending(s => s.Type.Priority).Select(s => new StallInformationViewModel
                 {
                     Icon = s.Type.Icon,
                     Name = s.Type.Name,
                     Value = s.Value,
-                    Priority=s.Type.Priority
+                    Priority = s.Type.Priority
                 }).ToList(),
                 CreateUser = await _userService.GetUserInfo(item.CreateUserId)
             };
@@ -171,7 +171,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     Name = s.Name,
                     Content = s.Content,
-                    Link=s.Link,
+                    Link = s.Link,
                     Id = s.Id
                 }).ToList(),
             };
@@ -184,10 +184,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     Name = info.Name,
                     Value = temp?.Value,
-                    Id = temp?.Id??0,
+                    Id = temp?.Id ?? 0,
                     Description = info.Description,
                     Icon = info.Icon,
-                    TypeId=info.Id,
+                    TypeId = info.Id,
                     Types = info.Types.ToList()
                 });
             }
@@ -365,10 +365,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> HideAsync(HideModel model)
         {
-            await _stallRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Hide, b => model.Hide));
+            var user = await _userService.GetCurrentUserAsync();
+            var admin = _userService.CheckCurrentUserRole("Admin");
+
+            await _stallRepository.GetAll().Where(s => model.Id == s.Id && (user.Id == s.CreateUserId || admin)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Hide, b => model.Hide));
             return new Result { Success = true };
         }
 
@@ -390,7 +392,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Where(s => s.Priority > 0 && s.Hide == false && s.EndTime > now)
                 .Include(s => s.Images)
                 .Include(s => s.CreateUser)
-                .Include(s=>s.Informations).ThenInclude(s=>s.Type)
+                .Include(s => s.Informations).ThenInclude(s => s.Type)
                 .OrderByDescending(s => s.Priority)
                 .ToListAsync();
 
@@ -420,7 +422,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Description = s.Description,
                     Id = s.Id,
                     HideInfoCard = s.HideInfoCard,
-                    Priority=s.Priority,
+                    Priority = s.Priority,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model

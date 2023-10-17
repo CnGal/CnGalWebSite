@@ -17,20 +17,27 @@ namespace CnGalWebSite.EventBus.Services
         public EventBusRabbitMQ(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
 
-            var factory = new ConnectionFactory
+        public void Init()
+        {
+            if(_channel == null)
             {
-                HostName = _configuration["EventBus_HostName"],
-                Port = int.Parse(_configuration["EventBus_Port"]),
-                UserName = _configuration["EventBus_UserName"],
-                Password = _configuration["EventBus_Password"],
-            };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
+                var factory = new ConnectionFactory
+                {
+                    HostName = _configuration["EventBus_HostName"],
+                    Port = int.Parse(_configuration["EventBus_Port"]),
+                    UserName = _configuration["EventBus_UserName"],
+                    Password = _configuration["EventBus_Password"],
+                };
+                _connection = factory.CreateConnection();
+                _channel = _connection.CreateModel();
+            }
         }
 
         public void SendMessage<T>(string queue,T message)
         {
+            Init();
             _channel.QueueDeclare(
                 queue: queue,   // 队列名称
                 durable: true,     // 是否持久化，true持久化，队列会保存磁盘，服务器重启时可以保证不丢失相关信息
@@ -46,6 +53,7 @@ namespace CnGalWebSite.EventBus.Services
 
         public void SubscribeMessages<T>(string queue, Action<T> action)
         {
+            Init();
             _channel.QueueDeclare(
                 queue: queue,   // 队列名称
                 durable: true,     // 是否持久化，true持久化，队列会保存磁盘，服务器重启时可以保证不丢失相关信息
@@ -69,7 +77,9 @@ namespace CnGalWebSite.EventBus.Services
         public void Dispose()
         {
             _connection?.Dispose();
+            _connection= null;
             _channel?.Dispose();
+            _channel= null;
         }
     }
 }

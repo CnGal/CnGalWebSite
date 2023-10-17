@@ -32,7 +32,7 @@
         </div>
         @if (_dataCacheService.DiscountPageCatcheHelper.TotalPages > 1)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.DiscountPageCatcheHelper.CurrentPage" Length="@_dataCacheService.DiscountPageCatcheHelper.TotalPages" ValueChanged="OnPageClick" />
+            <CnGalWebSite.Components.Paginations.MasaPagination Value="@_dataCacheService.DiscountPageCatcheHelper.CurrentPage" Length="@_dataCacheService.DiscountPageCatcheHelper.TotalPages" ValueChanged="OnPageClick" />
         }
         @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count() == 0)
         {

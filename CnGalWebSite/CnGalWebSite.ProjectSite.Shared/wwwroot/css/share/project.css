@@ -16,6 +16,11 @@
             width: 3rem;
             border-radius: 50%;
         }
+
+    .project-info-card .action-card {
+        display: flex;
+        justify-content: space-between;
+    }
 /*介绍卡片*/
 .project-description-card {
     gap: 2rem;

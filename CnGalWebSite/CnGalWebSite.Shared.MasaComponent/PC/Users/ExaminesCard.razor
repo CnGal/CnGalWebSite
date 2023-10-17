@@ -115,7 +115,7 @@
         }
         @if (pagedResultDto.TotalPages > 1)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@pagedResultDto.CurrentPage"  Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
+            <CnGalWebSite.Components.Paginations.MasaPagination Value="@pagedResultDto.CurrentPage"  Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
         }
         @if (pagedResultDto.Data.Count == 0)
         {

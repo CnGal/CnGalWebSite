@@ -16,7 +16,7 @@
         @if (TotalPages > 1)
         {
             <div class="col-12">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick"/>
+                <CnGalWebSite.Components.Paginations.MasaPagination Value="@Model.CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick"/>
 
             </div>
         }

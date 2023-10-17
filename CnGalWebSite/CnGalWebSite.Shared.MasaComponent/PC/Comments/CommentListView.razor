@@ -9,7 +9,7 @@
 
     @if (Model.TotalPages > 1)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
+        <CnGalWebSite.Components.Paginations.MasaPagination Value="@Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
     }
 
 }

@@ -65,7 +65,7 @@
             {
                 @if (DataModel.pagedResultDto.TotalPages > 1)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@DataModel.pagedResultDto.CurrentPage" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick" />
+                    <CnGalWebSite.Components.Paginations.MasaPagination Value="@DataModel.pagedResultDto.CurrentPage" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick" />
 
                 }
 
