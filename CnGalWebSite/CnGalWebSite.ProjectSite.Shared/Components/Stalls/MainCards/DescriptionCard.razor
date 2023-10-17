@@ -2,25 +2,32 @@
     <div class="head-card">
         <div class="headline-large">@Model.Name</div>
         <div class="tag-card">
-            <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
-             @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+            @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false)
+            {
+                <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+            }
+            @if (string.IsNullOrWhiteSpace(Model.Type) == false)
             {
                 <MChip Small Color="primary">@Model.Type</MChip>
             }
         </div>
     </div>
-    <MRow>
-        @foreach (var item in Model.Informations)
-        {
-            <MCol Cols="12" Md="6" Class="mb-4">
-                <div class="content-card">
-                    <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard IconString="@item.Icon" Title="@item.Name" />
-                    <div>@item.Value</div>
-                </div>
-            </MCol>
-        }
-    </MRow>
-    
+    @if (Model.Informations.Any())
+    {
+        <MRow>
+            @foreach (var item in Model.Informations)
+            {
+                <MCol Cols="12" Md="6" Class="mb-4">
+                    <div class="content-card">
+                        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard IconString="@item.Icon" Title="@item.Name" />
+                        <div>@item.Value</div>
+                    </div>
+                </MCol>
+            }
+        </MRow>
+    }
+
+
     <div class="content-card">
         <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Stall" Title="橱窗详情" />
         <div>@Model.Description</div>

@@ -273,15 +273,15 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             {
                 TabIndex= user.Type== UserType.Person? 2 : 0,
                 UserInfo = userinfo,
-                Projects = user.Projects.Select(s => _projectService.GetProjectInfoViewModel(s)).ToList(),
-                Stalls = user.Stalls.Select(s => _stallService.GetStallInfoViewModel(s, user)).ToList(),
-                Images = user.Images.Select(s => new UserImageViewModel
+                Projects = user.Projects.Where(s=>s.Hide==false).Select(s => _projectService.GetProjectInfoViewModel(s)).ToList(),
+                Stalls = user.Stalls.Where(s => s.Hide == false).Select(s => _stallService.GetStallInfoViewModel(s, user)).ToList(),
+                Images = user.Images.Where(s => s.Hide == false).Select(s => new UserImageViewModel
                 {
                     Image = s.Image,
                     Note = s.Note,
                     Priority = s.Priority,
                 }).ToList(),
-                Audios = user.Audios.Select(s => new EditAudioAloneModel
+                Audios = user.Audios.Where(s => s.Hide == false).Select(s => new EditAudioAloneModel
                 {
                     BriefIntroduction = s.BriefIntroduction,
                     Duration = s.Duration,
@@ -291,7 +291,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Thumbnail = s.Thumbnail,
                     Url = s.Url,
                 }).ToList(),
-                Texts = user.Texts.Select(s => new UserTextViewModel
+                Texts = user.Texts.Where(s => s.Hide == false).Select(s => new UserTextViewModel
                 {
                     Name = s.Name,
                     Content = s.Content,

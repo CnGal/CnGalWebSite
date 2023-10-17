@@ -33,7 +33,7 @@
 
 @if (_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages > 1)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages" ValueChanged="OnPageClick" />
+    <CnGalWebSite.Components.Paginations.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.JudgableGamesSetting.TotalPages" ValueChanged="OnPageClick" />
 }
 
 @if (Items.Any() == false && isReady)

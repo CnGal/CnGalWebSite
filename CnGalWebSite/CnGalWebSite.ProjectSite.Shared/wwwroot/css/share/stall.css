@@ -55,6 +55,11 @@
             width: 3rem;
             border-radius: 50%;
         }
+
+    .stall-info-card .action-card {
+        display: flex;
+        justify-content: space-between;
+    }
 /*介绍卡片*/
 .stall-description-card {
     gap: 2rem;

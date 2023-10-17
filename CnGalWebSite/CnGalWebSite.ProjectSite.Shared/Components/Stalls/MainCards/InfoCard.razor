@@ -1,4 +1,8 @@
 ﻿@inject IUserService _userService
+@inject IPopupService PopupService
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+
 @implements IDisposable
 
 <MDCard Class="stall-info-card mb-4 pa-4">
@@ -16,13 +20,14 @@
      <div class="item-card">
          <div class="label-large">截止日期</div>
          <div class="title-large primary-text">@Model.EndTime.ToString("yyyy-MM-dd")</div>
-     </div>
+    </div>
 
-       
+
     @if (_userService.UserInfo.Id == Model.CreateUser.Id)
     {
         <div class="action-card">
             <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Edit.ToIconString()" Text="编辑橱窗" Rounded Href="@($"/stall/edit/{Model.Id}")" />
+             <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Delete.ToIconString()" Text="删除" OnClick="OnDelete" />
          </div>
     }
 </MDCard>
@@ -30,6 +35,9 @@
 @code {
     [Parameter]
     public StallViewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override void OnInitialized()
     {
@@ -40,6 +48,36 @@
     public void OnUserInfoChanged()
     {
         StateHasChanged();
+    }
+
+    public async Task OnDelete()
+    {
+        var confirmed = await PopupService.ConfirmAsync("删除橱窗", "删除橱窗将会清空所有相关数据，确定要删除吗？", AlertTypes.Error);
+        if (confirmed == false)
+        {
+            return;
+        }
+
+        string operationName = "删除橱窗";
+        try
+        {
+            var obj = await _httpService.PostAsync<HideModel, Result>("api/stall/Hide", new HideModel { Id = Model.Id, Hide = true });
+
+            if (obj.Success == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败", AlertTypes.Error);
+            }
+            else
+            {
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                NavigationManager.NavigateTo("/stall");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+
     }
 
     public void Dispose()

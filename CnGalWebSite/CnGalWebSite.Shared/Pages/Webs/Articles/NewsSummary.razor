@@ -46,7 +46,7 @@
 
                 @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.NewsSummaryCache.CurrentPage" Length="@_dataCacheService.NewsSummaryCache.TotalPages" ValueChanged="OnPageClick"/>
+                    <CnGalWebSite.Components.Paginations.MasaPagination Value="@_dataCacheService.NewsSummaryCache.CurrentPage" Length="@_dataCacheService.NewsSummaryCache.TotalPages" ValueChanged="OnPageClick"/>
                 }
             }
         }
