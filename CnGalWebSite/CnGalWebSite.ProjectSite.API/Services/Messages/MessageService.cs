@@ -28,7 +28,7 @@ namespace CnGalWebSite.ProjectSite.API.Services.Messages
         {
             if (await _messageRepository.AnyAsync(s => s.Text == model.Text))
             {
-                //return;
+                return;
             }
 
             await _messageRepository.InsertAsync(new Message

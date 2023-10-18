@@ -9,10 +9,11 @@ namespace CnGalWebSite.ProjectSite.API.Services.Notices
         private readonly IConfiguration _configuration;
         private readonly ILogger<NoticeService> _logger;
 
-        public NoticeService(IEventBusService eventBusService, IConfiguration configuration)
+        public NoticeService(IEventBusService eventBusService, IConfiguration configuration, ILogger<NoticeService> logger)
         {
             _eventBusService = eventBusService;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public void PutNotice(string notice)
