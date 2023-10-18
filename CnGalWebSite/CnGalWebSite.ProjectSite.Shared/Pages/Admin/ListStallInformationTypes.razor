@@ -2,6 +2,7 @@
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="创作接稿附加信息类型版块" />
 
 <MDCard>
     <DataTableCard TModel="StallInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
@@ -56,7 +57,7 @@
     private bool _detailDialog;
 
     private string _baseUrl = "api/stall/ListEntryInformationTypes";
-    private string _name = "基础信息类型";
+    private string _name = "附加信息类型";
 
     CnGalWebSite.ProjectSite.Shared.Components.Admin.Stalls.Informations.EditCard editCard;
 

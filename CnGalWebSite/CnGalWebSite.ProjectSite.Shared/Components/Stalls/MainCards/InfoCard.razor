@@ -2,6 +2,9 @@
 @inject IPopupService PopupService
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<UserSpaceViewModel> _pageModelCatche
+@inject IPageModelCatche<List<StallInfoViewModel>> _stallPageModelCatche
+@inject IPageModelCatche<StallViewModel> _indexPageModelCatche
 
 @implements IDisposable
 
@@ -70,6 +73,9 @@
             else
             {
                 await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                _stallPageModelCatche.Clean($"api/stall/getall");
+                _indexPageModelCatche.Clean($"api/stall/get?id={Model.Id}");
+                _pageModelCatche.Clean($"api/user/GetUserSpace?id={_userService.UserInfo.Id}");
                 NavigationManager.NavigateTo("/stall");
             }
         }

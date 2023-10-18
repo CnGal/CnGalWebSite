@@ -48,7 +48,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Include(s => s.Audios)
                 .Include(s => s.Informations).ThenInclude(s => s.Type)
                 .Include(s => s.Texts)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id && s.Hide == false);
 
             if (item == null)
             {

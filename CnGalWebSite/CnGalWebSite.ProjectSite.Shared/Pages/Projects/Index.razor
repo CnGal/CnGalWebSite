@@ -6,8 +6,13 @@
 
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@Model?.Name" />
 
-
-@if (Model != null)
+@if(isNotFound)
+{
+    <NotFoundCard Page/>
+}
+else
+{
+    @if (Model != null)
 {
     <MRow>
         <MCol Cols="12" Md="4" Lg="3">
@@ -26,6 +31,8 @@ else
     <CnGalWebSite.Components.Progressings.ProgressingCard Page />
 }
 
+}
+
 
 @code {
     [Parameter]
@@ -38,6 +45,8 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    bool isNotFound;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +69,8 @@ else
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "获取企划数据失败");
+            isNotFound = true;
+            //await ErrorHandler.ProcessError(ex, "获取企划数据失败");
         }
     }
 

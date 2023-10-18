@@ -3,6 +3,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="轮播图版块" />
 
 <MDCard>
     <DataTableCard TModel="CarouselOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">

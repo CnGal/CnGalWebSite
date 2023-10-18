@@ -2,6 +2,10 @@
 @inject IPopupService PopupService
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<UserSpaceViewModel> _pageModelCatche
+@inject IPageModelCatche<List<ProjectInfoViewModel>> _projectPageModelCatche
+@inject IPageModelCatche<ProjectViewModel> _indexPageModelCatche
+@inject IPageModelCatche<List<ProjectPositionInfoViewModel>> _positionPageModelCatche
 
 @implements IDisposable
 
@@ -95,6 +99,10 @@
             else
             {
                 await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                _projectPageModelCatche.Clean($"api/project/getall");
+                _positionPageModelCatche.Clean($"api/project/getallpositions");
+                _indexPageModelCatche.Clean($"api/project/get?id={Model.Id}");
+                _pageModelCatche.Clean($"api/user/GetUserSpace?id={_userService.UserInfo.Id}");
                 NavigationManager.NavigateTo("/project");
             }
         }
