@@ -1,16 +1,20 @@
 ﻿<MDCard Class="stall-description-card mb-4 pa-4">
     <div class="head-card">
         <div class="headline-large">@Model.Name</div>
-        <div class="tag-card">
-            @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false)
-            {
-                <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
-            }
-            @if (string.IsNullOrWhiteSpace(Model.Type) == false)
-            {
-                <MChip Small Color="primary">@Model.Type</MChip>
-            }
-        </div>
+        @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false || string.IsNullOrWhiteSpace(Model.Type) == false)
+        {
+            <div class="tag-card">
+                @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false)
+                {
+                    <MChip Small Color="primary">@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())</MChip>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+                {
+                    <MChip Small Color="primary">@Model.Type</MChip>
+                }
+            </div>
+        }
+
     </div>
     @if (Model.Informations.Any())
     {

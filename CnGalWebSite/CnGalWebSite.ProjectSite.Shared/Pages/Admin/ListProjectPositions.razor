@@ -3,6 +3,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
+<CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划招募版块" />
 
 <MDCard>
     <DataTableCard TModel="ProjectPositionOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">

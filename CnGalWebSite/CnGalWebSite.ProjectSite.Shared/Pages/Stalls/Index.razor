@@ -6,25 +6,33 @@
 
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="@Model?.Name" />
 
-
-@if (Model != null)
+@if (isNotFound)
 {
-    <MRow>
-        <MCol Cols="12" Md="4" Lg="3">
-            <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.InfoCard Model="Model" />
-        </MCol>
-        <MCol Cols="12" Md="8" Lg="9">
-            <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.DescriptionCard Model="Model" />
-            <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.ImageCard Model="Model" />
-            <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.AudioCard Model="Model"/>
-            <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.TextGroupCard Model="Model" />
-        </MCol>
-    </MRow>
+    <NotFoundCard Page />
 }
 else
 {
-    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+    @if (Model != null)
+    {
+        <MRow>
+            <MCol Cols="12" Md="4" Lg="3">
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.InfoCard Model="Model" />
+            </MCol>
+            <MCol Cols="12" Md="8" Lg="9">
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.DescriptionCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.ImageCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.AudioCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.TextGroupCard Model="Model" />
+            </MCol>
+        </MRow>
+    }
+    else
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+    }
+
 }
+
 
 
 @code {
@@ -38,6 +46,8 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    bool isNotFound;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,7 +66,8 @@ else
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "获取橱窗数据失败");
+            isNotFound = true;
+            //await ErrorHandler.ProcessError(ex, "获取橱窗数据失败");
         }
     }
 

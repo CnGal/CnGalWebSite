@@ -56,7 +56,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 .Include(s=>s.CreateUser)
                 .Include(s => s.Images)
                 .Include(s => s.Positions).ThenInclude(s=>s.Users).ThenInclude(s=>s.User)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id&&s.Hide==false);
 
             if (item == null)
             {
@@ -345,9 +345,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         public async Task<List<ProjectPositionInfoViewModel>> GetAllPositions()
         {
             var now = DateTime.Now.ToCstTime();
-            var projects = await _projectPositionRepository.GetAll()
-                .Where(s => s.Priority > 0 && s.Hide == false && s.DeadLine > now)
+            var projects = await _projectPositionRepository.GetAll()                
                 .Include(s => s.Project).ThenInclude(s => s.CreateUser)
+                .Where(s => s.Priority > 0 && s.Hide == false&&s.Project.Hide==false && s.DeadLine > now)
                 .OrderByDescending(s=>s.Priority)
                 .ToListAsync();
 
