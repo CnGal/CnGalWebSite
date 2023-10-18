@@ -119,6 +119,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         Description = s.Description,
                         Name = s.Name,
                         Icon = s.Icon,
+                        TypeId=s.Id,
                         Types = s.Types.ToList(),
                     }).ToList()
                 };
