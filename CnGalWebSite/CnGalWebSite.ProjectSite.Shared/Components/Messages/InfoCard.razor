@@ -69,5 +69,9 @@
         {
             NavigationManager.NavigateTo($"/project/{Model.PageId}");
         }
+        else if (Model.PageType == PageType.Stall)
+        {
+            NavigationManager.NavigateTo($"/stall/{Model.PageId}");
+        }
     }
 }

@@ -49,8 +49,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             var model = new MessagePageModel();
 
-            model.Read.Items = messages.Where(s => s.Read).ToList();
-            model.UnRead.Items = messages.Where(s => !s.Read).ToList();
+            model.Read.Items = messages.Where(s => s.Read).OrderByDescending(s => s.CreateTime).ToList();
+            model.UnRead.Items = messages.Where(s => !s.Read).OrderByDescending(s => s.CreateTime).ToList();
 
             return model;
         }

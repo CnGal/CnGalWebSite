@@ -13,6 +13,8 @@ using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Share;
 using CnGalWebSite.ProjectSite.API.Services.Stalls;
 using CnGalWebSite.ProjectSite.API.Services.Notices;
+using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
+using CnGalWebSite.ProjectSite.API.Services.Messages;
 
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
@@ -24,12 +26,15 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     {
         private readonly IRepository<Stall, long> _stallRepository;
         private readonly IRepository<StallInformationType, long> _stallInformationTypeRepository;
+        private readonly IRepository<StallUser, long> _stallUserRepository;
         private readonly IUserService _userService;
         private readonly IStallService _stallService;
         private readonly IQueryService _queryService;
         private readonly INoticeService _noticeService;
+        private readonly IMessageService _messageService;
 
-        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService, IRepository<StallInformationType, long> stallInformationTypeRepository, INoticeService noticeService)
+        public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService, IRepository<StallInformationType, long> stallInformationTypeRepository, INoticeService noticeService,
+            IRepository<StallUser, long> stallUserRepository, IMessageService messageService)
         {
             _stallRepository = stallRepository;
             _userService = userService;
@@ -37,17 +42,22 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _stallService = stallService;
             _stallInformationTypeRepository = stallInformationTypeRepository;
             _noticeService = noticeService;
+            _stallUserRepository = stallUserRepository;
+            _messageService = messageService;
         }
 
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<StallViewModel>> GetAsync([FromQuery] long id)
         {
+            var user = await _userService.GetCurrentUserAsync();
+
             var item = await _stallRepository.GetAll()
                 .Include(s => s.Images)
                 .Include(s => s.Audios)
                 .Include(s => s.Informations).ThenInclude(s => s.Type)
                 .Include(s => s.Texts)
+                .Include(s=>s.Users).ThenInclude(s=>s.User)
                 .FirstOrDefaultAsync(s => s.Id == id && s.Hide == false);
 
             if (item == null)
@@ -62,7 +72,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 EndTime = item.EndTime,
                 CreateTime = item.CreateTime,
                 UpdateTime = item.UpdateTime,
-                Contact = item.Contact,
+                Contact = item.Users.Any(s => s.UserId == user?.Id && s.Passed == true) ? item.Contact : null,
                 PositionType = item.PositionType,
                 PositionTypeName = item.PositionTypeName,
                 Price = item.Price,
@@ -97,7 +107,14 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Value = s.Value,
                     Priority = s.Type.Priority
                 }).ToList(),
-                CreateUser = await _userService.GetUserInfo(item.CreateUserId)
+                CreateUser = await _userService.GetUserInfo(item.CreateUserId),
+                Users = item.Users.Select(s => new StallUserViewModel
+                {
+                    User = _userService.GetUserInfo(s.User),
+                    Id = s.Id,
+                    Passed = s.Passed,
+                    Contact = item.CreateUserId == user?.Id && s.Passed == true ? s.User.Contact : null
+                }).ToList()
             };
 
             return model;
@@ -119,7 +136,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         Description = s.Description,
                         Name = s.Name,
                         Icon = s.Icon,
-                        TypeId=s.Id,
+                        TypeId = s.Id,
                         Types = s.Types.ToList(),
                     }).ToList()
                 };
@@ -225,9 +242,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 });
                 model.Id = item.Id;
                 _stallRepository.Clear();
-
-                //通知
-                _noticeService.PutNotice($"【橱窗上新】\n“{user.GetName()}”发布了“{model.Name}”橱窗\nhttps://www.cngal.org.cn/stall/{model.Id}");
             }
 
             var admin = _userService.CheckCurrentUserRole("Admin");
@@ -379,6 +393,20 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPriorityAsync(EditPriorityModel model)
         {
+            var stall = await _stallRepository.GetAll().AsNoTracking()
+                                .Include(s => s.CreateUser)
+                                .FirstOrDefaultAsync(s => s.Id == model.Id);
+
+            if (stall == null)
+            {
+                return new Result { Success = false, Message = "找不到目标" };
+            }
+            if (stall.Priority <= 0 && model.PlusPriority > 0 && stall.Hide == false)
+            {
+                //通知
+                _noticeService.PutNotice($"【橱窗上新】\n“{stall.CreateUser.GetName()}”发布了“{stall.Name}”橱窗\nhttps://www.cngal.org.cn/stall/{model.Id}");
+            }
+
             await _stallRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Success = true };
@@ -535,12 +563,107 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                              }).ToList();
         }
 
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditStallInformationTypePriorityAsync(EditPriorityModel model)
         {
             await _stallInformationTypeRepository.GetAll().Where(s => model.Id == s.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        public async Task<Result> ApplyStall(ApplyStallModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+
+            var stall = await _stallRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.StallId);
+            if (stall == null)
+            {
+                return new Result { Success = false, Message = "找不到这个橱窗" };
+            }
+
+            if (stall.EndTime < DateTime.Now.ToCstTime())
+            {
+                return new Result { Success = false, Message = "已经过了截止日期" };
+            }
+
+            if (await _stallUserRepository.AnyAsync(s => s.StallId == model.StallId && s.UserId == user.Id))
+            {
+                if (model.Apply)
+                {
+                    return new Result { Success = false, Message = "你已经邀请了" };
+                }
+                else
+                {
+                    await _stallUserRepository.DeleteAsync(s => s.StallId == model.StallId && s.UserId == user.Id);
+
+                    //向用户发送消息
+                    await _messageService.PutMessage(new PutMessageModel
+                    {
+                        PageId = stall.Id,
+                        PageType = PageType.Stall,
+                        Text = $"“{user.GetName()}”取消了“{stall.Name}”约稿请求",
+                        Type = MessageType.ApplyStall,
+                        UserId = stall.CreateUserId,
+                    });
+
+                    return new Result { Success = true };
+                }
+            }
+
+            await _stallUserRepository.InsertAsync(new StallUser
+            {
+                StallId = model.StallId,
+                UserId = user.Id,
+            });
+
+            //向用户发送消息
+            await _messageService.PutMessage(new PutMessageModel
+            {
+                PageId = stall.Id,
+                PageType = PageType.Stall,
+                Text = $"“{user.GetName()}”请求“{stall.Name}”的约稿",
+                Type = MessageType.ApplyStall,
+                UserId = stall.CreateUserId,
+            });
+
+            return new Result { Success = true };
+        }
+
+        [HttpPost]
+        public async Task<Result> ProcStallUser(ProcStallApplicationModel model)
+        {
+            var user = await _userService.GetCurrentUserAsync();
+
+            var positionUser = await _stallUserRepository.GetAll()
+                .Include(s => s.Stall)
+                .FirstOrDefaultAsync(s => s.Id == model.UserId);
+
+            if (positionUser == null)
+            {
+                return new Result { Success = false, Message = "找不到这个用户" };
+            }
+
+            if (positionUser.Stall.CreateUserId != user.Id && !_userService.CheckCurrentUserRole("Admin"))
+            {
+                return new Result { Success = false, Message = "权限不足" };
+            }
+
+            positionUser.Passed = model.Passed;
+
+            await _stallUserRepository.UpdateAsync(positionUser);
+
+            //向用户发送消息
+            await _messageService.PutMessage(new PutMessageModel
+            {
+                PageId = positionUser.Stall.Id,
+                PageType = PageType.Stall,
+                Text = $"“{positionUser.Stall.Name}”的创作者{(model.Passed == true ? "接受" : "拒绝")}了你的约稿请求",
+                Type = MessageType.PassedStallUser,
+                UserId = positionUser.UserId,
+            });
+
 
             return new Result { Success = true };
         }

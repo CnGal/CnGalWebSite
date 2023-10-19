@@ -16,13 +16,14 @@ else
     {
         <MRow>
             <MCol Cols="12" Md="4" Lg="3">
-                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.InfoCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.InfoCard Model="Model" OnChanged="OnChanged" />
             </MCol>
             <MCol Cols="12" Md="8" Lg="9">
                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.DescriptionCard Model="Model" />
                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.ImageCard Model="Model" />
                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.AudioCard Model="Model" />
                 <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.TextGroupCard Model="Model" />
+                <CnGalWebSite.ProjectSite.Shared.Components.Stalls.MainCards.UserGroupCard Model="Model" OnChanged="OnChanged"/>
             </MCol>
         </MRow>
     }
@@ -57,11 +58,15 @@ else
         await Refresh();
     }
 
-    public async Task Refresh()
+    public async Task Refresh(int tab = 0)
     {
         try
         {
             Model = await _pageModelCatche.GetCache($"api/stall/get?id={Id}");
+            if (tab != 0)
+            {
+                Model.TabIndex = tab;
+            }
             StateHasChanged();
         }
         catch (Exception ex)
@@ -70,6 +75,15 @@ else
             //await ErrorHandler.ProcessError(ex, "获取橱窗数据失败");
         }
     }
+
+    public async Task OnChanged()
+    {
+        var model = await _pageModelCatche.GetCache($"api/stall/get?id={Id}");
+        var tab = model.TabIndex;
+        _pageModelCatche.Clean($"api/stall/get?id={Id}");
+        await Refresh(tab);
+    }
+
 
     public async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {

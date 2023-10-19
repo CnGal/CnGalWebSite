@@ -5,6 +5,7 @@ using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.Models.DataModels;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using IdentityModel;
+using Microsoft.VisualBasic;
 using System.Security.Claims;
 
 namespace CnGalWebSite.ProjectSite.API.Services.Users
@@ -107,12 +108,14 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
             return _httpContextAccessor.HttpContext.User.Claims.Any(s => (s.Type == JwtClaimTypes.Role || s.Type == ClaimTypes.Role) && s.Value == role);
         }
 
-        public async Task<UserInfoViewModel> GetUserInfo(string id)
+        public async Task<UserInfoViewModel> GetUserInfo(string id, bool extraInfo = false)
         {
             ApplicationUser user = null;
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 user = await GetCurrentUserAsync();
+                extraInfo = true;
             }
             else
             {
@@ -124,13 +127,14 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
                 return null;
             }
 
-            return GetUserInfo(user);
+            return GetUserInfo(user, extraInfo);
         }
 
-        public UserInfoViewModel GetUserInfo(ApplicationUser user)
+        public UserInfoViewModel GetUserInfo(ApplicationUser user,bool extraInfo= false)
         {
             return new UserInfoViewModel
             {
+                Contact= extraInfo?user.Contact:null,
                 Avatar = user.Avatar,
                 BackgroundImage = user.BackgroundImage,
                 Id = user.Id,

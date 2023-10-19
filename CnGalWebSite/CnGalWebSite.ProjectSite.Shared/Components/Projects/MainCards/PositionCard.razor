@@ -1,5 +1,4 @@
-﻿
-@inject IUserService _userService
+﻿@inject IUserService _userService
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
@@ -7,18 +6,18 @@
     <div class="project-position-card">
         @if (string.IsNullOrWhiteSpace(Model.Type) == false || Model.UrgencyType != PositionUrgencyType.None)
         {
-             <div class="name-card">
-            @if(string.IsNullOrWhiteSpace(Model.Type)==false)
-            {
-                  <MChip Small Color="primary">@Model.Type</MChip>
-            }
-            @if (Model.UrgencyType != PositionUrgencyType.None)
-            {
-                <MChip Small Color="primary">@Model.UrgencyType.GetDisplayName()</MChip>
-            }
-        </div>
+            <div class="name-card">
+                @if (string.IsNullOrWhiteSpace(Model.Type) == false)
+                {
+                    <MChip Small Color="primary">@Model.Type</MChip>
+                }
+                @if (Model.UrgencyType != PositionUrgencyType.None)
+                {
+                    <MChip Small Color="primary">@Model.UrgencyType.GetDisplayName()</MChip>
+                }
+            </div>
         }
-       
+
         <div class="info-card">
             <div class="item-card">
                 <div class="label-large">回报方式</div>
@@ -57,29 +56,34 @@
                 @Model.Description
             </div>
         </div>
-        <div class="action-card">
-            <AuthorizeView>
-                <Authorized>
-            <CnGalWebSite.Components.Buttons.MasaButton Rounded="!Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" TextStyle="Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)"
-                                                        Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消应征":"应征")"
-                                                                Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
+        @if (_userService.UserInfo.Id != CreateUserId)
+        {
+            <div class="action-card">
+                <AuthorizeView>
+                    <Authorized>
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded="!Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" TextStyle="Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" IsAsync
+                                                                    Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消应征":"应征")"
+                                                                    Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
+                    </Authorized>
+                    <NotAuthorized>
+                        <CnGalWebSite.Components.Buttons.MasaButton Text="登入后应征" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
+                     </NotAuthorized>
+                 </AuthorizeView>
 
-                </Authorized>
-                <NotAuthorized>
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后应征" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
-                </NotAuthorized>
-            </AuthorizeView>
-           
-        </div>
+             </div>
+        }
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
- @code {
+@code {
     [Parameter]
     public ProjectPositionViewModel Model { get; set; }
 
     [Parameter]
-    public EventCallback OnChanged{ get; set; }
+    public EventCallback OnChanged { get; set; }
+
+    [Parameter]
+    public string CreateUserId { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -94,8 +98,8 @@
         return Model.PositionType switch
         {
             ProjectPositionType.Music => IconType.Music.ToIconString(),
-            ProjectPositionType.Painter=> IconType.Style.ToIconString(),
-            ProjectPositionType.Programmer=> IconType.Programmer.ToIconString(),
+            ProjectPositionType.Painter => IconType.Style.ToIconString(),
+            ProjectPositionType.Programmer => IconType.Programmer.ToIconString(),
             ProjectPositionType.Writer => IconType.Writer.ToIconString(),
             ProjectPositionType.CV => IconType.Dub.ToIconString(),
             ProjectPositionType.Other => IconType.Shape.ToIconString(),
@@ -106,7 +110,7 @@
     public async Task OnClick()
     {
         var apply = !Model.Users.Any(s => s.User.Id == _userService.UserInfo.Id);
-        var _name=apply?"应征":"取消应征";
+        var _name = apply ? "应征" : "取消应征";
         try
         {
             var obj = await _httpService.PostAsync<ApplyProjectPositionModel, Result>("api/project/ApplyProjectPosition", new ApplyProjectPositionModel

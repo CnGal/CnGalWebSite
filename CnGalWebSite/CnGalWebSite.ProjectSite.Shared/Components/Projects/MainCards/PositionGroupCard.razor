@@ -5,7 +5,7 @@
          @foreach (var item in Model.Positions)
             {
                 <MCol Cols="12" Md="6" Xl="4" Class="mb-4">
-                    <PositionCard Model="item" OnChanged="OnChanged" />
+                    <PositionCard Model="item" OnChanged="OnChanged" CreateUserId="@Model.CreateUser.Id"/>
                 </MCol>
             }
         </MRow>

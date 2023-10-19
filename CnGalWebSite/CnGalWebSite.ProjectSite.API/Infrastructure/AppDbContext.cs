@@ -28,6 +28,7 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<ProjectPositionUser> ProjectPositionUsers { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<StallUser> StallUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

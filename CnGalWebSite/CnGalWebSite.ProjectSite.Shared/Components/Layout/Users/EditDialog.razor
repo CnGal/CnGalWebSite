@@ -1,0 +1,123 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject ILocalStorageService _localStorage
+
+<MDialog Value="_editDialog" Persistent
+         MaxWidth="800">
+
+    @if (Model == null)
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard />
+    }
+    else
+    {
+        <MDCard>
+            <MCardTitle>
+                完善个人信息
+            </MCardTitle>
+            <MCardText>
+                为了让您获得更好的体验，我们需要一些关于您的基本信息
+            </MCardText>
+            <MCardText>
+                <MRow>
+                    <MCol Cols="12" Md="6">
+                        <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="UserType" Label="身份" />
+                    </MCol>
+                    @if (Model.Type == UserType.Person)
+                    {
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.PersonName" Label="网名" />
+                        </MCol>
+                        <MCol Cols="12">
+                            <MTextarea Rows="6" @bind-Value="Model.PersonDescription" Label="个人简介" />
+                        </MCol>
+                    }
+                    else if (Model.Type == UserType.Organization)
+                    {
+                        <MCol Cols="12" Md="6">
+                            <MTextField @bind-Value="Model.OrganizationName" Label="组织名称" />
+                        </MCol>
+                        <MCol Cols="12">
+                            <MTextarea Rows="6" @bind-Value="Model.OrganizationDescription" Label="组织简介" />
+                        </MCol>
+                    }
+                    <MCol Cols="12">
+                        <MTextarea Rows="3" @bind-Value="Model.Contact" Label="联系方式（双方同意后，将会在“企划招募”和“创作接稿”页面展示）" />
+                    </MCol>
+                </MRow>
+            </MCardText>
+            <MCardActions Class="pa-6 pt-0">
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="跳过" OnClick="OnIgnore" />
+                <MSpacer />
+                <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Save.ToIconString()" Rounded Text="保存" OnClick="SaveEdit" IsAsync/>
+            </MCardActions>
+        </MDCard>
+
+
+    }
+</MDialog>
+
+@code
+{
+    public string Id { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+    bool _editDialog;
+
+
+    public UserEditModel Model { get; set; }
+
+    private string _baseUrl = "api/user/edit";
+    private string _name = "完善个人信息";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task Refresh(string id)
+    {
+        try
+        {
+            Id = id;
+            Model = null;
+            _editDialog = true;
+
+            StateHasChanged();
+            Model = Id == null ? new UserEditModel() : await _httpService.GetAsync<UserEditModel>($"{_baseUrl}?id={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"获取用户信息失败");
+        }
+    }
+
+    public async Task OnIgnore()
+    {
+        await _localStorage.SetItemAsync("ignore_user_contact", true);
+        _editDialog = false;
+        StateHasChanged();
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<UserEditModel, Result>($"{_baseUrl}", Model);
+            if (result.Success)
+            {
+                await OnEdited.InvokeAsync(Model);
+                _editDialog = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+
+    }
+}

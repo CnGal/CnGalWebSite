@@ -1,0 +1,52 @@
+﻿@inject IUserService _userService
+
+
+@if (Model.Users.Any())
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="邀请参与企划的组织" Icon="@IconType.Flag.ToIconString()" Class="mb-4" Collapable Outline>
+     <MDCard Class="mb-4">
+         <MTabs Value="Model.TabIndex" IconsAndText Grow CenterActive ValueChanged="TabValueChanged">
+                 <MTab Value="0">
+                     全部<MIcon>@IconType.Users.ToIconString()</MIcon>
+                    </MTab>
+                    <MTab Value="1">
+                        已选定<MIcon>@IconType.Check.ToIconString()</MIcon>
+                    </MTab>
+                </MTabs>
+            </MDCard>
+            <MTabsItems Value="Model.TabIndex">
+                <MTabItem Value="0">
+                    @foreach (var info in Model.Users)
+                {
+                    <UserCard Model="info" Creator="@(_userService.UserInfo.Id==Model.CreateUser.Id)" OnChanged="OnChanged" Id="Model.Id" />
+                }
+            </MTabItem>
+            <MTabItem Value="1">
+                @foreach (var info in Model.Users.Where(s => s.Passed == true))
+                {
+                    <UserCard Model="info" Creator="@(_userService.UserInfo.Id==Model.CreateUser.Id)" OnChanged="OnChanged" Id="Model.Id" />
+                }
+                @if (!Model.Users.Any(s => s.Passed == true))
+                {
+                    <NotFoundCard Fill />
+                }
+            </MTabItem>
+        </MTabsItems>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+}
+
+
+@code {
+    [Parameter]
+    public StallViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    public void TabValueChanged(StringNumber index)
+    {
+        if (index != null)
+        {
+            Model.TabIndex = index.ToInt32();
+        }
+    }
+}

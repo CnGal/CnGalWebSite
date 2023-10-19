@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,16 +54,18 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// </summary>
         public UserType Type { get; set; }
 
+        public string Contact { get; set; }
 
-        public string GetName()
+
+        public string GetName(UserType? type=null)
         {
-            if (Type == UserType.Organization)
+            if ((type??Type) == UserType.Organization)
             {
-                return OrganizationName ?? Name;
+                return string.IsNullOrWhiteSpace(OrganizationName) ? Name : OrganizationName;
             }
             else
             {
-                return PersonName ?? Name;
+                return string.IsNullOrWhiteSpace(PersonName) ? Name : PersonName;
             }
         }
     }

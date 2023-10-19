@@ -146,7 +146,5 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// 应征用户
         /// </summary>
         public UserInfoViewModel User { get; set; } = new UserInfoViewModel();
-
-
     }
 }

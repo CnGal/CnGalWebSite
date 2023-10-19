@@ -54,6 +54,7 @@ namespace CnGalWebSite.ProjectSite.API.Services.Messages
                     var link = model.PageType switch
                     {
                         PageType.Project => $"https://www.cngal.org.cn/project/{model.PageId}",
+                        PageType.Stall => $"https://www.cngal.org.cn/stall/{model.PageId}",
                         _ => "https://www.cngal.org.cn"
                     };
                     //向用户推送消息
