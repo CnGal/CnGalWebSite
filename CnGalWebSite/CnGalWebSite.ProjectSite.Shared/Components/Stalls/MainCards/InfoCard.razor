@@ -39,17 +39,18 @@
             <AuthorizeView>
                 <Authorized>
                     <CnGalWebSite.Components.Buttons.MasaButton Rounded="!Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" TextStyle="Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" IsAsync
-                                                                Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消邀请":"邀请")"
-                                                                Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
-                </Authorized>
-                <NotAuthorized>
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后邀请" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
+                                                                 Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消邀请":"邀请")"
+                                                                 Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
+                 </Authorized>
+                 <NotAuthorized>
+                     <CnGalWebSite.Components.Buttons.MasaButton Text="登入后邀请" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
                  </NotAuthorized>
              </AuthorizeView>
 
          </div>
     }
 </MDCard>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -60,6 +61,7 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     protected override void OnInitialized()
     {
@@ -114,7 +116,8 @@
             var obj = await _httpService.PostAsync<ApplyStallModel, Result>("api/stall/ApplyStall", new ApplyStallModel
                 {
                     StallId = Model.Id,
-                    Apply = apply
+                    Apply = apply,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
                 });
             //判断结果
             if (obj.Success == false)

@@ -61,6 +61,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// </summary>
         public List<StallInformationEditModel> Informations { get; set; } = new List<StallInformationEditModel>();
 
+        /// <summary>
+        /// 身份识别数据
+        /// </summary>
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
+
 
         public override Result Validate()
         {

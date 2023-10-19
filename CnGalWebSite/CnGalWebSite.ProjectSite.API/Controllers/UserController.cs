@@ -14,6 +14,7 @@ using CnGalWebSite.ProjectSite.Models.ViewModels.Stalls;
 using System.Collections.Generic;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.ProjectSite.API.Services;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -29,9 +30,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
+        private readonly IOperationRecordService _operationRecordService;
 
         public UserController(ILogger<UserController> logger, IUserService userService, IRepository<ApplicationUser, string> userRepository, IProjectService projectService, IStallService stallService, IQueryService queryService,
-            IRepository<ProjectPositionUser, long> projectPositionUserRepository)
+            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IOperationRecordService operationRecordService)
         {
             _logger = logger;
             _userService = userService;
@@ -40,6 +42,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _stallService = stallService;
             _queryService = queryService;
             _projectPositionUserRepository = projectPositionUserRepository;
+            _operationRecordService = operationRecordService;
         }
 
         [HttpGet]
@@ -227,6 +230,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             item.UpdateTime = DateTime.Now.ToCstTime();
 
             await _userRepository.UpdateAsync(item);
+
+            //记录
+            await _operationRecordService.AddOperationRecord(OperationRecordType.EditUser, -1, PageType.User,-1, user, model.Identification);
 
             return new Result { Success = true, Message = model.Id };
         }

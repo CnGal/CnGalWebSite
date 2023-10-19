@@ -34,6 +34,7 @@
 <div class="ms-4 @(Model.showComment?"":"d-none")">
     <CnGalWebSite.ProjectSite.Shared.Components.Comments.CommentTip ObjectId="@Model.Id" Type="CommentType.StallUser" ShowReply="Model.showReply" PageType="PageType.Stall" PageId="Id" />
 </div>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 
 @code {
@@ -45,6 +46,7 @@
     public long Id { get; set; }
     [Parameter]
     public EventCallback OnChanged { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -70,7 +72,8 @@
             var obj = await _httpService.PostAsync<ProcStallApplicationModel, Result>("api/stall/ProcStallUser", new ProcStallApplicationModel
                 {
                     UserId = Model.Id,
-                    Passed = passed
+                    Passed = passed,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
                 });
             //判断结果
             if (obj.Success == false)

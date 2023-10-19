@@ -74,6 +74,7 @@
         }
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -87,6 +88,7 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     public string GetName()
     {
@@ -116,7 +118,8 @@
             var obj = await _httpService.PostAsync<ApplyProjectPositionModel, Result>("api/project/ApplyProjectPosition", new ApplyProjectPositionModel
                 {
                     PositionId = Model.Id,
-                    Apply = apply
+                    Apply = apply,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
                 });
             //判断结果
             if (obj.Success == false)

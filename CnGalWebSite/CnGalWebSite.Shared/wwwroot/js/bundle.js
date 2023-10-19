@@ -741,6 +741,11 @@ function checkSystemThemeIsDark() {
         return true;
     }
 }
+/*获取UA*/
+function getUserAgent()
+{
+    return navigator.userAgent;
+}
 
 /*以下为加载时自动执行的代码*/
 if (typeof Blazor != "undefined") {

@@ -34,6 +34,7 @@
 <div class="ms-4 @(Model.showComment?"":"d-none")">
     <CnGalWebSite.ProjectSite.Shared.Components.Comments.CommentTip ObjectId="@Model.Id" Type="CommentType.PositionUser" ShowReply=" Model.showReply" PageType="PageType.Project" PageId="Id" />
 </div>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 
 @code {
@@ -48,6 +49,7 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     public void OnShowReply()
     {
@@ -70,7 +72,8 @@
             var obj = await _httpService.PostAsync<ProcProjectPositionModel, Result>("api/project/ProcProjectPosition", new ProcProjectPositionModel
                 {
                     UserId = Model.Id,
-                    Passed = passed
+                    Passed = passed,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
                 });
             //判断结果
             if (obj.Success == false)

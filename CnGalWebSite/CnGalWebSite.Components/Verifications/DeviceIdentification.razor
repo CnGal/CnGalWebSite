@@ -1,5 +1,4 @@
-﻿@using Blazored.LocalStorage;
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject ILocalStorageService _localStorage
 @inject IJSRuntime JS
 
@@ -8,6 +7,7 @@
     public ErrorHandler ErrorHandler { get; set; }
 
     private DeviceIdentificationModel Model { get; set; } = new DeviceIdentificationModel();
+
     [CascadingParameter]
     private ConnectionInfo? connectionInfo { get; set; }
 
@@ -26,23 +26,23 @@
             Model.Cookie = Guid.NewGuid().ToString();
         }
 
-        try
+        if (string.IsNullOrWhiteSpace(connectionInfo?.RemoteIpAddress)==false)
         {
-            if (connectionInfo != null && string.IsNullOrWhiteSpace(connectionInfo.RemoteIpAddress) == false)
-            {
-                Model.Ip = connectionInfo.RemoteIpAddress;
-            }
-            else
+            Model.Ip = connectionInfo?.RemoteIpAddress;
+        }
+        else
+        {
+            try
             {
                 var client = await _httpService.GetClientAsync();
                 Model.Ip = await client.GetStringAsync("https://api.cngal.org/api/account/GetIp");
             }
-
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "网络异常");
+            }
         }
-        catch (Exception ex)
-        {
-            await ErrorHandler.ProcessError(ex, "网络异常");
-        }
+        Model.UA = await JS.InvokeAsync<string>("getUserAgent");
     }
 
     public async Task Load()

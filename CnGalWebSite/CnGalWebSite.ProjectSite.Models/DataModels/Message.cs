@@ -15,9 +15,9 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
 
         public bool Read { get; set; }
 
-        public PageType PageType { get; set; }
-
         public MessageType Type { get; set; }
+
+        public PageType PageType { get; set; }
 
         public long PageId { get; set; }
 

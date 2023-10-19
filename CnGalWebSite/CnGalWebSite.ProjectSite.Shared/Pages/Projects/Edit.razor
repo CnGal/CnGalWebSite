@@ -31,12 +31,14 @@
     </NotAuthorized>
 </AuthorizeView>
 
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
     public string Id { get; set; }
 
     private ProjectEditModel Model { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     string _name = "创建企划";
 
@@ -69,6 +71,7 @@
     {
         try
         {
+            Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
             var obj = await _httpService.PostAsync<ProjectEditModel, Result>("api/project/edit", Model);
             //判断结果
             if (obj.Success == false)

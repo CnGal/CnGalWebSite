@@ -30,12 +30,14 @@
     }
 
 </div>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
     public string Id { get; set; }
 
     private UserEditModel Model { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     string _name = "编辑个人资料";
 
@@ -62,6 +64,8 @@
     {
         try
         {
+            Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
+
             var obj = await _httpService.PostAsync<UserEditModel, Result>("api/user/edit", Model);
             //判断结果
             if (obj.Success == false)

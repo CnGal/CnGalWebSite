@@ -16,6 +16,7 @@ using CnGalWebSite.ProjectSite.Models.ViewModels.Users;
 using CnGalWebSite.ProjectSite.API.Services.Messages;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
 using CnGalWebSite.ProjectSite.API.Services.Notices;
+using CnGalWebSite.ProjectSite.API.Services;
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
 {
@@ -32,9 +33,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IQueryService _queryService;
         private readonly IMessageService _messageService;
         private readonly INoticeService _noticeService;
+        private readonly IOperationRecordService _operationRecordService;
 
         public ProjectController(IRepository<Project, long> projectRepository, IUserService userService, IQueryService queryService, IProjectService projectService, IRepository<ProjectPosition, long> projectPositionRepository,
-            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IMessageService messageService, INoticeService noticeService)
+            IRepository<ProjectPositionUser, long> projectPositionUserRepository, IMessageService messageService, INoticeService noticeService, IOperationRecordService operationRecordService)
         {
             _projectRepository = projectRepository;
             _userService = userService;
@@ -44,6 +46,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _projectPositionUserRepository = projectPositionUserRepository;
             _messageService = messageService;
             _noticeService = noticeService;
+            _operationRecordService= operationRecordService;
         }
 
         [AllowAnonymous]
@@ -191,6 +194,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 model.Id = item.Id;
                 _projectRepository.Clear();
 
+                //记录
+                await _operationRecordService.AddOperationRecord(OperationRecordType.EditProject, model.Id, PageType.Project, model.Id, user, model.Identification);
             }
 
             var admin = _userService.CheckCurrentUserRole("Admin");
@@ -460,11 +465,14 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         UserId = position.Project.CreateUserId,
                     });
 
+                    //记录
+                    await _operationRecordService.AddOperationRecord(OperationRecordType.ApplyProject, -1, PageType.Project, position.Project.Id, user, model.Identification);
+
                     return new Result { Success = true };
                 }
             }
 
-            await _projectPositionUserRepository.InsertAsync(new ProjectPositionUser
+            var positionUser= await _projectPositionUserRepository.InsertAsync(new ProjectPositionUser
             {
                 PositionId = model.PositionId,
                 UserId = user.Id,
@@ -479,6 +487,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Type = MessageType.ApplyProjectPosition,
                 UserId = position.Project.CreateUserId,
             });
+
+            //记录
+            await _operationRecordService.AddOperationRecord(OperationRecordType.ApplyProject, positionUser.Id, PageType.Project, position.Project.Id, user, model.Identification);
 
             return new Result { Success = true };
         }
@@ -516,6 +527,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 UserId = positionUser.UserId,
             });
 
+
+            //记录
+            await _operationRecordService.AddOperationRecord(OperationRecordType.ProcProject,positionUser.Id, PageType.Project, positionUser.Position.ProjectId, user, model.Identification);
 
             return new Result { Success = true };
         }
