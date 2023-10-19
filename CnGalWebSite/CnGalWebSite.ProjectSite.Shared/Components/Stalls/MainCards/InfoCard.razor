@@ -43,7 +43,7 @@
                                                                 Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
                 </Authorized>
                 <NotAuthorized>
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后应征" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后邀请" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
                  </NotAuthorized>
              </AuthorizeView>
 

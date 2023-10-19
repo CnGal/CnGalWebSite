@@ -65,7 +65,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             var model = new ProjectViewModel
             {
-                Contact = item.Positions.Any(s => s.Users.Any(s => s.UserId == user?.Id && s.Passed == true)) ? item.Contact : null,
+                Contact = item.Positions.Any(s => s.Users.Any(s => s.UserId == user?.Id && s.Passed == true)) ? item.CreateUser.Contact : null,
                 Description = item.Description,
                 Name = item.Name,
                 EndTime = item.EndTime,
@@ -134,7 +134,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             var model = new ProjectEditModel
             {
-                Contact = item.Contact,
                 Description = item.Description,
                 Name = item.Name,
                 EndTime = item.EndTime,
@@ -185,7 +184,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     Description = model.Description,
                     Name = model.Name,
-                    Contact = model.Contact,
                     EndTime = model.EndTime,
                     CreateTime = DateTime.Now.ToCstTime(),
                     CreateUserId = user.Id
@@ -209,7 +207,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             item.Description = model.Description;
             item.Name = model.Name;
-            item.Contact = model.Contact;
             item.EndTime = model.EndTime;
 
             //相册
