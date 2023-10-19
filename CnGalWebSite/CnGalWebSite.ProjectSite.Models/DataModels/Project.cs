@@ -25,6 +25,7 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// <summary>
         /// 联系方式
         /// </summary>
+        [Obsolete("直接使用创建者的联系方式")]
         public string Contact { get; set; }
 
         /// <summary>

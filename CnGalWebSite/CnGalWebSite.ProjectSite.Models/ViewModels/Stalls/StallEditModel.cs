@@ -37,11 +37,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         public string Type { get; set; }
 
         /// <summary>
-        /// 联系方式
-        /// </summary>
-        public string Contact { get; set; }
-
-        /// <summary>
         /// 截止日期
         /// </summary>
         public DateTime EndTime { get; set; }
@@ -73,11 +68,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
             {
                 return new Result { Success = false, Message = "请填写橱窗名称" };
             }
-            if (string.IsNullOrWhiteSpace(Contact))
-            {
-                return new Result { Success = false, Message = "请填写联系方式" };
-            }
-
             if (EndTime <= DateTime.Now)
             {
                 return new Result { Success = false, Message = "截止日期必须大于当前日期" };

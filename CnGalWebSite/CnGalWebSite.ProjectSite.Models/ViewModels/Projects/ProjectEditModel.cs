@@ -17,11 +17,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         public string Description { get; set; }
 
         /// <summary>
-        /// 联系方式
-        /// </summary>
-        public string Contact { get; set; }
-
-        /// <summary>
         /// 预算区间
         /// </summary>
         public string BudgetRange { get; set; }
@@ -61,10 +56,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
             {
                 return new Result { Success = false, Message = "请填写企划名称" };
             }
-            if (string.IsNullOrWhiteSpace(Contact))
-            {
-                return new Result { Success = false, Message = "请填写联系方式" };
-            }
             if (string.IsNullOrWhiteSpace(Description) || Description.Length < 30)
             {
                 return new Result { Success = false, Message = "请填写企划详情，并不少于30个字" };
@@ -94,8 +85,6 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
     }
     public class ProjectPositionEditModel : ProjectPositionViewModel
     {
-        public long Id { get; set; }
-
         /// <summary>
         /// 隐藏
         /// </summary>

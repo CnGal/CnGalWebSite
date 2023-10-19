@@ -72,7 +72,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 EndTime = item.EndTime,
                 CreateTime = item.CreateTime,
                 UpdateTime = item.UpdateTime,
-                Contact = item.Users.Any(s => s.UserId == user?.Id && s.Passed == true) ? item.Contact : null,
+                Contact = item.Users.Any(s => s.UserId == user?.Id && s.Passed == true) ? item.CreateUser.Contact : null,
                 PositionType = item.PositionType,
                 PositionTypeName = item.PositionTypeName,
                 Price = item.Price,
@@ -159,7 +159,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             var model = new StallEditModel
             {
-                Contact = item.Contact,
                 Description = item.Description,
                 Name = item.Name,
                 EndTime = item.EndTime,
@@ -231,7 +230,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 {
                     Description = model.Description,
                     Name = model.Name,
-                    Contact = model.Contact,
                     EndTime = model.EndTime,
                     PositionType = model.PositionType,
                     PositionTypeName = model.PositionTypeName,
@@ -260,7 +258,6 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
             item.Description = model.Description;
             item.Name = model.Name;
-            item.Contact = model.Contact;
             item.EndTime = model.EndTime;
             item.PositionType = model.PositionType;
             item.PositionTypeName = model.PositionTypeName;
