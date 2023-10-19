@@ -12,7 +12,7 @@
     <MDCard Outline Class="user-card on-background-text" Href="@($"/user/space/{Model.CreateUser.Id}/0")">
          <CnGalWebSite.Components.Images.MasaImage Src="@Model.CreateUser.Avatar" Alt="@Model.CreateUser.Name" Type="ImageType.Avatar" />
          <div class="name-card">
-             <div class="title-medium">@(Model.CreateUser.PersonName ?? Model.CreateUser.Name)</div>
+             <div class="title-medium">@(Model.CreateUser.GetName(UserType.Person))</div>
              <div class="label-large text-truncate-1">@(Model.CreateUser.PersonDescription)</div>
          </div>
      </MDCard>
@@ -33,11 +33,30 @@
              <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Delete.ToIconString()" Text="删除" OnClick="OnDelete" />
          </div>
     }
+    @if (_userService.UserInfo.Id != Model.CreateUser.Id)
+    {
+        <div class="action-card">
+            <AuthorizeView>
+                <Authorized>
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded="!Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" TextStyle="Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)" IsAsync
+                                                                Text="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?"取消邀请":"邀请")"
+                                                                Icon="@(Model.Users.Any(s=>s.User.Id==_userService.UserInfo.Id)?@IconType.Close.ToIconString():@IconType.Flag.ToIconString())" OnClick="OnClick" />
+                </Authorized>
+                <NotAuthorized>
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="登入后应征" Icon="@IconType.Login.ToIconString()" Rounded OnClick="_userService.Login" />
+                 </NotAuthorized>
+             </AuthorizeView>
+
+         </div>
+    }
 </MDCard>
 
 @code {
     [Parameter]
     public StallViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -84,6 +103,34 @@
             await ErrorHandler.ProcessError(ex, operationName + "失败");
         }
 
+    }
+
+    public async Task OnClick()
+    {
+        var apply = !Model.Users.Any(s => s.User.Id == _userService.UserInfo.Id);
+        var _name = apply ? "邀请" : "取消邀请";
+        try
+        {
+            var obj = await _httpService.PostAsync<ApplyStallModel, Result>("api/stall/ApplyStall", new ApplyStallModel
+                {
+                    StallId = Model.Id,
+                    Apply = apply
+                });
+            //判断结果
+            if (obj.Success == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Message);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
     }
 
     public void Dispose()

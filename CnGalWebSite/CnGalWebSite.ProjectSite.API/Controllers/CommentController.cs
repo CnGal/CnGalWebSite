@@ -22,18 +22,45 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     {
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
+        private readonly IRepository<StallUser, long> _stallUserRepository;
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
         private readonly IMessageService _messageService;
 
         public CommentController(IRepository<Comment, long> commentRepository, IUserService userService, IQueryService queryService, IRepository<ProjectPositionUser, long> projectPositionUserRepository,
-            IMessageService messageService)
+            IMessageService messageService, IRepository<StallUser, long> stallUserRepository)
         {
             _commentRepository = commentRepository;
             _userService = userService;
             _queryService = queryService;
             _projectPositionUserRepository = projectPositionUserRepository;
             _messageService = messageService;
+            _stallUserRepository = stallUserRepository;
+        }
+
+        private async Task<bool> CheckPermissions(CommentType type, long id, ApplicationUser user)
+        {
+            //检查权限
+            if (type == CommentType.PositionUser)
+            {
+                if (user != null && !await _projectPositionUserRepository.GetAll().Include(s => s.Position).ThenInclude(s => s.Project).AnyAsync(s => s.Id == id && (s.UserId == user.Id || s.Position.Project.CreateUserId == user.Id)))
+                {
+                    return false;
+                }
+            }
+            else if (type == CommentType.StallUser)
+            {
+                if (user != null && !await _stallUserRepository.GetAll().Include(s => s.Stall).AnyAsync(s => s.Id == id && (s.UserId == user.Id || s.Stall.CreateUserId == user.Id)))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
 
         [HttpGet]
@@ -42,20 +69,14 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var result = new List<CommentViewModel>();
 
             var commentType = (CommentType)type;
+            var user = await _userService.GetCurrentUserAsync();
 
             //检查权限
-            if (commentType == CommentType.PositionUser)
-            {
-                var user = await _userService.GetCurrentUserAsync();
-                if (user != null && !await _projectPositionUserRepository.GetAll().Include(s => s.Position).ThenInclude(s => s.Project).AnyAsync(s => s.Id == id && (s.UserId == user.Id || s.Position.Project.CreateUserId == user.Id)))
-                {
-                    return new List<CommentViewModel>();
-                }
-            }
-            else
+            if (!await CheckPermissions(commentType, id, user))
             {
                 return new List<CommentViewModel>();
             }
+
 
             var comments = await _commentRepository.GetAll().AsNoTracking()
                 .Include(s => s.User)
@@ -144,6 +165,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             }
             var user = await _userService.GetCurrentUserAsync();
 
+            //检查权限
+            if (!await CheckPermissions(model.Type, model.PageId, user))
+            {
+                //return new Result { Success = false, Message = "权限不足" };
+            }
+
             Comment item = null;
             if (model.Id == 0)
             {
@@ -179,18 +206,28 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 }
                 else if (model.Type == CommentType.PositionUser)
                 {
-                    var temp = await _projectPositionUserRepository.GetAll().Include(s=>s.Position).ThenInclude(s=>s.Project).FirstOrDefaultAsync(s => s.Id == model.ObjectId);
-                    if (temp.UserId != user.Id)
+                    var temp = await _projectPositionUserRepository.GetAll().Include(s => s.Position).ThenInclude(s => s.Project).FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+
+                    await _messageService.PutMessage(new PutMessageModel
                     {
-                        await _messageService.PutMessage(new PutMessageModel
-                        {
-                            PageId = model.PageId,
-                            PageType = model.PageType,
-                            Text = $"“{user.GetName()}”在你的应征请求下留言：“{model.Text}”",
-                            Type = MessageType.Reply,
-                            UserId = temp.Position.Project.CreateUserId,
-                        });
-                    }
+                        PageId = model.PageId,
+                        PageType = model.PageType,
+                        Text = $"“{user.GetName()}”在企划招募下向你留言：“{model.Text}”",
+                        Type = MessageType.Reply,
+                        UserId = temp.UserId == user.Id ? temp.Position.Project.CreateUserId : temp.UserId,
+                    });
+                }
+                else if (model.Type == CommentType.StallUser)
+                {
+                    var temp = await _stallUserRepository.GetAll().Include(s => s.Stall).FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    await _messageService.PutMessage(new PutMessageModel
+                    {
+                        PageId = model.PageId,
+                        PageType = model.PageType,
+                        Text = $"“{user.GetName()}”在创作接稿下向你留言：“{model.Text}”",
+                        Type = MessageType.Reply,
+                        UserId = temp.UserId == user.Id ? temp.Stall.CreateUserId : temp.UserId,
+                    });
                 }
             }
 

@@ -96,15 +96,15 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// </summary>
         public string PreviousWorks { get; set; }
 
-        public string GetName()
+        public string GetName(UserType? type = null)
         {
-            if (Type == UserType.Organization)
+            if ((type ?? Type) == UserType.Organization)
             {
-                return OrganizationName ?? UserName;
+                return string.IsNullOrWhiteSpace(OrganizationName) ? UserName : OrganizationName;
             }
             else
             {
-                return PersonName ?? UserName;
+                return string.IsNullOrWhiteSpace(PersonName) ? UserName : PersonName;
             }
         }
     }

@@ -90,6 +90,10 @@
         {
             NavigationManager.NavigateTo($"/project/{model.PageId}");
         }
+        else if (model.PageType == PageType.Stall)
+        {
+            NavigationManager.NavigateTo($"/stall/{model.PageId}");
+        }
     }
 
     public async Task HideItem(MessageOverviewModel model, bool isHidden)

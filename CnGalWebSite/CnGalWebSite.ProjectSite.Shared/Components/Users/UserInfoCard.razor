@@ -10,7 +10,7 @@
         <CnGalWebSite.Components.Images.MasaImage Src="@Model.Avatar" Alt="@Model.Name" Type="ImageType.Avatar" />
         <div class="name-card">
             <div class="name">
-                <div class="headline-large">@GetName()</div>
+                <div class="headline-large">@Model.GetName()</div>
                 <MChip Small Color="primary">@Model.Type.GetDisplayName()</MChip>
              </div>
              <div class="action-card">
@@ -53,18 +53,6 @@
     public void OnUserInfoChanged()
     {
         StateHasChanged();
-    }
-
-    public string GetName()
-    {
-        if (Model.Type == UserType.Organization)
-        {
-            return Model.OrganizationName ?? Model.Name;
-        }
-        else
-        {
-            return Model.PersonName ?? Model.Name;
-        }
     }
 
     public async Task ChangeType()

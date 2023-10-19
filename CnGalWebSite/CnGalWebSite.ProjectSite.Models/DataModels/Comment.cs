@@ -27,11 +27,13 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
     public enum CommentType
     {
         PositionUser,
+        StallUser,
         Comment
     }
 
     public enum PageType
     {
-        Project
+        Project,
+        Stall
     }
 }

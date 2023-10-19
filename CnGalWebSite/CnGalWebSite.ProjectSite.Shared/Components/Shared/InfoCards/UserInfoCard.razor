@@ -7,7 +7,7 @@
          <div class="content-card">
              <div style="display: flex;align-items: center;gap: 1rem;">
                 <span class="@($"name title-medium")" itemprop="name">
-                    @GetName()
+                    @(Model.GetName(Type))
                  </span>
             </div>
             <div class="label-large  text-truncate-1">
@@ -30,16 +30,4 @@
     public bool Small { get; set; }
     [Parameter]
     public string Href { get; set; }
-
-    public string GetName()
-    {
-        if (Type == UserType.Organization)
-        {
-            return Model.OrganizationName ?? Model.Name;
-        }
-        else
-        {
-            return Model.PersonName ?? Model.Name;
-        }
-    }
 }

@@ -36,10 +36,13 @@
         <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Stall" Title="橱窗详情" />
         <div>@Model.Description</div>
     </div>
-    <div class="content-card">
-        <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Link" Title="联系方式" />
-        <div>@Model.Contact</div>
-    </div>
+    @if (string.IsNullOrWhiteSpace(Model.Contact) == false)
+    {
+        <div class="content-card">
+            <CnGalWebSite.ProjectSite.Shared.Components.Shared.IconTitleCard Icon="IconType.Link" Title="联系方式" />
+            <div>@Model.Contact</div>
+        </div>
+    }
 </MDCard>
 
 @code {

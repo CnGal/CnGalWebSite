@@ -33,5 +33,9 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         PassedPositionUser,
         [Display(Name = "回复留言")]
         Reply,
+        [Display(Name = "购买橱窗")]
+        ApplyStall,
+        [Display(Name = "回复橱窗购买请求")]
+        PassedStallUser,
     }
 }

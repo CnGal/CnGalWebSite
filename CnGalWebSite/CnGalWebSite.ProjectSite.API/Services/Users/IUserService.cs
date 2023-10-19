@@ -9,8 +9,8 @@ namespace CnGalWebSite.ProjectSite.API.Services.Users
 
         bool CheckCurrentUserRole(string role);
 
-        Task<UserInfoViewModel> GetUserInfo(string id);
+        Task<UserInfoViewModel> GetUserInfo(string id, bool extraInfo = false);
 
-        UserInfoViewModel GetUserInfo(ApplicationUser user);
+        UserInfoViewModel GetUserInfo(ApplicationUser user, bool extraInfo = false);
     }
 }

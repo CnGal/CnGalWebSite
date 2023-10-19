@@ -3,6 +3,7 @@
 @inject IPopupService PopupService
 @inject IUserService _userService
 @inject ISettingService _settingService
+@inject ILocalStorageService _localStorage
 
 @implements IDisposable
 
@@ -14,7 +15,7 @@
             <a class="d-flex on-surface-text" href="@("user/space/"+_userService.UserInfo.Id)" style="align-items: center; flex-direction: column; ">
                 <img src="@_userService.UserInfo.Avatar" alt="@_userService.UserInfo.Name" style="width:60px;border-radius:50%;" />
                 <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-                    <span class="title-large mb-1">@GetName()</span>
+                    <span class="title-large mb-1">@_userService.UserInfo.GetName()</span>
                     <MChip Small Color="primary">@_userService.UserInfo.Type.GetDisplayName()</MChip>
                  </div>
              </a>
@@ -65,7 +66,7 @@ else
                      </MButton>
                  </ActivatorContent>
                  <ChildContent>
-                     <span>@GetName()</span>
+                     <span>@_userService.UserInfo.GetName()</span>
                  </ChildContent>
              </MTooltip>
          </ActivatorContent>
@@ -75,7 +76,7 @@ else
                  <div class="d-flex" style="align-items: center; flex-direction: column; ">
                      <CnGalWebSite.Components.Images.MasaImage Src="@_userService.UserInfo.Avatar" Alt="@_userService.UserInfo.Name" Style="width:60px;border-radius:50%;" Type="ImageType.Avatar" />
                      <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-                         <span class="title-large mb-1">@GetName()</span>
+                        <span class="title-large mb-1">@_userService.UserInfo.GetName()</span>
                          <MChip Small Color="primary">@_userService.UserInfo.Type.GetDisplayName()</MChip>
                      </div>
                  </div>
@@ -108,6 +109,7 @@ else
 
 <CnGalWebSite.ProjectSite.Shared.Components.Layout.SettingDialog @ref="settingDialog" />
 
+<EditDialog @ref="editDialog" OnEdited="OnUserInfoChanged"/>
 
 @code {
     [Parameter]
@@ -118,6 +120,7 @@ else
     int count;
 
     CnGalWebSite.ProjectSite.Shared.Components.Layout.SettingDialog settingDialog;
+    EditDialog editDialog;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -146,6 +149,7 @@ else
             {
                 await _userService.Refresh();
                 count = await _httpService.GetAsync<int>("api/message/GetUnReadMessageCount");
+              
             }
             catch (Exception ex)
             {
@@ -154,15 +158,38 @@ else
         }
     }
 
-    public string GetName()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_userService.UserInfo.Type == UserType.Organization)
+        if (firstRender)
         {
-            return _userService.UserInfo.OrganizationName ?? _userService.UserInfo.Name;
-        }
-        else
-        {
-            return _userService.UserInfo.PersonName ?? _userService.UserInfo.Name;
+            var user = await authenticationStateTask;
+            if (user.User.Identity.IsAuthenticated)
+            {
+                //检查是否需要完善信息
+                var flag = false;
+                if (_userService.UserInfo.Type == UserType.Person)
+                {
+                    if (string.IsNullOrWhiteSpace(_userService.UserInfo.PersonName) || string.IsNullOrWhiteSpace(_userService.UserInfo.PersonDescription))
+                    {
+                        flag = true;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(_userService.UserInfo.OrganizationName) || string.IsNullOrWhiteSpace(_userService.UserInfo.OrganizationName))
+                    {
+                        flag = true;
+                    }
+                }
+                if (string.IsNullOrWhiteSpace(_userService.UserInfo.Contact))
+                {
+                    flag = true;
+                }
+                if (flag && !await _localStorage.GetItemAsync<bool>("ignore_user_contact"))
+                {
+                    editDialog?.Refresh(_userService.UserInfo.Id);
+                }
+            }
         }
     }
 

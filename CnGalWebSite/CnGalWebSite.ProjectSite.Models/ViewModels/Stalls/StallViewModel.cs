@@ -83,7 +83,14 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         /// <summary>
         /// 附加信息
         /// </summary>
-        public List<StallInformationViewModel> Informations { get; set; }=new List<StallInformationViewModel>();
+        public List<StallInformationViewModel> Informations { get; set; } = new List<StallInformationViewModel>();
+
+        /// <summary>
+        /// 购买的用户
+        /// </summary>
+        public List<StallUserViewModel> Users { get; set; } = new List<StallUserViewModel>();
+
+        public int TabIndex { get; set; }
 
     }
 
@@ -118,5 +125,23 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
     public class StallImageViewModel : BaseImageEditModel
     {
 
+    }
+
+    public class StallUserViewModel
+    {
+        public long Id { get; set; }
+
+        public string Contact { get; set; }
+
+        public bool? Passed { get; set; }
+
+        public bool showReply { get; set; }
+
+        public bool showComment { get; set; } = true;
+
+        /// <summary>
+        /// 购买用户
+        /// </summary>
+        public UserInfoViewModel User { get; set; } = new UserInfoViewModel();
     }
 }

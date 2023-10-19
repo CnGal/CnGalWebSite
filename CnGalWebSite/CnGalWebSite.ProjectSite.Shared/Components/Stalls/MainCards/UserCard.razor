@@ -3,7 +3,7 @@
 @inject IPopupService PopupService
 
 <MDCard Class="position-user-card mb-4">
-    <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.UserInfoCard Model="Model.User" Outline Type="@UserType.Person" />
+    <CnGalWebSite.ProjectSite.Shared.Components.Shared.InfoCards.UserInfoCard Model="Model.User" Outline Type="@UserType.Organization"/>
      @if (string.IsNullOrWhiteSpace(Model.Contact) == false && Model.showComment)
     {
         <div class="contact-card">
@@ -21,7 +21,7 @@
         @if (Creator)
         {
             <CnGalWebSite.Components.Buttons.MasaButton Small Rounded="@(!(Model.Passed??false))" TextStyle="@((Model.Passed??false))" IsAsync
-                                                         Text="@((Model.Passed??false)?"取消选定":"选定")" Icon="@((Model.Passed??false)?IconType.Close.ToIconString():IconType.Check.ToIconString())" OnClick="@Proc" />
+                                                         Text="@((Model.Passed??false)?"拒绝":"同意")" Icon="@((Model.Passed??false)?IconType.Close.ToIconString():IconType.Check.ToIconString())" OnClick="@Proc" />
         }
         @if (Creator || _userService.UserInfo.Id == Model.User.Id)
         {
@@ -32,13 +32,13 @@
 </MDCard>
 
 <div class="ms-4 @(Model.showComment?"":"d-none")">
-    <CnGalWebSite.ProjectSite.Shared.Components.Comments.CommentTip ObjectId="@Model.Id" Type="CommentType.PositionUser" ShowReply=" Model.showReply" PageType="PageType.Project" PageId="Id" />
+    <CnGalWebSite.ProjectSite.Shared.Components.Comments.CommentTip ObjectId="@Model.Id" Type="CommentType.StallUser" ShowReply="Model.showReply" PageType="PageType.Stall" PageId="Id" />
 </div>
 
 
 @code {
     [Parameter]
-    public ProjectPositionUserViewModel Model { get; set; }
+    public StallUserViewModel Model { get; set; }
     [Parameter]
     public bool Creator { get; set; }
     [Parameter]
@@ -64,10 +64,10 @@
     public async Task Proc()
     {
         var passed = !(Model.Passed ?? false);
-        var _name = passed ? "选定" : "取消选定";
+        var _name = passed ? "同意" : "拒绝";
         try
         {
-            var obj = await _httpService.PostAsync<ProcProjectPositionModel, Result>("api/project/ProcProjectPosition", new ProcProjectPositionModel
+            var obj = await _httpService.PostAsync<ProcStallApplicationModel, Result>("api/stall/ProcStallUser", new ProcStallApplicationModel
                 {
                     UserId = Model.Id,
                     Passed = passed

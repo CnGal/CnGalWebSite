@@ -72,6 +72,28 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
         /// </summary>
         public ApplicationUser CreateUser { get; set; }
         public string CreateUserId { get; set; }
+
+        /// <summary>
+        /// 应征用户
+        /// </summary>
+        public List<StallUser> Users { get; set; }
+
+    }
+
+    public class StallUser
+    {
+        public long Id { get; set; }
+
+        public long StallId { get; set; }
+        public Stall Stall { get; set; }
+
+        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 是否通过
+        /// </summary>
+        public bool? Passed { get; set; }
     }
 
     public class StallInformationType
