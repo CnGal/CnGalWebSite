@@ -69,6 +69,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Users
         /// </summary>
         public List<UserTextEditModel> Texts { get; set; } = new List<UserTextEditModel>();
 
+        /// <summary>
+        /// 身份识别数据
+        /// </summary>
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
 
         public override Result Validate()
         {

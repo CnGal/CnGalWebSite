@@ -15,6 +15,7 @@ using CnGalWebSite.ProjectSite.API.Services.Stalls;
 using CnGalWebSite.ProjectSite.API.Services.Notices;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
 using CnGalWebSite.ProjectSite.API.Services.Messages;
+using CnGalWebSite.ProjectSite.API.Services;
 
 
 namespace CnGalWebSite.ProjectSite.API.Controllers
@@ -32,9 +33,10 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         private readonly IQueryService _queryService;
         private readonly INoticeService _noticeService;
         private readonly IMessageService _messageService;
+        private readonly IOperationRecordService _operationRecordService;
 
         public StallController(IRepository<Stall, long> stallRepository, IUserService userService, IQueryService queryService, IStallService stallService, IRepository<StallInformationType, long> stallInformationTypeRepository, INoticeService noticeService,
-            IRepository<StallUser, long> stallUserRepository, IMessageService messageService)
+            IRepository<StallUser, long> stallUserRepository, IMessageService messageService, IOperationRecordService operationRecordService)
         {
             _stallRepository = stallRepository;
             _userService = userService;
@@ -44,6 +46,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             _noticeService = noticeService;
             _stallUserRepository = stallUserRepository;
             _messageService = messageService;
+            _operationRecordService = operationRecordService;
         }
 
         [AllowAnonymous]
@@ -53,11 +56,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
             var user = await _userService.GetCurrentUserAsync();
 
             var item = await _stallRepository.GetAll()
+                .Include(s=>s.CreateUser)
                 .Include(s => s.Images)
                 .Include(s => s.Audios)
                 .Include(s => s.Informations).ThenInclude(s => s.Type)
                 .Include(s => s.Texts)
-                .Include(s=>s.Users).ThenInclude(s=>s.User)
+                .Include(s => s.Users).ThenInclude(s => s.User)
                 .FirstOrDefaultAsync(s => s.Id == id && s.Hide == false);
 
             if (item == null)
@@ -107,7 +111,7 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                     Value = s.Value,
                     Priority = s.Type.Priority
                 }).ToList(),
-                CreateUser = await _userService.GetUserInfo(item.CreateUserId),
+                CreateUser = _userService.GetUserInfo(item.CreateUser),
                 Users = item.Users.Select(s => new StallUserViewModel
                 {
                     User = _userService.GetUserInfo(s.User),
@@ -240,6 +244,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 });
                 model.Id = item.Id;
                 _stallRepository.Clear();
+
+                //记录
+                await _operationRecordService.AddOperationRecord(OperationRecordType.EditStall, model.Id, PageType.Stall, model.Id, user, model.Identification);
             }
 
             var admin = _userService.CheckCurrentUserRole("Admin");
@@ -605,11 +612,14 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                         UserId = stall.CreateUserId,
                     });
 
+                    //记录
+                    await _operationRecordService.AddOperationRecord(OperationRecordType.ApplyStall, -1, PageType.Stall, stall.Id, user, model.Identification);
+
                     return new Result { Success = true };
                 }
             }
 
-            await _stallUserRepository.InsertAsync(new StallUser
+            var stalluser = await _stallUserRepository.InsertAsync(new StallUser
             {
                 StallId = model.StallId,
                 UserId = user.Id,
@@ -624,6 +634,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 Type = MessageType.ApplyStall,
                 UserId = stall.CreateUserId,
             });
+
+            //记录
+            await _operationRecordService.AddOperationRecord(OperationRecordType.ApplyStall, stalluser.Id, PageType.Stall, stall.Id, user, model.Identification);
 
             return new Result { Success = true };
         }
@@ -661,6 +674,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
                 UserId = positionUser.UserId,
             });
 
+            //记录
+            await _operationRecordService.AddOperationRecord(OperationRecordType.ProcStall, positionUser.Id, PageType.Stall, positionUser.Stall.Id, user, model.Identification);
 
             return new Result { Success = true };
         }

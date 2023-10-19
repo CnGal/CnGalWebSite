@@ -29,6 +29,7 @@ namespace CnGalWebSite.ProjectSite.API.Infrastructure
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<StallUser> StallUsers { get; set; }
+        public DbSet<OperationRecord> OperationRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

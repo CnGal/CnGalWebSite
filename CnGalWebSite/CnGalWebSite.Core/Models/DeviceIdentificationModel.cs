@@ -11,6 +11,8 @@ namespace CnGalWebSite.Core.Models
         public string Ip { get; set; }
 
         public string Cookie { get; set; }
+
+        public string UA { get; set; }
     }
 
     public class ConnectionInfo

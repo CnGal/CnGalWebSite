@@ -50,6 +50,12 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// </summary>
         public DateTime UpdateTime { get; set; }
 
+        /// <summary>
+        /// 身份识别数据
+        /// </summary>
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
+
+
         public override Result Validate()
         {
             if (string.IsNullOrWhiteSpace(Name))

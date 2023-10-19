@@ -295,3 +295,8 @@ function checkSystemThemeIsDark() {
         return true;
     }
 }
+/*获取UA*/
+function getUserAgent()
+{
+    return navigator.userAgent;
+}

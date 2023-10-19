@@ -39,12 +39,14 @@
 </NotAuthorized>
 </AuthorizeView>
 
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
     public string Id { get; set; }
 
     private StallEditModel Model { get; set; }
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     string _name = "创建橱窗";
 
@@ -82,6 +84,8 @@
     {
         try
         {
+            Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
+
             var obj = await _httpService.PostAsync<StallEditModel, Result>("api/stall/edit", Model);
             //判断结果
             if (obj.Success == false)

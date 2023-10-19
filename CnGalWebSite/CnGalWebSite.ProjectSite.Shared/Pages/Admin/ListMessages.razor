@@ -36,7 +36,7 @@
                 <CnGalWebSite.ProjectSite.Shared.Components.Admin.Messages.ReadChip Read="context.Item.Read" />
 
             }
-            else if (context.Header.Value == nameof(MessageOverviewModel.UserName))
+            else if (context.Header.Value == nameof(MessageOverviewModel.UserId))
             {
                 <CnGalWebSite.ProjectSite.Shared.Components.Admin.Users.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
             }
@@ -73,7 +73,7 @@
             Value= nameof(MessageOverviewModel.Id)
           },
           new (){ Text= "时间", Value= nameof(MessageOverviewModel.CreateTime)},
-          new (){ Text= "用户", Value= nameof(MessageOverviewModel.UserName)},
+          new (){ Text= "用户", Value= nameof(MessageOverviewModel.UserId)},
           new (){ Text= "内容", Value= nameof(MessageOverviewModel.Text)},
           new (){ Text= "状态", Value= nameof(MessageOverviewModel.Hide)},
           new (){ Text= "操作", Value= "actions",Sortable=false }

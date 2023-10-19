@@ -34,6 +34,7 @@ namespace CnGalWebSite.ProjectSite.Models.DataModels
     public enum PageType
     {
         Project,
-        Stall
+        Stall,
+        User
     }
 }

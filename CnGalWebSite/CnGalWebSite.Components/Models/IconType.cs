@@ -207,6 +207,7 @@ namespace CnGalWebSite.Components.Models
         Message,
         MessageRead,
         MessageUnRead,
+        Record
     }
 
     public static class IconTypeHelper
@@ -215,6 +216,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Record:
+                    return "mdi-history";
                 case IconType.MessageUnRead:
                     return "mdi-message-badge";
                 case IconType.MessageRead:
