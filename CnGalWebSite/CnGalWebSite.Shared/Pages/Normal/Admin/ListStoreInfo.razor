@@ -67,9 +67,9 @@
 </MDCard>
 
 
-<MDialog @bind-Value="_editDialog"
+<MDialog @bind-Value="_editDialog" Persistent
          MaxWidth="1200">
-    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Stores.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" OnClosed="OnClosed"/>
 </MDialog>
 
 @code {
@@ -133,6 +133,13 @@
             dataTableCard.GetDataFromApi();
         }
     }
+
+    public void OnClosed()
+    {
+        _editDialog = false;
+        StateHasChanged();
+    }
+
 
     public async Task AddItem()
     {

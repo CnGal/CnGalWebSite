@@ -1,47 +1,43 @@
-﻿
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
-<div class="shadow-sm rounded  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity">
+<MDCard Class="message-info-card ps-4 pe-4 pt-3 pb-3 mb-3">
     <div style="display: flex; flex-direction: column;">
-        <div style=" display: flex;">
-            <img class=" shadow-sm" src="@Model.Image"
+        <div class="mb-2" style=" display: flex;">
+            <img class="elevation-2 me-3" src="@Model.Image"
                  style="height: 45px;width: 45px;border-radius: 50%;" />
-            <div class="comment-tx-div">
-                <div>
-                    <div>@Model.Title</div>
-                </div>
-                <div>@Model.PostTime.ToString("yyy-MM-dd H:mm")</div>
+            <div class="name-card">
+                <div class="title-medium">@Model.Title</div>
+                <div class="label-large">@Model.PostTime.ToString("yyy-MM-dd H:mm")</div>
             </div>
-
         </div>
-        <div class="mt-2">
+        <div class="mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.Text" IsNeedHighlight="false" />
         </div>
-        <div class="col-12 p-0 pt-2" style="display: flex; justify-content: flex-end;">
+        <div style="display: flex; justify-content: flex-end;">
             @if (string.IsNullOrWhiteSpace(Model.Link) == false)
             {
-                <CnGalWebSite.Components.Buttons.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall />
+                <CnGalWebSite.Components.Buttons.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" Small Rounded />
             }
             @if (CommentId != 0)
             {
                 @if (IsReplying)
                 {
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall Class="ms-3" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="取消回复" OnClick="OnUnReplyClick" Small Class="ms-3" Rounded />
                 }
                 else
                 {
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="回复" OnClick="OnReplyClick" XSmall Class="ms-3" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Text="回复" OnClick="OnReplyClick" Small Class="ms-3" Rounded />
                 }
             }
 
         </div>
         @if (IsReplying)
         {
-            <CnGalWebSite.Shared.MasaComponent.PC.Comments.ReplyCommentTip ObjectId="@CommentId.ToString()" IsChild="true" Type="CommentType.ReplyComment" OnRefresh="OnRely"/>
+            <CnGalWebSite.Shared.MasaComponent.PC.Comments.ReplyCommentTip ObjectId="@CommentId.ToString()" IsChild="true" Type="CommentType.ReplyComment" OnRefresh="OnRely" />
         }
     </div>
-</div>
+</MDCard>
 
 @code {
     [Parameter]
@@ -69,11 +65,11 @@
         IsReplying = false;
         StateHasChanged();
         await PopupService.ToastAsync(new ToastConfig
-        {
-            Type = AlertTypes.Success,
-            Title = "回复成功",
+            {
+                Type = AlertTypes.Success,
+                Title = "回复成功",
                 Duration = 4000
-        });
+            });
     }
 
 }

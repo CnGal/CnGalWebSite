@@ -26,9 +26,16 @@
         justify-content: space-evenly;
     }
 
-        .user-info-card .content-card .name {
-            word-break: keep-all;
-        }
+    .user-info-card .name-card {
+        display: flex;
+        align-items: center;
+        column-gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .user-info-card .content-card .name {
+        word-break: keep-all;
+    }
 
 a.user-info-card {
     color: var(--md-sys-color-on-background) !important;
@@ -48,3 +55,9 @@ a.user-info-card {
         align-items: center;
         gap: .2rem;
     }
+/*消息*/
+.message-info-card .name-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

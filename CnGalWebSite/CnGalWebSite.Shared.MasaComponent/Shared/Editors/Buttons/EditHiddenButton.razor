@@ -2,7 +2,7 @@
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
-<MButton Text Block Color="primary" OnClick="OnHidden">
+<MButton Text Block Color="secondary" OnClick="OnHidden">
     <MIcon Left>@(IsHidden? "mdi-eye " : "mdi-eye-off")</MIcon>
     @(IsHidden?("取消隐藏" + Type.GetDisplayName()):("隐藏"+Type.GetDisplayName()))
 </MButton>

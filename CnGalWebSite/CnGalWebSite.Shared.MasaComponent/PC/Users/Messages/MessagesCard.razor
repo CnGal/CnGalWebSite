@@ -11,12 +11,15 @@
                 <MTabs @bind-Value="selected" IconsAndText Grow CenterActive>
 
                  <MTab Value="0">
-                     回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
+                        全部<MIcon>mdi-comment-multiple-outline</MIcon>
                  </MTab>
                  <MTab Value="1">
-                     编辑通过提醒<MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                     回复我的<MIcon>mdi-comment-text-outline</MIcon>
                  </MTab>
                  <MTab Value="2">
+                     编辑通过提醒<MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                 </MTab>
+                 <MTab Value="3">
                      编辑驳回提醒<MIcon>mdi-alert-circle-outline</MIcon>
                  </MTab>
              </MTabs>
@@ -32,13 +35,21 @@
                     <MListItemGroup @bind-Value="selected" Color="primary">
                         <MListItem @key="0">
                             <MListItemIcon>
-                                <MIcon>mdi-comment-text-multiple-outline </MIcon>
+                                <MIcon>mdi-comment-multiple-outline </MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>全部</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                         <MListItem @key="1">
+                            <MListItemIcon>
+                                <MIcon>mdi-comment-text-outline </MIcon>
                             </MListItemIcon>
                             <MListItemContent>
                                 <MListItemTitle>回复我的</MListItemTitle>
                             </MListItemContent>
                         </MListItem>
-                        <MListItem @key="1">
+                        <MListItem @key="2">
                             <MListItemIcon>
                                 <MIcon>mdi-checkbox-marked-circle-outline</MIcon>
                             </MListItemIcon>
@@ -46,7 +57,7 @@
                                 <MListItemTitle>编辑通过提醒</MListItemTitle>
                             </MListItemContent>
                         </MListItem>
-                        <MListItem @key="2">
+                        <MListItem @key="3">
                             <MListItemIcon>
                                 <MIcon>mdi-alert-circle-outline</MIcon>
                             </MListItemIcon>
@@ -65,8 +76,16 @@
         @if (isReady)
         {
             <MWindow @bind-Value="selected">
-
-                <MWindowItem Value="0">
+                  <MWindowItem Value="0">
+                    <ScaleTransition>
+                        <Element Show="selected==0">
+                            <MDCard Style=" display: contents; ">
+                                <GroupMessageViewTip Model="Model" />
+                            </MDCard>
+                        </Element>
+                    </ScaleTransition>
+                </MWindowItem>
+                <MWindowItem Value="1">
                     <ScaleTransition>
                         <Element Show="selected==0">
                             <MDCard Style=" display: contents; ">
@@ -76,7 +95,7 @@
                     </ScaleTransition>
                 </MWindowItem>
 
-                <MWindowItem Value="1">
+                <MWindowItem Value="2">
                     <ScaleTransition>
                         <Element Show="selected==1">
                             <MDCard Style=" display: contents; ">
@@ -86,7 +105,7 @@
                     </ScaleTransition>
                 </MWindowItem>
 
-                <MWindowItem Value="2">
+                <MWindowItem Value="3">
                     <ScaleTransition>
                         <Element Show="selected==2">
                             <MDCard Style=" display: contents; ">
@@ -120,7 +139,7 @@
     public ErrorHandler ErrorHandler { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        try
+        try 
         {
             //获取文章信息
             Model = await _httpService.GetAsync<List<CnGalWebSite.DataModel.Model.Message>>("api/space/GetUserMessages");
@@ -150,7 +169,7 @@
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
+            await ErrorHandler.ProcessError(ex, "获取用户消息列表失败");
         }
     }
 

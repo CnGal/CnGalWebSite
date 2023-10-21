@@ -28,6 +28,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<Message, long> _messageRepository;
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
         
@@ -37,8 +38,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IOperationRecordService _operationRecordService;
         private readonly ILogger<LotteryService> _logger;
 
-        public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-            IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger,
+        public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository, IRepository<Message, long> messageRepository,
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger,
          IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService)
         {
             _lotteryRepository = lotteryRepository;
@@ -54,9 +55,10 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _operationRecordService=operationRecordService;
             _playedGameRepository = playedGameRepository;
             _logger = logger;
+            _messageRepository=messageRepository;
         }
 
-        public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award,long lotteryId)
+        public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award, Lottery lottery)
         {
             user.LotteryAwardId = award.Id;
             if (award.Type == LotteryAwardType.ActivationCode)
@@ -72,7 +74,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 await _userService.AddUserIntegral(new DataModel.ViewModel.Space.AddUserIntegralModel
                 {
                     Count = award.Integral,
-                    Note = $"抽奖Id：{lotteryId}",
+                    Note = $"抽奖Id：{lottery.Id}",
                     Type = UserIntegralType.Integral,
                     UserId = user.ApplicationUserId,
                     SourceType= UserIntegralSourceType.Lottery
@@ -80,6 +82,20 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 //更新用户积分
                 await _userService.UpdateUserIntegral(await _userRepository.FirstOrDefaultAsync(s => s.Id == user.ApplicationUserId));
             }
+
+            //发送消息
+            await _messageRepository.InsertAsync(new Message
+            {
+                Title = "恭喜你中奖了",
+                PostTime = DateTime.Now.ToCstTime(),
+                Image = "default/logo.png",
+                Rank = "系统",
+                Text = $"你在『{lottery.DisplayName}』中获得『{award.Name}』奖品，请前往抽奖页面查看详情",
+                Link = "lotteries/index/" + lottery.Id,
+                LinkTitle = lottery.DisplayName,
+                Type = MessageType.LotteryWinner,
+                ApplicationUserId = user.ApplicationUserId
+            });
         }
 
         private async Task<bool> DrawLottery(Lottery lottery)
@@ -108,7 +124,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                         item.WinningUsers.Add(winnningUser);
                         _ = NotWinnningUser.Remove(winnningUser);
 
-                        await SendPrizeToWinningUser(winnningUser, item,lottery.Id);
+                        await SendPrizeToWinningUser(winnningUser, item,lottery);
                     }
                     else
                     {

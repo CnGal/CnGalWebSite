@@ -18,11 +18,11 @@
     {
         <CnGalWebSite.Shared.Component.Lotteries.DrawPage.LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnDrawLottery" />
 
-        <div class=" p-4" style=" display: flex; flex-direction: column; align-items: center; font-size: x-large;">
+        <div class=" pa-4" style=" display: flex; flex-direction: column; align-items: center; font-size: x-large;">
 
             @if (CurrentAward == null)
             {
-                <span class="fw-bold font-color">抽奖结束</span>
+                <span class="fw-bold primary-text">抽奖结束</span>
             }
             else
             {
@@ -30,16 +30,16 @@
                 {
                     <span>
                         即将抽选由
-                        <strong class="font-color">  @CurrentAward.Sponsor</strong>
+                        <strong class="primary-text">  @CurrentAward.Sponsor</strong>
                         提供的
-                        <strong class="font-color">  @CurrentAward.Name</strong>
+                        <strong class="primary-text">  @CurrentAward.Name</strong>
                     </span>
                 }
                 else
                 {
                     <span>
                         即将抽选
-                        <strong class="font-color">  @CurrentAward.Name</strong>
+                        <strong class="primary-text">  @CurrentAward.Name</strong>
                     </span>
                 }
             }
@@ -52,27 +52,27 @@
                     {
                         <span>
                             恭喜用户
-                            <strong class="font-color">  @LastWinningUser.Name</strong>
+                            <strong class="primary-text">  @LastWinningUser.Name</strong>
                             获得由
-                            <strong class="font-color">  @LastAward.Sponsor</strong>
+                            <strong class="primary-text">  @LastAward.Sponsor</strong>
                             提供的
-                            <strong class="font-color">  @LastAward.Name</strong>
+                            <strong class="primary-text">  @LastAward.Name</strong>
                         </span>
                     }
                     else
                     {
                         <span>
                             恭喜用户
-                            <strong class="font-color">  @LastWinningUser.Name</strong>
+                            <strong class="primary-text">  @LastWinningUser.Name</strong>
                             获得
-                            <strong class="font-color">  @LastAward.Name</strong>
+                            <strong class="primary-text">  @LastAward.Name</strong>
                         </span>
                     }
                 }
 
             }
 
-            @if(CurrentAward!=null)
+            @if (string.IsNullOrWhiteSpace(CurrentAward?.Image) == false)
                 {
 
                 <img src="@CurrentAward.Image" alt="@CurrentAward.Name" style="max-width:200px;width:100%;margin-top:30px;"/>
