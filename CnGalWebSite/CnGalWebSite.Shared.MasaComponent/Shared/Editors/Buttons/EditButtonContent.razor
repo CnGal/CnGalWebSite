@@ -16,7 +16,7 @@
         </div>
         <MDivider Class="w-100 mt-2 mb-2"></MDivider>
     }
-    <MButton Text Block Color="primary" OnClick="OnClickHistory">
+    <MButton Text Block Color="secondary" OnClick="OnClickHistory">
         <MIcon Left>mdi-history </MIcon>
         历史编辑记录
     </MButton>
@@ -31,14 +31,14 @@
             <Authorized>
                 @if (isInMonitor)
                 {
-                    <MButton Text Block Color="primary" OnClick="@(()=>SetMonitor(false))">
+                    <MButton Text Block Color="secondary" OnClick="@(()=>SetMonitor(false))">
                         <MIcon Left>mdi-monitor</MIcon>
                         已关注
                     </MButton>
                 }
                 else
                 {
-                    <MButton Text Block Color="primary" OnClick="@(()=>SetMonitor(true))">
+                    <MButton Text Block Color="secondary" OnClick="@(()=>SetMonitor(true))">
                         <MIcon Left>mdi-monitor</MIcon>
                         关注词条
                     </MButton>

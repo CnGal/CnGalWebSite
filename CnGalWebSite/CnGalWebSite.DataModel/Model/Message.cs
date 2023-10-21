@@ -42,6 +42,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "评论被回复")]
         CommentReply,
         [Display(Name = "空间被留言")]
-        SpaceReply
+        SpaceReply,
+        [Display(Name = "中奖")]
+        LotteryWinner
     }
 }

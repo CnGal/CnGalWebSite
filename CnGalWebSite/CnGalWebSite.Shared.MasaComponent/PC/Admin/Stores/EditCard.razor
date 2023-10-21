@@ -80,6 +80,7 @@ else
 
         </MCardText>
         <MCardActions Class="pb-6 ps-6 pe-6">
+             <MasaButton Color="primary" TextStyle Text="取消" Icon="mdi-close" OnClick="OnClosed"/>
             <MSpacer></MSpacer>
             <MButton Color="primary" Rounded  OnClick="SaveEdit">
                 <MIcon Left>mdi-check</MIcon>
@@ -98,6 +99,8 @@ else
     public long Id { get; set; }
     [Parameter]
     public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public EventCallback OnClosed { get; set; }
 
     StoreInfoEditModel Model;
 

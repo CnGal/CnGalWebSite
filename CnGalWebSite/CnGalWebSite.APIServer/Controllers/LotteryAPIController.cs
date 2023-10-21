@@ -740,13 +740,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var award = await _lotteryAwardRepository.GetAll().AsNoTracking()
                 .Include(s => s.WinningUsers)
+                .Include(s=>s.Lottery)
                 .FirstOrDefaultAsync(s => s.Id == model.LotteryAwardId && s.LotteryId == model.LotteryId && s.Count > s.WinningUsers.Count);
             if (award == null)
             {
                 return new Result { Successful = false, Error = "当前奖项人数已满，或未找到该奖项，请核对抽奖Id" };
             }
 
-            await _lotteryService.SendPrizeToWinningUser(userAward, award, model.LotteryId);
+            await _lotteryService.SendPrizeToWinningUser(userAward, award,award.Lottery);
 
             return new Result { Successful = true };
         }

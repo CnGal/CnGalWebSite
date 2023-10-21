@@ -633,6 +633,7 @@
         display: flex;
         gap: .5rem;
         align-items: flex-end;
+        flex-wrap: wrap;
     }
 
     #home-page .birthday-card .group .item .name {

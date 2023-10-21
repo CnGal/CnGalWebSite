@@ -3,7 +3,7 @@
 @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
 {
     <div class="mb-4">
-        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="介绍" Icon="@IconType.MainPage.ToIconString()">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="介绍" Icon="@IconType.MainPage.ToIconString()">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
         </CnGalWebSite.Components.Containers.MasaTitleContainer>
     </div>

@@ -2,24 +2,24 @@
 
 <div style="display: flex; align-items: center; flex-direction: column;">
     <div style="display: flex;align-items: center;">
-        <MProgressCircular Value="100" Size="80" Color="primary">@Model.Grade.ToString("0.0")</MProgressCircular>
+        <MProgressCircular Value="100" Size="80" Color="secondary">@Model.Grade.ToString("0.0")</MProgressCircular>
     </div>
     <div class="mt-2" style="display: flex; flex-direction: column;">
         <div style=" display: flex;align-items: center;flex-direction: column; ">
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="@Model.Level.GetDisplayName()" Color="primary" />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="@Model.Level.GetDisplayName()" Color="secondary" />
             <div>@("超过全站 " + Model.VictoryPercentage.ToString("0.0") + "% 的词条")</div>
         </div>
         <div class="mt-2" style="display: flex; flex-wrap: wrap; justify-content: center;">
             <div style="display: flex;align-items: center;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" Color="secondary"  />
                 <span class="label-large me-4">@(Model.LastEditTime.ToTimeFromNowString() + "编辑")</span>
             </div>
             <div style="display: flex;align-items: center;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count"  Color="secondary" />
                 <span class="label-large me-4">@(Model.DefectCount + "个项目待完善")</span><br />
             </div>
             <div style="display: flex;align-items: center;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Chart" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Chart"  Color="secondary" />
                 <span class="label-large me-4">@("总计" + Model.EditCount + "次编辑")</span>
             </div>
         </div>

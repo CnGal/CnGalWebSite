@@ -20,7 +20,7 @@
     </div>
     <MDivider Class="w-100 mt-2 mb-2"></MDivider>
     <div class="w-100">
-         <MButton Text Block Color="primary" OnClick="@(()=>OnNav("/tasks"))">
+         <MButton Text Block Color="secondary" OnClick="@(()=>OnNav("/tasks"))">
              <MIcon Left>@IconType.Task.ToIconString()</MIcon>
             每日任务
         </MButton>
@@ -49,7 +49,7 @@
         </MButton>
         @if (MessageCount > 0)
         {
-            <MButton Text Block Color="warning" OnClick="OnClickMessage">
+            <MButton Text Block Color="secondary" OnClick="OnClickMessage">
                 <MIcon Left>mdi-comment-text-multiple</MIcon>
                 @(MessageCount+"条新消息")
             </MButton>

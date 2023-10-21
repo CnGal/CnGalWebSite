@@ -29,7 +29,7 @@
                     @{ int index = 0; }
                     @foreach (var item in Model.OrderByDescending(s => s.Priority))
                     {
-                        <tr class="@(item==currentAudio?"font-color fw-bold":"")" @key="item.Url" @onclick="@(()=>OnClick(item))">
+                        <tr class="@(item==currentAudio?"primary-textfw-bold":"")" @key="item.Url" @onclick="@(()=>OnClick(item))">
                             <td class="p-0" style="height: 30px; width: 0px;"><MIcon Style="@(item== currentAudio?"color:var(--main-color)!important;":"")" Size="@("20px")">mdi-play-box</MIcon></td>
                             <td style="height:30px; ">
                                 <div  class="text-truncate-1">
