@@ -63,13 +63,12 @@
     }
     private async Task OnOutComment()
     {
-        await OnChanged.InvokeAsync();
         await Refresh();
         if (commentListView!=null)
         {
             commentListView.PageToEnd();
         }
-
+        await OnChanged.InvokeAsync();
     }
     private async Task GetData()
     {
