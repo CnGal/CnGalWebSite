@@ -62,7 +62,7 @@ namespace CnGalWebSite.Kanban.Services.Settings
             //保存
             await _localStorageService.SetItemAsync(_key, _settingModel);
 
-            OnSettingChanged.Invoke();
+            OnSettingChanged?.Invoke();
         }
 
         private async Task _resetAsync()
