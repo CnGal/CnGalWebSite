@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 namespace CnGalWebSite.DataModel.ViewModel.Coments
 {
     public class PublishCommentModel
@@ -8,5 +9,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Coments
         public string ObjectId { get; set; }
 
         public string Text { get; set; }
+
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
+
     }
 }

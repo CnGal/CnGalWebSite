@@ -26,10 +26,10 @@ else
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Outlined="Outlined" Href="@Href" Target="@Target" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+        <MButton Outlined="Outlined" XLarge="XLarge" Href="@Href" Target="@Target" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
             @if (string.IsNullOrWhiteSpace(Icon) == false)
             {
-                <MIcon XSmall="XSmall" Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
+                <MIcon XSmall="XSmall" Large="XLarge" Class="@(XLarge?"me-4":"")" Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
             }
 
             @Text
@@ -39,10 +39,10 @@ else
     {
         <MTooltip Bottom>
          <ActivatorContent>
-             <MButton Outlined="Outlined" Target="@Target" Href="@Href" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+             <MButton Outlined="Outlined" XLarge="XLarge" Target="@Target" Href="@Href" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Small="Small" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
                  @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
-                        <MIcon XSmall="XSmall">@Icon</MIcon>
+                        <MIcon XSmall="XSmall" Large="XLarge" Class="@(XLarge?"me-4":"")">@Icon</MIcon>
                     }
 
                     @Text
@@ -76,6 +76,8 @@ else
     public bool Small { get; set; }
     [Parameter]
     public bool XSmall { get; set; }
+    [Parameter]
+    public bool XLarge { get; set; }
     [Parameter]
     public string Text { get; set; }
     [Parameter]

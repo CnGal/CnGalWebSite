@@ -200,7 +200,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             }
             else if (lottery.ConditionType == LotteryConditionType.CommentLottery)
             {
-                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery && string.IsNullOrWhiteSpace(s.Text) == false) == false)
+                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery ) == false)
                 {
                     return "参加该抽奖需要评论该抽奖，并通过审核";
                 }
