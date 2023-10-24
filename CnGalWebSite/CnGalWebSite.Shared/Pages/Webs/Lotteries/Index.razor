@@ -72,7 +72,7 @@ else
                             <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
                         }
 
-                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" OnChanged="OnChanged"/>
 
 
 
@@ -90,7 +90,7 @@ else
 
                         <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
 
-                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" OnChanged="OnChanged" />
                     </div>
                     <div class="col-12 col-lg-3">
 
@@ -157,10 +157,6 @@ else
     {
         try
         {
-            isReady = false;
-            isNotFound = false;
-
-
             //获取周边信息
             Model = await _dataCacheService.LotteryIndexPageCatche.GetCache(Id);
             //判断投票名称是否为空 为空则跳转到主页
@@ -178,7 +174,7 @@ else
             }
             else
             {
-                _dataCacheService.VoteIndexPageCatche.Clean(Id);
+                _dataCacheService.LotteryIndexPageCatche.Clean(Id);
             }
         }
         catch (Exception exc)
@@ -188,6 +184,18 @@ else
             StateHasChanged();
         }
 
+    }
+
+    public async Task OnChanged()
+    {
+        if(Model.ConditionType== LotteryConditionType.CommentLottery)
+        {
+            isReady = false;
+            StateHasChanged();
+            _dataCacheService.LotteryIndexPageCatche.Clean(Id);
+        await Refresh();
+ 
+        }
     }
 
     public void HiddenStateChanged()

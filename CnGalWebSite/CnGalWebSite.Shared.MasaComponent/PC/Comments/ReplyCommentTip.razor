@@ -27,6 +27,9 @@
          <CnGalWebSite.Components.Images.UploadButton Text="上传图片" OnImageUploaded="OnImageUploaded" ShowPreview="false" Rounded />
     </div>
 </MDCard>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
+
+
 @code {
 
     [Parameter]
@@ -40,6 +43,8 @@
 
     [Parameter]
     public EventCallback OnRefresh { get; set; }
+
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
 
     string image = "";
@@ -61,7 +66,9 @@
                 await PopupService.ToastErrorAsync("发表评论失败", "你还什么都没说呢，我们不能发表空的评论哦");
                 return;
             }
-            var obj = await _httpService.PostAsync<PublishCommentModel, Result>("api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type });
+            var obj = await _httpService.PostAsync<PublishCommentModel, Result>("api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+            });
             //判断结果
             if (obj.Successful == false)
             {

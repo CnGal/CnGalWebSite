@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.Core.Models;
@@ -52,9 +53,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IEditRecordService _editRecordService;
         private readonly IQueryService _queryService;
+        private readonly ILotteryService _lotteryService;
 
         public CommentsAPIController( IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository, IQueryService queryService,
-        IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
+        IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService, ILotteryService lotteryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -73,6 +75,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _videoRepository = videoRepository;
             _queryService = queryService;
+            _lotteryService = lotteryService;
         }
 
         [AllowAnonymous]
@@ -271,7 +274,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentLottery:
-                    lottery = await _lotteryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    lottery = await _lotteryRepository.GetAll().Include(s=>s.Users).AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (lottery == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该抽奖，Id" + model.ObjectId };
@@ -324,7 +327,10 @@ namespace CnGalWebSite.APIServer.Controllers
             //先放入数据库 为了获得Id
             var comment = await _commentRepository.InsertAsync(new Comment
             {
-                CommentTime = DateTime.Now.ToCstTime()
+                CommentTime = DateTime.Now.ToCstTime(),
+                ApplicationUserId = user.Id,
+                LotteryId=lottery?.Id,
+                Type=model.Type,
             });
             var commentText = new CommentText
             {
@@ -337,7 +343,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //保存并尝试应用审核记录
             await _editRecordService.SaveAndApplyEditRecord(comment, user, commentText, Operation.PubulishComment, "");
-
+            //判断是否需要参与抽奖
+            if(lottery!=null&&lottery.ConditionType== LotteryConditionType.CommentLottery)
+            {
+                try
+                {
+                await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                }
+                catch
+                { }
+            }
 
             return new Result { Successful = true };
         }

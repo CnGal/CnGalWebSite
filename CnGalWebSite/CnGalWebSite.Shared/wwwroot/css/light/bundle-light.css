@@ -1,3 +1,13 @@
+/*背景图*/
+.official-website #web_bg::after {
+    content: "1";
+    font-size: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,.6);
+}
+
 :root {
     --md-sys-color-primary: var(--md-sys-color-primary-light);
     --md-sys-color-on-primary: var(--md-sys-color-on-primary-light);

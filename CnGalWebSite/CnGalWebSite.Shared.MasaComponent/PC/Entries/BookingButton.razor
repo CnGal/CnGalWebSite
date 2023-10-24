@@ -13,12 +13,7 @@
     }
     else
     {
-        <MButton Rounded Color="primary"  XLarge="@(_dataCacheService.IsApp?false:true)"  OnClick="OnClick">
-            <MIcon Left Class="me-4">
-                @(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())
-            </MIcon>
-            @(isBooking?"已预约":"预约")
-        </MButton>
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded XLarge="@(_dataCacheService.IsApp?false:true)"  Icon="@(isBooking?IconType.Booking.ToIconString():IconType.UnBooking.ToIconString())" Text="@(isBooking?"已预约":"预约")" Class="@Class" OnClick="OnClick" />
     }
 }
 <CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />

@@ -36,30 +36,22 @@
                 @((MarkupString)Model.WebsiteAddInfor.Impressions)
             </div>
         }
+        <div class="button-area">
+        @if (Model.Booking != null && Model.Booking.Open)
+        {
+                <BookingButton Template="EntryStyleTemplate.OfficialWebsite" Id="Model.Id" />
+        }
+        @if (Model.Releases.Any(s=>s.PublishPlatformType== PublishPlatformType.Steam))
+        {
+                <CnGalWebSite.Components.Buttons.MasaButton XLarge="@(_dataCacheService.IsApp?false:true)" Rounded Icon="@IconType.Steam.ToIconString()" Text="Steam商店" Href="@($"https://store.steampowered.com/app/{Model.Releases.FirstOrDefault(s=>s.PublishPlatformType== PublishPlatformType.Steam)?.Link}")" Target="_blank"/>
+        }
+    </div>
     }
     else
     {
         @((MarkupString)Model.WebsiteAddInfor.FirstPage)
     }
-    <div class="button-area">
-        @if (Model.Booking != null && Model.Booking.Open)
-        {
-            <div>
-                <BookingButton Template="EntryStyleTemplate.OfficialWebsite" Id="Model.Id" />
-            </div>
-        }
-        @if (Model.Releases.Any(s=>s.PublishPlatformType== PublishPlatformType.Steam))
-        {
-            <div>
-                <MButton Rounded Color="primary" XLarge="@(_dataCacheService.IsApp?false:true)" OnClick="@(()=>_eventService.OpenNewPage($"https://store.steampowered.com/app/{Model.Releases.FirstOrDefault(s=>s.PublishPlatformType== PublishPlatformType.Steam)?.Link}"))">
-                    <MIcon Left Class="me-4">
-                        @IconType.Steam.ToIconString()
-                    </MIcon>
-                    S T E A M
-                </MButton>
-            </div>
-        }
-    </div>
+    
     @if (Model.WebsiteAddInfor == null)
     {
         <div class="infor">

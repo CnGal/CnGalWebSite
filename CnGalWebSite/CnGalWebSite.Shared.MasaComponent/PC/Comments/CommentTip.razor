@@ -39,6 +39,8 @@
     public bool Desc { get; set; }
     [Parameter]
     public CommentType Type { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -61,6 +63,7 @@
     }
     private async Task OnOutComment()
     {
+        await OnChanged.InvokeAsync();
         await Refresh();
         if (commentListView!=null)
         {
