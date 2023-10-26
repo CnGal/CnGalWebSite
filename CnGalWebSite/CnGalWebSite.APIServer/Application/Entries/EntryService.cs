@@ -1223,7 +1223,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
             if (entry.Type == EntryType.Game)
             {
                 var qqIcon = informationTypes.FirstOrDefault(s => s.Name== "QQ群").Icon;
-                foreach (var item in entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation).Where(s => s.Type == EntryType.ProductionGroup&&s.Information.Any(s=>s.DisplayName=="QQ群"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false)))
+                var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral== PositionGeneralType.Publisher|| s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
+                foreach (var item in entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation).Where(s => publisherIds.Contains(s.Id) && s.Information.Any(s=>s.DisplayName=="QQ群"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false)))
                 {
                     model.Information.Add(new EntryInformationModel
                     {
@@ -1577,7 +1578,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //查找发行商制作组的信息
             if(entry.Type == EntryType.Game)
             {
-                foreach (var item in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.ProductionGroup).Select(s=>s.ToEntryNavigation))
+                var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
+
+                foreach (var item in entry.EntryRelationFromEntryNavigation.Where(s => publisherIds.Contains(s.ToEntry)).Select(s=>s.ToEntryNavigation))
                 {
                     relevanceOther.AddRange(item.Outlinks.Select(s => new RelevancesKeyValueModel
                     {
