@@ -765,7 +765,6 @@ font-size: 16px;
 .markdown-body  img {
   max-width: 100%;
   box-sizing: initial;
-  background-color: #fff;
 }
 
 .markdown-body  img[align=right] {
