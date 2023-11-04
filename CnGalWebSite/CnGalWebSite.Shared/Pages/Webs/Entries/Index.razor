@@ -42,6 +42,9 @@ else
                 case EntryStyleTemplate.ArticleIntroduce:
                     <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.IndexCard Model="EntryView" />
                     break;
+                case EntryStyleTemplate.Magazine:
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Main.IndexCard Model="EntryView" />
+                    break;
                 default:
                     break;
             }
@@ -240,7 +243,7 @@ else
 
     public async void SwitchEntryStyle()
     {
-        var index = ((int)style + 1) % 4;
+        var index = ((int)style + 1) % 5;
         if (index == 0)
         {
             index = 1;

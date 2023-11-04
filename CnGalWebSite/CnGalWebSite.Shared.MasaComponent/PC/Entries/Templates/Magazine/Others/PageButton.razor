@@ -1,0 +1,65 @@
+﻿@inject IJSRuntime JS
+
+<div class="page-button-card">
+    <CnGalWebSite.Components.Buttons.MasaButton Fab XSmall Icon="@IconType.Left.ToIconString()" OnClick="Previous" />
+    <div class="page-count primary-text title-large">
+        @pageString
+    </div>
+    <CnGalWebSite.Components.Buttons.MasaButton Fab XSmall Icon="@IconType.Right.ToIconString()" OnClick="Next" />
+</div>
+
+@code {
+    int totalPage;
+    int currentPage;
+    int pageWidth;
+    string layoutId = "magazine-style";
+    string pageString;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetPageInfo();
+            await Task.Delay(500);
+            await GetPageInfo();
+        }
+    }
+
+
+    public async Task GetPageInfo()
+    {
+        var left = await JS.InvokeAsync<double>("getElementScrollLeft", layoutId);
+        var totalWidth = await JS.InvokeAsync<double>("getElementScrollWidth", layoutId);
+        var screenWidth = await JS.InvokeAsync<double>("getBodyClientWidth");
+
+        totalPage = (int)Math.Ceiling(totalWidth / screenWidth);
+        pageWidth = (int)(screenWidth);
+        currentPage = (int)Math.Round(left / pageWidth) + 1;
+
+        pageString = $"{currentPage} / {totalPage}";
+        StateHasChanged();
+    }
+
+    public async Task Next()
+    {
+        if (currentPage < totalPage)
+        {
+            await JS.InvokeVoidAsync("setElementScrollLeft", layoutId, currentPage * pageWidth);
+            await Task.Delay(500);
+        }
+        await GetPageInfo();
+        StateHasChanged();
+    }
+
+    public async Task Previous()
+    {
+        if (currentPage != 1)
+        {
+
+            await JS.InvokeVoidAsync("setElementScrollLeft", layoutId, (currentPage - 2) * pageWidth);
+            await Task.Delay(500);
+        }
+        await GetPageInfo();
+    }
+
+}

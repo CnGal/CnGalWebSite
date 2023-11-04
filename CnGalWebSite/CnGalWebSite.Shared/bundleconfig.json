@@ -65,7 +65,8 @@
       "wwwroot/css/app/home.css",
       "wwwroot/css/app/common-app.css",
       "wwwroot/css/app/entry.css",
-      "wwwroot/css/app/article.css"
+      "wwwroot/css/app/article.css",
+      "wwwroot/css/app/official-website.css"
     ]
   }
 ]

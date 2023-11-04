@@ -1,0 +1,115 @@
+﻿#top .button-area > div {
+    min-width: 100px;
+}
+
+.information .jacket {
+    width: 100%;
+    max-width: 350px;
+}
+
+.information .description {
+    width: 100%;
+    max-width: 350px;
+}
+
+.character-card .caption .name {
+    font-size: 1.5rem;
+}
+
+.character-card .caption .cv {
+    margin-top: 0;
+}
+
+.character-card .caption .audio {
+    margin-top: 10px;
+}
+
+.character-card .caption .infor div {
+    margin-top: 0;
+    letter-spacing: 0;
+}
+
+.character-card .caption .audio + .infor {
+    margin-top: 10px;
+}
+
+.character-card .caption .infor {
+    margin-top: 20px;
+}
+
+.character-card .caption .description {
+    margin-top: 20px;
+}
+
+.character-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.character-list .m-card {
+    margin: 6px;
+}
+
+.character-card .caption {
+    max-width: 450px;
+    width: 100%;
+    padding: 20px 0 0px;
+    border-left: none;
+    border-top: 2px solid var(--md-sys-color-primary);
+    line-height: 1.25rem !important;
+    font-size: .875rem !important;
+}
+
+.character-card {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding: 0 20px;
+}
+
+.official-website section h2 {
+    padding-bottom: 3rem;
+}
+
+.official-website section {
+    margin: 0 0 4rem;
+}
+
+#top .logo-area h1 span {
+    font-size: 4rem;
+}
+
+#top .logo-area {
+    bottom: 18%;
+}
+
+    #top .logo-area .lead {
+        font-size: 1rem;
+    }
+
+#top .copy {
+    font-size: 1rem;
+}
+
+#top {
+    max-height: none;
+    height: calc(100vh - 48px);
+}
+
+.information .description .detail > div.title dd {
+    font-size: 1.5rem;
+    line-height: inherit;
+}
+
+.staff-card .group-no > .items {
+    font-size: 0.8rem;
+}
+
+    .staff-card .group-no > .items > .posts {
+        margin: 0;
+    }
+
+.staff-card .posts > .name {
+     margin-right: 0; 
+}

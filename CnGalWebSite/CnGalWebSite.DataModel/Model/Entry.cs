@@ -304,8 +304,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "文章介绍")]
         ArticleIntroduce,
         [Display(Name ="专题页")]
-        OfficialWebsite
-      
+        OfficialWebsite,
+        [Display(Name = "杂志")]
+        Magazine
     }
 
     public class EntryWebsiteImage

@@ -207,7 +207,8 @@ namespace CnGalWebSite.Components.Models
         Message,
         MessageRead,
         MessageUnRead,
-        Record
+        Record,
+        Story
     }
 
     public static class IconTypeHelper
@@ -216,6 +217,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Story:
+                    return "mdi-book";
                 case IconType.Record:
                     return "mdi-history";
                 case IconType.MessageUnRead:
