@@ -1,0 +1,17 @@
+﻿<div class="main-card">
+    <div class="image-card" style="background-image: url(@Model.Pictures.FirstOrDefault()?.Pictures?.FirstOrDefault()?.Url)"></div>
+    <div class="content-card background-text">
+        <div class="title-card display-large">
+            @Model.Name
+        </div>
+        <div class="brief-card label-large">
+            @Model.BriefIntroduction
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

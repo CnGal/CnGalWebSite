@@ -1,0 +1,34 @@
+﻿<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
+
+
+<div class="magazine-layout magazine-style" id="magazine-style">
+    <MainCard Model="Model" />
+    <div class="article-introduce magazine-columns">
+        <div class="columns-layout"> 
+            <div style="padding:0 3rem;">
+                <StoryCard />
+                <CharacterCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.InformationCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.ReleaseCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StoryCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.GalleryCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StaffCard Model="Model" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.RelevanceCard Model="Model" />
+                @for (var i = 0; i < 100; i++)
+                {
+                    <div>@i</div>
+                }
+            </div>
+
+        </div>
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.PageButton />
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

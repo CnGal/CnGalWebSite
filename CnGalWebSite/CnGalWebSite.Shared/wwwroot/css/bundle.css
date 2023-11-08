@@ -242,7 +242,7 @@
     /* display - large */
     --md-sys-typescale-display-large-font-family-name: Roboto;
     --md-sys-typescale-display-large-font-family-style: Regular;
-    --md-sys-typescale-display-large-font-weight: 400;
+    --md-sys-typescale-display-large-font-weight: 600;
     --md-sys-typescale-display-large-font-size: 57px;
     --md-sys-typescale-display-large-line-height: 64px;
     --md-sys-typescale-display-large-letter-spacing: -0.25px;
@@ -2648,90 +2648,70 @@ div.prizeTips {
     transition: all .6s ease;
 }
 
-@media screen and (max-width: 768px) {
-    #top {
-        max-height: none;
-        height: calc(100vh - 48px);
+    #top .copy {
+        position: absolute;
+        left: 8%;
+        top: 20%;
+        font-size: 1.5rem;
+        line-height: 3rem;
+        letter-spacing: 0.3rem;
     }
-}
 
-#top .copy {
-    position: absolute;
-    left: 8%;
-    top: 20%;
-    font-size: 1.5rem;
-    line-height: 3rem;
-    letter-spacing: 0.3rem;
-}
+    #top .infor {
+        position: fixed;
+        z-index: 1;
+        width: 100%;
+    }
 
-#top .infor {
-    position: fixed;
-    z-index: 1;
-    width: 100%;
-}
+    #top .logo-area .lead {
+        text-align: center;
+        font-size: 1.8rem;
+        letter-spacing: 0.4rem;
+        padding: 0 30px;
+    }
 
-#top .logo-area .lead {
-    text-align: center;
-    font-size: 1.8rem;
-    letter-spacing: 0.4rem;
-    padding: 0 30px;
-}
-
-#top .logo-area {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 15%;
-    margin: 0 auto;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    gap: 4vh;
-}
-
-@media screen and (max-width: 768px) {
     #top .logo-area {
-        bottom: 18%;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 15%;
+        margin: 0 auto;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        gap: 4vh;
     }
 
-        #top .logo-area .lead {
-            font-size: 1rem;
+
+        #top .logo-area h1 {
+            color: #fff;
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
-    #top .copy {
-        font-size: 1rem;
-    }
-}
+            #top .logo-area h1 img {
+                color: #fff;
+                width: 50%;
+                min-width: 300px;
+            }
 
-#top .logo-area h1 {
-    color: #fff;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-    #top .logo-area h1 img {
-        color: #fff;
-        width: 50%;
-        min-width: 300px;
-    }
-
-    #top .logo-area h1 span {
-        font-size: 7rem;
-        display: flex;
-        text-align: center;
-        justify-content: center;
-        font-family: 华文行楷;
-        width: 70%;
-        min-width: 300px;
-    }
+            #top .logo-area h1 span {
+                font-size: 7rem;
+                display: flex;
+                text-align: center;
+                justify-content: center;
+                font-family: 华文行楷;
+                width: 70%;
+                min-width: 300px;
+            }
 
 .official-website {
     display: flex;
@@ -2763,232 +2743,154 @@ div.prizeTips {
         margin: 0 0 10rem;
     }
 
-@media screen and (max-width: 768px) {
-    .official-website section {
-        margin: 0 0 4rem;
+    .official-website .markdown-body h2 {
+        padding: 0 0 .3rem;
     }
 
-    #top .logo-area h1 span {
-        font-size: 4rem;
+    .official-website .character-card {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 80px 0 80px;
+        gap: 10px 3%;
     }
-}
 
-@media screen and (max-width: 768px) {
-    .official-website section h2 {
-        padding-bottom: 3rem;
+        .official-website .character-card img {
+            align-self: center;
+            height: 45%;
+            max-height: 666px;
+        }
+
+        .official-website .character-card .caption {
+            max-width: 460px;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -ms-flex-line-pack: center;
+            align-content: center;
+            border-left: 2px solid var(--md-sys-color-primary);
+            padding-left: 20px;
+            letter-spacing: 0.05rem !important;
+            line-height: 1.8rem !important;
+            font-size: 1rem !important;
+        }
+
+
+            .official-website .character-card .caption .name {
+                font-size: 2.5rem;
+                color: var(--md-sys-color-primary);
+                letter-spacing: 0.2rem;
+                line-height: 3rem;
+                font-weight: bold;
+            }
+
+            .official-website .character-card .caption .cv {
+                letter-spacing: 0.1rem;
+                margin-top: 15px;
+            }
+
+            .official-website .character-card .caption .audio {
+                margin-top: 15px;
+            }
+
+                .official-website .character-card .caption .audio + .infor {
+                    margin-top: 15px;
+                }
+
+            .official-website .character-card .caption .infor {
+                margin-top: 35px;
+            }
+
+                .official-website .character-card .caption .infor div {
+                    letter-spacing: 0.1rem;
+                    margin-top: 5px;
+                    font-weight: bold;
+                }
+
+            .official-website .character-card .caption .description {
+                margin-top: 40px;
+                white-space: pre-line;
+            }
+
+    .official-website .character-icon {
+        width: 100px;
+        height: 100px;
+        cursor: pointer;
+        border-radius: 50% !important;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12) !important;
     }
-}
 
-.official-website .markdown-body h2 {
-    padding: 0 0 .3rem;
-}
-
-.character-card {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    align-items: center;
-    padding: 30px 80px 0 80px;
-    gap: 10px 3%;
-}
-
-@media screen and (max-width: 768px) {
-    .character-card {
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-        flex-direction: column;
-        padding: 0 20px;
+    .official-website .character-list .m-card {
+        border-radius: 50%;
+        margin: 16px;
     }
-}
 
-.character-card img {
-    align-self: center;
-    height: 45%;
-    max-height: 666px;
-}
 
-.character-card .caption {
-    max-width: 460px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -ms-flex-line-pack: center;
-    align-content: center;
-    border-left: 2px solid var(--md-sys-color-primary);
-    padding-left: 20px;
-    letter-spacing: 0.05rem !important;
-    line-height: 1.8rem !important;
-    font-size: 1rem !important;
-}
-
-@media screen and (max-width: 768px) {
-    .character-card .caption {
-        max-width: 450px;
-        width: 100%;
-        padding: 20px 0 0px;
-        border-left: none;
-        border-top: 2px solid var(--md-sys-color-primary);
-        line-height: 1.25rem !important;
-        font-size: .875rem !important;
+    .official-website .character-icon.active {
+        background-color: var(--md-sys-color-primary);
     }
-}
 
-.character-card .caption .name {
-    font-size: 2.5rem;
-    color: var(--md-sys-color-primary);
-    letter-spacing: 0.2rem;
-    line-height: 3rem;
+    .official-website .m-slide-group__content {
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .official-website .staff-card {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 1rem;
+        justify-content: space-between;
+    }
+
+        .official-website .staff-card .group {
+            margin: 2rem;
+        }
+
+            .official-website .staff-card .group > .name {
+                background-color: var(--md-sys-color-primary);
+                color: white;
+                display: flex;
+                justify-content: center;
+                font-weight: bold;
+                margin: 0 0.5rem 1.5rem 0.5rem;
+                padding: 0 1rem;
+            }
+
+        .official-website .staff-card .posts {
+            display: flex;
+        }
+
+.staff-card .posts > .name {
+    margin-right: 1rem;
+    width: 84px;
     font-weight: bold;
 }
 
-.character-card .caption .cv {
-    letter-spacing: 0.1rem;
-    margin-top: 15px;
+.staff-card .group-no {
+    width: 100%;
 }
 
-.character-card .caption .audio {
-    margin-top: 15px;
-}
-
-    .character-card .caption .audio + .infor {
-        margin-top: 15px;
-    }
-
-.character-card .caption .infor {
-    margin-top: 35px;
-}
-
-    .character-card .caption .infor div {
-        letter-spacing: 0.1rem;
-        margin-top: 5px;
-        font-weight: bold;
-    }
-
-.character-card .caption .description {
-    margin-top: 40px;
-    white-space: pre-line;
-}
-
-.character-icon {
-    width: 100px;
-    height: 100px;
-    cursor:pointer;
-    border-radius: 50% !important;
-    box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12) !important;
-}
-
-.character-list .m-card {
-    border-radius: 50%;
-    margin: 16px;
-}
-
-@media screen and (max-width: 768px) {
-    .character-card .caption .name {
-        font-size: 1.5rem;
-    }
-
-    .character-card .caption .cv {
-        margin-top: 0;
-    }
-
-    .character-card .caption .audio {
-        margin-top: 10px;
-    }
-
-    .character-card .caption .infor div {
-        margin-top: 0;
-        letter-spacing: 0;
-    }
-
-    .character-card .caption .audio + .infor {
-        margin-top: 10px;
-    }
-
-    .character-card .caption .infor {
-        margin-top: 20px;
-    }
-
-    .character-card .caption .description {
-        margin-top: 20px;
-    }
-
-    .character-icon {
-        width: 50px;
-        height: 50px;
-    }
-
-    .character-list .m-card {
-        margin: 6px;
-    }
-}
-
-
-
-.character-icon.active {
-    background-color: var(--md-sys-color-primary);
-}
-
-.official-website .m-slide-group__content {
-    justify-content: center;
-    gap: 1rem;
-}
-
-.staff-card {
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 1rem;
-    justify-content: space-between;
-}
-
-    .staff-card .group {
-        margin: 2rem;
-    }
-
-        .staff-card .group > .name {
-            background-color: var(--md-sys-color-primary);
-            color: white;
-            display: flex;
-            justify-content: center;
-            font-weight: bold;
-            margin: 0 0.5rem 1.5rem 0.5rem;
-            padding: 0 1rem;
-        }
-
-    .staff-card .posts {
+    .staff-card .group-no > .items {
         display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
     }
 
-        .staff-card .posts > .name {
-            margin-right: 1rem;
-            width: 84px;
-            font-weight: bold;
+        .staff-card .group-no > .items > .posts {
+            margin: 0 2rem;
         }
 
-    .staff-card .group-no {
-        width: 100%;
-    }
-
-        .staff-card .group-no > .items {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-
-            .staff-card .group-no > .items > .posts {
-                margin: 0 2rem;
-            }
-
-    .staff-card .staff-name {
-        width: 84px;
-    }
+.staff-card .staff-name {
+    width: 84px;
+}
 
 .official-website .information {
     display: -webkit-box;
@@ -3011,17 +2913,6 @@ div.prizeTips {
     border-radius: var( --md-card-border-radius);
 }
 
-@media screen and (max-width: 768px) {
-    .information .jacket {
-        width: 100%;
-        max-width: 350px;
-    }
-
-    .information .description {
-        width: 100%;
-        max-width: 350px;
-    }
-}
 
 .information .description .detail {
     display: -webkit-box;
@@ -3079,12 +2970,6 @@ div.prizeTips {
     -webkit-box-align: center;
     gap: 4vh;
     justify-content: center;
-}
-
-@media screen and (max-width: 768px) {
-    #top .button-area > div {
-        min-width: 100px;
-    }
 }
 
 .official-website .introduce {
