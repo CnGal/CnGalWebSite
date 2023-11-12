@@ -1,14 +1,14 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<MDCard class="@Class">
+<MDCard Class="@Class">
+
     <MStepper AltLabels Value="2" Vertical="_dataCacheService.IsApp" Elevation="0">
         <MStepperHeader>
             <MStepperStep Step="1" Complete>
                 <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
                     @(Model.UserName + " 提交审核")
                     <small class="mt-1">@Model.ApplyTime.ToString("yyyy-MM-dd HH:mm:ss")</small>
-
                 </div>
 
 
