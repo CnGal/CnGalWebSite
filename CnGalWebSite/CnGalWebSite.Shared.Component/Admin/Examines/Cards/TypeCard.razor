@@ -1,0 +1,27 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="@GetIcon(Type)" Text="@Type.GetDisplayName()"/>
+
+
+ @code {
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+
+    public IconType GetIcon(ExaminedNormalListModelType type)
+    {
+        return type switch
+        {
+            ExaminedNormalListModelType.Article => IconType.Article,
+            ExaminedNormalListModelType.Comment => IconType.Comment,
+            ExaminedNormalListModelType.Entry => IconType.Entry,
+            ExaminedNormalListModelType.FavoriteFolder => IconType.Favorite,
+            ExaminedNormalListModelType.Periphery => IconType.Periphery,
+            ExaminedNormalListModelType.Video => IconType.Video,
+            ExaminedNormalListModelType.UserCertification => IconType.Certification,
+            ExaminedNormalListModelType.User => IconType.User,
+            ExaminedNormalListModelType.Tag => IconType.Tag,
+            ExaminedNormalListModelType.PlayedGame => IconType.Game,
+            _ => IconType.Article,
+        };
+    }
+}

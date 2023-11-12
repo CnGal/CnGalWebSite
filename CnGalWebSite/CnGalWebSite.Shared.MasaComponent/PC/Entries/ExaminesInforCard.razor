@@ -16,7 +16,7 @@
                 <span>@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
             </OppositeContent>
             <ChildContent>
-                <MDCard Class="elevation-2" OnClick="@(()=>OnClickExamine(item))">
+                <MDCard Class="elevation-2 pointer" OnClick="@(()=>OnClickExamine(item))" ShowHoverStyle="true">
                     <MCardText>
                         @if (Model.IndexOf(item) % 2 == 0 || (_dataCacheService.IsApp || Model.Count < 3))
                         {
