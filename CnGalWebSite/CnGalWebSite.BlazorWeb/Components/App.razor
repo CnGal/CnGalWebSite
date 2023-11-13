@@ -1,10 +1,4 @@
-﻿@namespace CnGalWebSite.Server.Pages
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Components.Web
-@using CnGalWebSite.Shared.MasaComponent.Shared.Tips
-@{
-    Layout = null;
-}
+﻿@using CnGalWebSite.Extensions
 
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -23,7 +17,7 @@
     <meta name="shenma-site-verification" content="966d1197093bc0c3cb96125cfd07c5bc_1632156168">
     <meta name="360-site-verification" content="5640406dc9f1d06cee13b5f90b581abf" />
 
-    <base href="~/" />
+    <base href="/" />
 
     <!--开放搜索-->
     <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
@@ -39,10 +33,10 @@
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
 
     <!--字体-->
-@*     <link rel="preconnect" href="https://fonts.googleapis.com">
+    @*     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="@("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&display=swap")" rel="stylesheet">
- *@
+    *@
     <!--自定义样式-->
     @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css"> *@
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
@@ -50,15 +44,41 @@
     <!--不同屏幕大小自适应样式-->
     @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
-
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <component type="typeof(StructuredDataTip)" render-mode="ServerPrerendered" />
+    <HeadOutlet @rendermode="@RenderMode.InteractiveServer" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveServer" />
 </head>
+
 <body>
-    @RenderBody()
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @rendermode="@RenderMode.InteractiveServer" Mobile="mobile" />
 
+    <CnGalWebSite.Shared.App @rendermode="@RenderMode.InteractiveServer" connectionInfo="connectionInfo" Mobile="mobile" />
 
+    <div id="blazor-error-ui" data-nosnippet>
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面，如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
+                        </div>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
+            </div>
 
+        </div>
+    </div>
+    <div id="components-reconnect-modal">
+    </div>
 
     <!--自定义脚本-->
     @* <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script> *@
@@ -91,11 +111,28 @@
     @* <script src="_content/BlazorComponent/js/blazor-component.js"></script> *@
     <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
 
-    <!--运行时-->
-    @* <script src="_framework/blazor.server.js"></script> *@
-    <script src="https://res.cngal.org/_framework/blazor.server.8.0-rc2.js"></script>
-
-
-    <persist-component-state />
+    @* <script src="_framework/blazor.web.js"></script> *@
+    <script src="https://res.cngal.org/_framework/blazor.web.8.0-rc2.js"></script>
 </body>
+
 </html>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    bool mobile;
+    CnGalWebSite.Core.Models.ConnectionInfo connectionInfo = new Core.Models.ConnectionInfo();
+
+    protected override void OnInitialized()
+    {
+        var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(ip))
+        {
+            ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        }
+        connectionInfo.RemoteIpAddress = ip;
+
+        mobile = HttpContext.Request.IsMobileBrowser();
+    }
+}

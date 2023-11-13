@@ -120,7 +120,7 @@
     --md-sys-color-error-container-light: #ffdad6;
     --md-sys-color-on-error-light: #ffffff;
     --md-sys-color-on-error-container-light: #410002;
-    --md-sys-color-background-light: #fffbff;
+    --md-sys-color-background-light: #fffbffe0;
     --md-sys-color-on-background-light: #1e1a1d;
     --md-sys-color-surface-light: #fffbff;
     --md-sys-color-on-surface-light: #1e1a1d;
@@ -151,7 +151,7 @@
     --md-sys-color-error-container-dark: #93000a;
     --md-sys-color-on-error-dark: #690005;
     --md-sys-color-on-error-container-dark: #ffdad6;
-    --md-sys-color-background-dark: #1e1a1d;
+    --md-sys-color-background-dark: #1e1a1da0;
     --md-sys-color-on-background-dark: #e9e0e4;
     --md-sys-color-surface-dark: #1e1a1d;
     --md-sys-color-on-surface-dark: #e9e0e4;
