@@ -4,6 +4,10 @@
 
 <MDCard>
     <DataTableCard TModel="BasicInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+        <ButtonContent>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="游戏" Class="me-4" />
+        </ButtonContent>
+
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {

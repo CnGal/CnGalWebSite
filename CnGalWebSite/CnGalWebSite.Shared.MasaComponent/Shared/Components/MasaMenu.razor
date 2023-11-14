@@ -2,7 +2,7 @@
 
 <MMenu OffsetY>
     <ActivatorContent>
-        <MButton Color="@Color" @attributes="@context.Attrs" Dark Text="TextStyle">
+        <MButton Color="@Color" @attributes="@context.Attrs" Dark Text="TextStyle" Rounded="Rounded" Class="@Class">
             @if (string.IsNullOrWhiteSpace(Icon) == false)
             {
                 <MIcon Left>@Icon</MIcon>
@@ -27,7 +27,14 @@
     public bool TextStyle { get; set; }
 
     [Parameter]
+    public bool Rounded { get; set; }
+
+    [Parameter]
     public string Text { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
     [Parameter]
     public string Color { get; set; } = "primary";
 

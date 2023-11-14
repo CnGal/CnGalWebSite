@@ -9,15 +9,15 @@
 <MDCard Class="pa-4 mb-4">
     <h1 class="title-large text-center mb-2">CnGal资料站数据汇总</h1>
     <div class="d-flex" style="justify-content: center;flex-wrap: wrap;">
-        <div>
+        <div class="d-flex">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Entry" />
             <span class="me-4">@(Model.EntriesCount + "个词条")</span>
         </div>
-        <div>
+        <div class="d-flex">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Article" />
             <span class="me-4">@(Model.ArticlesCount + "篇文章")</span>
         </div>
-        <div>
+        <div class="d-flex">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" />
             <span>@(Model.LastEditTime?.ToString("yyyy-MM-dd HH:mm"))</span>
         </div>
