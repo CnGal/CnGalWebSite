@@ -64,8 +64,9 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             //添加记录
             _record.Add(datetime);
 
-            var response=await _httpClient.PostAsJsonAsync<ChatCompletionModel>(url + "v1/chat/completions", new ChatCompletionModel
+            var response=await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
             {
+                Model=string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"],
                 Messages = new List<ChatCompletionMessage>
                 {
                     new ChatCompletionMessage
