@@ -14,21 +14,23 @@
         <MAlert Color="primary" Class="mb-0"
                 Shaped
                 Outlined
-                Icon="@("mdi-information")">
-            请在根目录下的 <strong>appsettings.json</strong> 文件内编辑配置，部分配置将在重启后生效
-        </MAlert>
-    </MCardText>
-    <MCardText>
-        <dl>
-            <div>
-                <dt>Swagger 文档</dt>
-                <dd><a href="/swagger">/swagger</a></dd>
+                 Icon="@("mdi-information")">
+             请在根目录下的 <strong>appsettings.json</strong> 文件内编辑配置，部分配置将在重启后生效
+         </MAlert>
+     </MCardText>
+     <MCardText>
+         <dl>
+             <div>
+                 <dt>Swagger 文档</dt>
+                 <dd><a href="/swagger">/swagger</a></dd>
+             </div>
+             <div>
+                 <dt>敏感词总数</dt>
+                 <dd>@_sensitiveWordService.Count()</dd>
             </div>
-            <div>
-                <dt>敏感词总数</dt>
-                <dd>@_sensitiveWordService.Count()</dd>
-            </div>
-            @{ var model = _configuration.AsEnumerable().ToList();}
+            @{
+                var model = _configuration.AsEnumerable().ToList();
+            }
             @foreach (var item in _selfConfigurations)
             {
 
@@ -39,7 +41,7 @@
                 var info = model.Find(s => s.Key == item.Item1);
                 <div>
                     <dt>@($"{item.Item2} ( {item.Item1} )")</dt>
-                    <dd>@(item.Item3?info.Value.ReplaceWithSpecialChar(): info.Value)</dd>
+                    <dd>@(item.Item3 ? info.Value.ReplaceWithSpecialChar() : info.Value)</dd>
                 </div>
             }
         </dl>
@@ -54,7 +56,7 @@
         </MButton>
     </MCardActions>
 </MCard>
-<CnGalWebSite.RobotClientX.Components.Home.EditCard ConfigurationChanged="ConfigurationChanged"/>
+<CnGalWebSite.RobotClientX.Components.Home.EditCard ConfigurationChanged="ConfigurationChanged" />
 
 @code {
 
@@ -68,6 +70,7 @@
             ("NormalVerifyKey","Mirai 验证密匙",true),
             ("ChannelToken","QQ频道 Token",true),
             ("ChannelAppKey","QQ频道 AppKey",true),
+            ("ChatGPTModel","GPT模型",false),
             ("ChatGPTLimit","GPT对话上限每分钟",false),
             ("ChatGPTApiUrl","GPT API",false),
             ("ChatGPTApiKey","GPT Key",true),
