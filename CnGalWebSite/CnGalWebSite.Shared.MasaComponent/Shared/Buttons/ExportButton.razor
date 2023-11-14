@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " TextStyle>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " Rounded Class="@Class">
     <div style=" display: flex; flex-direction: column;">
         <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="Json" Icon="mdi-code-json " IsAsync OnClick="OnExportJson" />
     </div>
@@ -15,6 +15,8 @@
     public IEnumerable<TItem> Items { get; set; }
     [Parameter]
     public string Name { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 
 
     [Parameter]

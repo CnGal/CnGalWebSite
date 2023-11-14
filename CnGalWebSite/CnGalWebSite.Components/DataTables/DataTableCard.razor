@@ -18,10 +18,10 @@
      <TopContent>
          <MToolbar Flat>
             <MToolbarTitle> @Title</MToolbarTitle>
-            <MDivider Class="mx-4" Inset Vertical />
+                <MDivider Class="mx-4" Inset Vertical />
              <MSpacer></MSpacer>
              @ButtonContent
-             @if (ShowAddButton)
+            @if (ShowAddButton)
             {
                 <MButton Color="primary" Rounded="Rounded"
                           Dark
@@ -42,10 +42,10 @@
      </TopContent>
      <ItemColContent>
          @ItemColContent(context)
-     </ItemColContent>
- </MDataTable>
+    </ItemColContent>
+</MDataTable>
 
- @code {
+@code {
     [Parameter]
     public List<DataTableHeader<TModel>> Headers { get; set; }
     [Parameter]
@@ -74,6 +74,7 @@
     public Expression<Func<TModel, bool>> Predicate { get; set; }
     [Parameter]
     public List<TModel> DataSource { get; set; }
+
 
     private int _totalDesserts = 0;
     private IEnumerable<TModel> _items = new List<TModel>();
@@ -139,6 +140,29 @@
         }
     }
 
+    public async Task<IEnumerable<TModel>> QueryAllAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ApiUrl))
+        {
+            return DataSource;
+        }
+        else
+        {
+            try
+            {
+                var param = Data.Parameter.TryDeepClone();
+                param.ItemsPerPage = int.MaxValue;
+                Data = await _httpService.PostAsync<QueryParameterModel, QueryResultModel<TModel>>(ApiUrl, param);
+                return Data.Items;
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, $"获取 {Title} 数据失败");
+                return new List<TModel>();
+            }
+        }
+    }
+
     public void CopyOptions(QueryParameterModel parameter, DataOptions options)
     {
         parameter.SortBy = options.SortBy;
@@ -150,4 +174,4 @@
         parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
         parameter.Page = options.Page == 0 ? 1 : options.Page;
     }
- }
+}
