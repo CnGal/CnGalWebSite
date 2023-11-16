@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="Masa.Blazor" Version="1.0.0-preview.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0-rc.1.23421.29" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-rc.1.23419.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.16" />
   </ItemGroup>
