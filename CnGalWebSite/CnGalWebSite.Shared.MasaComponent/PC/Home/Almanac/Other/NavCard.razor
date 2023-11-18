@@ -1,0 +1,115 @@
+﻿@inject IJSRuntime JS
+
+@if (showNav)
+{
+    <div class="almanac-nav-card">
+        <a href="/" class="logo" aria-label="主页"></a>
+        <a class="previous-button" @onclick="Previous">
+            <div></div>
+        </a>
+        <a class="catalog-button" @onclick="@(()=>Nav("almanac-catalog-card"))">
+            <div></div>
+        </a>
+        <a class="next-button" @onclick="Next">
+            <div></div>
+        </a>
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string LayoutId { get; set; }
+
+    int totalPage;
+    int currentPage;
+    double pageWidth;
+    string pageString;
+
+    bool showNav = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetPageInfo();
+            await Task.Delay(500);
+            await GetPageInfo();
+        }
+    }
+
+
+    public async Task GetPageInfo()
+    {
+        try
+        {
+            var left = await JS.InvokeAsync<double>("getElementScrollLeft", LayoutId);
+            var totalWidth = await JS.InvokeAsync<double>("getElementScrollWidth", LayoutId);
+            var screenWidth = await JS.InvokeAsync<double>("getBodyClientWidth");
+
+            if (showNav)
+            {
+                screenWidth -= 64;
+            }
+
+            pageWidth = (int)(screenWidth / 2);
+            totalPage = (int)Math.Ceiling(totalWidth / pageWidth);
+            currentPage = (int)Math.Round(left / pageWidth) + 1;
+
+            pageString = $"{currentPage} / {totalPage - 1}";
+            StateHasChanged();
+
+        }
+        catch
+        {
+
+        }
+    }
+
+    public async Task Next()
+    {
+        try
+        {
+            if (currentPage < totalPage)
+            {
+                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage + 1) * pageWidth);
+                await Task.Delay(500);
+            }
+            await GetPageInfo();
+            StateHasChanged();
+        }
+        catch
+        {
+
+        }
+    }
+
+    public async Task Previous()
+    {
+        try
+        {
+            if (currentPage != 1)
+            {
+
+                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage - ((currentPage % 2 == 0 && currentPage == totalPage-1) ? 2 : 3)) * pageWidth);
+                await Task.Delay(500);
+            }
+            await GetPageInfo();
+        }
+        catch
+        {
+
+        }
+    }
+
+    public async Task Nav(string id)
+    {
+        var left = await JS.InvokeAsync<double>("getElementLeftOfLayout", id) + await JS.InvokeAsync<double>("getElementScrollLeft", LayoutId);
+        var page = (int)Math.Round(left / pageWidth);
+        await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, page * pageWidth);
+        await Task.Delay(500);
+        await GetPageInfo();
+    }
+
+}

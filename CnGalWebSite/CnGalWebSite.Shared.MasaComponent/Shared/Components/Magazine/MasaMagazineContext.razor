@@ -1,0 +1,16 @@
+﻿<div class="@($"magazine-context {(FullScreen?"full-screen":"half-screen")} {Class} {Id}")" id="@Id">
+    <div>
+        @ChildContent
+    </div>
+</div>
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public bool FullScreen { get; set; }
+
+}

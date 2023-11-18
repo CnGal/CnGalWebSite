@@ -15,6 +15,11 @@
         <MTab Href="/cv">CV</MTab>
         <MTab Href="/square">广场</MTab>
          <MTab Href="/sharegames">晒库存</MTab>
+         <AuthorizeView Roles="Admin">
+             <Authorized>
+                <MTab Href="/almanac">2023年鉴</MTab>
+             </Authorized>
+         </AuthorizeView>
     </MTabs>
     <MSpacer></MSpacer>
     <AuthorizeView>

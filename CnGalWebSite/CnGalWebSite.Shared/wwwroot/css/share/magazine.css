@@ -10,10 +10,8 @@
 
 /*分栏*/
 .magazine-columns {
-    font-size: small;
-    padding: 3rem 0;
+    min-width: 50%;
 }
-
 
 .magazine-style::-webkit-scrollbar {
     display: none;
@@ -21,11 +19,24 @@
 
 /*分栏列表*/
 .magazine-style .columns-layout {
-    height: calc(100vh - 6rem);
-    column-width: calc(100vh - 6rem);
+    height: 100%;
+    columns: 1;
     column-gap: 0;
 }
 
+/*未分栏内容*/
+.magazine-context.full-screen {
+    min-width: 100%;
+}
+
+.magazine-context.half-screen {
+    min-width: 50%;
+}
+
+.magazine-context > div {
+    height: calc(100vh);
+    position: relative;
+}
 /*隐藏头部尾部*/
 .variable.container {
     margin: 0;
@@ -61,6 +72,14 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+.article-introduce.magazine-columns {
+    padding: 3rem 0;
+}
+
+.article-introduce .columns-layout > div {
+    padding: 0 3rem;
 }
 /*首页*/
 .magazine-style .main-card {

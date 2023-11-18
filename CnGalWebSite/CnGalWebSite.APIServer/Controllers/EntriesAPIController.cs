@@ -1605,6 +1605,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Date> after && s.PubulishTime.Value.Date< before)
                 .Where(s => s.Releases.Any(s => s.Time != null && s.Type == GameReleaseType.Official))
                 .Where(s => string.IsNullOrWhiteSpace(s.Releases.OrderBy(s => s.Time).First(s => s.Time != null && s.Type == GameReleaseType.Official).TimeNote) || s.PubulishTime < time)
+                .OrderByDescending(s=>s.PubulishTime)
                 .ToListAsync();
 
             var model = new List<PublishGamesTimelineModel>();
@@ -1612,6 +1613,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entry = new PublishGamesTimelineModel();
                 entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(item));
+                entry.Thumbnail = item.Thumbnail;
 
                 entry.PublishTimeNote= item.Releases.OrderBy(s=>s.Time).FirstOrDefault(s =>s.Type== GameReleaseType.Official)?.TimeNote;
 

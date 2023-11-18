@@ -1,0 +1,14 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="almanac-home-card" FullScreen>
+    <div class="year">2023</div>
+    <div class="name">CNGAL年鉴</div>
+    <a class="enter" @onclick="@(()=>OnNav.InvokeAsync("almanac-catalog-card"))">
+        enter→
+    </a>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.ArrowBorderCard />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
+
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
+}

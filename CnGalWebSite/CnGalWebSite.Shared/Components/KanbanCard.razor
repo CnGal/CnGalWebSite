@@ -1,11 +1,13 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
 @inject ILive2DService _live2DService
+@inject NavigationManager NavigationManager
 
 @implements IDisposable
 
+
 <CnGalWebSite.Components.Containers.MiniModeContainer>
-    @if (isReady)
+    @if (isReady && !Hide)
     {
         @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp)
         {
@@ -34,7 +36,7 @@
 
 @code {
     bool isReady;
-    bool hide;
+    bool Hide;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip FloatTool;
     CnGalWebSite.Kanban.Components.Buttons.ExternalButton ExternalButton;
@@ -43,6 +45,21 @@
     {
         _eventService.KanbanChanged -= OnKanbanChanged;
         _eventService.KanbanChanged += OnKanbanChanged;
+
+        NavigationManager.LocationChanged -= LocationChanged;
+        NavigationManager.LocationChanged += LocationChanged;
+
+        LocationChanged(null, null);
+    }
+
+    public void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        var hide = NavigationManager.Uri.Contains("almanac");
+        if(hide!=Hide)
+        {
+            Hide=hide;
+            StateHasChanged();
+        }
     }
 
     public void DisplayArticleCatalogButton(ArticleViewModel model)
@@ -66,6 +83,7 @@
 
     public void Dispose()
     {
+        NavigationManager.LocationChanged -= LocationChanged;
         _eventService.KanbanChanged -= OnKanbanChanged;
         GC.SuppressFinalize(this);
     }

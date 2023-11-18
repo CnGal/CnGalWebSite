@@ -1,0 +1,16 @@
+﻿<div class="@($"magazine-columns {Class} {Id}")" id="@Id">
+    <div class="columns-layout">
+        <div>
+            @ChildContent
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+
+}

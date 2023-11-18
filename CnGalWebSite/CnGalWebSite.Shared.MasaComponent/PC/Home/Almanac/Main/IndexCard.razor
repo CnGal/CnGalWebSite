@@ -1,0 +1,30 @@
+﻿<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
+<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/almanac.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="@("https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Passion+One:wght@400;700;900&display=swap")" rel="stylesheet">
+
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="CnGal年鉴 - 2023" />
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="almanac-magazine-layout" Class="almanac-layout">
+
+    <HomeCard OnNav="OnNav" />
+    <CatalogCard OnNav="OnNav" />
+    <TopCard/>
+    <TimeLineCard/>
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.NavCard LayoutId="almanac-magazine-layout" @ref="navCard"/>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout>
+
+
+@code {
+    CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.NavCard navCard;
+
+    public async Task OnNav(string id)
+    {
+        await navCard?.Nav(id);
+    }
+}
