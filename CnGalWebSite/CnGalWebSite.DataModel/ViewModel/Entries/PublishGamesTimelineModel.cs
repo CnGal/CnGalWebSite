@@ -7,6 +7,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
 {
     public class PublishGamesTimelineModel: EntryInforTipViewModel
     {
+        public string Thumbnail { get; set; }
+
         public string PublishTimeNote { get; set; }
     }
 

@@ -1,0 +1,67 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="almanac-timeline-card" FullScreen="false">
+    <div class="name-en">TIMELINE</div>
+    <div class="name-cn">时间轴</div>
+    <div class="line" style="@($"height:{80+Model.Count*64}px")"></div>
+
+    @foreach (var item in Model)
+    {
+        <div class="@($"{(Model.IndexOf(item)%2==0?"":"right")} item-card")" style="@($"top: calc(17.83% + {40+Model.IndexOf(item)*64}px); {(Model.IndexOf(item)==Model.Count-1?"padding-bottom: calc(7.16% + 80px);":"")}")">
+            <a href="@($"/entries/index/{item.Id}")" class="rect-card">
+                <div class="content-card">
+                    @if(item.Thumbnail==null)
+                    {
+                        <div class="image" style="@($"background-image: url({@item.MainImage});")" />
+                    }
+                    else
+                    {
+                        <img src="@item.Thumbnail" alt="@item.Name" />
+                    }
+                   
+                    <div class="name-time-card">
+                        <div class="time">@item.PublishTime?.ToString("yyyy年M月d日")</div>
+                        <div class="name text-truncate-2">@item.Name</div>
+                    </div>
+                </div>
+                <div class="triangle"></div>
+            </a>
+            <div class="circle">
+
+            </div>
+        </div>
+    }
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
+
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
+
+
+    List<PublishGamesTimelineModel> Model = new List<PublishGamesTimelineModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await _dataCacheService.PublishGamesTimelineDataCatche.GetCache($"?beforeTime=1700395215131&aftertime=0");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+            await JS.InvokeVoidAsync("dragMoveX", ".almanac-timeline-card>div");
+
+            }
+            catch
+            {
+                
+            }
+        }
+    }
+}

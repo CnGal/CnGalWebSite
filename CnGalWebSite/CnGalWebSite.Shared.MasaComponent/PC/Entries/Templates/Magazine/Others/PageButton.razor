@@ -9,10 +9,13 @@
 </div>
 
 @code {
+    [Parameter]
+    [EditorRequired]
+    public string LayoutId{ get; set; }
+
     int totalPage;
     int currentPage;
-    int pageWidth;
-    string layoutId = "magazine-style";
+    double pageWidth;
     string pageString;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -28,15 +31,15 @@
 
     public async Task GetPageInfo()
     {
-        var left = await JS.InvokeAsync<double>("getElementScrollLeft", layoutId);
-        var totalWidth = await JS.InvokeAsync<double>("getElementScrollWidth", layoutId);
+        var left = await JS.InvokeAsync<double>("getElementScrollLeft", LayoutId);
+        var totalWidth = await JS.InvokeAsync<double>("getElementScrollWidth", LayoutId);
         var screenWidth = await JS.InvokeAsync<double>("getBodyClientWidth");
 
-        totalPage = (int)Math.Ceiling(totalWidth / screenWidth);
-        pageWidth = (int)(screenWidth);
+        pageWidth = (int)(screenWidth / 2);
+        totalPage = (int)Math.Ceiling(totalWidth / pageWidth);
         currentPage = (int)Math.Round(left / pageWidth) + 1;
 
-        pageString = $"{currentPage} / {totalPage}";
+        pageString = $"{currentPage} / {totalPage-1}";
         StateHasChanged();
     }
 
@@ -44,7 +47,7 @@
     {
         if (currentPage < totalPage)
         {
-            await JS.InvokeVoidAsync("setElementScrollLeft", layoutId, currentPage * pageWidth);
+            await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage + 1) * pageWidth);
             await Task.Delay(500);
         }
         await GetPageInfo();
@@ -56,7 +59,7 @@
         if (currentPage != 1)
         {
 
-            await JS.InvokeVoidAsync("setElementScrollLeft", layoutId, (currentPage - 2) * pageWidth);
+            await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage - 3) * pageWidth);
             await Task.Delay(500);
         }
         await GetPageInfo();

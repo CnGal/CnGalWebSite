@@ -1,0 +1,608 @@
+﻿/*全局*/
+:root {
+    --almanac-width: calc(100vh);
+    --almanac-width-half: calc(50vh);
+    --almanac-height: calc(100vh);
+    --almanac-background: rgba(204, 204, 204, 1);
+    --almanac-on-background: rgba(0, 0, 0, 1);
+    --almanac-card-on-background: rgba(0, 0, 0, .4);
+}
+/*字体*/
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+/* @font-face {
+    font-family: "AlimamaShuHeiTi-Regular";
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font-family/AlimamaShuHeiTi-Bold.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font-family/AlimamaShuHeiTi-Bold.woff") format("woff");
+} */
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+    font-family: "AlimamaShuHeiTi-Regular";
+    font-weight: 700;
+    src: url("//at.alicdn.com/wf/webfont/4j3ipFZxHcjo/Z1EvVlxNvQw9.woff2") format("woff2"), url("//at.alicdn.com/wf/webfont/4j3ipFZxHcjo/qXIAoA5jALwv.woff") format("woff");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "MiSans-Heavy";
+    font-weight: 800;
+    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Heavy.woff2") format("woff");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "MiSans-Regular";
+    font-weight: 400;
+    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Normal.woff2") format("woff");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "MiSans-Bold";
+    font-weight: 700;
+    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Bold.woff2") format("woff");
+    font-display: swap;
+}
+/*覆盖全局样式*/
+.m-application a {
+    color: var(--almanac-on-background);
+}
+
+.almanac-layout {
+    background-color: white;
+    color: var(--almanac-on-background);
+    font-size: 14px;
+    font-weight: 400;
+    font-family: 'MiSans-Regular';
+}
+
+/*侧边栏预留位置*/
+.almanac-layout {
+    margin-left: 64px;
+}
+
+:root {
+    --almanac-width: calc(100vh - 64px);
+    --almanac-width-half: calc(50vh - 32px);
+}
+/*鼠标指针*/
+
+a,
+a > *,
+a > * > *,
+a > * > * > * {
+    cursor: var(--cursor-pointer) !important;
+}
+
+* {
+    --cursor-pointer: -webkit-image-set(url(data:image/png;base64,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) 2x, url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAAEEfUpiAAAAAXNSR0IArs4c6QAAA9xJREFUWAntV8tLVFEYnzvvpzTazIijprZRpqRFhFLUooUglSFDs2vXInAxuBaX9RcEbVNBsHAlYtbGRUK4CnMhLoxQQ8lkZGZ0Xvf2+13m3O6dmYujhAT2wcc95zvf45zvdc61WEzABbpVW1PKAEJIECWHw5HERBIE4/fw8FDRU2w6HRY7VkqSJD3Sc9Q99lN3OBxWotHoR0j92SdV2Gy2h8IWvyBdIv08oaWlpQT33Kq0adjp7Ozs54GBgXxjY2OfgbG1tXVhaWlJO0Rvb++xYFA1bG1tPZ6fny8J4sHBgTbWhyOCPSRKAFmW34J5Twic/1dCvEZxsDRMe85i3kefMvB2u30ACtxAG1B/3pp6paampufIlAIVaD4tD46OjhTsqgBJn15aHyhpf3//E5JV2t7e1tNVfrfbbfF4PMwygwK9MjEO+ny+F8lkspjJZBRiKpVS4vF4HikbB5NTMPJrdi7SeW5HmYeWi2U0FBxoFx7oqEpwIw/SCNtONpv9gsXTOQ0hvM/cYfuBsL9Se+W8KmEgqyWK1+sNQIDdsIpPKKpcYPy13Jibm9sZHBzMIoW/d3R0vMcaG7cpOJubm4s4/yaPoIfJyUmlUCgofr9/GNKVRjWF0UQiUTg+PtbLGsaBQGAU3DxSTfDDgS83NjYMQvoJFDyDpKkCnr2jra1tSy8kxsvLy4zKbaDpEbCmFtBN9ITc+vq6WomsxpWVFaW9vf0n1jvJpAfN4zoiy/U6Svea1WoNkg4H/sJnFfiVU6AGtRRwkdukIrFd9nGWs9bPMf4P/4gHzIJYuT0GU4rFYmr7WVtbkzEXWMn71+d29LYrrPPFxUVlenqa91sGV1QUltgc6j3EmTeGruZ9IC5b8VTDrX0PGvkSE6l+JgOmfUGnjSes6vxo2B9wh1uKxeIrPIcyGJdyudwb3ME/wM+aEyE63Y1QNsxTOSKRSGcwGLwDdz8RHuATo7u7W4YxtU319PTIu7u7attBmOTx8XFlbGyshJ62B8+1UA/wVGGi8caurq5vExMTSjqdVoaGhvLob1XvHdEoa335zGxoaBihLmCVB0EzBTJHnE7nMJ94U1NTci0DJ9G4gfL9EYa+ekJt2BAFKHg3FAot9Pf354XLTzLMdfIiR2SXyzUIHZeBp/IA+FVgKHjBx6BoBN7IzczM1GOfIStgA+8ge6OswzQHTBcgKIBJxDhexUb68I/xFOMY/gWq3IobOY37bxXP3NdY59W1CTwEmt5C9WwA8moW06AXyNrnc4cvd8oTWWosO/7fpIEpYBYoyhHD2lDvBmpLG8vrTPVupvji0H8DAsFwgXvDpDQAAAAASUVORK5CYII=) 1x) 9 9, auto !important;
+}
+
+    *:not(.pointer-link *) {
+        cursor: -webkit-image-set(url(data:image/png;base64,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) 2x, url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAAEEfUpiAAAAAXNSR0IArs4c6QAAArtJREFUWAntV01rGlEUHWuibcU2TVPTRonJpiL2a1FbaEtpAvobanGnIK4qKQjuhP4GseDWjYuii9CNiyJCN134segiJGlAcKELQWJDFZmeM+0TDRM/ppVuvHCceXfuPXPvfe/dN0qSmmxvb8vn9cvnFWPGFouF/pcHJjIEA/1AoXoTjUZpdfGbyFssFuVAIDDKP0Q34R1DlppuN/D+t+M87Qyy0Wh8VjO6RKVer5cymcyrXq/XUjPahPIxQOMlNQOdmvLf6wxI9SloNVdUKYXb7ZYPDg4+gMgwbYwiQRKcCCedTicdHh4emc3mB9D9EPpxVyWCVqvVgNET4CHwHHADJmCirMDiHnB1ouXCQLUCunq9/gZPrqg+nUK5zN7Rbre7sOVsiLUxhetvEwMJuCmPj4/ZNdYAZR9OyzAgIEmhUJB3d3fts5CMEJAklUrJ8Xicm3zi5hrpAHCUut2uVCqVpEgk8nV9ff1FOBz+AiKmdqEoEfh8PtnpdL6G1X2Ae+AlwFQmikKQTqeTsBQFZOiMbmIKZF8yGo13cbUBM1WfzkL4Js3OgmRx1ViB4XnmLvxvM8FAVrCpe/1+/zSfz7O/XAO4GGduD/CZWXiQbYq2srOzw/O+Xy6X30O/CvALZq6BMAC7CIAdhXC5XHKlUpFrtdrHra2t27AxAnOZJtUARCA2m03OZrMyDt5SMBh0Igi2/+H1g6E2mSobtshQKCQ5HI5H+Jb9dnZ2dpRIJNjteOr/VSBiXlmBO5iCE/RgJZVYLCZ5vd5KMpncR5u9brVa1/7I6g2IyWQy5HK5d36//xMcToGxPVshHfMzmAKPxyM3m82fOAj2YM/efhNgpmaAhyZbNqO8BVA3cqhgrEm4yjc6nc73arW6j/tnHANzW3TgVkRMAdcCM+H/DOr4iUD0gYUsKrCowFwr8AukF+p8blYsTwAAAABJRU5ErkJggg==) 1x) 4 4, auto;
+    }
+/*首页*/
+
+
+.almanac-home-card .year {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 9.2%;
+    top: 31.1%;
+    height: 133px;
+    font-size: 120px;
+    font-weight: 700;
+    font-family: 'Passion One';
+}
+
+.almanac-home-card .name {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 9.2%;
+    top: calc(31.1% + 95px);
+    height: 87px;
+    font-size: 72px;
+    font-weight: 800;
+    font-family: 'AlimamaShuHeiTi-Regular';
+}
+
+.almanac-home-card .enter {
+    display: flex;
+    position: absolute;
+    left: 9.2%;
+    top: calc(31.1% + 199px);
+    width: 186px;
+    height: 54px;
+    border-radius: 20px;
+    background: var(--almanac-background);
+    font-size: 36px;
+    line-height: 54px;
+    font-weight: 800;
+    font-family: 'AlimamaShuHeiTi-Regular';
+    justify-content: center;
+    align-items: center;
+}
+/*边框*/
+.almanac-border-bottom-arrow {
+    position: absolute;
+    right: 5.14%;
+    bottom: 6%;
+    width: 9px;
+    height: 9px;
+    background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/arrow-border-bottom.png);
+    background-size: contain;
+}
+
+.almanac-border-bottom-line {
+    position: absolute;
+    right: calc(5.14% + 9px);
+    bottom: calc(6% + 4px);
+    width: calc(85.87% - 9px);
+    background-color: var(--almanac-on-background);
+    height: 1px;
+}
+
+.almanac-border-right-line {
+    position: absolute;
+    right: 5.14%;
+    top: 7.8%;
+    width: 1px;
+    background-color: var(--almanac-on-background);
+    height: 82%;
+}
+/*侧边导航栏*/
+.almanac-nav-card {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 100%;
+    background: var(--almanac-background);
+}
+
+    .almanac-nav-card .logo {
+        display: flex;
+        position: relative;
+        z-index: 1;
+        left: 11px;
+        top: 1.3020833333333335%;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png);
+    }
+
+    .almanac-nav-card .previous-button {
+        position: absolute;
+        z-index: 3;
+        left: 17.1875%;
+        bottom: calc(50% + 33px);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var( --almanac-card-on-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .almanac-nav-card .previous-button > div {
+            width: 20px;
+            height: 17.7px;
+            background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/nav-left.png);
+            background-size: contain;
+        }
+
+    .almanac-nav-card .catalog-button {
+        position: absolute;
+        z-index: 3;
+        left: 17.1875%;
+        bottom: calc(50% - 21px);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var( --almanac-card-on-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .almanac-nav-card .catalog-button > div {
+            width: 20px;
+            height: 12.5px;
+            background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/nav-catalog.png);
+            background-size: contain;
+        }
+
+    .almanac-nav-card .next-button {
+        position: absolute;
+        z-index: 3;
+        left: 17.1875%;
+        top: calc(50% + 33px);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var( --almanac-card-on-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .almanac-nav-card .next-button > div {
+            width: 20px;
+            height: 17.7px;
+            background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/nav-right.png);
+            background-size: contain;
+        }
+/*目录*/
+.almanac-catalog-card .almanac-year {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    left: 9.2%;
+    top: 10.1%;
+    height: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.almanac-catalog-card .almanac-name {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    left: 9.2%;
+    top: calc(10.1% + 20px);
+    height: 36px;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.almanac-catalog-card .card-title {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    left: 9.2%;
+    top: calc(10.1% + 35px);
+    height: 89px;
+    font-size: 60px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.almanac-catalog-card .item-group {
+    display: flex;
+    position: absolute;
+    left: 9.2%;
+    top: calc(10.1% + 123px);
+    width: 80.11%;
+    height: 54.42%;
+    justify-content: space-between;
+}
+
+.almanac-catalog-card .item-card {
+    width: 23.77%;
+    height: 100%;
+    border-radius: 20px;
+    background: var(--almanac-background);
+    position: relative;
+}
+
+
+
+    .almanac-catalog-card .item-card .index {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        left: 13.3%;
+        top: calc(38.27% - 63px);
+        width: 64px;
+        height: 87px;
+        font-size: 60px;
+        font-weight: 400;
+        font-family: 'Oswald';
+    }
+
+    .almanac-catalog-card .item-card .name-en {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        left: 13.3%;
+        top: 38.27%;
+        width: 129px;
+        height: 87px;
+        font-size: 60px;
+        font-weight: 700;
+        font-family: 'Oswald';
+    }
+
+    .almanac-catalog-card .item-card .name {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        left: 13.3%;
+        top: calc(38.27% + 75px);
+        width: 152px;
+        height: 87px;
+        font-size: 36px;
+        font-weight: 800;
+        font-family: 'MiSans-Heavy';
+        word-break: keep-all;
+    }
+/*年度总览*/
+.magazine-columns.almanac-top-card {
+    padding: 7.16% 0;
+}
+
+.almanac-top-card .columns-layout > div {
+    padding: 0 11.36%;
+}
+
+.almanac-top-card .game-count-group {
+    display: flex;
+    gap: 27px;
+    margin: 25px 0;
+}
+
+.almanac-top-card .model-worker-group {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin: 25px 0;
+}
+/*章节标题卡片*/
+.section-title-card .year-almanac-name-card {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.section-title-card .year {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.section-title-card .almanac-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 36px;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.section-title-card .name-cn-en-card {
+    display: flex;
+    align-items: center;
+}
+
+.section-title-card .name-en {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 89px;
+    font-size: 60px;
+    font-weight: 700;
+    font-family: 'Oswald';
+}
+
+.section-title-card .name {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 152px;
+    height: 68px;
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'MiSans-Heavy';
+}
+/*键值对卡片*/
+.key-value-card {
+    display: flex;
+    gap: 16px;
+    flex-direction: row;
+}
+
+    .key-value-card .border-line-left {
+        width: 1px;
+        height: 96px;
+        background-color: black;
+    }
+
+    .key-value-card .content-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .key-value-card .value {
+        display: flex;
+        flex-direction: column;
+        height: 60px;
+        font-size: 60px;
+        font-weight: 700;
+        font-family: 'Oswald';
+        justify-content: center;
+    }
+
+    .key-value-card .key {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        height: 19px;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: 'MiSans-Bold';
+    }
+/*时间轴*/
+.almanac-timeline-card {
+    background-color: rgba(204, 204, 204, 1);
+}
+
+    .almanac-timeline-card > div {
+        overflow-x: auto;
+    }
+
+    .almanac-timeline-card .name-en {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        left: 9.37%;
+        top: 7.16%;
+        width: 237px;
+        height: 87px;
+        font-size: 36px;
+        font-weight: 800;
+        font-family: 'MiSans-Heavy';
+    }
+
+    .almanac-timeline-card .name-cn {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        left: 9.37%;
+        top: calc(7.16% + 43px);
+        width: 152px;
+        height: 87px;
+        font-size: 36px;
+        font-weight: 800;
+        font-family: 'MiSans-Heavy';
+    }
+
+    .almanac-timeline-card .line {
+        position: absolute;
+        left: calc(50% - 10px);
+        top: 17.83%;
+        width: 20px;
+        height: 100%;
+        border-radius: 100px;
+        background: rgba(128, 128, 128, 1);
+    }
+
+    .almanac-timeline-card .time {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        color: rgba(255, 255, 255, 1);
+        font-size: 14px;
+        font-weight: 400;
+        font-family: 'MiSans-Regular';
+    }
+
+    .almanac-timeline-card .name {
+        color: rgba(255, 255, 255, 1);
+        font-size: 14px;
+        font-weight: 700;
+        font-family: 'MiSans-Bold';
+    }
+
+    .almanac-timeline-card .item-card {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        right: calc(50% - 8px);
+        width: 37.18%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .almanac-timeline-card .rect-card {
+        z-index: 1;
+        width: 82.67%;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .almanac-timeline-card .content-card {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        border-radius: 10px;
+        background: rgba(56, 56, 56, 1);
+        padding: 10px 13px;
+        gap: 13px;
+        align-items: center;
+    }
+
+        .almanac-timeline-card .content-card img {
+            border-radius: 6px;
+            width: 46px;
+            height: 46px;
+        }
+
+        .almanac-timeline-card .content-card .image {
+            border-radius: 6px;
+            min-width: 46px;
+            height: 46px;
+            background-repeat: no-repeat;
+            background-size: cover;
+            -webkit-background-size: cover;
+            -o-background-size: cover;
+            background-position: center;
+        }
+
+    .almanac-timeline-card .triangle {
+        position: absolute;
+        left: 98%;
+        top: 17px;
+        width: 13px;
+        height: 12px;
+        background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/timeline-triangle.png);
+        background-size: cover;
+    }
+
+    .almanac-timeline-card .circle {
+        position: absolute;
+        z-index: 25;
+        right: 0;
+        top: 14.5px;
+        width: 16px;
+        height: 16px;
+        background: rgba(204, 204, 204, 1);
+        border-radius: 50%;
+    }
+
+    .almanac-timeline-card .name-time-card {
+        display: flex;
+        flex-direction: column;
+    }
+    /*翻转*/
+
+    .almanac-timeline-card .item-card.right {
+        left: calc(50% - 8px);
+        right: unset;
+        flex-direction: row-reverse;
+    }
+
+        .almanac-timeline-card .item-card.right .circle {
+            left: 0;
+            right: unset;
+        }
+
+        .almanac-timeline-card .item-card.right .triangle {
+            transform: rotate(180deg);
+            right: 98%;
+            left: unset;
+        }

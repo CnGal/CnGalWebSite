@@ -1,0 +1,14 @@
+﻿<div class="key-value-card">
+    <div class="border-line-left"></div>
+    <div class="content-card">
+        <div class="key">@Key</div>
+        <div class="value">@Value</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Key{ get; set; }
+    [Parameter]
+    public string Value { get; set; }
+}

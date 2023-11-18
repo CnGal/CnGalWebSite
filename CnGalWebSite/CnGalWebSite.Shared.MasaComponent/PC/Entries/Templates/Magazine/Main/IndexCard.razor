@@ -1,30 +1,20 @@
 ﻿<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
 
 
-<div class="magazine-layout magazine-style" id="magazine-style">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="@($"entry-magzine-style-{Model.Id}")">
     <MainCard Model="Model" />
-    <div class="article-introduce magazine-columns">
-        <div class="columns-layout"> 
-            <div style="padding:0 3rem;">
-                <StoryCard />
-                <CharacterCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.InformationCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.ReleaseCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StoryCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.GalleryCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StaffCard Model="Model" />
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.RelevanceCard Model="Model" />
-                @for (var i = 0; i < 100; i++)
-                {
-                    <div>@i</div>
-                }
-            </div>
-
-        </div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.PageButton />
-    </div>
-</div>
-
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Class="article-introduce">
+        <StoryCard />
+        <CharacterCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.InformationCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.ReleaseCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StoryCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.GalleryCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StaffCard Model="Model" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.RelevanceCard Model="Model" />
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.PageButton LayoutId="@($"entry-magzine-style-{Model.Id}")" />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout>
 
 
 @code {
