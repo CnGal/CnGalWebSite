@@ -1,31 +1,31 @@
 ﻿<MDCard Href="@("/entries/index/" + Model.Id)" Class=" h-100" Style="display: flex; flex-direction: column; justify-content: space-between;">
-        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-        {
-            <div style="width:300px;">
-            <div style="display: flex;">
-                    <img class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
-                </div>
-                <div class="pa-3">
+    @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+    {
+        <div style="width:300px;">
+            <div class="d-flex">
+                <img style="width: 300px;height: 140px;" src="@Model.MainImage" alt="@Model.Name">
+            </div>
+            <div class="pa-3">
                 <div class="name text-truncate-1 title-large mb-1">@Model.Name</div>
                 <div class="brief text-truncate-3 label-large">@Model.BriefIntroduction</div>
             </div>
-            </div>
-        }
-        else
-        {
+        </div>
+    }
+    else
+    {
         <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center;width:200px; ">
-                <div class="pa-3">
-                <div style="width: 50%; margin-right: auto; margin-left: auto;display: flex;">
-                        <img class="img-fluid" src="@Model.MainImage" style=" border-radius: 50%;">
-                    </div>
-                    <div class="pt-3">
+            <div class="pa-3">
+                <div style="display: flex;justify-content: center;">
+                    <img src="@Model.MainImage" style=" border-radius: 50%;width: 80px;height: 80px;">
+                </div>
+                <div class="pt-3">
                     <div class="name text-center text-truncate-1 title-large mb-1">@Model.Name</div>
                     <div class="brief text-center  text-truncate-3 label-large">@Model.BriefIntroduction</div>
                 </div>
-                </div>
-
             </div>
-        }
+
+        </div>
+    }
 </MDCard>
 
 
