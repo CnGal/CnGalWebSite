@@ -101,6 +101,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<BasicEntryInformation> BasicEntryInformation { get; set; }
         public DbSet<Commodity> Commodities { get; set; }
         public DbSet<ApplicationUserCommodity> ApplicationUserCommodities { get; set; }
+        public DbSet<Almanac> Almanacs { get; set; }
+        public DbSet<AlmanacArticle> AlmanacArticles { get; set; }
+        public DbSet<AlmanacEntry> AlmanacEntries { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

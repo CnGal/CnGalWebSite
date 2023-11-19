@@ -1,0 +1,41 @@
+﻿@foreach (var info in Model)
+{
+    <div class="almanac-game-grid-item-group">
+        @foreach (var item in info)
+        {
+            <a class="item-card" href="@($"/entries/index/{item.Entry.Id}")">
+                <img src="@(item.Image??item.Entry.MainPicture)" alt="@item.Entry.Name" loading="lazy" />
+                <div class="name">@item.Entry.Name</div>
+                <div class="group"> @string.Join("、", item.Entry.ProductionGroups.Select(s => s.DisplayName))</div>
+                <div class="time">@(GetPublishTime(item.Entry))</div>
+            </a>
+        }
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<IEnumerable<AlmanacEntryViewModel>> Model{ get; set; }
+
+    public string GetPublishTime(EntryIndexViewModel model)
+    {
+        var release = model.Releases.Where(s => s.Type == GameReleaseType.Official).OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) == false);
+        if (release == null)
+        {
+            return null;
+        }
+        if (string.IsNullOrWhiteSpace(release.TimeNote) == false)
+        {
+            return release.TimeNote;
+        }
+
+        if (release.Time != null)
+        {
+            return release.Time.Value.ToString("yyyy年M月d日");
+        }
+
+        return null;
+    }
+
+}

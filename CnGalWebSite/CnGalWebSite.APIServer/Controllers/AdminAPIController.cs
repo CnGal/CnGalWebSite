@@ -129,20 +129,23 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IVideoService _videoService;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
+        private readonly IRepository<Almanac, long> _almanacRepository;
+        private readonly IRepository<AlmanacArticle, long> _almanacArticleRepository;
+        private readonly IRepository<AlmanacEntry, long> _almanacEntryRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
-        IRepository<Message, long> messageRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment,
-         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
+        IRepository<Message, long> messageRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment, IRepository<AlmanacArticle, long> almanacArticleRepository, IRepository<AlmanacEntry, long> almanacEntryRepository,
+        IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository,
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<Almanac, long> almanacRepository,
         IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository, IRepository<EntryInformationType, long> entryInformationTypeRepository, IRepository<BasicEntryInformation, long> basicEntryInformationRepository)
         {
 
@@ -210,6 +213,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _storeInfoRepository = storeInfoRepository;
             _entryInformationTypeRepository = entryInformationTypeRepository;
             _basicEntryInformationRepository = basicEntryInformationRepository;
+            _almanacRepository = almanacRepository;
+            _almanacArticleRepository = almanacArticleRepository;
+            _almanacEntryRepository = almanacEntryRepository;
         }
 
         /// <summary>
@@ -312,16 +318,41 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var users = await _userRepository.GetAll().AsNoTracking().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false)
-                .Select(s => s.Id)
-                .ToListAsync();
+                var games = await _entryRepository.GetAll().AsNoTracking()
+                     .Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && (s.PubulishTime != null && s.PubulishTime.Value.Year >= 2023))
+                     .Select(s => s.Id)
+                     .ToListAsync();
+                var articles = await _articleRepository.GetAll().AsNoTracking()
+                     .Where(s => s.Type != ArticleType.News && s.Type != ArticleType.Notice && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && ( s.PubishTime.Year >= 2023))
+                     .Select(s => s.Id)
+                     .ToListAsync();
 
-                foreach (var item in users)
+               foreach(var item in games)
                 {
-                    await _userService.TryAddGCoins(item, UserIntegralSourceType.BindSteamId, 10, null);
+                    if(!await _almanacEntryRepository.AnyAsync(s=>s.AlmanacId==1&&s.EntryId==item))
+                    {
+                        await _almanacEntryRepository.InsertAsync(new AlmanacEntry
+                        {
+                            AlmanacId = 1,
+                            EntryId = item
+                        });
+
+                        _logger.LogInformation("向年鉴添加词条Id：{id}", item);
+                    }
                 }
 
-                _logger.LogInformation("已给{number}个用户发放G币",users.Count);
+                foreach (var item in articles)
+                {
+                    if (!await _almanacArticleRepository.AnyAsync(s => s.AlmanacId == 1 && s.ArticleId == item))
+                    {
+                        await _almanacArticleRepository.InsertAsync(new AlmanacArticle
+                        {
+                            AlmanacId = 1,
+                            ArticleId = item
+                        });
+                        _logger.LogInformation("向年鉴添加文章Id：{id}", item);
+                    }
+                }
 
                 return new Result { Successful = true };
             }

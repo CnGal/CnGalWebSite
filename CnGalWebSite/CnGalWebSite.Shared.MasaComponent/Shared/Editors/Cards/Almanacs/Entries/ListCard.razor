@@ -1,0 +1,135 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard Class="mb-4">
+    <DataTableCard TModel="AlmanacEntryEditModel" Headers="_headers" DataSource="Model" SortByItem="@nameof(AlmanacEntryEditModel.Priority)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard" Rounded
+                   Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.EntryName!=null&&s.EntryName.Contains(dataTableCard._search))">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 170px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                    @if (context.Item.Hide)
+                    {
+                        <MIcon Color="success"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,false)">@IconType.Check.ToIconString()</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error"
+                               Class="mr-2"
+                               OnClick="()=>HideItem(context.Item,true)">@IconType.Close.ToIconString()</MIcon>
+                    }
+
+                    <MIcon Color="error"
+                           Class="mr-2"
+                           OnClick="()=>DeleteItem(context.Item)">@IconType.Delete.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(AlmanacEntryEditModel.Image))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.Image" />
+            }
+            else if (context.Header.Value == nameof(AlmanacEntryEditModel.Hide))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.Hide" />
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <EditCard Items="Model" OnEdited="OnEdited" @ref="editCard" Model="_editedItem" EntryGameItems="EntryGameItems" />
+</MDialog>
+@code {
+
+    [Parameter]
+    public List<AlmanacEntryEditModel> Model { get; set; }
+    [Parameter]
+    public List<string> EntryGameItems { get; set; }
+
+    private string _name = "词条";
+
+    private List<DataTableHeader<AlmanacEntryEditModel>> _headers = new List<DataTableHeader<AlmanacEntryEditModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(AlmanacEntryEditModel.Id)
+          },
+          new (){ Text= "图片", Value= nameof(AlmanacEntryEditModel.Image)},
+          new (){ Text= "词条", Value= nameof(AlmanacEntryEditModel.EntryName)},
+          new (){ Text= "优先级", Value= nameof(AlmanacEntryEditModel.Priority)},
+          new (){ Text= "状态", Value= nameof(AlmanacEntryEditModel.Hide)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<AlmanacEntryEditModel> dataTableCard;
+
+    EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+    private AlmanacEntryEditModel _editedItem;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void EditItem(AlmanacEntryEditModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        _editedItem = item;
+        StateHasChanged();
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        _editedItem = new AlmanacEntryEditModel();
+        StateHasChanged();
+    }
+
+    public void DeleteItem(AlmanacEntryEditModel model)
+    {
+        Model.Remove(model);
+        dataTableCard.GetDataFromApi();
+    }
+
+    public void EditItemPriority(AlmanacEntryEditModel model, bool up)
+    {
+        model.Priority += up ? 1 : -1;
+        dataTableCard.GetDataFromApi();
+    }
+    public void HideItem(AlmanacEntryEditModel model, bool hide)
+    {
+        model.Hide = hide;
+        dataTableCard.GetDataFromApi();
+    }
+}

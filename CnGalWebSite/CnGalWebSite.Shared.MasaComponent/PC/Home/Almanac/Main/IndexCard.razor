@@ -1,30 +1,72 @@
-﻿<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
-<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/almanac.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="@("https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Passion+One:wght@400;700;900&display=swap")" rel="stylesheet">
+﻿@inject IPageModelCatche<AlmanacViewModel> _pageModelCatche
+
+@if (Model != null)
+{
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
+    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/almanac.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="@("https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Passion+One:wght@400;700;900&display=swap")" rel="stylesheet">
 
 
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@($"{Model.Name} - {Model.Year}")" />
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="CnGal年鉴 - 2023" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="almanac-magazine-layout" Class="almanac-layout" OnKeyDown="OnKeyDown">
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="almanac-magazine-layout" Class="almanac-layout">
+        <HomeCard OnNav="OnNav" Model="Model" />
+        <CatalogCard OnNav="OnNav" Model="Model" />
+        <TopCard Model="Model" />
+        <TimeLineCard />
+        @if (Model.Entries.Any())
+        {
+            <GameListCard Model="Model" OnNav="OnNav" />
+            <NextCard Model="Model" OnNav="OnNav" />
+        }
+        @if (Model.Articles.Any())
+        {
+            <InSideCard Model="Model" OnNav="OnNav" />
+        }
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.NavCard LayoutId="almanac-magazine-layout" @ref="navCard" />
 
-    <HomeCard OnNav="OnNav" />
-    <CatalogCard OnNav="OnNav" />
-    <TopCard/>
-    <TimeLineCard/>
-
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.NavCard LayoutId="almanac-magazine-layout" @ref="navCard"/>
-
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout>
-
-
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout>
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
 @code {
+    [Parameter]
+    public string Id { get; set; }
+
     CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.NavCard navCard;
+
+    AlmanacViewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            Model = await _pageModelCatche.GetCache($"api/almanac/get?id={Id}");
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取年鉴数据失败");
+        }
+    }
 
     public async Task OnNav(string id)
     {
         await navCard?.Nav(id);
     }
+
+    public async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        await navCard?.OnKeyDown(e);
+    }
+
 }

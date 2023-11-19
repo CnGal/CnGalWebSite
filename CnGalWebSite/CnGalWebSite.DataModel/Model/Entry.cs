@@ -190,6 +190,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 请求监视的用户
         /// </summary>
         public virtual ICollection<UserMonitor> Monitors { get; set; }
+        /// <summary>
+        /// 年鉴列表
+        /// </summary>
+        public List<AlmanacEntry> Almanacs { get; set; }
 
 
         /// <summary>

@@ -1,0 +1,98 @@
+﻿@page "/almanac/edit/{Id}"
+@page "/almanac/edit"
+
+@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPopupService PopupService
+@inject IPageModelCatche<AlmanacViewModel> _pageModelCatche
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@_name" />
+<AuthorizeView>
+    <Authorized>
+        <div>
+            @if (Model == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+            }
+            else
+            {
+                <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@_name" Icon="@IconType.Almanac.ToIconString()" Outline>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Almanacs.MainCard Model="Model"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Almanacs.EntriesCard Model="Model" EntryGameItems="EntryGameItems"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Almanacs.ArticlesCard Model="Model" ArticleItems="ArticleItems"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton Model="Model" OnSubmit="OnSubmit" />
+                </CnGalWebSite.Components.Containers.MasaTitleContainer>
+            }
+
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedTipView />
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private AlmanacEditModel Model { get; set; }
+
+    string _name = "创建年鉴";
+
+    private List<string> EntryGameItems { get; set; } = new List<string>();
+    private List<string> ArticleItems { get; set; } = new List<string>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _name = string.IsNullOrWhiteSpace(Id) ? "创建年鉴" : "编辑年鉴";
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                //获取所有词条
+                EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+                //获取所有文章
+                ArticleItems = await _httpService.GetAsync<List<string>>("api/articles/GetAllArticles");
+
+                Model = await _httpService.GetAsync<AlmanacEditModel>($"api/almanac/edit?id={Id ?? "0"}");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                //await ErrorHandler.ProcessError(ex, "获取企划信息失败");
+            }
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var obj = await _httpService.PostAsync<AlmanacEditModel, Result>("api/almanac/edit", Model);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastErrorAsync($"{_name}失败", obj.Error);
+            }
+            else
+            {
+                await PopupService.ToastSuccessAsync($"{_name}成功");
+                _pageModelCatche.Clean($"api/almanac/get?id={Id}");
+                NavigationManager.NavigateTo("/admin/listalmanacs");
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"{_name}失败");
+        }
+    }
+}

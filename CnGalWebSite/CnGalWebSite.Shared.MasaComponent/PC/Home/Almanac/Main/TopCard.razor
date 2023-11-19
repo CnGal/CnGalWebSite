@@ -1,5 +1,5 @@
 ﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Id="almanac-top-card">
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.SectionTitleCard Name="年度总览" EnglishName="TOP" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.SectionTitleCard Name="年度总览" EnglishName="TOP" Year="@Model.Year" AlmanacName="@Model.Name"/>
     <div>
         在常用的社交分享组件中，微信（微信好友和朋友圈）、微博、QQ（QQ好友和QQ空间）是三大主要平台，而其中微信凭借高达9.38亿的月活跃用户以及高达29%的日均手机应用使用率，成为各款APP选择最...
     </div>
@@ -16,5 +16,7 @@
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
 @code {
+    [Parameter]
+    public AlmanacViewModel Model { get; set; }
 
 }

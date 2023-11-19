@@ -1,6 +1,6 @@
 ﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="almanac-catalog-card" FullScreen>
-    <div class="almanac-year">2023</div>
-    <div class="almanac-name">CNGAL年鉴</div>
+    <div class="almanac-year">@Model.Year</div>
+    <div class="almanac-name">@Model.Name</div>
     <div class="card-title">CATALOG</div>
 
     <div class="item-group">
@@ -22,11 +22,13 @@
 @code {
     [Parameter]
     public EventCallback<string> OnNav { get; set; }
-  
+    [Parameter]
+    public AlmanacViewModel Model { get; set; }
+
     List<(string EnglishName, string Name, string Id)> Items { get; set; } = new List<(string Name, string EnglishName, string Id)>
     {
         ("TOP","年度总览","almanac-top-card"),
-        ("LIST","游戏列表","almanac-list-card"),
+        ("LIST","游戏列表","almanac-game-list-card"),
         ("INSIDE","品鉴与分析","almanac-inside-card"),
         ("NEXT","来年展望","almanac-next-card"),
     };

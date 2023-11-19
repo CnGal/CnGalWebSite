@@ -29,6 +29,8 @@
 
     bool showNav = true;
 
+    bool naving = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -59,7 +61,6 @@
 
             pageString = $"{currentPage} / {totalPage - 1}";
             StateHasChanged();
-
         }
         catch
         {
@@ -69,47 +70,126 @@
 
     public async Task Next()
     {
+        if (naving)
+        {
+            return;
+        }
+        naving = true;
         try
         {
             if (currentPage < totalPage)
             {
-                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage + 1) * pageWidth);
-                await Task.Delay(500);
+                currentPage += 2;
+                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage - 1) * pageWidth);
             }
-            await GetPageInfo();
+            else
+            {
+                await GetPageInfo();
+            }
             StateHasChanged();
         }
         catch
         {
 
         }
+        await Task.Delay(200);
+        naving = false;
     }
 
     public async Task Previous()
     {
+        if (naving)
+        {
+            return;
+        }
+        naving = true;
         try
         {
-            if (currentPage != 1)
+            if (currentPage >= 1)
             {
-
-                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage - ((currentPage % 2 == 0 && currentPage == totalPage-1) ? 2 : 3)) * pageWidth);
-                await Task.Delay(500);
+                currentPage -= 2;
+                await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (currentPage - 1) * pageWidth);
             }
+            else
+            {
+                await GetPageInfo();
+            }
+        }
+        catch
+        {
+
+        }
+        await Task.Delay(200);
+        naving = false;
+    }
+
+    public async Task NavEnd()
+    {
+        if (naving)
+        {
+            return;
+        }
+        naving = true;
+
+        try
+        {
+            await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, (totalPage - 2) * pageWidth);
+            await Task.Delay(500);
             await GetPageInfo();
         }
         catch
         {
 
         }
+
+
+        naving = false;
     }
 
     public async Task Nav(string id)
     {
-        var left = await JS.InvokeAsync<double>("getElementLeftOfLayout", id) + await JS.InvokeAsync<double>("getElementScrollLeft", LayoutId);
-        var page = (int)Math.Round(left / pageWidth);
-        await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, page * pageWidth);
-        await Task.Delay(500);
-        await GetPageInfo();
+        if (naving)
+        {
+            return;
+        }
+        naving = true;
+        try
+        {
+            var left = await JS.InvokeAsync<double>("getElementLeftOfLayout", id) + await JS.InvokeAsync<double>("getElementScrollLeft", LayoutId);
+            var page = (int)Math.Round(left / pageWidth);
+            await JS.InvokeVoidAsync("setElementScrollLeft", LayoutId, page * pageWidth);
+            await Task.Delay(500);
+            await GetPageInfo();
+        }
+        catch
+        {
+
+        }
+        naving = false;
+    }
+
+    public async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Next();
+        }
+        else if (e.Key == "ArrowRight" || e.Key == "ArrowDown" || e.Key == "d" || e.Key == "s" || e.Key == "PageDown")
+        {
+            await Next();
+        }
+        else if (e.Key == "ArrowLeft" || e.Key == "ArrowUp" || e.Key == "a" || e.Key == "w" || e.Key == "PageUp")
+        {
+            await Previous();
+        }
+        else if (e.Key == "Escape" || e.Key == "Home")
+        {
+            await Nav("almanac-home-card");
+        }
+        else if (e.Key == "End")
+        {
+            await NavEnd();
+        }
     }
 
 }

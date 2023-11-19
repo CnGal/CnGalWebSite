@@ -1,0 +1,71 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+@if (Model != null)
+{
+    <MDCard>
+        <MCardTitle>
+            @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.EntryName
+        </MCardTitle>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" Text="上传主图" Class="mb-4" />
+                </MCol>
+                <MCol Cols="12"/>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.EntryName" Label="名称" AutoCompleteItems="EntryGameItems" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Priority" Label="优先级" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MCheckbox @bind-Value="Model.Hide" Label="隐藏" TValue="bool" />
+                </MCol>
+               
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary" Rounded OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+
+    </MDCard>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public List<AlmanacEntryEditModel> Items { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public AlmanacEntryEditModel Model { get; set; }
+    [Parameter]
+    public List<string> EntryGameItems { get; set; }
+
+    private string _name = "词条";
+
+
+    public async Task SaveEdit()
+    {
+        var result = Model.Validate(Items);
+        if (result.Successful == false)
+        {
+            await PopupService.ToastAsync(result.Error, AlertTypes.Error);
+        }
+
+        if (Items.IndexOf(Model)==-1)
+        {
+            Items.Add(Model);
+        }
+        await OnEdited.InvokeAsync();
+
+    }
+}

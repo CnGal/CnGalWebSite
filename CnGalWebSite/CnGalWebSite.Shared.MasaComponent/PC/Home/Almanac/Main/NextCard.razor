@@ -1,0 +1,34 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Id="almanac-next-card" FullScreen>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.SectionTitleCard Name="来年展望" EnglishName="NEXT" Year="@Model.Year" AlmanacName="@Model.Name" />
+    <div class="subtitle-card">
+        希望来年不咕
+    </div>
+    <div class="game-count-group">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.KeyValueCard Key="2023年度公布游戏数" Value="2000" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.KeyValueCard Key="2023年度上市游戏数" Value="200" />
+    </div>
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" />
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+@code {
+    [Parameter]
+    public AlmanacViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
+
+    List<IEnumerable<AlmanacEntryViewModel>> _items = new List<IEnumerable<AlmanacEntryViewModel>>();
+
+    protected override void OnInitialized()
+    {
+        var num = 5;
+        _items.Clear();
+        var list = Model.Entries.Where(s => s.PublishTime == null || s.PublishTime.Value.Year == Model.Year+1 ).OrderByDescending(s => s.PublishTime);
+        for (var i = 0; i < list.Count(); i += num)
+        {
+            _items.Add(list.Skip(i).Take(num));
+        }
+    }
+
+    
+}

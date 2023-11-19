@@ -1,0 +1,28 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Id="almanac-game-list-card" FullScreen>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.SectionTitleCard Name="游戏列表" EnglishName="LIST" Year="@Model.Year" AlmanacName="@Model.Name" />
+    <div class="subtitle-card">
+        在常用的社交分享组件中，微信（微信好友和朋友圈）
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" />
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+@code {
+    [Parameter]
+    public AlmanacViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
+
+    List<IEnumerable<AlmanacEntryViewModel>> _items = new List<IEnumerable<AlmanacEntryViewModel>>();
+
+    protected override void OnInitialized()
+    {
+        var num = 5;
+        _items.Clear();
+        var list = Model.Entries.Where(s => s.PublishTime != null && s.PublishTime.Value.Year == Model.Year && !(s.PublishTime.Value.Month == 12 && s.PublishTime.Value.Day == 31)).OrderByDescending(s => s.PublishTime);
+        for (var i = 0; i < list.Count(); i += num)
+        {
+            _items.Add(list.Skip(i).Take(num));
+        }
+    }
+
+}

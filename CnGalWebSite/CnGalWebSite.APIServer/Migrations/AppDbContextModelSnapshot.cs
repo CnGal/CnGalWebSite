@@ -114,6 +114,92 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("SearchCaches");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Almanac", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BriefIntroduction")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Almanacs");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.AlmanacArticle", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AlmanacId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ArticleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlmanacId");
+
+                    b.HasIndex("ArticleId");
+
+                    b.ToTable("AlmanacArticles");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.AlmanacEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AlmanacId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("EntryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Hide")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlmanacId");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("AlmanacEntries");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -261,7 +347,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "00dfc3c2-8d7e-4938-ad11-6b3de1305bf5",
+                            ConcurrencyStamp = "e53296ab-f9ef-4d26-895b-630cf903dcd8",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -283,7 +369,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2023, 9, 28, 20, 46, 4, 578, DateTimeKind.Utc).AddTicks(5257),
+                            RegistTime = new DateTime(2023, 11, 19, 13, 20, 49, 287, DateTimeKind.Utc).AddTicks(1725),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -4035,6 +4121,44 @@ namespace CnGalWebSite.APIServer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.AlmanacArticle", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Almanac", "Almanac")
+                        .WithMany("Articles")
+                        .HasForeignKey("AlmanacId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Article", "Article")
+                        .WithMany("Almanacs")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Almanac");
+
+                    b.Navigation("Article");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.AlmanacEntry", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Almanac", "Almanac")
+                        .WithMany("Entries")
+                        .HasForeignKey("AlmanacId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", "Entry")
+                        .WithMany("Almanacs")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Almanac");
+
+                    b.Navigation("Entry");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUserCommodity", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
@@ -5136,6 +5260,13 @@ namespace CnGalWebSite.APIServer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Almanac", b =>
+                {
+                    b.Navigation("Articles");
+
+                    b.Navigation("Entries");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUser", b =>
                 {
                     b.Navigation("ApplicationUserCommodities");
@@ -5179,6 +5310,8 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Article", b =>
                 {
+                    b.Navigation("Almanacs");
+
                     b.Navigation("ArticleRelationFromArticleNavigation");
 
                     b.Navigation("ArticleRelationToArticleNavigation");
@@ -5232,6 +5365,8 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Entry", b =>
                 {
+                    b.Navigation("Almanacs");
+
                     b.Navigation("Audio");
 
                     b.Navigation("BackUpArchive");

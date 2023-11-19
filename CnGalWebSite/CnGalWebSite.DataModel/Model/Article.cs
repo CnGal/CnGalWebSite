@@ -147,6 +147,11 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<Examine> Examines { get; set; } = new List<Examine>();
         /// <summary>
+        /// 年鉴列表
+        /// </summary>
+        public List<AlmanacArticle> Almanacs { get; set; }
+
+        /// <summary>
         /// 关联词条列表
         /// </summary>
         public virtual ICollection<ArticleRelation> ArticleRelationFromArticleNavigation { get; set; } = new List<ArticleRelation>();

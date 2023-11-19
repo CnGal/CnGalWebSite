@@ -5,6 +5,8 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="定时任务版块" />
+
 <MDCard>
     <DataTableCard TModel="TimedTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>

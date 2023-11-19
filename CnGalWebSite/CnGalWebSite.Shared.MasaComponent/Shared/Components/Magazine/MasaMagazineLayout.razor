@@ -1,13 +1,26 @@
-﻿<div class="@($"magazine-layout magazine-style {Class}")" id="@LayoutId">
+﻿@inject IJSRuntime JS
+
+<div class="@($"magazine-layout magazine-style {Class}")" id="@LayoutId" @onkeydown="OnKeyDown" tabindex="-1" autofocus="auto">
     @ChildContent
 </div>
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     [Parameter]
+    public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+    [Parameter]
     [EditorRequired]
     public string LayoutId { get; set; }
     [Parameter]
     public string Class { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("focusOnElement", LayoutId);
+        }
+    }
 
 }
