@@ -1,7 +1,6 @@
-﻿
-@inject IDataCacheService _dataCacheService
+﻿@inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
 
 <style>
     .variable.container {
@@ -29,20 +28,13 @@
         <div class="left-content col-12 col-md-9">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
-            @if (_dataCacheService.IsApp)
-            {
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
-            }
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
         </div>
         <div class="right-content col-12 col-md-3">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.AnnouncementsCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyEditedGamesCard />
-            @if(_dataCacheService.IsApp==false)
-            {
-                            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
-            }
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
         </div>
     </div>
     <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
@@ -52,6 +44,7 @@
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
             </div>
             <div class="right-content col-12  col-md-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.SupportCard/>
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.HotTagsCard />
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.LatastCommentsCard />
             </div>
@@ -60,13 +53,13 @@
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.KanbanCard />
 
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard  />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
 
-</CnGalWebSite.Components.Containers.MiniModeContainer>
-  
+    </CnGalWebSite.Components.Containers.MiniModeContainer>
+
 </div>
 
 
-@code{
+@code {
 
 }

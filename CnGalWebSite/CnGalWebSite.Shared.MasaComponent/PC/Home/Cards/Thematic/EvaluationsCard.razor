@@ -65,7 +65,7 @@
     {
         try
         {
-            _items = (await _pageModelCatche.GetCache("api/home/ListEvaluations")).Take(_dataCacheService.IsApp?2:4).ToList();
+            _items = (await _pageModelCatche.GetCache("api/home/ListEvaluations")).Take(_dataCacheService.IsApp?2:6).ToList();
             StateHasChanged();
         }
         catch (Exception ex)
