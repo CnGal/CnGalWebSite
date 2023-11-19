@@ -1,6 +1,10 @@
 ﻿@page "/almanac/{Id}"
 
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Main.IndexCard Id="@Id" />
+<AuthorizeView Roles="Tester">
+    <Authorized>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Main.IndexCard Id="@Id" />
+    </Authorized>
+</AuthorizeView>
 
 @code {
     [Parameter]

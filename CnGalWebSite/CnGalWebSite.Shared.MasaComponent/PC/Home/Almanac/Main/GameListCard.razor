@@ -3,18 +3,8 @@
     <div class="subtitle-card">
         在常用的社交分享组件中，微信（微信好友和朋友圈）
     </div>
-    <div class="item-group">
-        @foreach (var item in Model.Entries.Where(s => s.PublishTime != null && s.PublishTime.Value.Year == Model.Year && !(s.PublishTime.Value.Month == 12 && s.PublishTime.Value.Day == 31)).OrderByDescending(s => s.PublishTime))
-        {
-            <div class="item-card">
-                <img src="@(item.Image??item.Entry.MainPicture)" alt="@item.Entry.Name" loading="lazy" />
-                <div class="name">@item.Entry.Name</div>
-                <div class="group"> @string.Join("、", item.Entry.ProductionGroups.Select(s => s.DisplayName))</div>
-                <div class="time">@(GetPublishTime(item.Entry))</div>
-            </div>
-        }
-    </div>
-    
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" />
+
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
 @code {
     [Parameter]
@@ -22,24 +12,17 @@
     [Parameter]
     public EventCallback<string> OnNav { get; set; }
 
-    public string GetPublishTime(EntryIndexViewModel model)
+    List<IEnumerable<AlmanacEntryViewModel>> _items = new List<IEnumerable<AlmanacEntryViewModel>>();
+
+    protected override void OnInitialized()
     {
-        var release = model.Releases.Where(s => s.Type == GameReleaseType.Official).OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null || string.IsNullOrWhiteSpace(s.TimeNote) == false);
-        if (release == null)
+        var num = 5;
+        _items.Clear();
+        var list = Model.Entries.Where(s => s.PublishTime != null && s.PublishTime.Value.Year == Model.Year && !(s.PublishTime.Value.Month == 12 && s.PublishTime.Value.Day == 31)).OrderByDescending(s => s.PublishTime);
+        for (var i = 0; i < list.Count(); i += num)
         {
-            return null;
+            _items.Add(list.Skip(i).Take(num));
         }
-        if (string.IsNullOrWhiteSpace(release.TimeNote) == false)
-        {
-            return release.TimeNote;
-        }
-
-        if (release.Time != null)
-        {
-            return release.Time.Value.ToString("yyyy年M月d日");
-        }
-
-        return null;
     }
 
 }

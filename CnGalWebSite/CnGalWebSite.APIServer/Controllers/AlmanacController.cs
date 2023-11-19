@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
@@ -29,9 +30,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IQueryService _queryService;
         private readonly IArticleService _articleService;
         private readonly IEntryService _entryService;
+        private readonly IUserService _userService;
 
         public AlmanacController(IRepository<Almanac, long> almanacRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IQueryService queryService, IRepository<AlmanacArticle, long> almanacArticleRepository,
-            IRepository<AlmanacEntry, long> almanacEntryRepository, IArticleService articleService, IEntryService entryService)
+            IRepository<AlmanacEntry, long> almanacEntryRepository, IArticleService articleService, IEntryService entryService, IUserService userService)
         {
             _almanacRepository = almanacRepository;
             _appHelper = appHelper;
@@ -42,6 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _almanacEntryRepository = almanacEntryRepository;
             _articleService = articleService;
             _entryService = entryService;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -60,6 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Entries).ThenInclude(s => s.Entry).ThenInclude(s => s.Tags)
                 .Include(s => s.Entries).ThenInclude(s => s.Entry).ThenInclude(s => s.Pictures)
                 .Include(s => s.Entries).ThenInclude(s => s.Entry).ThenInclude(s => s.Releases)
+                .Include(s => s.Articles).ThenInclude(s => s.Article).ThenInclude(s => s.CreateUser)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (item == null)
@@ -75,17 +79,24 @@ namespace CnGalWebSite.APIServer.Controllers
                 Id = item.Id,
                 Name = item.Name,
                 Year = item.Year,
-                Articles = item.Articles.Where(s => s.Hide == false).OrderByDescending(s => s.Priority).ThenBy(s => s.Article.PubishTime).Select(s => new AlmanacArticleViewModel
-                {
-                    Article = _articleService.GetArticleViewModelAsync(s.Article),
-                    Hide = s.Hide,
-                    Id = s.Id,
-                    Image = s.Image,
-                    Priority = s.Priority,
-                }).ToList(),
             };
 
-            foreach (var info in item.Entries.Where(s => s.Hide == false).OrderByDescending(s => s.Priority).ThenBy(s => s.Entry.PubulishTime))
+            foreach(var info in item.Articles.Where(s => s.Hide == false))
+            {
+                var temp = new AlmanacArticleViewModel
+                {
+                    Hide = info.Hide,
+                    Id = info.Id,
+                    Image = info.Image,
+                    Priority = info.Priority,
+                    Article = _articleService.GetArticleViewModelAsync(info.Article),
+                };
+                temp.Article.MainPicture = _appHelper.GetImagePath(info.Article.MainPicture, "app.png");
+                temp.Article.UserInfor = await _userService.GetUserInforViewModel(info.Article.CreateUser, false);
+                model.Articles.Add(temp);
+            }
+
+            foreach (var info in item.Entries.Where(s => s.Hide == false))
             {
                 var temp = new AlmanacEntryViewModel
                 {

@@ -1,9 +1,5 @@
 ﻿<div class="@($"magazine-columns {Class} {Id} {(FullScreen?"full-screen":"half-screen")}")" id="@Id">
-    <div class="columns-layout">
-        <div>
-            @ChildContent
-        </div>
-    </div>
+    @ChildContent
 </div>
 @code {
     [Parameter]

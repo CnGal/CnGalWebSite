@@ -1,0 +1,43 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Id="almanac-inside-card" FullScreen>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.SectionTitleCard Name="品鉴与分析" EnglishName="INSIDE" Year="@Model.Year" AlmanacName="@Model.Name" />
+    <div class="subtitle-card">
+        在常用的社交分享组件中，微信（微信好友和朋友圈）
+    </div>
+    @foreach (var info in _items)
+    {
+        <div class="almanac-article-grid-item-group">
+            @foreach (var item in info)
+            {
+                <a class="item-card" href="@($"/articles/index/{item.Article.Id}")">
+                    <img src="@(item.Image??item.Article.MainPicture)" alt="@item.Article.Name" loading="lazy" />
+                    <div class="content-card">
+                        <div class="name">@item.Article.Name</div>
+                        <div class="author"> @(string.IsNullOrWhiteSpace(item.Article.OriginalAuthor)?item.Article.UserInfor.Name:item.Article.OriginalAuthor)</div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+@code {
+    [Parameter]
+    public AlmanacViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
+
+    List<IEnumerable<AlmanacArticleViewModel>> _items = new List<IEnumerable<AlmanacArticleViewModel>>();
+
+    protected override void OnInitialized()
+    {
+        var num = 2;
+        _items.Clear();
+        var list = Model.Articles.OrderByDescending(s=>s.Priority).ThenByDescending(s => s.Article.PubishTime);
+        for (var i = 0; i < list.Count(); i += num)
+        {
+            _items.Add(list.Skip(i).Take(num));
+        }
+    }
+
+}

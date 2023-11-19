@@ -62,6 +62,14 @@
     margin-left: 64px;
 }
 
+    .almanac-layout .magazine-columns.half-screen > div {
+        width: calc(50vw - 32px);
+    }
+
+    .almanac-layout .magazine-columns.full-screen > div {
+        width: calc(100vw - 64px);
+    }
+
 :root {
     --almanac-width: calc(100vh - 64px);
     --almanac-width-half: calc(50vh - 32px);
@@ -348,9 +356,9 @@ a > * > * > * {
     padding: 7.16% 0;
 }
 
-.almanac-top-card .columns-layout > div {
-    padding: 0 11.36%;
-}
+    .magazine-columns.almanac-top-card > div {
+        padding: 0 74px;
+    }
 
 .almanac-top-card .game-count-group {
     display: flex;
@@ -400,7 +408,7 @@ a > * > * > * {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    height: 89px;
+    height: 80px;
     font-size: 60px;
     font-weight: 700;
     font-family: 'Oswald';
@@ -410,8 +418,7 @@ a > * > * > * {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    width: 152px;
-    height: 68px;
+    height: 77px;
     font-size: 36px;
     font-weight: 800;
     font-family: 'MiSans-Heavy';
@@ -603,18 +610,19 @@ a > * > * > * {
         }
 /*游戏列表*/
 .magazine-columns.almanac-game-list-card {
-    padding: 7.16% 0 2.34% 0;
+    padding: calc(7.16vh) 0 calc(2.34vh) 0;
 }
 
-.almanac-game-list-card .columns-layout > div {
-    padding: 0 3.68% 0 5.68%;
-}
+    .magazine-columns.almanac-game-list-card > div {
+        padding: 0 calc(5.68vw);
+    }
 
 .almanac-game-list-card .section-title-card .name {
     margin-left: 9px;
 }
 
-.almanac-game-list-card .item-group {
+/*游戏网格卡片*/
+.almanac-game-grid-item-group {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -623,34 +631,104 @@ a > * > * > * {
     margin-top: 26px;
 }
 
-.almanac-game-list-card .item-card {
-    width: 220px;
+    .almanac-game-grid-item-group .item-card {
+        width: calc(16.1vw);
+    }
+
+        .almanac-game-grid-item-group .item-card > img {
+            width: calc(16.1vw);
+            object-fit: cover;
+            border-radius: 10px;
+            aspect-ratio: 220/94;
+        }
+
+        .almanac-game-grid-item-group .item-card .name {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'MiSans-Bold';
+        }
+
+        .almanac-game-grid-item-group .item-card .group {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 400;
+            font-family: 'MiSans-Regular';
+        }
+
+        .almanac-game-grid-item-group .item-card .time {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 400;
+            font-family: 'MiSans-Regular';
+        }
+/*来年展望*/
+.magazine-columns.almanac-next-card {
+    padding: calc(7.16vh) 0 calc(2.34vh) 0;
 }
 
-    .almanac-game-list-card .item-card > img {
-        width: 220px;
-        height: 94px;
-        object-fit: cover;
-        border-radius: 10px;
+    .magazine-columns.almanac-next-card > div {
+        padding: 0 calc(5.68vw);
     }
 
-    .almanac-game-list-card .item-card .name {
-        text-align: center;
-        font-size: 16px;
-        font-weight: 700;
-        font-family: 'MiSans-Bold';
+.almanac-next-card .game-count-group {
+    display: flex;
+    gap: 27px;
+    margin: 25px 0 30px 0;
+}
+
+.almanac-next-card .section-title-card .name {
+    margin-left: 11px;
+}
+/*品鉴与分析*/
+.magazine-columns.almanac-inside-card {
+    padding: calc(7.16vh) 0 calc(2.34vh) 0;
+}
+
+    .magazine-columns.almanac-inside-card > div {
+        padding: 0 calc(5.68vw);
     }
 
-    .almanac-game-list-card .item-card .group {
-        text-align: center;
-        font-size: 12px;
-        font-weight: 400;
-        font-family: 'MiSans-Regular';
+.almanac-inside-card .section-title-card .name {
+    margin-left: 21px;
+}
+/*文章网格卡片*/
+.almanac-article-grid-item-group {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-top: 36px;
+    justify-content: space-between;
+}
+
+    .almanac-article-grid-item-group .item-card {
+        width: calc(40vw);
+        display: flex;
+        gap: 12px;
     }
 
-    .almanac-game-list-card .item-card .time {
-        text-align: center;
-        font-size: 12px;
-        font-weight: 400;
-        font-family: 'MiSans-Regular';
-    }
+        .almanac-article-grid-item-group .item-card > img {
+            width: 184px;
+            height: 94px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .almanac-article-grid-item-group .item-card .name {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'MiSans-Bold';
+            word-break: break-all;
+        }
+
+        .almanac-article-grid-item-group .item-card .author {
+            font-size: 12px;
+            font-weight: 400;
+            word-break: break-all;
+            font-family: 'MiSans-Regular';
+        }
+
+        .almanac-article-grid-item-group .item-card .content-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }

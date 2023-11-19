@@ -319,11 +319,11 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var games = await _entryRepository.GetAll().AsNoTracking()
-                     .Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && (s.PubulishTime == null || s.PubulishTime.Value.Year >= 2023))
+                     .Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && (s.PubulishTime != null && s.PubulishTime.Value.Year >= 2023))
                      .Select(s => s.Id)
                      .ToListAsync();
                 var articles = await _articleRepository.GetAll().AsNoTracking()
-                     .Where(s => s.Type != ArticleType.News && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && ( s.PubishTime.Year >= 2023))
+                     .Where(s => s.Type != ArticleType.News && s.Type != ArticleType.Notice && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && ( s.PubishTime.Year >= 2023))
                      .Select(s => s.Id)
                      .ToListAsync();
 

@@ -10,12 +10,28 @@
 
 /*分栏*/
 .magazine-columns.full-screen {
-    min-width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: calc(100vh);
 }
 
+    .magazine-columns.full-screen > div, .magazine-columns.full-screen > section {
+        width: calc(100vw);
+    }
+
 .magazine-columns.half-screen {
-    min-width: 50%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: calc(100vh);
 }
+
+    .magazine-columns.half-screen > div, .magazine-columns.half-screen > section {
+        width: calc(50vw);
+    }
 
 .magazine-style::-webkit-scrollbar {
     display: none;
@@ -80,11 +96,12 @@
 
 .article-introduce.magazine-columns {
     padding: 3rem 0;
+    gap:unset;
 }
 
-.article-introduce .columns-layout > div {
-    padding: 0 3rem;
-}
+    .article-introduce.magazine-columns > div, .article-introduce.magazine-columns > section {
+        padding: 0 3rem;
+    }
 /*首页*/
 .magazine-style .main-card {
     min-width: 50%;

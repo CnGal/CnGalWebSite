@@ -1170,6 +1170,10 @@ html {
 .m-tab--active, .m-tab--active .m-btn.m-btn--flat, .m-tab--active .m-icon, .m-tab.m-tab {
     color: inherit;
 }
+/*聚焦边框去除*/
+:focus-visible {
+    outline:none;
+}
 
 /*卡片*/
 .md-card {
