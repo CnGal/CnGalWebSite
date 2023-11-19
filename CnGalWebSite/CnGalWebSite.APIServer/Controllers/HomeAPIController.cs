@@ -529,7 +529,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Select(s => s.Id)
                 .ToListAsync();
 
-            entryIds = entryIds.ToList().Random().Take(4).ToList();
+            entryIds = entryIds.ToList().Random().Take(6).ToList();
 
 
             var entries = await _entryRepository.GetAll().AsNoTracking()
