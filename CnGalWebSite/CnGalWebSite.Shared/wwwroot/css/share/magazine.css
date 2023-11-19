@@ -9,7 +9,11 @@
 }
 
 /*分栏*/
-.magazine-columns {
+.magazine-columns.full-screen {
+    min-width: 100%;
+}
+
+.magazine-columns.half-screen {
     min-width: 50%;
 }
 

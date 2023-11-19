@@ -1,4 +1,4 @@
-﻿<div class="@($"magazine-columns {Class} {Id}")" id="@Id">
+﻿<div class="@($"magazine-columns {Class} {Id} {(FullScreen?"full-screen":"half-screen")}")" id="@Id">
     <div class="columns-layout">
         <div>
             @ChildContent
@@ -12,5 +12,7 @@
     public string Class { get; set; }
     [Parameter]
     public string Id { get; set; }
+    [Parameter]
+    public bool FullScreen { get; set; } = false;
 
 }

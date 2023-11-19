@@ -1,0 +1,88 @@
+﻿@page "/admin/listalmanacs"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="年鉴版块" />
+
+<MDCard>
+    <DataTableCard TModel="AlmanacOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 140px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>LookItem(context.Item)">@IconType.Look.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(AlmanacOverviewModel.UpdateTime))
+            {
+                @context.Item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(AlmanacOverviewModel.BriefIntroduction))
+            {
+                <div style="white-space: pre-line;">
+                    @context.Item.BriefIntroduction
+                </div>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+</MDCard>
+@code {
+    private string _baseUrl = "api/almanac/List";
+    private string _name = "年鉴";
+
+    private List<DataTableHeader<AlmanacOverviewModel>> _headers = new List<DataTableHeader<AlmanacOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(AlmanacOverviewModel.Id)
+          },
+          new (){ Text= "年份", Value= nameof(AlmanacOverviewModel.Year)},
+          new (){ Text= "名称", Value= nameof(AlmanacOverviewModel.Name)},
+          new (){ Text= "简介", Value= nameof(AlmanacOverviewModel.BriefIntroduction)},
+          new (){ Text= "词条数", Value= nameof(AlmanacOverviewModel.EntryCount),Sortable=false},
+          new (){ Text= "文章数", Value= nameof(AlmanacOverviewModel.ArticleCount),Sortable=false},
+          new (){ Text= "更新时间", Value= nameof(AlmanacOverviewModel.UpdateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<AlmanacOverviewModel> dataTableCard;
+
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard editCard;
+    private bool _editDialog;
+    private int _editedItemId;
+    private bool _detailDialog;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void EditItem(AlmanacOverviewModel item)
+    {
+        NavigationManager.NavigateTo($"/almanac/edit/{item.Id}");
+    }
+    public void LookItem(AlmanacOverviewModel item)
+    {
+        NavigationManager.NavigateTo($"/almanac/{item.Id}");
+    }
+
+    public void AddItem()
+    {
+        NavigationManager.NavigateTo($"/almanac/edit");
+    }
+
+
+}

@@ -1,7 +1,7 @@
 ﻿<div class="section-title-card">
     <div class="year-almanac-name-card">
-        <div class="year">2023</div>
-        <div class="almanac-name">CNGAL年鉴</div>
+        <div class="year">@Year</div>
+        <div class="almanac-name">@AlmanacName</div>
     </div>
     <div class="name-cn-en-card">
         <div class="name-en">@EnglishName</div>
@@ -14,4 +14,10 @@
     public string Name{ get; set; }
     [Parameter]
     public string EnglishName { get; set; }
+    [Parameter]
+    public int Year { get; set; }
+    [Parameter]
+    public string AlmanacName { get; set; }
+
+
 }

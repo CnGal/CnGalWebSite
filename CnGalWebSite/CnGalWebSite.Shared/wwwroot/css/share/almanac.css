@@ -17,28 +17,28 @@
 @font-face {
     font-family: "AlimamaShuHeiTi-Regular";
     font-weight: 700;
-    src: url("//at.alicdn.com/wf/webfont/4j3ipFZxHcjo/Z1EvVlxNvQw9.woff2") format("woff2"), url("//at.alicdn.com/wf/webfont/4j3ipFZxHcjo/qXIAoA5jALwv.woff") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Heavy";
     font-weight: 800;
-    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Heavy.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Regular";
     font-weight: 400;
-    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Normal.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Bold";
     font-weight: 700;
-    src: url("/_content/CnGalWebSite.Shared/font-family/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font-family/MiSans-Bold.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff");
     font-display: swap;
 }
 /*覆盖全局样式*/
@@ -54,6 +54,9 @@
     font-family: 'MiSans-Regular';
 }
 
+::-webkit-scrollbar {
+    width: 0;
+}
 /*侧边栏预留位置*/
 .almanac-layout {
     margin-left: 64px;
@@ -548,19 +551,11 @@ a > * > * > * {
 
         .almanac-timeline-card .content-card img {
             border-radius: 6px;
+            min-width: 46px;
+            min-height: 46px;
             width: 46px;
             height: 46px;
-        }
-
-        .almanac-timeline-card .content-card .image {
-            border-radius: 6px;
-            min-width: 46px;
-            height: 46px;
-            background-repeat: no-repeat;
-            background-size: cover;
-            -webkit-background-size: cover;
-            -o-background-size: cover;
-            background-position: center;
+            object-fit: cover;
         }
 
     .almanac-timeline-card .triangle {
@@ -606,3 +601,56 @@ a > * > * > * {
             right: 98%;
             left: unset;
         }
+/*游戏列表*/
+.magazine-columns.almanac-game-list-card {
+    padding: 7.16% 0 2.34% 0;
+}
+
+.almanac-game-list-card .columns-layout > div {
+    padding: 0 3.68% 0 5.68%;
+}
+
+.almanac-game-list-card .section-title-card .name {
+    margin-left: 9px;
+}
+
+.almanac-game-list-card .item-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 26px;
+    margin-top: 26px;
+}
+
+.almanac-game-list-card .item-card {
+    width: 220px;
+}
+
+    .almanac-game-list-card .item-card > img {
+        width: 220px;
+        height: 94px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .almanac-game-list-card .item-card .name {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        font-family: 'MiSans-Bold';
+    }
+
+    .almanac-game-list-card .item-card .group {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 400;
+        font-family: 'MiSans-Regular';
+    }
+
+    .almanac-game-list-card .item-card .time {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 400;
+        font-family: 'MiSans-Regular';
+    }

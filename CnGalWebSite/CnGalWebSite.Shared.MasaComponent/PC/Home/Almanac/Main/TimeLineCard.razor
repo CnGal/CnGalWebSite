@@ -12,15 +12,7 @@
         <div class="@($"{(Model.IndexOf(item)%2==0?"":"right")} item-card")" style="@($"top: calc(17.83% + {40+Model.IndexOf(item)*64}px); {(Model.IndexOf(item)==Model.Count-1?"padding-bottom: calc(7.16% + 80px);":"")}")">
             <a href="@($"/entries/index/{item.Id}")" class="rect-card">
                 <div class="content-card">
-                    @if(item.Thumbnail==null)
-                    {
-                        <div class="image" style="@($"background-image: url({@item.MainImage});")" />
-                    }
-                    else
-                    {
-                        <img src="@item.Thumbnail" alt="@item.Name" />
-                    }
-                   
+                    <img src="@(item.Thumbnail??item.MainImage)" alt="@item.Name" loading="lazy" />
                     <div class="name-time-card">
                         <div class="time">@item.PublishTime?.ToString("yyyy年M月d日")</div>
                         <div class="name text-truncate-2">@item.Name</div>
@@ -29,7 +21,6 @@
                 <div class="triangle"></div>
             </a>
             <div class="circle">
-
             </div>
         </div>
     }
@@ -55,12 +46,12 @@
         {
             try
             {
-            await JS.InvokeVoidAsync("dragMoveX", ".almanac-timeline-card>div");
+                await JS.InvokeVoidAsync("dragMoveX", ".almanac-timeline-card>div");
 
             }
             catch
             {
-                
+
             }
         }
     }
