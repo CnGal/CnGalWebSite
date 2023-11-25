@@ -71,7 +71,7 @@ function initKanbanMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 100) {
+            if (timeEnd - timeStart > 500) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
                 //检查按钮组是否被按下
@@ -91,6 +91,10 @@ function initKanbanMoveAction(dotNetHelper) {
                 y_org = rect.y;
                 move = true;
                 document.body.classList.add('user-select-none');
+
+                //拖动开始 设置表情
+                switchLiv2DExpression('expression1');
+
             }
         }, 10);
     }
@@ -110,6 +114,7 @@ function initKanbanMoveAction(dotNetHelper) {
         }
 
         if (move) {
+
             //阻止页面的滑动默认事件
             event.preventDefault();
 
@@ -138,6 +143,9 @@ function initKanbanMoveAction(dotNetHelper) {
             //console.log('mouseup');
             dotNetHelper.invokeMethodAsync('SetKanbanPosition', x_org + dx, y_org + dy);
             document.body.classList.remove('user-select-none');
+
+            //拖动结束 清空表情
+            switchLiv2DExpression();
         }
         else {
             clearInterval(time);
@@ -183,7 +191,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 100) {
+            if (timeEnd - timeStart > 500) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
 
@@ -304,7 +312,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
             timeEnd = getTimeNow();
 
             //如果此时检测到的时间与第一次获取的时间差有1000毫秒
-            if (timeEnd - timeStart > 100) {
+            if (timeEnd - timeStart > 500) {
                 //便不再继续重复此函数 （clearInterval取消周期性执行）
                 clearInterval(time);
                 //执行逻辑
@@ -478,7 +486,9 @@ function switchLiv2DMotion(group, id) {
 }
 
 /*鼠标悬停事件*/
+var l2d_dotNetHelper_event
 function initMouseOverEvent(dotNetHelper, data) {
+    l2d_dotNetHelper_event = dotNetHelper;
     console.log('初始化鼠标悬停事件', data)
     let lastHoverElement;
     window.addEventListener("mouseover", event => {
@@ -487,7 +497,7 @@ function initMouseOverEvent(dotNetHelper, data) {
             if (lastHoverElement === selector) return;
             lastHoverElement = selector;
             console.log('触发鼠标悬停', selector)
-            dotNetHelper.invokeMethodAsync('TriggerMouseOverEventAsync', id);
+            l2d_dotNetHelper_event.invokeMethodAsync('TriggerMouseOverEventAsync', id);
             return;
         }
     });
@@ -509,4 +519,13 @@ function startKanbanImageGeneration(dotNetHelper) {
         console.log(blobUrl)
         dotNetHelper.invokeMethodAsync('OnKanbanImageGenerated', blobUrl);
     });
+}
+
+/*摸头事件*/
+window.Live2dHitHeadEvent = function () {
+    l2d_dotNetHelper_event.invokeMethodAsync('TriggerCustomEventAsync', '摸头');
+}
+/*触碰身体事件*/
+window.Live2dHitBodyEvent = function () {
+    l2d_dotNetHelper_event.invokeMethodAsync('TriggerCustomEventAsync', '触碰身体');
 }

@@ -118,6 +118,7 @@ namespace CnGalWebSite.Kanban.Services.Events
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
+        [JSInvokable]
         public async Task TriggerCustomEventAsync(string name)
         {
             var item = _eventGroupModel.CustomEvents.FirstOrDefault(s => s.Name == name);
