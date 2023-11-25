@@ -147,7 +147,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             user = await _userRepository.GetAll().Include(s => s.Commodities).FirstOrDefaultAsync(s => s.Id == user.Id);
-            var commodities=await _commodityRepository.GetAll().Where(s=>s.IsHidden==false).Select(s=>new CommodityUserModel
+            var commodities=await _commodityRepository.GetAll().Where(s=>s.IsHidden==false).OrderByDescending(s=>s.Priority).Select(s=>new CommodityUserModel
             {
                 BriefIntroduction=s.BriefIntroduction,
                 Id=s.Id,

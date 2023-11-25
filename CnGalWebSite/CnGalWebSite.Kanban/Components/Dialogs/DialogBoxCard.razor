@@ -8,7 +8,7 @@
 
 <div class="@($"kanban-dialogbox {(_sleep?"d-none":"")}")" id="kanban-dialogbox" style="@_settingService.Setting.DialogBox.GetStyles()">
     <MDCard Style="@($"width: fit-content;{((_show && !_settingService.Setting.DialogBox.Hide)?"":"opacity: 0;")}")">
-        <MDCard Color="surface" Style="@_settingService.Setting.DialogBox.GetContentStyles()">
+        <MDCard Style="@_settingService.Setting.DialogBox.GetContentStyles()">
             <ImageCard />
             <div class="content-card  pa-3">
                 <div class="title-medium name">
@@ -104,7 +104,15 @@
     public async Task Start(DialogBoxModel model)
     {
         _sleep = false;
-        _show = true;
+        if (string.IsNullOrWhiteSpace(model.Content) == false)
+        {
+            _show = true;
+        }
+        else
+        {
+            _show = false;
+        }
+
         _model = model;
         _context = model.Content;
         _delayTime = 1000 + model.Content.Length * 200;
@@ -113,10 +121,18 @@
         {
             await _live2DService.SetMotion(model.MotionGroup, model.Motion);
         }
+        else
+        {
+            await _live2DService.CleanMotion();
+        }
         //表情
         if (string.IsNullOrWhiteSpace(model.Expression) == false)
         {
             await _live2DService.SetExpression(model.Expression);
+        }
+        else
+        {
+            await _live2DService.CleanExpression();
         }
         await Task.Delay(100);
         //生成图片
@@ -154,16 +170,19 @@
     public async Task End()
     {
 
-        if (string.IsNullOrWhiteSpace(_model.Expression) == false)
+        if (_queue.Count == 0)
         {
-            await _live2DService.CleanExpression();
-        }
-        if (_model.Motion >= 0)
-        {
-            await _live2DService.CleanMotion();
+            if (string.IsNullOrWhiteSpace(_model?.Expression) == false)
+            {
+                await _live2DService.CleanExpression();
+            }
+            if (_model?.Motion >= 0)
+            {
+                await _live2DService.CleanMotion();
+            }
+            _show = false;
         }
         _model = null;
-        _show = false;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -175,7 +194,10 @@
 
     public void Add(DialogBoxModel model)
     {
-        _queue.Enqueue(model);
+        if (_queue.Count < 3)
+        {
+            _queue.Enqueue(model);
+        }
     }
 
     public void ShowDialogBox(DialogBoxModel model)
