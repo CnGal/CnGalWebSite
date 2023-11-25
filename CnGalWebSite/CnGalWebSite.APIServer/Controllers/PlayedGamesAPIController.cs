@@ -35,8 +35,9 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/playedgame/[action]")]
     public class PlayedGamesAPIController : ControllerBase
     {
-        
+
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<SteamAppRreview, int> _steamAppRreviewRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Examine, string> _examineRepository;
@@ -51,7 +52,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IQueryService _queryService;
 
         public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, 
-            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService, IQueryService queryService,
+            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService, IQueryService queryService, IRepository<SteamAppRreview, int> steamAppRreviewRepository,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
             _entryRepository = entryRepository;
@@ -68,6 +69,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _operationRecordService = operationRecordService;
             _editRecordService = editRecordService;
             _queryService = queryService;
+            _steamAppRreviewRepository= steamAppRreviewRepository;
         }
 
         /// <summary>
@@ -81,11 +83,15 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == id);
+            var entry = await _entryRepository.GetAll().Include(s=>s.Releases).FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == id);
             if (entry == null)
             {
                 return NotFound("不存在Id：" + id + " 的游戏");
             }
+
+            //获取Steam评价
+            var steamIds = entry.Releases.Where(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).Select(s=>s.Link);
+            var steam = await _steamAppRreviewRepository.FirstOrDefaultAsync(s => s.steamid == user.SteamId && steamIds.Contains(s.appid.ToString()) && string.IsNullOrWhiteSpace(s.review) == false);
 
             //查找是否已经添加
             var game = await _playedGameRepository.GetAll().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId == id);
@@ -94,7 +100,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new EditGameRecordModel
                 {
-                    GameId = id
+                    GameId = id,
+                    PlayImpressions = steam?.review,
+                    LoadSteamReview = !string.IsNullOrWhiteSpace(steam?.review)
                 };
             }
             else
@@ -116,7 +124,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Type = game.Type,
                     IsHidden = game.IsHidden,
                     ShowPublicly = game.ShowPublicly,
-                    PlayImpressions = game.PlayImpressions,
+                    PlayImpressions = string.IsNullOrWhiteSpace(game.PlayImpressions) ? steam?.review : game.PlayImpressions,
                     ScriptSocre = game.ScriptSocre,
                     ShowSocre = game.ShowSocre,
                     MusicSocre = game.MusicSocre,
@@ -124,6 +132,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     TotalSocre = game.TotalSocre,
                     SystemSocre = game.SystemSocre,
                     CVSocre = game.CVSocre,
+                    LoadSteamReview = string.IsNullOrWhiteSpace(steam?.review) == false && string.IsNullOrWhiteSpace(game.PlayImpressions)
                 };
             }
         }
