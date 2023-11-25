@@ -4,7 +4,7 @@
 @inject IEventService _eventService
 @inject IPopupService PopupService
 
-<MDialog @bind-Value="Dialog"
+<MDialog @bind-Value="Dialog" Persistent
          MaxWidth="550">
     <MDCard>
         <MCardTitle Class="text-h5">
@@ -17,7 +17,7 @@
         <MCardText>
             @if (isReady)
             {
-                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;" Color="primary">
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Class="pb-2" Style=" display: flex; flex-wrap: wrap;" Color="primary">
                     <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
                         想玩
                     </MButton>
@@ -27,7 +27,7 @@
                     <MButton Class="m-0" Value="(int)PlayedGameType.Played">
                         已玩
                     </MButton>
-                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested" >
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested">
                         不感兴趣
                     </MButton>
                     <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed">
@@ -46,8 +46,8 @@
                 }
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Label="总评" />
 
-                <MTextarea Label="评语" Rows="5" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
-                           @bind-Value="Model.PlayImpressions" Counter="true">
+                <MTextarea Label="@(Model.LoadSteamReview?"评语（已加载关联Steam账号数据）":"评语")" Rows="5" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
+                           @bind-Value="Model.PlayImpressions" Counter="true" >
 
                 </MTextarea>
                 <div class="row">
@@ -71,8 +71,9 @@
         </MCardText>
 
         <MCardActions Class="pa-6 pt-0">
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle OnClick="()=>Dialog=false" Icon="@IconType.Close.ToIconString()" Text="取消"/>
             <MSpacer></MSpacer>
-            <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Text="保存"/>
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Text="保存" />
         </MCardActions>
     </MDCard>
 </MDialog>
@@ -135,11 +136,11 @@
                 if (Model.ScriptSocre + Model.MusicSocre + Model.PaintSocre + Model.ShowSocre + Model.TotalSocre + Model.SystemSocre + Model.CVSocre != 0)
                 {
                     await PopupService.ToastAsync(new ToastConfig
-                    {
-                        Type = AlertTypes.Error,
-                        Title = "请填写所有项目的评分",
-                        Duration = 4000
-                    });
+                        {
+                            Type = AlertTypes.Error,
+                            Title = "请填写所有项目的评分",
+                            Duration = 4000
+                        });
                     return;
                 }
             }
@@ -152,12 +153,12 @@
                     {
 
                         await PopupService.ToastAsync(new ToastConfig
-                        {
-                            Type = AlertTypes.Info,
-                            Title = "提示",
-                            Content = $"只有大于{ToolHelper.MinValidPlayImpressionsLength}字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。" + (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0 ? $"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" : ""),
-                            Duration = 100000
-                        });
+                            {
+                                Type = AlertTypes.Info,
+                                Title = "提示",
+                                Content = $"只有大于{ToolHelper.MinValidPlayImpressionsLength}字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。" + (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0 ? $"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" : ""),
+                                Duration = 100000
+                            });
 
                         _dataCacheService.ThemeSetting.PlayedGameInforCount--;
                         _eventService.OnSavaTheme();
@@ -178,11 +179,11 @@
             if (obj.Successful == false)
             {
                 await PopupService.ToastAsync(new ToastConfig
-                {
-                    Type = AlertTypes.Error,
-                    Title = obj.Error ?? "编辑游玩记录失败~",
+                    {
+                        Type = AlertTypes.Error,
+                        Title = obj.Error ?? "编辑游玩记录失败~",
                         Duration = 4000
-                });
+                    });
             }
             else
             {

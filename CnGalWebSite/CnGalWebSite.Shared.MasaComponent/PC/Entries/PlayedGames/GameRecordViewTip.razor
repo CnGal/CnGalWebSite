@@ -60,21 +60,10 @@
 
         @if (IsCurrentUser)
         {
-            <MCardActions Class="ps-2 pe-2">
-
-                <MButton Color="green darken-1"
-                         Text
-                         OnClick="OnHidden">
-                    @(Model.IsHidden? "显示" : "隐藏")
-                </MButton>
-
-
+            <MCardActions Class="pa-6 pt-0">
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle OnClick="OnHidden" Icon="@(Model.IsHidden?IconType.Look.ToIconString() : IconType.Hide.ToIconString())" Text="@(Model.IsHidden? "显示" : "隐藏")" />
                 <MSpacer></MSpacer>
-                <MButton Color="green darken-1"
-                         Text
-                         OnClick="OnClickEdit">
-                    编辑
-                </MButton>
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnClickEdit" Icon="@IconType.Edit.ToIconString()" Text="编辑" />
             </MCardActions>
         }
 

@@ -104,6 +104,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<Almanac> Almanacs { get; set; }
         public DbSet<AlmanacArticle> AlmanacArticles { get; set; }
         public DbSet<AlmanacEntry> AlmanacEntries { get; set; }
+        public DbSet<SteamAppRreview> SteamAppRreviews { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -161,6 +162,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<SteamInfor>().HasIndex(g => g.SteamId).IsUnique();
             modelBuilder.Entity<SteamInforTableModel>().HasIndex(g => g.SteamId).IsUnique();
             modelBuilder.Entity<Recommend>().HasIndex(g => g.EntryId).IsUnique();
+            modelBuilder.Entity<SteamAppRreview>().HasIndex(g => g.recommendationid).IsUnique();
 
             //设定默认值
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);
