@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
             if (storeInfo == null)
             {
-                storeInfo = await Update(platformType, platformName, link,name, entryId);
+                storeInfo = await Update(platformType, platformName, link, name, entryId);
                 _storeInfoRepository.Clear();
             }
 
@@ -87,7 +87,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 return new StoreInfo();
             }
 
-            var storeInfo = await _storeInfoRepository.GetAll().FirstOrDefaultAsync(s => s.PlatformType == platformType && s.PlatformName == platformName && s.Link == link && s.Name == name&&s.EntryId==entryId);
+            var storeInfo = await _storeInfoRepository.GetAll().FirstOrDefaultAsync(s => s.PlatformType == platformType && s.PlatformName == platformName && s.Link == link && s.Name == name && s.EntryId == entryId);
 
             if (storeInfo == null)
             {
@@ -95,7 +95,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 {
                     PlatformType = platformType,
                     PlatformName = platformName,
-                    Name= name,
+                    Name = name,
                     Link = link,
                     EntryId = entryId,
                     UpdateTime = DateTime.Now.ToCstTime()
@@ -125,7 +125,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
             await _storeInfoRepository.UpdateAsync(storeInfo);
 
-            _logger.LogInformation("更新平台 - {platformType}, Id/链接 - {link}, 词条 - {id} 的商店信息", storeInfo.PlatformType == PublishPlatformType.Other ? storeInfo.PlatformName : storeInfo.PlatformType.GetDisplayName(),storeInfo.Link,storeInfo.EntryId);
+            _logger.LogInformation("更新平台 - {platformType}, Id/链接 - {link}, 词条 - {id} 的商店信息", storeInfo.PlatformType == PublishPlatformType.Other ? storeInfo.PlatformName : storeInfo.PlatformType.GetDisplayName(), storeInfo.Link, storeInfo.EntryId);
         }
 
         #region Steam
@@ -150,35 +150,44 @@ namespace CnGalWebSite.APIServer.Application.Stores
             }
 
             //获取附加信息
-            if (storeInfo.State== StoreState.OnSale)
+            if (storeInfo.State == StoreState.OnSale)
             {
                 await GetSteamAdditionInformationAsync(storeInfo);
             }
         }
 
-        public async Task<SteamEvaluation> GetSteamEvaluationAsync(string id)
+        public async Task GetSteamEvaluationAsync(StoreInfo steam)
         {
-
-            var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + id);
-
-            var document = new HtmlDocument();
-            document.LoadHtml(content);
-
-            var node = document.GetElementbyId("userReviews");
-            var text = node.ChildNodes.Count > 3
-                ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
-                : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
-            var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
-            var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
-
-            int.TryParse(countStr, out int evaluationCount);
-            int.TryParse(rateStr, out int recommendationRate);
-
-            return new SteamEvaluation
+            try
             {
-                EvaluationCount = evaluationCount,
-                RecommendationRate = recommendationRate,
-            };
+                var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + steam.Link);
+
+                var document = new HtmlDocument();
+                document.LoadHtml(content);
+
+                var node = document.GetElementbyId("userReviews");
+                var text = node.ChildNodes.Count > 3
+                    ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
+                    : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
+                var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
+                var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
+
+                if (int.TryParse(countStr, out int evaluationCount))
+                {
+                    steam.EvaluationCount = evaluationCount;
+
+                }
+                if (int.TryParse(rateStr, out int recommendationRate))
+                {
+                    steam.RecommendationRate = recommendationRate;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Id：{id} 获取Steam页面评测数据失败", steam.Link);
+            }
         }
 
 
@@ -197,9 +206,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
                 if (steam.EvaluationCount == 0)
                 {
-                    var re = await GetSteamEvaluationAsync(steam.Link);
-                    steam.EvaluationCount = re.EvaluationCount;
-                    steam.RecommendationRate = re.RecommendationRate;
+                    await GetSteamEvaluationAsync(steam);
                 }
                 if (steam.EvaluationCount != 0)
                 {
@@ -225,9 +232,9 @@ namespace CnGalWebSite.APIServer.Application.Stores
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Id：{id} 获取Steam附加信息失败", steam.Link);
+                _logger.LogError(ex, "Id：{id} 获取SteamspyAPI数据失败", steam.Link);
+                await GetSteamEvaluationAsync(steam);
             }
-
         }
 
         /// <summary>
@@ -271,7 +278,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
                     steamNowJson = new SteamNowJson
                     {
-                        price = int.Parse(final)*0.01,
+                        price = int.Parse(final) * 0.01,
                         cut = int.Parse(discount_percent),
                         price_formatted = final_formatted
                     };
@@ -297,8 +304,8 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     //已发布
                     steam.State = StoreState.OnSale;
 
-                    steam.PriceNow =null;
-                    steam.CutNow =null;
+                    steam.PriceNow = null;
+                    steam.CutNow = null;
 
                     steam.CutLowest = steamLowestJson.cut;
                     steam.PriceLowest = steamLowestJson.price;
