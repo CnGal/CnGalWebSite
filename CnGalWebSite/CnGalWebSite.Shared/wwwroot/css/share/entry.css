@@ -40,12 +40,13 @@
 
         .entry-card-default.relevance-card .main-card img {
             width: 250px;
-            height: min-content;
+            aspect-ratio: 460/215;
         }
 
             .entry-card-default.relevance-card .main-card img.thum {
                 width: 120px;
                 border-radius: 50%;
+                aspect-ratio: 1;
             }
 
     .entry-card-default.relevance-card .title-card {
@@ -96,8 +97,8 @@
     }
 
     .entry-card-default.relevance-card .add-info-card {
-        display:flex;
-        gap:1rem;
+        display: flex;
+        gap: 1rem;
     }
     /*大卡片样式*/
     .entry-card-default.relevance-card.big-card-style {

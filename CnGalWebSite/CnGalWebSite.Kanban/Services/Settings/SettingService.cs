@@ -72,6 +72,18 @@ namespace CnGalWebSite.Kanban.Services.Settings
             //设置看板娘位置
             var size = await _jsRuntime.InvokeAsync<Size>("getWindowSize");
 
+            if(size.Width<1600)
+            {
+                _settingModel.Kanban.Size.Width = 220;
+                _settingModel.Kanban.Size.Height = 400;
+
+                _settingModel.Button.Position.Left = 140;
+
+                _settingModel.DialogBox.Position.Left = -200;
+                _settingModel.DialogBox.Position.Bottom =410;
+
+            }
+
             _settingModel.Kanban.Position.Left = size.Width - _settingModel.Kanban.Size.Width;
             _settingModel.Kanban.Position.Top = size.Height - _settingModel.Kanban.Size.Height;
         }

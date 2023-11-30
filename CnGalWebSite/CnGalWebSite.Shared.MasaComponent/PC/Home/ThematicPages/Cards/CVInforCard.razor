@@ -5,7 +5,7 @@
 {
     <MDCard Class="pa-2 pt-3 pb-0 h-100" Style=" display: flex; flex-direction: column; align-items: center;">
         <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
-            <img class="w-100 mb-2 ps-2 pe-2" src="@Model.Infor.MainImage" style="border-radius: 50%;">
+            <img class="w-100 mb-2 ps-2 pe-2" src="@Model.Infor.MainImage" style="border-radius: 50%;  aspect-ratio: 1;">
             <div class="mb-1 text-truncate-2 on-surface-text" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
         </a>
         <CnGalWebSite.Components.Audios.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2"/>
@@ -18,7 +18,7 @@ else
 {
 <MDCard Class="pa-4 pb-0 h-100" Style=" display: flex; flex-direction: column; align-items: center;">
     <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
-        <img class="w-100 mb-2" src="@Model.Infor.MainImage" style="border-radius: 50%;">
+            <img class="w-100 mb-2" src="@Model.Infor.MainImage" style="border-radius: 50%;  aspect-ratio: 1;">
             <div class="title-large mb-2 text-truncate-2 on-surface-text" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
     </a>
     <CnGalWebSite.Components.Audios.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2" />
