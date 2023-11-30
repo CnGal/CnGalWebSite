@@ -1234,7 +1234,7 @@ html {
     .md-card img, .md-card .image {
         transition: .3s;
         border-radius: var( --md-card-border-radius);
-        height: min-content;
+        /* height: min-content; */
     }
 
     .md-card.show-hover-style:active img, .md-card.show-hover-style:active .image {

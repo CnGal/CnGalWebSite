@@ -1734,7 +1734,7 @@ html {
 
         #home-page .item img, #home-page .item .image {
             width: 100%;
-            height: min-content;
+            aspect-ratio: 460/215;
         }
 
         /*内部纸片*/
@@ -1910,6 +1910,7 @@ html {
         #home-page .latest-articles-card .user-image {
             width: 1.5rem !important;
             border-radius: 50% !important;
+            aspect-ratio: 1;
         }
 
         #home-page .latest-articles-card .author .name {
@@ -3297,12 +3298,13 @@ div.prizeTips {
 
         .entry-card-default.relevance-card .main-card img {
             width: 250px;
-            height: min-content;
+            aspect-ratio: 460/215;
         }
 
             .entry-card-default.relevance-card .main-card img.thum {
                 width: 120px;
                 border-radius: 50%;
+                aspect-ratio: 1;
             }
 
     .entry-card-default.relevance-card .title-card {
@@ -3353,8 +3355,8 @@ div.prizeTips {
     }
 
     .entry-card-default.relevance-card .add-info-card {
-        display:flex;
-        gap:1rem;
+        display: flex;
+        gap: 1rem;
     }
     /*大卡片样式*/
     .entry-card-default.relevance-card.big-card-style {

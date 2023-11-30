@@ -41,6 +41,7 @@ namespace CnGalWebSite.Kanban.Models
             Height = 500,
             Width = 300,
         };
+
     }
 
     public class ButtonSettingModel

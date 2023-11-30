@@ -43,7 +43,7 @@
 
         #home-page .item img, #home-page .item .image {
             width: 100%;
-            height: min-content;
+            aspect-ratio: 460/215;
         }
 
         /*内部纸片*/
@@ -219,6 +219,7 @@
         #home-page .latest-articles-card .user-image {
             width: 1.5rem !important;
             border-radius: 50% !important;
+            aspect-ratio: 1;
         }
 
         #home-page .latest-articles-card .author .name {
