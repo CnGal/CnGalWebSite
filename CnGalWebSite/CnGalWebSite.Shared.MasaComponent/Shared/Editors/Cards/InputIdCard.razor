@@ -4,10 +4,10 @@
     {
         var type = (OutlinkType)item;
         var id = (int)item;
-           <MCol Cols="12" Md="6">
+        <MCol Cols="12" Md="6">
             <MTextField Value="_values[id]" TValue="string" ValueChanged="@((s)=>ValueChanged(type,id,s))" Label="@type.GetDisplayName()" />
-    </MCol>
- 
+        </MCol>
+
     }
 </MRow>
 @code {
@@ -30,11 +30,11 @@
 
     public void ValueChanged(OutlinkType type, int id, string value)
     {
-        if (value.Contains("http")&&type!= OutlinkType.Official)
+        if (value.Contains("http") && type != OutlinkType.Official)
         {
             value = System.Web.HttpUtility.UrlDecode(value);
             var temp = value.Split('?').FirstOrDefault()?.Split('/');
-            value = temp?.LastOrDefault(s => string.IsNullOrWhiteSpace(s) == false).Replace("@", "").Replace(".html","");
+            value = temp?.LastOrDefault(s => string.IsNullOrWhiteSpace(s) == false).Replace("@", "").Replace(".html", "");
         }
 
         _values[id] = value;
@@ -48,37 +48,38 @@
         Model.others.RemoveAll(s => s.DisplayName.ToLower() == type.GetDisplayName().ToLower());
 
         Model.others.Add(new RelevancesModel
-        {
-            DisplayName = type.GetDisplayName(),
-            Link = type switch
             {
-                OutlinkType.Moegirl => "https://zh.moegirl.org.cn/" + value,
-                OutlinkType.VNDB => "https://vndb.org/" + value,
-                OutlinkType.YMGal => "https://www.ymgal.games/" + value,
-                OutlinkType.Bangumi => "https://bangumi.tv/" + Model.Type switch
+                DisplayName = type.GetDisplayName(),
+                Link = type switch
                 {
-                    EntryType.Game => "subject/",
-                    EntryType.Role => "character/",
-                    EntryType.Staff => "person/",
-                    EntryType.ProductionGroup => "person/",
-                    _ => "subject/",
-                } + value,
-                OutlinkType.WikiData => "https://www.wikidata.org/wiki/" + value,
-                OutlinkType.BaiDu => "https://baike.baidu.com/item/" + value,
-                OutlinkType.ZhWikiPedia => "https://zh.wikipedia.org/wiki/" + value,
-                OutlinkType._2DFan => "https://galge.fun/subjects/" + value,
-                OutlinkType.Weibo => "https://weibo.com/u/" + value,
-                OutlinkType.Bilibili => "https://space.bilibili.com/" + value,
-                OutlinkType.AcFun => "https://www.acfun.cn/u/" + value,
-                OutlinkType.Zhihu => "https://www.zhihu.com/people/" + value,
-                OutlinkType.Afdian => "https://afdian.net/@" + value,
-                OutlinkType.Pixiv => "https://www.pixiv.net/users/" + value,
-                OutlinkType.Twitter => "https://twitter.com/" + value,
-                OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
-                OutlinkType.Facebook => "https://www.facebook.com/" + value,
-                OutlinkType.Modian => $"https://zhongchou.modian.com/item/{value}.html",
-                _ => value
-            }
-        });
+                    OutlinkType.Moegirl => "https://zh.moegirl.org.cn/" + value,
+                    OutlinkType.VNDB => "https://vndb.org/" + value,
+                    OutlinkType.YMGal => "https://www.ymgal.games/" + value,
+                    OutlinkType.Bangumi => "https://bangumi.tv/" + Model.Type switch
+                    {
+                        EntryType.Game => "subject/",
+                        EntryType.Role => "character/",
+                        EntryType.Staff => "person/",
+                        EntryType.ProductionGroup => "person/",
+                        _ => "subject/",
+                    } + value,
+                    OutlinkType.WikiData => "https://www.wikidata.org/wiki/" + value,
+                    OutlinkType.BaiDu => "https://baike.baidu.com/item/" + value,
+                    OutlinkType.ZhWikiPedia => "https://zh.wikipedia.org/wiki/" + value,
+                    OutlinkType._2DFan => "https://galge.fun/subjects/" + value,
+                    OutlinkType.Weibo => "https://weibo.com/u/" + value,
+                    OutlinkType.Bilibili => "https://space.bilibili.com/" + value,
+                    OutlinkType.AcFun => "https://www.acfun.cn/u/" + value,
+                    OutlinkType.Zhihu => "https://www.zhihu.com/people/" + value,
+                    OutlinkType.Afdian => "https://afdian.net/@" + value,
+                    OutlinkType.Pixiv => "https://www.pixiv.net/users/" + value,
+                    OutlinkType.Twitter => "https://twitter.com/" + value,
+                    OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
+                    OutlinkType.Facebook => "https://www.facebook.com/" + value,
+                    OutlinkType.Modian => $"https://zhongchou.modian.com/item/{value}.html",
+                    OutlinkType.XiaoHeiHe => $"https://api.xiaoheihe.cn/game/share_game_detail?appid={value}",
+                    _ => value
+                }
+            });
     }
 }

@@ -58,6 +58,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         VNDB,
         [Display(Name = "月幕Galgame")]
         YMGal,
+        [Display(Name = "小黑盒")]
+        XiaoHeiHe,
         [Display(Name = "WikiData")]
         WikiData,
         [Display(Name = "萌娘百科")]
