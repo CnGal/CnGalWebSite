@@ -3,9 +3,22 @@
     <div class="subtitle-card">
         在常用的社交分享组件中，微信（微信好友和朋友圈）
     </div>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" OnNav="OnNav"/>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+@foreach (var items in _items)
+{
+    @foreach (var item in items)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Main.IndexCard Model="item.Entry" Outline Id="@($"almanac-entry-{item.Id}")">
+            <div class="year-almanac-name-card">
+                <div class="year">@Model.Year</div>
+                <div class="almanac-name">@Model.Name</div>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Main.IndexCard>
+    }
+}
+
 @code {
     [Parameter]
     public AlmanacViewModel Model { get; set; }

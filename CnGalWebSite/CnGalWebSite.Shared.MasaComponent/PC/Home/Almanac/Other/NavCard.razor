@@ -3,11 +3,11 @@
 @if (showNav)
 {
     <div class="almanac-nav-card">
-        <a href="/" class="logo" aria-label="主页"></a>
+        <a class="logo" aria-label="主页" @onclick="@(()=>Nav("almanac-home-card"))"></a>
         <a class="previous-button" @onclick="Previous">
             <div></div>
         </a>
-        <a class="catalog-button" @onclick="@(()=>Nav("almanac-catalog-card"))">
+        <a class="catalog-button" @onclick="@(()=>NavCatalog())">
             <div></div>
         </a>
         <a class="next-button" @onclick="Next">
@@ -55,7 +55,7 @@
                 screenWidth -= 64;
             }
 
-            pageWidth = (int)(screenWidth / 2);
+            pageWidth = (screenWidth / 2);
             totalPage = (int)Math.Ceiling(totalWidth / pageWidth);
             currentPage = (int)Math.Round(left / pageWidth) + 1;
 
@@ -189,6 +189,25 @@
         else if (e.Key == "End")
         {
             await NavEnd();
+        }
+    }
+
+    public async Task NavCatalog()
+    {
+        var ids = new[] { "almanac-next-card", "almanac-inside-card", "almanac-game-list-card", "almanac-catalog-card" };
+        foreach (var item in ids)
+        {
+            var left = await JS.InvokeAsync<double>("getElementLeftOfLayout", item);
+            if (left < 0)
+            {
+                await Nav(item);
+                return;
+            }
+            else if (left < pageWidth * 2)
+            {
+                await Nav("almanac-catalog-card");
+                return;
+            }
         }
     }
 

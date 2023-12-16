@@ -222,10 +222,23 @@
     gap: 1rem;
 }
 
-.slide-group::-webkit-scrollbar {
+    .slide-group::-webkit-scrollbar {
         display: none; /* Chrome Safari */
     }
 
 .slide-item {
     display: flex;
+}
+/*相册查看*/
+.slide-group-image-large {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+}
+
+.slide-group-image-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }

@@ -8,9 +8,23 @@
         <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.KeyValueCard Key="2023年度上市游戏数" Value="200" />
     </div>
 
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.GameGridCard Model="_items" OnNav="OnNav" />
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+
+@foreach (var items in _items)
+{
+    @foreach (var item in items)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Main.IndexCard Model="item.Entry" Outline Id="@($"almanac-entry-{item.Id}")">
+            <div class="year-almanac-name-card">
+                <div class="year">@Model.Year</div>
+                <div class="almanac-name">@Model.Name</div>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Main.IndexCard>
+    }
+}
+
 @code {
     [Parameter]
     public AlmanacViewModel Model { get; set; }

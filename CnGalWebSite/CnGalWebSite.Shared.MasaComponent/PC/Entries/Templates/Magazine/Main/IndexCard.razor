@@ -1,24 +1,48 @@
-﻿<link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/share/magazine.css">
+﻿<style>
+    ::-webkit-scrollbar {
+        width: 0;
+    }
 
+    .variable.container {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="@($"entry-magzine-style-{Model.Id}")">
-    <MainCard Model="Model" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn Class="article-introduce">
-        <StoryCard />
+    .m-sheet.m-app-bar.m-toolbar:not(.m-sheet--outlined), .m-footer--absolute:not(.m-footer--inset) {
+        display: none;
+    }
+
+    .m-main {
+        padding: 0 !important;
+    }
+</style>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout LayoutId="@($"entry-magzine-style-{Model.Id}")" Outline="Outline">
+    <MainCard Model="Model" Id="@Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Class="magzine-content-card">
+        @ChildContent
+        <StoryCard Model="Model"/>
         <CharacterCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.InformationCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.ReleaseCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StoryCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.GalleryCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.StaffCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.ArticleIntroduce.Main.RelevanceCard Model="Model" />
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
-    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.PageButton LayoutId="@($"entry-magzine-style-{Model.Id}")" />
+        <GalleryCard Model="Model" />
+        <StaffCard Model="Model" />
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
+    @if (!Outline)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.PageButton LayoutId="@($"entry-magzine-style-{Model.Id}")" />
+    }
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineLayout>
 
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
 }

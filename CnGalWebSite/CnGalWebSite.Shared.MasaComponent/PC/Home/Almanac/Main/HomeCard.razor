@@ -1,10 +1,35 @@
-﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="almanac-home-card" FullScreen>
-    <div class="year">@Model.Year</div>
-    <div class="name">@Model.Name</div>
-    <a class="enter" @onclick="@(()=>OnNav.InvokeAsync("almanac-catalog-card"))">
-        enter→
+﻿@inject ILocalStorageService _localStorage
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="almanac-home-card" FullScreen>
+    <div class="border-card">
+        <div class="line-1"></div>
+        <div class="line-2"></div>
+        <div class="line-3"></div>
+        <div class="content-card">
+            <div class="primary-color-card"></div>
+            <div class="secondary-color-card"></div>
+            <div class="tertiary-color-card"></div>
+            <div class="name-card">CNGAL.org E-Magazine</div>
+        </div>
+    </div>
+    <div class="title-card">
+        <img class="title-image" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/home-title.png" />
+        <div class="content-card">
+            <div class="title-text">年鉴</div>
+            <div class="sub-title">（内部测试中）</div>
+        </div>
+        <img class="code-image" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/home-code.png" />
+    </div>
+    <div class="enter-card">
+        <div class="triangle-card"> </div>
+        <a @onclick="@(()=>OnNav.InvokeAsync("almanac-catalog-card"))">
+            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/home-enter.png" />
+        </a>
+        <div class="line-card"></div>
+    </div>
+    <a class="image-card" @onclick="SwitchImage">
+        <img src="@($"https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/home-image-{imageId}.jpg")" />
     </a>
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.ArrowBorderCard />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
 
 
@@ -13,4 +38,30 @@
     public EventCallback<string> OnNav { get; set; }
     [Parameter]
     public AlmanacViewModel Model { get; set; }
+
+    int imageId = 1;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            imageId = await _localStorage.GetItemAsync<int>("Almanac-Image-2023");
+            if (imageId == 0)
+            {
+                imageId = 1;
+            }
+            StateHasChanged();
+        }
+    }
+
+    public async Task SwitchImage()
+    {
+        imageId++;
+        if (imageId > 3)
+        {
+            imageId = 1;
+        }
+        StateHasChanged();
+        await _localStorage.SetItemAsync<int>("Almanac-Image-2023", imageId);
+    }
 }

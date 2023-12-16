@@ -237,6 +237,11 @@
 .scrim-text {
     color: var(--md-sys-color-scrim);
 }
+/*自定义颜色*/
+.m-application .light-red {
+    background-color: #FF4D4F !important;
+    border-color: #FF4D4F !important;
+}
 
 :root {
     /* display - large */
@@ -1399,10 +1404,23 @@ html {
     gap: 1rem;
 }
 
-.slide-group::-webkit-scrollbar {
+    .slide-group::-webkit-scrollbar {
         display: none; /* Chrome Safari */
     }
 
 .slide-item {
     display: flex;
+}
+/*相册查看*/
+.slide-group-image-large {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+}
+
+.slide-group-image-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }

@@ -73,10 +73,8 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             var client = _clientFactory.CreateClient();
             var url1 = "https://www.cngal.org/entries/index/" + backUpArchive.EntryId;
             var response1 = await client.GetAsync(_configuration["BackUpArchiveUrl"] + url1);
-            var url2 = "https://www.cngal.org/entries/index/" + ToolHelper.Base64EncodeName(entryName);
-            var response2 = await client.GetAsync(_configuration["BackUpArchiveUrl"] + url2);
 
-            if (response1.StatusCode == System.Net.HttpStatusCode.OK || response2.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response1.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 //如果成功则写入数据 不成功也要写
                 await UpdateBackUpInfor(backUpArchive, false, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds / 2);

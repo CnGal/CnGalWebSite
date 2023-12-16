@@ -8,7 +8,7 @@
         <div class="almanac-article-grid-item-group">
             @foreach (var item in info)
             {
-                <a class="item-card" href="@($"/articles/index/{item.Article.Id}")">
+                <a class="item-card" @onclick="@(()=>OnNav.InvokeAsync($"almanac-article-{item.Article.Id}"))">
                     <img src="@(item.Image??item.Article.MainPicture)" alt="@item.Article.Name" loading="lazy" />
                     <div class="content-card">
                         <div class="name">@item.Article.Name</div>
@@ -21,6 +21,20 @@
 
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineColumn>
+
+@foreach (var items in _items)
+{
+    @foreach (var item in items)
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.ArticleCard Model="item.Article">
+            <div class="year-almanac-name-card">
+                <div class="year">@Model.Year</div>
+                <div class="almanac-name">@Model.Name</div>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.PC.Home.Almanac.Other.ArticleCard>
+    }
+}
+
 @code {
     [Parameter]
     public AlmanacViewModel Model { get; set; }

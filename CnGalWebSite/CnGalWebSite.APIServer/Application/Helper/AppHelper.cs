@@ -35,13 +35,15 @@ using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext
 using Operation = CnGalWebSite.DataModel.Model.Operation;
 using Microsoft.AspNetCore.Authentication;
 using CnGalWebSite.Core.Models;
+using HtmlAgilityPack;
+using NuGet.Versioning;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {
     public class AppHelper : IAppHelper
     {
-        
-        
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -69,7 +71,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository,
             IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
-            IRepository<Comment, long> commentRepository, IConfiguration configuration,  IRepository<Loginkey, long> loginkeyRepository,
+            IRepository<Comment, long> commentRepository, IConfiguration configuration, IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
@@ -286,7 +288,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public async Task<ApplicationUser> GetAPICurrentUserAsync(HttpContext context)
         {
             var id = context.User?.Claims?.GetUserId();
-            if(string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return null;
             }
@@ -308,13 +310,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
             //新用户
             var (email, name) = context.User.Claims.GetExternalUserInfor();
-            if(await _userRepository.AnyAsync(s=>s.Email==email))
+            if (await _userRepository.AnyAsync(s => s.Email == email))
             {
                 email = null;
             }
-            while(await _userRepository.AnyAsync(s=>s.UserName==name))
+            while (await _userRepository.AnyAsync(s => s.UserName == name))
             {
-                name = "用户_"+new Random(DateTime.Now.Millisecond).Next(0,99999).ToString();
+                name = "用户_" + new Random(DateTime.Now.Millisecond).Next(0, 99999).ToString();
             }
             user = new ApplicationUser
             {
@@ -407,7 +409,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
             _articleRepository.Clear();
-            _ = await _articleRepository.GetAll().Where(s => s.Id == articleId).ExecuteUpdateAsync(s => s.SetProperty(a=>a.ReaderCount, b => b.ReaderCount + 1));
+            _ = await _articleRepository.GetAll().Where(s => s.Id == articleId).ExecuteUpdateAsync(s => s.SetProperty(a => a.ReaderCount, b => b.ReaderCount + 1));
 
         }
 
@@ -422,7 +424,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             foreach (var item in favoriteFolderIds)
             {
                 var count = await _favoriteFolderRepository.GetAll().Include(s => s.FavoriteObjects).Where(s => s.Id == item).Select(s => s.FavoriteObjects.Count).FirstOrDefaultAsync();
-                _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Count, b => count));
+                _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s => s.SetProperty(s => s.Count, b => count));
             }
         }
 
@@ -512,7 +514,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 Id = item.Id,
                 Name = item.Name,
                 Type = item.Type ?? "视频",
-                DisplayName =  item.DisplayName,
+                DisplayName = item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
                 CreateUserId = item.CreateUserId,
                 MainImage = GetImagePath(item.MainPicture, "app.png"),
@@ -526,7 +528,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry)
         {
-          
+
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
@@ -545,7 +547,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 : GetImagePath(entry.MainPicture, "app.png");
 
             //处理音频
-            if(entry.Audio!=null&&entry.Audio.Any())
+            if (entry.Audio != null && entry.Audio.Any())
             {
                 model.Audio.AddRange(entry.Audio.Select(s => new EditAudioAloneModel
                 {
@@ -559,7 +561,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
 
             //处理附加信息
-            if (entry.EntryRelationFromEntryNavigation != null&&entry.EntryStaffFromEntryNavigation!=null)
+            if (entry.EntryRelationFromEntryNavigation != null && entry.EntryStaffFromEntryNavigation != null)
             {
                 if (entry.Type == EntryType.Role)
                 {
@@ -572,7 +574,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                             Modifier = "配音",
                             Contents = cvs.Select(s => new StaffNameModel
                             {
-                                DisplayName =string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
+                                DisplayName = string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
                                 Id = s.ToEntryNavigation?.Id ?? -1
                             }).ToList()
                         });
@@ -616,7 +618,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         .Take(3)
                         .Select(s => new StaffNameModel
                         {
-                            DisplayName =s.First().FromEntryNavigation.DisplayName,
+                            DisplayName = s.First().FromEntryNavigation.DisplayName,
                             Id = s.First().FromEntryNavigation.Id
                         }).ToList();
                     if (gameNames.Any())
@@ -692,7 +694,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
 
             //处理附加信息
-            if (periphery.RelatedEntries != null&&periphery.RelatedEntries.Any())
+            if (periphery.RelatedEntries != null && periphery.RelatedEntries.Any())
             {
                 var temp = new EntryInforTipAddInforModel
                 {
@@ -767,36 +769,43 @@ namespace CnGalWebSite.APIServer.Application.Helper
             text = RemoveCode(text);
 
             //为图片添加注释
-            sb=ProcImageText(sb, text);
-           
+            sb = ProcImageText(sb, text);
+
 
             //转换Bilibili视频
 
-            sb=ProcBilibiliVideo(sb,text);
-           
-           
+            sb = ProcBilibiliVideo(sb, text);
+
+
 
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
-           return Markdown.ToHtml(sb.ToString(), pipeline);
+            var html = Markdown.ToHtml(sb.ToString(), pipeline);
+            html = AddLazyLoading(html);
+            return html;
+        }
+
+        private string AddLazyLoading(string html)
+        {
+            return html.Replace("<img", "<img loading=\"lazy\" ");
         }
 
         private string RemoveCode(string text)
         {
-            while(true)
+            while (true)
             {
                 var mid = text.MidStrEx("```", "```");
-                if(string.IsNullOrWhiteSpace(mid))
+                if (string.IsNullOrWhiteSpace(mid))
                 {
                     break;
                 }
 
-                text = text.Replace($"```{mid}```","");
+                text = text.Replace($"```{mid}```", "");
             }
 
             return text;
         }
 
-        private StringBuilder ProcImageText(StringBuilder sb,string text)
+        private StringBuilder ProcImageText(StringBuilder sb, string text)
         {
             //查找所有图片链接
             var regImg = new Regex(@"\!\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
@@ -819,7 +828,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return sb;
         }
 
-        private StringBuilder ProcBilibiliVideo(StringBuilder sb,string text)
+        private StringBuilder ProcBilibiliVideo(StringBuilder sb, string text)
         {
             var regLink = new Regex(@"\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 

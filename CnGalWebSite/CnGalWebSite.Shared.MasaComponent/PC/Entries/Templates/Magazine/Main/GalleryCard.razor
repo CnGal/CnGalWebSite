@@ -1,0 +1,24 @@
+﻿@if (Model.Pictures.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard Icon="IconType.PhotoAlbum" Title="Gallery 相册">
+        <CnGalWebSite.Components.Images.ImageSlideGroup Model="imagesList" />
+    </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    public List<ImagesLargeViewModel> imagesList = new List<ImagesLargeViewModel>();
+
+    protected override void OnInitialized()
+    {
+        imagesList = Model.Pictures.Select(s => s.Pictures).SelectMany(s => s).Select(s => new ImagesLargeViewModel
+            {
+                Note = s.Note,
+                Image = s.Url
+            }).ToList();
+    }
+
+}
+
+

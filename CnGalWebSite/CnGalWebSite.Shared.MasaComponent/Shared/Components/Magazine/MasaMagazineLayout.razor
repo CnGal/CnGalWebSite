@@ -1,8 +1,16 @@
 ﻿@inject IJSRuntime JS
 
-<div class="@($"magazine-layout magazine-style {Class}")" id="@LayoutId" @onkeydown="OnKeyDown" tabindex="-1" autofocus="auto">
+@if (Outline)
+{
     @ChildContent
-</div>
+}
+else
+{
+    <div class="@($"magazine-layout magazine-style {Class}")" id="@LayoutId" @onkeydown="OnKeyDown" tabindex="-1" autofocus="auto">
+        @ChildContent
+    </div>
+}
+
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
@@ -13,11 +21,13 @@
     public string LayoutId { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !Outline)
         {
             await JS.InvokeVoidAsync("focusOnElement", LayoutId);
         }

@@ -6,6 +6,9 @@
     --almanac-background: rgba(204, 204, 204, 1);
     --almanac-on-background: rgba(0, 0, 0, 1);
     --almanac-card-on-background: rgba(0, 0, 0, .4);
+    --almanac-primary-color: var(--md-sys-color-primary);
+    --almanac-secondary-color: var(--md-sys-color-secondary);
+    --almanac-tertiary-color: var(--md-sys-color-tertiary);
 }
 /*字体*/
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
@@ -24,28 +27,38 @@
 @font-face {
     font-family: "MiSans-Heavy";
     font-weight: 800;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Regular";
     font-weight: 400;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Bold";
     font-weight: 700;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff");
+    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff") format("woff");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "OPPOSans-H";
+    font-weight: 800;
+    src: url("/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff") format("woff");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "SourceHanSerifCN-Heavy";
+    font-weight: 800;
+    src: url("/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff") format("woff");
     font-display: swap;
 }
 /*覆盖全局样式*/
-.m-application a {
-    color: var(--almanac-on-background);
-}
-
 .almanac-layout {
     background-color: white;
     color: var(--almanac-on-background);
@@ -54,20 +67,17 @@
     font-family: 'MiSans-Regular';
 }
 
-::-webkit-scrollbar {
-    width: 0;
-}
 /*侧边栏预留位置*/
 .almanac-layout {
     margin-left: 64px;
 }
 
-    .almanac-layout .magazine-columns.half-screen > div {
-        width: calc(50vw - 32px);
+    .almanac-layout .magazine-columns.half-screen > div, .almanac-layout .magazine-columns.half-screen > section {
+        width: calc(50vw - 32px) !important;
     }
 
-    .almanac-layout .magazine-columns.full-screen > div {
-        width: calc(100vw - 64px);
+    .almanac-layout .magazine-columns.full-screen > div, .almanac-layout .magazine-columns.full-screen > section {
+        width: calc(100vw - 64px) !important;
     }
 
 :root {
@@ -75,7 +85,7 @@
     --almanac-width-half: calc(50vh - 32px);
 }
 /*鼠标指针*/
-
+.image-overlays,
 a,
 a > *,
 a > * > *,
@@ -93,75 +103,242 @@ a > * > * > * {
 /*首页*/
 
 
-.almanac-home-card .year {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    left: 9.2%;
-    top: 31.1%;
-    height: 133px;
-    font-size: 120px;
-    font-weight: 700;
-    font-family: 'Passion One';
-}
-
-.almanac-home-card .name {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    left: 9.2%;
-    top: calc(31.1% + 95px);
-    height: 87px;
-    font-size: 72px;
-    font-weight: 800;
-    font-family: 'AlimamaShuHeiTi-Regular';
-}
-
-.almanac-home-card .enter {
-    display: flex;
-    position: absolute;
-    left: 9.2%;
-    top: calc(31.1% + 199px);
-    width: 186px;
-    height: 54px;
-    border-radius: 20px;
-    background: var(--almanac-background);
-    font-size: 36px;
-    line-height: 54px;
-    font-weight: 800;
-    font-family: 'AlimamaShuHeiTi-Regular';
-    justify-content: center;
-    align-items: center;
-}
-/*边框*/
-.almanac-border-bottom-arrow {
-    position: absolute;
-    right: 5.14%;
-    bottom: 6%;
-    width: 9px;
-    height: 9px;
-    background-image: url(https://res.cngal.org/_content/CnGalWebSite.Shared/images/almanac/arrow-border-bottom.png);
-    background-size: contain;
-}
-
-.almanac-border-bottom-line {
-    position: absolute;
-    right: calc(5.14% + 9px);
-    bottom: calc(6% + 4px);
-    width: calc(85.87% - 9px);
-    background-color: var(--almanac-on-background);
+/*首页边框*/
+.almanac-home-card .border-card .line-1 {
+    width: 25.11%;
+    background-color: rgba(0, 0, 0, 0.3);
     height: 1px;
+    position: absolute;
+    left: 3.3%;
+    top: 9.89%;
 }
 
-.almanac-border-right-line {
-    position: absolute;
-    right: 5.14%;
-    top: 7.8%;
+.almanac-home-card .border-card .line-2 {
     width: 1px;
-    background-color: var(--almanac-on-background);
-    height: 82%;
+    background-color: rgba(0, 0, 0, 0.3);
+    height: 20.96%;
+    position: absolute;
+    left: 3.3%;
+    top: 9.89%;
+}
+
+.almanac-home-card .border-card .line-3 {
+    width: 1px;
+    background-color: rgba(0, 0, 0, 0.3);
+    height: 26.4%;
+    position: absolute;
+    left: 3.3%;
+    bottom: 0;
+}
+/*首页边框上的文字*/
+.almanac-home-card .border-card .content-card {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    left: 3.3%;
+    top: calc(9.89% - 25px);
+}
+
+    .almanac-home-card .border-card .content-card .primary-color-card {
+        width: 14px;
+        height: 14px;
+        background-color: var( --almanac-primary-color);
+    }
+
+    .almanac-home-card .border-card .content-card .secondary-color-card {
+        width: 14px;
+        height: 14px;
+        background-color: var(--almanac-secondary-color);
+    }
+
+    .almanac-home-card .border-card .content-card .tertiary-color-card {
+        width: 14px;
+        height: 14px;
+        background-color: var(--almanac-tertiary-color);
+    }
+
+    .almanac-home-card .border-card .content-card .name-card {
+        margin-left: 4px;
+        font-size: 12px;
+        font-weight: 800;
+        font-family: 'OPPOSans-H';
+        letter-spacing: 0px;
+        white-space: nowrap;
+    }
+/*首页的标题*/
+.almanac-home-card .title-card {
+    position: absolute;
+    top: 36.58%;
+    left: 3.3%;
+}
+
+    .almanac-home-card .title-card .title-image {
+        width: 24.42%;
+        aspect-ratio: 318/158;
+    }
+
+    .almanac-home-card .title-card .content-card {
+        display: flex;
+        align-items: flex-end;
+        margin-top: 2px;
+    }
+
+        .almanac-home-card .title-card .content-card .title-text {
+            height: 90px;
+            color: var( --almanac-primary-color);
+            font-size: 90px;
+            line-height: 90px;
+            font-weight: 800;
+            font-family: 'SourceHanSerifCN-Heavy';
+            letter-spacing: 0px;
+            white-space: nowrap;
+        }
+
+        .almanac-home-card .title-card .content-card .sub-title {
+            height: 15px;
+            color: var( --almanac-primary-color);
+            font-size: 15px;
+            line-height: 15px;
+            font-weight: 800;
+            font-family: 'SourceHanSerifCN-Heavy';
+            letter-spacing: 0px;
+            white-space: nowrap;
+        }
+
+    .almanac-home-card .title-card .code-image {
+        width: 19.43%;
+        aspect-ratio: 253/8;
+        margin-top: 18px;
+    }
+/*首页的中间分割线*/
+.almanac-home-card .enter-card a {
+    width: 50px;
+    height: 44px;
+    position: absolute;
+    bottom: calc(4.03% + 16px);
+    right: calc(71.274% + 13px);
+}
+
+.almanac-home-card .enter-card img {
+    width: 50px;
+    height: 44px;
+}
+
+.almanac-home-card .enter-card .triangle-card {
+    position: absolute;
+    height: 126px;
+    width: 126px;
+    right: 71.274%;
+    bottom: 4.03%;
+    border: 63px solid var(--almanac-secondary-color);
+    border-left: 63px solid transparent;
+    border-top: 63px solid transparent;
+}
+
+.almanac-home-card .enter-card .line-card {
+    height: 89.06%;
+    width: 4px;
+    position: absolute;
+    background-color: var(--almanac-secondary-color);
+    left: 28.57%;
+    bottom: 4.036%;
+    z-index: 1;
+}
+/*首页的图片*/
+.almanac-home-card .image-card {
+    width: 71.12%;
+    height: 89.0625%;
+    position: absolute;
+    bottom: 4.036%;
+    left: 28.57%;
+    object-fit: cover;
+}
+
+    .almanac-home-card .image-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+/*边框*/
+.almanac-border-line-1 {
+    width: 116px;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.3);
+    top: 9.895%;
+    position: absolute;
+    left: 3.3%;
+}
+
+.almanac-border-line-2 {
+    width: 1px;
+    height: 20.96%;
+    background-color: rgba(0, 0, 0, 0.3);
+    top: 9.895%;
+    position: absolute;
+    left: 3.3%;
+}
+
+.almanac-border-line-3 {
+    width: 1px;
+    height: 20.96%;
+    background-color: rgba(0, 0, 0, 0.3);
+    bottom: 4.296%;
+    position: absolute;
+    right: 2.76%;
+}
+
+.almanac-border-line-4 {
+    width: 8.9%;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.3);
+    bottom: 4.296%;
+    position: absolute;
+    right: 2.76%;
+}
+
+.almanac-border-image-title {
+    width: 56px;
+    aspect-ratio: 159/79;
+    position: absolute;
+    left: 3.3%;
+    bottom: calc(90.1% + 8px);
+}
+
+.almanac-border-title-name {
+    position: absolute;
+    left: calc(3.3% + 60px);
+    bottom: calc(90.1% + 9px);
+    height: 28px;
+    color: var( --almanac-primary-color);
+    font-size: 28px;
+    line-height: 28px;
+    font-weight: 800;
+    font-family: 'SourceHanSerifCN-Heavy';
+    letter-spacing: 0px;
+    white-space: nowrap;
+}
+
+.almanac-border-sub-title-name {
+    position: absolute;
+    left: calc(3.3% + 115px);
+    bottom: calc(90.1% + 9px);
+    height: 15px;
+    color: var( --almanac-primary-color);
+    font-size: 15px;
+    line-height: 15px;
+    font-weight: 800;
+    font-family: 'SourceHanSerifCN-Heavy';
+    letter-spacing: 0px;
+    white-space: nowrap;
+}
+
+.almanac-border-image-code {
+    width: 19.5%;
+    aspect-ratio: 254/8;
+    right: 0.537%;
+    position: absolute;
+    top: 7.8125%;
 }
 /*侧边导航栏*/
 .almanac-nav-card {
@@ -170,7 +347,7 @@ a > * > * > * {
     left: 0;
     width: 64px;
     height: 100%;
-    background: var(--almanac-background);
+    background: var(--almanac-secondary-color);
 }
 
     .almanac-nav-card .logo {
@@ -178,7 +355,7 @@ a > * > * > * {
         position: relative;
         z-index: 1;
         left: 11px;
-        top: 1.3020833333333335%;
+        top: calc(50% - 129px);
         width: 42px;
         height: 42px;
         border-radius: 10px;
@@ -196,7 +373,7 @@ a > * > * > * {
         width: 42px;
         height: 42px;
         border-radius: 10px;
-        background: var( --almanac-card-on-background);
+        background: var(--almanac-tertiary-color);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -217,7 +394,7 @@ a > * > * > * {
         width: 42px;
         height: 42px;
         border-radius: 10px;
-        background: var( --almanac-card-on-background);
+        background-color: white;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -238,7 +415,7 @@ a > * > * > * {
         width: 42px;
         height: 42px;
         border-radius: 10px;
-        background: var( --almanac-card-on-background);
+        background-color: white;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -251,49 +428,48 @@ a > * > * > * {
             background-size: contain;
         }
 /*目录*/
-.almanac-catalog-card .almanac-year {
+
+.almanac-catalog-card .card-title-cn {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    left: 9.2%;
-    top: 10.1%;
-    height: 30px;
-    font-size: 20px;
-    font-weight: 700;
-    font-family: 'Oswald';
+    left: 11.13%;
+    top: 14.97%;
+    width: 199px;
+    color: var( --almanac-primary-color);
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'SourceHanSerifCN-Heavy';
+    letter-spacing: 0px;
+    white-space: pre-wrap;
 }
 
-.almanac-catalog-card .almanac-name {
+.almanac-catalog-card .card-title-en {
     position: absolute;
     display: flex;
     flex-direction: column;
     justify-content: start;
-    left: 9.2%;
-    top: calc(10.1% + 20px);
-    height: 36px;
-    font-size: 24px;
-    font-weight: 700;
-    font-family: 'Oswald';
-}
-
-.almanac-catalog-card .card-title {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    left: 9.2%;
-    top: calc(10.1% + 35px);
+    left: 11.3%;
+    top: calc(14.97% + 28px);
     height: 89px;
     font-size: 60px;
     font-weight: 700;
     font-family: 'Oswald';
+    z-index: 1;
+}
+
+.almanac-catalog-card .card-title-line {
+    width: 234px;
+    height: 13px;
+    background-color: var(--almanac-secondary-color);
+    position: absolute;
+    left: 11.3%;
+    top: calc(14.97% + 94px);
 }
 
 .almanac-catalog-card .item-group {
     display: flex;
     position: absolute;
-    left: 9.2%;
-    top: calc(10.1% + 123px);
+    left: 11.3%;
+    top: calc(14.9% + 132px);
     width: 80.11%;
     height: 54.42%;
     justify-content: space-between;
@@ -305,6 +481,7 @@ a > * > * > * {
     border-radius: 20px;
     background: var(--almanac-background);
     position: relative;
+    color: var(--almanac-on-background);
 }
 
 
@@ -633,6 +810,7 @@ a > * > * > * {
 
     .almanac-game-grid-item-group .item-card {
         width: calc(16.1vw);
+        color: var(--almanac-on-background);
     }
 
         .almanac-game-grid-item-group .item-card > img {
@@ -704,6 +882,7 @@ a > * > * > * {
         width: calc(40vw);
         display: flex;
         gap: 12px;
+        color: var(--almanac-on-background);
     }
 
         .almanac-article-grid-item-group .item-card > img {
@@ -732,3 +911,65 @@ a > * > * > * {
             flex-direction: column;
             justify-content: center;
         }
+/*年鉴标题*/
+.year-almanac-name-card {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+    .year-almanac-name-card .year {
+        height: 30px;
+        color: rgba(0, 0, 0, 1);
+        font-size: 20px;
+        font-weight: 700;
+        font-family: 'Oswald-Bold';
+        letter-spacing: 0px;
+        white-space: nowrap;
+    }
+
+    .year-almanac-name-card .almanac-name {
+        color: rgba(0, 0, 0, 1);
+        font-size: 24px;
+        font-weight: 700;
+        font-family: 'Oswald-Bold';
+        letter-spacing: 0px;
+        white-space: nowrap;
+    }
+/*文章*/
+
+.almanac-article-style .year-almanac-name-card {
+    margin: 0 22.1%;
+    margin-bottom: 25px;
+    margin-top: 58px;
+}
+
+.almanac-article-style > div {
+    overflow-x: auto;
+}
+
+.almanac-article-style .image-card {
+    width: 100%;
+    height: 25.3%;
+    object-fit: cover;
+}
+
+.almanac-article-style .title-card {
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'MiSans-Heavy';
+    letter-spacing: 0px;
+    white-space: pre-wrap;
+    margin: 0 22.1%;
+    margin-bottom: 25px;
+}
+
+.almanac-article-style .Author-card {
+    margin: 0 22.1%;
+    margin-bottom: 25px;
+}
+
+.almanac-article-style .markdown-body {
+    margin: 0 22.1%;
+    margin-bottom: 10rem;
+}

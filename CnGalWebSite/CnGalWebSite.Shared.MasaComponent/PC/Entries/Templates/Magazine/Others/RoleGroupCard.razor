@@ -1,0 +1,46 @@
+﻿@inject IDataCacheService _dataCatcheService
+@inject IEventService _eventService
+
+
+<div class="character-list">
+    <MSlideGroup @bind-Value="Index" ShowArrows="true" CenterActive Mandatory>
+        @foreach (var item in Model)
+        {
+            <MSlideItem>
+                <MCard  OnClick="@context.Toggle" RefBack="@context.Ref">
+                    <img src="@item.MainImage" class="character-icon" loading="lazy" />
+                </MCard>
+            </MSlideItem>
+        }
+    </MSlideGroup>
+    <div>
+
+        <MWindow @bind-Value="Index">
+            <ChildContent>
+                @foreach (var item in Model)
+                {
+                    <MWindowItem Value="@Model.IndexOf(item)">
+                        <RoleCard Model="item" />
+                    </MWindowItem>
+                }
+            </ChildContent>
+          
+        </MWindow>
+    </div>
+</div>
+
+@code {
+    private StringNumber Index { get; set; } = 0;
+
+    [Parameter]
+    public List<EntryRoleViewModel> Model { get; set; }
+
+    public void ClickNext()
+    {
+        Index = (Index.ToInt32() + 1) % Model.Count;
+    }
+    public void ClickPrev()
+    {
+        Index = Index.ToInt32() == 1 ? Model.Count - 1 : Index.ToInt32() - 1;
+    }
+}
