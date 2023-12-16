@@ -10,7 +10,7 @@
     @foreach (var item in Model)
     {
         <div class="@($"{(Model.IndexOf(item)%2==0?"":"right")} item-card")" style="@($"top: calc(17.83% + {40+Model.IndexOf(item)*64}px); {(Model.IndexOf(item)==Model.Count-1?"padding-bottom: calc(7.16% + 80px);":"")}")">
-            <a href="@($"/entries/index/{item.Id}")" class="rect-card">
+            <a href="@($"https://www.cngal.org/entries/index/{item.Id}")" target="_blank" class="rect-card">
                 <div class="content-card">
                     <img src="@(item.Thumbnail??item.MainImage)" alt="@item.Name" loading="lazy" />
                     <div class="name-time-card">

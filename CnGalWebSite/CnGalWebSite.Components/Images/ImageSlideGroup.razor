@@ -8,8 +8,7 @@
             <MWindowItem Value="@Model.IndexOf(item)">
                 <MResponsive AspectRatio="16/9D">
                     <MCard Style=" display: contents; " OnClick="OnClickImage">
-                        <div style="@($"background-image: url({item.Image});")" class="image-contain">
-                        </div>
+                        <img class="slide-group-image-large" src="@item.Image" loading="lazy" />
                     </MCard>
                 </MResponsive>
 
@@ -21,8 +20,7 @@
         {
             <MSlideItem>
                 <MCard Class="mt-4 me-4 mb-2 pointer" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})">
-                    <div style="@($"background-image: url({item.Image});")" class="@((context.Active?"active":"")+" image-overlays ")">
-                    </div>
+                    <img src="@item.Image" loading="lazy" class="@((context.Active?"active":"")+" image-overlays slide-group-image-thumb")" />
                 </MCard>
             </MSlideItem>
         }

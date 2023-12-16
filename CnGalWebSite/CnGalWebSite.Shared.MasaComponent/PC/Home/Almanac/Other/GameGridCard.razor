@@ -3,7 +3,7 @@
     <div class="almanac-game-grid-item-group">
         @foreach (var item in info)
         {
-            <a class="item-card" href="@($"/entries/index/{item.Entry.Id}")">
+            <a class="item-card" @onclick="@(()=>OnNav.InvokeAsync($"almanac-entry-{item.Id}"))">
                 <img src="@(item.Image??item.Entry.MainPicture)" alt="@item.Entry.Name" loading="lazy" />
                 <div class="name">@item.Entry.Name</div>
                 <div class="group"> @string.Join("、", item.Entry.ProductionGroups.Select(s => s.DisplayName))</div>
@@ -17,6 +17,8 @@
 @code {
     [Parameter]
     public List<IEnumerable<AlmanacEntryViewModel>> Model{ get; set; }
+    [Parameter]
+    public EventCallback<string> OnNav { get; set; }
 
     public string GetPublishTime(EntryIndexViewModel model)
     {

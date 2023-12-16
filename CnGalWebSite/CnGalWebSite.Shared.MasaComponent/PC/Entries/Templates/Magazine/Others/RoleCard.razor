@@ -1,0 +1,60 @@
+﻿<div class="character-item-card">
+    @if (string.IsNullOrWhiteSpace(Model.StandingPainting) == false)
+    {
+        <img src="@Model.StandingPainting" loading="lazy">
+    }
+    <div class="caption_wrapper">
+        <div class="caption-card">
+            <div class="name">@Model.Name</div>
+            @if (string.IsNullOrWhiteSpace(Model.CV) == false)
+            {
+                <div class="cv">CV： @Model.CV</div>
+            }
+        <CnGalWebSite.Components.Containers.MiniModeContainer>
+            @if (Model.Audio.Any())
+            {
+                <div class="audio">
+                    @foreach (var item in Model.Audio)
+                    {
+                        <CnGalWebSite.Components.Audios.AudioButton Url="@item.Url" />
+                    }
+                </div>
+            }
+        </CnGalWebSite.Components.Containers.MiniModeContainer>
+          
+
+            @if (string.IsNullOrWhiteSpace(Model.Age) == false || string.IsNullOrWhiteSpace(Model.Height) == false || string.IsNullOrWhiteSpace(Model.Birthday) == false)
+            {
+                <div class="infor">
+                    @if (string.IsNullOrWhiteSpace(Model.Age) == false)
+                    {
+                        <div class="age">年龄： @Model.Age</div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(Model.Height) == false)
+                    {
+                        <div class="height">身高： @Model.Height</div>
+                    }
+                    @if (string.IsNullOrWhiteSpace(Model.Birthday) == false)
+                    {
+                        <div class="birthday">生日： @Model.Birthday</div>
+                    }
+                </div>
+            }
+
+
+            @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) == false)
+            {
+                <div class="description">
+                    @Model.BriefIntroduction
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EntryRoleViewModel Model { get; set; }
+
+
+}

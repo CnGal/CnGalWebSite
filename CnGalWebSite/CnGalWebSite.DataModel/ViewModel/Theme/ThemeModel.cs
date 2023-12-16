@@ -8,7 +8,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
     public class ThemeModel
     {
         public static string DefaultThemeColor = "pink";
-        public static string[] AvailableColors = new string[] { "red", "pink", "purple", "deep-purple", "indigo", "blue", "light-blue", "cyan", "teal", "green", "light-green", "lime", "yellow", "amber", "orange", "deep-orange", "brown", "blue-grey", "grey" };
+        public static string[] AvailableColors = new string[] { "red", "light-red", "pink", "purple", "deep-purple", "indigo", "blue", "light-blue", "cyan", "teal", "green", "light-green", "lime", "yellow", "amber", "orange", "deep-orange", "brown", "blue-grey", "grey" };
 
         /// <summary>
         /// 主题颜色

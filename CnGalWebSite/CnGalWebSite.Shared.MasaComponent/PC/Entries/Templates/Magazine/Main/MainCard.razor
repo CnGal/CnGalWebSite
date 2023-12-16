@@ -1,18 +1,15 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="main-card">
-    <div class="image-card" style="background-image: url(@Model.Pictures.FirstOrDefault()?.Pictures?.FirstOrDefault()?.Url)"></div>
-    <div class="content-card background-text">
-        <div class="title-card display-large">
-            @Model.Name
-        </div>
-        <div class="brief-card label-large">
-            @Model.BriefIntroduction
-        </div>
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext Id="@Id" Class="main-card">
+    @if (string.IsNullOrWhiteSpace(Model.Pictures.FirstOrDefault()?.Pictures?.FirstOrDefault()?.Url) == false)
+    {
+        <img src="@Model.Pictures.FirstOrDefault()?.Pictures?.FirstOrDefault()?.Url" loading="lazy" />
+    }
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public string Id { get; set; }
 
 }

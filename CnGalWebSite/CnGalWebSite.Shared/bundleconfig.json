@@ -32,6 +32,7 @@
       "wwwroot/css/share/error.css",
       "wwwroot/css/share/loading.css",
       "wwwroot/css/share/commodity.css",
+      "wwwroot/css/share/magazine.css",
       "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
     ]
   },

@@ -1,99 +1,11 @@
 ﻿@if (Model.Roles.Any())
 {
     <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard Title="Character 角色" Icon="IconType.Role" Class="character-card">
-        @foreach (var item in Model.Roles)
-        {
-            <div class="item-card @(Model.Roles.IndexOf(item)%2==0?"":"opposite")" style="@($"margin-top: {GetMaginTop(item)}%;")">
-                @if (string.IsNullOrWhiteSpace(item.StandingPainting))
-                {
-                    if (string.IsNullOrWhiteSpace(item.MainImage))
-                    {
-                        <img src="@item.MainImage" alt="@item.Name" />
-                    }
-                }
-                else
-                {
-                    <img src="@item.StandingPainting" alt="@item.Name" />
-                }
-                <div class="content-card">
-                    <div class="name primary-text">
-                        @item.Name
-                      
-                    </div>
-                    <div class="info-card primary-text">
-                        @GetInfo(item)
-                    </div>
-
-                    @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) == false)
-                    {
-                        <div class="description">
-                            @item.BriefIntroduction
-                        </div>
-                    }
-                </div>
-
-            </div>
-        }
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.RoleGroupCard Model="Model.Roles" />
     </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard>
 }
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
-    [Parameter]
-    public EventCallback<Operation> OnRevoke { get; set; }
-
-    public int GetMaginTop(EntryRoleViewModel model)
-    {
-        return 0;
-    }
-
-    public string GetInfo(EntryRoleViewModel item)
-    {
-        string str = "";
-        if (item.AddInfors.Any(s => s.Modifier == "配音" && s.Contents.Any()))
-        {
-            if (string.IsNullOrWhiteSpace(str) == false)
-            {
-                str += " | ";
-            }
-            str += "配音 ";
-            foreach (var temp in item.AddInfors.FirstOrDefault(s => s.Modifier == "配音").Contents)
-            {
-                str += temp.DisplayName;
-            }
-        }
-
-        if (string.IsNullOrWhiteSpace(item.Age) == false)
-        {
-            if (string.IsNullOrWhiteSpace(str) == false)
-            {
-                str += " | ";
-            }
-            str += "年龄 ";
-            str += item.Age;
-        }
-        if (string.IsNullOrWhiteSpace(item.Height) == false)
-        {
-            if (string.IsNullOrWhiteSpace(str) == false)
-            {
-                str += " | ";
-            }
-            str += "身高 ";
-            str += item.Height;
-        }
-        if (string.IsNullOrWhiteSpace(item.Birthday) == false)
-        {
-            if (string.IsNullOrWhiteSpace(str) == false)
-            {
-                str += " | ";
-            }
-            str += "生日 ";
-            str += item.Birthday;
-        }
-
-
-        return str;
-    }
-
 }
