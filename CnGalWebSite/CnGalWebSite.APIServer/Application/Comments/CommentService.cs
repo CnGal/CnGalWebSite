@@ -64,7 +64,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
             var query = _commentRepository.GetAll().AsNoTracking()
                 .Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser)
-                .Where(s => s.ParentCodeNavigation == null&&s.IsHidden==false);
+                .Where(s => s.ParentCodeNavigation == null&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Text)==false);
             long tempId = 0;
             if (type != CommentType.CommentUser)
             {
