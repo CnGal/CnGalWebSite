@@ -9,16 +9,7 @@
 @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction) == false || string.IsNullOrWhiteSpace(Model.MainPage) == false)
 {
     <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard Title="Introduction 介绍" Icon="IconType.Story" Class="story-card">
-        <div class="markdown-body">
-            @if (string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction))
-            {
-                @((MarkupString)Model.MainPage)
-            }
-            else
-            {
-                @((MarkupString)Model.WebsiteAddInfor.Introduction)
-            }
-        </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="false" Text="@(string.IsNullOrWhiteSpace(Model.WebsiteAddInfor?.Introduction)?Model.MainPage:Model.WebsiteAddInfor.Introduction)" />
     </CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Magazine.Others.SectionCard>
 
 }

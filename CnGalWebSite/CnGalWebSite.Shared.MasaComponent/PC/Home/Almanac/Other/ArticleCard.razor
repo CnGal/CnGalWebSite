@@ -6,9 +6,8 @@
     @ChildContent
     <div class="title-card">@Model.DisplayName</div>
     <div class="Author-card"><strong>作者：</strong> @(string.IsNullOrWhiteSpace(Model.OriginalAuthor) ? Model.UserInfor.Name : Model.OriginalAuthor)</div>
-    <div class="markdown-body">
-        @((MarkupString)Model.MainPage)
-    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip IsNeedHighlight="false" Text="@Model.MainPage" />
+
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.Magazine.MasaMagazineContext>
 
 @code {
