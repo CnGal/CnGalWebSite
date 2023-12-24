@@ -7,9 +7,9 @@
         {
             <MWindowItem Value="@Model.IndexOf(item)">
                 <MResponsive AspectRatio="16/9D">
-                    <MCard Style=" display: contents; " OnClick="OnClickImage">
+                    <MDCard Class="pointer" ShowHoverStyle="true" OnClick="OnClickImage" Style="margin: 3px;">
                         <img class="slide-group-image-large" src="@item.Image" loading="lazy" />
-                    </MCard>
+                    </MDCard>
                 </MResponsive>
 
             </MWindowItem>
@@ -19,7 +19,7 @@
         @foreach (var item in Model)
         {
             <MSlideItem>
-                <MCard Class="mt-4 me-4 mb-2 pointer" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})">
+                <MCard Class="mt-4 me-4 mb-2 pointer" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="@context.Ref">
                     <img src="@item.Image" loading="lazy" class="@((context.Active?"active":"")+" image-overlays slide-group-image-thumb")" />
                 </MCard>
             </MSlideItem>
