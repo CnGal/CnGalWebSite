@@ -68,7 +68,6 @@
             {
                 var i = 0;
 
-                <div class="rounded shadow-sm bg-opacity p-3">
                     <MTimeline Dense="_dataCacheService.IsApp||TimelineModel.Count<3">
 
                         @foreach (var item in TimelineModel.OrderByDescending(s => s.PublishTime))
@@ -78,9 +77,7 @@
                                     <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
                                 </OppositeContent>
                                 <ChildContent>
-                                    <MCard Class="elevation-2" @onclick="@(() => ViewAt(item.Id))">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType="false" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@_dataCacheService.IsApp" AllowNav="false" />
-                                    </MCard>
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.EntryInforViewTip Model="item" ShowType="false" ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@_dataCacheService.IsApp"/>
                                 </ChildContent>
                             </MTimelineItem>
 
@@ -89,8 +86,6 @@
 
                         }
                     </MTimeline>
-                </div>
-
             }
 
         }
