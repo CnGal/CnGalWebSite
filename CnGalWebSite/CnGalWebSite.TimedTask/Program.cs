@@ -67,6 +67,8 @@ builder.Services.AddEventBus();
 builder.Services.AddHostedService<BackgroundTask>();
 //注入HttpContext
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+//添加状态检查
+builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>("DbContext");
 //依赖注入仓储
 builder.Services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
 //添加OpenId 身份验证
