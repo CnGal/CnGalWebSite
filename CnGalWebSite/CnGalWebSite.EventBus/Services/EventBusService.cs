@@ -36,5 +36,15 @@ namespace CnGalWebSite.EventBus.Services
         {
             _eventBus.SubscribeMessages("qq_group", action);
         }
+
+        public void SendRunTimedTask(RunTimedTaskModel model)
+        {
+            _eventBus.SendMessage("timed_task", model);
+        }
+
+        public void RecieveRunTimedTask(Action<RunTimedTaskModel> action)
+        {
+            _eventBus.SubscribeMessages("timed_task", action);
+        }
     }
 }

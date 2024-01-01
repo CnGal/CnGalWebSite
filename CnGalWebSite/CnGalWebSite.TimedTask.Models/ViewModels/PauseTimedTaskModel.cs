@@ -1,4 +1,4 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
+﻿namespace CnGalWebSite.TimedTask.Models.ViewModels
 {
     public class PauseTimedTaskModel
     {

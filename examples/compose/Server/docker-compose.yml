@@ -17,6 +17,8 @@ services:
       # Live2D
       - Live2D_DataUrl=${Live2D_DataUrl}
       - Live2D_ResourcesPath=${Live2D_ResourcesPath}
+      # 定时任务API
+      - TaskApiPath=${TaskApiPath}
     hostname: blazorserver
     restart: always
     healthcheck:

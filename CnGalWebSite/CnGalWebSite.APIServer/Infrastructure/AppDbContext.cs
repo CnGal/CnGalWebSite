@@ -41,7 +41,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<ErrorCount> ErrorCounts { get; set; }
         public DbSet<UserOnlineInfor> UserOnlineInfors { get; set; }
         public DbSet<Disambig> Disambigs { get; set; }
-        public DbSet<TimedTask> TimedTasks { get; set; }
+        public DbSet<TimedTask_Deleted> TimedTasks { get; set; }
         public DbSet<BackUpArchive> BackUpArchives { get; set; }
         public DbSet<BackUpArchiveDetail> BackUpArchiveDetails { get; set; }
         public DbSet<FavoriteObject> FavoriteObjects { get; set; }

@@ -56,6 +56,10 @@ namespace CnGalWebSite.WebAssembly
             {
                 ToolHelper.ImageApiPath = builder.Configuration["ImageApiPath"];
             }
+            if (string.IsNullOrWhiteSpace(builder.Configuration["TaskApiPath"]) == false)
+            {
+                ToolHelper.TaskApiPath = builder.Configuration["TaskApiPath"];
+            }
 
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadX>("head::after");

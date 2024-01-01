@@ -76,7 +76,7 @@ else
 
     TimedTaskEditModel Model;
 
-    private string _baseUrl = "api/timedtasks/";
+    private string _baseUrl = ToolHelper.TaskApiPath + "api/timedtasks/";
     private string _name = "定时任务";
 
 
@@ -107,19 +107,19 @@ else
     {
         try
         {
-            var result = await _httpService.PostAsync<TimedTaskEditModel, Result>($"{_baseUrl}edit", Model);
-            if (result.Successful)
+            var result = await _httpService.PostAsync<TimedTaskEditModel,CnGalWebSite.Core.Models.Result>($"{_baseUrl}edit", Model);
+            if (result.Success)
             {
-                if (!string.IsNullOrWhiteSpace(result.Error))
+                if (!string.IsNullOrWhiteSpace(result.Message))
                 {
-                    await PopupService.ToastAsync(result.Error, AlertTypes.Success);
+                    await PopupService.ToastAsync(result.Message, AlertTypes.Success);
                 }
                 await OnEdited.InvokeAsync(Model);
                 StateHasChanged();
             }
             else
             {
-                await PopupService.ToastAsync(result.Error ?? "操作失败", AlertTypes.Error);
+                await PopupService.ToastAsync(result.Message ?? "操作失败", AlertTypes.Error);
             }
         }
         catch (Exception ex)

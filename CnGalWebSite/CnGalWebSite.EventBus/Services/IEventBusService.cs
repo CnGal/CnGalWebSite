@@ -17,5 +17,9 @@ namespace CnGalWebSite.EventBus.Services
         void SendQQGroupMessage(QQGroupMessageModel model);
 
         void RecieveQQGroupMessage(Action<QQGroupMessageModel> action);
+
+        void SendRunTimedTask(RunTimedTaskModel model);
+
+        void RecieveRunTimedTask(Action<RunTimedTaskModel> action);
     }
 }

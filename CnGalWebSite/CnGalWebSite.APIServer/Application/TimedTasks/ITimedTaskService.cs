@@ -1,6 +1,6 @@
 ﻿
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using CnGalWebSite.EventBus.Models;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.TimedTasks
@@ -10,8 +10,8 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         /// <summary>
         /// 运行定时任务
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="Model"></param>
         /// <returns></returns>
-        Task RunTimedTask(TimedTask item);
+        Task RunTimedTask(RunTimedTaskModel Model);
     }
 }

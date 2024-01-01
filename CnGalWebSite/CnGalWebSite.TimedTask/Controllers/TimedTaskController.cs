@@ -1,44 +1,37 @@
-﻿using CnGalWebSite.APIServer.Application.TimedTasks;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.Core.Models;
+﻿using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
-using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Ranks;
-using CnGalWebSite.DataModel.ViewModel.TimedTasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CnGalWebSite.TimedTask.DataReositories;
+using CnGalWebSite.TimedTask.Models.DataModels;
+using CnGalWebSite.TimedTask.Models.ViewModels;
+using CnGalWebSite.TimedTask.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nest;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Result = CnGalWebSite.DataModel.Model.Result;
 
-namespace CnGalWebSite.APIServer.Controllers
+namespace CnGalWebSite.TimedTask.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [ApiController]
     [Route("api/timedtasks/[action]")]
-
-    public class TimedTaskAPIContorller : ControllerBase
+    [ApiController]
+    public class TimedTaskController : ControllerBase
     {
-        private readonly IRepository<TimedTask, int> _timedTaskRepository;
-        private readonly ITimedTaskService _timedTaskService;
+        private readonly IRepository<TimedTaskModel, int> _timedTaskRepository;
         private readonly IQueryService _queryService;
+        private readonly ITimedTaskService _timedTaskService;
 
-        public TimedTaskAPIContorller(ITimedTaskService timedTaskService, IRepository<TimedTask, int> timedTaskRepository, IQueryService queryService)
+        public TimedTaskController( IRepository<TimedTaskModel, int> timedTaskRepository, IQueryService queryService, ITimedTaskService timedTaskService)
         {
             _timedTaskRepository = timedTaskRepository;
-            _timedTaskService = timedTaskService;
             _queryService = queryService;
+            _timedTaskService = timedTaskService;
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<TimedTaskOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<TimedTask, int>(_timedTaskRepository.GetAll().AsSingleQuery(), model,
+            var (items, total) = await _queryService.QueryAsync<TimedTaskModel, int>(_timedTaskRepository.GetAll().AsSingleQuery(), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
             return new QueryResultModel<TimedTaskOverviewModel>
@@ -85,6 +78,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsRuning = item.IsRuning,
                 IsLastFail = item.IsLastFail
             };
+            if(model.EveryTime==null)
+            {
+                model.EveryTime = DateTime.Now;
+            }
+            if (model.EveryTime.Value.Year==1)
+            {
+                model.EveryTime= model.EveryTime.Value.AddYears(2022);
+            }
 
             return model;
         }
@@ -93,10 +94,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> EditAsync(TimedTaskEditModel model)
         {
-            TimedTask item = null;
+            TimedTaskModel item = null;
             if (model.Id == 0)
             {
-                item = await _timedTaskRepository.InsertAsync(new TimedTask
+                item = await _timedTaskRepository.InsertAsync(new TimedTaskModel
                 {
                     Name = model.Name,
                     Type = model.Type,
@@ -118,7 +119,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             if (item == null)
             {
-                return new Result { Successful = false, Error = "项目不存在" };
+                return new Result { Success = false, Message = "项目不存在" };
             }
 
             item.Name = model.Name;
@@ -134,15 +135,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
             await _timedTaskRepository.UpdateAsync(item);
 
-            return new Result { Successful = true };
+            return new Result { Success = true };
         }
 
         [HttpPost]
         public async Task<ActionResult<Result>> PauseTimedTaskAsync(PauseTimedTaskModel model)
         {
-            await _timedTaskRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsPause, b => model.IsPause));
+            await _timedTaskRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsPause, b => model.IsPause));
 
-            return new Result { Successful = true };
+            return new Result { Success = true };
         }
 
         [HttpPost]
@@ -150,7 +151,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
 
             await _timedTaskRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
-            return new Result { Successful = true };
+            return new Result { Success = true };
         }
 
         [HttpPost]
@@ -165,12 +166,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 else
                 {
-                    return new Result { Successful = false, Error = "无法找到Id：" + item + " 的定时任务" };
+                    return new Result { Success = false, Message = "无法找到Id：" + item + " 的定时任务" };
                 }
             }
 
-            return new Result { Successful = true };
+            return new Result { Success = true };
         }
-
     }
 }

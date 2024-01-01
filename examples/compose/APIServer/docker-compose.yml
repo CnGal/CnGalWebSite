@@ -32,6 +32,11 @@ services:
       - ImageApiPath=${ImageApiPath}
       # IP 白名单
       - IpWhitelist=${IpWhitelist}
+      # 事件总线
+      - EventBus_HostName=${EventBus_HostName}
+      - EventBus_Port=${EventBus_Port}
+      - EventBus_UserName=${EventBus_UserName}
+      - EventBus_Password=${EventBus_Password}
     hostname: apiserver
     restart: always
     healthcheck:

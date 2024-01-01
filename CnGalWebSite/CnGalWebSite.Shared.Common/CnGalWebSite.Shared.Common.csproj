@@ -25,5 +25,6 @@
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
     <ProjectReference Include="..\CnGalWebSite.PublicToolbox\CnGalWebSite.PublicToolbox.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.TimedTask.Models\CnGalWebSite.TimedTask.Models.csproj" />
   </ItemGroup>
 </Project>

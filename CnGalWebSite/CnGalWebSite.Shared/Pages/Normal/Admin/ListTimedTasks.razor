@@ -77,7 +77,7 @@
     <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
-    private string _baseUrl = "api/timedtasks/List";
+    private string _baseUrl =ToolHelper.TaskApiPath+ "api/timedtasks/List";
     private string _name = "定时任务";
 
     private List<DataTableHeader<TimedTaskOverviewModel>> _headers = new List<DataTableHeader<TimedTaskOverviewModel>>
@@ -145,9 +145,9 @@
         string operationName = (isPause ? "暂停" : "启动") + _name;
         try
         {
-            var obj = await _httpService.PostAsync<PauseTimedTaskModel, Result>("api/timedtasks/PauseTimedTask", new PauseTimedTaskModel { Ids = new int[] { model .Id}, IsPause = isPause });
+            var obj = await _httpService.PostAsync<PauseTimedTaskModel, CnGalWebSite.Core.Models.Result>(ToolHelper.TaskApiPath + "api/timedtasks/PauseTimedTask", new PauseTimedTaskModel { Ids = new int[] { model.Id }, IsPause = isPause });
 
-            if (obj.Successful == false)
+            if (obj.Success == false)
             {
                 await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
             }
@@ -170,12 +170,12 @@
         string operationName = "运行"+_name;
         try
         {
-            var task = _httpService.PostAsync<RunTimedTaskModel, Result>("api/timedtasks/RunTimedTask", new RunTimedTaskModel { Ids = new int[] { model.Id } });
+            var task = _httpService.PostAsync<RunTimedTaskModel, CnGalWebSite.Core.Models.Result>(ToolHelper.TaskApiPath + "api/timedtasks/RunTimedTask", new RunTimedTaskModel { Ids = new int[] { model.Id } });
             dataTableCard.GetDataFromApi();
             await PopupService.ToastAsync("正在运行任务", AlertTypes.Info);
             var obj = await task;
 
-            if (obj.Successful == false)
+            if (obj.Success == false)
             {
                 await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
             }

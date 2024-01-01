@@ -48,6 +48,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using Typesense.Setup;
+using CnGalWebSite.EventBus.Extensions;
 
 namespace CnGalWebSite.APIServer
 {
@@ -181,7 +182,8 @@ namespace CnGalWebSite.APIServer
                     Security = true
                 });
             });
-           
+            //事件总线
+            services.AddEventBus();
             //添加后台定时任务
             services.AddHostedService<BackgroundTask>();
             //添加真实IP
