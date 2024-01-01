@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.DataModel.Model
 {
-    public class TimedTask
+    public class TimedTask_Deleted
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public TimedTaskType Type { get; set; }
+        public TimedTaskType_Deleted Type { get; set; }
 
-        public TimedTaskExecuteType ExecuteType { get; set; }
+        public TimedTaskExecuteType_Deleted ExecuteType { get; set; }
 
         /// <summary>
         /// 间隔时间 单位 分钟
@@ -40,7 +40,7 @@ namespace CnGalWebSite.DataModel.Model
 
     }
 
-    public enum TimedTaskType
+    public enum TimedTaskType_Deleted
     {
         [Display(Name = "更新游戏商店信息")]
         UpdateGameSteamInfor,
@@ -79,7 +79,7 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "更新游戏推荐列表")]
         UpdateRecommend
     }
-    public enum TimedTaskExecuteType
+    public enum TimedTaskExecuteType_Deleted
     {
         [Display(Name = "间隔时间")]
         IntervalTime,

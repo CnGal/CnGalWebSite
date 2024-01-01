@@ -92,8 +92,7 @@ builder.Services.AddSwaggerGen(c =>
 //添加控制器
 builder.Services.AddControllers();
 //事件总线
-builder.Services.AddSingleton<IEventBusService, EventBusService>();
-builder.Services.AddSingleton<IEventBus, EventBusRabbitMQ>();
+builder.Services.AddEventBus();
 
 var app = builder.Build();
 

@@ -10,14 +10,14 @@
                        OffsetY
                        MinWidth="@("auto")">
                     <ActivatorContent>
-                         <MTextField @bind-Value="_date" HideDetails="true" Disabled="Disabled"
+                        <MTextField @bind-Value="_date" HideDetails="true" Disabled="Disabled"
                                     Label="@Label"
                                     PrependIcon="mdi-calendar"
                                     Readonly
-                                    @attributes="context.Attrs"/>
+                                    @attributes="context.Attrs" />
                     </ActivatorContent>
                     <ChildContent>
-                        <MDatePicker Value="_date" ValueChanged="OnDateChanged" TValue="DateOnly?" 
+                        <MDatePicker Value="_date" ValueChanged="OnDateChanged" TValue="DateOnly?"
                                      Locale="zh-CN"
                                      ActivePicker="_activePicker"
                                      OnActivePickerUpdate="val=>_activePicker=val"
@@ -38,7 +38,7 @@
                        MaxWidth="290"
                        MinWidth="290">
                     <ActivatorContent>
-                         <MTextField @bind-Value="_time" HideDetails="true" Disabled="Disabled"
+                        <MTextField @bind-Value="_time" HideDetails="true" Disabled="Disabled"
                                     Label="@Label"
                                     PrependIcon="mdi-clock-time-four-outline"
                                     Readonly
@@ -47,7 +47,7 @@
                     <ChildContent>
                         @if (_menu2)
                         {
-                            <MTimePicker Value="_time" ValueChanged="OnTimeChanged" 
+                            <MTimePicker Value="_time" ValueChanged="OnTimeChanged"
                                          FullWidth></MTimePicker>
                         }
                     </ChildContent>
@@ -91,9 +91,9 @@
 
     protected override void OnParametersSet()
     {
-        if(Nullable)
+        if (Nullable)
         {
-            if(NullableValue != null)
+            if (NullableValue != null)
             {
 
                 _date = DateOnly.FromDateTime(NullableValue.Value);
@@ -121,9 +121,9 @@
             return;
         }
 
-        if(date == null)
+        if (date == null)
         {
-            if(NullableValue != null)
+            if (NullableValue != null)
             {
                 NullableValue = null;
                 await NullableValueChanged.InvokeAsync(NullableValue);
@@ -156,7 +156,7 @@
             return;
         }
 
-        NullableValue = Value = (ShowDate ? _date : DateOnly.MinValue).Value.ToDateTime(_time.Value);
+        NullableValue = Value = (ShowDate ? _date : DateOnly.FromDateTime(DateTime.Now)).Value.ToDateTime(_time.Value);
         await ValueChanged.InvokeAsync(Value);
         await NullableValueChanged.InvokeAsync(NullableValue);
     }

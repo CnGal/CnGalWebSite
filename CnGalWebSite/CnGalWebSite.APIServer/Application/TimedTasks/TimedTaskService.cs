@@ -13,9 +13,9 @@ using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using CnGalWebSite.EventBus.Models;
 using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.TimedTask.Models.DataModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,7 +28,6 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
 {
     public class TimedTaskService : ITimedTaskService
     {
-        private readonly IRepository<TimedTask, int> _timedTaskRepository;
         private readonly IStoreInfoService _storeInfoService;
         private readonly ITableService _tableService;
         private readonly IBackUpArchiveService _backUpArchiveService;
@@ -43,12 +42,11 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly IRecommendService _recommendService;
         private readonly ILogger<TimedTaskService> _logger;
 
-        public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
+        public TimedTaskService(IStoreInfoService storeInfoService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
         IPerfectionService perfectionService, ISearchHelper searchHelper, ISteamInforService steamService,
         INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService,
         IRecommendService recommendService)
         {
-            _timedTaskRepository = timedTaskRepository;
             _storeInfoService = storeInfoService;
             _backUpArchiveService = backUpArchiveService;
             _tableService = tableService;
@@ -64,49 +62,37 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _recommendService = recommendService;
         }
 
-        public async Task RunTimedTask(TimedTask item)
+        public async Task RunTimedTask(RunTimedTaskModel Model)
         {
-            if (item.IsRuning == true || item.IsPause == true)
-            {
-                return;
-            }
             try
             {
                 int maxNum = 0;
-                //更新执行状态
-                _timedTaskRepository.Clear();
-                item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
-                if (item != null)
-                {
-                    item.IsRuning = true;
-                    await _timedTaskRepository.UpdateAsync(item);
-                }
                 //根据不同类型任务进行调用
-                switch (item.Type)
+            switch ((TimedTaskType)Model.Type)
                 {
                     case TimedTaskType.UpdateGameSteamInfor:
-                        if(!int.TryParse(item.Parameter, out maxNum))
+                        if(!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 20;
                         }
                         await _storeInfoService.BatchUpdate(maxNum);
                         break;
                     case TimedTaskType.UpdateUserSteamInfor:
-                        if (!int.TryParse(item.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 10;
                         }
                         await _steamService.BatchUpdateUserSteamInfo(maxNum);
                         break;
                     case TimedTaskType.BackupEntry:
-                        if (!int.TryParse(item.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 10;
                         }
                         await _backUpArchiveService.BackUpAllEntries(maxNum);
                         break;
                     case TimedTaskType.BackupArticle:
-                        if (!int.TryParse(item.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 10;
                         }
@@ -128,7 +114,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _perfectionService.UpdateAllEntryPerfectionsAsync();
                         break;
                     case TimedTaskType.UpdateDataToElasticsearch:
-                        await _searchHelper.UpdateDataToSearchService(item.LastExecutedTime ?? DateTime.MinValue);
+                        await _searchHelper.UpdateDataToSearchService(Model.LastExecutedTime ?? DateTime.MinValue);
                         break;
                     case TimedTaskType.UpdateGameNews:
                         await _newsService.UpdateNewestGameNews();
@@ -143,7 +129,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _lotteryService.DrawAllLottery();
                         break;
                     case TimedTaskType.TransferAllMainImages:
-                        if (!int.TryParse(item.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 2;
                         }
@@ -153,7 +139,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _entryService.UpdateRoleBrithday();
                         break;
                     case TimedTaskType.PostAllBookingNotice:
-                        if (!int.TryParse(item.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 2;
                         }
@@ -163,36 +149,12 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _recommendService.Update();
                         break;
                 }
-                //记录执行时间
-                _timedTaskRepository.Clear();
-                item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
-                if (item != null)
-                {
-                    item.IsLastFail = false;
-                    item.IsRuning = false;
-                    item.LastExecutedTime = DateTime.Now.ToCstTime();
-                    await _timedTaskRepository.UpdateAsync(item);
-                }
-                _logger.LogInformation("成功执行定时任务：{name}", item.Name ?? item.Type.GetDisplayName());
+               
+                _logger.LogInformation("成功执行定时任务：{name}", Model.Note ?? ((TimedTaskType)Model.Type).GetDisplayName());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "执行定时任务失败：{name}", item.Name ?? item.Type.GetDisplayName());
-
-                _timedTaskRepository.Clear();
-                item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
-                if (item != null)
-                {
-                    item.IsLastFail = false;
-                    item.IsRuning = false;
-                    item.IsLastFail = true;
-                    item.LastExecutedTime = DateTime.Now.ToCstTime();
-                    await _timedTaskRepository.UpdateAsync(item);
-                }
-            }
-            finally
-            {
-
+                _logger.LogError(ex, "执行定时任务失败：{name}", Model.Note ?? ((TimedTaskType)Model.Type).GetDisplayName());
             }
         }
 

@@ -1,0 +1,31 @@
+version: "3"
+services:
+  timedtask:
+    image: littlefishtentears/cngalwebsitetimedtask:latest
+    container_name: timedtask
+    environment:
+      - TZ=${TZ}
+      # Ids 地址
+      - Authority=${Authority}
+      # 数据库连接字符串
+      - DefaultDBConnection=${DefaultDBConnection}
+      # 事件总线
+      - EventBus_HostName=${EventBus_HostName}
+      - EventBus_Port=${EventBus_Port}
+      - EventBus_UserName=${EventBus_UserName}
+      - EventBus_Password=${EventBus_Password}
+    hostname: timedtask
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+    ports:
+      - "3009:8081"
+      - "2009:8080"

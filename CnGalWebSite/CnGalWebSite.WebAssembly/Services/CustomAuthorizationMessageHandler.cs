@@ -15,7 +15,7 @@ namespace CnGalWebSite.WebAssembly.Services
             NavigationManager navigationManager)
             : base(provider, navigationManager)
         {
-            ConfigureHandler(authorizedUrls: new[] { ToolHelper.WebApiPath, ToolHelper.ImageApiPath });
+            ConfigureHandler(authorizedUrls: new[] { ToolHelper.WebApiPath, ToolHelper.ImageApiPath, ToolHelper.TaskApiPath });
         }
     }
 }

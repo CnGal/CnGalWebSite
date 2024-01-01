@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿
+using CnGalWebSite.TimedTask.Models.DataModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
+namespace CnGalWebSite.TimedTask.Models.ViewModels
 {
     public class TimedTaskOverviewModel
     {

@@ -38,6 +38,8 @@ namespace CnGalWebSite.DataModel.Helper
         public static string ImageApiPath = "https://api.cngal.top/";
         //public const string ImageApiPath = "http://localhost:5098/";
 
+        public static string TaskApiPath = "https://api.cngal.top/";
+
 
         public static bool IsMaui = false;
         public const bool IsApp = true;

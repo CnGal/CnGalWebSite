@@ -2,9 +2,13 @@
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.EventBus.Models;
+using CnGalWebSite.EventBus.Services;
+using CnGalWebSite.TimedTask.Models.DataModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,68 +17,53 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
     public class BackgroundTask : BackgroundService
     {
 
-        public IServiceProvider Services { get; }
+        private readonly IServiceProvider _serviceProvider;
 
-        public BackgroundTask(IServiceProvider services)
+        public BackgroundTask(IServiceProvider serviceProvider)
         {
-            Services = services;
+            _serviceProvider = serviceProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            using var scope = _serviceProvider.CreateScope();
+            var _logger = scope.ServiceProvider.GetRequiredService<ILogger<BackgroundTask>>();
+            var _applicationLifetime = scope.ServiceProvider.GetRequiredService<IHostApplicationLifetime>();
+            var _configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            var _eventBusService = scope.ServiceProvider.GetRequiredService<IEventBusService>();
+            var _timedTaskService = scope.ServiceProvider.GetRequiredService<ITimedTaskService>();
+            ConcurrentQueue<RunTimedTaskModel> _queue = new ConcurrentQueue<RunTimedTaskModel>();
+
+            try
             {
-                await new TaskFactory().StartNew(() =>
+
+                _logger.LogInformation("启动后台任务");
+
+                if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
                 {
-                    try
+                    _eventBusService.RecieveRunTimedTask(_queue.Enqueue);
+                }
+
+                while (true)
+                {
+                    if (!_queue.TryDequeue(out RunTimedTaskModel model))
                     {
-                        using var scope = Services.CreateScope();
-                        var _timedTaskRepository =
-                            scope.ServiceProvider
-                                .GetRequiredService<IRepository<TimedTask, int>>();
-                        var _timedTaskService =
-                           scope.ServiceProvider
-                               .GetRequiredService<ITimedTaskService>();
-
-                        var taskList = _timedTaskRepository.GetAllList(s => s.IsRuning == false && s.IsPause == false);
-
-                        foreach (var item in taskList)
-                        {
-                            switch (item.ExecuteType)
-                            {
-                                case TimedTaskExecuteType.IntervalTime:
-                                    if (item.LastExecutedTime != null && item.LastExecutedTime.Value.AddMinutes(item.IntervalTime) >= DateTime.Now.ToCstTime())
-                                    {
-                                        continue;
-                                    }
-                                    break;
-                                case TimedTaskExecuteType.EveryDay:
-                                    if (item.LastExecutedTime != null && item.LastExecutedTime.Value.Date >= DateTime.Now.ToCstTime().Date)
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        if (item.EveryTime.Value.TimeOfDay >= DateTime.Now.ToCstTime().TimeOfDay)
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    break;
-                            }
-                            _timedTaskService.RunTimedTask(item).Wait();
-                        }
+                        await Task.Delay(100, stoppingToken);
                     }
-                    catch
+                    else
                     {
-                        //错误处理
+                        await _timedTaskService.RunTimedTask(model);
                     }
+                }
 
-                    //定时任务休眠
-                    Thread.Sleep(60 * 1000);
-                }, stoppingToken);
             }
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "后台任务异常");
+                //关闭
+                _applicationLifetime.StopApplication();
+                //错误处理
+            }
         }
 
     }
