@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -35,6 +35,7 @@
     <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
     <ProjectReference Include="..\CnGalWebSite.EventBus\CnGalWebSite.EventBus.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj" />
     <ProjectReference Include="..\CnGalWebSite.TimedTask.Models\CnGalWebSite.TimedTask.Models.csproj" />
   </ItemGroup>
 

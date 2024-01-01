@@ -10,6 +10,7 @@ using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.TimedTask.Services;
 using System.Text.Json.Serialization;
 using CnGalWebSite.TimedTask.Extentions;
+using CnGalWebSite.HealthCheck.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,9 @@ app.UseCors(options =>
           .AllowAnyMethod()
           .AllowAnyHeader();
 });
+
+//添加状态检查终结点
+app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
 //添加身份验证中间件
 app.UseAuthentication();
