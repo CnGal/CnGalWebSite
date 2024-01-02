@@ -8,7 +8,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {
     public class WinnerOverviewModel
     {
-        public string UserId { get; set; }
+        /// <summary>
+        /// 用户Id
+        /// </summary>
+        public string Id { get; set; }
         /// <summary>
         /// 号码
         /// </summary>

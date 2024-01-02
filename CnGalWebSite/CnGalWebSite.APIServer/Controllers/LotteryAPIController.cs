@@ -854,7 +854,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         AwardName = item.Name,
                         Email = temp.ApplicationUser.Email,
                         PrizeId = temp.LotteryPrize?.Id ?? 0,
-                        UserId = temp.ApplicationUser.Id,
+                        Id = temp.ApplicationUser.Id,
                         UserName=temp.ApplicationUser.UserName,
                         AwardType=item.Type,
                         Number=temp.Number,
