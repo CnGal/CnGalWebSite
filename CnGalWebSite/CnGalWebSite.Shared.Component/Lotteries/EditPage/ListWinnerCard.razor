@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="WinnerOverviewModel" Headers="_headers" DataSource="Model" SortByItem="@nameof(WinnerOverviewModel.Number)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard"
+    <DataTableCard TModel="WinnerOverviewModel" Headers="_headers" DataSource="Model" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard"
                    Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.AwardName!=null&&s.AwardName.Contains(dataTableCard._search))|| (s.RealName!=null&&s.RealName.Contains(dataTableCard._search))|| (s.UserName!=null&&s.UserName.Contains(dataTableCard._search))|| (s.Email!=null&&s.Email.Contains(dataTableCard._search))">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -23,9 +23,9 @@
                     }
                 </div>
             }
-            else if (context.Header.Value == nameof(WinnerOverviewModel.UserName))
+            else if (context.Header.Value == nameof(WinnerOverviewModel.Id))
             {
-                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+                <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.Id" Name="@context.Item.UserName" />
             }
             else if (context.Header.Value == nameof(WinnerOverviewModel.AwardType))
             {
@@ -92,7 +92,7 @@
             Align= DataTableHeaderAlign.Start,
             Value= nameof(WinnerOverviewModel.Number)
           },
-          new (){ Text= "用户名", Value= nameof(WinnerOverviewModel.UserName)},
+          new (){ Text= "用户名", Value= nameof(WinnerOverviewModel.Id)},
           new (){ Text= "电子邮箱", Value= nameof(WinnerOverviewModel.Email)},
           new (){ Text= "类型", Value= nameof(WinnerOverviewModel.AwardType)},
           new (){ Text= "激活码", Value= nameof(WinnerOverviewModel.ActivationCode)},
@@ -143,7 +143,7 @@
             {
                 Context = tempStr,
                 LotteryAwardId = currentWinner.AwardId,
-                UserId = currentWinner.UserId
+                UserId = currentWinner.Id
             });
             if (obj.Successful)
             {
