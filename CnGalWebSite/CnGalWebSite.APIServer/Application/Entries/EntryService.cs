@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Nest;
 using NETCore.MailKit.Core;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -396,7 +397,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     }
                 }
-                if (isSame == false&& infor.IsDelete == false)
+                if (isSame == false && infor.IsDelete == false)
                 {
                     entry.Releases.Add(new GameRelease
                     {
@@ -413,7 +414,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
             //提取发行时间
-            var release = entry.Releases.OrderBy(s=>s.Time).FirstOrDefault(s =>s.Time!=null&& s.Type == GameReleaseType.Official);
+            var release = entry.Releases.OrderBy(s => s.Time).FirstOrDefault(s => s.Time != null && s.Type == GameReleaseType.Official);
             if (release != null)
             {
                 entry.PubulishTime = release.Time;
@@ -833,7 +834,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var isAdd = false;
                 foreach (var pic in pictures)
                 {
-                    if (pic.Url == item.Url&&pic.Type== item.Type)
+                    if (pic.Url == item.Url && pic.Type == item.Type)
                     {
                         if (item.IsDelete == true)
                         {
@@ -1146,7 +1147,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
                 IsHideOutlink = entry.IsHideOutlink,
-                Template=entry.Template
+                Template = entry.Template
             };
 
             //查看是否有配音
@@ -1167,7 +1168,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             //初始化主页Html代码
-            model.MainPage =renderMarkdown? _appHelper.MarkdownToHtml(entry.MainPage ?? ""):entry.MainPage;
+            model.MainPage = renderMarkdown ? _appHelper.MarkdownToHtml(entry.MainPage ?? "") : entry.MainPage;
 
             //读取词条信息
             //添加别称到附加信息
@@ -1175,9 +1176,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 model.Information.Add(new EntryInformationModel
                 {
-                    Icon= "mdi-card-account-details-outline",
+                    Icon = "mdi-card-account-details-outline",
                     Name = "别称",
-                    Value = model.AnotherName,                     
+                    Value = model.AnotherName,
                 });
             }
             //添加角色CV
@@ -1196,20 +1197,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.Information.Add(new EntryInformationModel
                     {
-                        Icon= "mdi-microphone",
+                        Icon = "mdi-microphone",
                         Name = "配音",
                         Value = cvs.ToString()
                     });
                 }
 
             }
-            
+
 
             var informationTypes = await _entryInformationTypeRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
             foreach (var item in entry.Information)
             {
                 var info = informationTypes.FirstOrDefault(s => s.Name == item.DisplayName);
-                if(info!=null)
+                if (info != null)
                 {
                     model.Information.Add(new EntryInformationModel
                     {
@@ -1219,18 +1220,22 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     });
                 }
             }
+            var relstionsAndStaffs = new List<Entry>();
+            relstionsAndStaffs.AddRange(entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation));
+            relstionsAndStaffs.AddRange(entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation != null).Select(s => s.ToEntryNavigation));
+            relstionsAndStaffs = relstionsAndStaffs.GroupBy(s => s.Id).Select(s => s.First()).ToList();
             //添加制作组发行商QQ群
             if (entry.Type == EntryType.Game)
             {
-                var qqIcon = informationTypes.FirstOrDefault(s => s.Name== "QQ群").Icon;
-                var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral== PositionGeneralType.Publisher|| s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
-                foreach (var item in entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation).Where(s => publisherIds.Contains(s.Id) && s.Information.Any(s=>s.DisplayName=="QQ群"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false)))
+                var qqIcon = informationTypes.FirstOrDefault(s => s.Name == "QQ群").Icon;
+                var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
+                foreach (var item in relstionsAndStaffs.Where(s => publisherIds.Contains(s.Id) && s.Information.Any(s => s.DisplayName == "QQ群" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)))
                 {
                     model.Information.Add(new EntryInformationModel
                     {
                         Name = model.Information.Any(s => s.Name == "QQ群") ? item.DisplayName : "QQ群",
-                        Icon= model.Information.Any(s=>s.Name== "QQ群")? "mdi-vector-point" : qqIcon,
-                        Value = model.Information.Any(s => s.Name == "QQ群") ? item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue : $"{ item.Information.FirstOrDefault(s=>s.DisplayName== "QQ群").DisplayValue} ({item.DisplayName})"
+                        Icon = model.Information.Any(s => s.Name == "QQ群") ? "mdi-vector-point" : qqIcon,
+                        Value = model.Information.Any(s => s.Name == "QQ群") ? item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue : $"{item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue} ({item.DisplayName})"
                     });
                 }
             }
@@ -1248,7 +1253,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Time = item.Time,
                     TimeNote = item.TimeNote,
                     Type = item.Type,
-                    StoreInfor = await _storeInfoService.Get(item.PublishPlatformType, item.PublishPlatformName, item.Link,item.Name, entry.Id)
+                    StoreInfor = await _storeInfoService.Get(item.PublishPlatformType, item.PublishPlatformName, item.Link, item.Name, entry.Id)
                 };
 
                 model.Releases.Add(infor);
@@ -1576,11 +1581,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 });
             }
             //查找发行商制作组的信息
-            if(entry.Type == EntryType.Game)
+            if (entry.Type == EntryType.Game)
             {
                 var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
 
-                foreach (var item in entry.EntryRelationFromEntryNavigation.Where(s => publisherIds.Contains(s.ToEntry)).Select(s=>s.ToEntryNavigation))
+                foreach (var item in relstionsAndStaffs.Where(s => publisherIds.Contains(s.Id)))
                 {
                     relevanceOther.AddRange(item.Outlinks.Select(s => new RelevancesKeyValueModel
                     {
@@ -1592,7 +1597,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //官网补充信息
-            if(entry.WebsiteAddInfor!=null)
+            if (entry.WebsiteAddInfor != null)
             {
                 model.WebsiteAddInfor = new EntryWebsiteViewModel
                 {
@@ -1602,7 +1607,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         Priority = s.Priority,
                         Type = s.Type,
                         Url = s.Url,
-                        Size=s.Size
+                        Size = s.Size
                     }).ToList(),
                     Html = entry.WebsiteAddInfor.Html,
                     Introduction = entry.WebsiteAddInfor.Introduction,
@@ -1618,7 +1623,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.Pictures = picturesViewModels;
             model.ArticleRelevances = relevanceArticle;
             model.EntryRelevances = relevancesEntry;
-            model.OtherRelevances = relevanceOther.OrderBy(s=>s.DisplayName).ToList();
+            model.OtherRelevances = relevanceOther.OrderBy(s => s.DisplayName).ToList();
             model.Tags = tags;
             model.Roles = roleInforModel;
             model.StaffGames = staffGames;
@@ -1792,7 +1797,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         entryAddInfor.Booking.Goals.Add(new EditBookingGoal
                         {
                             Target = infor.Target,
-                            Name=infor.Name,
+                            Name = infor.Name,
                             IsDelete = false
                         });
                     }
@@ -1889,7 +1894,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (item.PublishPlatformName == infor.PublishPlatformName && item.PublishPlatformType == infor.PublishPlatformType && item.Link == infor.Link && item.Name == infor.Name)
                     {
-                        if ( item.Type != infor.Type || item.Time != infor.Time || item.TimeNote != infor.TimeNote || item.Engine != infor.Engine || item.GamePlatformTypes.SequenceEqual(infor.GamePlatformTypes)==false)
+                        if (item.Type != infor.Type || item.Time != infor.Time || item.TimeNote != infor.TimeNote || item.Engine != infor.Engine || item.GamePlatformTypes.SequenceEqual(infor.GamePlatformTypes) == false)
                         {
                             item.Type = infor.Type;
                             item.Time = infor.Time;
@@ -2220,7 +2225,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Duration = item.Duration,
                     Name = item.Name,
                     Priority = item.Priority,
-                    Thumbnail=item.Thumbnail,
+                    Thumbnail = item.Thumbnail,
                     IsDelete = true
                 });
             }
@@ -2298,7 +2303,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     var isSame = false;
                     foreach (var item in entryWebsite.Images)
                     {
-                        if (item.Url == infor.Url&&item.Type==infor.Type)
+                        if (item.Url == infor.Url && item.Type == infor.Type)
                         {
                             if (item.Size != infor.Size || item.Priority != infor.Priority || item.Note != infor.Note)
                             {
@@ -2324,7 +2329,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             Note = infor.Note,
                             Type = infor.Type,
                             Url = infor.Url,
-                            Size=infor.Size,
+                            Size = infor.Size,
                             IsDelete = false
                         });
                     }
@@ -2333,7 +2338,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 //主要信息
                 entryWebsite.MainInfor = ToolHelper.GetEditingRecordFromContrastData(currentEntry.WebsiteAddInfor, newEntry.WebsiteAddInfor);
             }
-            if (entryWebsite.Images.Any() || entryWebsite.MainInfor.Any() )
+            if (entryWebsite.Images.Any() || entryWebsite.MainInfor.Any())
             {
                 examines.Add(new KeyValuePair<object, Operation>(entryWebsite, Operation.EstablishWebsite));
             }
@@ -2368,7 +2373,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 DisplayName = entry.DisplayName,
                 AnotherName = entry.AnotherName,
                 SmallBackgroundPicture = entry.SmallBackgroundPicture,
-                Template=entry.Template,
+                Template = entry.Template,
                 Id = entry.Id
             };
 
@@ -2397,8 +2402,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }).ToList();
             foreach (var item in entry.Information)
             {
-               var info= model.Informations.FirstOrDefault(s => s.Name == item.DisplayName);
-                if(info!=null)
+                var info = model.Informations.FirstOrDefault(s => s.Name == item.DisplayName);
+                if (info != null)
                 {
                     info.Value = item.DisplayValue;
                     info.Id = item.Id;
@@ -2498,7 +2503,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     text.Append(item.CustomName);
                 }
-                if(cvs.IndexOf(item)!= cvs.Count-1)
+                if (cvs.IndexOf(item) != cvs.Count - 1)
                 {
                     text.Append('、');
                 }
@@ -2676,12 +2681,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 model.Audio.Add(new EditAudioAloneModel
                 {
-                    BriefIntroduction=item.BriefIntroduction,
-                    Name=item.Name,
-                    Priority=item.Priority,
-                    Url=item.Url,
-                    Duration=item.Duration,
-                    Thumbnail=item.Thumbnail
+                    BriefIntroduction = item.BriefIntroduction,
+                    Name = item.Name,
+                    Priority = item.Priority,
+                    Url = item.Url,
+                    Duration = item.Duration,
+                    Thumbnail = item.Thumbnail
                 });
             }
 
@@ -2696,7 +2701,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 Id = entry.Id,
             };
 
-            if(entry.WebsiteAddInfor==null)
+            if (entry.WebsiteAddInfor == null)
             {
                 return model;
             }
@@ -2717,7 +2722,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Note = item.Note,
                     Priority = item.Priority,
                     Type = item.Type,
-                    Size=item.Size
+                    Size = item.Size
                 });
             }
 
@@ -2739,18 +2744,18 @@ namespace CnGalWebSite.APIServer.Application.Entries
             newEntry.Template = model.Template;
         }
 
-        public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model,int lotteryId)
+        public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model, int lotteryId)
         {
             newEntry.Information.Clear();
             newEntry.Releases.Clear();
             newEntry.EntryStaffFromEntryNavigation.Clear();
             //获取基础信息
-            newEntry.Information= model.Informations.Where(s=>string.IsNullOrWhiteSpace(s.Name)==false&& string.IsNullOrWhiteSpace(s.Value) == false).Select(s => new BasicEntryInformation
+            newEntry.Information = model.Informations.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.Value) == false).Select(s => new BasicEntryInformation
             {
                 Id = s.Id,
                 DisplayName = s.Name,
                 DisplayValue = s.Value,
-                Modifier= "基本信息"
+                Modifier = "基本信息"
             }).ToList();
             //根据类别进行序列化操作
             switch (model.Type)
@@ -2805,7 +2810,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //预约
             newEntry.Booking ??= new Booking();
             newEntry.Booking.Goals.Clear();
-            foreach(var item in model.Booking.Goals)
+            foreach (var item in model.Booking.Goals)
             {
                 newEntry.Booking.Goals.Add(new BookingGoal
                 {
@@ -2886,7 +2891,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Priority = item.Priority,
                     Url = item.Url,
                     Duration = item.Duration,
-                    Thumbnail=item.Thumbnail
+                    Thumbnail = item.Thumbnail
                 });
 
             }
@@ -2913,7 +2918,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Url = item.Image,
                     Note = item.Note,
                     Type = item.Type,
-                    Size=item.Size
+                    Size = item.Size
                 });
             }
         }
@@ -2938,7 +2943,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
 
-                    if (newEntry.EntryStaffFromEntryNavigation.Any(s => s.ToEntry == publisherEntry?.Id && s.Name == (publisherEntry == null ? publisher : null)&&s.PositionGeneral==type))
+                    if (newEntry.EntryStaffFromEntryNavigation.Any(s => s.ToEntry == publisherEntry?.Id && s.Name == (publisherEntry == null ? publisher : null) && s.PositionGeneral == type))
                     {
                         continue;
                     }
@@ -2964,7 +2969,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var roles = await _entryRepository.GetAll().AsNoTracking()
                .Include(s => s.Information)
                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-               .Where(s => s.Type == EntryType.Role && s.Information.Any(s => s.DisplayName == "生日"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false))
+               .Where(s => s.Type == EntryType.Role && s.Information.Any(s => s.DisplayName == "生日" && string.IsNullOrWhiteSpace(s.DisplayValue) == false))
                .Select(s => new
                {
                    s.Id,
@@ -2973,7 +2978,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                })
                .ToListAsync();
 
-            foreach(var item in roles)
+            foreach (var item in roles)
             {
                 DateTime day;
                 try
@@ -2981,14 +2986,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     var temp = item.Brithday.Replace("日", "").Split("月");
                     day = new DateTime(2020, int.Parse(temp[0]), int.Parse(temp[1]), 0, 0, 0, DateTimeKind.Utc);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    _logger.LogError(ex,"更新角色 - {name}({id}) 生日时，转换日期（{day}）失败", item.Name, item.Id, item.Brithday);
+                    _logger.LogError(ex, "更新角色 - {name}({id}) 生日时，转换日期（{day}）失败", item.Name, item.Id, item.Brithday);
                     continue;
                 }
-               
+
                 var brithday = await _roleBirthdayRepository.GetAll().FirstOrDefaultAsync(s => s.RoleId == item.Id);
-                if(brithday==null)
+                if (brithday == null)
                 {
                     brithday = new RoleBirthday
                     {
@@ -2996,11 +3001,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         Birthday = day
                     };
 
-                  
+
                     await _roleBirthdayRepository.InsertAsync(brithday);
                     _logger.LogError("添加角色 - {name}({id}) 生日：{brithday}", item.Name, item.Id, item.Brithday);
                 }
-                else if(brithday.Birthday != day)
+                else if (brithday.Birthday != day)
                 {
                     brithday.Birthday = day;
                     await _roleBirthdayRepository.UpdateAsync(brithday);
@@ -3014,14 +3019,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
         /// 获取今天生日的角色
         /// </summary>
         /// <returns></returns>
-        public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day=0)
+        public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day = 0)
         {
             List<RoleBrithdayViewModel> model = new List<RoleBrithdayViewModel>();
             var date = DateTime.UtcNow;
 
             var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
-                .Include(s => s.Role).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
-                .Where(s=>s.Birthday.Date.Month==month&&(day==0||s.Birthday.Date.Day==day))
+                .Include(s => s.Role).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s => s.Birthday.Date.Month == month && (day == 0 || s.Birthday.Date.Day == day))
                 .ToListAsync();
 
             foreach (var role in roles)
@@ -3031,7 +3036,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 entry.Brithday = role.Birthday;
 
                 model.Add(entry);
-                 
+
             }
 
             return model;
@@ -3049,7 +3054,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //查找基础信息
-            roleModel.StandingPainting =_appHelper.GetImagePath(entry.MainPicture, "");
+            roleModel.StandingPainting = _appHelper.GetImagePath(entry.MainPicture, "");
             if (entry.Information != null && entry.Information.Any())
             {
                 roleModel.Age = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "年龄")?.DisplayValue;
@@ -3085,7 +3090,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }).ToListAsync();
 
             List<string> userIds = new List<string>();
-            foreach(var item in entries)
+            foreach (var item in entries)
             {
                 var htmlContent = _viewRenderService.Render("~/Models/BookingMsgView.cshtml", new BookingMsgViewModel
                 {
@@ -3098,9 +3103,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 foreach (var infor in item.Users)
                 {
-                    _emailService.Send(infor.Email, $"《{item.DisplayName}》已发布", htmlContent,true);
+                    _emailService.Send(infor.Email, $"《{item.DisplayName}》已发布", htmlContent, true);
                     userIds.Add(infor.Id);
-                    if(userIds.Count> max)
+                    if (userIds.Count > max)
                     {
                         break;
                     }
