@@ -334,7 +334,6 @@
 
         #home-page .latest-videoes-card .image {
             width: 15rem !important;
-            height: min-content;
         }
 
         #home-page .latest-videoes-card .content {
@@ -454,7 +453,6 @@
     #home-page .plain-text-card.item img {
         min-width: 25rem !important;
         width: 25rem !important;
-        height: fit-content;
     }
 
     #home-page .plain-text-card.item .content {
