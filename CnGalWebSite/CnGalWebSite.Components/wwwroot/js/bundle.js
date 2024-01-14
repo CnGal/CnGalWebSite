@@ -657,19 +657,18 @@ function getUserAgent()
 }
 
 /*以下为加载时自动执行的代码*/
-if (typeof Blazor != "undefined") {
-    Blazor.start({
-        reconnectionOptions: {
-            maxRetries: 3,
-            retryIntervalMilliseconds: 2000
-        }
-    });
-}
+//if (typeof Blazor != "undefined") {
+//    Blazor.start({
+//        reconnectionOptions: {
+//            maxRetries: 3,
+//            retryIntervalMilliseconds: 2000
+//        }
+//    });
+//}
 
 function onreload() {
     location.reload();
 }
-
 /*检测浏览器版本*/
 function browserVersion() {
     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
@@ -685,7 +684,7 @@ function browserVersion() {
     } else if (isIE11) {
         return 1;
     } else if (isEdge) {
-        if (userAgent.split('Edge/')[1].split('.')[0] < 16) {
+        if (userAgent.split('Edge/')[1].split('.')[0] < 91) {
             return 1;
         }
         else {
@@ -699,21 +698,21 @@ function browserVersion() {
             return 0;
         }
     } else if (isOpera) {
-        if (userAgent.split('OPR/')[1].split('.')[0] < 44) {
+        if (userAgent.split('OPR/')[1].split('.')[0] < 70) {
             return 1;
         }
         else {
             return 0;
         }
     } else if (isChrome) {
-        if (userAgent.split('Chrome/')[1].split('.')[0] < 56) {
+        if (userAgent.split('Chrome/')[1].split('.')[0] < 91) {
             return 1;
         }
         else {
             return 0;
         }
     } else if (isSafari) {
-        if (userAgent.split('Safari/')[1].split('.')[0] < 11) {
+        if (userAgent.split('Safari/')[1].split('.')[0] < 15) {
             return 1;
         }
         else {
@@ -724,10 +723,8 @@ function browserVersion() {
     }
 }
 
-browserVersion();
-
 if (browserVersion() == 1) {
-    alert("貌似这个网站不支持你的浏览器哦\n你可以选择安装Edge，Chorme，Firefox或其他支持最新Web标准的浏览器，再重新进入\n如果使用的是QQ浏览器或360极速浏览器，请右击网页，选择极速模式，并重新打开标签页\n有任何疑问可以加群 761794704 进行反馈");
+    alert("浏览器版本过低，网页可能无法正确展示\n你可以尝试安装 Edge，Chorme，Firefox 的最新版本后重试\n有任何疑问可以加群 761794704 进行反馈");
 }
 
 
