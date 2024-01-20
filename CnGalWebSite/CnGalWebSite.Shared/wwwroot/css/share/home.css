@@ -775,6 +775,10 @@
     font-weight: bold;
 }
 
+#home-page .latast-comments-card .text img {
+    aspect-ratio: unset!important;
+}
+
 #home-page .latast-comments-card .time {
     text-align: end;
 }

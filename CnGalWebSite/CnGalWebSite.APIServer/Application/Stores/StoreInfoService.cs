@@ -3,10 +3,13 @@ using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.DataModel.ViewModel.Stores;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using Senparc.Weixin.MP.AdvancedAPIs.Card;
 using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace CnGalWebSite.APIServer.Application.Stores
 {
@@ -67,6 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
             var steams = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Where(s => s.UpdateTime.Date < date && s.State != StoreState.Takedown && s.UpdateType == StoreUpdateType.Automatic && s.Entry.PubulishTime != null && s.Entry.PubulishTime < date)
+                .Where(s => s.PlatformType == PublishPlatformType.Steam)
                 .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
                 .Take(max)
                 .ToListAsync();
@@ -114,7 +118,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
             switch (storeInfo.PlatformType)
             {
                 case PublishPlatformType.Steam:
-                    await UpdateFromSteam(storeInfo);
+                    await UpdateSteamInfo(storeInfo);
                     break;
                 default:
                     return;
@@ -125,47 +129,99 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
             await _storeInfoRepository.UpdateAsync(storeInfo);
 
-            _logger.LogInformation("更新平台 - {platformType}, Id/链接 - {link}, 词条 - {id} 的商店信息", storeInfo.PlatformType == PublishPlatformType.Other ? storeInfo.PlatformName : storeInfo.PlatformType.GetDisplayName(), storeInfo.Link, storeInfo.EntryId);
+            _logger.LogInformation("更新平台 - {platformType}, Id/链接 - {link}, 游戏 - {name}({id}) 的商店信息", storeInfo.PlatformType == PublishPlatformType.Other ? storeInfo.PlatformName : storeInfo.PlatformType.GetDisplayName(), storeInfo.Link, storeInfo.Name, storeInfo.EntryId);
         }
 
         #region Steam
 
         /// <summary>
-        /// 更新Steam信息
+        /// 更新Steam的商店信息
         /// </summary>
         /// <param name="storeInfo"></param>
         /// <returns></returns>
-        public async Task UpdateFromSteam(StoreInfo storeInfo)
+        public async Task UpdateSteamInfo(StoreInfo storeInfo)
         {
-            //判断是否下架
-            if (storeInfo.State == StoreState.Takedown)
+            var data = new StoreInfo
             {
-                return;
-            }
+                Name = storeInfo.Name,
+                Link = storeInfo.Link,
+            };
+            var officalApiTask = UpdateSteamInfoFromOfficialAPI(data);
+            var officalHtmlTask = UpdateSteamInfoFromOfficialHtml(data);
+            var isthereanydealTask = UpdateSteamInfoFromIsthereanydeal(data);
+            var xiaoHeiHeTask = UpdateSteamInfoFromXiaoHeiHe(data);
+            var gamalyticTask = UpdateSteamInfoFromGamalytic(data);
 
-            //判断是否为免费游戏
-            //if (storeInfo.OriginalPrice != 0)
-            {
-                await UpdateSteamInforByRemoteAPI(storeInfo);
-            }
+            await Task.WhenAll(officalApiTask, officalHtmlTask, isthereanydealTask, xiaoHeiHeTask, gamalyticTask);
 
-            //获取附加信息
-            if (storeInfo.State == StoreState.OnSale)
-            {
-                await GetSteamAdditionInformationAsync(storeInfo);
-            }
+            storeInfo.State = data.State;
+            storeInfo.PriceLowest = data.PriceLowest;
+            storeInfo.OriginalPrice = data.OriginalPrice;
+            storeInfo.PriceNow = data.PriceNow;
+            storeInfo.CutNow = data.CutNow;
+            storeInfo.CutLowest = data.CutLowest;
+            storeInfo.PlayTime = data.PlayTime;
+            storeInfo.EvaluationCount = data.EvaluationCount;
+            storeInfo.RecommendationRate = data.RecommendationRate;
+            storeInfo.EstimationOwnersMax = data.EstimationOwnersMax;
+            storeInfo.EstimationOwnersMin = data.EstimationOwnersMin;
         }
 
-        public async Task GetSteamEvaluationAsync(StoreInfo steam)
+        /// <summary>
+        /// 使用Steam官方API获取信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateSteamInfoFromOfficialAPI(StoreInfo storeInfo)
         {
             try
             {
-                var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + steam.Link);
+                var json = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + storeInfo.Link + "&cc=cn&filters=price_overview");
+                var re = JObject.Parse(json);
+                var data = re[storeInfo.Link].ToObject<SteamOfficialDataModel>();
+                if (!data.Success)
+                {
+                    //storeInfo.State = StoreState.Takedown;
+                    _logger.LogError("获取 {name} - {id} Steam官方API数据失败", storeInfo.Name, storeInfo.Link);
+                    return;
+                }
+                //原价
+                storeInfo.OriginalPrice ??= data.Data.Price_overview.Initial * 0.01;
+                //现价
+                storeInfo.PriceNow ??= data.Data.Price_overview.Final * 0.01;
+                //折扣
+                storeInfo.CutNow ??= data.Data.Price_overview.Discount_percent;
+                //状态
+                if (storeInfo.State == StoreState.None)
+                {
+                    storeInfo.State = StoreState.OnSale;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取 {name} - {id} Steam官方API数据失败", storeInfo.Name, storeInfo.Link);
+            }
+        }
+
+        /// <summary>
+        /// 使用 Steam 商店页面的数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task UpdateSteamInfoFromOfficialHtml(StoreInfo storeInfo)
+        {
+            try
+            {
+                var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + storeInfo.Link);
 
                 var document = new HtmlDocument();
                 document.LoadHtml(content);
 
                 var node = document.GetElementbyId("userReviews");
+                if(node == null)
+                {
+                    _logger.LogError("获取 {name} - {id} Steam商店页面数据失败", storeInfo.Name, storeInfo.Link);
+                    return;
+                }
                 var text = node.ChildNodes.Count > 3
                     ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
                     : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
@@ -174,203 +230,160 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
                 if (int.TryParse(countStr, out int evaluationCount))
                 {
-                    steam.EvaluationCount = evaluationCount;
+                    storeInfo.EvaluationCount ??= evaluationCount;
 
                 }
                 if (int.TryParse(rateStr, out int recommendationRate))
                 {
-                    steam.RecommendationRate = recommendationRate;
+                    storeInfo.RecommendationRate ??= recommendationRate;
                 }
 
 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Id：{id} 获取Steam页面评测数据失败", steam.Link);
-            }
-        }
-
-
-        /// <summary>
-        /// 获取Steam附加信息
-        /// </summary>
-        /// <param name="steam"></param>
-        /// <returns></returns>
-        public async Task GetSteamAdditionInformationAsync(StoreInfo steam)
-        {
-            try
-            {
-                var content = await (await _httpService.GetClientAsync()).GetStringAsync(_configuration["SteamspyUrl"] + "api.php?request=appdetails&appid=" + steam.Link);
-                var json = JObject.Parse(content);
-
-                steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
-                if (steam.EvaluationCount == 0)
-                {
-                    await GetSteamEvaluationAsync(steam);
-                }
-                if (steam.EvaluationCount != 0)
-                {
-                    steam.RecommendationRate = json["positive"].ToObject<int>() * 100.0 / steam.EvaluationCount;
-                }
-
-
-                var minutes = json["average_forever"].ToObject<int>();
-                if (minutes > 3000)
-                {
-                    steam.PlayTime = 0;
-                }
-                else
-                {
-                    steam.PlayTime = minutes;
-                }
-
-
-                var times = json["owners"].ToObject<string>().Split("..");
-
-                steam.EstimationOwnersMin = int.Parse(times[0].Replace(" ", "").Replace(",", ""));
-                steam.EstimationOwnersMax = int.Parse(times[1].Replace(" ", "").Replace(",", ""));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Id：{id} 获取SteamspyAPI数据失败", steam.Link);
-                await GetSteamEvaluationAsync(steam);
+                _logger.LogError(ex, "获取 {name} - {id} Steam商店页面数据失败", storeInfo.Name, storeInfo.Link);
             }
         }
 
         /// <summary>
-        /// 获取Steam价格
+        /// 使用 isthereanydeal API获取信息
         /// </summary>
-        /// <param name="steam"></param>
+        /// <param name="storeInfo"></param>
         /// <returns></returns>
-        private async Task UpdateSteamInforByRemoteAPI(StoreInfo steam)
+        public async Task UpdateSteamInfoFromIsthereanydeal(StoreInfo storeInfo)
         {
-            //获取信息
-
-            var jsonContent = await (await _httpService.GetClientAsync()).GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steam.Link + "&allowed=steam");
-
-            var thirdResult = JObject.Parse(jsonContent);
-            var steamNowJson = new SteamNowJson();
-            var steamLowestJson = new SteamLowestJson();
-
-            if (thirdResult["data"]["app/" + steam.Link]["lowest"].Any())
-            {
-                steamLowestJson = thirdResult["data"]["app/" + steam.Link]["lowest"].ToObject<SteamLowestJson>();
-            }
-            JObject officialResult = null;
             try
             {
-                //尝试使用官方api获取信息
-                jsonContent = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steam.Link + "&cc=cn&filters=price_overview");
-                officialResult = JObject.Parse(jsonContent);
+                var json = await (await _httpService.GetClientAsync()).GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + storeInfo.Link + "&allowed=steam");
+                var re = JObject.Parse(json);
+                var data = re["data"][$"app/{storeInfo.Link}"].ToObject<IsthereanydealDataModel>();
+                if (data.Price != null)
+                {
+                    //原价
+                    storeInfo.OriginalPrice ??= data.Price.Cut == 100 ? 0 : data.Price.Price / (100 - data.Price.Cut);
+                    //现价
+                    storeInfo.PriceNow ??= data.Price.Price;
+                    //折扣
+                    storeInfo.CutNow ??= data.Price.Cut;
+                }
+                if (data.Lowest != null)
+                {
+                    //历史最低
+                    storeInfo.PriceLowest ??= data.Lowest.Price;
+                    //历史最高折扣
+                    storeInfo.CutLowest ??= data.Lowest.Cut;
+                }
+                //状态
+                if (storeInfo.State == StoreState.None)
+                {
+                    if (data.Price != null && data.Lowest != null)
+                    {
+                        storeInfo.State = StoreState.OnSale;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Id:{id} 获取Steam官方API数据失败", steam.Link);
-            }
-
-            if (officialResult != null && officialResult[steam.Link.ToString()]["success"].ToObject<bool>() == true)
-            {
-                if (officialResult[steam.Link.ToString()]["data"].Any())
-                {
-                    var discount_percent = officialResult[steam.Link.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
-                    var final = officialResult[steam.Link.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
-                    var final_formatted = officialResult[steam.Link.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
-
-                    steamNowJson = new SteamNowJson
-                    {
-                        price = int.Parse(final) * 0.01,
-                        cut = int.Parse(discount_percent),
-                        price_formatted = final_formatted
-                    };
-
-                }
-            }
-            else
-            {
-                if (thirdResult["data"]["app/" + steam.Link]["price"].Any())
-                {
-                    steamNowJson = thirdResult["data"]["app/" + steam.Link]["price"].ToObject<SteamNowJson>();
-                }
-            }
-
-            //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
-
-            //当前价格
-            if (steamNowJson.price == null)
-            {
-                //判断是否 无法获取数据
-                if (steamLowestJson.price != null)
-                {
-                    //已发布
-                    steam.State = StoreState.OnSale;
-
-                    steam.PriceNow = null;
-                    steam.CutNow = null;
-
-                    steam.CutLowest = steamLowestJson.cut;
-                    steam.PriceLowest = steamLowestJson.price;
-
-                    //计算原价
-                    if (steam.CutLowest == 100)
-                    {
-                        steam.OriginalPrice = steam.PriceLowest;
-                    }
-                    steam.OriginalPrice = (int)(steam.PriceLowest / (1 - ((double)steam.CutLowest / 100)));
-
-
-                }
-                else
-                {
-                    //未发布
-                    steam.State = StoreState.NotPublished;
-
-                    steam.PriceNow = null;
-                    steam.CutNow = null;
-
-                    steam.PriceLowest = null;
-                    steam.CutLowest = null;
-                }
-            }
-            else
-            {
-                //已发布
-                steam.State = StoreState.OnSale;
-
-                steam.PriceNow = steamNowJson.price;
-
-                steam.CutNow = steamNowJson.cut;
-
-                steam.CutLowest = steamLowestJson.cut;
-
-                //计算原价
-                //当前价格 = 原价 * （1 - 折扣）
-                //原价 = 当前价格 / （1 - 折扣）
-                if (steam.CutNow == 100)
-                {
-                    steam.OriginalPrice = steam.PriceNow;
-                }
-                steam.OriginalPrice = (int)(steam.PriceNow / (1 - ((double)steam.CutNow / 100)));
-
-                //计算史低价格
-                if (steamLowestJson.price != null)
-                {
-                    steam.PriceLowest = steam.CutLowest >= 0 ? (int)(steam.OriginalPrice * (1 - ((double)steam.CutLowest / 100))) : steam.OriginalPrice;
-
-                    //比较是否偏差较大
-                    if (Math.Abs((steam.PriceLowest.Value / 100) - steamLowestJson.price.Value) > 2)
-                    {
-                        steam.PriceLowest = steamLowestJson.price;
-                    }
-                }
-                else
-                {
-                    steam.PriceLowest = null;
-                    steam.CutLowest = null;
-                }
+                _logger.LogError(ex, "获取 {name} - {id} isthereanydeal 数据失败", storeInfo.Name, storeInfo.Link);
             }
         }
 
+        /// <summary>
+        /// 使用 小黑盒 API获取信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateSteamInfoFromXiaoHeiHe(StoreInfo storeInfo)
+        {
+            try
+            {
+                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>("https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid=" + storeInfo.Link);
+                if (data.Status != "ok")
+                {
+                    _logger.LogError("获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
+                    return;
+                }
+                if (data.Result.Is_free)
+                {
+                    //原价
+                    storeInfo.OriginalPrice ??= 0;
+                    //现价
+                    storeInfo.PriceNow ??= 0;
+                    //折扣
+                    storeInfo.CutNow ??= 0;
+                    //历史最低
+                    storeInfo.PriceLowest ??= 0;
+                    //历史最高折扣
+                    storeInfo.CutLowest ??= 0;
+                    //状态
+                    if (storeInfo.State == StoreState.None)
+                    {
+                        storeInfo.State = StoreState.OnSale;
+                    }
+                }
+                else if (data.Result.Price != null)
+                {
+                    //原价
+                    storeInfo.OriginalPrice ??= double.Parse(data.Result.Price.Initial);
+                    //现价
+                    storeInfo.PriceNow ??= double.Parse(data.Result.Price.Current);
+                    //折扣
+                    storeInfo.CutNow ??= data.Result.Price.Discount;
+                    //历史最低
+                    storeInfo.PriceLowest ??= double.Parse(data.Result.Price.Lowest_price_raw);
+                    //历史最高折扣
+                    storeInfo.CutLowest ??= data.Result.Price.Lowest_discount;
+                    //状态
+                    if (storeInfo.State == StoreState.None)
+                    {
+                        storeInfo.State = StoreState.OnSale;
+                    }
+                }
+                if (data.Result.Positive_desc?.Contains('%') ?? false)
+                {
+                    storeInfo.RecommendationRate ??= int.Parse(data.Result.Positive_desc.MidStrEx("：", "%"));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
+            }
+        }
 
+        /// <summary>
+        /// 使用 Gamalytic API获取信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateSteamInfoFromGamalytic(StoreInfo storeInfo)
+        {
+            try
+            {
+                var data = await _httpService.GetAsync<GamalyticDataModel>("https://api.gamalytic.com/game/" + storeInfo.Link);
+
+                //评测数
+                storeInfo.EvaluationCount ??= data.ReviewsSteam;
+                //好评率
+                storeInfo.RecommendationRate ??= data.ReviewScore;
+                //平均游玩时长
+                storeInfo.PlayTime ??= (int)(data.AvgPlaytime * 60);
+                //估计拥有人数上限
+                storeInfo.EstimationOwnersMax ??= (int)(data.Owners * (2 - data.Accuracy));
+                //估计拥有人数下限
+                storeInfo.EstimationOwnersMin ??= (int)(data.Owners * (data.Accuracy));
+
+                //状态
+                if (storeInfo.State == StoreState.None && data.Unreleased)
+                {
+                    storeInfo.State = StoreState.NotPublished;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取 {name} - {id} gamalytic 数据失败", storeInfo.Name, storeInfo.Link);
+            }
+        }
 
         #endregion
     }

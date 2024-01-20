@@ -15,6 +15,7 @@ using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.Application.Votes;
@@ -38,6 +39,7 @@ using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.TimedTask.Models.DataModels;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -128,6 +130,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ISteamInforService _steamInforService;
         private readonly IEditRecordService _editRecordService;
         private readonly IVideoService _videoService;
+        private readonly ITimedTaskService _timedTaskService;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
         private readonly IRepository<Almanac, long> _almanacRepository;
         private readonly IRepository<AlmanacArticle, long> _almanacArticleRepository;
@@ -144,7 +147,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
-        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
+        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository, ITimedTaskService timedTaskService,
         IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<Almanac, long> almanacRepository,
         IRepository<PerfectionOverview, long> perfectionOverviewRepository, IRepository<StoreInfo, long> storeInfoRepository, IRepository<EntryInformationType, long> entryInformationTypeRepository, IRepository<BasicEntryInformation, long> basicEntryInformationRepository)
         {
@@ -216,6 +219,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _almanacRepository = almanacRepository;
             _almanacArticleRepository = almanacArticleRepository;
             _almanacEntryRepository = almanacEntryRepository;
+            _timedTaskService = timedTaskService;
         }
 
         /// <summary>
@@ -318,41 +322,11 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var games = await _entryRepository.GetAll().AsNoTracking()
-                     .Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && (s.PubulishTime != null && s.PubulishTime.Value.Year >= 2023))
-                     .Select(s => s.Id)
-                     .ToListAsync();
-                var articles = await _articleRepository.GetAll().AsNoTracking()
-                     .Where(s => s.Type != ArticleType.News && s.Type != ArticleType.Notice && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && ( s.PubishTime.Year >= 2023))
-                     .Select(s => s.Id)
-                     .ToListAsync();
-
-               foreach(var item in games)
+                await _timedTaskService.RunTimedTask(new EventBus.Models.RunTimedTaskModel
                 {
-                    if(!await _almanacEntryRepository.AnyAsync(s=>s.AlmanacId==1&&s.EntryId==item))
-                    {
-                        await _almanacEntryRepository.InsertAsync(new AlmanacEntry
-                        {
-                            AlmanacId = 1,
-                            EntryId = item
-                        });
-
-                        _logger.LogInformation("向年鉴添加词条Id：{id}", item);
-                    }
-                }
-
-                foreach (var item in articles)
-                {
-                    if (!await _almanacArticleRepository.AnyAsync(s => s.AlmanacId == 1 && s.ArticleId == item))
-                    {
-                        await _almanacArticleRepository.InsertAsync(new AlmanacArticle
-                        {
-                            AlmanacId = 1,
-                            ArticleId = item
-                        });
-                        _logger.LogInformation("向年鉴添加文章Id：{id}", item);
-                    }
-                }
+                    Type = (int)TimedTaskType.UpdateGameSteamInfor,
+                    Parameter = "500"
+                });
 
                 return new Result { Successful = true };
             }
