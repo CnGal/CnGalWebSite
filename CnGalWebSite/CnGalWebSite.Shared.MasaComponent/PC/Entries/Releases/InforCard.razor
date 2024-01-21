@@ -27,7 +27,7 @@ Class="entry-card-default store-info-card mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Free" Text="当前价格：¥ 0.00 - Free" Class="ma-1" />
 
             }
-            else if (Model.StoreInfor.State == StoreState.NotPublished)
+            else if (Model.StoreInfor.State == StoreState.NotPublished && Model.Type!= GameReleaseType.Demo)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.State" Text="未发售" Class="ma-1" />
                 <meta itemprop="availability" content="PreOrder" />
@@ -59,9 +59,9 @@ Class="entry-card-default store-info-card mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.DeterminedTime" Text="@($"平均游玩时长：{Model.StoreInfor.PlayTime/60.0:0.0} 小时")" Class="ma-1" />
             }
 
-            @if (Model.StoreInfor.EstimationOwnersMax > 0)
+            @if (Model.StoreInfor.EstimationOwnersMax > 0 && Model.StoreInfor.EstimationOwnersMin > 0)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{(Model.StoreInfor.EstimationOwnersMin == 0 ? $"< {Model.StoreInfor.EstimationOwnersMax:#,#}" : $"> {Model.StoreInfor.EstimationOwnersMin:#,#}")}")" Class="" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#} - {Model.StoreInfor.EstimationOwnersMax:#,#}")" Class="" />
             }
 
             @if (Model.StoreInfor.OriginalPrice >= 0)
