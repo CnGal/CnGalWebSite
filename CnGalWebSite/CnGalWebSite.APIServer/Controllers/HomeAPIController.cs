@@ -192,6 +192,33 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
+        /// 获取活动轮播图
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<CarouselViewModel>>> GetActivityCarouselsViewAsync()
+        {
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => s.Type == CarouselType.Activity && s.Priority >= 0).OrderByDescending(s => s.Priority).ToListAsync();
+
+            var model = new List<CarouselViewModel>();
+            foreach (var item in carouses)
+            {
+                model.Add(new CarouselViewModel
+                {
+                    Image = _appHelper.GetImagePath(item.Image, ""),
+                    Link = item.Link,
+                    Note = item.Note,
+                    Priority = item.Priority,
+                    Type = item.Type,
+                    Id = item.Id,
+                });
+            }
+
+            return model;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="Types"></param>

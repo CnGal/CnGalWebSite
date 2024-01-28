@@ -22,6 +22,7 @@ using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.DataModel.ViewModel.Stores;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.ThematicPages;
 using CnGalWebSite.DataModel.ViewModel.Theme;
@@ -244,6 +245,12 @@ namespace CnGalWebSite.Shared.Service
         /// CV专题页缓存
         /// </summary>
         public CVThematicPageViewModel CVThematicPageCache { get; set; }
+
+        /// <summary>
+        /// 游戏销量
+        /// </summary>
+        public GameRevenueInfoCacheModel GameRevenueInfoCache { get; set; } = new();
+
 
         /// <summary>
         /// 主页Tab

@@ -24,5 +24,7 @@ namespace CnGalWebSite.DataModel.Model
         Home,
         [Display(Name = "专题页")]
         ThematicPage,
+        [Display(Name = "活动")]
+        Activity,
     }
 }

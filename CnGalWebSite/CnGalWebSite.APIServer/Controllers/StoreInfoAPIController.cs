@@ -7,10 +7,12 @@ using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.DataModel.ViewModel.Stores;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.EntityFrameworkCore;
 using Nest;
 using System;
@@ -86,13 +88,60 @@ namespace CnGalWebSite.APIServer.Controllers
                     PlatformType = item.PlatformType,
                     UpdateTime = item.UpdateTime,
                     UpdateType = item.UpdateType,
-                    Id=item.Entry.Id,
+                    Id = item.Entry.Id,
                 });
             }
 
             return model;
         }
 
+        /// <summary>
+        /// 获取按年份分组的游戏销售额信息
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<GameRevenueInfoViewModel>> GetGameRevenueInfo([FromQuery] int year, [FromQuery] int page = 0, [FromQuery] int max = 20)
+        {
+            var games = _storeInfoRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s => s.PriceNow != null && s.PriceNow > 0 && s.Revenue != null && s.Revenue > 0 && s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0 && s.EstimationOwnersMin != null && s.EstimationOwnersMin > 0)
+                .Where(s => s.Entry != null && s.Entry.PubulishTime != null && (year == 0 || s.Entry.PubulishTime.Value.Year == year))
+                .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
+
+
+            var gameList = await games.OrderByDescending(s => s.Revenue)
+                .Skip(page * max)
+                .Take(max)
+
+                .ToListAsync();
+
+            var model = new List<GameRevenueInfoCardModel>();
+            foreach (var item in gameList)
+            {
+                model.Add(new GameRevenueInfoCardModel
+                {
+                    Index = page * max + gameList.IndexOf(item) + 1,
+                    EvaluationCount = item.EvaluationCount ?? 0,
+                    MainImage = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    Name = item.Entry.DisplayName,
+                    Price = item.OriginalPrice ?? 0,
+                    PublishTime = item.Entry.PubulishTime,
+                    RecommendationRate = item.RecommendationRate ?? 0,
+                    PlayTime = item.PlayTime ?? 0,
+                    Id = item.Entry.Id,
+                    Owner = (item.EstimationOwnersMax + item.EstimationOwnersMin) / 2 ?? 0,
+                    Publisher = string.Join(" / ", item.Entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntryNavigation?.Name ?? s.Name).Distinct()),
+                    Revenue = item.Revenue ?? 0
+                });
+            }
+
+            return new GameRevenueInfoViewModel
+            {
+                Items = model,
+                TotalPages = (await games.CountAsync() + max - 1) / max
+            };
+        }
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<StoreInfoOverviewModel>> List(QueryParameterModel model)
@@ -163,7 +212,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var item = await _storeInfoRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
 
-            if(item==null)
+            if (item == null)
             {
                 item = new StoreInfo();
 

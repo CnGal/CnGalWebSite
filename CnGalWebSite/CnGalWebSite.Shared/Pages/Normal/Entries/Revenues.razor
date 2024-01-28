@@ -1,0 +1,133 @@
+﻿@page "/revenues"
+
+
+@inject IHttpService _httpService
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+@inject IPageModelCatche<GameRevenueInfoViewModel> _pageModelCatche
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="国G销量年榜" Description="榜单仅收录当年新发售,且在CnGal资料站中收录的作品" />
+
+<div class="revenues-page">
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Revenues.ScreenCard Year="@Year" YearChanged="YearChanged" />
+    </div>
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model.Items)
+            {
+                <div class="mb-3 col-12 col-lg-6">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Revenues.GameCard Model="item" />
+                </div>
+            }
+
+
+        </div>
+        @if (Model.TotalPages > 1)
+        {
+            <CnGalWebSite.Components.Paginations.MasaPagination Value="@Page" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
+        }
+        @if (Model.TotalPages == 0)
+        {
+            <NotFoundCard Fill />
+        }
+    }
+</div>
+
+@code {
+
+    [SupplyParameterFromQuery]
+    public int Max { get; set; }
+    [SupplyParameterFromQuery]
+    public int Page { get; set; }
+    [SupplyParameterFromQuery]
+    public int Year { get; set; }
+
+
+    GameRevenueInfoViewModel Model = new();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            isReady = false;
+            StateHasChanged();
+            if (_dataCacheService.GameRevenueInfoCache.Page == 0)
+            {
+                if (Page == 0)
+                {
+                    Page = 1;
+                }
+                if (Max == 0)
+                {
+                    Max = 20;
+                }
+                _dataCacheService.GameRevenueInfoCache.Page = Page;
+                _dataCacheService.GameRevenueInfoCache.Max = Max;
+                _dataCacheService.GameRevenueInfoCache.Year = Year;
+            }
+
+            Model = await _pageModelCatche.GetCache($"api/storeinfo/GetGameRevenueInfo?page={_dataCacheService.GameRevenueInfoCache.Page - 1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}");
+            isReady = true;
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取游戏销量信息失败");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
+        }
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        _dataCacheService.GameRevenueInfoCache.Page = Page;
+        _dataCacheService.GameRevenueInfoCache.Max = Max;
+        _dataCacheService.GameRevenueInfoCache.Year = Year;
+        await Refresh();
+    }
+
+    public void YearChanged(int year)
+    {
+        NavigationManager.NavigateTo($"/revenues?page={1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={year}");
+    }
+
+    private void OnPageClick(int pageIndex)
+    {
+        NavigationManager.NavigateTo($"/revenues?page={pageIndex}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}");
+    }
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+}

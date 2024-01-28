@@ -13,6 +13,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Stores
         public double AvgPlaytime { get; set; }
         public bool Unreleased { get; set; }
         public int Owners { get; set; }
+        public int Revenue { get; set; }
         public int Players { get; set; }
         public double Accuracy { get; set; }
     }

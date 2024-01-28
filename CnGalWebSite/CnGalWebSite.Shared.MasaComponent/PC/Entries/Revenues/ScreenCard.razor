@@ -1,0 +1,53 @@
+﻿@inject NavigationManager NavigationManager
+
+
+<MDCard Class="screen-card mb-4">
+    <h1>国G销量年榜</h1>
+    <div class="brief-card">
+        <div class="line-1">● 榜单仅收录当年新发售，且在CnGal资料站中收录的作品</div>
+        <div class="line-2">（P.S因为没收录的用SQL查不出来）</div>
+        <div class="line-1">● CnGal资料站收录范围是</div>
+        <div class="line-2">
+            以美少女为主要角色或以美少女为主要攻略对象的冒险、视觉小说、养成、角色扮演等类型的游戏 <s>可爱的男孩子作品也可以收录</s> （汗流浃背了，兄弟)
+        </div>
+        <div class="line-2">
+            由于CnGal人手有限，存在即便满足了定义但并未收录的作品
+        </div>
+        <div class="line-1">
+            欢迎同好们一起参与到资料站编辑中
+        </div>
+        <div class="line-2">
+            ● 销量数据源采用 <a href="https://gamalytic.com/" target="_blank">Gamalytic</a> ，收入是乘以原价获得的。所以肯定不准，图一乐就好
+        </div>
+    </div>
+    <div class="year-card">
+        <MButtonGroup Tile Group Value="Year" ValueChanged="ValueChanged" Style=" display: flex; flex-wrap: wrap;" Color="primary">
+            <MButton Class="m-0" Value="0">
+                全部
+            </MButton>
+            @foreach (var item in Enumerable.Range(2014, DateTime.Now.Year - 2014 + 1))
+            {
+                <MButton Rounded Class="m-0" Value="@item">
+                    @item
+                </MButton>
+            }
+        </MButtonGroup>
+    </div>
+</MDCard>
+
+@code {
+    [Parameter]
+    public int Year { get; set; }
+    [Parameter]
+    public EventCallback<int> YearChanged { get; set; }
+
+
+    public async Task ValueChanged(StringNumber year)
+    {
+        if (year == null)
+        {
+            year = 0;
+        }
+        await YearChanged.InvokeAsync(year.ToInt32());
+    }
+}

@@ -1,0 +1,36 @@
+﻿.revenues-page .game-card .head-card img {
+    width: 180px;
+}
+
+.revenues-page .game-card .head-card .text-card {
+    font-size: 0.9rem;
+}
+
+.revenues-page .game-card .head-card .number-card {
+    font-size: 1.3rem;
+}
+
+.revenues-page .game-card .content-card .name-card {
+    font-size: 1.1rem;
+}
+
+.revenues-page .game-card .content-card {
+    gap: .3rem;
+}
+
+    .revenues-page .game-card .content-card .info-crad, .revenues-page .game-card .content-card .publisher-card {
+        font-size: .75rem;
+    }
+
+    .revenues-page .game-card .content-card .divider-crad {
+        height: 10px;
+    }
+
+.revenues-page .brief-card .line-1 {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.revenues-page .brief-card .line-2 {
+    font-size: .8rem;
+}
