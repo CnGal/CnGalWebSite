@@ -113,9 +113,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.BlazorWeb", "C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "定时任务", "定时任务", "{C402C9F2-CB27-4361-A79C-C76599B2D564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.TimedTask", "CnGalWebSite\CnGalWebSite.TimedTask\CnGalWebSite.TimedTask.csproj", "{275B53D2-2342-4EF7-A378-1A57B253625C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.TimedTask", "CnGalWebSite\CnGalWebSite.TimedTask\CnGalWebSite.TimedTask.csproj", "{275B53D2-2342-4EF7-A378-1A57B253625C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.TimedTask.Models", "CnGalWebSite\CnGalWebSite.TimedTask.Models\CnGalWebSite.TimedTask.Models.csproj", "{96F368C4-098C-4ED5-A3F6-613C3B404C4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.TimedTask.Models", "CnGalWebSite\CnGalWebSite.TimedTask.Models\CnGalWebSite.TimedTask.Models.csproj", "{96F368C4-098C-4ED5-A3F6-613C3B404C4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

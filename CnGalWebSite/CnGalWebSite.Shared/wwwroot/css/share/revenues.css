@@ -1,0 +1,114 @@
+﻿.revenues-page .screen-card {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+    .revenues-page .screen-card h1 {
+        align-self: center;
+    }
+
+.revenues-page .game-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: .5rem;
+    gap: .5rem;
+    height: 100%;
+}
+
+    .revenues-page .game-card .head-card {
+        display: flex;
+        flex-direction: column;
+        background-color: var(--md-sys-color-surface-2);
+        border-radius: var(--md-card-border-radius);
+    }
+
+        .revenues-page .game-card .head-card img {
+            width: 250px;
+        }
+
+        .revenues-page .game-card .head-card .owner-revenue-card {
+            display: flex;
+            padding: .5rem;
+        }
+
+
+        .revenues-page .game-card .head-card .text-number-card {
+            width: 50%;
+            padding-right: .5rem;
+        }
+
+        .revenues-page .game-card .head-card .text-card {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .revenues-page .game-card .head-card .number-card {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .revenues-page .game-card .head-card .text-number-card {
+            width: 50%;
+        }
+
+    .revenues-page .game-card .content-card .name-card {
+        font-size: 1.5rem;
+        padding: 0 .5rem;
+        font-weight: bold;
+    }
+
+    .revenues-page .game-card .content-card .info-crad {
+        font-size: .9rem;
+        font-weight: bold;
+        padding: 0 .5rem;
+    }
+
+    .revenues-page .game-card .content-card .divider-crad {
+        width: 100%;
+        height: 15px;
+        background-color: var(--md-sys-color-surface-5);
+    }
+
+    .revenues-page .game-card .content-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
+
+        .revenues-page .game-card .content-card .publisher-card {
+            padding: 0 .5rem;
+            font-size: .9rem;
+            font-weight: bold;
+        }
+
+.revenues-page .brief-card {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    letter-spacing: .5px;
+}
+
+    .revenues-page .brief-card .line-1 {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+.revenues-page .title-card {
+    display: flex;
+    justify-content: space-between;
+}
+
+.revenues-page .index-card {
+    background-color: var(--md-sys-color-primary);
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+    padding: 0 .5rem;
+    display: flex;
+    border-radius: 5px;
+    align-items: center;
+    height: fit-content;
+}

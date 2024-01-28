@@ -1,0 +1,43 @@
+﻿@inject IHttpService _httpService
+@inject IPageModelCatche<List<CarouselViewModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Components.Containers.MiniModeContainer>
+    <section class="activities-card">
+        <div class="row">
+            @foreach (var item in _items.Take(_dataCacheService.IsApp?2:3))
+            {
+                <div class="@(_dataCacheService.IsApp?"col-6":"col-4 ")">
+                    <MDCard Class="item" Href="@item.Link">
+                        <img class="w-100" src="@item.Image" alt="@item.Note" />
+                    </MDCard>
+                </div>
+            }
+        </div>
+    </section>
+</CnGalWebSite.Components.Containers.MiniModeContainer>
+
+
+@code {
+
+    List<CarouselViewModel> _items { get; set; } = new List<CarouselViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/GetActivityCarouselsView");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取主页活动轮播图失败");
+        }
+    }
+}

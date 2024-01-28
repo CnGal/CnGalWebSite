@@ -776,7 +776,7 @@
 }
 
 #home-page .latast-comments-card .text img {
-    aspect-ratio: unset!important;
+    aspect-ratio: unset !important;
 }
 
 #home-page .latast-comments-card .time {
@@ -878,3 +878,9 @@
         gap: .5rem;
         width: 20%;
     }
+
+/*活动卡片*/
+
+#home-page .activities-card img{
+    aspect-ratio: 16/9;
+}

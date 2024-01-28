@@ -95,6 +95,11 @@ namespace CnGalWebSite.DataModel.Model
         public int? EstimationOwnersMin { get; set; }
 
         /// <summary>
+        /// 销售额 单位 人民币
+        /// </summary>
+        public int? Revenue { get; set; }
+
+        /// <summary>
         /// 关联的游戏
         /// </summary>
         public Entry Entry { get; set; }

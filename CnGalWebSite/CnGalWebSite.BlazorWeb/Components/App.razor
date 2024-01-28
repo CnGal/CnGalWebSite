@@ -84,7 +84,6 @@
     <!--自定义脚本-->
     @* <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script> *@
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script>
-    <script src="_content/CnGalWebSite.Shared/js/magazine.js"></script>
 
     <!--图片裁剪-->
     <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
@@ -113,7 +112,13 @@
     <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
 
     @* <script src="_framework/blazor.web.js"></script> *@
-    <script src="https://res.cngal.org/_framework/blazor.web.8.0.js"></script>
+    <script src="https://res.cngal.org/_framework/blazor.web.8.0.js" autostart="false"></script>
+
+    <script>
+        Blazor.start({
+            ssr: { disableDomPreservation: true }
+        });
+    </script>
 </body>
 
 </html>

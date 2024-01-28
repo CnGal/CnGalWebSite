@@ -4,6 +4,7 @@
     "inputFiles": [
       "wwwroot/js/lottery.js",
       "wwwroot/js/home.js",
+      "wwwroot/js/magazine.js",
       "../CnGalWebSite.Components/wwwroot/js/bundle.js",
       "../CnGalWebSite.Kanban/wwwroot/js/live2d-core.js"
     ]
@@ -33,6 +34,7 @@
       "wwwroot/css/share/loading.css",
       "wwwroot/css/share/commodity.css",
       "wwwroot/css/share/magazine.css",
+      "wwwroot/css/share/revenues.css",
       "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
     ]
   },
@@ -67,7 +69,8 @@
       "wwwroot/css/app/common-app.css",
       "wwwroot/css/app/entry.css",
       "wwwroot/css/app/article.css",
-      "wwwroot/css/app/official-website.css"
+      "wwwroot/css/app/official-website.css",
+      "wwwroot/css/app/revenues.css"
     ]
   }
 ]

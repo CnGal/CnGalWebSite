@@ -1,0 +1,40 @@
+﻿<MDCard Href="@($"/entries/index/{Model.Id}")" Class="game-card">
+    <div class="head-card">
+        <img src="@Model.MainImage" alt="@Model.Name" />
+        <div class="owner-revenue-card">
+            <div class="text-number-card">
+                <div class="text-card">销量</div>
+                <div class="number-card">@(Model.Owner >= 10000000 ? ($"{Model.Owner * 0.0001:G4}万") : (Model.Owner > 10000 ? ($"{Model.Owner * 0.0001:G3}万") : ($"{Model.Owner}")))</div>
+            </div>
+            <div class="text-number-card">
+                <div class="text-card">收入</div>
+                <div class="number-card">@(Model.Revenue >= 10000000 ? ($"{Model.Revenue * 0.0001:G4}万") : (Model.Revenue > 10000 ? ($"{Model.Revenue * 0.0001:G3}万") : ($"{Model.Revenue}")))</div>
+            </div>
+        </div>
+    </div>
+    <div class="content-card">
+        <div class="title-card">
+            <div class="name-card">@Model.Name</div>
+            <div class="index-card">@Model.Index.ToString("00")</div>
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.Publisher) == false)
+        {
+            <div class="publisher-card">@Model.Publisher</div>
+        }
+        <div class="divider-crad"></div>
+        <div class="info-crad">
+            <div>@($"好评率：{Model.RecommendationRate:0}%({Model.EvaluationCount})")</div>
+            <div>@($"售价：¥ {Model.Price:G2}")</div>
+            <div>@($"发布时间：{Model.PublishTime:yyyy-MM-dd}")</div>
+            @if (Model.PlayTime > 0)
+            {
+                <div>@($"平均时长：{Model.PlayTime / 60:0.0}h")</div>
+            }
+        </div>
+    </div>
+</MDCard>
+
+@code {
+    [Parameter]
+    public GameRevenueInfoCardModel Model { get; set; }
+}

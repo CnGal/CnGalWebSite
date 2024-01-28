@@ -165,6 +165,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
             storeInfo.RecommendationRate = data.RecommendationRate;
             storeInfo.EstimationOwnersMax = data.EstimationOwnersMax;
             storeInfo.EstimationOwnersMin = data.EstimationOwnersMin;
+            storeInfo.Revenue = data.Revenue;
         }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 if (data.Price != null)
                 {
                     //原价
-                    storeInfo.OriginalPrice ??= data.Price.Cut == 100 ? 0 : data.Price.Price / (100 - data.Price.Cut);
+                    storeInfo.OriginalPrice ??= data.Price.Cut == 100 ? 0 : data.Price.Price / (100 - data.Price.Cut) * 100;
                     //现价
                     storeInfo.PriceNow ??= data.Price.Price;
                     //折扣
@@ -372,6 +373,8 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 storeInfo.EstimationOwnersMax ??= (int)(data.Owners * (2 - data.Accuracy));
                 //估计拥有人数下限
                 storeInfo.EstimationOwnersMin ??= (int)(data.Owners * (data.Accuracy));
+                //销售额
+                storeInfo.Revenue ??= (int)(data.Revenue * 7);
 
                 //状态
                 if (storeInfo.State == StoreState.None && data.Unreleased)
