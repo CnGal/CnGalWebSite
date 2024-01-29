@@ -3136,12 +3136,14 @@ div.prizeTips {
     flex-direction: column;
     align-content: center;
     flex-wrap: wrap;
+    row-gap: 1rem;
 }
 
     .cngal-about-card .head {
         display: flex;
-        gap: 6rem;
+        column-gap: 6rem;
         flex-wrap: wrap;
+        row-gap: 1rem;
     }
 
     .cngal-about-card .links-groups {

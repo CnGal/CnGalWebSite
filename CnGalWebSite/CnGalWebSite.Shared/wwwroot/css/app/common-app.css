@@ -1,1 +1,18 @@
-﻿
+﻿/*关于我们*/
+
+.cngal-about-card .links-groups {
+    gap: 3rem;
+}
+
+.cngal-about-card .addinfo {
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.cngal-about-card .head {
+    gap: 1rem;
+}
+
+.cngal-about-card {
+    gap: 1rem;
+}

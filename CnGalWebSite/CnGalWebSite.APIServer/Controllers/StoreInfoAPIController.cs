@@ -103,18 +103,20 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<GameRevenueInfoViewModel>> GetGameRevenueInfo([FromQuery] int year, [FromQuery] int page = 0, [FromQuery] int max = 20)
         {
-            var games = _storeInfoRepository.GetAll().AsNoTracking()
+            var games = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.PriceNow != null && s.PriceNow > 0 && s.Revenue != null && s.Revenue > 0 && s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0 && s.EstimationOwnersMin != null && s.EstimationOwnersMin > 0)
                 .Where(s => s.Entry != null && s.Entry.PubulishTime != null && (year == 0 || s.Entry.PubulishTime.Value.Year == year))
-                .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
+                .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
+                .OrderByDescending(s => s.Revenue)
+                .ToListAsync();
+            games = games.DistinctBy(s => s.Link).ToList();
 
 
-            var gameList = await games.OrderByDescending(s => s.Revenue)
+            var gameList = games.DistinctBy(s => s.Link)
                 .Skip(page * max)
                 .Take(max)
-
-                .ToListAsync();
+                .ToList();
 
             var model = new List<GameRevenueInfoCardModel>();
             foreach (var item in gameList)
@@ -139,7 +141,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new GameRevenueInfoViewModel
             {
                 Items = model,
-                TotalPages = (await games.CountAsync() + max - 1) / max
+                TotalPages = (games.Count + max - 1) / max
             };
         }
         [Authorize(Roles = "Admin")]
