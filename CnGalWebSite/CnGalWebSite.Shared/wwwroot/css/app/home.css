@@ -127,161 +127,161 @@
         }
 
 
-        #home-page .about-card .addinfo {
-            column-gap: 1rem;
-            flex-wrap: wrap;
-            row-gap: .5rem;
-        }
+#home-page .about-card .addinfo {
+    column-gap: 1rem;
+    flex-wrap: wrap;
+    row-gap: .5rem;
+}
 
-        #home-page .about-card {
-            gap: 2rem !important;
-        }
-        /*专题推荐*/
-        #home-page .evaluations-item {
-            padding: 0;
-        }
+#home-page .about-card {
+    gap: 2rem !important;
+}
+/*专题推荐*/
+#home-page .evaluations-item {
+    padding: 0;
+}
 
-        #home-page .evaluations-group {
-            margin: 0;
-            padding: 0;
-        }
+#home-page .evaluations-group {
+    margin: 0;
+    padding: 0;
+}
 
-        #home-page .evaluations-card .articles-group img {
-            width: 9rem !important;
-        }
+#home-page .evaluations-card .articles-group img {
+    width: 9rem !important;
+}
 
-        #home-page .articles-group .item {
-            flex-direction: column;
-            width: calc((100% - 1rem)*0.5);
-        }
+#home-page .articles-group .item {
+    flex-direction: column;
+    width: calc((100% - 1rem)*0.5);
+}
 
-            #home-page .articles-group .item img {
-                width: 100% !important;
-            }
+    #home-page .articles-group .item img {
+        width: 100% !important;
+    }
 
-        #home-page .articles-group {
-            flex-wrap: wrap;
-            flex-direction: row;
-            justify-content: space-around;
-        }
+#home-page .articles-group {
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+}
 
-            #home-page .articles-group .head {
-                gap: .5rem;
-            }
+    #home-page .articles-group .head {
+        gap: .5rem;
+    }
 
-            #home-page .articles-group .addinfo {
-                word-break: keep-all;
-                flex-wrap: wrap;
-            }
+    #home-page .articles-group .addinfo {
+        word-break: keep-all;
+        flex-wrap: wrap;
+    }
 
-            #home-page .articles-group .name {
-                -webkit-line-clamp: 2;
-            }
+    #home-page .articles-group .name {
+        -webkit-line-clamp: 2;
+    }
 
-        #home-page .evaluations-card .content {
-            font-size: inherit;
-        }
-        /*免费游戏*/
-        #home-page .free-games-card .name {
-            font-size: 1rem !important;
-            font-weight: inherit;
-        }
+#home-page .evaluations-card .content {
+    font-size: inherit;
+}
+/*免费游戏*/
+#home-page .free-games-card .name {
+    font-size: 1rem !important;
+    font-weight: inherit;
+}
 
-        #home-page .free-games-card .brief {
-            display: none;
-        }
+#home-page .free-games-card .brief {
+    display: none;
+}
 
-        #home-page .free-games-card .item {
-            width: 10rem;
-        }
-        /*打折游戏*/
-        #home-page .discount-games-card .item {
-            width: 13rem;
-        }
+#home-page .free-games-card .item {
+    width: 10rem;
+}
+/*打折游戏*/
+#home-page .discount-games-card .item {
+    width: 13rem;
+}
 
-        #home-page .discount-games-card .name {
-            font-size: 1rem !important;
-            font-weight: inherit;
-        }
-        /*看板娘*/
-        #home-page .kanban-card .content {
-            flex-direction: column;
-            align-items: center;
-            flex-wrap: nowrap;
-            gap: 2rem;
-        }
+#home-page .discount-games-card .name {
+    font-size: 1rem !important;
+    font-weight: inherit;
+}
+/*看板娘*/
+#home-page .kanban-card .content {
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 2rem;
+}
 
-        /*个性化推荐*/
-        #home-page .recommends-group {
-            gap: 1rem;
-        }
+/*个性化推荐*/
+#home-page .recommends-group {
+    gap: 1rem;
+}
 
-        /*纯文本*/
-        #home-page .plain-text-card.item {
-            flex-direction: column;
-            gap: 0rem;
-        }
+/*纯文本*/
+#home-page .plain-text-card.item {
+    flex-direction: column;
+    gap: 0rem;
+}
 
-            #home-page .plain-text-card.item img {
-                width: 100% !important;
-                height: auto !important;
-                min-width: auto !important;
-            }
+    #home-page .plain-text-card.item img {
+        width: 100% !important;
+        height: auto !important;
+        min-width: auto !important;
+    }
 
-            #home-page .plain-text-card.item .name {
-                font-size: 1.5rem;
-            }
+    #home-page .plain-text-card.item .name {
+        font-size: 1.5rem;
+    }
 
 
-        /*相册*/
-        #home-page .gallery-card .actions {
-            flex-wrap: wrap;
-            gap: .5rem;
-            padding: 0;
-            justify-content: space-between;
-        }
+/*相册*/
+#home-page .gallery-card .actions {
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: 0;
+    justify-content: space-between;
+}
 
-        #home-page .gallery-card .head {
-            gap: .5rem;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+#home-page .gallery-card .head {
+    gap: .5rem;
+    flex-direction: column;
+    align-items: flex-start;
+}
 
-        #home-page .gallery-card .name {
-            font-size: 1.5rem;
-        }
+#home-page .gallery-card .name {
+    font-size: 1.5rem;
+}
 
-        #home-page .gallery-card {
-            padding: 1rem;
-            gap: 1rem;
-        }
+#home-page .gallery-card {
+    padding: 1rem;
+    gap: 1rem;
+}
 
-            #home-page .gallery-card .content {
-                padding: 0;
-            }
-        /*图墙*/
-        #home-page .masa-image .item-image .image-name {
-            opacity: 1;
-            display: flex;
-            font-size: 1rem;
-        }
+    #home-page .gallery-card .content {
+        padding: 0;
+    }
+/*图墙*/
+#home-page .masa-image .item-image .image-name {
+    opacity: 1;
+    display: flex;
+    font-size: 1rem;
+}
 
-        #home-page .image-games-card {
-            row-gap: 1rem;
-        }
-        /*标签*/
-        #home-page .hot-tags-card .item {
-            padding: .2rem .5rem .2rem .5rem;
-        }
+#home-page .image-games-card {
+    row-gap: 1rem;
+}
+/*标签*/
+#home-page .hot-tags-card .item {
+    padding: .2rem .5rem .2rem .5rem;
+}
 
-        #home-page .hot-tags-card .group {
-            gap: .5rem;
-        }
-        /*随机推荐*/
-        #home-page .recommends .container {
-            padding: 0;
-        }
-        /*轮播图*/
-        #home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
-            border-radius: var( --md-card-border-radius);
-        }
+#home-page .hot-tags-card .group {
+    gap: .5rem;
+}
+/*随机推荐*/
+#home-page .recommends .container {
+    padding: 0;
+}
+/*轮播图*/
+#home-page .carousels-card img, #home-page .carousels-card .m-responsive__content, #home-page .carousels-card .m-window-item, #home-page .carousels-card .m-responsive .cv-carousel-card img, .cv-carousel-card .m-responsive__content, .cv-carousel-card .m-window-item, .cv-carousel-card .m-responsive {
+    border-radius: var( --md-card-border-radius);
+}
