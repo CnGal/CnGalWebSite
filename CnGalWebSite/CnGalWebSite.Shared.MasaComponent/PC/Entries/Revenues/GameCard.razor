@@ -24,7 +24,7 @@
         <div class="divider-crad"></div>
         <div class="info-crad">
             <div>@($"好评率：{Model.RecommendationRate:0}%({Model.EvaluationCount})")</div>
-            <div>@($"售价：¥ {(Model.Price >= 1000 ? Model.Price.ToString("G3") : Model.Price.ToString("G2"))}")</div>
+            <div>@($"售价：¥ {(Model.Price >= 100 ? Model.Price.ToString("G3") : Model.Price.ToString("G2"))}")</div>
             <div>@($"发布时间：{Model.PublishTime:yyyy-MM-dd}")</div>
             @if (Model.PlayTime > 0)
             {
