@@ -49,6 +49,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Typesense.Setup;
 using CnGalWebSite.EventBus.Extensions;
+using CnGalWebSite.APIServer.Application.Tasks;
 
 namespace CnGalWebSite.APIServer
 {
@@ -186,6 +187,7 @@ namespace CnGalWebSite.APIServer
             services.AddEventBus();
             //添加后台定时任务
             services.AddHostedService<BackgroundTask>();
+            services.AddSingleton<IBackgroundTaskService,BackgroundTaskService>();
             //添加真实IP
             services.Configure<ForwardedHeadersOptions>(options =>
             {

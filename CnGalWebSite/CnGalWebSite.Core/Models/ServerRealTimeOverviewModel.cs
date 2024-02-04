@@ -19,6 +19,8 @@ namespace CnGalWebSite.Core.Models
         public MemoryMetrics Memory { get; set; } = new MemoryMetrics();
 
         public long NetworkBandwidth { get; set; }
+
+       
     }
 
     public class ServerStaticOverviewModel
@@ -29,6 +31,8 @@ namespace CnGalWebSite.Core.Models
         public string SDKVersion { get; set; }
 
         public DateTime LastUpdateTime { get; set; }
+
+        public bool IsRuningBackgroundTask { get; set; }
 
 
     }
