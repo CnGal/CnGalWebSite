@@ -12,13 +12,11 @@
 <div class="row">
     <div class="col-12">
         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="APIServerModel" Name="API Server" />
-
     </div>
     @if (ToolHelper.IsSSR)
     {
         <div class="col-12">
             <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="BlazorServerModel" Name="Blazor Server" />
-
         </div>
     }
     <div class="@(ToolHelper.IsSSR ?"col-12 col-lg-6":"col-12")">

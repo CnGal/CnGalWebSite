@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.TimedTasks;
+﻿using CnGalWebSite.APIServer.Application.Tasks;
+using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -32,6 +33,7 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
             var _configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
             var _eventBusService = scope.ServiceProvider.GetRequiredService<IEventBusService>();
             var _timedTaskService = scope.ServiceProvider.GetRequiredService<ITimedTaskService>();
+            var _backgroundTaskService = scope.ServiceProvider.GetRequiredService<IBackgroundTaskService>();
             ConcurrentQueue<RunTimedTaskModel> _queue = new ConcurrentQueue<RunTimedTaskModel>();
 
             try
@@ -46,6 +48,8 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
 
                 while (true)
                 {
+                    _backgroundTaskService.Runing();
+
                     if (!_queue.TryDequeue(out RunTimedTaskModel model))
                     {
                         await Task.Delay(100, stoppingToken);
@@ -61,8 +65,9 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
             {
                 _logger.LogError(ex, "后台任务异常");
                 //关闭
-                _applicationLifetime.StopApplication();
+                //_applicationLifetime.StopApplication();
                 //错误处理
+                _backgroundTaskService.Fail();
             }
         }
 

@@ -28,7 +28,7 @@
             <div>@($"发布时间：{Model.PublishTime:yyyy-MM-dd}")</div>
             @if (Model.PlayTime > 0)
             {
-                <div>@($"平均时长：{Model.PlayTime / 60:0.0}h")</div>
+                <div>@($"平均时长：{Model.PlayTime / 60.0:0.0}h")</div>
             }
         </div>
     </div>

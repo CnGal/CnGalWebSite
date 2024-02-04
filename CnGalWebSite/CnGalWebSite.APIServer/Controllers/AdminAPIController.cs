@@ -15,6 +15,7 @@ using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Tasks;
 using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
@@ -131,6 +132,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IVideoService _videoService;
         private readonly ITimedTaskService _timedTaskService;
+        private readonly IBackgroundTaskService _backgroundTaskService;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
         private readonly IRepository<Almanac, long> _almanacRepository;
         private readonly IRepository<AlmanacArticle, long> _almanacArticleRepository;
@@ -138,7 +140,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService,
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, IBackgroundTaskService backgroundTaskService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
         IRepository<Message, long> messageRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IWebHostEnvironment webHostEnvironment, IRepository<AlmanacArticle, long> almanacArticleRepository, IRepository<AlmanacEntry, long> almanacEntryRepository,
         IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
@@ -220,6 +222,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _almanacArticleRepository = almanacArticleRepository;
             _almanacEntryRepository = almanacEntryRepository;
             _timedTaskService = timedTaskService;
+            _backgroundTaskService = backgroundTaskService;
         }
 
         /// <summary>
@@ -356,7 +359,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<ServerStaticOverviewModel>> GetServerStaticDataOverview()
         {
-            return await Task.FromResult(SystemEnvironmentHelper.GetServerStaticDataOverview());
+            var model = SystemEnvironmentHelper.GetServerStaticDataOverview();
+            model.IsRuningBackgroundTask = _backgroundTaskService.IsRuning;
+            return await Task.FromResult(model);
         }
 
         /// <summary>
