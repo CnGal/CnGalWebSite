@@ -24,7 +24,7 @@
                  <CnGalWebSite.Components.Inputs.MasaSelecte Value="Model.Type" ValueChanged="OnTypeChanged" TValue="EntryType" Label="类型" />
              </MCol>
 
-             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" ExistingItems="ExistingItems" Class="form-group col-12 col-sm-6" />
 
              <MCol Cols="12" Md="6">
                  <MTextField @bind-Value="Model.AnotherName" Label="别称" />
@@ -48,6 +48,8 @@
     public string Class { get; set; }
     [Parameter]
     public EventCallback<EntryType> TypeChanged { get; set; }
+    [Parameter]
+    public List<string> ExistingItems { get; set; }
 
     public async Task OnTypeChanged(EntryType type)
     {

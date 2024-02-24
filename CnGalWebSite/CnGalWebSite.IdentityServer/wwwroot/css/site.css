@@ -335,3 +335,18 @@ footer {
     display: flex;
     justify-content: space-between;
 }
+/*下拉框*/
+select {
+    font-size: 1.1rem;
+    border: 0 !important;
+    overflow-y: scroll !important;
+    padding: 0.3rem 0;
+    outline: 0 !important;
+    border-bottom: 1px solid #ccc !important;
+}
+.input-phone-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}

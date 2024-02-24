@@ -8,7 +8,7 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke" />
 }
-<CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="动态" ShowMoreButton OnClickMore="@(()=>{Dialog=true;})" Icon="@IconType.News.ToIconString()">
+<CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="动态" ShowMoreButtonText="查看更多" ShowMoreButton OnClickMore="@(()=>{Dialog=true;})" Icon="@IconType.News.ToIconString()">
      <NewsCard Model="Model.NewsOfEntry.Take(2)" />
  </CnGalWebSite.Components.Containers.MasaTitleContainer>
 

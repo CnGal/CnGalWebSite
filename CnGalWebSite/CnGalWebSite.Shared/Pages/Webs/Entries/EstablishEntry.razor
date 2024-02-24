@@ -33,7 +33,7 @@
 
         <CnGalWebSite.Components.Containers.MasaTitleContainer Title="创建词条" Icon="@IconType.Entry.ToIconString()" Outline>
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainCard Model="Model.Main" Class="mb-4" TypeChanged="TypeChanged" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainCard Model="Model.Main" Class="mb-4" TypeChanged="TypeChanged" ExistingItems="EntryItems" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AddInforCard Model="Model.AddInfor" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" LotteryItems="LotteryItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.ImagesCard Model="Model.Images" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.AudioCard Model="Model.Audio" Class="mb-4" />
@@ -61,6 +61,7 @@
     private List<string> EntryRoleItems { get; set; } = new List<string>();
     private List<string> EntryGroupItems { get; set; } = new List<string>();
     private List<string> EntryStaffItems { get; set; } = new List<string>();
+    private List<string> EntryItems { get; set; } = new List<string>();
     private List<string> ArticleItems { get; set; } = new List<string>();
     private List<string> TagItems { get; set; } = new List<string>();
     private List<string> VideoItems { get; set; } = new List<string>();
@@ -84,6 +85,10 @@
                 EntryRoleItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/1");
                 EntryGroupItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/2");
                 EntryStaffItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/3");
+                EntryItems.AddRange(EntryGameItems);
+                EntryItems.AddRange(EntryRoleItems);
+                EntryItems.AddRange(EntryGroupItems);
+                EntryItems.AddRange(EntryStaffItems);
                 //获取所有文章
                 ArticleItems = await _httpService.GetAsync<List<string>>("api/articles/GetAllArticles");
                 //获取所有标签

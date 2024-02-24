@@ -7,6 +7,8 @@ using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MimeKit;
+using Senparc.NeuChar.NeuralSystems;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -47,7 +49,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             _peripheryRepository = peripheryRepository;
         }
 
-      
+
         public async Task BackUpArticle(BackUpArchive backUpArchive)
         {
             var BeginTime = DateTime.Now.ToCstTime();
@@ -74,7 +76,13 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             var url1 = "https://www.cngal.org/entries/index/" + backUpArchive.EntryId;
             var response1 = await client.GetAsync(_configuration["BackUpArchiveUrl"] + url1);
 
-            if (response1.StatusCode == System.Net.HttpStatusCode.OK)
+            while(response1.StatusCode == System.Net.HttpStatusCode.Found)
+            {
+                var newuri = response1.Headers.Location.ToString(); // 跳转的目标地址是在 HTTP-HEAD 中的
+                response1 = await client.GetAsync(newuri);
+            }
+
+            if (response1.StatusCode == System.Net.HttpStatusCode.OK )
             {
                 //如果成功则写入数据 不成功也要写
                 await UpdateBackUpInfor(backUpArchive, false, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds / 2);
@@ -306,7 +314,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 foreach (var item in data)
                 {
                     xml.WriteStartElement("url");
-                    xml.WriteElementString("loc",  item.Loc);
+                    xml.WriteElementString("loc", item.Loc);
                     xml.WriteElementString("priority", item.Priority);
                     xml.WriteElementString("changefreq", item.ChangeFreq);
                     xml.WriteElementString("lastmod", item.LastModified);

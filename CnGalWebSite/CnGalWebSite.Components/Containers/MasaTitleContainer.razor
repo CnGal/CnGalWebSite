@@ -18,7 +18,7 @@ else
                     {
                         <MButton Small="Small" Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore" Href="@Href" Target="@Target">
                              <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
-                         查看详情
+                            @ShowMoreButtonText   
                      </MButton>
                     }
                     @if (Collapable)
@@ -72,6 +72,8 @@ else
     public bool IsCollapsed { get; set; }
     [Parameter]
     public bool ShowMoreButton { get; set; }
+    [Parameter]
+    public string ShowMoreButtonText { get; set; } = "查看详情";
     [Parameter]
     public bool HideContentPadding { get; set; }
     [Parameter]
