@@ -415,7 +415,7 @@ namespace IdentityServerHost.Quickstart.UI
         public async Task<IActionResult> VerifyCode(VerifyCodeInputModel model, string button)
         {
             //查找用户
-            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId) ??await FindLoginUserAsync() ;
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId) ?? await FindLoginUserAsync();
             if (user == null)
             {
                 //伪装正确
@@ -571,6 +571,7 @@ namespace IdentityServerHost.Quickstart.UI
                 ReturnUrl = returnUrl,
                 UserId = userId,
                 Code = code,
+                Country = "86",
                 SecondCode = secondCode,
             }));
         }
@@ -591,7 +592,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //查找用户
-            var user =  await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId)?? await FindLoginUserAsync();
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == model.UserId) ?? await FindLoginUserAsync();
             if (user == null)
             {
                 //伪装正确
@@ -613,19 +614,29 @@ namespace IdentityServerHost.Quickstart.UI
                 return View(BuildAddPhoneNumberViewModel(model));
             }
 
+            //合并区号
+            var phone = GetCountryPhoneNumber(model.PhoneNumber, model.Country);
+
             //检查是否被绑定
-            if (await _userRepository.AnyAsync(s => s.PhoneNumber == model.PhoneNumber))
+            if (await _userRepository.AnyAsync(s => s.PhoneNumber == phone && s.PhoneNumberConfirmed))
             {
                 ModelState.AddModelError(string.Empty, "此手机号已经被绑定");
                 return View(BuildAddPhoneNumberViewModel(model));
             }
 
-            //设置手机号
-            user.PhoneNumber = model.PhoneNumber;
-            await _userRepository.UpdateAsync(user);
-
             //跳转验证手机号
-            return await RedirectToVerifyPhoneNumber(user, model.ReturnUrl);
+            if (await TryToSendPhoneNumberCodeAsync(user, phone))
+            {
+                //设置手机号
+                user.PhoneNumber = phone;
+                await _userRepository.UpdateAsync(user);
+                return RedirectToAction("VerifyCode", new { UserId = user.Id, user.PhoneNumber, Type = VerificationCodeType.AddPhoneNumber, model.ReturnUrl });
+            }
+            else
+            {
+
+                return View(BuildAddPhoneNumberViewModel(model));
+            }
         }
 
         [HttpGet]
@@ -634,7 +645,7 @@ namespace IdentityServerHost.Quickstart.UI
         {
 
             //检查支持的外部身份验证提供商
-            var providers = _configuration["TrustedExternalAuthProviders"].Split(',').Select(s => s.Trim());
+            var providers = _configuration["TrustedExternalAuthProviders"]?.Split(',')?.Select(s => s.Trim()) ?? new List<string>();
 
             return await Task.FromResult(View(new SelectRealNameMethodViewModel
             {
@@ -940,23 +951,37 @@ namespace IdentityServerHost.Quickstart.UI
                 return View(BuildChangePhoneNumberViewModel(model));
             }
 
+            //合并区号
+            var phone = GetCountryPhoneNumber(model.PhoneNumber, model.Country);
+
+
             //判断手机号是否被绑定
-            if (await _userRepository.AnyAsync(s => s.PhoneNumber == model.PhoneNumber))
+            if (await _userRepository.AnyAsync(s => s.PhoneNumber == phone))
             {
                 ModelState.AddModelError(string.Empty, "此手机号已经被绑定");
                 return View(BuildChangePhoneNumberViewModel(model));
             }
 
             //发送验证码
-            var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, model.PhoneNumber);
+            var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, phone);
             var code = await _verificationCodeService.GetCodeAsync(token, user.Id, VerificationCodeType.ChangePhoneNumber);
             //向新地址发送
-            if (!await _messageService.SendVerificationSMSAsync(code, model.PhoneNumber, user, VerificationCodeType.ChangePhoneNumber))
+            try
             {
-                ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                if (!await _messageService.SendVerificationSMSAsync(code, phone, user, VerificationCodeType.ChangePhoneNumber))
+                {
+                    ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                    return View(BuildChangePhoneNumberViewModel(model));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(BuildChangePhoneNumberViewModel(model));
             }
 
-            return RedirectToAction("VerifyCode", new { model.SecondCode, UserId = user.Id, NewPhoneNumber = model.PhoneNumber, Type = VerificationCodeType.ChangePhoneNumber, model.ReturnUrl });
+
+            return RedirectToAction("VerifyCode", new { model.SecondCode, UserId = user.Id, NewPhoneNumber = phone, Type = VerificationCodeType.ChangePhoneNumber, model.ReturnUrl });
         }
 
         [HttpGet]
@@ -1241,7 +1266,7 @@ namespace IdentityServerHost.Quickstart.UI
         private async Task<IActionResult> RedirectToVerifyEmail(ApplicationUser user, string returnUrl)
         {
             //老用户不检查实名认证
-            if(!await _accountService.IsNewUserAsync(user.Id))
+            if (!await _accountService.IsNewUserAsync(user.Id))
             {
                 return null;
             }
@@ -1257,17 +1282,31 @@ namespace IdentityServerHost.Quickstart.UI
 
         }
 
-        private async Task<IActionResult> RedirectToVerifyPhoneNumber(ApplicationUser user, string returnUrl)
+        private async Task<bool> TryToSendPhoneNumberCodeAsync(ApplicationUser user, string phone)
         {
             var code = await _verificationCodeService.GetCodeAsync(user.UserName.Sha256(), user.Id, VerificationCodeType.AddPhoneNumber);
-            if (!await _messageService.SendVerificationSMSAsync(code, user.PhoneNumber, user, VerificationCodeType.AddPhoneNumber))
+
+            try
             {
-                ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                if (!await _messageService.SendVerificationSMSAsync(code, phone, user, VerificationCodeType.AddPhoneNumber))
+                {
+                    ModelState.AddModelError(string.Empty, "验证码发送过于频繁");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return false;
             }
 
-            return RedirectToAction("VerifyCode", new { UserId = user.Id, user.PhoneNumber, Type = VerificationCodeType.AddPhoneNumber, ReturnUrl = returnUrl });
+            return true;
         }
 
+        private string GetCountryPhoneNumber(string phone, string country)
+        {
+            return $"+{country}{phone}".Replace(" ","");
+        }
         /// <summary>
         /// 检查用户实名验证
         /// </summary>

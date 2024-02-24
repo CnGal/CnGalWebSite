@@ -3,7 +3,7 @@
     <MCheckbox @bind-Value="IsSame" Label="显示名称与唯一名称保持一致" TValue="bool" />
 </MCol>
 <MCol Cols="12" Md="6">
-    <MTextField Value="Name" TValue="string" ValueChanged="OnNameChanged" Label="唯一名称" />
+    <MTextField Value="Name" Color="@color" PersistentHint PrependIcon="@(color==null?null:"mdi-information-outline")" Hint="@(color==null?null:"该名称已存在，请检查是否已创建该词条，或考虑使用显示名称")" TValue="string" ValueChanged="OnNameChanged" Label="唯一名称" />
 </MCol>
 <MCol Cols="12" Md="6">
     <MTextField Value="DisplayName" Disabled="IsSame" TValue="string" ValueChanged="DisplayNameChanged" Label="显示名称" />
@@ -18,9 +18,12 @@
     [Parameter]
     public string DisplayName { get; set; }
     [Parameter]
+    public List<string> ExistingItems { get; set; } = new List<string>();
+    [Parameter]
     public EventCallback<string> DisplayNameChanged { get; set; }
 
     private bool IsSame { get; set; }
+    string color;
 
     protected override void OnInitialized()
     {
@@ -31,6 +34,15 @@
     {
         Name = name;
         await NameChanged.InvokeAsync(name);
+
+        if (ExistingItems.Any(s=>s==name))
+        {
+            color = "error";
+        }
+        else
+        {
+            color = null;
+        }
 
         if(IsSame)
         {
