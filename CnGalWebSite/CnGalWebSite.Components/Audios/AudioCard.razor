@@ -56,12 +56,14 @@
     public bool AutoPlay { get; set; } = false;
 
     EditAudioAloneModel currentAudio;
+    List<EditAudioAloneModel> _model;
 
 
     protected override void OnParametersSet()
     {
-        if (currentAudio == null)
+        if (_model != Model)
         {
+            _model = Model;
             currentAudio = Model.FirstOrDefault();
         }
         AutoPlay = false;
