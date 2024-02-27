@@ -31,6 +31,10 @@ services:
       - SMS_ResetPassword=${SMS_ResetPassword}
       - SMS_AddPhoneNumber=${SMS_AddPhoneNumber}
       - SMS_ChangePhoneNumber=${SMS_ChangePhoneNumber}
+      # 海外短信模板
+      - SMS_Globe_ResetPassword=${SMS_Globe_ResetPassword}
+      - SMS_Globe_AddPhoneNumber=${SMS_Globe_AddPhoneNumber}
+      - SMS_Globe_ChangePhoneNumber=${SMS_Globe_ChangePhoneNumber}
       # 阿里云
       - AliyunAccessKeySecret=${AliyunAccessKeySecret}
       - AliyunAccessKeyId=${AliyunAccessKeyId}
