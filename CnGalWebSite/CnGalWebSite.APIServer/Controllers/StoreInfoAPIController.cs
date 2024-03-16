@@ -112,8 +112,34 @@ namespace CnGalWebSite.APIServer.Controllers
                 .ToListAsync();
             games = games.DistinctBy(s => s.Link).ToList();
 
+            var groupGames = new List<StoreInfo>();
 
-            var gameList = games.DistinctBy(s => s.Link)
+            foreach (var item in games.GroupBy(s => s.EntryId))
+            {
+                var temp = item.First();
+                //将相同游戏的商店信息合并
+                var revenue = item.Sum(s => s.Revenue);
+                var estimationOwnersMin = item.Sum(s => s.EstimationOwnersMin);
+                var estimationOwnersMax = item.Sum(s => s.EstimationOwnersMax);
+                var evaluationCount = item.Sum(s => s.EvaluationCount);
+                var price = item.Min(s => s.OriginalPrice);
+
+                double? score = 0;
+                foreach(var info in item)
+                {
+                    score += info.EvaluationCount * info.RecommendationRate;
+                }
+                temp.RecommendationRate = score / evaluationCount;
+                temp.Revenue = revenue;
+                temp.EstimationOwnersMin = estimationOwnersMin;
+                temp.EstimationOwnersMax = estimationOwnersMax;
+                temp.EvaluationCount = evaluationCount;
+                temp.OriginalPrice = price;
+                groupGames.Add(temp);
+            }
+
+
+            var gameList = groupGames
                 .Skip(page * max)
                 .Take(max)
                 .ToList();

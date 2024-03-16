@@ -64,14 +64,15 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
 
         public async Task RunTimedTask(RunTimedTaskModel Model)
         {
+            _logger.LogInformation("开始执行定时任务：{name}", Model.Note ?? ((TimedTaskType)Model.Type).GetDisplayName());
             try
             {
                 int maxNum = 0;
                 //根据不同类型任务进行调用
-            switch ((TimedTaskType)Model.Type)
+                switch ((TimedTaskType)Model.Type)
                 {
                     case TimedTaskType.UpdateGameSteamInfor:
-                        if(!int.TryParse(Model.Parameter, out maxNum))
+                        if (!int.TryParse(Model.Parameter, out maxNum))
                         {
                             maxNum = 20;
                         }
@@ -149,7 +150,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _recommendService.Update();
                         break;
                 }
-               
+
                 _logger.LogInformation("成功执行定时任务：{name}", Model.Note ?? ((TimedTaskType)Model.Type).GetDisplayName());
             }
             catch (Exception ex)
