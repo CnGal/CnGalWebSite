@@ -61,7 +61,14 @@ Class="entry-card-default store-info-card mb-4">
 
             @if (Model.StoreInfor.EstimationOwnersMax > 0 && Model.StoreInfor.EstimationOwnersMin > 0)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#} - {Model.StoreInfor.EstimationOwnersMax:#,#}")" Class="" />
+                @if (Model.StoreInfor.EstimationOwnersMax== Model.StoreInfor.EstimationOwnersMin)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数：{Model.StoreInfor.EstimationOwnersMin:#,#}")" Class="" />
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#} - {Model.StoreInfor.EstimationOwnersMax:#,#}")" Class="" />
+                }
             }
 
             @if (Model.StoreInfor.OriginalPrice >= 0)

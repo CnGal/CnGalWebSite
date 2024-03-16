@@ -70,7 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
             var steams = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Where(s => s.UpdateTime.Date < date && s.State != StoreState.Takedown && s.UpdateType == StoreUpdateType.Automatic && s.Entry.PubulishTime != null && s.Entry.PubulishTime < date)
-                .Where(s => s.PlatformType == PublishPlatformType.Steam)
+                .Where(s => s.PlatformType == PublishPlatformType.Steam || s.PlatformType == PublishPlatformType.TapTap)
                 .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
                 .Take(max)
                 .ToListAsync();
@@ -119,6 +119,9 @@ namespace CnGalWebSite.APIServer.Application.Stores
             {
                 case PublishPlatformType.Steam:
                     await UpdateSteamInfo(storeInfo);
+                    break;
+                case PublishPlatformType.TapTap:
+                    await UpdateTapTapInfo(storeInfo);
                     break;
                 default:
                     return;
@@ -193,7 +196,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 //折扣
                 storeInfo.CutNow ??= data.Data.Price_overview.Discount_percent;
                 //状态
-                if (storeInfo.State == StoreState.None)
+                if (storeInfo.State == StoreState.None && storeInfo.PriceNow > 0)
                 {
                     storeInfo.State = StoreState.OnSale;
                 }
@@ -218,7 +221,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 document.LoadHtml(content);
 
                 var node = document.GetElementbyId("userReviews");
-                if(node == null)
+                if (node == null)
                 {
                     _logger.LogError("获取 {name} - {id} Steam商店页面数据失败", storeInfo.Name, storeInfo.Link);
                     return;
@@ -385,6 +388,131 @@ namespace CnGalWebSite.APIServer.Application.Stores
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取 {name} - {id} gamalytic 数据失败", storeInfo.Name, storeInfo.Link);
+            }
+        }
+
+        #endregion
+
+        #region TapTap
+
+        /// <summary>
+        /// 更新TapTap的商店信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateTapTapInfo(StoreInfo storeInfo)
+        {
+            var data = new StoreInfo
+            {
+                Name = storeInfo.Name,
+                Link = storeInfo.Link,
+            };
+            var officalApiTask = UpdateTapTapInfoFromOfficialAPI(data);
+
+            await Task.WhenAll(officalApiTask);
+
+            storeInfo.State = data.State;
+            storeInfo.PriceLowest = data.PriceLowest;
+            storeInfo.OriginalPrice = data.OriginalPrice;
+            storeInfo.PriceNow = data.PriceNow;
+            storeInfo.CutNow = data.CutNow;
+            storeInfo.CutLowest = data.CutLowest;
+            storeInfo.PlayTime = data.PlayTime;
+            storeInfo.EvaluationCount = data.EvaluationCount;
+            storeInfo.RecommendationRate = data.RecommendationRate;
+            storeInfo.EstimationOwnersMax = data.EstimationOwnersMax;
+            storeInfo.EstimationOwnersMin = data.EstimationOwnersMin;
+            storeInfo.Revenue = data.Revenue;
+        }
+
+        /// <summary>
+        /// 使用TapTap官方API获取信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateTapTapInfoFromOfficialAPI(StoreInfo storeInfo)
+        {
+            try
+            {
+                var data = await _httpService.GetAsync<TapTapDataModel>("https://www.taptap.cn/webapiv2/app/v4/detail?X-UA=V%3D1%26PN%3DWebApp%26LANG%3Dzh_CN%26VN_CODE%3D102%26LOC%3DCN%26PLT%3DPC%26DS%3DAndroid%26UID%3D36729d9f-0ebc-4d8e-9959-7866f4a1c75f%26OS%3DWindows%26OSV%3D10%26DT%3DPC&id=" + storeInfo.Link);
+
+                if (data.Redirect != null)
+                {
+                    data = await _httpService.GetAsync<TapTapDataModel>("https://www.taptap.cn/webapiv2/app/v4/detail?X-UA=V%3D1%26PN%3DWebApp%26LANG%3Dzh_CN%26VN_CODE%3D102%26LOC%3DCN%26PLT%3DPC%26DS%3DAndroid%26UID%3D36729d9f-0ebc-4d8e-9959-7866f4a1c75f%26OS%3DWindows%26OSV%3D10%26DT%3DPC&id=" + data.Redirect.web_url.Split('/').LastOrDefault());
+                }
+
+                if (data.Data.Code == -1 || (data.Data.Price == null && data.Data.Stat == null))
+                {
+                    //storeInfo.State = StoreState.Takedown;
+                    _logger.LogError("获取 {name} - {id} TapTap官方API数据失败", storeInfo.Name, storeInfo.Link);
+                    return;
+                }
+                // 免费游戏
+                if (data.Data.Price == null && data.Data.Stat != null && data.Data.Stat.hits_total != 0)
+                {
+                    //原价
+                    storeInfo.OriginalPrice ??= 0;
+                    //现价
+                    storeInfo.PriceNow ??= 0;
+                    //折扣
+                    storeInfo.CutNow ??= 0;
+                    //历史最低
+                    storeInfo.PriceLowest ??= 0;
+                    //历史最高折扣
+                    storeInfo.CutLowest ??= 0;
+                    //状态
+                    if (storeInfo.State == StoreState.None)
+                    {
+                        storeInfo.State = StoreState.OnSale;
+                    }
+                }
+                else if (data.Data.Price != null)
+                {
+                    //原价
+                    if (storeInfo.OriginalPrice == null && string.IsNullOrWhiteSpace(data.Data.Price?.taptap_original) == false)
+                    {
+                        if (int.TryParse(data.Data.Price.taptap_original.Replace("￥", ""), out int price))
+                        {
+                            storeInfo.OriginalPrice = price;
+                        }
+                    }
+
+                    //现价
+                    if (storeInfo.PriceNow == null && string.IsNullOrWhiteSpace(data.Data.Price?.taptap_current) == false)
+                    {
+                        if (int.TryParse(data.Data.Price.taptap_current.Replace("￥", ""), out int price))
+                        {
+                            storeInfo.PriceNow = price;
+                        }
+                    }
+                    //折扣
+                    storeInfo.CutNow ??= data.Data.Price?.discount_rate;
+                    //游玩人数
+                    storeInfo.EstimationOwnersMax ??= data.Data.Stat.bought_count;
+                    storeInfo.EstimationOwnersMin ??= data.Data.Stat.bought_count;
+                    storeInfo.Revenue ??= (int)(data.Data.Stat.bought_count * storeInfo.OriginalPrice.Value);
+                    //状态
+                    if (storeInfo.State == StoreState.None)
+                    {
+                        storeInfo.State = StoreState.OnSale;
+                    }
+                }
+
+                // 评测
+                if(storeInfo.RecommendationRate==null&&string.IsNullOrWhiteSpace(data.Data.Stat?.Rating?.Score)==false)
+                {
+                    if (double.TryParse(data.Data.Stat?.Rating?.Score, out double score))
+                    {
+                        storeInfo.RecommendationRate ??= score / (double)data.Data.Stat?.Rating?.Max * 100;
+                    }
+                }
+                storeInfo.EvaluationCount ??= data.Data.Stat?.review_count;
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取 {name} - {id} TapTap官方API数据失败", storeInfo.Name, storeInfo.Link);
             }
         }
 

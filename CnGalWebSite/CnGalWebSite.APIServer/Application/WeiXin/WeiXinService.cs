@@ -45,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             _articleRepository = articleRepository;
             _articleService = articleService;
             _appHelper = appHelper;
-           _storeInfoService= storeInfoService;
+            _storeInfoService = storeInfoService;
             _searchHelper = searchHelper;
             _entryService = entryService;
             _roleBirthdayRepository = roleBirthdayRepository;
@@ -133,8 +133,8 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         {
             var result = await _searchHelper.QueryAsync(new DataModel.Application.Search.Dtos.SearchInputModel
             {
-                MaxResultCount=6,
-                FilterText=text,
+                MaxResultCount = 6,
+                FilterText = text,
             });
 
             var sb = new StringBuilder();
@@ -229,42 +229,36 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 {
                     _ = sb.AppendLine();
 
-                    var steam = await _storeInfoService.Get(release.PublishPlatformType,release.PublishPlatformName,release.Link,release.Name, model.Id);
-                    if (steam.PriceNow > 0)
+                    var steam = await _storeInfoService.Get(release.PublishPlatformType, release.PublishPlatformName, release.Link, release.Name, model.Id);
+                    if (steam.State == StoreState.OnSale)
                     {
-                        _ = sb.AppendLine($"当前价格：¥ {steam.PriceNow:0.00}{(steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
-
-                        if (steam.CutLowest > 0)
+                        if (steam.PriceNow > 0)
                         {
-                            _ = sb.AppendLine($"历史最低：¥ {steam.PriceLowest:0.00}");
+                            _ = sb.AppendLine($"当前价格：¥ {steam.PriceNow:0.00}{(steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
+
+                            if (steam.CutLowest > 0)
+                            {
+                                _ = sb.AppendLine($"历史最低：¥ {steam.PriceLowest:0.00}");
+                            }
+                        }
+                        else if (steam.PriceNow == 0)
+                        {
+                            if (entry.PubulishTime < DateTime.Now.ToCstTime())
+                            {
+                                _ = sb.AppendLine($"当前价格：¥ 0.00 - Free");
+                            }
+                            else
+                            {
+                                _ = sb.AppendLine($"未发售");
+                            }
+
                         }
                     }
-                    else if (steam.PriceNow == 0)
-                    {
-                        _ = sb.AppendLine($"当前价格：¥ 0.00 - Free");
-                    }
-                    else if (steam.PriceNow == -1)
+                    else if (steam.State == StoreState.NotPublished)
                     {
                         _ = sb.AppendLine($"未发售");
-
-
                     }
-                    else if (steam.PriceNow == -2)
-                    {
-                        if (steam.OriginalPrice > 0)
-                        {
-                            _ = sb.AppendLine($"价格：¥ {steam.OriginalPrice:0.00}（数据未更新）");
-                        }
-                        else if (steam.OriginalPrice == 0)
-                        {
-                            _ = sb.AppendLine($"价格：¥ 0.00 - Free（数据未更新）");
-                        }
-                        else
-                        {
-                            _ = sb.AppendLine($"数据未更新");
-                        }
-                    }
-                    else if (steam.PriceNow == -3)
+                    else if (steam.State == StoreState.Takedown)
                     {
                         _ = sb.AppendLine($"已下架");
                     }
