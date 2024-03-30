@@ -326,8 +326,8 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                var lottery=  await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == 10);
-
-                lottery.MainPicture = "https://tucang.cngal.top/api/image/show/eff79eeb2860dc7b117b96c90d4daf81?https://image.cngal.org/images/upload/20240330/3fe68efcc0de2071ee489163609c6a1a616cae66.jpg";
+                lottery.MainPicture = null;
+                lottery.Thumbnail = "https://tucang.cngal.top/api/image/show/eff79eeb2860dc7b117b96c90d4daf81?https://image.cngal.org/images/upload/20240330/3fe68efcc0de2071ee489163609c6a1a616cae66.jpg";
                 lottery.BriefIntroduction = "CnGal八周年啦！";
                 await _lotteryRepository.UpdateAsync(lottery);
 
