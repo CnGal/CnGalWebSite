@@ -566,3 +566,18 @@
 .revenues-page .index-card {
     font-size: 1rem;
 }
+
+.lottery-home-page > .md-card {
+    flex-direction:column;
+}
+.lottery-home-page .image-card {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+}
+
+.lottery-home-page .head-card {
+    width: 100%;
+}
+    .lottery-home-page .head-card .title-text {
+        font-size: larger;
+    }

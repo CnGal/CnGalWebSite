@@ -329,7 +329,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 LastOnlineTime = DateTime.Now.ToCstTime()
             };
 
-            await _userRepository.InsertAsync(user);
+            try
+            {
+                await _userRepository.InsertAsync(user);
+            }
+            catch
+            {
+                // 插入失败说明同时并发的请求已经插入了
+            }
+            
             return user;
         }
 

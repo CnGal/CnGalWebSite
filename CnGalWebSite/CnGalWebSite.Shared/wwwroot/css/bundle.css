@@ -2682,10 +2682,75 @@ div.prizeTips {
         padding: 0 0.5em;
     }
 
-.slotMachine-box ul
-{
-    padding:0;
+.slotMachine-box ul {
+    padding: 0;
 }
+/*主页*/
+
+.lottery-home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .lottery-home-page > .md-card {
+        max-width: 700px;
+        width: 100%;
+        flex-direction: row;
+    }
+
+    .lottery-home-page .head-card {
+        display: flex;
+        padding: 1rem;
+        flex-direction: column;
+        width: 60%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .lottery-home-page .image-card {
+        width: 40%;
+        aspect-ratio: 600 / 900;
+        height: fit-content;
+    }
+
+    .lottery-home-page .head-card .title-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        gap: 1rem;
+    }
+
+    .lottery-home-page .head-card .info-card {
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+        font-size: small;
+    }
+
+            .lottery-home-page .head-card .info-card div {
+                display: flex;
+            }
+
+    .lottery-home-page .content-card {
+   
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .lottery-home-page .content-card a {
+            width: 200px;
+            max-width: 100%;
+        }
+        .lottery-home-page .content-card  .condition-card {
+            font-weight: bold;
+            font-size: small;
+        }
+        .lottery-home-page .title-card .text-card {
+            white-space: pre-wrap;
+        }
 
 
 #top {
