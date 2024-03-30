@@ -70,7 +70,8 @@
       "wwwroot/css/app/entry.css",
       "wwwroot/css/app/article.css",
       "wwwroot/css/app/official-website.css",
-      "wwwroot/css/app/revenues.css"
+      "wwwroot/css/app/revenues.css",
+      "wwwroot/css/app/lottery.css"
     ]
   }
 ]

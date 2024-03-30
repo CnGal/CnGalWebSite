@@ -1,48 +1,44 @@
-﻿<a href="@("lotteries/index/"+Model.Id)">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100 a-font-color" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div class="">
-            <div class=" pt-3">
-                <img class="img-fluid" src="@Model.MainPicture">
-            </div>
-            <div class=" pt-3">
-                <header style=" display: flex; align-items: center;" class="mb-2">
-                    <div class="article-home-tag">抽奖</div>
-                    <h5 class="fw-bold mb-0 text-truncate-2">@Model.Name</h5>
-                </header>
-                <div style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; ">
-                    @Model.BriefIntroduction
+﻿@inject IDataCacheService _dataCacheService
+
+
+<MDCard Class="mb-4">
+    <img class="image-card" src="@(_dataCacheService.IsApp?Model.MainPicture:Model.Thumbnail)" alt="@Model.Name" />
+    <div class="head-card">
+        <div class="title-card">
+            <h2 class="title-text">@Model.Name</h2>
+            <dl class="info-card">
+                <div>
+                    <dt>参与人数：</dt>
+                    <dd>@Model.Count</dd>
                 </div>
-                <div class="mt-2 d-flex" style="color:gray;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.State" />
-                    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
-                    {
-                        
-                        <span>未开始</span>
-                    }
-                    else if (DateTime.Now.ToCstTime() > Model.EndTime)
-                    {
-                      
-                        <span>已结束</span>
-                    }
-                    else
-                    {
-                       
-                        <span>正在进行</span>
-                    }
+                <div>
+                    <dt>截止时间：</dt>
+                    <dd>@Model.EndTime.ToString("yyyy年M月d日  H点")</dd>
                 </div>
-               
+            </dl>
+            <div class="text-card">
+                @Model.BriefIntroduction
             </div>
         </div>
-        <p class="mt-2 d-flex" style="color: gray;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" />
-            <span class="article-home-infor-text">@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d  HH:mm"))&nbsp;&nbsp;&nbsp;</span>
+        <div class="content-card">
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Users" />
-            <span class="article-home-infor-text">@(Model.Count)人参与&nbsp;&nbsp;&nbsp;</span>
-        </p>
-
+            <div class="condition-card">
+                参与条件：@Model.ConditionType.GetDisplayName()
+            </div>
+            <div class="button-card">
+                @if (Model.EndTime < DateTime.Now.ToCstTime())
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Outlined Icon="@IconType.GiftOpened.ToIconString()" Text="查看抽奖" Href="@("lotteries/index/"+Model.Id)" />
+                }
+                else
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Gift.ToIconString()" Text="参与抽奖" Href="@("lotteries/index/"+Model.Id)" />
+                }
+            </div>
+        </div>
     </div>
-</a>
+
+</MDCard>
 
 
 @code {

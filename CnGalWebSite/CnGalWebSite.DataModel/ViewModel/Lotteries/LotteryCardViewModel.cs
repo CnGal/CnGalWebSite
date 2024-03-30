@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.DataModel.Model;
+using System;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {
@@ -12,11 +13,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 
         public string MainPicture { get; set; }
 
+        public string Thumbnail { get; set; }
+
         public DateTime BeginTime { get; set; }
 
         public DateTime EndTime { get; set; }
 
         public long Count { get; set; }
 
+        public LotteryConditionType ConditionType { get; set; }
     }
 }
