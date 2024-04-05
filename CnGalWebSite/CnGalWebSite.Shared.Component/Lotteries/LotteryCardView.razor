@@ -1,8 +1,14 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject IUserService _userService
+@inject NavigationManager NavigationManager
 
 
-<MDCard Class="mb-4">
-    <img class="image-card" src="@(_dataCacheService.IsApp?Model.MainPicture:Model.Thumbnail)" alt="@Model.Name" />
+<MDCard Class="mb-8">
+    <a class="image-link-card" href="@("lotteries/index/"+Model.Id)">
+        <img class="image-card" src="@(_dataCacheService.IsApp?Model.MainPicture:Model.Thumbnail)" alt="@Model.Name" />
+    </a>
     <div class="head-card">
         <div class="title-card">
             <h2 class="title-text">@Model.Name</h2>
@@ -23,16 +29,34 @@
         <div class="content-card">
 
             <div class="condition-card">
-                参与条件：@Model.ConditionType.GetDisplayName()
+                @if(Model.ConditionType== LotteryConditionType.Wishlist)
+                {
+                    <span>参与条件：把游戏 </span>
+
+                    <a target="_blank" href="@($"https://store.steampowered.com/app/{Model.GameSteamId}")">加入Steam愿望单</a>
+                }
+                else
+                {
+                    @($"参与条件：{Model.ConditionType.GetDisplayName()}")
+                }
+                
             </div>
             <div class="button-card">
-                @if (Model.EndTime < DateTime.Now.ToCstTime())
+                @if (Model.EndTime < DateTime.Now.ToCstTime() || Model.IsParticipated)
                 {
                     <CnGalWebSite.Components.Buttons.MasaButton Rounded Outlined Icon="@IconType.GiftOpened.ToIconString()" Text="查看抽奖" Href="@("lotteries/index/"+Model.Id)" />
                 }
                 else
                 {
-                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Gift.ToIconString()" Text="参与抽奖" Href="@("lotteries/index/"+Model.Id)" />
+                    <AuthorizeView>
+                        <Authorized>
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Gift.ToIconString()" Text="参与抽奖" IsAsync OnClick="OnParticipateInLottery" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <CnGalWebSite.Components.Buttons.MasaButton Text="登入后参与抽奖" Rounded OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
+                        </NotAuthorized>
+                    </AuthorizeView>
+                    
                 }
             </div>
         </div>
@@ -41,8 +65,14 @@
 </MDCard>
 
 
+
 @code {
     [Parameter]
     public LotteryCardViewModel Model { get; set; }
+
+
+    [Parameter]
+    public EventCallback OnParticipateInLottery{ get; set; }
+
 
 }

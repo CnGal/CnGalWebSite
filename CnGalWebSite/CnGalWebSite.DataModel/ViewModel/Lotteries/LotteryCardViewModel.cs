@@ -22,5 +22,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public long Count { get; set; }
 
         public LotteryConditionType ConditionType { get; set; }
+
+        public bool IsParticipated { get; set; }
+
+        public string GameSteamId { get; set; }
     }
 }

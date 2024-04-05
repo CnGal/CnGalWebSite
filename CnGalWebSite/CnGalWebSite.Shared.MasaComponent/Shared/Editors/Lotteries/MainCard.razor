@@ -21,10 +21,16 @@
              <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.ConditionType" TValue="LotteryConditionType" Label="参加抽奖的条件" />
          </MCol>
          <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
-         @if (Model.ConditionType == LotteryConditionType.BookingGame)
+        @if (Model.ConditionType == LotteryConditionType.BookingGame)
         {
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.GameName" Label="关联游戏" AutoCompleteItems="EntryGameItems" />
+            </MCol>
+        }
+        @if ( Model.ConditionType == LotteryConditionType.Wishlist)
+        {
+            <MCol Cols="12" Md="6">
+                <MTextField @bind-Value="Model.GameSteamId" Label="游戏SteamId" />
             </MCol>
         }
         <MCol Cols="12">

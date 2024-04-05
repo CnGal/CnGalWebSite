@@ -1,20 +1,21 @@
 ﻿@page "/lotteries/home"
 @page "/lotteries"
 
+@inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
-
-
+@inject IPopupService PopupService
+@inject IUserService _userService
 @inject NavigationManager NavigationManager
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="抽奖板块" Description="这里是正在测试中的抽奖板块，如果有什么好的设计方案欢迎加群761794704反馈" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="抽奖板块" Description="快来参加抽奖吧" />
 
 <div class="lottery-home-page">
         @if (isReady)
         {
             @foreach (var item in Model)
             {
-                <CnGalWebSite.Shared.Component.Lotteries.LotteryCardView Model="item" />
+            <CnGalWebSite.Shared.Component.Lotteries.LotteryCardView Model="item" OnParticipateInLottery="@(()=>OnParticipateInLottery(item))" />
             }
         }
         else
@@ -23,6 +24,8 @@
         }
 
 </div>
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
 
@@ -32,6 +35,17 @@
     bool isReady = false;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
+
+
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
+
+    public void OnEditSteam()
+    {
+        editUserSteamInforTip?.Refresh(true);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,6 +58,45 @@
         catch (Exception ex)
         {
             await ErrorHandler.ProcessError(ex, "获取抽奖主页信息列表失败");
+        }
+    }
+
+
+
+    public async Task OnParticipateInLottery(LotteryCardViewModel item)
+    {
+        try
+        {
+            // 判断是否已经绑定Steam账号
+            if (item.ConditionType == LotteryConditionType.Wishlist)
+            {
+                var model = await _httpService.GetAsync<EditUserDataViewModel>("api/space/EditUserData");
+                if (model.SteamIds.Count == 0)
+                {
+                    OnEditSteam();
+                    return;
+                }
+            }
+
+            var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+                {
+                    Id = item.Id,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+                });
+            if (obj.Successful)
+            {
+                await PopupService.ToastAsync("参与抽奖成功", AlertTypes.Success);
+                item.IsParticipated = true;
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastErrorAsync("参与抽奖失败", obj.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "参与抽奖失败");
         }
     }
 

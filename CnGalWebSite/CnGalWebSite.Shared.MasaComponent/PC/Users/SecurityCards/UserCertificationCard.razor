@@ -9,14 +9,14 @@
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {
-            <span>认证后可以审核对应词条的编辑</span>
+            <span style="font-size: small;" class="pb-2">认证后可以审核对应词条的编辑</span>
         }
         else
         {
-            <span>认证：@Model.UserCertificationModel.EntryName</span>
+            <span style="font-size: small;" class="pb-2">认证：@Model.UserCertificationModel.EntryName</span>
             @if (Model.UserCertificationModel.IsPending)
             {
-                <span>审核中</span>
+                <span style="font-size: small;" class="pb-2">审核中</span>
             }
 
         }

@@ -310,10 +310,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
             //新用户
             var (email, name) = context.User.Claims.GetExternalUserInfor();
-            if (await _userRepository.AnyAsync(s => s.Email == email))
-            {
-                email = null;
-            }
+            //if (await _userRepository.AnyAsync(s => s.Email == email))
+            //{
+            //    email = null;
+            //}
             while (await _userRepository.AnyAsync(s => s.UserName == name))
             {
                 name = "用户_" + new Random(DateTime.Now.Millisecond).Next(0, 99999).ToString();
