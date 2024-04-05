@@ -1,6 +1,7 @@
 ﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
@@ -31,16 +32,18 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
-        
+        private readonly ISteamInforService _steamInforService;
+
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<BookingUser, long> _bookingUserRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
         private readonly IOperationRecordService _operationRecordService;
         private readonly ILogger<LotteryService> _logger;
 
         public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository, IRepository<Message, long> messageRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger,
-         IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryService> logger, IRepository<Entry, int> entryRepository,
+        IRepository<BookingUser, long> bookingUserRepository, IRepository<Comment, long> commentRepository, IRepository<PlayedGame, long> playedGameRepository, IOperationRecordService operationRecordService, ISteamInforService steamInforService)
         {
             _lotteryRepository = lotteryRepository;
             _lotteryUserRepository = lotteryUserRepository;
@@ -49,13 +52,17 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _appHelper = appHelper;
             _userService = userService;
             _userRepository = userRepository;
-            
+
             _bookingUserRepository = bookingUserRepository;
             _commentRepository = commentRepository;
-            _operationRecordService=operationRecordService;
+            _operationRecordService = operationRecordService;
             _playedGameRepository = playedGameRepository;
             _logger = logger;
-            _messageRepository=messageRepository;
+            _messageRepository = messageRepository;
+
+            _entryRepository = entryRepository;
+
+            _steamInforService = steamInforService;
         }
 
         public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award, Lottery lottery)
@@ -77,7 +84,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     Note = $"抽奖Id：{lottery.Id}",
                     Type = UserIntegralType.Integral,
                     UserId = user.ApplicationUserId,
-                    SourceType= UserIntegralSourceType.Lottery
+                    SourceType = UserIntegralSourceType.Lottery
                 });
                 //更新用户积分
                 await _userService.UpdateUserIntegral(await _userRepository.FirstOrDefaultAsync(s => s.Id == user.ApplicationUserId));
@@ -124,7 +131,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                         item.WinningUsers.Add(winnningUser);
                         _ = NotWinnningUser.Remove(winnningUser);
 
-                        await SendPrizeToWinningUser(winnningUser, item,lottery);
+                        await SendPrizeToWinningUser(winnningUser, item, lottery);
                     }
                     else
                     {
@@ -189,7 +196,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _ = await _lotteryRepository.UpdateAsync(lottery);
         }
 
-        public async Task<string> CheckCondition(ApplicationUser user,Lottery lottery)
+        public async Task<string> CheckCondition(ApplicationUser user, Lottery lottery)
         {
             if (lottery.ConditionType == LotteryConditionType.GameRecord)
             {
@@ -200,7 +207,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             }
             else if (lottery.ConditionType == LotteryConditionType.CommentLottery)
             {
-                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery ) == false)
+                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery) == false)
                 {
                     return "参加该抽奖需要评论该抽奖，并通过审核";
                 }
@@ -212,14 +219,21 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     return "参加该抽奖需要预约游戏";
                 }
             }
+            else if (lottery.ConditionType == LotteryConditionType.Wishlist)
+            {
+                if (await _steamInforService.CheckUserWishlist(user, lottery.GameSteamId) == false)
+                {
+                    return "参加该抽奖需要将游戏添加到愿望单";
+                }
+            }
 
             return null;
         }
 
-        public async Task AddUserToLottery(Lottery lottery,ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification)
+        public async Task AddUserToLottery(Lottery lottery, ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification)
         {
             //检查抽奖条件
-           var result=await CheckCondition(user, lottery);
+            var result = await CheckCondition(user, lottery);
             if (result != null)
             {
                 throw new Exception(result);
@@ -251,7 +265,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             }
         }
 
-        public async Task CopyUserFromBookingToLottery(Booking booking,Lottery lottery)
+        public async Task CopyUserFromBookingToLottery(Booking booking, Lottery lottery)
         {
             var users = booking.Users.Where(s => lottery.Users.Any(x => x.ApplicationUserId == s.ApplicationUserId) == false).Select(s => s.ApplicationUser);
 

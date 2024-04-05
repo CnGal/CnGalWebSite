@@ -105,6 +105,12 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public LotteryConditionType ConditionType { get; set; }
 
+        /// <summary>
+        /// 游戏SteamId
+        /// </summary>
+        public string GameSteamId { get; set; }
+
+
         public virtual ICollection<LotteryUser> Users { get; set; } = new List<LotteryUser>();
 
         public virtual ICollection<LotteryAward> Awards { get; set; } = new List<LotteryAward>();
@@ -130,6 +136,8 @@ namespace CnGalWebSite.DataModel.Model
         CommentLottery,
         [Display(Name = "预约游戏")]
         BookingGame,
+        [Display(Name = "将游戏加入Steam愿望单")]
+        Wishlist,
     }
 
     public class LotteryUser

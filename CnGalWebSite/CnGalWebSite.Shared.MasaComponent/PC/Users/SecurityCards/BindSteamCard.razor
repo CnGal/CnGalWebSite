@@ -1,0 +1,29 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="Steam账号" Icon="@IconType.Steam.ToIconString()" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span style="font-size: small;" class="pb-2">可以导入Steam库存，还可以分享游玩记录</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block OnClick="OnEditSteam" Color="primary">
+                    <MIcon Left>@IconType.Steam.ToIconString()</MIcon>
+                    绑定
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Components.Containers.MasaTitleContainer>
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip"/>
+
+@code {
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
+
+    public void OnEditSteam()
+    {
+        editUserSteamInforTip?.Refresh(true);
+    }
+}

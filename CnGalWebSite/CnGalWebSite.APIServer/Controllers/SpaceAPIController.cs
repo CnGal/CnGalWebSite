@@ -395,7 +395,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Birthday = user.Birthday;
             model.PersonalSignature = user.PersonalSignature;
             model.CanComment = user.CanComment ?? true;
-            model.SteamId = user.SteamId;
+            model.SteamIds = user.SteamId?.Split(",")?.Where(s=>!string.IsNullOrWhiteSpace(s))?.ToList()??[];
             model.Id = user.Id;
             model.IsShowFavorites = user.IsShowFavotites;
             model.IsShowGameRecord = user.IsShowGameRecord;
@@ -452,11 +452,22 @@ namespace CnGalWebSite.APIServer.Controllers
             user.CanComment = model.CanComment;
 
             //判断SteamId是否改变
-            if (model.SteamId != user.SteamId)
+            var steamId = string.Join(",", model.SteamIds);
+            if (steamId != user.SteamId)
             {
-                user.SteamId = model.SteamId;
+                // 判断SteamId是否已经被绑定
+                foreach(var item in model.SteamIds)
+                {
+                    if(await _userRepository.AnyAsync(s=>s.SteamId.Contains(item)))
+                    {
+                        return new Result { Successful = false, Error = $"SteamId被其他用户绑定：{item}" };
+                    }
+                }
+
+
+                user.SteamId = steamId;
                 user = await _userRepository.UpdateAsync(user);
-                if (string.IsNullOrWhiteSpace(model.SteamId) == false)
+                if (string.IsNullOrWhiteSpace(steamId) == false)
                 {
                     //更新游戏信息
                     if (await _steamInforService.UpdateUserSteam(user) == false)

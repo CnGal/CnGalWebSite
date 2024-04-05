@@ -348,6 +348,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<LotteryCardViewModel>>> GetLotteryCardsAsync()
         {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
             var lotteries = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
@@ -366,9 +369,11 @@ namespace CnGalWebSite.APIServer.Controllers
                     Count = item.Users.Count,
                     EndTime = item.EndTime,
                     Id = item.Id,
+                    GameSteamId=item.GameSteamId,
                     MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                     Thumbnail = item.Thumbnail,
                     Name = item.Name,
+                    IsParticipated = user != null && item.Users.Any(s => s.ApplicationUserId == user.Id)
                 });
             }
 
@@ -417,6 +422,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 MainPicture = model.MainPicture,
                 Thumbnail = model.Thumbnail,
                 ConditionType = model.ConditionType,
+                GameSteamId = model.GameSteamId,
             };
 
             foreach (var item in model.Awards)
@@ -501,6 +507,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Name = lottery.Name,
                 Thumbnail = lottery.Thumbnail,
                 Type = lottery.Type,
+                GameSteamId = lottery.GameSteamId,
                 ConditionType = lottery.ConditionType,
             };
 
@@ -591,6 +598,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             lottery.Name = model.Name;
+            lottery.GameSteamId = model.GameSteamId;
             lottery.EndTime = model.EndTime;
             lottery.LastEditTime = DateTime.Now.ToCstTime();
             lottery.SmallBackgroundPicture = model.SmallBackgroundPicture;

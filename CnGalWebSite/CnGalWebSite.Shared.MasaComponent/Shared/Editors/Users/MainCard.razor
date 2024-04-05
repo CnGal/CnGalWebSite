@@ -13,11 +13,6 @@
         <MCol Cols="12">
             <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
         </MCol>
-
-
-        <MCol Cols="12">
-             <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" />
-         </MCol>
          <MCol Cols="12">
              <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2" Color="primary">
                  点击查看<a @onclick="OnClickQuestion" class="primary--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦

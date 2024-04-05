@@ -112,8 +112,13 @@ div.prizeTips {
         gap: 1rem;
     }
 
-    .lottery-home-page .image-card {
+    .lottery-home-page .image-link-card {
+        display: flex;
         width: 40%;
+    }
+
+    .lottery-home-page .image-card {
+        width: 100%;
         aspect-ratio: 600 / 900;
         height: fit-content;
     }

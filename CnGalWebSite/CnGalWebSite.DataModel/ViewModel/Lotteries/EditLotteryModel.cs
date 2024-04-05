@@ -45,6 +45,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         [Display(Name = "关联游戏")]
         public string GameName { get; set; }
 
+        [Display(Name = "游戏SteamId")]
+        public string GameSteamId { get; set; }
+
         public List<EditLotteryAwardModel> Awards { get; set; } = new List<EditLotteryAwardModel>();
 
         public override Result Validate()
@@ -60,6 +63,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
                 if(string.IsNullOrWhiteSpace(GameName))
                 {
                     return new Result { Error = "筛选条件为“预约游戏”时，关联游戏不能为空" };
+                }
+            }
+            if (ConditionType == LotteryConditionType.Wishlist)
+            {
+                if (string.IsNullOrWhiteSpace(GameSteamId))
+                {
+                    return new Result { Error = "筛选条件为“愿望单”时，游戏SteamId不能为空" };
                 }
             }
 

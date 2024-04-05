@@ -1,5 +1,4 @@
-﻿
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
@@ -17,16 +16,38 @@
         </MCardText>
 
         <MCardText Class="pt-0">
-                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）"  />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Color="primary">
-                    Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            <CnGalWebSite.Components.Buttons.MasaButton Text="添加" IsAsync="true" OnClick="OnClickAdd" Icon="@IconType.Create.ToIconString()" Rounded />
+            <MSimpleTable Class="mb-4">
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                           SteamId
+                        </th>
+                        <th class="text-left">
+                            操作
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SteamIds)
+                    {
+                        <tr @key="item">
+                            <td style="min-width: 50px; ">@item</td>
+                            <td>
+                                <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>DeleteOther(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </MSimpleTable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Color="primary">
+                Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         </MCardText>
-        <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
-            <CnGalWebSite.Components.Buttons.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" TextStyle />
+        <MCardText Class="d-flex pt-0">
             <MSpacer></MSpacer>
-            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Rounded />
-        </MCardActions>
+            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="@IconType.Save.ToIconString()" Rounded />
+        </MCardText>
     </MDCard>
 </MDialog>
 
@@ -60,16 +81,10 @@
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(Model.SteamId))
-            {
-                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId不能为空");
-                return;
-            }
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
-            var steamIds = Model.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
-            foreach (var item in steamIds)
+            foreach (var item in Model.SteamIds)
             {
-                if (regex.IsMatch(Model.SteamId) == false)
+                if (regex.IsMatch(item) == false)
                 {
                     await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId需为64位纯数字");
                     return;
@@ -81,15 +96,14 @@
             if (obj.Successful == false)
             {
 
-                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", obj.Error??"参数不符合要求");
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", obj.Error ?? "参数不符合要求");
             }
             else
             {
                 await PopupService.ToastSuccessAsync("编辑用户Steam信息成功", "编辑用户Steam信息成功");
                 Dialog = false;
                 StateHasChanged();
-                await OnChanged.InvokeAsync(Model.SteamId);
-
+                await OnChanged.InvokeAsync(string.Join(",", Model.SteamIds));
             }
         }
         catch (Exception ex)
@@ -98,9 +112,9 @@
         }
     }
 
-    public void OnClickQuestion()
+    public void OnClickAdd()
     {
-        _eventService.OpenNewPage(NavigationManager.BaseUri + "articles/index/5");
+        NavigationManager.NavigateTo($"https://steamcommunity.com/openid/login?openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.realm={NavigationManager.BaseUri}&openid.return_to={NavigationManager.BaseUri}bind-steam&openid.ns.ax=http%3A%2F%2Fopenid.net%2Fsrv%2Fax%2F1.0&openid.ax.mode=fetch_request&openid.ax.type.email=http%3A%2F%2Faxschema.org%2Fcontact%2Femail&openid.ax.type.name=http%3A%2F%2Faxschema.org%2FnamePerson&openid.ax.type.first=http%3A%2F%2Faxschema.org%2FnamePerson%2Ffirst&openid.ax.type.last=http%3A%2F%2Faxschema.org%2FnamePerson%2Flast&openid.ax.type.email2=http%3A%2F%2Fschema.openid.net%2Fcontact%2Femail&openid.ax.type.name2=http%3A%2F%2Fschema.openid.net%2FnamePerson&openid.ax.type.first2=http%3A%2F%2Fschema.openid.net%2FnamePerson%2Ffirst&openid.ax.type.last2=http%3A%2F%2Fschema.openid.net%2FnamePerson%2Flast&openid.ax.required=email,name,first,last,email2,name2,first2,last2");
 
     }
 
@@ -109,6 +123,12 @@
         Dialog = dialog;
         StateHasChanged();
 
+    }
+
+    public void DeleteOther(string steamId)
+    {
+        Model.SteamIds.Remove(steamId);
+        StateHasChanged();
     }
 
 

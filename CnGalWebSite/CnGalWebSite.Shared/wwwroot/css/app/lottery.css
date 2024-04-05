@@ -12,3 +12,12 @@
     .lottery-home-page .head-card .title-text {
         font-size: larger;
     }
+.lottery-home-page .image-link-card {
+    display: flex;
+    width: 100%;
+}
+
+.lottery-home-page .image-card {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+}

@@ -8,11 +8,11 @@
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
         {
-            <span>绑定QQ号可以向看板娘查询信息，点击绑定获取身份识别码，并在群聊中发送【看板娘，绑定+身份识别码】即可绑定</span>
+            <span style="font-size: small;" class="pb-2">绑定QQ号可以向看板娘查询信息，点击绑定获取身份识别码，并在群聊中发送【看板娘，绑定+身份识别码】即可绑定</span>
         }
         else
         {
-            <span>QQ号：@Model.GroupQQ</span>
+            <span style="font-size: small;" class="pb-2">QQ号：@Model.GroupQQ</span>
 
     }
 

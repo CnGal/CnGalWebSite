@@ -7,7 +7,9 @@ using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nest;
 using Newtonsoft.Json.Linq;
+using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,19 +43,19 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _logger = logger;
         }
 
-        public async  Task BatchUpdateUserSteamInfo(int max)
+        public async Task BatchUpdateUserSteamInfo(int max)
         {
             var now = DateTime.Now.ToCstTime();
             var users = await _userRepository.GetAll()
-                .Where(s=>string.IsNullOrWhiteSpace(s.SteamId)==false)
+                .Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false)
                 .Where(s => now > s.LastUpdateSteamInfoTime.AddDays(7))
                 .OrderBy(s => s.LastUpdateSteamInfoTime)
                 .Take(max).ToListAsync();
 
-            foreach(var item in users)
+            foreach (var item in users)
             {
-                var re =await UpdateUserSteam(item);
-                if(re)
+                var re = await UpdateUserSteam(item);
+                if (re)
                 {
                     _logger.LogInformation("成功更新用户 - {name}({id}) 的Steam信息", item.UserName, item.Id);
                 }
@@ -185,7 +187,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             foreach (var item in steams)
             {
                 //计算总价格
-                var price = gameIds.Any() ? await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && s.OriginalPrice != null && s.OriginalPrice >0&& s.EntryId != null && gameIds.Contains(s.EntryId.Value)).SumAsync(s => s.OriginalPrice.Value) : 0;
+                var price = gameIds.Any() ? await _storeInfoRepository.GetAll().AsNoTracking().Where(s => s.PlatformType == PublishPlatformType.Steam && s.OriginalPrice != null && s.OriginalPrice > 0 && s.EntryId != null && gameIds.Contains(s.EntryId.Value)).SumAsync(s => s.OriginalPrice.Value) : 0;
 
                 model.Add(new SteamUserInforModel
                 {
@@ -230,6 +232,50 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return user;
         }
 
+        /// <summary>
+        /// 检查多个steamid愿望单是否有目标游戏
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckUserWishlist(ApplicationUser user, string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(user.SteamId))
+            {
+                return false;
+            }
+            var ids = user.SteamId.Split(',');
+            foreach (var id in ids)
+            {
+                if (await CheckGameInWishlistSteam(id, gameId))
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        /// <summary>
+        /// 检查单个用户的愿望单中是否有目标游戏
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckGameInWishlistSteam(string userId, string gameId)
+        {
+            try
+            {
+                var jsonContent = await _httpClient.GetStringAsync($"https://store.steampowered.com/wishlist/profiles/{userId}/wishlistdata/?p=0");
+                var obj = JObject.Parse(jsonContent);
+                return obj.ContainsKey(gameId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取用户Steam愿望单失败");
+                return false;
+            }
+        }
     }
-    
+
 }

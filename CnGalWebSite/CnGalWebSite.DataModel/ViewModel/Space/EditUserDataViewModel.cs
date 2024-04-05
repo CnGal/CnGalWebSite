@@ -43,9 +43,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public bool IsShowGameRecord { get; set; }
 
         [Display(Name = "SteamID64（64位的数字Id，可用逗号分隔多个Id）")]
-        public string SteamId { get; set; }
+        public List<string> SteamIds { get; set; }
 
-        
+
 
         /// <summary>
         /// 上次修改密码时间
@@ -71,7 +71,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
             if (string.IsNullOrWhiteSpace(UserName))
             {
-                return new Result { Error= "请输入用户名" };
+                return new Result { Error = "请输入用户名" };
 
             }
             if (UserName.Length > 20)
@@ -79,15 +79,15 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
                 return new Result { Error = "用户名必须少于20个字符" };
             }
             //处理头衔
-            if (Ranks.Any(s=>s.IsShow)==false)
+            if (Ranks.Any(s => s.IsShow) == false)
             {
                 return new Result { Error = "至少展示一个头衔" };
             }
-            if (string.IsNullOrWhiteSpace(SteamId) == false)
+            if (SteamIds.Count != 0)
             {
                 System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
-                var steamIds = SteamId.Replace(" ","").Replace("，", ",").Replace("、", ",").Split(',');
-                foreach (var item in steamIds)
+
+                foreach (var item in SteamIds)
                 {
                     if (regex.IsMatch(item) == false)
                     {
