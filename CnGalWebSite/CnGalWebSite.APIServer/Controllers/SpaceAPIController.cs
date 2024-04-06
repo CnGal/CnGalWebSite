@@ -456,13 +456,13 @@ namespace CnGalWebSite.APIServer.Controllers
             if (steamId != user.SteamId)
             {
                 // 判断SteamId是否已经被绑定
-                foreach(var item in model.SteamIds)
-                {
-                    if(await _userRepository.AnyAsync(s=>s.SteamId.Contains(item)))
-                    {
-                        return new Result { Successful = false, Error = $"SteamId被其他用户绑定：{item}" };
-                    }
-                }
+                //foreach(var item in model.SteamIds)
+                //{
+                //    if(await _userRepository.AnyAsync(s=>s.SteamId.Contains(item)))
+                //    {
+                //        return new Result { Successful = false, Error = $"SteamId被其他用户绑定：{item}" };
+                //    }
+                //}
 
 
                 user.SteamId = steamId;

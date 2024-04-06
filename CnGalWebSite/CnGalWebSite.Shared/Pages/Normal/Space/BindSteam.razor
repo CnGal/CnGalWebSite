@@ -1,30 +1,22 @@
-﻿@page "/bind-steam"
+﻿@page "/bind-steam/{returnurl}"
 
 @inject NavigationManager NavigationManager
 @inject IHttpService _httpService
 
-@if (success)
-{
-    <NotFoundCard Page>
-        <h1 class="text-center title-large">绑定Steam账号成功</h1>
-        <div class="text-center">@("我们会在 5 秒后帮你返回") <a href="/">主页</a> 哦~</div>
-    </NotFoundCard>
-}
-else
-{
-    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
-}
+
+<CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+
 
 @code {
     [SupplyParameterFromQuery(Name = "openid.claimed_id")]
     [Parameter]
     public string openid_claimed_id { get; set; }
 
+    [Parameter]
+    public string returnurl { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-
-    bool success;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -61,15 +53,14 @@ else
                 }
                 else
                 {
-                    success = true;
-                    StateHasChanged();
+                    NavigationManager.NavigateTo(ToolHelper.Base64DecodeUrl(returnurl));
                 }
 
             }
             catch (Exception ex)
             {
                 await ErrorHandler.ProcessError(ex, "绑定Steam失败");
-                NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo(ToolHelper.Base64DecodeUrl(returnurl));
                 return;
             }
         }
