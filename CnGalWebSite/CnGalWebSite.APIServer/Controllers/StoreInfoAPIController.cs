@@ -105,7 +105,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var games = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Where(s => s.PriceNow != null && s.PriceNow > 0 && s.Revenue != null && s.Revenue > 0 && s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0 && s.EstimationOwnersMin != null && s.EstimationOwnersMin > 0)
+                .Where(s => s.PriceNow != null && s.PriceNow > 0 && s.Revenue != null && s.Revenue > 0 && s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0 /*&& s.EstimationOwnersMin != null && s.EstimationOwnersMin > 0*/)
                 .Where(s => s.Entry != null && s.Entry.PubulishTime != null && (year == 0 || s.Entry.PubulishTime.Value.Year == year))
                 .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
                 .OrderByDescending(s => s.Revenue)
