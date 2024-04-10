@@ -2693,7 +2693,7 @@ div.prizeTips {
     align-items: center;
 }
 
-    .lottery-home-page > .md-card {
+    .lottery-home-page > .md-card, .lottery-home-page > .m-alert {
         max-width: 700px;
         width: 100%;
         flex-direction: row;
