@@ -26,5 +26,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public bool IsParticipated { get; set; }
 
         public string GameSteamId { get; set; }
+
+        public bool ShowError { get; set; }
     }
 }

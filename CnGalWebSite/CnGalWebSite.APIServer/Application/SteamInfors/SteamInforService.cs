@@ -285,8 +285,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取用户Steam愿望单失败");
-                return false;
+                throw new Exception("获取愿望单失败，请设置Steam个人资料公开",ex);
             }
         }
     }

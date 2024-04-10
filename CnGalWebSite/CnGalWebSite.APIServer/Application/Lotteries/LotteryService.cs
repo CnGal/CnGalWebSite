@@ -198,34 +198,43 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
         public async Task<string> CheckCondition(ApplicationUser user, Lottery lottery)
         {
-            if (lottery.ConditionType == LotteryConditionType.GameRecord)
+            try
             {
-                if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id) == false)
+                if (lottery.ConditionType == LotteryConditionType.GameRecord)
                 {
-                    return "参加该抽奖需要至少有一条游玩记录";
+                    if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id) == false)
+                    {
+                        return "参加该抽奖需要至少有一条游玩记录";
+                    }
+                }
+                else if (lottery.ConditionType == LotteryConditionType.CommentLottery)
+                {
+                    if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery) == false)
+                    {
+                        return "参加该抽奖需要评论该抽奖，并通过审核";
+                    }
+                }
+                else if (lottery.ConditionType == LotteryConditionType.BookingGame)
+                {
+                    if (await _bookingUserRepository.GetAll().Include(s => s.Booking).AsNoTracking().AnyAsync(s => s.Booking.EntryId == lottery.GameId && s.ApplicationUserId == user.Id) == false)
+                    {
+                        return "参加该抽奖需要预约游戏";
+                    }
+                }
+                else if (lottery.ConditionType == LotteryConditionType.Wishlist)
+                {
+                    if (await _steamInforService.CheckUserWishlist(user, lottery.GameSteamId) == false)
+                    {
+                        return "参加该抽奖需要将游戏添加到愿望单";
+                    }
                 }
             }
-            else if (lottery.ConditionType == LotteryConditionType.CommentLottery)
+            catch (Exception ex)
             {
-                if (await _commentRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == lottery.Id && s.Type == CommentType.CommentLottery) == false)
-                {
-                    return "参加该抽奖需要评论该抽奖，并通过审核";
-                }
+                _logger.LogError(ex, "参与抽奖失败");
+                return ex.Message;
             }
-            else if (lottery.ConditionType == LotteryConditionType.BookingGame)
-            {
-                if (await _bookingUserRepository.GetAll().Include(s => s.Booking).AsNoTracking().AnyAsync(s => s.Booking.EntryId == lottery.GameId && s.ApplicationUserId == user.Id) == false)
-                {
-                    return "参加该抽奖需要预约游戏";
-                }
-            }
-            else if (lottery.ConditionType == LotteryConditionType.Wishlist)
-            {
-                if (await _steamInforService.CheckUserWishlist(user, lottery.GameSteamId) == false)
-                {
-                    return "参加该抽奖需要将游戏添加到愿望单";
-                }
-            }
+
 
             return null;
         }

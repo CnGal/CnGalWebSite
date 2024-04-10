@@ -87,10 +87,16 @@
             {
                 await PopupService.ToastAsync("参与抽奖成功", AlertTypes.Success);
                 item.IsParticipated = true;
+                item.ShowError = false;
                 StateHasChanged();
             }
             else
             {
+                if (obj.Error.StartsWith("获取愿望单失败"))
+                {
+                    item.ShowError = true;
+                    StateHasChanged();
+                }
                 await PopupService.ToastErrorAsync("参与抽奖失败", obj.Error);
             }
         }

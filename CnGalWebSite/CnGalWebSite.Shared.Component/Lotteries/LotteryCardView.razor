@@ -29,7 +29,7 @@
         <div class="content-card">
 
             <div class="condition-card">
-                @if(Model.ConditionType== LotteryConditionType.Wishlist)
+                @if (Model.ConditionType == LotteryConditionType.Wishlist)
                 {
                     <span>参与条件：把游戏 </span>
 
@@ -39,7 +39,7 @@
                 {
                     @($"参与条件：{Model.ConditionType.GetDisplayName()}")
                 }
-                
+
             </div>
             <div class="button-card">
                 @if (Model.EndTime < DateTime.Now.ToCstTime() || Model.IsParticipated)
@@ -56,13 +56,19 @@
                             <CnGalWebSite.Components.Buttons.MasaButton Text="登入后参与抽奖" Rounded OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
                         </NotAuthorized>
                     </AuthorizeView>
-                    
+
                 }
             </div>
         </div>
     </div>
 
 </MDCard>
+@if (Model.ShowError)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-8">
+        Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦！<a href="/articles/index/5" target="blank" class="error--text fw-bold">点击阅读教程</a>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+}
 
 
 
@@ -72,7 +78,7 @@
 
 
     [Parameter]
-    public EventCallback OnParticipateInLottery{ get; set; }
+    public EventCallback OnParticipateInLottery { get; set; }
 
 
 }
