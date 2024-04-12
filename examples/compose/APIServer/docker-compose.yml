@@ -37,6 +37,9 @@ services:
       - EventBus_Port=${EventBus_Port}
       - EventBus_UserName=${EventBus_UserName}
       - EventBus_Password=${EventBus_Password}
+      # 反代
+      - SteamAPIUrl=${SteamAPIUrl}
+      - BackUpArchiveUrl=${BackUpArchiveUrl}
     hostname: apiserver
     restart: always
     healthcheck:

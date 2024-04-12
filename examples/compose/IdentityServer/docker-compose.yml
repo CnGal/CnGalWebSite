@@ -56,7 +56,7 @@ services:
       # 白名单
       - IpWhitelist=${IpWhitelist}
     hostname: identityserver
-    # restart: always
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
@@ -71,4 +71,4 @@ services:
       - "5011:8080"
       - "5001:8081"
     volumes:
-      - "/mnt/docker/IdentityServer:/app/cert"
+      - "${MNT_DIR}/IdentityServer:/app/cert"
