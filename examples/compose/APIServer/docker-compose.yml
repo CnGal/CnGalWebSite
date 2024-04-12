@@ -37,6 +37,9 @@ services:
       - EventBus_Port=${EventBus_Port}
       - EventBus_UserName=${EventBus_UserName}
       - EventBus_Password=${EventBus_Password}
+      # 反代
+      - SteamAPIUrl=${SteamAPIUrl}
+      - BackUpArchiveUrl=${BackUpArchiveUrl}
     hostname: apiserver
     restart: always
     healthcheck:
@@ -48,7 +51,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1.2G
+          memory: ${resources_limits_memory}
     ports:
       - "3001:8081"
       - "2001:8080"

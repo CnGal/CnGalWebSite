@@ -23,6 +23,6 @@ services:
     deploy:
       resources:
         limits:
-          memory: 0.7G
+          memory: ${resources_limits_memory}
     ports:
       - "5100:8080"
