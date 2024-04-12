@@ -24,7 +24,12 @@
         }
 
 </div>
-<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" />
+<AuthorizeView>
+                        <Authorized>
+                          <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" />
+    </Authorized>
+                        
+                    </AuthorizeView>
 <CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
