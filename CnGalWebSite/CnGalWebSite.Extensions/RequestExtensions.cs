@@ -13,6 +13,13 @@ namespace CnGalWebSite.Extensions
         public static bool IsMobileBrowser(this HttpRequest request)
         {
             var userAgent = request.UserAgent();
+
+            // 空值默认为PC
+            if(userAgent == null)
+            {
+                return false;
+            }
+            
             if (b.IsMatch(userAgent) || v.IsMatch(userAgent.AsSpan(0, 4)))
             {
                 return true;
