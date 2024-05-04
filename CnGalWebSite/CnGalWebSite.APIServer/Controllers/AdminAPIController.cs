@@ -15,6 +15,7 @@ using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
+using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Application.Tasks;
 using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.Application.Users;
@@ -132,6 +133,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IVideoService _videoService;
         private readonly ITimedTaskService _timedTaskService;
+        private readonly IStoreInfoService _storeInfoService;
         private readonly IBackgroundTaskService _backgroundTaskService;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
         private readonly IRepository<Almanac, long> _almanacRepository;
@@ -147,7 +149,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
-        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
+        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository, IStoreInfoService storeInfoService,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository, ITimedTaskService timedTaskService,
         IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository, IRepository<Almanac, long> almanacRepository,
@@ -223,6 +225,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _almanacEntryRepository = almanacEntryRepository;
             _timedTaskService = timedTaskService;
             _backgroundTaskService = backgroundTaskService;
+            _storeInfoService= storeInfoService;
         }
 
         /// <summary>
@@ -325,11 +328,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-               var lottery=  await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == 10);
-                lottery.MainPicture = null;
-                lottery.Thumbnail = "https://tucang.cngal.top/api/image/show/eff79eeb2860dc7b117b96c90d4daf81?https://image.cngal.org/images/upload/20240330/3fe68efcc0de2071ee489163609c6a1a616cae66.jpg";
-                lottery.BriefIntroduction = "CnGal八周年啦！";
-                await _lotteryRepository.UpdateAsync(lottery);
+               await _fileService.TransferMainImagesToPublic(1);
 
                 return new Result { Successful = true };
             }

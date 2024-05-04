@@ -28,7 +28,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IConfiguration _configuration;
         private readonly ILogger<FileService> _logger;
 
-        public FileService(IAppHelper appHelper,IConfiguration configuration, IHttpService httpService,
+        public FileService(IAppHelper appHelper, IConfiguration configuration, IHttpService httpService,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository, IFileUploadService fileUploadService)
         {
             _appHelper = appHelper;
@@ -50,15 +50,15 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
-                var result = await _httpService.GetAsync<UploadResult>(_configuration["ImageApiPath"]+ "api/files/TransferDepositToTucangCC?url=" + url);
-                
+                var result = await _httpService.GetAsync<UploadResult>(_configuration["ImageApiPath"] + "api/files/TransferDepositToTucangCC?url=" + url);
+
                 if (result.Uploaded)
                 {
                     return $"{result.Url}?{url}";
                 }
                 else
                 {
-                    _logger.LogError("转存图片({img})失败，{msg}",url,result.Error);
+                    _logger.LogError("转存图片({img})失败，{msg}", url, result.Error);
                     return null;
                 }
 
@@ -201,6 +201,43 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存 词条 - {name}({id}) 相册失败", item.Name, item.Id);
+                }
+            }
+
+            var websitePictures = await _entryRepository.GetAll()
+                .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Where(s => s.WebsiteAddInfor != null)
+                .Where(s => s.WebsiteAddInfor.Images.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false))
+                .OrderBy(s => s.Id)
+                .Take(maxCount)
+                .ToListAsync();
+
+            foreach (var item in websitePictures)
+            {
+                try
+                {
+                    var count = item.WebsiteAddInfor.Images.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false);
+                    foreach (var infor in item.WebsiteAddInfor.Images.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false))
+                    {
+                        var temp = await TransferDepositFile(infor.Url);
+                        if (string.IsNullOrWhiteSpace(temp) == false)
+                        {
+                            infor.Url = temp;
+                        }
+                        else
+                        {
+                            throw new Exception("转存图片失败");
+                        }
+                    }
+
+                    await _entryRepository.UpdateAsync(item);
+                    _logger.LogInformation("转存 词条 - {name}({id}) 专题页图片到 tucang.cc 图床，总计 {count} 张图片", item.Name, item.Id, count);
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存 词条 - {name}({id}) 专题页图片失败", item.Name, item.Id);
                 }
             }
         }
