@@ -3,11 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <InvariantGlobalization>false</InvariantGlobalization>
-    <PublishTrimmed>false</PublishTrimmed>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <EmccExtraLDFlags>-s WARN_ON_UNDEFINED_SYMBOLS=0</EmccExtraLDFlags>
     <Nullable>disable</Nullable>
+    <UserSecretsId>98ccc002-c5c6-4af3-8e3d-c5aa3eae73c7</UserSecretsId>
   </PropertyGroup>
   
   <ItemGroup>

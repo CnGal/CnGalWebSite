@@ -2,6 +2,7 @@
 #blazor-error-ui {
     background-color: transparent;
     box-shadow: none;
+    display: none;
 }
 
     #blazor-error-ui .background-card {
@@ -11,6 +12,7 @@
         background-color: rgba(0,0,0,.5);
         top: 0;
         left: 0;
+        z-index: 5;
     }
 
     #blazor-error-ui .main-card {

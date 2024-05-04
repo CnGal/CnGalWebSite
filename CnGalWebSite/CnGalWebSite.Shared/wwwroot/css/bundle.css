@@ -491,6 +491,7 @@
 #blazor-error-ui {
     background-color: transparent;
     box-shadow: none;
+    display: none;
 }
 
     #blazor-error-ui .background-card {
@@ -500,6 +501,7 @@
         background-color: rgba(0,0,0,.5);
         top: 0;
         left: 0;
+        z-index: 5;
     }
 
     #blazor-error-ui .main-card {
@@ -826,6 +828,93 @@ input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
 /*鼠标悬停样式*/
 .pointer {
     cursor: pointer !important;
+}
+
+/*撑开布局框架*/
+.m-application__wrap {
+    flex: 1 1 auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 100%;
+}
+
+
+/*主题*/
+
+.m-application a {
+    color: var(--md-sys-color-primary);
+}
+
+.m-application .primary {
+    background-color: var(--md-sys-color-primary) !important;
+    border-color: var(--md-sys-color-primary) !important;
+}
+
+.m-application .primary--text {
+    color: var(--md-sys-color-primary) !important;
+    caret-color: var(--md-sys-color-primary) !important;
+}
+
+.m-application .secondary {
+    background-color: var(--md-sys-color-secondary) !important;
+    border-color: var(--md-sys-color-secondary) !important;
+}
+
+.m-application .secondary--text {
+    color: var(--md-sys-color-secondary) !important;
+    caret-color: var(--md-sys-color-secondary) !important;
+}
+
+.m-application .accent {
+    background-color: #82B1FF !important;
+    border-color: #82B1FF !important;
+}
+
+.m-application .accent--text {
+    color: #82B1FF !important;
+    caret-color: #82B1FF !important;
+}
+
+.m-application .error {
+    background-color: var(--md-sys-color-error) !important;
+    border-color: var(--md-sys-color-error) !important;
+}
+
+.m-application .error--text {
+    color: var(--md-sys-color-error) !important;
+    caret-color: var(--md-sys-color-error) !important;
+}
+
+.m-application .info {
+    background-color: #2196F3 !important;
+    border-color: #2196F3 !important;
+}
+
+.m-application .info--text {
+    color: #2196F3 !important;
+    caret-color: #2196F3 !important;
+}
+
+.m-application .success {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+}
+
+.m-application .success--text {
+    color: #4CAF50 !important;
+    caret-color: #4CAF50 !important;
+}
+
+.m-application .warning {
+    background-color: #FB8C00 !important;
+    border-color: #FB8C00 !important;
+}
+
+.m-application .warning--text {
+    color: #FB8C00 !important;
+    caret-color: #FB8C00 !important;
 }
 
 

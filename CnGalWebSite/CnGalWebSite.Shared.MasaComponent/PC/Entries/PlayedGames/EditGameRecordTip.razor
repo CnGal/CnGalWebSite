@@ -135,11 +135,11 @@
             {
                 if (Model.ScriptSocre + Model.MusicSocre + Model.PaintSocre + Model.ShowSocre + Model.TotalSocre + Model.SystemSocre + Model.CVSocre != 0)
                 {
-                    await PopupService.ToastAsync(new ToastConfig
+                    await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                         {
                             Type = AlertTypes.Error,
                             Title = "请填写所有项目的评分",
-                            Duration = 4000
+                            Timeout = 4000
                         });
                     return;
                 }
@@ -152,12 +152,12 @@
                     if (_dataCacheService.ThemeSetting.PlayedGameInforCount >= 0)
                     {
 
-                        await PopupService.ToastAsync(new ToastConfig
+                        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                             {
                                 Type = AlertTypes.Info,
                                 Title = "提示",
                                 Content = $"只有大于{ToolHelper.MinValidPlayImpressionsLength}字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。" + (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0 ? $"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" : ""),
-                                Duration = 100000
+                                Timeout = 100000
                             });
 
                         _dataCacheService.ThemeSetting.PlayedGameInforCount--;
@@ -178,11 +178,11 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await PopupService.ToastAsync(new ToastConfig
+                await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
                     {
                         Type = AlertTypes.Error,
                         Title = obj.Error ?? "编辑游玩记录失败~",
-                        Duration = 4000
+                        Timeout = 4000
                     });
             }
             else
