@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.33.0" />
+    <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="ReverseMarkdown" Version="3.25.0" />
+    <PackageReference Include="ReverseMarkdown" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
