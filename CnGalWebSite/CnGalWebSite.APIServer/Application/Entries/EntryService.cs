@@ -3132,7 +3132,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             await _bookingUserRepository.GetAll().Where(s => userIds.Contains(s.ApplicationUserId) && s.BookingId != null && entries.Select(s => s.BookingId).Contains(s.BookingId.Value)).ExecuteUpdateAsync(s => s.SetProperty(a => a.IsNotified, b => true));
         }
 
-        [GeneratedRegex("(\\d{8})")]
+        [GeneratedRegex("(\\d{6,})")]
         private static partial Regex QQGroupRegex();
     }
 }
