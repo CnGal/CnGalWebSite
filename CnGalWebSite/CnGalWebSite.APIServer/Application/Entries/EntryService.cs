@@ -25,6 +25,7 @@ using NuGet.Packaging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -37,7 +38,7 @@ using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
-    public class EntryService : IEntryService
+    public partial class EntryService : IEntryService
     {
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, int> _articleRepository;
@@ -1212,14 +1213,21 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var info = informationTypes.FirstOrDefault(s => s.Name == item.DisplayName);
                 if (info != null)
                 {
-                    model.Information.Add(new EntryInformationModel
+                    var temp = new EntryInformationModel
                     {
                         Icon = info.Icon,
                         Name = item.DisplayName,
                         Value = item.DisplayValue
-                    });
+                    };
+                    if(temp.Name== "QQ群")
+                    {
+                        temp.Value = QQGroupRegex().Replace(temp.Value, "<b>$1</b>");
+                    }
+                    model.Information.Add(temp);
                 }
             }
+
+            // 添加Staff
             var relstionsAndStaffs = new List<Entry>();
             relstionsAndStaffs.AddRange(entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation));
             relstionsAndStaffs.AddRange(entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation != null).Select(s => s.ToEntryNavigation));
@@ -1231,14 +1239,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var publisherIds = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup).Select(s => s.ToEntry);
                 foreach (var item in relstionsAndStaffs.Where(s => publisherIds.Contains(s.Id) && s.Information.Any(s => s.DisplayName == "QQ群" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)))
                 {
-                    model.Information.Add(new EntryInformationModel
+                    var temp = new EntryInformationModel
                     {
                         Name = model.Information.Any(s => s.Name == "QQ群") ? item.DisplayName : "QQ群",
                         Icon = model.Information.Any(s => s.Name == "QQ群") ? "mdi-vector-point" : qqIcon,
                         Value = model.Information.Any(s => s.Name == "QQ群") ? item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue : $"{item.Information.FirstOrDefault(s => s.DisplayName == "QQ群").DisplayValue} ({item.DisplayName})"
-                    });
+                    };
+
+
+                    temp.Value = QQGroupRegex().Replace(temp.Value, "<b>$1</b>");
+                    model.Information.Add(temp);
                 }
             }
+
             //添加发行列表
             foreach (var item in entry.Releases)
             {
@@ -3118,5 +3131,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             await _bookingUserRepository.GetAll().Where(s => userIds.Contains(s.ApplicationUserId) && s.BookingId != null && entries.Select(s => s.BookingId).Contains(s.BookingId.Value)).ExecuteUpdateAsync(s => s.SetProperty(a => a.IsNotified, b => true));
         }
+
+        [GeneratedRegex("(\\d{8})")]
+        private static partial Regex QQGroupRegex();
     }
 }

@@ -5,7 +5,7 @@
 {
     <div>
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString"/>
-        @($"{Title}{(string.IsNullOrWhiteSpace(Title)?"":"：")}{Text}")
+        <span>@((MarkupString)$"{Title}{(string.IsNullOrWhiteSpace(Title) ? "" : "：")}{Text}")</span>
     </div>
 }
 else
