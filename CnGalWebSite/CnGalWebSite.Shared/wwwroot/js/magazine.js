@@ -91,5 +91,5 @@ function dragMoveX(id) {
 
 /*设置聚焦*/
 function focusOnElement(id) {
-    document.getElementById(id).focus()
+    document.getElementById(id).focus();
 }

@@ -9,7 +9,11 @@ using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Service;
+using Masa.Blazor.Popup;
+using Masa.Blazor;
 using Microsoft.Extensions.DependencyInjection;
+using Masa.Blazor.Presets;
+using BlazorComponent;
 
 namespace CnGalWebSite.Shared.Extentions
 {
@@ -29,6 +33,22 @@ namespace CnGalWebSite.Shared.Extentions
                     s.Themes.Dark.Secondary = "var(--md-sys-color-secondary)";
                     s.Themes.Dark.Error = "var(--md-sys-color-error)";
                 });
+
+                // 提示框
+                options.Defaults = new Dictionary<string, IDictionary<string, object>>()
+                {
+                    {
+                        PopupComponents.SNACKBAR, new Dictionary<string, object>()
+                        {
+                            { nameof(PEnqueuedSnackbars.Closeable), true },
+                            { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomRight },
+                            { nameof(PEnqueuedSnackbars.Text), true },
+                            { nameof(PEnqueuedSnackbars.Elevation), new StringNumber(2) },
+                            { nameof(PEnqueuedSnackbars.MaxCount), 5 },
+                            { nameof(PEnqueuedSnackbars.Timeout), 5000 },
+                        }
+                    }
+                };
             });
 
             //本地储存

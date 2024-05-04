@@ -12,26 +12,26 @@ namespace CnGalWebSite.Components.Extensions
 {
     public static class PopupServiceExtensions
     {
-        public static async Task ToastErrorAsync(this IPopupService popupService, string title, string message)
+        public static async Task ToastErrorAsync(this IPopupService popupService, string title, string message=null)
         {
             await popupService.ToastAsync(title, message, AlertTypes.Error);
         }
-        public static async Task ToastWarningAsync(this IPopupService popupService, string title, string message)
+        public static async Task ToastWarningAsync(this IPopupService popupService, string title, string message = null)
         {
             await popupService.ToastAsync(title, message, AlertTypes.Warning);
         }
-        public static async Task ToastInfoAsync(this IPopupService popupService, string title, string message)
+        public static async Task ToastInfoAsync(this IPopupService popupService, string title, string message = null)
         {
             await popupService.ToastAsync(title, message, AlertTypes.Info);
         }
-        public static async Task ToastSuccessAsync(this IPopupService popupService, string title, string message)
+        public static async Task ToastSuccessAsync(this IPopupService popupService, string title, string message = null)
         {
             await popupService.ToastAsync(title, message, AlertTypes.Success);
         }
 
         public static async Task ToastAsync(this IPopupService popupService, string title, string message, AlertTypes type)
         {
-            await popupService.ToastAsync(new ToastConfig
+            await popupService.EnqueueSnackbarAsync(new SnackbarOptions
             {
                 Type = type,
                 Title = title,
@@ -39,5 +39,9 @@ namespace CnGalWebSite.Components.Extensions
             });
         }
 
+        public static async Task ToastAsync(this IPopupService popupService, string title, AlertTypes type)
+        {
+            await popupService.ToastAsync(title, null, type);
+        }
     }
 }

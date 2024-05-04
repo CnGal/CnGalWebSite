@@ -5,13 +5,21 @@
 @inject ILogger<ErrorHandler> Logger
 @inject IJSRuntime JS
 @inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
 
-
-<MErrorHandler OnErrorHandleAsync="OnErrorHandleAsync">
-    <CascadingValue Value=this IsFixed="true">
-        @ChildContent
-    </CascadingValue>
+<MErrorHandler OnHandle="OnErrorHandleAsync" PopupType="ErrorPopupType.None">
+    @if (isError)
+    {
+        <MAlert Elevation="2" Class="ma-2" Type="AlertTypes.Error">发生未知错误，尝试刷新页面</MAlert>
+    }
+    else
+    {
+        <CascadingValue Value=this IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    }
 </MErrorHandler>
 
 @code {
@@ -23,9 +31,27 @@
     [EditorRequired]
     public bool ShowDetailedErrorInfor { get; set; }
 
+    bool isError;
+
     private DateTime LastErrorTime { get; set; } = DateTime.UtcNow.AddYears(-1);
 
-    public async Task<bool> OnErrorHandleAsync(Exception ex)
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    public void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (isError)
+        {
+            isError = false;
+            StateHasChanged();
+        }
+    }
+
+
+    public async Task OnErrorHandleAsync(Exception ex)
     {
         if (ex is OutOfMemoryException)
         {
@@ -43,7 +69,8 @@
         else
         {
             await ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
-            return true;
+            isError = true;
+            StateHasChanged();
         }
     }
 
@@ -65,13 +92,13 @@
                     var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
                     resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 {qq} 反馈Bug";
                 }
-                await PopupService.ToastAsync(new ToastConfig
-                {
-                    Type = AlertTypes.Error,
-                    Title = message,
-                    Duration=20000,
-                    Content = $"报错：{ex?.Message?.Split('\n')?.FirstOrDefault()}\n {ex?.StackTrace} \n 可能原因：{reason}\n解决方法：{resolvent}",
-                });
+                await PopupService.EnqueueSnackbarAsync(new SnackbarOptions
+                    {
+                        Type = AlertTypes.Error,
+                        Title = message,
+                        Timeout = 20000,
+                        Content = $"报错：{ex?.Message?.Split('\n')?.FirstOrDefault()}\n {ex?.StackTrace} \n 可能原因：{reason}\n解决方法：{resolvent}",
+                    });
 
 
                 LastErrorTime = DateTime.UtcNow;
@@ -82,4 +109,12 @@
 
         }
     }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+
 }
