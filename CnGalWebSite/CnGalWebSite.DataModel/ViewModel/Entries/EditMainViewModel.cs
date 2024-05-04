@@ -9,7 +9,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EntryStyleTemplate Template { get; set; }
 
         [Display(Name = "显示名称")]
-        [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }
         [Display(Name = "别称")]
         public string AnotherName { get; set; }
