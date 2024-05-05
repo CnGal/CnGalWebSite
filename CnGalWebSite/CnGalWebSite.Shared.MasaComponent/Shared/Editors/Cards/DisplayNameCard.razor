@@ -30,12 +30,13 @@
         IsSame = Name == DisplayName;
     }
 
-    public void IsSameChanged(bool same)
+    public async Task IsSameChanged(bool same)
     {
         IsSame = same;
         if (IsSame)
         {
             DisplayName = Name;
+            await DisplayNameChanged.InvokeAsync(DisplayName);
             StateHasChanged();
         }
     }
