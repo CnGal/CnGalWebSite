@@ -12,38 +12,38 @@
             发行版本包含名称、日期、平台、链接......
         </MCardText>
         <MCardText Class="pb-0">
-            <div class="row">
-                <div class="col-12  col-sm-6">
+            <MRow>
+                <MCol Cols="12" Sm="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="GameReleaseType" Label="类型" />
-                </div>
-                <div class="col-12  col-sm-6">
+                </MCol>
+                <MCol Cols="12" Sm="6">
                     <MTextField @bind-Value="Model.Name" Label="游戏发行名称" />
-                </div>
-                <div class="col-12  col-sm-6">
+                </MCol>
+                <MCol Cols="12" Sm="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.PublishPlatformType" TValue="PublishPlatformType" Label="发行平台类型" />
-                </div>
+                </MCol>
                 @if (Model.PublishPlatformType == PublishPlatformType.Other)
                 {
-                    <div class="col-12  col-sm-6">
+                    <MCol Cols="12" Sm="6">
                         <MTextField @bind-Value="Model.PublishPlatformName" Label="发行平台名称" />
-                    </div>
+                    </MCol>
                 }
-                <div class="col-12  col-sm-6">
+                <MCol Cols="12" Sm="6">
                     <MTextField @bind-Value="Model.Link" Label="@(Model.PublishPlatformType== PublishPlatformType.Other?"链接":"平台Id")" />
-                </div>
-                <div class="col-12">
+                </MCol>
+                <MCol Cols="12">
                     <CnGalWebSite.Components.Checkboxes.InputEnumCheckboxList Items="Model.GamePlatformTypes" TValue="GamePlatformType" Label="游戏平台" />
-                </div>
-                <div class="col-12  col-sm-6">
+                </MCol>
+                <MCol Cols="12" Sm="6">
                     <CnGalWebSite.Components.Inputs.MasaDatePicker @bind-NullableValue="Model.Time" Nullable Label="发行时间" ShowDate ShowTime="false" />
-                </div>
-                <div class="col-12  col-sm-6">
+                </MCol>
+                <MCol Cols="12" Sm="6">
                     <MTextField @bind-Value="Model.TimeNote" Label="发行时间备注" />
-                </div>
-                <div class="col-12  col-sm-6">
+                </MCol>
+                <MCol Cols="12" Sm="6">
                     <MTextField @bind-Value="Model.Engine" Label="引擎" />
-                </div>
-            </div>
+                </MCol>
+            </MRow>
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6">
             <MSpacer></MSpacer>
@@ -52,7 +52,6 @@
     </MDCard>
 </MDialog>
 @code {
-
     private EditReleaseModel Model { get; set; }
     private EditReleaseModel _model { get; set; }
     [Parameter]
