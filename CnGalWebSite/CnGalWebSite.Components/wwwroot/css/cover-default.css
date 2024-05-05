@@ -68,6 +68,18 @@ html {
 .theme--light.m-tabs-items {
     background-color: transparent;
 }
+/*表格背景色*/
+.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.stripe):not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
+    background-color: transparent !important;
+}
+
+.m-data-table > .m-data-table__wrapper > table > tbody > tr:not(.stripe):not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper):not(.m-data-table__selected), .m-data-table > .m-data-table__wrapper > table > thead > tr {
+    background-color: transparent !important;
+}
+/*表格边框*/
+.m-sheet.m-toolbar.m-toolbar--flat {
+    border-radius: var(--md-card-border-radius) !important;
+}
 
 /*页脚*/
 .img-fluid {
@@ -234,8 +246,8 @@ html {
 }
 
 .theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
+    background-color: var(--md-sys-color-primary-container)!important;
+    color: var(--md-sys-color-on-primary-container)!important;
 }
 /*步骤条*/
 .theme--light.m-stepper .m-stepper__label {
