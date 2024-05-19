@@ -1,12 +1,12 @@
 ﻿@typeparam TValue where TValue : Enum
 
-<MasaSelecteBase Value="@Value" ValueChanged="ValueChanged" TValue="TValue" TItem="KeyValuePair<string, TValue>" TItemValue="TValue" Class="@Class"
+<MSelect Value="@Value" ValueChanged="ValueChanged" TValue="TValue" TItem="KeyValuePair<string, TValue>" TItemValue="TValue" Class="@Class"
          Label="@Label"  Item
          Items="@items"
          ItemText="u => u.Key"
          ItemValue="u => u.Value"
          MenuProps="@(props => {props.OffsetY = true;props.Auto = false;})">
-</MasaSelecteBase>
+</MSelect>
 
 @code {
     [Parameter]

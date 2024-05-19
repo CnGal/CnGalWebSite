@@ -1,10 +1,10 @@
-﻿<MasaAutoCompleteBase Value="Value" ValueChanged="ValueChanged"
+﻿<MAutocomplete Value="Value" ValueChanged="ValueChanged"
                Loading="_loading"
                Items="_items"
                OnSearchInputUpdate="QuerySelections"
                 ItemValue="r=>r"
                 ItemText="r=>r"
-                Label="@Label"></MasaAutoCompleteBase>
+                Label="@Label"></MAutocomplete>
  @code {
     [Parameter]
     public List<string> AutoCompleteItems { get; set; }
