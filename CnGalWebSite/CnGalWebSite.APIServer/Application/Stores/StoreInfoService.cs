@@ -302,7 +302,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>("https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid=" + storeInfo.Link);
+                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>("https://n8n.sliots.top/webhook/game/get_game_detail/?h_src=game_rec_a&appid=" + storeInfo.Link);
                 if (data.Status != "ok")
                 {
                     _logger.LogError("获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
@@ -329,13 +329,13 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 else if (data.Result.Price != null)
                 {
                     //原价
-                    storeInfo.OriginalPrice ??= double.Parse(data.Result.Price.Initial);
+                    storeInfo.OriginalPrice ??= data.Result.Price.Initial;
                     //现价
-                    storeInfo.PriceNow ??= double.Parse(data.Result.Price.Current);
+                    storeInfo.PriceNow ??= data.Result.Price.Current;
                     //折扣
                     storeInfo.CutNow ??= data.Result.Price.Discount;
                     //历史最低
-                    storeInfo.PriceLowest ??= double.Parse(data.Result.Price.Lowest_price_raw);
+                    storeInfo.PriceLowest ??=data.Result.Price.Lowest_price_raw;
                     //历史最高折扣
                     storeInfo.CutLowest ??= data.Result.Price.Lowest_discount;
                     //状态

@@ -20,9 +20,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Stores
     }
     public class XiaoHeiHeDataModelPrice
     {
-        public string Current { get; set; }
-        public string Initial { get; set; }
-        public string Lowest_price_raw { get; set; }
+        public double Current { get; set; }
+        public double Initial { get; set; }
+        public double Lowest_price_raw { get; set; }
         public int Lowest_discount { get; set; }
         public int Discount { get; set; }
     }
