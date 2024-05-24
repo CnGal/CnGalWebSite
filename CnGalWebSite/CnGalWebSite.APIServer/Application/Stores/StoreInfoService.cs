@@ -373,9 +373,9 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 //平均游玩时长
                 storeInfo.PlayTime ??= (int)(data.AvgPlaytime * 60);
                 //估计拥有人数上限
-                storeInfo.EstimationOwnersMax ??= (int)(data.Owners * (2 - data.Accuracy));
+                storeInfo.EstimationOwnersMax ??= (int)(data.Owners);
                 //估计拥有人数下限
-                storeInfo.EstimationOwnersMin ??= (int)(data.Owners * (data.Accuracy));
+                storeInfo.EstimationOwnersMin ??= (int)(data.Owners);
                 //销售额
                 storeInfo.Revenue ??= (int)(data.Revenue * 7);
 
