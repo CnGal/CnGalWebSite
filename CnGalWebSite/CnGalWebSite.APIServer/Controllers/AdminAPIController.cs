@@ -328,7 +328,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-               await _fileService.TransferMainImagesToPublic(1);
+                await _storeInfoService.BatchUpdate(10);
 
                 return new Result { Successful = true };
             }
