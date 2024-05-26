@@ -114,6 +114,7 @@
 
     public void OnSearch(string text)
     {
+        _search = text;
         Data.Parameter.SearchText = text;
         StateHasChanged();
         GetDataFromApi();
