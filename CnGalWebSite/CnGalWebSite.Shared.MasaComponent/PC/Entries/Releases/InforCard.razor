@@ -63,7 +63,7 @@ Class="entry-card-default store-info-card mb-4">
             {
                 @if (Model.StoreInfor.EstimationOwnersMax== Model.StoreInfor.EstimationOwnersMin)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数：{Model.StoreInfor.EstimationOwnersMin:#,#}")" Class="" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#}")" Class="" />
                 }
                 else
                 {
