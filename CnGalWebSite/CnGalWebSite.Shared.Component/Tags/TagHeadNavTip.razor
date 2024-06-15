@@ -3,14 +3,14 @@
 
 @code {
     [Parameter]
-    public List<KeyValuePair<string, int>> TagList { get; set; }
+    public List<TagLevelViewModel> TagList { get; set; }
 
     public List<BreadcrumbItem> GetItems()
     {
         return TagList.Select(s => new BreadcrumbItem
             {
-                Text = s.Key,
-                Href = "/tags/index/" + s.Value
+                Text = s.Name,
+                Href = "/tags/index/" + s.Id
             }).ToList();
     }
 

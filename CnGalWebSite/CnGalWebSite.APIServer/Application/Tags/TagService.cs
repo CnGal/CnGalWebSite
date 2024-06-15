@@ -323,17 +323,21 @@ namespace CnGalWebSite.APIServer.Application.Tags
             }
         }
 
-        public async Task<List<KeyValuePair<string, int>>> GetTagLevelListAsync(Tag tag)
+        public async Task<List<TagLevelViewModel>> GetTagLevelListAsync(Tag tag)
         {
             if (tag == null)
             {
-                return new List<KeyValuePair<string, int>>();
+                return new List<TagLevelViewModel>();
             }
             else
             {
-                var result = new List<KeyValuePair<string, int>>
+                var result = new List<TagLevelViewModel>
                 {
-                    new KeyValuePair<string, int>(tag.Name, tag.Id)
+                    new TagLevelViewModel{
+
+                        Name=tag.Name,
+                        Id=tag.Id,
+                    }
                 };
 
                 //尝试向上索引
@@ -342,7 +346,11 @@ namespace CnGalWebSite.APIServer.Application.Tags
                     tag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Name == tag.ParentCodeNavigation.Name);
                     if (tag != null)
                     {
-                        result.Insert(0, new KeyValuePair<string, int>(tag.Name, tag.Id));
+                        result.Insert(0, new TagLevelViewModel
+                        {
+                            Name = tag.Name,
+                            Id = tag.Id,
+                        });
                     }
                     else
                     {
@@ -457,15 +465,15 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
 
 
-            foreach (var item in tag.InverseParentCodeNavigation.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false))
+            foreach (var item in tag.InverseParentCodeNavigation.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false))
             {
                 model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
             }
 
 
-            foreach (var item in tag.Entries.Where(s => s.IsHidden == false&&string.IsNullOrWhiteSpace(s.Name)==false))
+            foreach (var item in tag.Entries.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false))
             {
-                model.ChildrenEntries.Add( _appHelper.GetEntryInforTipViewModel(item));
+                model.ChildrenEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
             }
 
             return model;

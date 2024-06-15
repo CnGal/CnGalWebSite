@@ -8,7 +8,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
 
         public string Name { get; set; }
 
-        public List<KeyValuePair<string, int>> Taglevels { get; set; } = new List<KeyValuePair<string, int>>();
+        public List<TagLevelViewModel> Taglevels { get; set; } = [];
         /// <summary>
         /// 父标签
         /// </summary>
@@ -62,5 +62,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
         public int CurrentPage { get; set; } = 1;
 
         #endregion
+    }
+
+    public class TagLevelViewModel
+    {
+        public string Name { get; set; }
+
+        public int Id { get; set; }
     }
 }
