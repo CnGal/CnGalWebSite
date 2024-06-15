@@ -21,7 +21,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
         Task UpdateTagDataOldAsync(Tag tag, TagEdit examine);
 
-        Task<List<KeyValuePair<string, int>>> GetTagLevelListAsync(Tag tag);
+        Task<List<TagLevelViewModel>> GetTagLevelListAsync(Tag tag);
 
         Task<TagEditState> GetTagEditState(ApplicationUser user, long tagId);
 
