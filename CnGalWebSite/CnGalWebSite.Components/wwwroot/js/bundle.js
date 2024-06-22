@@ -380,7 +380,7 @@ function initRecaptcha() {
 function initDebugTool() {
     // init vConsole
     eruda.init();
-   // var vConsole = new VConsole();
+    // var vConsole = new VConsole();
     console.log('成功启动调试工具');
 }
 function initMouseJs() {
@@ -393,9 +393,9 @@ function highlightAllCode() {
     hljs.highlightAll();
 }
 
-function trackEvent(event_name, type,objectName,objectId, userId,note) {
+function trackEvent(event_name, type, objectName, objectId, userId, note) {
     umami.track(event_name, {
-        type:type,
+        type: type,
         objectName: objectName,
         objectId: objectId,
         userId: userId,
@@ -433,7 +433,7 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
                 },
                 success: function (res) {
                     objRef.invokeMethodAsync('UpLoaded', res.image.url + '||' + f.size);
-                 //   document.getElementsByClassName("tui-editor-contents")[0].innerHTML='<a href="' + res.image.url + '"><img src="' + res.image.url + '" alt="' + res.image.title + '"></img></a>';
+                    //   document.getElementsByClassName("tui-editor-contents")[0].innerHTML='<a href="' + res.image.url + '"><img src="' + res.image.url + '" alt="' + res.image.title + '"></img></a>';
                     jQuery(up_img_label).html('<i class="fa fa-fw fa-check" aria-hidden="true"></i> 上传成功,继续上传');
                 },
                 error: function () {
@@ -446,7 +446,7 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
 
 function initTencentCAPTCHA(objRef) {
     var captcha1 = new TencentCaptcha('2049507573', function (res) {
-            //成功回调
+        //成功回调
         if (res.ret === 0) {
             // 上传票据 可根据errorCode和errorMessage做特殊处理或统计
             objRef.invokeMethodAsync('OnChecked', res.ticket, res.randstr);
@@ -454,8 +454,8 @@ function initTencentCAPTCHA(objRef) {
         else {
             objRef.invokeMethodAsync('OnCancel');
         }
-        });
-        captcha1.show(); // 显示验证码
+    });
+    captcha1.show(); // 显示验证码
 }
 function setCustomVar(name, value) {
     _czc.push(['_setCustomVar', name, value, 1]);
@@ -505,7 +505,7 @@ function initGeetestCAPTCHA(objRef, gt, challenge, success) {
         //成功回调
         captchaObj.onSuccess(function () {
             var result = captchaObj.getValidate();
-            objRef.invokeMethodAsync('OnSuccessed', result.geetest_challenge, result.geetest_validate,result.geetest_seccode);
+            objRef.invokeMethodAsync('OnSuccessed', result.geetest_challenge, result.geetest_validate, result.geetest_seccode);
         });
     });
 }
@@ -528,7 +528,7 @@ function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
         captchaObj.onReady(function () {
             captchaObj.verify();
         });
-       
+
         captchaObj.onSuccess(function () {
             var result = captchaObj.getValidate();
             objRef.invokeMethodAsync('OnChecked', result.geetest_challenge, result.geetest_validate, result.geetest_seccode);
@@ -543,20 +543,20 @@ function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
 }
 
 function showGeetestBindCAPTCHA(objRef) {
-        if (capObj == null) {
-            objRef.invokeMethodAsync('OnCancel');
-        }
-        else {
-            
-        }
+    if (capObj == null) {
+        objRef.invokeMethodAsync('OnCancel');
+    }
+    else {
+
+    }
 }
 function isMobile() {
     var ua = navigator.userAgent; /* navigator.userAgent 浏览器发送的用户代理标题 */
     if (ua.indexOf('Android') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPod') > -1 || ua.indexOf('Symbian') > -1) {
         return true;
     } else {
-　　　　return false;
-　　}
+        return false;
+    }
 };
 
 /*加载友盟js*/
@@ -592,14 +592,14 @@ window.downloadFileFromStream = async (fileName, contentStreamReference) => {
         anchorElement.download = '';
     }
     else {
-    anchorElement.download = fileName;
+        anchorElement.download = fileName;
     }
     anchorElement.click();
     anchorElement.remove();
     URL.revokeObjectURL(url);
 }
 
-function domToImageUrl(id,name) {
+function domToImageUrl(id, name) {
     domtoimage.toBlob(document.getElementById(id))
         .then(function (blob) {
             window.saveAs(blob, name);
@@ -651,9 +651,43 @@ function checkSystemThemeIsDark() {
     }
 }
 /*获取UA*/
-function getUserAgent()
-{
+function getUserAgent() {
     return navigator.userAgent;
+}
+
+
+var int = self.setInterval("error_check()", 500);
+var counter = 0;
+function error_check() {
+    // 获取错误弹窗是否显示
+    var str = window.getComputedStyle(document.getElementById("blazor-error-ui")).display
+
+    // 没有错误则退出
+    if (str == "none") {
+
+        // 计数器
+        counter++;
+
+        // 如果正常浏览页面超过30s 清空错误计数
+        if (counter > 60) {
+            localStorage.setItem("error-counter", 0);
+        }
+        return;
+    }
+
+    // 记录错误数量
+    var error = localStorage.getItem("error-counter");
+    error++;
+    localStorage.setItem("error-counter", error);
+
+    // 大于3次则不刷新页面
+    if (error > 3) {
+        return;
+    }
+
+
+    // 重新加载页面
+    onreload();
 }
 
 /*以下为加载时自动执行的代码*/
