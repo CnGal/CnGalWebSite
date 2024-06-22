@@ -871,6 +871,42 @@ function getUserAgent()
     return navigator.userAgent;
 }
 
+
+var int = self.setInterval("clock()", 500);
+var counter=0;
+function clock() {
+
+    // 计数器
+    counter++;
+
+    // 如果正常浏览页面超过30s 清空错误计数
+    if (counter > 60) {
+        localStorage.setItem("error-counter", 0);
+    }
+
+    // 获取错误弹窗是否显示
+    var str = window.getComputedStyle(document.getElementById("blazor-error-ui")).display
+
+    // 没有错误则退出
+    if (str == "none") {
+        return;
+    }
+
+    // 记录错误数量
+    var error = localStorage.getItem("error-counter");
+    error++;
+    localStorage.setItem("error-counter", error);
+
+    // 大于3次则不刷新页面
+    if (error > 3) {
+        return;
+    }
+
+
+    // 重新加载页面
+    onreload();
+}
+
 /*以下为加载时自动执行的代码*/
 //if (typeof Blazor != "undefined") {
 //    Blazor.start({
