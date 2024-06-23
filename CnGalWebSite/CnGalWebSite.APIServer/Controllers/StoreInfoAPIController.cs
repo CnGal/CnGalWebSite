@@ -265,6 +265,7 @@ namespace CnGalWebSite.APIServer.Controllers
             item.PlayTime = model.PlayTime;
             item.PriceLowest = model.PriceLowest;
             item.RecommendationRate = model.RecommendationRate;
+            item.CurrencyCode = model.CurrencyCode;
             item.UpdateTime = DateTime.Now.ToCstTime();
 
             await _storeInfoRepository.UpdateAsync(item);
