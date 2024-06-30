@@ -60,7 +60,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var games = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
-                .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).ToListAsync();
+                .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
+                .ToListAsync();
 
             var model = new List<StoreInfoCardModel>();
             foreach (var item in games)
@@ -92,7 +93,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 });
             }
 
-            return model;
+            return model.DistinctBy(s => s.Id).ToList();
         }
 
         /// <summary>
