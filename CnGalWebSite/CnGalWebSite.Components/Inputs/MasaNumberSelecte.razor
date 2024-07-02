@@ -1,0 +1,38 @@
+﻿<MSelect Value="@Value" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" Class="@Class"
+         Label="@Label"
+         Items="@items"
+         ItemText="u => u.Key"
+         ItemValue="u => u.Value">
+</MSelect>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public int Value { get; set; }
+    [Parameter]
+    public IEnumerable<int> Items { get; set; }
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    List<KeyValuePair<string, int>> items = new List<KeyValuePair<string, int>>();
+
+    protected override void OnInitialized()
+    {
+        items.Clear();
+
+        foreach (var value in Items)
+        {
+            items.Add(new KeyValuePair<string, int>(value.ToString(), value));
+        }
+
+    }
+
+    public async Task OnValueChanged(int type)
+    {
+        Value = type;
+        await ValueChanged.InvokeAsync(type);
+    }
+}
