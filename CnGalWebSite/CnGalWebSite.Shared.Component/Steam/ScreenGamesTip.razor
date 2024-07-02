@@ -22,42 +22,50 @@
         </div>
         <div style=" display: flex; align-items: flex-end; ">
             <CnGalWebSite.Components.Buttons.MasaButton Fab Tooltip="@(_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions?"折叠高级选项":"展开高级选项")" Icon="@IconType.Filter.ToIconString()" OnClick="OnSwitch" />
-         </div>
-     </div>
-     @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions)
+        </div>
+    </div>
+    @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions)
     {
-            <div style="" class="w-100 input-card">
-                <div style="max-width: 120px; width: 100%;">
-                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Label="折扣" />
-                </div>
-                <div style="max-width: 140px; width: 100%;">
-                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.OrderType" ValueChanged="OnOrderTypeChanged" TValue="SteamSortType" Class="pt-0" Label="排序" />
-                </div>
-
-                @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions || _dataCacheService.IsApp == false)
-                {
-                    <div style="max-width: 270px; width: 100%;">
-                        <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.PurchasedType" ValueChanged="OnPurchasedTypeChanged" TValue="PurchasedSteamType" Class="pt-0" Label="库存（请先前往个人空间绑定Steam账号）" />
-                    </div>
-                }
-                <div style="max-width: 120px; width: 100%;">
-                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" ValueChanged="OnDisplayTypeChanged" TValue="SteamDisplayType" Class="pt-0" Label="样式" />
-                </div>
-                <div>
-                    <MCheckbox Class="mt-0" Value="_dataCacheService.DiscountPageCatcheHelper.ShowNoDiscountGames" TValue="bool" ValueChanged="ShowNoDiscountGamesChanged" Label="显示无折扣的游戏" />
-                </div>
-                <div style="max-width: 400px; width: 100%;">
-                    <MSlider Max="DiscountPageHelper.MaxOriginalPriceLimit" Min="5" Step="5" Value="_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice" TValue="double" ValueChanged="MaxOriginalPriceChanged"
-                             Label="@(_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice>=DiscountPageHelper.MaxOriginalPriceLimit?"任意价格":_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice<10?"免费发布的游戏":$"原价低于 {_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice:00} ￥")" />
-                </div>
-
+        <div style="" class="w-100 input-card">
+            <div style="max-width: 120px; width: 100%;">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Label="折扣" />
             </div>
+            <div style="max-width: 140px; width: 100%;">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.OrderType" ValueChanged="OnOrderTypeChanged" TValue="SteamSortType" Class="pt-0" Label="排序" />
+            </div>
+
+            @if (_dataCacheService.DiscountPageCatcheHelper.ShowAdvancedOptions || _dataCacheService.IsApp == false)
+            {
+                <div style="max-width: 270px; width: 100%;">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.PurchasedType" ValueChanged="OnPurchasedTypeChanged" TValue="PurchasedSteamType" Class="pt-0" Label="库存（请先前往个人空间绑定Steam账号）" />
+                </div>
+            }
+            <div style="max-width: 120px; width: 100%;">
+                <CnGalWebSite.Components.Inputs.MasaSelecte Value="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" ValueChanged="OnDisplayTypeChanged" TValue="SteamDisplayType" Class="pt-0" Label="样式" />
+            </div>
+            <div>
+                <MCheckbox Class="mt-0" Value="_dataCacheService.DiscountPageCatcheHelper.ShowNoDiscountGames" TValue="bool" ValueChanged="ShowNoDiscountGamesChanged" Label="显示无折扣的游戏" />
+            </div>
+            <div style="max-width: 120px; width: 100%;">
+                <CnGalWebSite.Components.Inputs.MasaNumberSelecte Class="mt-0" Value="_dataCacheService.DiscountPageCatcheHelper.MaxCount" Items="@itmes" ValueChanged="MaxCountChanged" Label="每页显示的游戏数目" />
+            </div>
+            <div style="max-width: 400px; width: 100%;">
+                <MSlider Max="DiscountPageHelper.MaxOriginalPriceLimit" Min="5" Step="5" Value="_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice" TValue="double" ValueChanged="MaxOriginalPriceChanged"
+                         Label="@(_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice>=DiscountPageHelper.MaxOriginalPriceLimit?"任意价格":_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice<10?"免费发布的游戏":$"原价低于 {_dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice:00} ￥")" />
+            </div>
+
+        </div>
     }
 </MDCard>
 
 @code {
     [Parameter]
     public EventCallback<PurchasedSteamType> ValueChanged { get; set; }
+
+    List<int> itmes = new List<int>
+    {
+        2,12,24,48,96
+    };
 
 
     public void OnSwitch()
@@ -100,6 +108,12 @@
     public async Task MaxOriginalPriceChanged(double price)
     {
         _dataCacheService.DiscountPageCatcheHelper.MaxOriginalPrice = price;
+        await ValueChanged.InvokeAsync();
+    }
+
+    public async Task MaxCountChanged(int count)
+    {
+        _dataCacheService.DiscountPageCatcheHelper.MaxCount = count;
         await ValueChanged.InvokeAsync();
     }
 }

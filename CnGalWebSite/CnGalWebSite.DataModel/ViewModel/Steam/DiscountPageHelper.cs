@@ -12,7 +12,15 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public int TabIndex { get; set; } = 1;
 
-        public int MaxCount { get; set; } = 12;
+        private int maxCount = 12;
+        public int MaxCount {
+            get => maxCount;
+            set {
+                maxCount = value;
+                CurrentPage = 1;
+                SetItems();
+            }
+        } 
 
         public int TotalPages => ((Items.Count()-1) / MaxCount) + 1;
 
