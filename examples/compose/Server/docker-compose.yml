@@ -20,8 +20,6 @@ services:
       - TaskApiPath=${TaskApiPath}
     hostname: blazorserver
     restart: always
-    volumes:
-      - blazorserver-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
@@ -35,6 +33,5 @@ services:
     ports:
       - "3002:8081"
       - "2002:8080"
-
-volumes:
-  blazorserver-DataProtection-Keys:
+    volumes:
+      - ${MNT_DIR}/blazorserver/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
