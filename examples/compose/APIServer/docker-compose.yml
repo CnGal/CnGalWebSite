@@ -55,3 +55,5 @@ services:
     ports:
       - "3001:8081"
       - "2001:8080"
+    volumes:
+      - ${MNT_DIR}/apiserver/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
