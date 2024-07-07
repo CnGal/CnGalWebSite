@@ -1,6 +1,6 @@
-﻿@page "/8th"
+﻿@page "/9th"
 @page "/Anniversaries"
-@page "/8th/{Type}"
+@page "/9th/{Type}"
 @page "/Anniversaries/{Type}"
 
 @inject IDataCacheService _dataCacheService
@@ -8,7 +8,7 @@
 @implements IDisposable
 
 <div class="anniversary-page">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍",_=>""})" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖","Introduction"=>"介绍","PlayedGames"=>"晒出你的游戏库",_=>""})" />
     <MDCard Class="mb-4">
         <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow CenterActive>
             <MTab Value="1">
@@ -42,7 +42,7 @@
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard />
         </MTabItem>
         <MTabItem Value="4">
-            <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="10" />
+            <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="22" />
         </MTabItem>
         <MTabItem Value="5">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard />

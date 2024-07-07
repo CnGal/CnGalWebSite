@@ -14,6 +14,11 @@
         <MTab Href="/discount">游戏折扣</MTab>
         <MTab Href="/lotteries">抽奖</MTab>
         <MTab Href="/square">广场</MTab>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MTab Href="/9th">周年庆</MTab>
+            </Authorized>
+        </AuthorizeView>
     </MTabs>
     <MSpacer></MSpacer>
     <AuthorizeView>
