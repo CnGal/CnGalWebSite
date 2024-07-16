@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Nest;
+using Senparc.Weixin.MP.AdvancedAPIs.CV.OCR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -200,6 +201,33 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<CarouselViewModel>>> GetActivityCarouselsViewAsync()
         {
             var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => s.Type == CarouselType.Activity && s.Priority >= 0).OrderByDescending(s => s.Priority).ToListAsync();
+
+            var model = new List<CarouselViewModel>();
+            foreach (var item in carouses)
+            {
+                model.Add(new CarouselViewModel
+                {
+                    Image = _appHelper.GetImagePath(item.Image, ""),
+                    Link = item.Link,
+                    Note = item.Note,
+                    Priority = item.Priority,
+                    Type = item.Type,
+                    Id = item.Id,
+                });
+            }
+
+            return model;
+        }
+
+        /// <summary>
+        /// 获取广告
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<CarouselViewModel>>> GetAdvertisingCarouselsViewAsync([FromQuery] bool pc)
+        {
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => pc ? s.Type == CarouselType.AdvertisingPC : s.Type == CarouselType.AdvertisingApp && s.Priority >= 0).OrderByDescending(s => s.Priority).ToListAsync();
 
             var model = new List<CarouselViewModel>();
             foreach (var item in carouses)
@@ -788,7 +816,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Priority = s.Priority,
                     Image = s.Image,
                     Link = s.Link,
-                    Name=s.Name,
+                    Name = s.Name,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model

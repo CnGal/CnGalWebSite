@@ -37,6 +37,7 @@
     <CnGalWebSite.Components.Containers.MasaContainer>
          <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
             @Body
+
         </ErrorHandler>
     </CnGalWebSite.Components.Containers.MasaContainer>
 </MMain>
@@ -44,7 +45,10 @@
 <MFooter App Padless Absolute>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
 </MFooter>
-<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard/>
+<CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
+<CnGalWebSite.Components.Containers.MiniModeContainer>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Advertising.BottomFloatingAdsCard />
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 @code {
 
 }

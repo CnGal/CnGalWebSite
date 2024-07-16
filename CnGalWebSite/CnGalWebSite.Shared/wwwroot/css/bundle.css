@@ -2694,6 +2694,25 @@ html {
 #home-page .activities-card img{
     aspect-ratio: 16/9;
 }
+/*底部广告*/
+.bottom-flaoting-ads-card {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    margin: .5rem;
+    z-index: 3;
+}
+.bottom-flaoting-ads-card a{
+    display: flex;
+}
+    .bottom-flaoting-ads-card img {
+        width: 100%;
+    }
+    .bottom-flaoting-ads-card button {
+        position: absolute;
+        left: .5rem;
+        top: .5rem;
+    }
 
 .slotMachine-box {
     min-height: calc(100% - 341px);
