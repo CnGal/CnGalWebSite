@@ -1,0 +1,70 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+@inject IStructuredDataService _structuredDataService
+@inject IPageModelCatche<List<CarouselViewModel>> _pageModelCatche
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+
+@if (ads != null && close == false)
+{
+    <MDCard class="bottom-flaoting-ads-card">
+        <a href="@ads.Link" target="@(ads.Link.Contains("http")?"_blank":"_self")">
+            <img src="@ads.Image" alt="@ads.Note" />
+        </a>
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Close.ToIconString()" Fab XSmall OnClick="OnClose" Class="close-button" />
+    </MDCard>
+
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
+@code {
+    bool close;
+    private CarouselViewModel ads;
+    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                Carousels = await _pageModelCatche.GetCache(ToolHelper.WebApiPath + $"api/home/GetAdvertisingCarouselsView?pc={!_dataCacheService.IsApp}");
+
+                ads = Carousels.OrderByDescending(s => s.Priority).FirstOrDefault();
+
+                var time = await _localStorage.GetItemAsync<DateTime>("AdvertisingCloseTime");
+
+                if (time.AddDays(1) > DateTime.Now.ToCstTime())
+                {
+                    close = true;
+                }
+
+                StateHasChanged();
+
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取主页底部广告列表失败");
+            }
+        }
+
+    }
+
+
+    private async Task OnClick(CarouselViewModel item)
+    {
+        await trackEven?.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, item.Id.ToString(), item.Note);
+    }
+
+    private async void OnClose()
+    {
+        close = true;
+        await _localStorage.SetItemAsync("AdvertisingCloseTime", DateTime.Now.ToCstTime());
+    }
+}

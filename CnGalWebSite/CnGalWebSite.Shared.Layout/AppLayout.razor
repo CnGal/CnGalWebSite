@@ -20,13 +20,15 @@
             <CnGalWebSite.Components.Containers.MasaContainer>
              <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
                     @Body
-                </ErrorHandler>
 
+                </ErrorHandler>
             </CnGalWebSite.Components.Containers.MasaContainer>
     </CascadingValue>
 </MMain>
 <CnGalWebSite.Components.Verifications.SynchronousAuthStateCard />
-
+<CnGalWebSite.Components.Containers.MiniModeContainer>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Advertising.BottomFloatingAdsCard />
+</CnGalWebSite.Components.Containers.MiniModeContainer>
 @code {
     bool drawer { get; set; }
     CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton navButton;

@@ -27,8 +27,9 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IFileUploadService _fileUploadService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<FileService> _logger;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public FileService(IAppHelper appHelper, IConfiguration configuration, IHttpService httpService,
+        public FileService(IAppHelper appHelper, IConfiguration configuration, IHttpService httpService, IRepository<ApplicationUser, string> userRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository, IFileUploadService fileUploadService)
         {
             _appHelper = appHelper;
@@ -39,6 +40,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             _videoRepository = videoRepository;
             _fileUploadService = fileUploadService;
             _httpService = httpService;
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -77,6 +79,30 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// <returns></returns>
         public async Task TransferMainImagesToPublic(int maxCount)
         {
+            var users = await _userRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.PhotoPath) == false && string.IsNullOrWhiteSpace(s.UserName) == false && s.PhotoPath.Contains("?") == false && s.PhotoPath.Contains("default") == false)
+                .OrderBy(s => s.Id)
+                .Take(maxCount).ToListAsync();
+
+            foreach (var item in users)
+            {
+                try
+                {
+                    var temp = await TransferDepositFile(item.PhotoPath);
+                    if (string.IsNullOrWhiteSpace(temp) == false)
+                    {
+                        item.PhotoPath = temp;
+                        await _userRepository.UpdateAsync(item);
+                        _logger.LogInformation("转存 用户 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.UserName, item.Id, item.PhotoPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存用户 - {Name}({Id}) 主图失败", item.UserName, item.Id);
+                }
+
+            }
+
+
             var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();

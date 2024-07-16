@@ -26,5 +26,9 @@ namespace CnGalWebSite.DataModel.Model
         ThematicPage,
         [Display(Name = "活动")]
         Activity,
+        [Display(Name = "PC底部横幅")]
+        AdvertisingPC,
+        [Display(Name = "APP底部横幅")]
+        AdvertisingApp,
     }
 }
