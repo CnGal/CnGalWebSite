@@ -227,7 +227,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CarouselViewModel>>> GetAdvertisingCarouselsViewAsync([FromQuery] bool pc)
         {
-            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => pc ? s.Type == CarouselType.AdvertisingPC : s.Type == CarouselType.AdvertisingApp && s.Priority >= 0).OrderByDescending(s => s.Priority).ToListAsync();
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => (pc ? s.Type == CarouselType.AdvertisingPC : s.Type == CarouselType.AdvertisingApp) && s.Priority >= 0).OrderByDescending(s => s.Priority).ToListAsync();
 
             var model = new List<CarouselViewModel>();
             foreach (var item in carouses)
