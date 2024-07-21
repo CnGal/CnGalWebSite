@@ -6,6 +6,7 @@
 @inject IPopupService PopupService
 @inject IUserService _userService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<LotteryCardViewModel>> _pageModelCatche
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="抽奖板块" Description="快来参加抽奖吧" />
@@ -57,7 +58,7 @@
 
         try
         {
-            Model = await _httpService.GetAsync<List<LotteryCardViewModel>>("api/lotteries/GetLotteryCards");
+            Model = await _pageModelCatche.GetCache("api/lotteries/GetLotteryCards");
             isReady = true;
         }
         catch (Exception ex)

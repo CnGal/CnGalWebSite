@@ -1284,7 +1284,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         StaffList = new List<StaffValue>()
                     }
                 };
-                foreach (var item in entry.EntryStaffFromEntryNavigation.OrderBy(s => s.PositionGeneral).ThenBy(s => s.PositionOfficial))
+
+                // 根据职位重新排序
+                foreach(var item in entry.EntryStaffFromEntryNavigation)
+                {
+                    var id = EntryStaff.PositionSort.IndexOf(item.PositionGeneral);
+                    item.SortId = id;
+                }
+
+                foreach (var item in entry.EntryStaffFromEntryNavigation.OrderBy(s => s.SortId).ThenBy(s => s.PositionOfficial))
                 {
 
                     var isAdd = false;
