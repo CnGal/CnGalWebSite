@@ -6,6 +6,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IPageModelCatche<List<EntryInforTipViewModel>> _pageModelCatche
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="游戏发售时间汇总" Description="可以查看每月发售游戏列表"/>
 
@@ -161,7 +162,7 @@
                     Date = new DateOnly(Year, Month, 1);
                 }
 
-                CardModel = await _dataCacheService.PublishGameTimesDataCatche.GetCache($"?year={Year}&month={Month}");
+                CardModel = await _pageModelCatche.GetCache($"api/entries/GetPublishGamesByTime?year={Year}&month={Month}");
 
             }
             else

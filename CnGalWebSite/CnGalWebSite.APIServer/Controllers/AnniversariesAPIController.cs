@@ -1,10 +1,13 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +23,7 @@ namespace CnGalWebSite.APIServer.Controllers
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IUserService _userService;
+        private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
@@ -115,5 +119,29 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        /// <summary>
+        /// 获取参与的制作组列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<EntryInforTipViewModel>>> GetGroupListAsync()
+        {
+            var games = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s=>s.Priority==1 && s.Type== EntryType.ProductionGroup)
+                .OrderBy(s=>s.DisplayName)
+                .ToListAsync();
+
+            var model = new List<EntryInforTipViewModel>();
+            foreach (var item in games)
+            {
+                var temp = _appHelper.GetEntryInforTipViewModel(item);
+
+                model.Add(temp);
+            }
+
+            return model;
+        }
+
     }
 }

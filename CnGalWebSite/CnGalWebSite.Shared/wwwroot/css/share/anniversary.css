@@ -37,3 +37,17 @@
         font-weight: bold;
         color: var(--md-sys-color-primary);
     }
+    /* 制作组列表*/
+.anniversaries-group-card .content-card {
+    display: flex;
+    padding: 1rem;
+    gap: .5rem;
+    flex-direction: column;
+}
+.anniversaries-group-card .name {
+    font-size: large;
+    font-weight: bold;
+}
+.anniversaries-group-card .biref {
+    font-size: small;
+}
