@@ -11,5 +11,11 @@
         public bool IsComment { get; set; }
 
         public bool IsBindSteamId { get; set; }
+
+        public bool IsAnniversariesLiveBookings { get; set; }
+
+        public bool IsAnniversariesShare { get; set; }
+
+        public bool IsAnniversariesLottery { get; set; }
     }
 }

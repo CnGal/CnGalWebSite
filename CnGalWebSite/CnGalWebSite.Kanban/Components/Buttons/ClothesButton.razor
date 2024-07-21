@@ -19,21 +19,21 @@
             <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
                 @foreach (var item in _clothesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||item.Name==null))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="title-medium">丝袜</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.StockingsName" TValue="string" ValueChanged="StockingsChanged" Row Mandatory>
                 @foreach (var item in _stockingsRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||item.Name==null))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="title-medium">鞋子</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.ShoesName" TValue="string" ValueChanged="ShoesChanged" Row Mandatory>
                 @foreach (var item in _shoesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||item.Name==null))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="action-card">
@@ -79,37 +79,16 @@
 
     public async Task ClothesChanged(string name)
     {
-        if (name == null)
-        {
-            await _live2DService.CleanClothes();
-        }
-        else
-        {
-            await _live2DService.SetClothes(name);
-        }
+        await _live2DService.SetClothes(name);
     }
 
     public async Task StockingsChanged(string name)
     {
-        if (name == null)
-        {
-            await _live2DService.CleanStockings();
-        }
-        else
-        {
-            await _live2DService.SetStockings(name);
-        }
+        await _live2DService.SetStockings(name);
     }
 
     public async Task ShoesChanged(string name)
     {
-        if (name == null)
-        {
-            await _live2DService.CleanShoes();
-        }
-        else
-        {
-            await _live2DService.SetShoes(name);
-        }
+        await _live2DService.SetShoes(name);
     }
 }

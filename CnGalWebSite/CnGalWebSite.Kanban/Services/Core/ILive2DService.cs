@@ -20,15 +20,12 @@ namespace CnGalWebSite.Kanban.Services.Core
 
         Task SetClothes(string name);
 
-        Task CleanClothes();
 
         Task SetStockings(string name);
 
-        Task CleanStockings();
 
         Task SetShoes(string name);
 
-        Task CleanShoes();
 
         Task SetMotion(string group, int index);
 

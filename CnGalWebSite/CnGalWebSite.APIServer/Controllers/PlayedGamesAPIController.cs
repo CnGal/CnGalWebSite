@@ -209,6 +209,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
 
+            // 周年庆活动
+            if(string.IsNullOrWhiteSpace(model.PlayImpressions) == false)
+            {
+                // 有评语 且绑定Steam
+                if(user.SteamId != null)
+                {
+                    await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
+                }
+            }
+
+
             //不公开或没有感想 都可以直接保存
 
             if  (model.ShowPublicly == false || string.IsNullOrWhiteSpace(model.PlayImpressions))

@@ -1,0 +1,43 @@
+﻿@inject IHttpService _httpService
+@inject IEventService _eventService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
+
+<TaskCard ButtonIcon="@IconType.Link" ButtonText="前往预约" Finished="Model.IsAnniversariesLiveBookings" Icon="@IconType.Video" Name="预约周年庆直播" OnClick="OnClick" Reward="G币+1" Text="前往B站预约直播吧" />
+
+@code {
+    [Parameter]
+    public UserTaskModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnClick()
+    {
+        await _eventService.OpenNewPage("https://live.bilibili.com/4622426");
+
+        try
+        {
+            var obj = await _httpService.PostAsync<SetUserTaskFinshModel, Result>("api/space/SetUserTaskFinsh", new SetUserTaskFinshModel { Type = UserIntegralSourceType.AnniversariesLiveBookings });
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastErrorAsync("完成预约直播任务失败", obj.Error);
+            }
+            else
+            {
+                _dataCacheService.UserInfor.GCoins += 1;
+                Model.IsAnniversariesLiveBookings = true;
+                StateHasChanged();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "完成预约直播任务失败");
+        }
+
+    }
+
+}

@@ -1,0 +1,15 @@
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+
+<TaskCard ButtonIcon="@IconType.Link" ButtonText="前往分享" Finished="Model.IsAnniversariesShare" Icon="@IconType.GameRecord" Name="分享游玩记录" OnClick="OnClick" Reward="G币+1" Text="绑定Steam账号后分享一篇游玩记录" />
+
+@code {
+    [Parameter]
+    public UserTaskModel Model { get; set; }
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo("/sharegames");
+    }
+
+}

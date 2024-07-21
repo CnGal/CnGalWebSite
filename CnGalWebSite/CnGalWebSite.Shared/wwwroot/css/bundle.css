@@ -3788,6 +3788,7 @@ a.user-info-card {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
+    justify-content: space-between;
 }
 
     .user-task-card .content-card {
@@ -3795,6 +3796,10 @@ a.user-info-card {
         flex-direction: column;
         align-items: center;
         gap: .2rem;
+    }
+
+    .user-task-card .biref {
+        text-align: center;
     }
 /*消息*/
 .message-info-card .name-card {

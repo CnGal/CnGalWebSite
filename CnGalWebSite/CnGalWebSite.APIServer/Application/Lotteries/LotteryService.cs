@@ -252,6 +252,15 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 throw new Exception("你已经参加了这个抽奖");
             }
+
+            // 周年庆特殊处理 G币
+            if(lottery.Id == 22)
+            {
+                //尝试添加G币
+                await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesLotteries, 1, null);
+            }
+
+
             var time = DateTime.Now.ToCstTime();
             await _lotteryUserRepository.InsertAsync(new LotteryUser
             {

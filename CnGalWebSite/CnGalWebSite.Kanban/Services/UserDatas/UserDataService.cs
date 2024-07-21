@@ -76,17 +76,17 @@ namespace CnGalWebSite.Kanban.Services.UserDatas
         /// <returns></returns>
         private void CheckClothes()
         {
-            if (_userDataModel.Clothes.ClothesName != null && !_clothesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ClothesName))
+            if (_userDataModel.Clothes.ClothesName == null || !_clothesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ClothesName))
             {
-                _userDataModel.Clothes.ClothesName = null;
+                _userDataModel.Clothes.ClothesName = _clothesRepository.GetAll().FirstOrDefault().Name;
             }
-            if (_userDataModel.Clothes.StockingsName != null && !_strockingsRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.StockingsName))
+            if (_userDataModel.Clothes.StockingsName == null || !_strockingsRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.StockingsName))
             {
-                _userDataModel.Clothes.StockingsName = null;
+                _userDataModel.Clothes.StockingsName = _strockingsRepository.GetAll().FirstOrDefault().Name;
             }
-            if (_userDataModel.Clothes.ShoesName != null && !_shoesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ShoesName))
+            if (_userDataModel.Clothes.ShoesName == null || !_shoesRepository.GetAll().Any(s => s.Name == _userDataModel.Clothes.ShoesName))
             {
-                _userDataModel.Clothes.ShoesName = null;
+                _userDataModel.Clothes.ShoesName = _strockingsRepository.GetAll().FirstOrDefault().Name;
             }
         }
     }

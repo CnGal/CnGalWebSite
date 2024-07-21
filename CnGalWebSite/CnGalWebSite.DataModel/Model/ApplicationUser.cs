@@ -211,7 +211,13 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "抽奖")]
         Lottery,
         [Display(Name = "购买商品")]
-        BuyCommodity
+        BuyCommodity,
+        [Display(Name = "周年庆直播预约")]
+        AnniversariesLiveBookings,
+        [Display(Name = "周年庆抽奖")]
+        AnniversariesLotteries,
+        [Display(Name = "周年庆分享游戏库")]
+        AnniversariesShare,
     }
 
     public enum UserIntegralType
