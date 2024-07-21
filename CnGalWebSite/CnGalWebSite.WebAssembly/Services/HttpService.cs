@@ -27,22 +27,22 @@ namespace CnGalWebSite.WebAssembly.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<HttpService> _logger;
         private readonly NavigationManager _navigationManager;
+        private readonly IAccessTokenProvider _accessTokenProvider;
 
         private readonly string _baseUrl = ToolHelper.WebApiPath;
         private bool _isPreRender = true;
-
-        public bool IsAuth { get; set; }
 
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
         };
 
-        public HttpService(IHttpClientFactory httpClientFactory, ILogger<HttpService> logger, NavigationManager navigationManager)
+        public HttpService(IHttpClientFactory httpClientFactory, ILogger<HttpService> logger, NavigationManager navigationManager, IAccessTokenProvider accessTokenProvider)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _navigationManager = navigationManager;
+            _accessTokenProvider = accessTokenProvider;
 
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
@@ -50,12 +50,12 @@ namespace CnGalWebSite.WebAssembly.Services
         }
         public async Task<TValue> GetAsync<TValue>(string url)
         {
-            _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
+           // _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
             var client = await GetClientAsync();
 
             try
             {
-                return await client.GetFromJsonAsync<TValue>(url.Contains("://")?url: _baseUrl + url, _jsonOptions);
+                return await client.GetFromJsonAsync<TValue>(url.Contains("://") ? url : _baseUrl + url, _jsonOptions);
             }
             catch (AccessTokenNotAvailableException ex)
             {
@@ -72,7 +72,7 @@ namespace CnGalWebSite.WebAssembly.Services
 
         public async Task<TValue> PostAsync<TModel, TValue>(string url, TModel model)
         {
-            _logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
+            //_logger.LogInformation(IsAuth ? "AuthAPI" : "AnonymousAPI");
             try
             {
                 var client = await GetClientAsync();
@@ -88,24 +88,19 @@ namespace CnGalWebSite.WebAssembly.Services
                     ReturnUrl = _navigationManager.Uri,
                 };
                 _navigationManager.NavigateToLogin("authentication/login", requestOptions);
-                
+
                 throw new Exception("令牌过期，请重新登入", ex);
             }
         }
 
         public async Task<HttpClient> GetClientAsync()
         {
-            if (_isPreRender)
-            {
-                await Task.Delay(100);
-            }
-            _isPreRender = false;
-            return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
+            return _httpClientFactory.CreateClient((await _accessTokenProvider.RequestAccessToken()).Status == AccessTokenResultStatus.Success ? "AuthAPI" : "AnonymousAPI");
         }
 
         public HttpClient GetClient()
         {
-            return _httpClientFactory.CreateClient(IsAuth ? "AuthAPI" : "AnonymousAPI");
+            return GetClientAsync().Result;
         }
     }
 }

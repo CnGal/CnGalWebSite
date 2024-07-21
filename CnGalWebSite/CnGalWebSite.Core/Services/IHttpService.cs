@@ -12,8 +12,6 @@ namespace CnGalWebSite.Core.Services
 
         Task<TValue> PostAsync<TModel, TValue>(string url, TModel model);
 
-        bool IsAuth { get; set; }
-
         Task<HttpClient> GetClientAsync();
     }
 }

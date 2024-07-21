@@ -532,6 +532,14 @@ namespace CnGalWebSite.APIServer.Application.Users
                     return;
                 }
             }
+            else if (sourceType == UserIntegralSourceType.AnniversariesLiveBookings || sourceType == UserIntegralSourceType.AnniversariesLotteries || sourceType == UserIntegralSourceType.AnniversariesShare)
+            {
+                DateTime now = DateTime.Now.ToCstTime();
+                if (await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == userId && s.SourceType == sourceType && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > now.ToCstTime()))
+                {
+                    return;
+                }
+            }
             else if (sourceType == UserIntegralSourceType.BuyCommodity)
             {
 

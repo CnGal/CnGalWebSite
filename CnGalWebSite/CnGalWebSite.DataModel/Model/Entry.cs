@@ -307,7 +307,7 @@ namespace CnGalWebSite.DataModel.Model
         Default,
         [Display(Name = "文章介绍")]
         ArticleIntroduce,
-        [Display(Name ="专题页")]
+        [Display(Name = "专题页")]
         OfficialWebsite,
         [Display(Name = "杂志")]
         Magazine
@@ -330,7 +330,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum EntryWebsiteImageSize
     {
-        [Display(Name ="PC端")]
+        [Display(Name = "PC端")]
         Large,
         [Display(Name = "移动端")]
         Small
@@ -368,6 +368,41 @@ namespace CnGalWebSite.DataModel.Model
 
     public partial class EntryStaff
     {
+        /// <summary>
+        /// 职位顺序
+        /// </summary>
+        public static readonly List<PositionGeneralType> PositionSort =
+            [
+                PositionGeneralType.MainUrge,
+                PositionGeneralType.Video,
+                PositionGeneralType.Design,
+                PositionGeneralType.Music,
+                PositionGeneralType.ComposingWords,
+                PositionGeneralType.Singing,
+                PositionGeneralType.Script,
+                PositionGeneralType.CV,
+                PositionGeneralType.Show,
+                PositionGeneralType.FineArts,
+                PositionGeneralType.Program,
+                PositionGeneralType.Operate,
+                PositionGeneralType.Issue,
+                PositionGeneralType.Make,
+                PositionGeneralType.PV,
+                PositionGeneralType.LaterStage,
+                PositionGeneralType.Plan,
+                PositionGeneralType.ComposeMusic,
+                PositionGeneralType.ProductionGroup,
+                PositionGeneralType.Publisher,
+                PositionGeneralType.SpecialThanks,
+                PositionGeneralType.Other,
+            ];
+
+        /// <summary>
+        /// 临时排序ID
+        /// </summary>
+        public int SortId;
+
+
         public long EntryStaffId { get; set; }
 
         public int? FromEntry { get; set; }
@@ -579,7 +614,7 @@ namespace CnGalWebSite.DataModel.Model
     {
         public long Id { get; set; }
 
-        public DateTime Birthday { get;set;}
+        public DateTime Birthday { get; set; }
 
         public Entry Role { get; set; }
         public int RoleId { get; set; }
@@ -656,6 +691,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "特别感谢")]
         SpecialThanks
     }
+
+
 
     public enum GenderType
     {

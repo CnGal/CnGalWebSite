@@ -1,15 +1,28 @@
 ﻿@inject IDataCacheService _dataCatcheService
+@inject IPageModelCatche<List<EntryInforTipViewModel>> _pageModelCatche
 
-
-<div class="rounded  shadow-sm bg-opacity mb-4">
-    @((MarkupString)Model.MainPage)
-</div>
-
-
+<MRow>
+    @foreach (var item in _items)
+    {
+        <MCol Cols="6" Sm="4"  Lg="3" Xl="2" Class="mb-4">
+            <MDCard Href="@($"/entries/index/{item.Id}")" Class="h-100 anniversaries-group-card">
+                <img src="@item.MainImage" alt="@item.Name" loading="lazy"/>
+                <div class="content-card">
+                    <div class="name">
+                        @item.Name
+                    </div>
+                    <div class="text-truncate-2 biref">
+                        @item.BriefIntroduction
+                    </div>
+                </div>
+            </MDCard>
+        </MCol>
+    }
+</MRow>
 
 @code {
 
-    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+    List<EntryInforTipViewModel> _items { get; set; } = new List<EntryInforTipViewModel>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -18,11 +31,12 @@
     {
         try
         {
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("3757");
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/anniversaries/GetGroupList");
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "获取获取周年庆活动介绍失败");
+            await ErrorHandler.ProcessError(ex, "获取周年庆参与制作组列表失败");
         }
 
     }

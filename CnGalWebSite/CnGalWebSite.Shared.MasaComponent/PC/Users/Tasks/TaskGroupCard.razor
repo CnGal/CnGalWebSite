@@ -3,20 +3,49 @@
 
 @if (isReady)
 {
-    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="新手任务" Icon="@IconType.NewbieTask.ToIconString()" Collapable Outline>
-     <MRow>
-         <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
-             <BindSteamIdCard Model="Model" />
-         </MCol>
-     </MRow>
- </CnGalWebSite.Components.Containers.MasaTitleContainer>
-    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="日常任务" Icon="@IconType.DailyTask.ToIconString()" Collapable Outline>
-     <MRow>
-         <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
-             <SignInCard Model="Model" />
-         </MCol>
-     </MRow>
- </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    @if (OnlyShowAnniversaries == false)
+    {
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="日常任务" Icon="@IconType.DailyTask.ToIconString()" Collapable Outline>
+            <MRow>
+                <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
+                    <SignInCard Model="Model" />
+                </MCol>
+            </MRow>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+    }
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周年庆任务" Icon="@IconType.Birthday.ToIconString()" Collapable Outline>
+                <MRow>
+                    <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4 h-100">
+                        <BookLiveCard Model="Model" />
+                    </MCol>
+                    <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4 h-100">
+                        <LotteryCard Model="Model" />
+                    </MCol>
+                    <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4 h-100">
+                        <ShareAndCommentGameCard Model="Model" />
+                    </MCol>
+
+                </MRow>
+            </CnGalWebSite.Components.Containers.MasaTitleContainer>
+        </Authorized>
+    </AuthorizeView>
+
+
+    @if (OnlyShowAnniversaries == false)
+    {
+
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Title="新手任务" Icon="@IconType.NewbieTask.ToIconString()" Collapable Outline>
+            <MRow>
+                <MCol Cols="12" Md="6" Lg="4" Xl="3" Class="mb-4">
+                    <BindSteamIdCard Model="Model" />
+                </MCol>
+            </MRow>
+        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+    }
 }
 else
 {
@@ -24,6 +53,10 @@ else
 }
 
 @code {
+    [Parameter]
+    public bool OnlyShowAnniversaries { get; set; }
+
+
     bool isReady;
 
     public UserTaskModel Model { get; set; }

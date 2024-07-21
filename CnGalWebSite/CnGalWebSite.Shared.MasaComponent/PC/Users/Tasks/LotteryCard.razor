@@ -1,0 +1,17 @@
+﻿@inject NavigationManager NavigationManager
+
+<TaskCard ButtonIcon="@IconType.Link" ButtonText="前往抽奖" Finished="Model.IsAnniversariesLottery" Icon="@IconType.Lottery" Name="参与抽奖" OnClick="OnClick" Reward="G币+1" Text="前往周年庆抽奖页面参与抽奖吧" />
+
+@code {
+    [Parameter]
+    public UserTaskModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo("/lotteries/index/22");
+    }
+
+}

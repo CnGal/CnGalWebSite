@@ -25,6 +25,15 @@
         font-size: large;
         font-weight: bold;
     }
+/* 制作组列表*/
+.anniversaries-group-card .content-card {
+    padding: .5rem;
+    gap: .3rem;
+}
+
+.anniversaries-group-card .name {
+    font-size: inherit;
+}
 
 
 /*全局*/

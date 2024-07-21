@@ -7,7 +7,7 @@
 
 <MDCard Class="mb-8">
     <a class="image-link-card" href="@("lotteries/index/"+Model.Id)">
-        <img class="image-card" src="@(_dataCacheService.IsApp?Model.MainPicture:Model.Thumbnail)" alt="@Model.Name" />
+        <img class="image-card" src="@(_dataCacheService.IsApp?Model.MainPicture:Model.Thumbnail)" alt="@Model.Name" loading="lazy" />
     </a>
     <div class="head-card">
         <div class="title-card">

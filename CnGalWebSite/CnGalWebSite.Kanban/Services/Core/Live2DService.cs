@@ -38,9 +38,9 @@ namespace CnGalWebSite.Kanban.Services.Core
             _settingService = settingService;
             _userDataService = userDataService;
             _expressionRepository = expressionRepository;
-            _configuration= configuration;
+            _configuration = configuration;
             _motionGroupRepository = motionGroupRepository;
-            _shoesRepository= shoesRepository;
+            _shoesRepository = shoesRepository;
             _strockingsRepository = strockingsRepository;
         }
 
@@ -95,7 +95,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public async Task SetMotion(string group,int index)
+        public async Task SetMotion(string group, int index)
         {
             await _jSRuntime.InvokeVoidAsync("switchLiv2DMotion", group, index);
         }
@@ -136,22 +136,23 @@ namespace CnGalWebSite.Kanban.Services.Core
         /// <returns></returns>
         public async Task SetClothes(string name)
         {
+            if(name == null)
+            {
+                return;
+            }
+
             _userDataService.UserData.Clothes.ClothesName = name;
             await _userDataService.SaveAsync();
 
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DClothes", name);
-        }
 
-        /// <summary>
-        /// 清空衣服
-        /// </summary>
-        /// <returns></returns>
-        public async Task CleanClothes()
-        {
-            _userDataService.UserData.Clothes.ClothesName = null;
-            await _userDataService.SaveAsync();
-
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DClothes");
+            if (name.EndsWith('0'))
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DClothes");
+            }
+            else
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DClothes", name);
+            }
         }
 
         /// <summary>
@@ -161,22 +162,22 @@ namespace CnGalWebSite.Kanban.Services.Core
         /// <returns></returns>
         public async Task SetStockings(string name)
         {
+            if (name == null)
+            {
+                return;
+            }
+
             _userDataService.UserData.Clothes.StockingsName = name;
             await _userDataService.SaveAsync();
 
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DStockings", name);
-        }
-
-        /// <summary>
-        /// 清空丝袜
-        /// </summary>
-        /// <returns></returns>
-        public async Task CleanStockings()
-        {
-            _userDataService.UserData.Clothes.StockingsName = null;
-            await _userDataService.SaveAsync();
-
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DStockings");
+            if (name.EndsWith('0'))
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DStockings");
+            }
+            else
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DStockings", name);
+            }
         }
 
         /// <summary>
@@ -186,21 +187,24 @@ namespace CnGalWebSite.Kanban.Services.Core
         /// <returns></returns>
         public async Task SetShoes(string name)
         {
+            if (name == null)
+            {
+                return;
+            }
+
             _userDataService.UserData.Clothes.ShoesName = name;
             await _userDataService.SaveAsync();
 
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DShoes", name);
-        }
 
-        /// <summary>
-        /// 清空鞋子
-        /// </summary>
-        /// <returns></returns>
-        public async Task CleanShoes()
-        {
-            _userDataService.UserData.Clothes.ShoesName = null;
-            await _userDataService.SaveAsync();
-            await _jSRuntime.InvokeVoidAsync("switchLiv2DShoes");
+
+            if (name.EndsWith('0'))
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DShoes");
+            }
+            else
+            {
+                await _jSRuntime.InvokeVoidAsync("switchLiv2DShoes", name);
+            }
         }
 
         /// <summary>

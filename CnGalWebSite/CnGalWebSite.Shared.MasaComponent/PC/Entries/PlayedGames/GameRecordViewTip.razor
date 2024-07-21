@@ -1,5 +1,4 @@
-﻿
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
@@ -18,43 +17,47 @@
         <MCardText Class="pb-2">
             @Model.GameBriefIntroduction
         </MCardText>
-        
-        <MCardText Class="pb-2">
-            @if (Model.IsScored)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.MusicSocre" Label="音乐" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.PaintSocre" Label="美术" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Label="剧本" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Label="演出" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Label="程序" />
-                @if (Model.CVSocre > 0 && Model.IsDubbing)
+
+        @if (Model.IsScored)
+        {
+            <MCardText Class="pb-2">
+                @if (Model.IsScored)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Label="配音" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.MusicSocre" Label="音乐" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.PaintSocre" Label="美术" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Label="剧本" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Label="演出" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Label="程序" />
+                    @if (Model.CVSocre > 0 && Model.IsDubbing)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Label="配音" />
+
+                    }
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Label="总评" />
+
 
                 }
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Label="总评" />
+                else
+                {
+                    <div class="pb-2">
+                        未评分
+                    </div>
+                }
+            </MCardText>
+        }
 
-
-            }
-            else
-            {
-                <div class="pb-2">
-                    未评分
-                </div>
-            }
-        </MCardText>
 
         <MCardText Class="pb-2">
             <GameRecordTagCard Model="Model" IsDark="true" />
         </MCardText>
 
-        @if (IsCurrentUser)
+        @if (IsCurrentUser && string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
         {
             <MCardTitle Class="text-h6 pt-0">
                 评语
             </MCardTitle>
-            <MCardText Class="pb-2" Style=" white-space: break-spaces;"> 
-                @(string.IsNullOrWhiteSpace(Model.PlayImpressions)?"无": Model.PlayImpressions)
+            <MCardText Class="pb-2" Style=" white-space: break-spaces;">
+                @(string.IsNullOrWhiteSpace(Model.PlayImpressions) ? "无" : Model.PlayImpressions)
             </MCardText>
         }
 
@@ -63,7 +66,7 @@
             <MCardActions Class="pa-6 pt-0">
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle OnClick="OnHidden" Icon="@(Model.IsHidden?IconType.Look.ToIconString() : IconType.Hide.ToIconString())" Text="@(Model.IsHidden? "显示" : "隐藏")" />
                 <MSpacer></MSpacer>
-                <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnClickEdit" Icon="@IconType.Edit.ToIconString()" Text="编辑" />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded OnClick="OnClickEdit" Icon="@IconType.Edit.ToIconString()" Text="编辑游玩记录" />
             </MCardActions>
         }
 
@@ -106,7 +109,7 @@
                 Model.IsHidden = !Model.IsHidden;
                 await PopupService.ToastSuccessAsync("修改游玩记录显示状态成功", "修改游玩记录显示状态成功");
                 Dialog = false;
-               await OnChanged.InvokeAsync();
+                await OnChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
@@ -121,6 +124,6 @@
         Dialog = dialog;
         Model = model;
         StateHasChanged();
-        
+
     }
 }

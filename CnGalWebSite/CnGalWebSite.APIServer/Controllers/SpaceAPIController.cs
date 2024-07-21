@@ -41,7 +41,7 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/space/[action]")]
     public class SpaceAPIController : ControllerBase
     {
-        
+
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<ApplicationUser, long> _userRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
@@ -60,16 +60,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IQueryService _queryService;
         private readonly IRepository<UserIntegral, string> _userIntegralRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
-         IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
+         IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
         ISteamInforService steamInforService, IQueryService queryService, IRepository<UserIntegral, string> userIntegralRepository)
         {
             _examineRepository = examineRepository;
             _examineService = examineService;
             _appHelper = appHelper;
-            
+
             _messageService = messageService;
             _messageRepository = messageRepository;
             _userRepository = userRepository;
@@ -85,6 +86,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _queryService = queryService;
             _userIntegralRepository = userIntegralRepository;
+            _playedGameRepository = playedGameRepository;
         }
 
         /// <summary>
@@ -111,8 +113,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     PersonalSignature = s.PersonalSignature,
                     DisplayIntegral = s.DisplayIntegral,
                     SBgImage = s.SBgImage,
-                    MBgImage=s.MBgImage,
-                    GCoins=s.GCoins
+                    MBgImage = s.MBgImage,
+                    GCoins = s.GCoins
                 }).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -161,7 +163,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 user = await _userRepository.GetAll().AsNoTracking()
                                           .Include(x => x.SignInDays)
                                           .Include(s => s.FileManager)
-                                          .Include(x=>x.Certification).ThenInclude(s=>s.Entry)
+                                          .Include(x => x.Certification).ThenInclude(s => s.Entry)
                                           .FirstOrDefaultAsync(x => x.Id == id);
             }
             catch
@@ -227,7 +229,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 SteamId = user.SteamId,
                 IsShowGameRecord = user.IsShowGameRecord,
                 BasicInfor = await _userService.GetUserInforViewModel(user),
-                UserCertification = user.Certification?.Entry != null ?_appHelper.GetEntryInforTipViewModel(user.Certification.Entry) : null
+                UserCertification = user.Certification?.Entry != null ? _appHelper.GetEntryInforTipViewModel(user.Certification.Entry) : null
 
             };
 
@@ -243,7 +245,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync([FromQuery]string userId, [FromQuery]string sorting, [FromQuery]int maxResultCount, [FromQuery] int currentPage, [FromQuery]string screeningConditions)
+        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync([FromQuery] string userId, [FromQuery] string sorting, [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] string screeningConditions)
         {
             return await _examineService.GetPaginatedResult(new GetExamineInput
             {
@@ -395,7 +397,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Birthday = user.Birthday;
             model.PersonalSignature = user.PersonalSignature;
             model.CanComment = user.CanComment ?? true;
-            model.SteamIds = user.SteamId?.Split(",")?.Where(s=>!string.IsNullOrWhiteSpace(s))?.ToList()??[];
+            model.SteamIds = user.SteamId?.Split(",")?.Where(s => !string.IsNullOrWhiteSpace(s))?.ToList() ?? [];
             model.Id = user.Id;
             model.IsShowFavorites = user.IsShowFavotites;
             model.IsShowGameRecord = user.IsShowGameRecord;
@@ -411,14 +413,14 @@ namespace CnGalWebSite.APIServer.Controllers
             if (examine != null)
             {
                 var userCertification = new UserCertification();
-               await  _userService.UpdateUserCertificationData(userCertification, examine);
+                await _userService.UpdateUserCertificationData(userCertification, examine);
 
                 model.UserCertificationModel = new EditUserCertificationModel
                 {
                     IsPending = true,
                     EntryName = userCertification.Entry.DisplayName,
                     Note = examine.Note,
-                    Type = userCertification.Entry.Type == EntryType.ProductionGroup? UserCertificationType.Group: UserCertificationType.Staff,
+                    Type = userCertification.Entry.Type == EntryType.ProductionGroup ? UserCertificationType.Group : UserCertificationType.Staff,
                 };
             }
             else
@@ -476,6 +478,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     //尝试添加G币
                     await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
+
+                    // 如果还有评语 继续添加G币
+                    if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false))
+                    {
+                        await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
+                    }
                 }
             }
             user.IsShowGameRecord = model.IsShowGameRecord;
@@ -516,7 +524,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _messageRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => true));
+            await _messageRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsReaded, b => true));
 
             return new Result { Successful = true };
         }
@@ -525,7 +533,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditMessageIsReadedAsync(EditMessageIsReadedModel model)
         {
-            await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
+            await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
         }
@@ -545,8 +553,8 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
-            await _messageRepository.GetAll().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
+            var isAdmin = _userService.CheckCurrentUserRole("Admin");
+            await _messageRepository.GetAll().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
         }
@@ -555,7 +563,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<MessageOverviewModel>> ListMessages(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<Message, int>(_messageRepository.GetAll().AsSingleQuery().Include(s=>s.ApplicationUser), model,
+            var (items, total) = await _queryService.QueryAsync<Message, int>(_messageRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.Title.Contains(model.SearchText) || s.LinkTitle.Contains(model.SearchText)));
 
             return new QueryResultModel<MessageOverviewModel>
@@ -568,7 +576,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Text = s.Text,
                     Title = s.Title,
                     UserId = s.ApplicationUser.Id,
-                    UserName=s.ApplicationUser.UserName,
+                    UserName = s.ApplicationUser.UserName,
                     Link = s.Link,
                     IsReaded = s.IsReaded
                 }).ToListAsync(),
@@ -583,7 +591,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
-            var isAdmin = _userService.CheckCurrentUserRole( "Admin");
+            var isAdmin = _userService.CheckCurrentUserRole("Admin");
             await _messageRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
@@ -614,19 +622,22 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsSignIn = await _signInDayRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.Time.Date == dateTime.Date),
                 IsComment = await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.ApplyTime.Date == dateTime.Date && s.Operation == Operation.PubulishComment),
                 IsEdit = await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.ApplyTime.Date == dateTime.Date && s.Operation != Operation.PubulishComment),
+                IsAnniversariesLiveBookings = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesLiveBookings && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime),
+                IsAnniversariesLottery = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesLotteries && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime),
+                IsAnniversariesShare = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesShare && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime),
             };
 
             //获取签到信息
-            var sign =_userService.GetUserSignInDays(user);
+            var sign = _userService.GetUserSignInDays(user);
             model.IsSignIn = sign.IsSignIn;
             model.SignInDays = sign.SignInDays;
 
             //绑定SteamId
-            if (await _userIntegralRepository.AnyAsync(s=>s.ApplicationUserId==user.Id))
+            if (await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id))
             {
                 model.IsBindSteamId = true;
             }
-           else
+            else
             {
                 if (string.IsNullOrWhiteSpace(user.SteamId))
                 {
@@ -636,12 +647,47 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
                     model.IsBindSteamId = true;
+
+
                 }
+            }
+
+            // 分享游玩记录
+            if (model.IsAnniversariesShare == false && model.IsBindSteamId)
+            {
+                // 如果还有评语 继续添加G币
+                if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false))
+                {
+                    await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
+                    model.IsAnniversariesShare = true;
+                }
+
             }
 
             return model;
 
         }
+
+
+        /// <summary>
+        /// 尝试完成任务
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<Result>> SetUserTaskFinsh(SetUserTaskFinshModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            user = await _userRepository.GetAll().Include(s => s.SignInDays).FirstOrDefaultAsync(s => s.Id == user.Id);
+
+            if (model.Type == UserIntegralSourceType.AnniversariesLiveBookings)
+            {
+                await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesLiveBookings, 1, null);
+            }
+
+            return new Result { Successful = true };
+
+        }
+
 
         [HttpGet("{id}")]
         [AllowAnonymous]
@@ -738,7 +784,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            if(user == null)
+            if (user == null)
             {
                 return new Result { Error = "未找到该用户" };
             }
@@ -782,10 +828,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id)
         {
-            var items = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).ToListAsync();
+            var items = await _articleRepository.GetAll().Include(s => s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
-            var model =new UserArticleListModel();
-            foreach (var item in items.OrderByDescending(s=>s.Id))
+            var model = new UserArticleListModel();
+            foreach (var item in items.OrderByDescending(s => s.Id))
             {
                 model.Items.Add(_appHelper.GetArticleInforTipViewModel(item));
             }
@@ -842,15 +888,15 @@ namespace CnGalWebSite.APIServer.Controllers
             //}
             Entry entry = null;
 
-            if(string.IsNullOrWhiteSpace(model.EntryName)==false)
+            if (string.IsNullOrWhiteSpace(model.EntryName) == false)
             {
-                if ((await _userService.GetAllNotCertificatedEntriesAsync()).Contains(model.EntryName)==false)
+                if ((await _userService.GetAllNotCertificatedEntriesAsync()).Contains(model.EntryName) == false)
                 {
                     return new Result { Successful = false, Error = "词条不存在或被占用" };
                 }
                 entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Name == model.EntryName);
 
-                if(entry==null)
+                if (entry == null)
                 {
                     return new Result { Successful = false, Error = "词条不存在或被占用" };
                 }
@@ -865,7 +911,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             if (userCertification == null)
             {
-                if (entry==null)
+                if (entry == null)
                 {
                     await _examineRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Operation == Operation.RequestUserCertification && s.IsPassed == null);
                     return new Result { Successful = true };
@@ -890,7 +936,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     userCertification.EntryId = null;
                     userCertification.Entry = null;
 
-                    userCertification= await _userCertificationRepository.UpdateAsync(userCertification);
+                    userCertification = await _userCertificationRepository.UpdateAsync(userCertification);
 
                     await _examineRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Operation == Operation.RequestUserCertification && s.IsPassed == null);
                     return new Result { Successful = true };
@@ -926,7 +972,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<EChartsHeatMapOptionModel>> GetUserHeatMap([FromQuery]string id, [FromQuery]UserHeatMapType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
+        public async Task<ActionResult<EChartsHeatMapOptionModel>> GetUserHeatMap([FromQuery] string id, [FromQuery] UserHeatMapType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
         {
             var after = afterTime.ToString().TransTime();
             var before = beforeTime.ToString().TransTime();

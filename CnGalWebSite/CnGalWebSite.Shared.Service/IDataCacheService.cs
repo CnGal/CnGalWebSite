@@ -100,8 +100,6 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
 
-        IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
-
         IPageModelCatche<List<RoleBrithdayViewModel>> RoleBrithdaysDataCatche { get; set; }
 
         IPageModelCatche<EChartsHeatMapOptionModel> HeatMapDataCatche { get; set; }
