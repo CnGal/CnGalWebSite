@@ -480,7 +480,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.BindSteamId, 10, null);
 
                     // 如果还有评语 继续添加G币
-                    if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false))
+                    if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.LastEditTime.Year == 2024))
                     {
                         await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
                     }
@@ -656,7 +656,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (model.IsAnniversariesShare == false && model.IsBindSteamId)
             {
                 // 如果还有评语 继续添加G币
-                if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false))
+                if (await _playedGameRepository.AnyAsync(s => s.ApplicationUserId == user.Id && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.LastEditTime.Year == 2024))
                 {
                     await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
                     model.IsAnniversariesShare = true;
