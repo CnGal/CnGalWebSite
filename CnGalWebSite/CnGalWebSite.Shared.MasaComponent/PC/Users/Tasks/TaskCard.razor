@@ -1,4 +1,5 @@
-﻿
+﻿@inject IDataCacheService _dataCacheService
+
 <MDCard Class="user-task-card  h-100">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="Icon" XLarge Small=false />
      <div class="content-card">
@@ -9,11 +10,11 @@
      <div class="action-card">
          @if (Finished)
         {
-            <CnGalWebSite.Components.Buttons.MasaButton Small TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成" />
+            <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成" />
         }
         else
         {
-            <CnGalWebSite.Components.Buttons.MasaButton Small Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
+            <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
         }
     </div>
 </MDCard>
