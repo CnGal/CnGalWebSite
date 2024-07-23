@@ -34,3 +34,17 @@
 .anniversaries-group-card .name {
     font-size: inherit;
 }
+/*周年庆任务*/
+.user-task-card {
+    gap: .5rem;
+    padding: .5rem;
+}
+    .user-task-card .name {
+        font-size: medium!important;
+    }
+    .user-task-card .biref{
+        font-size:small;
+    }
+    .user-task-card .reward {
+        font-size: smaller;
+    }
