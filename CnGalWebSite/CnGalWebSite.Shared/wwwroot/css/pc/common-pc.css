@@ -1,3 +1,10 @@
 ﻿tbody, td, tfoot, th, thead, tr {
     border-style: none;
 }
+/*平台判断*/
+.d-pc{
+    display:flex;
+}
+.d-app {
+    display: none;
+}

@@ -1,10 +1,14 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-<div class="rounded  shadow-sm bg-opacity mb-4">
-    @((MarkupString)Model.MainPage)
-</div>
+<MDCard Class="mb-4 anniversaries-introdution-card">
+    @((MarkupString)Model_1.MainPage)
+</MDCard>
 
 <CnGalWebSite.Shared.MasaComponent.PC.Users.Tasks.TaskGroupCard OnlyShowAnniversaries/>
+
+<MDCard Class="mb-4 anniversaries-introdution-card">
+    @((MarkupString)Model_2.MainPage)
+</MDCard>
 
 @if (isReady)
 {
@@ -17,7 +21,8 @@
     bool isReady;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+    public ArticleViewModel Model_1 { get; set; } = new ArticleViewModel();
+    public ArticleViewModel Model_2 { get; set; } = new ArticleViewModel();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -32,7 +37,8 @@
             {
                 CanDeleted = true;
             }
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache("3759");
+            Model_1 = await _dataCatcheService.ArticleIndexPageCatche.GetCache("3759");
+            Model_2 = await _dataCatcheService.ArticleIndexPageCatche.GetCache("3757");
             isReady = true;
         }
         catch (Exception ex)
