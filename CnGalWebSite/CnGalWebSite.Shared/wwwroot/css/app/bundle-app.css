@@ -346,6 +346,14 @@
 .cngal-about-card {
     gap: 1rem;
 }
+/*平台判断*/
+.d-pc {
+    display: none;
+}
+
+.d-app {
+    display: flex;
+}
 
 
 .entry-card-default.relevance-card .main-card img {
