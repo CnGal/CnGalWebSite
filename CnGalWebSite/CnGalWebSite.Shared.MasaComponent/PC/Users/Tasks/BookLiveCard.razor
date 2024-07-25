@@ -4,7 +4,7 @@
 @inject IDataCacheService _dataCacheService
 @inject IPopupService PopupService
 
-<TaskCard ButtonIcon="@IconType.Link" ButtonText="前往预约" Finished="Model.IsAnniversariesLiveBookings" Icon="@IconType.Video" Name="预约周年庆直播" OnClick="OnClick" Reward="G币+1" Text="前往B站预约直播吧" />
+<TaskCard ButtonIcon="@IconType.Link" ButtonText="前往预约" Finished="Model.IsAnniversariesLiveBookings" Icon="@IconType.Video" Name="预约直播" OnClick="OnClick" Reward="G币+1" Text="前往B站预约直播吧" />
 
 @code {
     [Parameter]
@@ -35,7 +35,7 @@
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "完成预约直播任务失败");
+            //await ErrorHandler.ProcessError(ex, "完成预约直播任务失败");
         }
 
     }

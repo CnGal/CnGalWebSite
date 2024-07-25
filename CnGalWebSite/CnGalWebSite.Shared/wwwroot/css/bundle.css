@@ -1684,9 +1684,21 @@ html {
 .anniversaries-group-card .biref {
     font-size: small;
 }
+.anniversaries-group-card.staff img{
+    border-radius: 50%;
+    width: 40%;
+    margin: 0 auto;
+    padding-top: 1rem;
+}
+.anniversaries-group-card.staff .name, .anniversaries-group-card.staff .biref {
+    text-align: center;
+}
 /*周年庆介绍*/
-.anniversaries-introdution-card p{
-    margin:0!important;
+.anniversaries-introdution-card p {
+    margin: 0 !important;
+}
+.anniversaries-introdution-card a {
+    display:flex;
 }
 
 .article-introduce {
@@ -2722,7 +2734,6 @@ html {
     bottom: 0;
     margin: .5rem;
     z-index: 3;
-    width:100%;
 }
 .bottom-flaoting-ads-card a{
     display: flex;
@@ -3821,6 +3832,9 @@ a.user-info-card {
     }
 
     .user-task-card .biref {
+        text-align: center;
+    }
+    .user-task-card .name {
         text-align: center;
     }
 /*消息*/

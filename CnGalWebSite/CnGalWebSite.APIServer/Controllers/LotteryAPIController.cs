@@ -354,7 +354,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var lotteries = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .OrderByDescending(s => s.CreateTime)
+                .OrderByDescending(s=>s.Priority).ThenByDescending(s => s.CreateTime)
                 .ToListAsync();
 
             var model = new List<LotteryCardViewModel>();

@@ -1,6 +1,7 @@
-﻿@import url(light/bundle-light.min.css) (prefers-color-scheme: light);
-@import url(light/bundle-light.min.css) (prefers-color-scheme: no-preference);
+﻿@import url(light/bundle-light.min.css);
+
 @import url(dark/bundle-dark.min.css) (prefers-color-scheme: dark);
+@import url(light/bundle-light.min.css) (prefers-color-scheme: light);
 
 @import url(https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css) (prefers-color-scheme: light);
 @import url(https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css) (prefers-color-scheme: no-preference);

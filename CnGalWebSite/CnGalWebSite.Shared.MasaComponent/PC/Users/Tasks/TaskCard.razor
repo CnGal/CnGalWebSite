@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IUserService _userService
 
 <MDCard Class="user-task-card  h-100">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="Icon" XLarge Small=false />
@@ -8,14 +9,21 @@
          <div class="reward label-large primary-text">@Reward</div>
      </div>
      <div class="action-card">
-         @if (Finished)
-        {
-            <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成" />
-        }
-        else
-        {
-            <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
-        }
+         <AuthorizeView>
+             <Authorized>
+                @if (Finished)
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" TextStyle Icon="@IconType.Check.ToIconString()" Text="已完成" />
+                }
+                else
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" Rounded Icon="@ButtonIcon.ToIconString()" IsAsync Text="@ButtonText" OnClick="OnClick" />
+                }
+             </Authorized>
+             <NotAuthorized>
+                <CnGalWebSite.Components.Buttons.MasaButton Small="_dataCacheService.IsApp?true:false" Rounded Text="登入后参与" OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
+             </NotAuthorized>
+         </AuthorizeView>
     </div>
 </MDCard>
 
