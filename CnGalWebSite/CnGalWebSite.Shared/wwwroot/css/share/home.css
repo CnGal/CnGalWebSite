@@ -891,7 +891,6 @@
     bottom: 0;
     margin: .5rem;
     z-index: 3;
-    width:100%;
 }
 .bottom-flaoting-ads-card a{
     display: flex;

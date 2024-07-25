@@ -5,7 +5,7 @@
     @foreach (var item in _items)
     {
         <MCol Cols="6" Sm="4"  Lg="3" Xl="2" Class="mb-4">
-            <MDCard Href="@($"/entries/index/{item.Id}")" Class="h-100 anniversaries-group-card">
+            <MDCard Href="@($"/entries/index/{item.Id}")" Class="@($"h-100 anniversaries-group-card {(item.Type== EntryType.ProductionGroup?"group":"staff")}")">
                 <img src="@item.MainImage" alt="@item.Name" loading="lazy"/>
                 <div class="content-card">
                     <div class="name">

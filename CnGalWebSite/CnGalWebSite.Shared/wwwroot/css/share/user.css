@@ -60,6 +60,9 @@ a.user-info-card {
     .user-task-card .biref {
         text-align: center;
     }
+    .user-task-card .name {
+        text-align: center;
+    }
 /*消息*/
 .message-info-card .name-card {
     display: flex;

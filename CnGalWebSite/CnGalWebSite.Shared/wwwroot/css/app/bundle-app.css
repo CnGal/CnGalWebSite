@@ -1,4 +1,4 @@
-﻿
+
 /*分享库存*/
 .anniversary-page .user-steam-card {
     gap: .5rem;
@@ -34,6 +34,10 @@
 .anniversaries-group-card .name {
     font-size: inherit;
 }
+.anniversaries-group-card .staff {
+    width: 43%;
+    padding-top: .5rem;
+}
 /*周年庆任务*/
 .user-task-card {
     gap: .5rem;
@@ -45,7 +49,7 @@
     .user-task-card .biref{
         font-size:small;
     }
-    .user-task-card .biref {
+    .user-task-card .reward {
         font-size: smaller;
     }
 

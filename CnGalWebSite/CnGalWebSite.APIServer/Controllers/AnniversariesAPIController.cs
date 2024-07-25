@@ -19,19 +19,19 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/anniversaries/[action]")]
     public class AnniversariesAPIController : ControllerBase
     {
-        
-        
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IUserService _userService;
         private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
-        public AnniversariesAPIController(IUserService userService,  IAppHelper appHelper, IRepository<Entry, int> entryRepository,IRepository<PlayedGame, long> playedGameRepository)
+        public AnniversariesAPIController(IUserService userService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
-            
+
             _entryRepository = entryRepository;
-            _appHelper = appHelper;            
+            _appHelper = appHelper;
             _userService = userService;
             _playedGameRepository = playedGameRepository;
         }
@@ -47,7 +47,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.PlayedGames)
-                .Where(s => s.Type == EntryType.Game && s.PubulishTime != null && s.Id != 139 && s.Id != 3412 && s.Id != 3835 && s.IsHidden == false&& s.PubulishTime.Value.Date <= before.Date && s.PubulishTime.Value.Date >= after.Date)
+                .Where(s => s.Type == EntryType.Game && s.PubulishTime != null && s.Id != 139 && s.Id != 3412 && s.Id != 3835 && s.IsHidden == false && s.PubulishTime.Value.Date <= before.Date && s.PubulishTime.Value.Date >= after.Date)
                 .ToListAsync();
             var model = new List<JudgableGameViewModel>();
             foreach (var item in games)
@@ -85,9 +85,9 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var games = await _playedGameRepository.GetAll().AsNoTracking()
                 .Include(s => s.ApplicationUser)
-                .Include(s=>s.Entry).ThenInclude(s=>s.Tags)
-                .Where(s =>  s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.Entry.IsHidden==false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
-                .Where(s =>s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
+                .Include(s => s.Entry).ThenInclude(s => s.Tags)
+                .Where(s => s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.Entry.IsHidden == false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
+                .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
                 .ToListAsync();
             var model = new List<PlayedGameUserScoreRandomModel>();
             foreach (var item in games)
@@ -128,8 +128,8 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetGroupListAsync()
         {
             var games = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s=>s.Priority==1 && s.Type== EntryType.ProductionGroup)
-                .OrderBy(s=>s.DisplayName)
+                .Where(s => s.Priority == 1 && (s.Type == EntryType.ProductionGroup || s.Type == EntryType.Staff))
+                .OrderBy(s => s.DisplayName)
                 .ToListAsync();
 
             var model = new List<EntryInforTipViewModel>();
