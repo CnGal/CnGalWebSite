@@ -27,11 +27,11 @@
 
         @if (string.IsNullOrWhiteSpace(gameName) == false)
         {
-            <MCardText Class="pb-2">
+            <MCardText Class="pb-2 pt-0" Style="color:gray">
                 @($"《{gameName}》")
             </MCardText>
         }
-        <MCardText Class="@(gameId!=0?"pb-0":"")">
+        <MCardText Class="@(gameId!=0?"pb-0 pt-0":"pt-0")"  Style="color:gray">
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
         </MCardText>
 

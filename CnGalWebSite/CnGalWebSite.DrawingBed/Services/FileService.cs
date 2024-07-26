@@ -26,7 +26,7 @@ namespace CnGalWebSite.DrawingBed.Services
         private readonly IUploadService _uploadService;
         private readonly IRecordService _recordService;
 
-        public FileService(IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService, IRecordService recordService)
+        public FileService(IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger, IUploadService uploadService, IRecordService recordService)
         {
             _httpClientFactory = httpClientFactory;
             _webHostEnvironment = webHostEnvironment;
@@ -44,7 +44,7 @@ namespace CnGalWebSite.DrawingBed.Services
             Directory.CreateDirectory(_audioTempPath);
         }
 
-        public async Task<UploadResult> TransferDepositFile(string url,bool gallery , double x = 0, double y = 0, UploadFileType type = UploadFileType.Image )
+        public async Task<UploadResult> TransferDepositFile(string url, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
         {
             string pathSaveFile = null;
             string pathCutFile = null;
@@ -109,7 +109,7 @@ namespace CnGalWebSite.DrawingBed.Services
             }
         }
 
-        public async Task<UploadResult> UploadFormFile(IFormFile file,bool gallery,  double x = 0, double y = 0,UploadFileType type = UploadFileType.Image )
+        public async Task<UploadResult> UploadFormFile(IFormFile file, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
         {
             string pathSaveFile = null;
             string pathCompressFile = null;
@@ -118,7 +118,7 @@ namespace CnGalWebSite.DrawingBed.Services
             try
             {
 
-                pathSaveFile =await SaveFormFile(file, type);
+                pathSaveFile = await SaveFormFile(file, type);
 
                 if (type == UploadFileType.Image)
                 {
@@ -146,7 +146,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 if (string.IsNullOrWhiteSpace(model.Url))
                 {
-                    model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type,gallery);
+                    model.Url = await UploadLocalFileToServer(pathCompressFile, sha1, type, gallery);
                     //添加文件上传记录
                     await _recordService.Add(model);
                 }
@@ -169,18 +169,18 @@ namespace CnGalWebSite.DrawingBed.Services
 
 
         #region 上传文件
-        private async Task<string> UploadLocalFileToServer(string filePath,string shar1, UploadFileType type, bool gallery)
+        private async Task<string> UploadLocalFileToServer(string filePath, string shar1, UploadFileType type, bool gallery)
         {
-            var url= type switch
+            var url = type switch
             {
                 UploadFileType.Audio => await _uploadService.UploadToAliyunOSS(filePath, shar1),
-                UploadFileType.Image =>await _uploadService.UploadToTencentOSS(filePath, shar1),
+                UploadFileType.Image => await _uploadService.UploadToTencentOSS(filePath, shar1),
                 _ => null
             };
 
-            if(gallery&&type== UploadFileType.Image)
+            if (gallery && type == UploadFileType.Image)
             {
-                url = await _uploadService.UploadToTucangCC(filePath)+"?"+ url;
+                url = await _uploadService.UploadToTucangCC(filePath) + "?" + url;
             }
 
             return url;
@@ -207,7 +207,7 @@ namespace CnGalWebSite.DrawingBed.Services
             using var steam = file.OpenReadStream();
             await SaveFile(steam, newPath);
 
-            _logger.LogInformation("保存客户端传输的文件：{file}" ,file.FileName);
+            _logger.LogInformation("保存客户端传输的文件：{file}", file.FileName);
 
             return newPath;
         }
@@ -220,14 +220,14 @@ namespace CnGalWebSite.DrawingBed.Services
             }
 
             var response = await _httpClientFactory.CreateClient().GetAsync(url);
-            using var stream =await response.Content.ReadAsStreamAsync();
-            var tempName =new Random().Next() + "." + GetFileSuffixName(url,type);
+            using var stream = await response.Content.ReadAsStreamAsync();
+            var tempName = new Random().Next() + "." + GetFileSuffixName(url, type);
 
             //保存图片到本地
             var newPath = Path.Combine(type switch { UploadFileType.Image => _imageTempPath, UploadFileType.Audio => _audioTempPath, _ => _fileTempPath }, tempName);
             await SaveFile(stream, newPath);
 
-            _logger.LogInformation( "下载远程链接里的文件：{file}" ,url);
+            _logger.LogInformation("下载远程链接里的文件：{file}", url);
 
             return newPath;
         }
@@ -257,7 +257,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
         private static async Task SaveFile(Stream file, string destinationPath)
         {
-          using  var fs = File.Create(destinationPath);
+            using var fs = File.Create(destinationPath);
             await file.CopyToAsync(fs);
             file.Close();
             fs.Close();
@@ -276,7 +276,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="y"></param>
         private async Task<CutFileResult> CutAudioAsync(string path)
         {
-           if( File.Exists(path)==false)
+            if (File.Exists(path) == false)
             {
                 throw new Exception($"裁剪音频失败，文件不存在：{path}");
             }
@@ -292,14 +292,14 @@ namespace CnGalWebSite.DrawingBed.Services
 
             var output = await ffmpeg.ConvertAsync(inputFile, outputFile, options, default);
 
-            var mediaFile = new MediaInfoWrapper(outputFile.FileInfo.FullName,_logger);
+            var mediaFile = new MediaInfoWrapper(outputFile.FileInfo.FullName, _logger);
 
             _logger.LogInformation("成功裁剪音频：{url}", output.FileInfo.FullName);
 
             return new CutFileResult
             {
                 FileURL = output.FileInfo.FullName,
-                Duration = new TimeSpan(0,0,0,0,mediaFile.Duration)
+                Duration = new TimeSpan(0, 0, 0, 0, mediaFile.Duration)
             };
 
         }
@@ -326,7 +326,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="proportion"></param>
         private string GetPicThumbnail(string path, double proportion)
         {
-            var newPath = Path.Combine(_imageTempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path,  UploadFileType.Image));
+            var newPath = Path.Combine(_imageTempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path, UploadFileType.Image));
             using (var image = Image.Load(path))
             {
                 image.Mutate(x => x
@@ -362,7 +362,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 image.Mutate(x => x
                      //.Resize(linshi_x, linshi_y)
-                     .Crop(new Rectangle((image.Width- linshi_x)/2, (image.Height - linshi_y) / 2, linshi_x, linshi_y)));
+                     .Crop(new Rectangle((image.Width - linshi_x) / 2, (image.Height - linshi_y) / 2, linshi_x, linshi_y)));
                 image.Save(newPath);
                 return newPath;
 
@@ -423,7 +423,7 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 File.Delete(path);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "删除文件失败：{url}", path);
             }

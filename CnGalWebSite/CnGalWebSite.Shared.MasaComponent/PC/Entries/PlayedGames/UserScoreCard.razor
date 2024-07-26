@@ -53,14 +53,16 @@
     }
     else
     {
-        @if (string.IsNullOrWhiteSpace(GameName) == false)
-        {
-            <div class="label-large mt-4">
-                @($"《{GameName}》")
+        <div>
+            @if (string.IsNullOrWhiteSpace(GameName) == false)
+            {
+                <div class="label-large mt-2" style="color:gray">
+                    @($"《{GameName}》")
+                </div>
+            }
+            <div class="label-large mt-2" style="color:gray">
+                @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
             </div>
-        }
-        <div class="label-large mt-4">
-            @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
         </div>
     }
 

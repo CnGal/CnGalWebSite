@@ -1696,6 +1696,7 @@ html {
 /*周年庆介绍*/
 .anniversaries-introdution-card p {
     margin: 0 !important;
+    display: flex;
 }
 .anniversaries-introdution-card a {
     display:flex;
