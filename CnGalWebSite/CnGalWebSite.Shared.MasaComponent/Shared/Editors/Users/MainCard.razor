@@ -1,6 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject IEventService _eventService
 
 <CnGalWebSite.Components.Containers.MasaTitleContainer Title="基本信息" Icon="@IconType.Infor.ToIconString()" Collapable Class="@Class">
     <MRow>
@@ -13,11 +12,6 @@
         <MCol Cols="12">
             <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" />
         </MCol>
-         <MCol Cols="12">
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mt-2 mb-2" Color="primary">
-                 点击查看<a @onclick="OnClickQuestion" class="primary--text fw-bold">如何获取SteamId</a> ，Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦
-             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-         </MCol>
         <MCol Cols="12" Md="6">
              <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" />
          </MCol>
@@ -43,9 +37,5 @@
     [Parameter]
     public string Class { get; set; }
 
-    public void OnClickQuestion()
-    {
-        _eventService.OpenNewPage(NavigationManager.BaseUri + "articles/index/5");
 
-    }
 }

@@ -31,10 +31,10 @@
         }
 
         <MCardText>
-            <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
                 <MRow>
                     <MCol Cols="12" Md="6">
-                        <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" ShowCropper Text="上传预览图" Class="mb-4"/>
+                        <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" ShowCropper Text="上传预览图" Class="mb-4" Gallery/>
                      </MCol>
                      <MCol Cols="12"></MCol>
                      <MCol Cols="12" Md="6">
@@ -45,7 +45,7 @@
                      </MCol>
                  </MRow>
              </CnGalWebSite.Components.Containers.MasaTitleContainer>
-             <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+            <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
                 <MRow>
 
                     <MCol Cols="12" Md="6">
@@ -72,9 +72,9 @@
 
 
 
-        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-0">
             <MSpacer />
-            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="success" Rounded />
+            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="@IconType.Save.ToIconString()" Rounded />
          </MCardActions>
      </MDCard>
  </MDialog>

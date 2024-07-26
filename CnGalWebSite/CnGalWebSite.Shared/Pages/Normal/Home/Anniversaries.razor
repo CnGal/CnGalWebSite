@@ -44,7 +44,7 @@
             <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="22" />
         </MTabItem>
         <MTabItem Value="3">
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard />
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard Anniversaries/>
         </MTabItem>
         <MTabItem Value="4">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Home.IntroductionCard />
@@ -80,10 +80,10 @@
         index = Type switch
         {
             "Home" => 1,
-            "Rating" => 2,
+            "Rating" => 5,
             "PlayedGames" => 3,
-            "Lottery" => 4,
-            "Introduction" => 5,
+            "Lottery" => 2,
+            "Introduction" => 4,
             _=>1
         };
         StateHasChanged();
@@ -111,10 +111,10 @@
         NavigationManager.NavigateTo($"/{baseStr}/" + (index.ToInt32() switch
         {
             1 => "Home",
-            2 => "Rating",
+            5 => "Rating",
             3 => "PlayedGames",
-            4 => "Lottery",
-            5 => "Introduction",
+            2 => "Lottery",
+            4 => "Introduction",
             _ => ""
         }));
 

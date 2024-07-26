@@ -2,10 +2,10 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Components.Containers.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4" Outline>
+<CnGalWebSite.Components.Containers.MasaTitleContainer Title="随机评价" Icon="@IconType.GameRecord.ToIconString()" Class="mb-4" Outline>
 
     <ButtonContent>
-        <MButton Text Block Color="primary"  OnClick="OnClickMore">
+        <MButton Rounded OnClick="OnClickMore" Color="primary">
             <MIcon Left>mdi-refresh  </MIcon>
             换一批
         </MButton>
