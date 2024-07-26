@@ -8,17 +8,13 @@
     <div style=" word-break: keep-all;" class="ms-4 me-8">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
     </div>
-     <MTabs Class="cngal-main-tab-card" Routable>
+    <MTabs Class="cngal-main-tab-card" Routable>
         <MTab Href="/">首页</MTab>
-        <MTab Href="/#evaluations-card" >专题推荐</MTab>
+        @* <MTab Href="/#evaluations-card">专题推荐</MTab> *@
         <MTab Href="/discount">游戏折扣</MTab>
         <MTab Href="/lotteries">抽奖</MTab>
         <MTab Href="/square">广场</MTab>
-        <AuthorizeView Roles="Admin">
-            <Authorized>
-                <MTab Href="/9th">周年庆</MTab>
-            </Authorized>
-        </AuthorizeView>
+        <MTab Href="/9th">周年庆</MTab>
     </MTabs>
     <MSpacer></MSpacer>
     <AuthorizeView>
@@ -35,7 +31,7 @@
 
 <MMain>
     <CnGalWebSite.Components.Containers.MasaContainer>
-         <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
+        <ErrorHandler ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" IsSSR="ToolHelper.IsSSR">
             @Body
 
         </ErrorHandler>

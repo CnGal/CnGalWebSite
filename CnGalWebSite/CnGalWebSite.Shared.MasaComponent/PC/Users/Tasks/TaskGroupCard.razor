@@ -15,41 +15,19 @@
 
     }
 
-    <AuthorizeView>
-        <Authorized>
-            <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周年庆任务" Icon="@IconType.Birthday.ToIconString()" Collapable Outline>
-                <MRow Class="compact-row">
-                    <MCol Cols="4" Xl="3" Class="mb-4">
-                        <BookLiveCard Model="Model" />
-                    </MCol>
-                    <MCol Cols="4" Xl="3" Class="mb-4">
-                        <LotteryCard Model="Model" />
-                    </MCol>
-                    <MCol Cols="4" Xl="3" Class="mb-4">
-                        <ShareAndCommentGameCard Model="Model" />
-                    </MCol>
-                </MRow>
-            </CnGalWebSite.Components.Containers.MasaTitleContainer>
-        </Authorized>
-        <NotAuthorized>
-            @if (OnlyShowAnniversaries)
-            {
-                <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周年庆任务" Icon="@IconType.Birthday.ToIconString()" Collapable Outline>
-                    <MRow Class="compact-row">
-                        <MCol Cols="4" Xl="3" Class="mb-4">
-                            <BookLiveCard Model="Model" />
-                        </MCol>
-                        <MCol Cols="4" Xl="3" Class="mb-4">
-                            <LotteryCard Model="Model" />
-                        </MCol>
-                        <MCol Cols="4" Xl="3" Class="mb-4">
-                            <ShareAndCommentGameCard Model="Model" />
-                        </MCol>
-                    </MRow>
-                </CnGalWebSite.Components.Containers.MasaTitleContainer>
-            }
-        </NotAuthorized>
-    </AuthorizeView>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="周年庆任务" Icon="@IconType.Birthday.ToIconString()" Collapable Outline>
+        <MRow Class="compact-row">
+            <MCol Cols="4" Xl="3" Class="mb-4">
+                <BookLiveCard Model="Model" />
+            </MCol>
+            <MCol Cols="4" Xl="3" Class="mb-4">
+                <LotteryCard Model="Model" />
+            </MCol>
+            <MCol Cols="4" Xl="3" Class="mb-4">
+                <ShareAndCommentGameCard Model="Model" />
+            </MCol>
+        </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
 
     @if (OnlyShowAnniversaries == false)
