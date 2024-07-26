@@ -31,15 +31,17 @@
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
         </div>
     </MTabItem>
+
     <MTabItem Value="1">
         <div id="home-page">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
-
         </div>
-
     </MTabItem>
     <MTabItem Value="2">
+        <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries />
+    </MTabItem>
+    <MTabItem Value="3">
         <div id="home-page">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.NewsCard />
             <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.WeeklyNewsCard />
@@ -51,7 +53,7 @@
         </div>
 
     </MTabItem>
-    <MTabItem Value="3">
+    <MTabItem Value="4">
         <AuthorizeView>
             <Authorized>
                 <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
@@ -76,10 +78,14 @@
             <MIcon>@IconType.Explore.ToIconString()</MIcon>
         </MButton>
         <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+            <span>周年庆</span>
+            <MIcon>@IconType.Birthday.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="3">
             <span>广场</span>
             <MIcon>@IconType.Shape.ToIconString()</MIcon>
         </MButton>
-        <MButton ActiveClass="nav-bottom-tab-active" Value="3">
+        <MButton ActiveClass="nav-bottom-tab-active" Value="4">
             <span>空间</span>
             <MIcon>@IconType.User.ToIconString()</MIcon>
         </MButton>
