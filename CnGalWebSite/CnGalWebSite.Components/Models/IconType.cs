@@ -210,7 +210,8 @@ namespace CnGalWebSite.Components.Models
         Record,
         Story,
         Almanac,
-        GiftOpened
+        GiftOpened,
+        Flash
     }
 
     public static class IconTypeHelper
@@ -219,6 +220,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Flash:
+                    return " mdi-flash";
                 case IconType.GiftOpened:
                     return "mdi-gift-open";
                 case IconType.Almanac:
