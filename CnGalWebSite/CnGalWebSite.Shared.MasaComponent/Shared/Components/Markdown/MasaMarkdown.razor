@@ -1,7 +1,14 @@
 ﻿@inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject IFileUploadService _fileUploadService
+@implements IDisposable
 
+@if (isInjectFailed)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-4" Color="error" Transparent="false">
+        加载编辑器出错，将导致无法上传图片， <a @onclick="InitEditor" rel="noreferrer" class="error--text fw-bold">尝试重新加载</a>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+}
 
 <MMarkdown Options="_options" Value="@Context" ValueChanged="ValueChanged" @ref="mMarkdown" Class="@Class">
 </MMarkdown>
@@ -19,6 +26,9 @@
     public string Class { get; set; }
     [Parameter]
     public MarkdownEditorMode Mode { get; set; }
+
+    bool isInjectFailed;
+    CancellationTokenSource tokenSource;
 
     private Dictionary<string, object> _options = new Dictionary<string, object>();
 
@@ -57,15 +67,31 @@
     {
         if (firstRender)
         {
-           await InitEditor();
+            await InitEditor();
         }
     }
 
     public async Task InitEditor()
     {
-        await Task.Delay(2000);
-        objRef = DotNetObjectReference.Create(this);
-        await JS.InvokeVoidAsync("initVditorContext", objRef, mMarkdown.Ref);
+        try
+        {
+            tokenSource = new CancellationTokenSource();
+
+            await Task.Delay(2000, tokenSource.Token);
+            if (tokenSource.Token.IsCancellationRequested)
+            {
+                return;
+            }
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initVditorContext", objRef, mMarkdown.Ref);
+            isInjectFailed = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            isInjectFailed = true;
+            StateHasChanged();
+        }
     }
 
     public async Task ValueChanged(string text)
@@ -128,5 +154,13 @@
             await mMarkdown.InsertValueAsync(context);
 
         }
+    }
+
+
+    public void Dispose()
+    {
+        tokenSource?.Cancel();
+        tokenSource?.Dispose();
+        objRef?.Dispose();
     }
 }
