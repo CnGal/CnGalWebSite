@@ -1,6 +1,11 @@
 ﻿@inject IDataCacheService _dataCatcheService
 @inject IPageModelCatche<List<EntryInforTipViewModel>> _pageModelCatche
 
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Icon="@IconType.Board.ToIconString()" Type="AlertTypes.Success" Class="mb-4" Color="tertiary">
+    参会制作组名单持续更新中！
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
 @if (_items != null)
 {
     <MRow>
