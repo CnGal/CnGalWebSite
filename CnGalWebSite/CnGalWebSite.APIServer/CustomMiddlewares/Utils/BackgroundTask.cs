@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.EventBus.Models;
 using CnGalWebSite.EventBus.Services;
 using CnGalWebSite.TimedTask.Models.DataModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -19,6 +20,7 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
     {
 
         private readonly IServiceProvider _serviceProvider;
+        private int _counter = 0;
 
         public BackgroundTask(IServiceProvider serviceProvider)
         {
@@ -34,6 +36,7 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
             var _eventBusService = scope.ServiceProvider.GetRequiredService<IEventBusService>();
             var _timedTaskService = scope.ServiceProvider.GetRequiredService<ITimedTaskService>();
             var _backgroundTaskService = scope.ServiceProvider.GetRequiredService<IBackgroundTaskService>();
+            var _entryRepository = scope.ServiceProvider.GetRequiredService<IRepository<Entry, int>>();
             ConcurrentQueue<RunTimedTaskModel> _queue = new ConcurrentQueue<RunTimedTaskModel>();
 
             try
@@ -57,6 +60,13 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
                     else
                     {
                         await _timedTaskService.RunTimedTask(model);
+                    }
+
+                    _counter++;
+                    if (_counter%10==0)
+                    {
+                        var item =await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == 5223);
+                        _logger.LogInformation($"{item?.DisplayName}");
                     }
                 }
 

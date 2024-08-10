@@ -101,6 +101,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 }
 
             }
+            _userRepository.Clear();
 
 
             var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
@@ -126,6 +127,8 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
+            _entryRepository.Clear();
+
             entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Thumbnail.Contains("?") == false && s.Thumbnail.Contains("default") == false)
                .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
@@ -149,6 +152,8 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
+            _entryRepository.Clear();
+
 
             var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
@@ -171,6 +176,8 @@ namespace CnGalWebSite.APIServer.Application.Files
                     _logger.LogError(ex, "转存文章 - {Name}({Id}) 主图失败", item.Name, item.Id);
                 }
             }
+            _articleRepository.Clear();
+
 
             var videos = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
               .OrderBy(s => s.Id)
@@ -193,6 +200,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     _logger.LogError(ex, "转存视频 - {Name}({Id}) 主图失败", item.Name, item.Id);
                 }
             }
+
+            _videoRepository.Clear();
+
 
             var entryPictures = await _entryRepository.GetAll()
                 .Include(s => s.Pictures)
@@ -230,6 +240,8 @@ namespace CnGalWebSite.APIServer.Application.Files
                 }
             }
 
+            _entryRepository.Clear();
+
             var websitePictures = await _entryRepository.GetAll()
                 .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
@@ -266,6 +278,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     _logger.LogError(ex, "转存 词条 - {name}({id}) 专题页图片失败", item.Name, item.Id);
                 }
             }
+
+
+            _entryRepository.Clear();
         }
     }
 }
