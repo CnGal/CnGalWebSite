@@ -8,46 +8,46 @@
 @if (isReady)
 {
     <MDCard Class="mb-4 pa-4" Style="display: flex; flex-direction: column; align-items: center;gap: 1rem;">
-        <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="max-width:250px;width:100%"/>
-    @if (StateModel == null)
-    {
-        @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
-        {
-
-        }
-        else
-        {
-            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后参与抽奖" Icon="@IconType.Login.ToIconString()" OnClick="_userService.Login" />
-        }
-    }
-    else
-    {
-        @if (StateModel.State == UserLotteryState.NotInvolved)
+        <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="max-width:250px;width:100%" />
+        @if (StateModel == null)
         {
             @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
             {
-            }
-            else if (ViewModel.BeginTime > DateTime.Now.ToCstTime())
-            {
+
             }
             else
             {
-                <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync />
+                <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入后参与抽奖" Icon="@IconType.Login.ToIconString()" OnClick="_userService.Login" />
             }
         }
-    }
-</MDCard>
+        else
+        {
+            @if (StateModel.State == UserLotteryState.NotInvolved)
+            {
+                @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
+                {
+                }
+                else if (ViewModel.BeginTime > DateTime.Now.ToCstTime())
+                {
+                }
+                else
+                {
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="参与抽奖" Icon="@IconType.Lottery.ToIconString()" OnClick="OnParticipateInLottery" IsAsync />
+                }
+            }
+        }
+    </MDCard>
     @if (StateModel == null)
     {
         @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100" Color="secondary">
-                 没有参与这个抽奖哦，下次再来吧
-             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                没有参与这个抽奖哦，下次再来吧
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
         else
         {
-            
+
         }
     }
     else
@@ -57,14 +57,14 @@
             @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100" Color="secondary">
-                     没有参与这个抽奖哦，下次再来吧
-                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                    没有参与这个抽奖哦，下次再来吧
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             }
             else if (ViewModel.BeginTime > DateTime.Now.ToCstTime())
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100" Color="secondary">
-                     抽奖还没有开始呢，再等一会吧
-                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                    抽奖还没有开始呢，再等一会吧
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             }
             else
             {
@@ -73,21 +73,21 @@
         else if (StateModel.State == UserLotteryState.NoCondition)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Outline Class="w-100" Color="secondary">
-                 没有满足抽奖条件哦，看看旁边的说明吧
-             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                没有满足抽奖条件哦，看看旁边的说明吧
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
         else if (StateModel.State == UserLotteryState.NotWin)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="w-100" Color="secondary">
-                 没有中奖欸，呜~~~
-             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                没有中奖欸，呜~~~
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
         }
         else if (StateModel.State == UserLotteryState.WaitingDraw)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Class="w-100" Color="secondary">
-                 给，这是你的号码，记得来看结果哦~
-             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                给，这是你的号码，记得来看结果哦~
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
         }
         else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
@@ -95,38 +95,38 @@
             @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100" Color="secondary">
-                     欸欸欸，中奖了欸，来 <a @onclick="OnLookPrize" class="success--text fw-bold">看看激活码吧</a><br />
-                     你的奖品是：<strong> @StateModel.Award.Name</strong>
+                    欸欸欸，中奖了欸，来 <a @onclick="OnLookPrize" class="success--text fw-bold">看看激活码吧</a><br />
+                    你的奖品是：<strong> @StateModel.Award.Name</strong>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             }
             else if (StateModel.Award.Type == LotteryAwardType.Integral)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100" Color="secondary">
-                     恭喜你中奖了，已经把积分打到你的账户里了哦<br />
-                     你的奖品是：<strong> @StateModel.Award.Name</strong>
+                    恭喜你中奖了，已经把积分打到你的账户里了哦<br />
+                    你的奖品是：<strong> @StateModel.Award.Name</strong>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             }
         }
         else if (StateModel.State == UserLotteryState.WaitAddress)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100" Color="secondary">
-                 中奖啦，快点 <a @onclick="EditUserAddress" class="success--text fw-bold">填写收货地址</a> 吧<br />
-                 你的奖品是：<strong> @StateModel.Award.Name</strong>
+                中奖啦，快点 <a @onclick="EditUserAddress" class="success--text fw-bold">填写收货地址</a> 吧<br />
+                你的奖品是：<strong> @StateModel.Award.Name</strong>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
         else if (StateModel.State == UserLotteryState.WaitShipments)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100" Color="secondary">
-                 看板娘正在努力发货中，还可以 <a @onclick="EditUserAddress" class="success--text fw-bold">修改地址</a> 哦<br />
-                 你的奖品是：<strong> @StateModel.Award.Name</strong>
+                看板娘正在努力发货中，还可以 <a @onclick="EditUserAddress" class="success--text fw-bold">修改地址</a> 哦<br />
+                你的奖品是：<strong> @StateModel.Award.Name</strong>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
         else if (StateModel.State == UserLotteryState.Shipped)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Outline Class="w-100" Color="secondary">
-                 发货啦，记得给五星好评哦~<br />
-                 <a @onclick="OnLookPrize" class="success--text fw-bold">快递单号在这里呢</a><br />
-                 你的奖品是：<strong> @StateModel.Award.Name</strong>
+                发货啦，记得给五星好评哦~<br />
+                <a @onclick="OnLookPrize" class="success--text fw-bold">快递单号在这里呢</a><br />
+                你的奖品是：<strong> @StateModel.Award.Name</strong>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
     }
@@ -134,21 +134,21 @@
 }
 else
 {
-    <CnGalWebSite.Components.Progressings.ProgressingCard Fill Page/>
+    <CnGalWebSite.Components.Progressings.ProgressingCard Fill Page />
 }
 @if (isReady && StateModel != null && StateModel.State == UserLotteryState.WaitingDraw)
 {
-    <MDCard Class="mb-4 pa-4" Style="display: flex; align-items: center; justify-content: center;">
-        <MProgressCircular Value="100" Size="80" Color="primary">
-            <div class="primary-text headline-large">
+<MDCard Class="mb-4 pa-4" Style="display: flex; align-items: center; justify-content: center;">
+    <MProgressCircular Value="100" Size="100" Color="primary">
+        <div class="primary-text headline-large">
                 @StateModel.Number
-                </div>
-            </MProgressCircular>
-    </MDCard>
+        </div>
+    </MProgressCircular>
+</MDCard>
 }
 
 <CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
-<CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip @ref="lookPrizeTip" Id="ViewModel.Id"/>
+<CnGalWebSite.Shared.Component.Lotteries.PrizePage.LookPrizeTip @ref="lookPrizeTip" Id="ViewModel.Id" />
 <CnGalWebSite.Shared.MasaComponent.PC.Users.EditAddressCard @ref="editAddressCard" />
 @code {
     [Parameter]
@@ -193,13 +193,13 @@ else
         try
         {
             var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
-            {
-                Id = ViewModel.Id,
-                Identification = await deviceIdentification.GetDeviceIdentificationModel()
-            });
+                {
+                    Id = ViewModel.Id,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+                });
             if (obj.Successful)
             {
-                await PopupService.ToastAsync("参与抽奖成功",  AlertTypes.Success);
+                await PopupService.ToastAsync("参与抽奖成功", AlertTypes.Success);
                 await Refresh();
             }
             else

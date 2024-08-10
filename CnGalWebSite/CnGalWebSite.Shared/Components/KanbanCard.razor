@@ -2,6 +2,7 @@
 @inject IEventService _eventService
 @inject ILive2DService _live2DService
 @inject NavigationManager NavigationManager
+@inject IHttpService _httpService
 
 @implements IDisposable
 
@@ -9,25 +10,17 @@
 <CnGalWebSite.Components.Containers.MiniModeContainer>
     @if (isReady && !Hide)
     {
-        @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp)
+        @if (_dataCacheService.ThemeSetting.HideKanban || _dataCacheService.IsApp || ForceHide)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
         }
         else
         {
-            <AuthorizeView Roles="Tester">
-                <Authorized>
-                    <ErrorHandler IsSSR="ToolHelper.IsSSR" ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor">
-
-                        <CnGalWebSite.Kanban.KanbanLive2D>
-                            <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
-                        </CnGalWebSite.Kanban.KanbanLive2D>
-                    </ErrorHandler>
-                </Authorized>
-                <NotAuthorized>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip @ref="FloatTool" />
-                </NotAuthorized>
-            </AuthorizeView>
+            <ErrorHandler IsSSR="ToolHelper.IsSSR" ShowDetailedErrorInfor="_dataCacheService.ThemeSetting.ShowDetailedErrorInfor">
+                <CnGalWebSite.Kanban.KanbanLive2D>
+                    <CnGalWebSite.Kanban.Components.Buttons.ExternalButton @ref="ExternalButton" />
+                </CnGalWebSite.Kanban.KanbanLive2D>
+            </ErrorHandler>
         }
     }
 
@@ -37,9 +30,13 @@
 @code {
     bool isReady;
     bool Hide;
+    bool ForceHide = true;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Tips.FloatToolTip FloatTool;
     CnGalWebSite.Kanban.Components.Buttons.ExternalButton ExternalButton;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override void OnInitialized()
     {
@@ -52,12 +49,34 @@
         LocationChanged(null, null);
     }
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                //获取词条信息
+                var mode = await _httpService.GetAsync<KanbanPermissionsModel>("api/space/GetKanbanPermissions/");
+                ForceHide = !mode.Permissions;
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取看板娘权限失败");
+            }
+        }
+    }
+
+
     public void LocationChanged(object sender, LocationChangedEventArgs args)
     {
         var hide = NavigationManager.Uri.Contains("almanac");
-        if(hide!=Hide)
+        if (hide != Hide)
         {
-            Hide=hide;
+            Hide = hide;
             StateHasChanged();
         }
     }

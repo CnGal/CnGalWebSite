@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Stores;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.Core.Models;
@@ -52,11 +53,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IStoreInfoService _storeInfoService;
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IQueryService _queryService;
+        private readonly IUserService _userService;
         private readonly IRepository<FriendLink, int> _friendLinkRepository;
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger, IRepository<StoreInfo, long> storeInfoRepository,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository, IRepository<Recommend, long> recommendRepository,
-        IRepository<Comment, long> commentRepository, IRepository<Carousel, int> carouselRepository, IQueryService queryService, IRepository<FriendLink, int> friendLinkRepository)
+        IRepository<Comment, long> commentRepository, IRepository<Carousel, int> carouselRepository, IQueryService queryService, IRepository<FriendLink, int> friendLinkRepository, IUserService userService)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -75,6 +77,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _carouselRepository = carouselRepository;
             _queryService = queryService;
             _friendLinkRepository = friendLinkRepository;
+            _userService = userService;
         }
 
         /// <summary>
