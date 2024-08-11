@@ -38,7 +38,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _eventService.KanbanChanged -= OnKanbanChanged;
         _eventService.KanbanChanged += OnKanbanChanged;
@@ -47,26 +47,19 @@
         NavigationManager.LocationChanged += LocationChanged;
 
         LocationChanged(null, null);
-    }
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        try
         {
-            try
-            {
-                //获取词条信息
-                var mode = await _httpService.GetAsync<KanbanPermissionsModel>("api/space/GetKanbanPermissions/");
-                ForceHide = !mode.Permissions;
+            //获取词条信息
+            var mode = await _httpService.GetAsync<KanbanPermissionsModel>("api/space/GetKanbanPermissions/");
+            ForceHide = !mode.Permissions;
 
-                isReady = true;
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                await ErrorHandler.ProcessError(ex, "获取看板娘权限失败");
-            }
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取看板娘权限失败");
         }
     }
 

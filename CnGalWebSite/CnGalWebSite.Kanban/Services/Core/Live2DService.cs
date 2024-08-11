@@ -53,6 +53,15 @@ namespace CnGalWebSite.Kanban.Services.Core
             //创建对象引用
             objRef = DotNetObjectReference.Create(this);
 
+            //初始化Live2D核心
+            await InitLive2DAsync();
+        }
+
+        [JSInvokable]
+        public async Task Live2dInitCallback()
+        {
+
+
             //获取模型数据
             await _clothesRepository.LoadAsync();
             await _expressionRepository.LoadAsync();
@@ -66,13 +75,6 @@ namespace CnGalWebSite.Kanban.Services.Core
             //加载UI相关设置
             await _settingService.LoadAsync();
 
-            //初始化Live2D核心
-            await InitLive2DAsync();
-        }
-
-        [JSInvokable]
-        public async Task Live2dInitCallback()
-        {
             //设置上次的衣服
             await SetClothes(_userDataService.UserData.Clothes.ClothesName);
             await SetShoes(_userDataService.UserData.Clothes.ShoesName);

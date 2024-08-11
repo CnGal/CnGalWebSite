@@ -1008,18 +1008,48 @@ var canvasId = 'live2d';//画布Id
 
 var live2d_dotNetHelper;
 
+// 动态加载脚本
+function loadScript(url, callback) {
+    let script = document.createElement('script');
+    if (script.readyState) { // IE
+        script.onreadystatechange = function () {
+            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                script.onreadystatechange = null;
+                callback();
+            }
+        }
+    } else { // 其他浏览器
+        script.onload = function () {
+            callback();
+        }
+    }
+    script.src = url;
+    document.body.appendChild(script);
+}
+
 function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
-    var modelDirs = modelDir.split(',');
-    live2d_dotNetHelper = dotNetHelper;
 
-    setLive2dDefine(resourcesPath, backImageName, modelDirs, canvasId, modelIndex);
-    initLive2d();
-    initKanbanMoveAction(dotNetHelper);
-    initButtonGroupMoveAction(dotNetHelper);
-    initDialogBoxMoveAction(dotNetHelper);
-    listenLive2dCanvasChange();
+    // 将注释节点插入到 HTML 文档中的 body 元素中
+    var comment = document.createComment("看板娘live2d依赖库");
+    document.body.appendChild(comment);
+    // 加载js
+    loadScript('https://app.cngal.org/live2d/js/live2dcubismcore.min.js', function () {
+        //loadScript('https://app.cngal.org/live2d/js/bundle.js', function () {
+        loadScript('http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js', function () {
+            // 再初始化l2d
+            var modelDirs = modelDir.split(',');
+            live2d_dotNetHelper = dotNetHelper;
 
-    console.log("初始化Live2D")
+            setLive2dDefine(resourcesPath, backImageName, modelDirs, canvasId, modelIndex);
+            initLive2d();
+            initKanbanMoveAction(dotNetHelper);
+            initButtonGroupMoveAction(dotNetHelper);
+            initDialogBoxMoveAction(dotNetHelper);
+            listenLive2dCanvasChange();
+
+            console.log("初始化Live2D")
+        })
+    })
 }
 
 // 初始化完成回调
@@ -1201,7 +1231,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
                 //检查对话框是否被按下
                 if (dialogbox_mousedown) {
                     return;
-                } 
+                }
 
                 //执行逻辑
                 deltaLeft = touch.clientX - touch.target.offsetLeft;
@@ -1258,7 +1288,7 @@ function initButtonGroupMoveAction(dotNetHelper) {
     }
 
     // 移动触发事件要放在，区域控制元素上
-    window.addEventListener('mousemove', mousemove_fun )
+    window.addEventListener('mousemove', mousemove_fun)
     window.addEventListener('touchmove', mousemove_fun, { passive: false })
 
     const mouseup_fun = function () {
@@ -1298,7 +1328,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
         /*
         * @des deltaLeft 即移动过程中不变的值
         */
-       
+
         var touch;
         if (event.touches) {
             touch = event.touches[0];//多个鼠标|手指事件取第一个
@@ -1372,7 +1402,7 @@ function initDialogBoxMoveAction(dotNetHelper) {
     }
 
     // 移动触发事件要放在，区域控制元素上
-    window.addEventListener('mousemove', mousemove_fun )
+    window.addEventListener('mousemove', mousemove_fun)
     window.addEventListener('touchmove', mousemove_fun, { passive: false })
 
     const mouseup_fun = function () {
