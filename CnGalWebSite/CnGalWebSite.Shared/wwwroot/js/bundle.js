@@ -1034,8 +1034,8 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
     document.body.appendChild(comment);
     // 加载js
     loadScript('https://app.cngal.org/live2d/js/live2dcubismcore.min.js', function () {
-        //loadScript('https://app.cngal.org/live2d/js/bundle.js', function () {
-        loadScript('http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js', function () {
+        loadScript('https://app.cngal.org/live2d/js/bundle.js', function () {
+        //loadScript('http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js', function () {
             // 再初始化l2d
             var modelDirs = modelDir.split(',');
             live2d_dotNetHelper = dotNetHelper;

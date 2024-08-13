@@ -535,6 +535,10 @@ namespace CnGalWebSite.APIServer.Application.Users
             else if (sourceType == UserIntegralSourceType.AnniversariesLiveBookings || sourceType == UserIntegralSourceType.AnniversariesLotteries || sourceType == UserIntegralSourceType.AnniversariesShare)
             {
                 DateTime now = DateTime.Now.ToCstTime();
+                if (now > new DateTime(2024, 8, 17, 19, 00, 00))
+                {
+                    return;
+                }
                 if (await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == userId && s.SourceType == sourceType && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > now.ToCstTime()))
                 {
                     return;
