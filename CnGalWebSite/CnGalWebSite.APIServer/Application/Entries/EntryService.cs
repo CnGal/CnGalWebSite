@@ -1208,7 +1208,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             var informationTypes = await _entryInformationTypeRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
-            foreach (var item in entry.Information)
+            foreach (var item in entry.Information.OrderByDescending(s=>s.DisplayName))
             {
                 var info = informationTypes.FirstOrDefault(s => s.Name == item.DisplayName);
                 if (info != null)
