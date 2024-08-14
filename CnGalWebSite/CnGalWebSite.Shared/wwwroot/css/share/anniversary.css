@@ -51,11 +51,11 @@
 .anniversaries-group-card .biref {
     font-size: small;
 }
-.anniversaries-group-card.staff img{
+.anniversaries-group-card.staff img {
     border-radius: 50%;
     width: 40%;
     margin: 0 auto;
-    padding-top: 1rem;
+    margin-top: 1rem;
 }
 .anniversaries-group-card.staff .name, .anniversaries-group-card.staff .biref {
     text-align: center;
