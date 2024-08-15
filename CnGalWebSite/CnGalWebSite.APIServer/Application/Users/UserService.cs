@@ -535,7 +535,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             else if (sourceType == UserIntegralSourceType.AnniversariesLiveBookings || sourceType == UserIntegralSourceType.AnniversariesLotteries || sourceType == UserIntegralSourceType.AnniversariesShare)
             {
                 DateTime now = DateTime.Now.ToCstTime();
-                if (now > new DateTime(2024, 8, 17, 19, 00, 00))
+                if (now > new DateTime(2024, 8, 18, 12, 00, 00))
                 {
                     return;
                 }
