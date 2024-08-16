@@ -61,13 +61,6 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
                     {
                         await _timedTaskService.RunTimedTask(model);
                     }
-
-                    _counter++;
-                    if (_counter%10==0)
-                    {
-                        var item =await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == 5223);
-                        _logger.LogInformation($"{item?.DisplayName}");
-                    }
                 }
 
             }
