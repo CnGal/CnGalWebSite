@@ -1007,7 +1007,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var dateTime = DateTime.Now.ToCstTime();
 
-            if (dateTime < new DateTime(2024, 8, 17, 23, 30, 00))
+            if (dateTime < new DateTime(2024, 8, 17, 15, 30, 00))
             {
                 return new KanbanPermissionsModel { Permissions = false };
             }
