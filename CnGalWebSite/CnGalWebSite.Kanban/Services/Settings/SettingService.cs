@@ -101,24 +101,25 @@ namespace CnGalWebSite.Kanban.Services.Settings
         private async Task CheckKanbanPositionAsync()
         {
             var size = await _jsRuntime.InvokeAsync<Size>("getWindowSize");
-            var percent = 0.8;
+            var percent_x = 0.5;
+            var percent_y = 0.8;
 
-            if (_settingModel.Kanban.Position.Left + _settingModel.Kanban.Size.Width * percent < 0)
+            if (_settingModel.Kanban.Position.Left + _settingModel.Kanban.Size.Width * percent_x < 0)
             {
                 _settingModel.Kanban.Position.Left = 0;
             }
 
-            if (_settingModel.Kanban.Position.Left + _settingModel.Kanban.Size.Width * (1 - percent) > size.Width)
+            if (_settingModel.Kanban.Position.Left + _settingModel.Kanban.Size.Width * (1 - percent_x) > size.Width)
             {
                 _settingModel.Kanban.Position.Left = (int)(size.Width - _settingModel.Kanban.Size.Width);
             }
 
-            if (_settingModel.Kanban.Position.Top + _settingModel.Kanban.Size.Height * percent < 0)
+            if (_settingModel.Kanban.Position.Top + _settingModel.Kanban.Size.Height * percent_y < 0)
             {
                 _settingModel.Kanban.Position.Top = 0;
             }
 
-            if (_settingModel.Kanban.Position.Top + _settingModel.Kanban.Size.Height * (1 - percent) > size.Height)
+            if (_settingModel.Kanban.Position.Top + _settingModel.Kanban.Size.Height * (1 - percent_y) > size.Height)
             {
                 _settingModel.Kanban.Position.Top = (int)(size.Height - _settingModel.Kanban.Size.Height);
             }
