@@ -38,5 +38,7 @@ namespace CnGalWebSite.DataModel.Model
         Registe,
         [Display(Name = "预约")]
         Booking,
+        [Display(Name = "兑换")]
+        Redeemed,
     }
 }

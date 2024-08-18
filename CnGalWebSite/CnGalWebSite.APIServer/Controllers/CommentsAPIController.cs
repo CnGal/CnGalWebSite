@@ -38,7 +38,7 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/comments/[action]")]
     public class CommentsAPIController : ControllerBase
     {
-        
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Comment, long> _commentRepository;
@@ -55,7 +55,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IQueryService _queryService;
         private readonly ILotteryService _lotteryService;
 
-        public CommentsAPIController( IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository, IQueryService queryService,
+        public CommentsAPIController(IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository, IQueryService queryService,
         IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService, ILotteryService lotteryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
@@ -65,7 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleRepository = articleRepository;
             _commentRepository = commentRepository;
             _commentService = commentService;
-            
+
             _userRepository = userRepository;
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
@@ -274,7 +274,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentLottery:
-                    lottery = await _lotteryRepository.GetAll().Include(s=>s.Users).AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    lottery = await _lotteryRepository.GetAll().Include(s => s.Users).AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (lottery == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该抽奖，Id" + model.ObjectId };
@@ -329,8 +329,8 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 CommentTime = DateTime.Now.ToCstTime(),
                 ApplicationUserId = user.Id,
-                LotteryId=lottery?.Id,
-                Type=model.Type,
+                LotteryId = lottery?.Id,
+                Type = model.Type,
             });
             var commentText = new CommentText
             {
@@ -344,11 +344,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //保存并尝试应用审核记录
             await _editRecordService.SaveAndApplyEditRecord(comment, user, commentText, Operation.PubulishComment, "");
             //判断是否需要参与抽奖
-            if(lottery!=null&&lottery.ConditionType== LotteryConditionType.CommentLottery)
+            if (lottery != null && lottery.ConditionType == LotteryConditionType.CommentLottery)
             {
                 try
                 {
-                await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                    await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
                 }
                 catch
                 { }
@@ -361,7 +361,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditArticleCanCommentAsync(EditArticleCanCommentModel model)
         {
-            await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -369,7 +369,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPeripheryCanCommentAsync(EditPeripheryCanCommentModel model)
         {
-            await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -377,7 +377,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVoteCanCommentAsync(EditVoteCanCommentModel model)
         {
-            await _voteRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _voteRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -385,7 +385,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditLotteryCanCommentAsync(EditLotteryCanCommentModel model)
         {
-            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -393,7 +393,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVideoCanCommentAsync(EditLotteryCanCommentModel model)
         {
-            await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -401,7 +401,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryCanCommentAsync(EditEntryCanCommentModel model)
         {
-            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
 
             return new Result { Successful = true };
         }
@@ -410,7 +410,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditSpaceCanCommentAsync(EditSpaceCanComment model)
         {
-            await _userRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
+            await _userRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.CanComment, b => model.CanComment));
 
 
             return new Result { Successful = true };
@@ -421,7 +421,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> HiddenCommentAsync(HiddenCommentModel model)
         {
 
-            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
+            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -436,7 +436,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (await _commentService.IsUserHavePermissionForCommmentAsync(item, user))
                 {
-                    await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => true));
+                    await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsHidden, b => true));
                 }
                 else
                 {
@@ -450,12 +450,12 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<CommentOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<Comment, long>(_commentRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Text)==false)
+            var (items, total) = await _queryService.QueryAsync<Comment, long>(_commentRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Text) == false)
                 .Include(s => s.ApplicationUser)
                 .Include(s => s.Entry)
                 .Include(s => s.Article)
                 .Include(s => s.Periphery)
-                .Include(s => s.UserSpaceCommentManager).ThenInclude(s=>s.ApplicationUser)
+                .Include(s => s.UserSpaceCommentManager).ThenInclude(s => s.ApplicationUser)
                 .Include(s => s.Vote)
                 .Include(s => s.Lottery)
                 .Include(s => s.ParentCodeNavigation), model,
@@ -469,12 +469,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     Type = s.Type,
                     CommentTime = s.CommentTime,
                     Text = s.Text,
-                    UserId=s.ApplicationUser.Id,
-                    UserName=s.ApplicationUser.UserName,
+                    UserId = s.ApplicationUser.Id,
+                    UserName = s.ApplicationUser.UserName,
                     IsHidden = s.IsHidden,
                     Priority = s.Priority,
                     ObjectId = s.Entry != null ? s.Entry.Id.ToString() : s.Article != null ? s.Article.Id.ToString() : s.Periphery != null ? s.Periphery.Id.ToString() : s.Video != null ? s.Video.Id.ToString() : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.Id : s.Vote != null ? s.Vote.Id.ToString() : s.Lottery != null ? s.Lottery.Id.ToString() : null,
-                    ObjectName =s.Entry!=null?s.Entry.Name: s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.UserName : s.Vote != null ? s.Vote.Name : s.Lottery != null ? s.Lottery.Name : s.ParentCodeNavigation != null ? "回复：Id"+s.ParentCodeNavigation.Id : null
+                    ObjectName = s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.UserName : s.Vote != null ? s.Vote.Name : s.Lottery != null ? s.Lottery.Name : s.ParentCodeNavigation != null ? "回复：Id" + s.ParentCodeNavigation.Id : null
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
@@ -485,7 +485,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Result>> EditCommentPriorityAsync(EditCommentPriorityViewModel model)
         {
-            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
+            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Successful = true };
         }

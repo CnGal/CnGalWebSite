@@ -1,0 +1,126 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject IPopupService PopupService
+@inject IEventService _eventService
+@inject IUserService _userService
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Color="tertiary" Class="mb-4">
+    前往 <a class="tertiary--text fw-bold" href="https://gf.bilibili.com/item/detail/1110069065">B站工房</a> 购买周边，我们会按消费金额（不包括邮费）5：1 赠送G币哦。<br />
+    在下面输入B站工房 <strong>订单号</strong> 即可兑换（数据更新会有延迟，可在B站私信询问）
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+<MDCard Class="commodity-code-card pa-4 mb-4">
+    <MTextField @bind-Value="@Code" Label="B站工房订单号" />
+    <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@IconType.Lottery.ToIconString()" Text="兑换" IsAsync OnClick="Buy" />
+
+</MDCard>
+
+@if (string.IsNullOrWhiteSpace(msg) == false)
+{
+    @if (success)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
+            @msg
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Color="error" Class="mb-4">
+            @msg
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    }
+}
+
+<MDCard Class="mb-4 commodity-code-image-card ">
+    <a href="https://gf.bilibili.com/item/detail/1110069065">
+        <img src="https://tucang.cngal.top/api/image/show/e144487a1a224a3bb54dfc7eb55483ab?https://image.cngal.org/images/upload/20240818/793eac7917a9fe37ea4934760ea39bb387fce0c2.jpeg" />
+    </a>
+</MDCard>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
+
+@code {
+    public string Code { get; set; }
+    string msg;
+    bool success;
+    bool processing;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
+
+
+    public async Task Buy()
+    {
+        if (string.IsNullOrWhiteSpace(Code))
+        {
+            msg = "请输入订单号";
+            success = false;
+            StateHasChanged();
+            return;
+        }
+        processing = true;
+        await humanMachineVerification.StartVerification();
+
+        for (var i = 0; i < 1000; i++)
+        {
+            if (processing == false)
+            {
+                return;
+            }
+            await Task.Delay(100);
+        }
+    }
+
+    public async Task OnVerficated(HumanMachineVerificationResult model)
+    {
+        if (model.Success == false)
+        {
+            processing = false;
+            return;
+        }
+
+        try
+        {
+            var obj = await _httpService.PostAsync<RedeemedCommodityCodeModel, Result>("api/commodities/RedeemedCommodityCode", new RedeemedCommodityCodeModel
+                {
+                    Code = Code,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel(),
+                    Verification = model
+                });
+            if (obj.Successful)
+            {
+                await RefreshUserInfor();
+            }
+            success = obj.Successful;
+            msg = obj.Error;
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "兑换失败");
+        }
+        processing = false;
+    }
+
+    public async Task RefreshUserInfor()
+    {
+        try
+        {
+            var model = await _httpService.GetAsync<UserInforViewModel>("api/space/GetUserData/" + _dataCacheService.UserInfor.Id);
+            _dataCacheService.UserInfor = model;
+            _eventService.OnUserInfoChanged();
+            StateHasChanged();
+        }
+        catch
+        {
+            await PopupService.ToastErrorAsync("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
+        }
+    }
+}

@@ -1283,6 +1283,13 @@ html {
 :focus-visible {
     outline: none;
 }
+/*outline输入框*/
+.theme--light.m-text-field--outlined:not(.m-input--is-focused):not(.m-input--has-state):not(.m-input--is-disabled) > .m-input__control > .m-input__slot:hover fieldset {
+    color: var(--md-sys-color-primary);
+}
+.theme--light.m-input:hover, .theme--light.m-input input:hover, .theme--light.m-input textarea:hover {
+    color: var(--md-sys-color-primary) !important
+}
 
 /*卡片*/
 .md-card {
@@ -3906,6 +3913,18 @@ a.user-info-card {
     flex-direction: column;
     gap: .5rem;
     padding: 1rem;
+}
+.commodity-code-card {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+}
+.commodity-code-image-card a{
+    display:flex;
+}
+.commodity-code-image-card img {
+    width: 100%;
 }
 
 /*外层*/

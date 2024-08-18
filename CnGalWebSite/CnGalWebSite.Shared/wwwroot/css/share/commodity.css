@@ -14,3 +14,15 @@
     gap: .5rem;
     padding: 1rem;
 }
+.commodity-code-card {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+}
+.commodity-code-image-card a{
+    display:flex;
+}
+.commodity-code-image-card img {
+    width: 100%;
+}

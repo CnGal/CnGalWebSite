@@ -1,0 +1,164 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="CommodityCodeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+        <ButtonContent>
+            <MButton Color="primary" Rounded
+                     Dark
+                     Class="me-8"
+                     OnClick="ImportItems">
+                <MIcon Left>@IconType.Import.ToIconString()</MIcon>
+                批量导入
+            </MButton>
+        </ButtonContent>
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 140px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.Hide))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.Hide" />
+                <StateChip CanRedeemed="context.Item.CanRedeemed" />
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.Type))
+            {
+                @context.Item.Type.GetDisplayName()
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.UserId))
+            {
+                @if (context.Item.Redeemed)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ReviewEditRecords.UserChip Id="@context.Item.UserId" Name="@context.Item.UserName" />
+                }
+                else
+                {
+                    @("无")
+                }
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.RedeemedTime))
+            {
+                @(context.Item.RedeemedTime?.ToString("yyyy-MM-dd HH:mm")??"无")
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.CreateTime))
+            {
+                @context.Item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else if (context.Header.Value == nameof(CommodityCodeOverviewModel.UpdateTime))
+            {
+                @context.Item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1000">
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+
+<MDialog @bind-Value="_importDialog"
+         MaxWidth="1000">
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.ImportCard OnEdited="OnImported" @ref="importCard" />
+</MDialog>
+
+@code {
+    private string _baseUrl = "api/commodities/listcode";
+    private string _name = "商品";
+
+    private List<DataTableHeader<CommodityCodeOverviewModel>> _headers = new List<DataTableHeader<CommodityCodeOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(CommodityCodeOverviewModel.Id)
+          },
+          new (){ Text= "兑换码", Value= nameof(CommodityCodeOverviewModel.Code)},
+          new (){ Text= "类型", Value= nameof(CommodityCodeOverviewModel.Type)},
+          new (){ Text= "数量", Value= nameof(CommodityCodeOverviewModel.Count)},
+          new (){ Text= "兑换者", Value= nameof(CommodityCodeOverviewModel.UserId) },
+          new (){ Text= "兑换时间", Value= nameof(CommodityCodeOverviewModel.RedeemedTime)},
+          new (){ Text= "创建时间", Value= nameof(CommodityCodeOverviewModel.CreateTime)},
+          new (){ Text= "更新时间", Value= nameof(CommodityCodeOverviewModel.UpdateTime)},
+          new (){ Text= "状态", Value= nameof(CommodityCodeOverviewModel.Hide)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<CommodityCodeOverviewModel> dataTableCard;
+
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.EditCard editCard;
+    CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.ImportCard importCard;
+
+    private bool _editDialog;
+    private long _editedItemId;
+
+    private bool _importDialog;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void EditItem(CommodityCodeOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public async void ImportItems()
+    {
+        _importDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnImported()
+    {
+        _importDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+}
