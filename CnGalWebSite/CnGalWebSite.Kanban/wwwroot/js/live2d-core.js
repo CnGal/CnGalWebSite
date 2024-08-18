@@ -32,7 +32,7 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
     // 加载js
     loadScript('https://app.cngal.org/live2d/js/live2dcubismcore.min.js', function () {
         loadScript('https://app.cngal.org/live2d/js/bundle.js', function () {
-        //loadScript('http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js', function () {
+            //loadScript('http://localhost:5000/Samples/TypeScript/Demo/dist/bundle.js', function () {
             // 再初始化l2d
             var modelDirs = modelDir.split(',');
             live2d_dotNetHelper = dotNetHelper;
@@ -60,6 +60,33 @@ function getWindowSize() {
         Width: window.innerWidth,
     }
 }
+
+// 监听窗口变化
+const getWindowInfo = () => {
+    const windowInfo = {
+        width: window.innerWidth,
+        hight: window.innerHeight
+    }
+    console.log(windowInfo);
+    live2d_dotNetHelper.invokeMethodAsync("CheckKanbanPositionAsync")
+};
+
+const debounce = (fn, delay) => {
+    let timer;
+    return function () {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+            fn();
+        }, delay);
+    }
+};
+const cancalDebounce = debounce(getWindowInfo, 100);
+
+window.addEventListener('resize', cancalDebounce);
+
+
 
 //获取此刻时间
 function getTimeNow() {

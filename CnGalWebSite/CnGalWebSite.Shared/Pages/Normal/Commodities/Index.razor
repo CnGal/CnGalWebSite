@@ -9,57 +9,73 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="看板娘的小卖铺" />
 
 <CnGalWebSite.Components.Containers.MiniModeContainer>
-    <MRow>
-        <MCol Cols="12" Md="5" Lg="4" Xl="3" Class="mb-4">
-            <CnGalWebSite.Shared.MasaComponent.PC.Commodities.KanbanCard />
-        </MCol>
-        <MCol Cols="12" Md="7" Lg="8" Xl="9" Class="mb-4">
-            <MDCard Class="mb-4">
-                <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow CenterActive>
-                    <MTab Value="1">
-                        小卖铺<MIcon>@IconType.Store.ToIconString()</MIcon>
-                    </MTab>
-                    <MTab Value="2">
-                        G币兑换<MIcon>@IconType.Lottery.ToIconString()</MIcon>
-                    </MTab>
-                </MTabs>
-            </MDCard>
+    @if (isReadyA)
+    {
+        @if (ForceHide)
+        {
+            <NotAuthorizedTipView NoPermissions="true" />
+        }
+        else
+        {
+            <MRow>
+                <MCol Cols="12" Md="5" Lg="4" Xl="3" Class="mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Commodities.KanbanCard />
+                </MCol>
+                <MCol Cols="12" Md="7" Lg="8" Xl="9" Class="mb-4">
+                    <MDCard Class="mb-4">
+                        <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow CenterActive>
+                            <MTab Value="1">
+                                小卖铺<MIcon>@IconType.Store.ToIconString()</MIcon>
+                            </MTab>
+                            <MTab Value="2">
+                                G币兑换<MIcon>@IconType.Lottery.ToIconString()</MIcon>
+                            </MTab>
+                        </MTabs>
+                    </MDCard>
 
-            <MTabsItems @bind-Value="index">
-                <MTabItem Value="1">
-                    @if (isReady)
-                    {
-                        <MRow>
-                            @foreach (var item in Model)
+                    <MTabsItems @bind-Value="index">
+                        <MTabItem Value="1">
+                            @if (isReadyB)
                             {
-                                <MCol Cols="6" Md="6" Lg="4" Xl="3" Class="mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Commodities.ItemCard Model="item" />
-                                </MCol>
+                                <MRow>
+                                    @foreach (var item in Model)
+                                    {
+                                        <MCol Cols="6" Md="6" Lg="4" Xl="3" Class="mb-4">
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Commodities.ItemCard Model="item" />
+                                        </MCol>
+                                    }
+                                </MRow>
                             }
-                        </MRow>
-                    }
-                    else
-                    {
-                        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
-                    }
-                </MTabItem>
-                <MTabItem Value="2">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Commodities.Codes.MainCard />
-                </MTabItem>
+                            else
+                            {
+                                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+                            }
+                        </MTabItem>
+                        <MTabItem Value="2">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Commodities.Codes.MainCard />
+                        </MTabItem>
 
-            </MTabsItems>
-        </MCol>
-    </MRow>
+                    </MTabsItems>
+                </MCol>
+            </MRow>
+        }
+    }
+    else
+    {
+        <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+
+    }
+
 </CnGalWebSite.Components.Containers.MiniModeContainer>
-
 
 @code {
 
     [Parameter]
     public string Type { get; set; }
 
-
-    bool isReady;
+    bool ForceHide = true;
+    bool isReadyA;
+    bool isReadyB;
     StringNumber index = 0;
 
     public List<CommodityUserModel> Model { get; set; }
@@ -73,14 +89,27 @@
         LocationChanged(null, null);
         try
         {
-            Model = await _pageModelCatche.GetCache("api/commodities/GetAllCommodities");
-            isReady = true;
+            //获取词条信息
+            var mode = await _httpService.GetAsync<KanbanPermissionsModel>("api/space/GetKanbanPermissions/");
+            ForceHide = !mode.Permissions;
+            isReadyA = true;
+            StateHasChanged();
+
+            if (ForceHide == false)
+            {
+                Model = await _pageModelCatche.GetCache("api/commodities/GetAllCommodities");
+                isReadyB = true;
+                StateHasChanged();
+            }
         }
         catch (Exception ex)
         {
+            ForceHide = true;
+            isReadyA = true;
             await ErrorHandler.ProcessError(ex, "获取看板娘的小卖铺商品列表失败");
         }
     }
+
 
     protected override void OnAfterRender(bool firstRender)
     {

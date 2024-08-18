@@ -242,6 +242,12 @@ namespace CnGalWebSite.APIServer.Controllers
             CommodityCode item = null;
             if (model.Id == 0)
             {
+                // 新创建的兑换码 不能和已有的重复
+                if (await _commodityCodeRepository.AnyAsync(s => s.Code == model.Code))
+                {
+                    return new Result { Successful = false, Error = "已存在相同的兑换码" };
+                }
+
                 item = await _commodityCodeRepository.InsertAsync(new CommodityCode
                 {
                     CreateTime = DateTime.Now.ToCstTime(),
@@ -255,6 +261,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 _commodityCodeRepository.Clear();
             }
 
+
+            // 编辑现有的创建的兑换码 不能和已有的重复
+            if (await _commodityCodeRepository.AnyAsync(s => s.Code == model.Code && s.Id != model.Id))
+            {
+                return new Result { Successful = false, Error = "已存在相同的兑换码" };
+            }
+
+
             item = await _commodityCodeRepository.GetAll().FirstOrDefaultAsync(s => s.Id == model.Id);
 
 
@@ -262,6 +276,8 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "目标不存在" };
             }
+
+
 
 
             // 如果兑换码已经被兑换 修改为不可兑换需要退还G币
@@ -337,7 +353,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            var code = await _commodityCodeRepository.GetAll().FirstOrDefaultAsync(s => s.Code == model.Code);
+            var code = await _commodityCodeRepository.GetAll().FirstOrDefaultAsync(s => s.Code == model.Code && s.Hide == false);
             if (code == null)
             {
                 return new Result { Successful = false, Error = "没有查找到这个订单，数据更新会有延迟，可以稍后再来查询（也可以在B站私信询问）" };

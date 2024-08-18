@@ -289,6 +289,16 @@ namespace CnGalWebSite.Kanban.Services.Core
             _ = _jSRuntime.InvokeVoidAsync("window.releaseLive2d");
         }
 
+        /// <summary>
+        /// 检查看板娘位置是否正确
+        /// </summary>
+        /// <returns></returns>
+        [JSInvokable]
+        public async Task CheckKanbanPositionAsync()
+        {
+           await _settingService.SaveAsync();
+        }
+
         public void Dispose()
         {
             objRef?.Dispose();
