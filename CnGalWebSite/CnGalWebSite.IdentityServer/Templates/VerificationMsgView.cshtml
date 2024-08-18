@@ -2,86 +2,57 @@
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Messages
 @using CnGalWebSite.Extensions
 
-<div id="contentDiv" style="">
-    <table cellpadding="0"
-           align="center"
-           style="
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            border-bottom-right-radius: 5px;
-            border-bottom-left-radius: 5px;
-            box-shadow: rgb(153, 153, 153) 0px 0px 5px;
-            border-collapse: collapse;
-          ">
+
+<div>
+    <table align="center" cellpadding="0" cellspacing="0"
+           style="font-family:Tahoma,Helvetica,Arial,sans-serif,Microsoft YaHei;" width="700">
         <tbody>
             <tr>
-                <th valign="middle"
-                    style="
-                  height: 25px;
-                  line-height: 25px;
-                  padding: 15px 35px;
-                  border-bottom-width: 1px;
-                  border-bottom-style: solid;
-                  border-bottom-color: #f06292;
-                  background-color: #f06292;
-                  border-top-left-radius: 5px;
-                  border-top-right-radius: 5px;
-                  border-bottom-right-radius: 0px;
-                  border-bottom-left-radius: 0px;
-                  text-align: center;
-                  font-size: x-large;
-                  color: white;
-                ">
-                    CnGal资料站
-                </th>
+                <td align="center" colspan="2" height="100"
+                    style="border: 2px solid #bc004b;border-right-width: 0;border-left-width: 0;color: #bc004b;font-size: 30px;font-weight: bold;">
+                    <p>CnGal 中文GalGame资料站</p>
+                </td>
             </tr>
             <tr>
-                <td>
-                    <div style="
-                    padding: 25px 35px 40px;
-                    background-color: #fff;
-                    max-width: 550px;
-                  ">
-                        <h2 style="margin: 5px 0px">
-                            <font color="#333333" style="line-height: 20px">
-                                <font style="line-height: 22px" size="4">
-                                    亲爱的 @Model.UserName
-                                </font>
-                            </font>
-                        </h2>
-                        <p>
-                            非常感谢您的访问，欢迎来到
-                            CnGal资料站，在完成 <strong>@Model.Purpose</strong>  之前，我们需要验证一下您的邮箱哦~<br />
-                            <br />
-                        </p>
-                        <h1>验证码：@Model.Code</h1>
-                        <br />
-                        <br />
+                <td colspan="2"
+                    style="font-size:15px; line-height:1.75; padding:0 25px; color:#514242;padding-top: 30px;">
+                    <p style="text-align: left;">
+                        @Model.UserName，你好！<br />
+                        欢迎来到 CnGal资料站，在完成 <strong>@Model.Purpose</strong> 之前，我们需要验证一下你的邮箱<br />
+                    </p>
+                    <p style="text-align: left;font-size: 20px;font-weight: bold;">🔢 验证码：@Model.Code</p>
+                    <p style="text-align: left;">
+
                         最后，感谢您的访问，祝您使用愉快！
-                        <p></p>
-                        <p align="right">CnGal资料站 管理团队</p>
-                        <div style="width: 550px; margin: 0 auto">
-                            <div style="
-                        padding: 10px 10px 0;
-                        border-top: 1px solid #ccc;
-                        color: #747474;
-                        margin-bottom: 20px;
-                        line-height: 1.3em;
-                        font-size: 12px;
-                      ">
-                                <p>
-                                    此为系统邮件，请勿回复<br />
-                                    请保管好您的邮箱，避免账号被他人盗用
-                                </p>
-                                <p>
-                                    ©CnGal.org<br />
-                                    <a href="https://www.cngal.org/"
-                                       rel="noopener"
-                                       target="_blank">https://www.cngal.org/</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    </p>
+
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" height="50" style="font-size:12px;color: #bc004b;padding: 20px;padding-top: 0;">
+                    <p style="margin-top: 30px;color: #bc004b;    font-size: 15px;">
+                        CnGal资料站 管理团队
+                    </p>
+                    此为系统邮件，请勿回复 <br> 请保管好您的邮箱，避免账号被他人盗用
+                </td>
+            </tr>
+            <tr>
+
+                <td width="230" style="padding-left:20px; font-size:13px; color:#bc004b; border-top:1px dashed #bc004b;"
+                    valign="middle">
+                    <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/footer_logo.png"
+                         style="float:left;" height="40">
+                </td>
+
+
+                <td align="right" width="470"
+                    style="padding-right:20px; font-size:13px; color:#bc004b; border-top:1px dashed #bc004b;"
+                    valign="middle">
+                    <span style="float:right;">
+                        © 2024 - CnGal资料站
+                    </span>
+                </td>
                 </td>
             </tr>
         </tbody>
