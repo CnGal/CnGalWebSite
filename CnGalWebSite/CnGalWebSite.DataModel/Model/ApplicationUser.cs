@@ -154,7 +154,12 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<UserReviewEditRecord> ReviewEntries { get; set; }
 
         public virtual ICollection<Commodity> Commodities { get; set; }
+        /// <summary>
+        /// 多对多关系映射虚拟字段
+        /// </summary>
         public virtual ICollection<ApplicationUserCommodity> ApplicationUserCommodities { get; set; }
+
+        public virtual ICollection<CommodityCode> CommodityCodes { get; set; }
 
     }
 
@@ -218,6 +223,8 @@ namespace CnGalWebSite.DataModel.Model
         AnniversariesLotteries,
         [Display(Name = "周年庆分享游戏库")]
         AnniversariesShare,
+        [Display(Name = "兑换码")]
+        CommodityCode,
     }
 
     public enum UserIntegralType

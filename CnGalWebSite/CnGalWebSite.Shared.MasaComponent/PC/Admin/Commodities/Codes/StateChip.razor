@@ -1,0 +1,25 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@(CanRedeemed?"可兑换":"不可兑换")" />
+
+@code {
+    [Parameter]
+    public bool CanRedeemed { get; set; }
+
+    public string GetColor()
+    {
+        return CanRedeemed switch
+        {
+            false => "error",
+            true => "success"
+        };
+    }
+
+    public IconType GetIcon()
+    {
+        return CanRedeemed switch
+        {
+            true => IconType.Code,
+            false => IconType.UnCode,
+        };
+    }
+}

@@ -7,110 +7,31 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="看板娘的小卖铺" />
 
-<MDCard>
-    <DataTableCard TModel="CommodityOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
-        <ItemColContent>
-            @if (context.Header.Value == "actions")
-            {
-                <div style="width: 140px;">
-                    <MIcon Color="success"
-                           Class="mr-2"
-                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
-                </div>
-            }
-            else if (context.Header.Value == nameof(CommodityOverviewModel.IsHidden))
-            {
-                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Recommends.StateChip IsHidden="context.Item.IsHidden" />
-            }
-            else if (context.Header.Value == nameof(CommodityOverviewModel.Image))
-            {
-                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.Image" />
-            }
-            else if (context.Header.Value == nameof(CommodityOverviewModel.Type))
-            {
-                @context.Item.Type.GetDisplayName()
-            }
-            else if (context.Header.Value == nameof(CommodityOverviewModel.LastEditTime))
-            {
-                @context.Item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
-            }
-            else
-            {
-                @context.Value
-            }
-        </ItemColContent>
-    </DataTableCard>
+<div>
+    <MDCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
 
-</MDCard>
+            <MTab Value="1">
+                小卖铺<MIcon>@IconType.Store.ToIconString()</MIcon>
+            </MTab>
+            <MTab Value="2">
+                兑换码<MIcon>@IconType.Lottery.ToIconString()</MIcon>
+            </MTab>
+        </MTabs>
+    </MDCard>
 
-<MDialog @bind-Value="_editDialog"
-         MaxWidth="1000">
-    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
-</MDialog>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.ListCard />
+
+        </MTabItem>
+        <MTabItem Value="2">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.ListCard />
+        </MTabItem>
+    </MTabsItems>
+</div>
+
 @code {
-    private string _baseUrl = "api/commodities/list";
-    private string _name = "商品";
 
-    private List<DataTableHeader<CommodityOverviewModel>> _headers = new List<DataTableHeader<CommodityOverviewModel>>
-{
-          new ()
-          {
-            Text= "Id",
-            Align= DataTableHeaderAlign.Start,
-            Value= nameof(CommodityOverviewModel.Id)
-          },
-          new (){ Text= "类型", Value= nameof(CommodityOverviewModel.Type)},
-          new (){ Text= "预览", Value= nameof(CommodityOverviewModel.Image)},
-          new (){ Text= "名称", Value= nameof(CommodityOverviewModel.Name)},
-          new (){ Text= "值", Value= nameof(CommodityOverviewModel.Value)},
-          new (){ Text= "价格", Value= nameof(CommodityOverviewModel.Price) },
-          new (){ Text= "拥有人数", Value= nameof(CommodityOverviewModel.UserCount),Sortable=false },
-          new (){ Text= "优先级", Value= nameof(CommodityOverviewModel.Priority)},
-          new (){ Text= "最后编辑时间", Value= nameof(CommodityOverviewModel.LastEditTime)},
-          new (){ Text= "状态", Value= nameof(CommodityOverviewModel.IsHidden)},
-          new (){ Text= "操作", Value= "actions",Sortable=false }
-    };
-
-    DataTableCard<CommodityOverviewModel> dataTableCard;
-
-    CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.EditCard editCard;
-    private bool _editDialog;
-    private long _editedItemId;
-    private bool _detailDialog;
-
-
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    public async void EditItem(CommodityOverviewModel item)
-    {
-        _editedItemId = item.Id;
-        _editDialog = true;
-        StateHasChanged();
-        if (editCard != null)
-        {
-            await editCard.Refresh();
-        }
-    }
-
-    public void OnEdited()
-    {
-        _editDialog = false;
-        StateHasChanged();
-        if (dataTableCard != null)
-        {
-            dataTableCard.GetDataFromApi();
-        }
-    }
-
-    public async Task AddItem()
-    {
-        _editedItemId = 0;
-        _editDialog = true;
-        StateHasChanged();
-        if (editCard != null)
-        {
-            await editCard.Refresh();
-        }
-    }
+    public StringNumber TabIndex { get; set; } = 1;
 }

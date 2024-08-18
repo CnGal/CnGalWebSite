@@ -548,6 +548,10 @@ namespace CnGalWebSite.APIServer.Application.Users
             {
 
             }
+            else if (sourceType == UserIntegralSourceType.CommodityCode)
+            {
+
+            }
             else
             {
                 throw new InvalidOperationException("不支持的来源类型");
