@@ -20,9 +20,12 @@
 
     public void OnChanged(string steamId)
     {
-        _dataCacheService.UserInfor.GCoins += 10;
-        Model.IsBindSteamId = true;
-        StateHasChanged();
+        if (string.IsNullOrWhiteSpace(steamId) == false)
+        {
+            _dataCacheService.UserInfor.GCoins += 10;
+            Model.IsBindSteamId = true;
+            StateHasChanged();
+        }
     }
 
 }

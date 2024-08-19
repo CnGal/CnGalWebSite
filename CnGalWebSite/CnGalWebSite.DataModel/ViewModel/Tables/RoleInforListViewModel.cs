@@ -8,7 +8,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
     public class RoleInforTableModel
     {
         public long Id { get; set; }
-        [Display(Name = "Id")]
+        [Display(Name = "真实Id")]
         public long RealId { get; set; }
         [Display(Name = "名称")]
         public string Name { get; set; }

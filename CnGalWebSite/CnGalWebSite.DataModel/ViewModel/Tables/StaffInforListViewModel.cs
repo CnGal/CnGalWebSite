@@ -8,7 +8,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
     public class StaffInforTableModel
     {
         public long Id { get; set; }
-        [Display(Name = "Id")]
+        [Display(Name = "真实Id")]
         public long RealId { get; set; }
         [Display(Name = "游戏名称")]
         public string GameName { get; set; }

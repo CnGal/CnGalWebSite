@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -11,7 +13,7 @@ namespace CnGalWebSite.Extensions
     {
         static public void SynchronizationProperties(this object des, object src)
         {
-            if (des == null ||src==null)
+            if (des == null || src == null)
             {
                 return;
             }
@@ -38,7 +40,7 @@ namespace CnGalWebSite.Extensions
         /// <param name="obj2">对象2</param>
         /// <param name="type">按type类型中的属性进行比较</param>
         /// <returns></returns>
-        public static bool CompareProperties<T>( T obj1, T obj2, Type type)
+        public static bool CompareProperties<T>(T obj1, T obj2, Type type)
         {
             //为空判断
             if (obj1 == null && obj2 == null)
@@ -54,7 +56,7 @@ namespace CnGalWebSite.Extensions
                 {
                     var a = po.GetValue(obj1);
                     var b = po.GetValue(obj2);
-                    if(a ==null||b==null)
+                    if (a == null || b == null)
                     {
                         if (a != null || b != null)
                         {
@@ -98,6 +100,87 @@ namespace CnGalWebSite.Extensions
             }
         }
 
+        /// <summary>
+        /// 获取字段名称
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private static string GetDisplayName(Type type, string property)
+        {
+            var pName = type.GetProperty(property);
 
+            //4.0或以上版本
+            var displayName = pName.GetCustomAttribute<DisplayAttribute>();
+
+            return displayName?.Name;
+        }
+
+
+        /// <summary>
+        /// Using a bit of reflection to build up the strings.
+        /// </summary>
+        public static string ToCsvHeader(this object obj)
+        {
+            Type type = obj.GetType();
+            var properties = type.GetProperties(BindingFlags.DeclaredOnly |
+                                           BindingFlags.Public |
+                                           BindingFlags.Instance);
+
+            string result = string.Empty;
+            Array.ForEach(properties, prop =>
+            {
+                result += "\"" + (GetDisplayName(type, prop.Name) ?? prop.Name) + "\"" + ",";
+            });
+
+            return (!string.IsNullOrEmpty(result) ? result.Substring(0, result.Length - 1) : result);
+        }
+
+        /// <summary>
+        /// 转换csv
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string ToCsvRow(this object obj)
+        {
+            Type type = obj.GetType();
+            var properties = type.GetProperties(BindingFlags.DeclaredOnly |
+                                           BindingFlags.Public |
+                                           BindingFlags.Instance);
+
+            string result = string.Empty;
+            Array.ForEach(properties, prop =>
+            {
+                var value = prop.GetValue(obj, null);
+
+                if (prop.PropertyType == typeof(string))
+                {
+                    value = "\"" + value + "\"";
+                }
+                else if (prop.PropertyType.IsEnum)
+                {
+                    value = "\"" + ((Enum)value).GetDisplayName() + "\"";
+                }
+                else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+                {
+                    if (value != null)
+                    {
+                        if (prop.Name == "Birthday")
+                        {
+                            value = "\"" + ((DateTime)value).ToString("M") + "\"";
+                        }
+                        else
+                        {
+                            value = "\"" + ((DateTime)value).ToString("yyyy-MM-dd") + "\"";
+                        }
+                    }
+                }
+
+                result += value + ",";
+
+            });
+
+            return (!string.IsNullOrEmpty(result) ? result.Substring(0, result.Length - 1) : result);
+        }
     }
 }
