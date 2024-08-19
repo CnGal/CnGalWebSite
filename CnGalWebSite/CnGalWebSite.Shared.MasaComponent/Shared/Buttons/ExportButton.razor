@@ -6,6 +6,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " Rounded Class="@Class">
     <div style=" display: flex; flex-direction: column;">
         <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="Json" Icon="mdi-code-json " IsAsync OnClick="OnExportJson" />
+        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="CSV" Icon="mdi-file-delimited" IsAsync OnClick="OnExportCSV" />
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu>
 
@@ -58,7 +59,33 @@
         await DownloadFileFromStream(fileStream, $"{Name} - {items.Count()}条记录.json");
     }
 
-   
+    public async Task OnExportCSV()
+    {
+
+        //获取
+        var items = await GetData();
+        //检查
+        if (items == null || items.Any() == false)
+        {
+            return;
+        }
+
+
+        //生成json
+
+        var output = items.First().ToCsvHeader();
+        output += Environment.NewLine;
+
+        items.ForEach(burger =>
+        {
+            output += burger.ToCsvRow();
+            output += Environment.NewLine;
+        });
+
+        var fileStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(output));
+
+        await DownloadFileFromStream(fileStream, $"{Name} - {items.Count()}条记录.csv");
+    }
 
     private async Task DownloadFileFromStream(MemoryStream fileStream, string fileName)
     {

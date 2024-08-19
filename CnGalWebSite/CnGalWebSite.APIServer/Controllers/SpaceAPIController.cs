@@ -44,6 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
     {
 
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<UserAddress, long> _userAddressRepository;
         private readonly IRepository<ApplicationUser, long> _userRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Message, int> _messageRepository;
@@ -65,7 +66,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
          IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
+        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService, IRepository<UserAddress, long> userAddressRepository,
         ISteamInforService steamInforService, IQueryService queryService, IRepository<UserIntegral, string> userIntegralRepository)
         {
             _examineRepository = examineRepository;
@@ -88,6 +89,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _queryService = queryService;
             _userIntegralRepository = userIntegralRepository;
             _playedGameRepository = playedGameRepository;
+            _userAddressRepository = userAddressRepository;
         }
 
         /// <summary>
@@ -739,19 +741,27 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            _userRepository.Clear();
-            user = await _userRepository.GetAll().AsNoTracking()
-                .Include(s => s.UserAddress)
-                .FirstOrDefaultAsync(s => s.Id == user.Id);
-            if (user.UserAddress == null)
-            {
-                user.UserAddress = new UserAddress();
-            }
-            user.UserAddress.Address = model.Address;
-            user.UserAddress.RealName = model.RealName;
-            user.UserAddress.PhoneNumber = model.PhoneNumber;
 
-            await _userRepository.UpdateAsync(user);
+            var address = await _userAddressRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
+
+            if (address == null)
+            {
+                address = new UserAddress
+                {
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    RealName = model.RealName,
+                    ApplicationUserId = user.Id
+                };
+                await _userAddressRepository.InsertAsync(address);
+            }
+            else
+            {
+                address.Address = model.Address;
+                address.RealName = model.RealName;
+                address.PhoneNumber = model.PhoneNumber;
+                await _userAddressRepository.UpdateAsync(address);
+            }
 
             return new Result { Successful = true };
         }
@@ -994,7 +1004,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if(user == null)
+            if (user == null)
             {
                 return new KanbanPermissionsModel { Permissions = false };
             }
