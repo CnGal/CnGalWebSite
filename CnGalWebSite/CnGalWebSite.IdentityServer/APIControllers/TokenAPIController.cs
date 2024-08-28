@@ -56,17 +56,17 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<ActionResult< AppUserAccessToken>> Get(GetTokenModel model)
+        public async Task<ActionResult<AppUserAccessToken>> Get(GetTokenModel model)
         {
             if (!Check(model.Secret))
             {
                 return BadRequest();
             }
 
-            var token = await _tokenRepository.FirstOrDefaultAsync(s => s.UserId == model.UserId && s.Type== model.Type);
-            if(token==null)
+            var token = await _tokenRepository.FirstOrDefaultAsync(s => s.UserId == model.UserId && s.Type == model.Type);
+            if (token == null)
             {
-                return new AppUserAccessToken();
+                return NotFound();
             }
 
             return token;
