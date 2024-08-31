@@ -1,0 +1,172 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Others;
+@using System.Collections.Concurrent;
+@inject ISettingService _settingService
+@inject IDialogBoxService _dialogBoxService
+@inject ILive2DService _live2DService
+@inject IDataCacheService _dataCacheService
+@inject IChatService _chatService
+@inject CnGalWebSite.Shared.Service.IEventService _eventService
+@inject IPopupService PopupService
+@inject IJSRuntime JS
+
+@implements IDisposable
+
+<MDCard Class="@($"kanban-chat-card {(_sleep?"d-none":"")}")" Id="kanban-chatcard" Style="@_settingService.Setting.Chat.GetStyles()">
+    <div style="@_settingService.Setting.Chat.GetWidthStyles()">
+        <div class="button-card">
+            <div>
+                <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Refresh.ToIconString()" TextStyle OnClick="Refresh" IsAsync Tooltip="重新开始聊天" />
+            </div>
+            <div>
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@IconType.Close.ToIconString()" OnClick="Clean" Class="close-button" Tooltip="关闭聊天框" />
+            </div>
+        </div>
+
+        @if (Chats != null)
+        {
+            <div class="chat-message-list" Style="@_settingService.Setting.Chat.GetMessageListStyles()">
+                @foreach (var item in Chats)
+                {
+                    <div class="single-chat-card @(item.IsUser?"user":"")">
+                        <ImageCard Url="@item.Image" />
+                        <MDCard Class="@("label-large chat-text-card")">
+                            <div class="content-card">  @item.Text</div>
+                            @if (item.IsUser == false)
+                            {
+                                <div class="count-card">
+                                    @($"🗨️ {Chats.IndexOf(item) / 2 + 1} / 5")
+                                </div>
+                            }
+                        </MDCard>
+                    </div>
+                }
+            </div>
+        }
+        <div Class="chat-input-card">
+            @if (Chats != null)
+            {
+
+                <MTextField @bind-Value="@Model.Message" TValue="string" HideDetails="true" Placeholder="来聊天吧~" />
+                <div>
+                    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Send.ToIconString()" TextStyle OnClick="Add" IsAsync Tooltip="发送" />
+                </div>
+            }
+            else
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Style="width: 100%;" />
+            }
+        </div>
+    </div>
+
+</MDCard>
+
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
+
+@code {
+    bool _sleep = true;
+    GetKanbanReplyModel Model = new GetKanbanReplyModel();
+    List<ChatModel> Chats = null;
+
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
+
+
+    string _context = "晚上好喵~欢迎来到CnGal资料站喵~";
+
+    protected override void OnInitialized()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        _settingService.OnSettingChanged += OnSettingChanged;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //注册
+            _chatService.Init(this);
+        }
+    }
+
+    public void Clean()
+    {
+        _chatService.Close();
+        _sleep = true;
+        StateHasChanged();
+    }
+
+    public async Task Refresh()
+    {
+        _chatService.Clear();
+        Chats = await _chatService.GetChatRecords(await deviceIdentification.GetDeviceIdentificationModel());
+        StateHasChanged();
+    }
+
+    public async Task Add()
+    {
+        if ((Chats.Count + 1) / 2 >= 5)
+        {
+            await PopupService.ToastErrorAsync("对话次数达到上限", "点击右上角刷新按钮，可以重新开始聊天");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(Model.Message))
+        {
+            await PopupService.ToastErrorAsync("发送消息失败", "需要输入一些文字哦");
+            return;
+        }
+        if (Model.Message.Length > 30)
+        {
+            await PopupService.ToastErrorAsync("发送消息失败", "超过30个字的部分，可以分多次发送");
+            return;
+        }
+        try
+        {
+            _chatService.Add(new ChatModel
+                {
+                    Image = _dataCacheService.UserInfor.PhotoPath,
+                    IsUser = true,
+                    Text = Model.Message,
+                    Time = DateTime.Now.ToCstTime(),
+                });
+            StateHasChanged();
+            await JS.InvokeVoidAsync("scrollToBottom", ".kanban-live2d .kanban-chat-card .chat-message-list");
+            Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
+            await _chatService.GetChatReply(Model);
+            StateHasChanged();
+            await JS.InvokeVoidAsync("scrollToBottom", ".kanban-live2d .kanban-chat-card .chat-message-list");
+
+        }
+        catch (Exception ex)
+        {
+            await PopupService.ToastErrorAsync(ex.Message);
+        }
+
+    }
+
+    public async Task ShowCard()
+    {
+        try
+        {
+            _dialogBoxService.CloseDialogBox();
+            _sleep = false;
+            StateHasChanged();
+            Chats = await _chatService.GetChatRecords(await deviceIdentification.GetDeviceIdentificationModel());
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await PopupService.ToastErrorAsync(ex.Message);
+        }
+    }
+
+    public void OnSettingChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _settingService.OnSettingChanged -= OnSettingChanged;
+        GC.SuppressFinalize(this);
+    }
+
+}

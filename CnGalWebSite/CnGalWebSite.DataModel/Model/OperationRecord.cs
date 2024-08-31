@@ -40,5 +40,7 @@ namespace CnGalWebSite.DataModel.Model
         Booking,
         [Display(Name = "兑换")]
         Redeemed,
+        [Display(Name = "聊天")]
+        Chat,
     }
 }

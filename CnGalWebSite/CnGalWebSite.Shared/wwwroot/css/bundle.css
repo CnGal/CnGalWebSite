@@ -1283,6 +1283,10 @@ html {
 :focus-visible {
     outline: none;
 }
+/*错误提示标题栏换行*/
+.m-alert__title {
+    word-break: break-all;
+}
 
 /*卡片*/
 .md-card {
@@ -4370,10 +4374,18 @@ a.user-info-card {
 }
 
 .kanban-dialogbox .content-card {
-    margin-left: 90px;
     display: flex;
     flex-direction: column;
     gap: .5rem;
+}
+
+.kanban-dialogbox .image-card {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: .5rem;
 }
 
 .kanban-dialogbox button {
@@ -4397,9 +4409,83 @@ a.user-info-card {
     .tool-menu > div {
         width: 100%;
     }
-    /*换衣服*/
+/*换衣服*/
 .kanban-switch-clothes-card .action-card {
     display: flex;
     justify-content: center;
     padding-bottom: .5rem;
 }
+/*聊天框*/
+.kanban-chat-card .image-card {
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12) !important;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.kanban-chat-card .content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.kanban-live2d .kanban-chat-card {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    padding: 1rem 0;
+    gap: .5rem;
+}
+
+    .kanban-live2d .kanban-chat-card .close-button {
+    }
+
+    .kanban-live2d .kanban-chat-card .chat-text-card {
+        padding: 0.5rem;
+        margin: 2px;
+        gap: .3rem;
+    }
+
+        .kanban-live2d .kanban-chat-card .chat-text-card .content-card {
+            word-break: break-all;
+        }
+
+        .kanban-live2d .kanban-chat-card .chat-text-card .count-card {
+            color: gray;
+            align-self: end;
+        }
+
+    .kanban-live2d .kanban-chat-card .single-chat-card {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .kanban-live2d .kanban-chat-card .single-chat-card.user {
+            flex-direction: row-reverse;
+        }
+
+
+    .kanban-live2d .kanban-chat-card .chat-input-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: .5rem;
+        padding: 0 1rem;
+    }
+
+
+    .kanban-live2d .kanban-chat-card .chat-message-list {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        overflow-y: auto;
+        padding: 0 1rem;
+    }
+
+    .kanban-live2d .kanban-chat-card .button-card {
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+        padding: 0 1rem;
+    }

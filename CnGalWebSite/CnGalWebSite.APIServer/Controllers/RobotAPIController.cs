@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.Application.GPT;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
@@ -21,10 +22,12 @@ using CnGalWebSite.DataModel.ImportModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Robots;
+using CnGalWebSite.EventBus.Services;
 using CnGalWebSite.Helper.Extensions;
 using Elasticsearch.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -48,26 +51,36 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/robot/[action]")]
     public class RobotAPIController : ControllerBase
     {
-        
-        
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly IUserService _userService;
         private readonly IWeiXinService _weiXinService;
         private readonly IChatGPTService _chatGPTService;
+        private readonly IAppHelper _appHelper;
+        private readonly IConfiguration _configuration;
+        private readonly IEventBusService _eventBusService;
+        private readonly IOperationRecordService _operationRecordService;
+        private readonly ILogger<RobotAPIController> _logger;
 
-        public RobotAPIController(IRepository<StoreInfo, long> storeInfoRepository,IWeiXinService weiXinService,
-         IUserService userService,  IChatGPTService chatGPTService,
-       IRepository<Entry, int> entryRepository)
+        public RobotAPIController(IRepository<StoreInfo, long> storeInfoRepository, IWeiXinService weiXinService, IConfiguration configuration, IEventBusService eventBusService,
+        IUserService userService, IChatGPTService chatGPTService, IAppHelper appHelper, IOperationRecordService operationRecordService, ILogger<RobotAPIController> logger,
+        IRepository<Entry, int> entryRepository)
         {
             _storeInfoRepository = storeInfoRepository;
             _entryRepository = entryRepository;
             _userService = userService;
             _weiXinService = weiXinService;
-            _chatGPTService= chatGPTService;
+            _chatGPTService = chatGPTService;
+            _appHelper = appHelper;
+            _operationRecordService = operationRecordService;
+            _logger = logger;
+            _configuration = configuration;
+            _eventBusService = eventBusService;
         }
 
-       
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<Result>> GetArgValueAsync(GetArgValueModel model)
@@ -109,7 +122,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entryName = model.Infor.Trim();
 
-                if(string.IsNullOrWhiteSpace(entryName))
+                if (string.IsNullOrWhiteSpace(entryName))
                 {
                     return new Result { Successful = false, Error = "呜呜呜~~~ 找不到这个词条" };
                 }
@@ -128,7 +141,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (entry.DisplayName != entryName && entry.DisplayName != entryName)
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true,model.SenderId!=0)).DeleteHtmlLinks() + "\n（不太确定是不是这个词条哦~" };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true, model.SenderId != 0)).DeleteHtmlLinks() + "\n（不太确定是不是这个词条哦~" };
                     }
                     else
                     {
@@ -166,7 +179,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (model.Name == "steamdiscount")
             {
-                var count = await _storeInfoRepository.GetAll().Include(s => s.Entry).CountAsync(s =>s.PlatformType== PublishPlatformType.Steam&& s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
+                var count = await _storeInfoRepository.GetAll().Include(s => s.Entry).CountAsync(s => s.PlatformType == PublishPlatformType.Steam && s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
 
                 return new Result { Successful = true, Error = $"今天有{count}款作品打折中：https://www.cngal.org/discount" };
             }
@@ -175,8 +188,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 var value = model.Name switch
                 {
                     "recommend" => await _weiXinService.GetRandom(true, true),
-                    "birthday" => await _weiXinService.GetRoleBirthdays( true)??"",
-                    "BirthdayWithDefault" => await _weiXinService.GetRoleBirthdays(true)??"好像今天没人过生日~~~",
+                    "birthday" => await _weiXinService.GetRoleBirthdays(true) ?? "",
+                    "BirthdayWithDefault" => await _weiXinService.GetRoleBirthdays(true) ?? "好像今天没人过生日~~~",
                     "NewestEditGames" => await _weiXinService.GetNewestEditGames(true),
                     "NewestUnPublishGames" => await _weiXinService.GetNewestUnPublishGames(true),
                     "NewestPublishGames" => await _weiXinService.GetNewestPublishGames(true),
@@ -188,6 +201,59 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true, Error = value?.DeleteHtmlLinks() };
             }
 
+        }
+
+        /// <summary>
+        /// 获取看板娘聊天回复
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> GetKanbanReply(GetKanbanReplyModel model)
+        {
+            //判断是否为当前登入用户
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            // 限流
+            if (await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromMinutes(1)) > int.Parse(_configuration["ChatGPTLimit_1_Minute"] ?? "10"))
+            {
+                return new Result { Successful = false, Error = "累了喵，待会再聊喵~" };
+            }
+            if (await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromDays(1)) > int.Parse(_configuration["ChatGPTLimit_1_Day"] ?? "1000"))
+            {
+                return new Result { Successful = false, Error = "累了喵，待会再聊喵~" };
+            }
+
+
+            // 添加操作记录
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Chat, user.Id, user, model.Identification, HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
+                return new Result { Successful = false, Error = "身份识别失败" };
+            }
+
+            // 请求数据
+            var result = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            {
+                IsFirst = model.IsFirst,
+                Message = model.Message,
+                UserId = user.Id,
+                MessageMax = int.Parse(_configuration["ChatGPTLimit_PreConversationMax"] ?? "5")
+            });
+
+            if (result == null)
+            {
+                return new Result { Successful = false, Error = "后端返回结果为空" };
+            }
+
+            return new Result
+            {
+                Successful = result.Success,
+                Error = result.Message
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace CnGalWebSite.Extensions
 {
@@ -132,7 +133,7 @@ namespace CnGalWebSite.Extensions
         /// <returns></returns>
         public static DateTime TransTime(this string str)
         {
-            return  new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(str));
+            return new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(str));
         }
 
         public static bool IsLocalUrl(this string url)
@@ -162,7 +163,7 @@ namespace CnGalWebSite.Extensions
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     return value;
                 }
@@ -222,7 +223,7 @@ namespace CnGalWebSite.Extensions
                 {
                     try
                     {
-                        return  new DateTime(DateTime.ParseExact(value, "yyyy/M/d", null).Ticks, DateTimeKind.Utc);
+                        return new DateTime(DateTime.ParseExact(value, "yyyy/M/d", null).Ticks, DateTimeKind.Utc);
                     }
                     catch
                     {
@@ -253,7 +254,57 @@ namespace CnGalWebSite.Extensions
 
             return list;
         }
+
+        /// <summary>
+        /// 计算SHA-1码
+        /// </summary>
+        /// <param name="word">字符串</param>
+        /// <param name="toUpper">返回哈希值格式 true：英文大写，false：英文小写</param>
+        /// <returns></returns>
+        public static string GetSha1(this string word, bool toUpper = true)
+        {
+            try
+            {
+                using SHA1 sha1 = SHA1.Create();
+
+                byte[] bytValue = System.Text.Encoding.UTF8.GetBytes(word);
+                byte[] bytHash = sha1.ComputeHash(bytValue);
+                sha1.Clear();
+
+                //根据计算得到的Hash码翻译为SHA-1码
+                string sHash = "", sTemp = "";
+                for (int counter = 0; counter < bytHash.Count(); counter++)
+                {
+                    long i = bytHash[counter] / 16;
+                    if (i > 9)
+                    {
+                        sTemp = ((char)(i - 10 + 0x41)).ToString();
+                    }
+                    else
+                    {
+                        sTemp = ((char)(i + 0x30)).ToString();
+                    }
+                    i = bytHash[counter] % 16;
+                    if (i > 9)
+                    {
+                        sTemp += ((char)(i - 10 + 0x41)).ToString();
+                    }
+                    else
+                    {
+                        sTemp += ((char)(i + 0x30)).ToString();
+                    }
+                    sHash += sTemp;
+                }
+
+                //根据大小写规则决定返回的字符串
+                return toUpper ? sHash : sHash.ToLower();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 
-   
+
 }

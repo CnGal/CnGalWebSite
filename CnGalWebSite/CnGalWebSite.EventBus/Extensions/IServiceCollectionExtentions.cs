@@ -8,8 +8,8 @@ namespace CnGalWebSite.EventBus.Extensions
     {
         public static IServiceCollection AddEventBus(this IServiceCollection services)
         {
-            services.AddScoped<IEventBusService, EventBusService>();
-            services.AddScoped<IEventBus, EventBusRabbitMQ>();
+            services.AddSingleton<IEventBusService, EventBusService>();
+            services.AddSingleton<IEventBus, EventBusRabbitMQ>();
 
             return services;
         }

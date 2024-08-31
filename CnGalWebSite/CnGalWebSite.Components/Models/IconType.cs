@@ -213,7 +213,8 @@ namespace CnGalWebSite.Components.Models
         GiftOpened,
         Flash,
         Board,
-        UnCode
+        UnCode,
+        Send
     }
 
     public static class IconTypeHelper
@@ -222,6 +223,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Send:
+                    return "mdi-send";
                 case IconType.UnCode:
                     return "mdi-barcode-off";
                 case IconType.Board:

@@ -46,7 +46,11 @@ namespace CnGalWebSite.APIServer.Application.BackgroundTasks
 
                 if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
                 {
+                    // 定时任务
                     _eventBusService.RecieveRunTimedTask(_queue.Enqueue);
+
+                    // RPC远程过程调用 客户端
+                    _eventBusService.InitRpcClient();
                 }
 
                 while (true)

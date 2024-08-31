@@ -164,7 +164,7 @@ namespace CnGalWebSite.Kanban.Services.Events
             //初始化鼠标悬停
             await InitMouseOverEvent();
             //初始化完毕
-            await Task.Delay(2000);
+            await Task.Delay(2000, token);
             //循环
             while (true)
             {

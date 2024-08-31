@@ -21,5 +21,11 @@ namespace CnGalWebSite.EventBus.Services
         void SendRunTimedTask(RunTimedTaskModel model);
 
         void RecieveRunTimedTask(Action<RunTimedTaskModel> action);
+
+        void CreateKanbanServer(Func<KanbanChatGPTSendModel, Task<KanbanChatGPTReceiveModel>> func);
+
+        void InitRpcClient();
+
+        Task<KanbanChatGPTReceiveModel> CallKanbanChatGPT(KanbanChatGPTSendModel model, CancellationToken cancellationToken = default);
     }
 }

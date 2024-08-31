@@ -1283,6 +1283,10 @@ html {
 :focus-visible {
     outline: none;
 }
+/*错误提示标题栏换行*/
+.m-alert__title {
+    word-break: break-all;
+}
 
 /*卡片*/
 .md-card {

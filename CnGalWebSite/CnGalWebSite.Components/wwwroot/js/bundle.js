@@ -690,6 +690,12 @@ function error_check() {
     onreload();
 }
 
+/*滚动到底部 */
+function scrollToBottom(css) {
+    var container = document.querySelector(css);
+    container.scrollTop = container.scrollHeight;
+}
+
 /*以下为加载时自动执行的代码*/
 //if (typeof Blazor != "undefined") {
 //    Blazor.start({

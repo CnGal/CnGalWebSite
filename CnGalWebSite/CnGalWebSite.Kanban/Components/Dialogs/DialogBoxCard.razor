@@ -3,6 +3,9 @@
 @inject ISettingService _settingService
 @inject IDialogBoxService _dialogBoxService
 @inject ILive2DService _live2DService
+@inject IChatService _chatService
+
+
 @implements IDisposable
 
 
@@ -202,6 +205,11 @@
 
     public void ShowDialogBox(DialogBoxModel model)
     {
+        if (_chatService.IsOpen)
+        {
+            return;
+        }
+
         if (model.Priority > 0)
         {
             Clean();

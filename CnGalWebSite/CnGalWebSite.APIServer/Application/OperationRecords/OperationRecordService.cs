@@ -22,7 +22,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
     {
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IConfiguration _configuration;
-        private readonly IDictionary<string, string> _ips=new Dictionary<string, string>();
+        private readonly IDictionary<string, string> _ips = new Dictionary<string, string>();
         private DateTime _lastRefreshTime;
 
         public OperationRecordService(IRepository<OperationRecord, long> operationRecordRepository, IConfiguration configuration)
@@ -30,9 +30,9 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             _operationRecordRepository = operationRecordRepository;
             _configuration = configuration;
 
-            if(string.IsNullOrWhiteSpace( _configuration["IpWhitelist"])==false)
+            if (string.IsNullOrWhiteSpace(_configuration["IpWhitelist"]) == false)
             {
-               foreach(var item in  _configuration["IpWhitelist"].Split(',').Select(s => new KeyValuePair<string, string>(s.Trim(), null)))
+                foreach (var item in _configuration["IpWhitelist"].Split(',').Select(s => new KeyValuePair<string, string>(s.Trim(), null)))
                 {
                     _ips.Add(item);
                 }
@@ -44,12 +44,12 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
         {
             IPAddress[] addresslist = Dns.GetHostAddresses(howtogeek);
 
-            return addresslist.FirstOrDefault(s=>s.AddressFamily== System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+            return addresslist.FirstOrDefault(s => s.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
         }
 
         private void RefreshIPs()
         {
-            if((DateTime.Now.ToCstTime()- _lastRefreshTime).TotalMinutes<10)
+            if ((DateTime.Now.ToCstTime() - _lastRefreshTime).TotalMinutes < 10)
             {
                 return;
             }
@@ -57,7 +57,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
             foreach (var item in _ips)
             {
-                if(IpRegex().IsMatch(item.Key))
+                if (IpRegex().IsMatch(item.Key))
                 {
                     _ips[item.Key] = item.Key;
                 }
@@ -70,7 +70,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
         public async Task AddOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context)
         {
-            if (string.IsNullOrEmpty(model.Cookie)||string.IsNullOrWhiteSpace(model.Ip))
+            if (string.IsNullOrEmpty(model.Cookie) || string.IsNullOrWhiteSpace(model.Ip))
             {
                 throw new Exception("身份验证参数不能为空");
             }
@@ -112,7 +112,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
         public async Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user)
         {
             var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
-            if(item==null)
+            if (item == null)
             {
                 return false;
             }
@@ -126,7 +126,27 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             return await _operationRecordRepository.GetAll().CountAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == item.Cookie || s.Ip == item.Ip)) > 1;
         }
 
-        public async Task CopyOperationRecord(OperationRecordType fromType, string fromObjectId, OperationRecordType toType, string toObjectId,ApplicationUser user)
+        /// <summary>
+        /// 检查在指定时间内相同特征值的操作记录有多少个
+        /// </summary>
+        public async Task<int> GetOperationRecordNumber(OperationRecordType type, string objectId, ApplicationUser user, TimeSpan timeSpan)
+        {
+            var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
+            if (item == null)
+            {
+                return 0;
+            }
+
+            if (string.IsNullOrEmpty(item.Cookie) || string.IsNullOrWhiteSpace(item.Ip))
+            {
+                throw new Exception("身份验证参数不能为空");
+            }
+
+            var now = DateTime.Now.ToCstTime().AddHours(-8).Add(-timeSpan);
+            return await _operationRecordRepository.GetAll().CountAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == item.Cookie || s.Ip == item.Ip) && s.OperationTime > now);
+        }
+
+        public async Task CopyOperationRecord(OperationRecordType fromType, string fromObjectId, OperationRecordType toType, string toObjectId, ApplicationUser user)
         {
             var fromItem = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == fromType && (s.ObjectId == fromObjectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
             var toItem = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == toType && (s.ObjectId == toObjectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);

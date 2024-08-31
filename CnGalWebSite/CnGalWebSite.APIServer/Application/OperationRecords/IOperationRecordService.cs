@@ -19,5 +19,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
         Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user);
 
+        Task<int> GetOperationRecordNumber(OperationRecordType type, string objectId, ApplicationUser user, TimeSpan timeSpan);
+
     }
 }

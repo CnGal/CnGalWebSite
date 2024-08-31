@@ -4,24 +4,40 @@
 
 @if (string.IsNullOrWhiteSpace(_image) == false)
 {
-    <div class="image-card pa-3">
-        <img src="@_image" alt="看板娘表情" style="@_settingService.Setting.Kanban.GetDialogKanbanImageStyles()" />
-    </div>
+    <img class="image-card" src="@_image" alt="看板娘表情" />
 }
 
 
 @code {
+    [Parameter]
+    public string Url { get; set; }
+
     string _image = null;
+
 
     protected override void OnInitialized()
     {
-        _live2DService.KanbanImageGenerated -= OnKanbanImageGenerated;
-        _live2DService.KanbanImageGenerated += OnKanbanImageGenerated;
+        if (string.IsNullOrWhiteSpace(Url))
+        {
+            _live2DService.KanbanImageGenerated -= OnKanbanImageGenerated;
+            _live2DService.KanbanImageGenerated += OnKanbanImageGenerated;
+        }
+        else
+        {
+            _image = Url;
+        }
     }
 
     public void OnKanbanImageGenerated(string url)
     {
-        _image = url;
+        if (string.IsNullOrWhiteSpace(Url) == false)
+        {
+            _image = Url;
+        }
+        else
+        {
+            _image = url;
+        }
         StateHasChanged();
     }
 

@@ -2,6 +2,8 @@
 @implements IDisposable
 
 <canvas id="live2d" width="@_settingService.Setting.Kanban.Size.Width" height="@_settingService.Setting.Kanban.Size.Height"  class="live2d"></canvas>
+<canvas id="live2d-cache" style="display:none"></canvas>
+
 
 @code {
     protected override void OnInitialized()
