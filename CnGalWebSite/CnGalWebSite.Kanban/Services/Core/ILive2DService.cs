@@ -35,6 +35,8 @@ namespace CnGalWebSite.Kanban.Services.Core
 
         Task StartKanbanImageGeneration();
 
+        Task<string> GetKanbanImageGeneration();
+
         event Action<string> KanbanImageGenerated;
     }
 }

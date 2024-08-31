@@ -905,6 +905,12 @@ function error_check() {
     onreload();
 }
 
+/*滚动到底部 */
+function scrollToBottom(css) {
+    var container = document.querySelector(css);
+    container.scrollTop = container.scrollHeight;
+}
+
 /*以下为加载时自动执行的代码*/
 //if (typeof Blazor != "undefined") {
 //    Blazor.start({
@@ -1045,6 +1051,7 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
             initKanbanMoveAction(dotNetHelper);
             initButtonGroupMoveAction(dotNetHelper);
             initDialogBoxMoveAction(dotNetHelper);
+            initChatCardMoveAction(dotNetHelper);
             listenLive2dCanvasChange();
 
             console.log("初始化Live2D")
@@ -1100,6 +1107,7 @@ function getTimeNow() {
 var kanban_mousedown = false;
 var buttongroup_mousedown = false;
 var dialogbox_mousedown = false;
+var chatcard_mousedown = false;
 
 function initKanbanMoveAction(dotNetHelper) {
     const live2dItem = document.getElementById('kanban-live2d');
@@ -1454,6 +1462,123 @@ function initDialogBoxMoveAction(dotNetHelper) {
 
 }
 
+
+function initChatCardMoveAction(dotNetHelper) {
+    const itemId = 'kanban-chatcard';
+    const live2dItem = document.getElementById('kanban-live2d');
+    const groupItem = document.getElementById(itemId);
+
+    let move = false;
+    let deltaLeft = 0, deltaTop = 0;
+    let x_org, y_org;
+    let dx = 0;
+    let dy = 0;
+    var time;
+
+    const mousedown_fun = function (event) {
+        /*
+        * @des deltaLeft 即移动过程中不变的值
+        */
+
+        var touch;
+        if (event.touches) {
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        } else {
+            touch = event;
+        }
+        //获取鼠标按下时的时间
+        timeStart = getTimeNow();
+
+        chatcard_mousedown = true;
+
+        //setInterval会每100毫秒执行一次，也就是每100毫秒获取一次时间
+        time = setInterval(function () {
+            timeEnd = getTimeNow();
+
+            //如果此时检测到的时间与第一次获取的时间差有1000毫秒
+            if (timeEnd - timeStart > 500) {
+                //便不再继续重复此函数 （clearInterval取消周期性执行）
+                clearInterval(time);
+                //执行逻辑
+                deltaLeft = touch.clientX - touch.target.offsetLeft;
+                deltaTop = touch.clientY - touch.target.offsetTop;
+                //console.log("初始", deltaLeft, deltaTop);
+                var rect_w = live2dItem.getBoundingClientRect();
+                var rect_n = groupItem.getBoundingClientRect();
+                x_org = rect_w.x - rect_n.x;
+                y_org = rect_w.y - rect_n.y;
+                move = true;
+                document.body.classList.add('user-select-none');
+            }
+        }, 10);
+    }
+
+    // 拖动开始事件，要绑定在被移动元素上
+    groupItem.addEventListener('mousedown', mousedown_fun)
+    groupItem.addEventListener('touchstart', mousedown_fun, { passive: false })
+
+    const mousemove_fun = function (event) {
+        if (move) {
+            var touch;
+            if (event.touches) {
+                touch = event.touches[0];//多个鼠标|手指事件取第一个
+            } else {
+                touch = event;
+            }
+            //阻止页面的滑动默认事件
+            event.preventDefault();
+
+
+
+            const cx = touch.clientX;
+            const cy = touch.clientY;
+            /** 相减即可得到相对于父元素移动的位置 */
+            dx = cx - deltaLeft - x_org;
+            dy = cy - deltaTop - y_org;
+            //console.log("坐标", cx, cy)
+            //console.log("移动", dx, dy)
+            var rect = live2dItem.getBoundingClientRect();
+            //console.log("位移", rect.x + dx, rect.y + dy);
+            //限定范围
+            //if (dx < -rect.width) dx = -rect.width
+            //if (dy < -rect.height) dy = -rect.height
+            //if (dx > 2*rect.width) dx = 2*rect.width
+            //if (dy > 2*rect.height) dy = 2*rect.height
+
+            groupItem.setAttribute('style', `left:${dx}px; top:${dy}px;`)
+        }
+        else {
+            clearInterval(time);
+        }
+    }
+
+    // 移动触发事件要放在，区域控制元素上
+    window.addEventListener('mousemove', mousemove_fun)
+    window.addEventListener('touchmove', mousemove_fun, { passive: false })
+
+    const mouseup_fun = function () {
+        chatcard_mousedown = false;
+
+        if (move) {
+            move = false;
+            console.log('mouseup');
+            var rect_w = live2dItem.getBoundingClientRect();
+            var rect_n = groupItem.getBoundingClientRect();
+            dotNetHelper.invokeMethodAsync('SetChatCardPosition', dx, rect_w.height - dy - rect_n.height);
+            document.body.classList.remove('user-select-none');
+        }
+        else {
+            clearInterval(time);
+        }
+    }
+
+    // 拖动结束触发要放在，区域控制元素上
+    window.addEventListener('mouseup', mouseup_fun)
+    window.addEventListener('touchend', mouseup_fun, { passive: false })
+
+}
+
+
 //监听画布大小改变事件
 function listenLive2dCanvasChange() {
     var _w = -1;
@@ -1573,13 +1698,72 @@ function scrollToTop() {
 
 
 /*获取当前看板娘图片*/
-function startKanbanImageGeneration(dotNetHelper) {
-    document.getElementById('live2d').toBlob((res) => {
-        let blobUrl = URL.createObjectURL(res);
-        console.log(blobUrl)
-        dotNetHelper.invokeMethodAsync('OnKanbanImageGenerated', blobUrl);
-    });
+//function startKanbanImageGeneration(dotNetHelper) {
+//    document.getElementById('live2d').toBlob((res) => {
+//        let blobUrl = URL.createObjectURL(res);
+//        console.log(blobUrl)
+//        dotNetHelper.invokeMethodAsync('OnKanbanImageGenerated', blobUrl);
+//    });
+//}
+function flipImageVertically(pixels, width, height) {
+    const halfHeight = height / 2 | 0; // 向下取整
+    for (let y = 0; y < halfHeight; ++y) {
+        for (let x = 0; x < width; ++x) {
+            for (let c = 0; c < 4; ++c) {
+                const topIndex = (y * width + x) * 4 + c;
+                const bottomIndex = ((height - y - 1) * width + x) * 4 + c;
+                const temp = pixels[topIndex];
+                pixels[topIndex] = pixels[bottomIndex];
+                pixels[bottomIndex] = temp;
+            }
+        }
+    }
 }
+
+/*获取当前看板娘图片*/
+function startKanbanImageGeneration(dotNetHelper, x, y, width, height) {
+    // 获取 WebGL 上下文
+    const canvas = document.getElementById('live2d');
+    const gl = canvas.getContext('webgl');
+
+    // 设置读取的矩形范围
+    //const x = 0; // 起始 x 坐标
+    //const y = 0; // 起始 y 坐标
+    //const width = 300; // 矩形的宽度
+    //const height = 500; // 矩形的高度
+
+    // 创建一个数组来存储像素数据
+    const pixels = new Uint8Array(width * height * 4); // 4 表示 RGBA 四个通道
+
+    // 读取像素数据
+    gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    // 翻转像素数据
+    flipImageVertically(pixels, width, height);
+
+    // 创建一个新的 Canvas 用于绘制图像数据
+    const offscreenCanvas = document.getElementById('live2d-cache');
+    offscreenCanvas.width = width;
+    offscreenCanvas.height = height;
+    const ctx = offscreenCanvas.getContext('2d');
+
+
+    // 创建 ImageData 对象
+    const imageData = new ImageData(new Uint8ClampedArray(pixels), width, height);
+
+    // 将 ImageData 绘制到 Canvas 上
+    ctx.putImageData(imageData, 0, 0);
+    //ctx.rotate(Math.PI);
+
+    // 将 Canvas 内容转换为 Blob
+    offscreenCanvas.toBlob((blob) => {
+        // 生成 Blob URL
+        const url = URL.createObjectURL(blob);
+        console.log(url); // 输出 Blob URL
+        dotNetHelper.invokeMethodAsync('OnKanbanImageGenerated', url);
+    }, 'image/png');
+}
+
 
 /*摸头事件*/
 window.Live2dHitHeadEvent = function () {

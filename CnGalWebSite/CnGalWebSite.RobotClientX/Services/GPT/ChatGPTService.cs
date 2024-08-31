@@ -5,14 +5,14 @@ using System.Text.Json;
 
 namespace CnGalWebSite.RobotClientX.Services.GPT
 {
-    public class ChatGPTService:IChatGPTService
+    public class ChatGPTService : IChatGPTService
     {
         private readonly IHttpService _httpService;
         private readonly IConfiguration _configuration;
         private readonly IExternalDataService _externalDataService;
         private readonly ILogger<ChatGPTService> _logger;
 
- private static List<DateTime> _record = new List<DateTime>();
+        private static List<DateTime> _record = new List<DateTime>();
         private readonly HttpClient _httpClient;
 
         private readonly JsonSerializerOptions _jsonOptions = new()
@@ -31,9 +31,9 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
         }
 
-        public async Task< string > GetReply(string question)
+        public async Task<string> GetReply(string question)
         {
-            var datetime= DateTime.Now;
+            var datetime = DateTime.Now;
             //检查上限
             if (_record.Count(s => s > datetime.AddMinutes(-1)) > int.Parse(_configuration["ChatGPTLimit"] ?? "10"))
             {
@@ -47,7 +47,7 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             var user = _configuration["ChatGPT_UserMessageTemplate"];
             var url = _configuration["ChatGPTApiUrl"];
 
-            if (string.IsNullOrWhiteSpace(sys)|| string.IsNullOrWhiteSpace(user))
+            if (string.IsNullOrWhiteSpace(sys) || string.IsNullOrWhiteSpace(user))
             {
                 return null;
             }
@@ -60,13 +60,13 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             user = user.Replace("{question}", question);
 
             //日志
-            _logger.LogInformation("向ChatGPT发送消息：{question}",question);
+            _logger.LogInformation("向ChatGPT发送消息：{question}", question);
             //添加记录
             _record.Add(datetime);
 
-            var response=await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
+            var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
             {
-                Model=string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"],
+                Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"],
                 Messages = new List<ChatCompletionMessage>
                 {
                     new ChatCompletionMessage
@@ -82,17 +82,17 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
                 }
             });
 
-            if(!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("请求ChatGPT回复失败，正文：{msg}",await response.Content.ReadAsStringAsync());
+                _logger.LogError("请求ChatGPT回复失败，正文：{msg}", await response.Content.ReadAsStringAsync());
                 return null;
             }
 
-            string jsonContent =await response.Content.ReadAsStringAsync();
-            var result= JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
+            string jsonContent = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
 
             var reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
-            if ( string.IsNullOrWhiteSpace(reply))
+            if (string.IsNullOrWhiteSpace(reply))
             {
                 return null;
             }
@@ -116,7 +116,7 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
                 }
 
                 list.Add(await _externalDataService.GetArgValue("introduce", name, -1, null));
-                reply= reply.Replace($"【{name}】", "");
+                reply = reply.Replace($"【{name}】", "");
             }
 
             if (list.Any())

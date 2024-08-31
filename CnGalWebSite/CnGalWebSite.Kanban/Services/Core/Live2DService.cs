@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CnGalWebSite.Kanban.Extensions;
 
 namespace CnGalWebSite.Kanban.Services.Core
 {
@@ -26,6 +27,8 @@ namespace CnGalWebSite.Kanban.Services.Core
         private readonly IUserDataService _userDataService;
         private DotNetObjectReference<Live2DService>? objRef;
         private readonly IConfiguration _configuration;
+
+        string kanbanImage;
 
         public event Action Live2DInitialized;
         public event Action<string> KanbanImageGenerated;
@@ -138,7 +141,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         /// <returns></returns>
         public async Task SetClothes(string name)
         {
-            if(name == null)
+            if (name == null)
             {
                 return;
             }
@@ -266,13 +269,50 @@ namespace CnGalWebSite.Kanban.Services.Core
         }
 
         /// <summary>
+        /// 设置聊天框坐标
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="bottom"></param>
+        /// <returns></returns>
+        [JSInvokable]
+        public async Task SetChatCardPosition(int left, int bottom)
+        {
+            _settingService.Setting.Chat.Position.Left = left;
+            _settingService.Setting.Chat.Position.Bottom = bottom;
+
+            await _settingService.SaveAsync();
+        }
+
+        /// <summary>
         /// 开始生成看板娘图片
         /// </summary>
         /// <returns></returns>
         public async Task StartKanbanImageGeneration()
         {
-            await _jSRuntime.InvokeVoidAsync("startKanbanImageGeneration", objRef);
+            var size = _settingService.Setting.Kanban.GetCircleKanbanImageSize();
+            await _jSRuntime.InvokeVoidAsync("startKanbanImageGeneration", objRef, size.x, size.y, size.height, size.width);
         }
+
+
+        /// <summary>
+        /// 获取看板娘图片
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetKanbanImageGeneration()
+        {
+            kanbanImage = null;
+            await StartKanbanImageGeneration();
+            for (int i = 0; i < 100; i++)
+            {
+                if (string.IsNullOrWhiteSpace(kanbanImage) == false)
+                {
+                    return kanbanImage;
+                }
+                await Task.Delay(100);
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// 看板娘生成图片成功回调
@@ -281,6 +321,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         [JSInvokable]
         public void OnKanbanImageGenerated(string url)
         {
+            kanbanImage = url;
             KanbanImageGenerated?.Invoke(url);
         }
 
@@ -296,7 +337,7 @@ namespace CnGalWebSite.Kanban.Services.Core
         [JSInvokable]
         public async Task CheckKanbanPositionAsync()
         {
-           await _settingService.SaveAsync();
+            await _settingService.SaveAsync();
         }
 
         public void Dispose()

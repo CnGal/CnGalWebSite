@@ -38,6 +38,11 @@ namespace CnGalWebSite.Kanban.Services.Dialogs
             _dialogBoxCard?.ShowDialogBox(model);
         }
 
+        public void CloseDialogBox()
+        {
+            _dialogBoxCard?.Clean();
+        }
+
         public void ShowDialogBox(string content, int priority)
         {
             ShowDialogBox(StringToDialogModel(content, priority));

@@ -334,3 +334,9 @@ function error_check() {
     // 重新加载页面
     onreload();
 }
+
+/*滚动到底部 */
+function scrollToBottom(css) {
+    var container = document.querySelector(css);
+    container.scrollTop = container.scrollHeight;
+}

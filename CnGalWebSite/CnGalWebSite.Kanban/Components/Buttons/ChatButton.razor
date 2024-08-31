@@ -1,10 +1,11 @@
 ﻿@inject IEventService _eventService
+@inject IChatService _chatService
 
 <CnGalWebSite.Kanban.Components.Shared.FloatButton Image="./_content/CnGalWebSite.Kanban/images/message.png" OnClick="Chat" Tooltip="聊天" />
 
 @code {
     public void Chat()
     {
-        _eventService.TriggerCustomEventAsync("闲聊");
+        _chatService.Show();
     }
 }

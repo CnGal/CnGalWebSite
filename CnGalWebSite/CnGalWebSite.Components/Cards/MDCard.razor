@@ -1,18 +1,20 @@
 ﻿@if (string.IsNullOrWhiteSpace(Href))
 {
-    <div class="@GetClass()" @onclick="OnClick" style="@Style">
+    <div class="@GetClass()" @onclick="OnClick" style="@Style" id="@Id">
         @ChildContent
     </div>
 }
 else
 {
-    <a href="@Href" class="@GetClass()" @onclick="OnClick" target="@Target" style="@Style">
+    <a href="@Href" class="@GetClass()" @onclick="OnClick" target="@Target" style="@Style" id="@Id">
         @ChildContent
     </a>
 }
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Id { get; set; }
     [Parameter]
     public string Href { get; set; }
     [Parameter]

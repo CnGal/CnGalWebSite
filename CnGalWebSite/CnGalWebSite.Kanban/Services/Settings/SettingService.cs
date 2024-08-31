@@ -58,6 +58,8 @@ namespace CnGalWebSite.Kanban.Services.Settings
             CheckButtonGrouposition();
             //对话框
             CheckDialogBoxosition();
+            // 聊天框
+            CheckChatCardosition();
 
             //保存
             await _localStorageService.SetItemAsync(_key, _settingModel);
@@ -72,7 +74,7 @@ namespace CnGalWebSite.Kanban.Services.Settings
             //设置看板娘位置
             var size = await _jsRuntime.InvokeAsync<Size>("getWindowSize");
 
-            if(size.Width<1600)
+            if (size.Width < 1600)
             {
                 _settingModel.Kanban.Size.Width = 220;
                 _settingModel.Kanban.Size.Height = 400;
@@ -80,7 +82,10 @@ namespace CnGalWebSite.Kanban.Services.Settings
                 _settingModel.Button.Position.Left = 140;
 
                 _settingModel.DialogBox.Position.Left = -200;
-                _settingModel.DialogBox.Position.Bottom =410;
+                _settingModel.DialogBox.Position.Bottom = 410;
+
+                _settingModel.Chat.Position.Left = -200;
+                _settingModel.Chat.Position.Bottom = 410;
 
             }
 
@@ -176,6 +181,33 @@ namespace CnGalWebSite.Kanban.Services.Settings
             if (_settingModel.DialogBox.Position.Bottom > _settingModel.Kanban.Size.Height * 4)
             {
                 _settingModel.DialogBox.Position.Bottom = _settingModel.Kanban.Size.Height * 4;
+            }
+        }
+
+        /// <summary>
+        /// 检查聊天位置是否正确
+        /// </summary>
+        /// <returns></returns>
+        private void CheckChatCardosition()
+        {
+            if (_settingModel.Chat.Position.Left < -_settingModel.Kanban.Size.Width)
+            {
+                _settingModel.Chat.Position.Left = -_settingModel.Kanban.Size.Width;
+            }
+
+            if (_settingModel.Chat.Position.Left > _settingModel.Kanban.Size.Width * 4)
+            {
+                _settingModel.Chat.Position.Left = _settingModel.Kanban.Size.Width * 4;
+            }
+
+            if (_settingModel.Chat.Position.Bottom < -_settingModel.Kanban.Size.Height)
+            {
+                _settingModel.Chat.Position.Bottom = -_settingModel.Kanban.Size.Height;
+            }
+
+            if (_settingModel.Chat.Position.Bottom > _settingModel.Kanban.Size.Height * 4)
+            {
+                _settingModel.Chat.Position.Bottom = _settingModel.Kanban.Size.Height * 4;
             }
         }
 

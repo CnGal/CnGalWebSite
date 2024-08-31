@@ -23,7 +23,11 @@ namespace CnGalWebSite.Kanban.Models
         /// </summary>
         public DialogBoxSettingModel DialogBox { get; set; } = new DialogBoxSettingModel();
 
-        
+        /// <summary>
+        /// 聊天框
+        /// </summary>
+        public ChatCardSettingModel Chat { get; set; } = new ChatCardSettingModel();
+
     }
 
     public class KanbanSettingModel
@@ -66,6 +70,19 @@ namespace CnGalWebSite.Kanban.Models
         public int Width { get; set; } = 400;
 
         public bool Hide { get; set; }
+    }
+
+    public class ChatCardSettingModel
+    {
+        public Position Position { get; set; } = new Position
+        {
+            Left = -110,
+            Bottom = 525
+        };
+
+        public int Width { get; set; } = 370;
+
+        public int ContentHeight { get; set; } = 400;
     }
 
     public class Position

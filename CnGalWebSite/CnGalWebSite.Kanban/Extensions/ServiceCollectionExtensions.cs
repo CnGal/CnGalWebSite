@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CnGalWebSite.Kanban.Services.Chat;
 
 namespace CnGalWebSite.Kanban.Extensions
 {
@@ -24,6 +25,7 @@ namespace CnGalWebSite.Kanban.Extensions
             services.AddScoped<ILive2DService, Live2DService>();
             services.AddScoped<IUserDataService, UserDataService>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(sp => new HttpClient());
             services.AddBlazoredLocalStorage();

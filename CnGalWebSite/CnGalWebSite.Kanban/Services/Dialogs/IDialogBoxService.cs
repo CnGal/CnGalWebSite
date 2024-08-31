@@ -15,5 +15,7 @@ namespace CnGalWebSite.Kanban.Services.Dialogs
         void ShowDialogBox(string content, int priority);
 
         void Init(DialogBoxCard dialogBoxCard);
+
+        void CloseDialogBox();
     }
 }

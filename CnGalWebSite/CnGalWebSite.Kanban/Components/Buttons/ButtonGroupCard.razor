@@ -2,20 +2,24 @@
 @implements IDisposable
 
 <style>
-    .float-button{
-        @_settingService.Setting.Button.GetFloatButtonStyles()
+    .float-button {
+    @_settingService.Setting.Button.GetFloatButtonStyles()
     }
 </style>
 
 <div id="kanban-button-group" class="button-group user-select-none" style="@_settingService.Setting.Button.GetStyles()">
-    <QuitButton/>
+    <QuitButton />
     @ChildContent
-@*     <MotionButton/>
- *@    <ExpressionButton/>
-    <ClothesButton/>
-    @* <ChatButton/> *@
-    <SettingButton/>
-    <TopButton/>
+    @*     <MotionButton/>  *@
+    <ExpressionButton />
+    <ClothesButton />
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <ChatButton />
+        </Authorized>
+    </AuthorizeView>
+    <SettingButton />
+    <TopButton />
 </div>
 
 @code {
