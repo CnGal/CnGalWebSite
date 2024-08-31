@@ -1,0 +1,35 @@
+version: "3"
+services:
+  apiserver:
+    image: littlefishtentears/cngalwebsitekanbangpt:latest
+    container_name: kanbangpt
+    environment:
+      - TZ=${TZ}
+      # 事件总线 主机名称
+      - EventBus_HostName=${EventBus_HostName}
+      # 事件总线 端口
+      - EventBus_Port=${EventBus_Port}
+      # 事件总线 用户名
+      - EventBus_UserName=${EventBus_UserName}
+      # 事件总线 密码
+      - EventBus_Password=${EventBus_Password}
+      # GPT API KEY
+      - ChatGPTApiKey=${ChatGPTApiKey}
+      # 1分钟所有用户调用次数限制
+      - ChatGPTLimit_1_Minute=${ChatGPTLimit_1_Minute}
+      # 1天所有用户调用次数限制
+      - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day}
+      # GPT 模型
+      - ChatGPTModel=${ChatGPTModel}
+      # GPT API url
+      - ChatGPTApiUrl=${ChatGPTApiUrl}
+      # GPT 提示词
+      - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
+      # GPT 单次对话长度限制
+      - ChatGPTLimit_Length=${ChatGPTLimit_Length}
+    hostname: kanbangpt
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${resources_limits_memory}

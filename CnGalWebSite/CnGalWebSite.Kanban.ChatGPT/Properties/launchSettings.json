@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CnGalWebSite.Kanban.ChatGPT": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
