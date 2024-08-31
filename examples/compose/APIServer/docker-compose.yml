@@ -40,6 +40,12 @@ services:
       # 反代
       - SteamAPIUrl=${SteamAPIUrl}
       - BackUpArchiveUrl=${BackUpArchiveUrl}
+      # GPT一分钟请求次数上限 单用户
+      - ChatGPTLimit_1_Minute=${ChatGPTLimit_1_Minute}
+      # GPT一天请求次数上限 单用户
+      - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day}
+      # GPT单个对话回复次数上限
+      - ChatGPTLimit_PreConversationMax=${ChatGPTLimit_PreConversationMax}
     hostname: apiserver
     restart: always
     healthcheck:
