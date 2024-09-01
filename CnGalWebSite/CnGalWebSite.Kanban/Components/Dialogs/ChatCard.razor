@@ -34,7 +34,7 @@
                             @if (item.IsUser == false)
                             {
                                 <div class="count-card">
-                                    @($"🗨️ {Chats.IndexOf(item) / 2 + 1} / 5")
+                                    @($"🗨️ {Chats.IndexOf(item) / 2} / 5")
                                 </div>
                             }
                         </MDCard>
@@ -42,13 +42,20 @@
                 }
             </div>
         }
+        @if (_proc)
+        {
+            <div class="ps-4 pe-4">
+                <MProgressLinear Indeterminate Rounded Height="3"/>
+            </div>
+        }
+
         <div Class="chat-input-card">
             @if (Chats != null)
             {
 
-                <MTextField @bind-Value="@Model.Message" TValue="string" HideDetails="true" Placeholder="来聊天吧~" />
+                <MTextField @bind-Value="@InputText" TValue="string" HideDetails="true" Placeholder="来聊天吧~" Dense />
                 <div>
-                    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Send.ToIconString()" TextStyle OnClick="Add" IsAsync Tooltip="发送" />
+                    <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Send.ToIconString()" TextStyle OnClick="Add" Tooltip="发送" Disabled="_proc" />
                 </div>
             }
             else
@@ -64,7 +71,8 @@
 
 @code {
     bool _sleep = true;
-    GetKanbanReplyModel Model = new GetKanbanReplyModel();
+    bool _proc = false;
+    string InputText = "";
     List<ChatModel> Chats = null;
 
     CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
@@ -103,17 +111,17 @@
 
     public async Task Add()
     {
-        if ((Chats.Count + 1) / 2 >= 5)
+        if ((Chats.Count + 1) / 2 > 5)
         {
             await PopupService.ToastErrorAsync("对话次数达到上限", "点击右上角刷新按钮，可以重新开始聊天");
             return;
         }
-        if (string.IsNullOrWhiteSpace(Model.Message))
+        if (string.IsNullOrWhiteSpace(InputText))
         {
             await PopupService.ToastErrorAsync("发送消息失败", "需要输入一些文字哦");
             return;
         }
-        if (Model.Message.Length > 30)
+        if (InputText.Length > 30)
         {
             await PopupService.ToastErrorAsync("发送消息失败", "超过30个字的部分，可以分多次发送");
             return;
@@ -124,19 +132,28 @@
                 {
                     Image = _dataCacheService.UserInfor.PhotoPath,
                     IsUser = true,
-                    Text = Model.Message,
+                    Text = InputText,
                     Time = DateTime.Now.ToCstTime(),
                 });
+            var text = InputText;
+            InputText = "";
+            _proc = true;
             StateHasChanged();
             await JS.InvokeVoidAsync("scrollToBottom", ".kanban-live2d .kanban-chat-card .chat-message-list");
-            Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
-            await _chatService.GetChatReply(Model);
+            await _chatService.GetChatReply(new GetKanbanReplyModel
+                {
+                    Message = text,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+                });
+            _proc = false;
             StateHasChanged();
             await JS.InvokeVoidAsync("scrollToBottom", ".kanban-live2d .kanban-chat-card .chat-message-list");
 
         }
         catch (Exception ex)
         {
+            _proc = false;
+            StateHasChanged();
             await PopupService.ToastErrorAsync(ex.Message);
         }
 

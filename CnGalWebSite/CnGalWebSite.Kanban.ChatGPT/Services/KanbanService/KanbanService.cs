@@ -92,7 +92,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
 
 
             //  检查上限
-            if (messageList.Count(s => s.Role == "user") >= messageMax)
+            if (messageList.Count(s => s.Role == "user") >= messageMax && first == false)
             {
                 return new ChatGPTSendMessageResult
                 {

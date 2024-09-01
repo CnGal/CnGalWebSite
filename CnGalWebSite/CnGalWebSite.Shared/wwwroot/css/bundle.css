@@ -4433,9 +4433,15 @@ a.user-info-card {
     display: flex;
     flex-direction: column;
     position: absolute;
-    padding: 1rem 0;
+    padding: .5rem 0 1rem 0;
     gap: .5rem;
 }
+
+    .kanban-live2d .kanban-chat-card > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
     .kanban-live2d .kanban-chat-card .close-button {
     }
