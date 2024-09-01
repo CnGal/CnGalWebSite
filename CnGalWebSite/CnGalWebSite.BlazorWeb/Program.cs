@@ -16,6 +16,11 @@ using CnGalWebSite.HealthCheck.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddServerSideBlazor().AddCircuitOptions(option =>
+    {
+        option.DisconnectedCircuitMaxRetained = 30; // default is 100
+        option.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2); // default is 3 minutes
+    });
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents().AddHubOptions(options =>
     {
