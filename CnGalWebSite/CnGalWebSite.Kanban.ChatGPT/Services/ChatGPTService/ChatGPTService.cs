@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.Extensions;
 using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
+using CnGalWebSite.Kanban.ChatGPT.Services.SensitiveWords;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         private readonly IConfiguration _configuration;
         private readonly ILogger<ChatGPTService> _logger;
         private readonly IMemoryCache _memoryCache;
+        private readonly ISensitiveWordService _sensitiveWordService;
 
         private static List<DateTime> _record = new List<DateTime>();
         private readonly HttpClient _httpClient;
@@ -29,12 +31,13 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             PropertyNameCaseInsensitive = true,
         };
 
-        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IMemoryCache memoryCache)
+        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IMemoryCache memoryCache, ISensitiveWordService sensitiveWordService)
         {
             _httpService = httpService;
             _configuration = configuration;
             _logger = logger;
             _memoryCache = memoryCache;
+            _sensitiveWordService = sensitiveWordService;
 
             _httpClient = _httpService.GetClientAsync().GetAwaiter().GetResult();
             _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
@@ -136,47 +139,71 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 };
             }
 
+            string? reply;
 
-
-            //日志
-            _logger.LogInformation("向ChatGPT发送消息：{question}\n", messages.Last().Content!.Length >= 30 ? ($"{messages.Last().Content![..30].Replace("\n", "\n      ")}......") : messages.Last().Content!);
-            //添加记录
-            _record.Add(DateTime.Now);
-
-
-            // api
-            var url = _configuration["ChatGPTApiUrl"];
-
-            var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
+            // 检查敏感词
+            var words = await _sensitiveWordService.Check(messages.Last().Content!);
+            if (words.Count != 0)
             {
-                Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"]!,
-                Messages = messages
-            });
+                _logger.LogError("提问中检查到 {re} 个敏感词：\n      {}", words.Count, string.Join("\n      ", words));
 
-            if (!response.IsSuccessStatusCode)
+                // 默认回复
+                reply = "看板娘不知道哦~";
+            }
+            else
             {
-                _logger.LogError("请求ChatGPT回复失败，正文：{msg}", await response.Content.ReadAsStringAsync());
-                return new ChatGPTSendMessageResult
+                //日志
+                _logger.LogInformation("向ChatGPT发送消息：{question}\n", messages.Last().Content!.Length >= 30 ? ($"{messages.Last().Content![..30].Replace("\n", "\n      ")}......") : messages.Last().Content!);
+                //添加记录
+                _record.Add(DateTime.Now);
+
+
+                // api
+                var url = _configuration["ChatGPTApiUrl"];
+
+                var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
                 {
-                    Success = false,
-                    Message = "请求 GPT API 失败"
-                };
+                    Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"]!,
+                    Messages = messages
+                });
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("请求ChatGPT回复失败，正文：{msg}", await response.Content.ReadAsStringAsync());
+                    return new ChatGPTSendMessageResult
+                    {
+                        Success = false,
+                        Message = "请求 GPT API 失败"
+                    };
+                }
+
+                string jsonContent = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
+
+                reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
+                if (result == null || string.IsNullOrWhiteSpace(reply))
+                {
+                    return new ChatGPTSendMessageResult
+                    {
+                        Success = false,
+                        Message = "回复为空"
+                    };
+                }
+
+                // 检查敏感词
+                words = await _sensitiveWordService.Check(reply);
+                if (words.Count != 0)
+                {
+                    _logger.LogError("回复中检查到 {re} 个敏感词：\n      {}", words.Count, string.Join("\n      ", words));
+
+                    // 默认回复
+                    reply = "看板娘不知道哦~";
+                }
+
+                _logger.LogInformation("收到ChatGPT的回复：{reply}\n      消耗 {} Token，回复占比 {}%（{}）\n", reply, result.Usage.Total_tokens, (result.Usage.Completion_tokens * 100.0 / result.Usage.Total_tokens).ToString("0.0"), result.Usage.Completion_tokens);
+
             }
 
-            string jsonContent = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
-
-            var reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
-            if (result == null || string.IsNullOrWhiteSpace(reply))
-            {
-                return new ChatGPTSendMessageResult
-                {
-                    Success = false,
-                    Message = "回复为空"
-                };
-            }
-
-            _logger.LogInformation("收到ChatGPT的回复：{reply}\n      消耗 {} Token，回复占比 {}%（{}）\n", reply, result.Usage.Total_tokens, (result.Usage.Completion_tokens * 100.0 / result.Usage.Total_tokens).ToString("0.0"), result.Usage.Completion_tokens);
 
             // 缓存回复
             SetCache(messages, reply);

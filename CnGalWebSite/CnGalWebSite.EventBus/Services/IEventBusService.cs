@@ -27,5 +27,9 @@ namespace CnGalWebSite.EventBus.Services
         void InitRpcClient();
 
         Task<KanbanChatGPTReceiveModel> CallKanbanChatGPT(KanbanChatGPTSendModel model, CancellationToken cancellationToken = default);
+
+        Task<SensitiveWordsResultModel> CallSensitiveWordsCheck(SensitiveWordsCheckModel model, CancellationToken cancellationToken = default);
+
+        void CreateSensitiveWordsCheckServer(Func<SensitiveWordsCheckModel, Task<SensitiveWordsResultModel>> func);
     }
 }

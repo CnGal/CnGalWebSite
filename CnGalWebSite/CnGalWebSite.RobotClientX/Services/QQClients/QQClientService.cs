@@ -328,7 +328,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
             //尝试找出所有匹配的回复
-            RobotReply reply = _messageService.GetAutoReply(message, range);
+            RobotReply reply =await _messageService.GetAutoReply(message, range);
 
             if (reply == null)
             {

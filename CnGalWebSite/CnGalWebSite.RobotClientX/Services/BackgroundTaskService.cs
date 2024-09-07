@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.RobotClientX.Services.QQClients;
+﻿using CnGalWebSite.EventBus.Services;
+using CnGalWebSite.RobotClientX.Services.QQClients;
 
 namespace CnGalWebSite.RobotClientX.Services
 {
@@ -21,12 +22,17 @@ namespace CnGalWebSite.RobotClientX.Services
                 using var scope = Services.CreateScope();
                 var provider = scope.ServiceProvider;
                 var _logger = provider.GetRequiredService<ILogger<BackgroundTaskService>>();
+                var _eventBusService = provider.GetRequiredService<IEventBusService>();
                 try
                 {
                     _logger.LogInformation("启动后台任务");
 
                     var _QQClientService = provider.GetRequiredService<IQQClientService>();
                     await _QQClientService.Init();
+
+                    // 初始化RPC客户端
+                    _eventBusService.InitRpcClient();
+
                     while (true)
                         await Task.Delay(100);
                 }

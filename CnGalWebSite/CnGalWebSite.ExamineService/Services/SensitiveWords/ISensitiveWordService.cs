@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
+namespace CnGalWebSite.EamineService.Services.SensitiveWords
 {
     public interface ISensitiveWordService
     {
-        Task<List<string>> Check(List<string> texts);
+        List<string> Check(List<string> texts);
 
-        Task<List<string>> Check(string text);
+        List<string> Check(string text);
+
+        int Count();
     }
 }

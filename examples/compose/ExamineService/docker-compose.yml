@@ -1,0 +1,20 @@
+services:
+  apiserver:
+    image: littlefishtentears/cngalwebsiteexamineservice:latest
+    container_name: examineservice
+    environment:
+      - TZ=${TZ}
+      # 事件总线 主机名称
+      - EventBus_HostName=${EventBus_HostName}
+      # 事件总线 端口
+      - EventBus_Port=${EventBus_Port}
+      # 事件总线 用户名
+      - EventBus_UserName=${EventBus_UserName}
+      # 事件总线 密码
+      - EventBus_Password=${EventBus_Password}
+    hostname: examineservice
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${resources_limits_memory}
