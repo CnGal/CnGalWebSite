@@ -205,7 +205,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             var length = await _uploadRecordRepository.CountAsync(s => string.IsNullOrWhiteSpace(s.Url) == false&&s.Type==type);
             if (length > 0)
             {
-                var p = random.Next(1, length - 1);
+                var p = random.Next(0, length);
                 var temp = await _uploadRecordRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Url) == false && s.Type == type).OrderBy(s => s.Id).Skip(p).Take(1).ToListAsync();
                 if (temp.Any())
                 {
