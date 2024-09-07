@@ -15,7 +15,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
 {
     public interface IMessageService
     {
-        RobotReply GetAutoReply(string message, RobotReplyRange range);
+        Task<RobotReply> GetAutoReply(string message, RobotReplyRange range);
 
         Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range, string reply, string message, string regex, long qq, string name);
 

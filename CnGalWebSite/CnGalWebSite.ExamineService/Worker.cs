@@ -1,9 +1,10 @@
 ﻿
+using CnGalWebSite.EamineService.Services.SensitiveWords;
+using CnGalWebSite.EventBus.Models;
 using CnGalWebSite.EventBus.Services;
-using CnGalWebSite.Kanban.ChatGPT.Services.KanbanService;
 using Microsoft.Extensions.Logging;
 
-namespace CnGalWebSite.Kanban.ChatGPT
+namespace CnGalWebSite.EamineService
 {
 
     public class Worker : BackgroundService
@@ -23,69 +24,46 @@ namespace CnGalWebSite.Kanban.ChatGPT
             var provider = scope.ServiceProvider;
             var _logger = provider.GetRequiredService<ILogger<Worker>>();
             var _eventBusService = provider.GetRequiredService<IEventBusService>();
-            var _kanbanService = provider.GetRequiredService<IKanbanService>();
+            var _sensitiveWordService = provider.GetRequiredService<ISensitiveWordService>();
 
 
             var server = new Random().Next(0, 2);
 
 
             _logger.LogInformation("服务端上线");
-            _eventBusService.CreateKanbanServer(async (input) =>
+            _eventBusService.CreateSensitiveWordsCheckServer((input) =>
             {
-                //_logger.LogInformation("收到客户端消息：{input}", input.Message);
-
-                var result = await _kanbanService.GetReply(input.Message, input.UserId, input.IsFirst, input.MessageMax);
-
-                if (result.Success == false)
+                return Task.FromResult(new SensitiveWordsResultModel
                 {
-                    _logger.LogError("发送回复：{re}", result.Message);
-                }
-
-
-                return new EventBus.Models.KanbanChatGPTReceiveModel
-                {
-                    Success = result.Success,
-                    Message = result.Message
-                };
-
+                    Words = _sensitiveWordService.Check(input.Texts)
+                });
             });
 
             _logger.LogInformation("客户端上线");
             _eventBusService.InitRpcClient();
 
-
-            // 1
-            var message = "你是傻逼";
-            // _logger.LogInformation("客户端发送消息：{message}", message);
-
-            var re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            var re = await _eventBusService.CallSensitiveWordsCheck(new SensitiveWordsCheckModel
             {
-                Message = message,
-                IsFirst = true,
-                UserId = "123",
-                MessageMax = 3
+                Texts = ["傻逼煞笔沙比","12122112"] 
             }, stoppingToken);
 
-
-            if (re.Success == false)
-            {
-                _logger.LogError("接收失败：{re}", re.Message);
-            }
+            _logger.LogError("检查到 {re} 个敏感词：\n      {}", re.Words.Count, string.Join("\n      ", re.Words));
 
 
 
-            // 2
-            message = "你是傻逼";
 
-            re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
-            {
-                Message = message,
-                IsFirst = false,
-                UserId = "123",
-                MessageMax = 3
-            }, stoppingToken);
+            //// 2
+            //message = "看板娘知道《硅心》这个游戏吗？可以介绍一下吗？";
 
-            _logger.LogInformation("接收消息{re}", re.Success ? "成功" : "失败");
+            //re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            //{
+            //    Message = message,
+            //    IsFirst = false,
+            //    UserId = "123",
+            //    MessageMax = 3
+            //}, stoppingToken);
+
+            //_logger.LogInformation("接收消息{re}", re.Success ? "成功" : "失败");
 
             //// 3
             //message = "不对哦~《硅心》是由呐呐呐制作组制作的galgame。讲述了突然到来的机器人少女，打破了某自由插画师的隐世单机生活，一场人机恋爱喜剧由此开的故事。";

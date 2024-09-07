@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
+namespace CnGalWebSite.Kanban.ChatGPT.Services.SensitiveWords
 {
     public interface ISensitiveWordService
     {

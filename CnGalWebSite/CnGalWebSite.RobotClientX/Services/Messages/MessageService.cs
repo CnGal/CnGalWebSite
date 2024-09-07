@@ -53,7 +53,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// <param name="message"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public RobotReply GetAutoReply(string message, RobotReplyRange range)
+        public async Task<RobotReply> GetAutoReply(string message, RobotReplyRange range)
         {
 
             DateTime now = DateTime.Now.ToCstTime();
@@ -73,7 +73,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             //检查是否含有变量替换 如果有 则检查输入是否包含敏感词
             if (reply.Value.Contains('$'))
             {
-                List<string> words = _sensitiveWordService.Check(message);
+                List<string> words =await _sensitiveWordService.Check(message);
 
                 if (words.Count != 0)
                 {
@@ -119,7 +119,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
 
 
             //检测敏感词
-            List<string> words = _sensitiveWordService.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
+            List<string> words = await _sensitiveWordService.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
 
             if (words.Count != 0)
             {

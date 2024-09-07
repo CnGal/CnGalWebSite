@@ -7,11 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CnGalWebSite.EventBus.Services;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CnGalWebSite.RobotClientX.Services.SensitiveWords
+namespace CnGalWebSite.Kanban.ChatGPT.Services.SensitiveWords
 {
     public class SensitiveWordService : ISensitiveWordService
     {
