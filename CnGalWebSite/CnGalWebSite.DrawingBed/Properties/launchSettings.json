@@ -1,4 +1,4 @@
-{
+﻿{
   "profiles": {
     "CnGalWebSite.DrawingBed": {
       "commandName": "Project",
@@ -18,12 +18,12 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Docker": {
+    "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "http://+:80"
+        "ASPNETCORE_HTTP_PORTS": "8080"
       },
       "publishAllPorts": true
     }

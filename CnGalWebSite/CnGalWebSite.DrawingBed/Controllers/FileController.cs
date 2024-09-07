@@ -37,7 +37,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         }
 
         /// <summary>
-        /// 上传图片
+        /// 上传文件 图片或音频
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -178,6 +178,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
             };
         }
 
+        /// <summary>
+        /// 获取相同sha1的图片
+        /// </summary>
+        /// <param name="sha1"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<Result>> GetSameFileAsync([FromQuery] string sha1)
@@ -197,6 +202,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
         }
 
+        /// <summary>
+        /// 获取随机类型的图片或音频
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<Result>> GetRandomFileAsync([FromQuery] UploadFileType type)
