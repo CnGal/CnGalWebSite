@@ -8,6 +8,7 @@ using MediaInfo;
 using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using Tweetinvi.Security;
@@ -284,7 +285,10 @@ namespace CnGalWebSite.DrawingBed.Services
             var inputFile = new InputFile(path);
             var outputFile = new OutputFile(Path.Combine(_audioTempPath, Guid.NewGuid().ToString() + ".mp3"));
 
-            var ffmpeg = new Engine(_configuration["FFmpegPath"]);
+            var ffmpegPath = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                   ? $"/usr/bin/ffmpeg"
+                   : _configuration["FFmpegPath"];
+            var ffmpeg = new Engine(ffmpegPath);
 
             var options = new ConversionOptions();
             options.AudioBitRate = 127000;
