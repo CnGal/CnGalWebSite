@@ -1,4 +1,3 @@
-version: "3"
 services:
   drawingbed:
     image: littlefishtentears/cngalwebsitedrawingbed:latest
@@ -12,8 +11,6 @@ services:
       - OSSBucketName=${OSSBucketName}
       - OSSAccessKeyId=${OSSAccessKeyId}
       - OSSAccessKeySecret=${OSSAccessKeySecret}
-      # 图床
-      - SliotsImageAPIToken=${SliotsImageAPIToken}
       # 数据库连接字符串
       - DefaultDBConnection=${DefaultDBConnection}
       # 腾讯云COS
@@ -25,8 +22,6 @@ services:
       - TucangCCAPIToken=${TucangCCAPIToken}
       - TucangCCAPIUrl=${TucangCCAPIUrl}
       - CustomTucangCCUrl=${CustomTucangCCUrl}
-      # FFmpeg
-      - FFmpegPath=${FFmpegPath}
       # 音频 baseUrl
       - AudioUrl=${AudioUrl}
       # 图片 baseUrl
@@ -45,3 +40,6 @@ services:
           memory: ${resources_limits_memory}
     ports:
       - "2003:8080"
+    volumes:
+      - ${MNT_DIR}/drawingbed/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - ${MNT_DIR}/drawingbed/wwwroot:/app/wwwroot
