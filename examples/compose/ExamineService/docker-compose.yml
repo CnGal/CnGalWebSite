@@ -18,3 +18,6 @@ services:
       resources:
         limits:
           memory: ${resources_limits_memory}
+    volumes:
+      - ${MNT_DIR}/examineservice/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - ${MNT_DIR}/examineservice/Data/SensitiveWords:/app/Data/SensitiveWords
