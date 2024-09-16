@@ -967,7 +967,7 @@ function browserVersion() {
             return 0;
         }
     } else if (isSafari) {
-        if (userAgent.split('Version/')[1].split(' ')[0] < 17.6) {
+        if (userAgent.split('Version/')[1].split(' ')[0] < 16.4) {
             return 1;
         }
         else {
