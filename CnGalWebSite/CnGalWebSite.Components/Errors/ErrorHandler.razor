@@ -97,7 +97,7 @@
                         Type = AlertTypes.Error,
                         Title = message,
                         Timeout = 20000,
-                        Content = $"报错：{ex?.Message?.Split('\n')?.FirstOrDefault()}\n {ex?.StackTrace} \n 可能原因：{reason}\n解决方法：{resolvent}",
+                        Content = $"报错：{ex?.Message?.Split('\n')?.FirstOrDefault()}\n{(ShowDetailedErrorInfor ? ($" {ex?.StackTrace} \n ") : "")}可能原因：{reason}\n解决方法：{resolvent}",
                     });
 
 
