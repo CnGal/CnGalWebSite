@@ -79,7 +79,7 @@
     background-color: var(--md-sys-color-primary);
     padding: 0 .3rem;
     border-radius: 5px;
-    color: white;
+    color: var(--md-sys-color-on-primary);
     margin-right: 0.5rem;
 }
 /*关于我们*/

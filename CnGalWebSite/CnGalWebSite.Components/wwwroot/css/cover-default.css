@@ -204,11 +204,11 @@ html {
 }
 
 .m-chip:not(.m-chip--outlined).primary {
-    color: var(--md-sys-color-on-primary)
+    color: var(--md-sys-color-on-primary)!important;
 }
 
 .m-btn:not(.m-btn--outlined).primary {
-    color: var(--md-sys-color-on-primary)
+    color: var(--md-sys-color-on-primary) !important;
 }
 /*边框颜色*/
 .theme--light.m-text-field > .m-input__control > .m-input__slot:before {
@@ -367,4 +367,19 @@ html {
 /*错误提示标题栏换行*/
 .m-alert__title {
     word-break: break-all;
+}
+/*分页*/
+.theme--light.m-pagination .m-pagination__item--active {
+    color: var(--md-sys-color-on-primary) !important;
+}
+.theme--light.m-pagination .m-pagination__item {
+    background: var(--md-sys-color-background) !important;
+    color: var(--md-sys-color-on-background) !important;
+}
+.theme--light.m-pagination .m-pagination__navigation {
+    background: var(--md-sys-color-background) !important;
+}
+/*弹出菜单*/
+.theme--light.m-menu__content {
+    background: none!important;
 }
