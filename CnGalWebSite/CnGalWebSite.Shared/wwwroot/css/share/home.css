@@ -904,3 +904,11 @@
         left: .5rem;
         top: .5rem;
     }
+    /*slide 内部卡片間距*/
+#home-page .m-slide-group__content > div {
+    margin: 2px;
+}
+
+#home-page .m-slide-group__content > a {
+    margin: 2px;
+}

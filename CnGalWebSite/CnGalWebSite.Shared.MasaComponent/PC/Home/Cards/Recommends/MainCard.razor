@@ -37,17 +37,12 @@
             <div class="completed-card">
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.DivideCard />
                 <div class="content">不能再往下划啦 o(〃＾▽＾〃)o</div>
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.DivideCard />
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.DivideCard />
             </div>
         }
     </MContainer>
 
 </section>
-    @if (completed)
-    {
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Segmented.AboutCard />
-    }
-
 
 
 @code {
@@ -80,7 +75,7 @@
     {
         try
         {
-            if(Lock)
+            if (Lock)
             {
                 return;
             }

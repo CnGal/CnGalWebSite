@@ -3,7 +3,7 @@
 
 <MTooltip Top Color="primary-container elevation-2">
     <ActivatorContent>
-        <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="@((_dataCacheService.IsApp?"height:30px;":"height:40px;")+"aspect-ratio:1;border-radius:50%;") " @onclick="@(()=>OnClick())" />
+        <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="@((_dataCacheService.IsApp?"height:30px;":"height:40px;")+"aspect-ratio:1;border-radius:50%;cursor: pointer;") " @onclick="@(()=>OnClick())" />
     </ActivatorContent>
     <ChildContent>
          <div style=" display: flex; flex-direction: column; align-items: center; width:230px;color: var(--md-sys-color-on-primary-container);gap: .3rem;padding: 1rem 0;">
