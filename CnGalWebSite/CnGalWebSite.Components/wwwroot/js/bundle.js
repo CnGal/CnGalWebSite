@@ -752,7 +752,7 @@ function browserVersion() {
             return 0;
         }
     } else if (isSafari) {
-        if (userAgent.split('Safari/')[1].split('.')[0] < 15) {
+        if (userAgent.split('Version/')[1].split(' ')[0] < 17.6) {
             return 1;
         }
         else {
