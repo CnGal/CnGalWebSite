@@ -3,6 +3,7 @@ using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.DataReositories;
 using CnGalWebSite.DrawingBed.Infrastructure;
 using CnGalWebSite.DrawingBed.Services;
+using CnGalWebSite.HealthCheck.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -82,6 +83,12 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("scope", "FileAPI");
     });
 });
+
+
+//添加状态检查
+builder.Services.AddHealthChecks();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -95,6 +102,9 @@ app.UseCors(options =>
           .AllowAnyMethod()
           .AllowAnyHeader();
 });
+
+//添加状态检查终结点
+app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
 //添加身份验证中间件
 app.UseAuthentication();
