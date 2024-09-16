@@ -1302,6 +1302,10 @@ html {
 .theme--light.m-menu__content {
     background: none!important;
 }
+/*弹窗*/
+.theme--light.m-dialog__content .m-dialog {
+    background: none !important;
+}
 
 /*卡片*/
 .md-card {
