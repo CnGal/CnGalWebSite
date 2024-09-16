@@ -103,7 +103,7 @@
 
 .revenues-page .index-card {
     background-color: var(--md-sys-color-primary);
-    color: white;
+    color: var(--md-sys-color-on-primary);
     font-weight: bold;
     font-size: 1.3rem;
     padding: 0 .5rem;
