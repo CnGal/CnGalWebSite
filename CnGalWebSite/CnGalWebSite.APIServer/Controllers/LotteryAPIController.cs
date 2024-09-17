@@ -720,10 +720,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> ParticipateInLottery(ParticipateInLotteryModel model)
         {
-            //if (_userService.CheckCurrentUserRole("Admin"))
-            //{
-            //    return new Result { Successful = false, Error = "管理员不允许参与抽奖！" };
-            //}
+            if (_userService.CheckCurrentUserRole("Admin"))
+            {
+                return new Result { Successful = false, Error = "管理员不允许参与抽奖！" };
+            }
 
             var time = DateTime.Now.ToCstTime();
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
