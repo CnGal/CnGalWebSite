@@ -103,12 +103,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Name = lottery.Name,
                     Id = lottery.Id,
+                    Type = lottery.Type,
                     NotWinningUsers = lottery.Users.Where(s => s.IsHidden == false).Select(s => new LotteryUserDataModel
                     {
                         Id = s.ApplicationUserId,
                         Name = s.ApplicationUser.UserName,
                         Number = s.Number,
-                        IsHidden = s.IsHidden
+                        IsHidden = s.IsHidden,
+                        Priority = 2,
                     }).ToList()
                 };
 
@@ -127,6 +129,24 @@ namespace CnGalWebSite.APIServer.Controllers
                     });
                     model.NotWinningUsers.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id));
                 }
+
+                // 根据用户消耗的G币数量提升权重
+                var gcoins = await _userRepository.GetAll().AsNoTracking().Include(s => s.Commodities)
+                     .Where(s => model.NotWinningUsers.Select(s => s.Id).ToList().Contains(s.Id)).Select(s => new
+                     {
+                         s.Id,
+                         GCoins = s.Commodities.Sum(s => s.Price)
+                     }).ToListAsync();
+
+                foreach (var item in model.NotWinningUsers)
+                {
+                    var user = gcoins.FirstOrDefault(s => s.Id == item.Id);
+                    if (user != null)
+                    {
+                        item.Priority = (int)(item.Priority * (1 + user.GCoins / 20.0));
+                    }
+                }
+
 
                 return model;
             }
@@ -354,7 +374,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var lotteries = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .OrderByDescending(s=>s.Priority).ThenByDescending(s => s.CreateTime)
+                .OrderByDescending(s => s.Priority).ThenByDescending(s => s.CreateTime)
                 .ToListAsync();
 
             var model = new List<LotteryCardViewModel>();
@@ -369,7 +389,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Count = item.Users.Count,
                     EndTime = item.EndTime,
                     Id = item.Id,
-                    GameSteamId=item.GameSteamId,
+                    GameSteamId = item.GameSteamId,
                     MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                     Thumbnail = item.Thumbnail,
                     Name = item.Name,
@@ -700,10 +720,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> ParticipateInLottery(ParticipateInLotteryModel model)
         {
-            if (_userService.CheckCurrentUserRole("Admin"))
-            {
-                return new Result { Successful = false, Error = "管理员不允许参与抽奖！" };
-            }
+            //if (_userService.CheckCurrentUserRole("Admin"))
+            //{
+            //    return new Result { Successful = false, Error = "管理员不允许参与抽奖！" };
+            //}
 
             var time = DateTime.Now.ToCstTime();
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()

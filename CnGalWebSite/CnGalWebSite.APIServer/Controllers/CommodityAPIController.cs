@@ -285,11 +285,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (model.CanRedeemed == false)
                 {
-                    await _userService.TryAddGCoins(item.ApplicationUserId, UserIntegralSourceType.CommodityCode, -item.Count, $"{item.Code} 修改为不可兑换，退回G币：{item.Count}");
+                    await _userService.TryAddGCoins(item.ApplicationUserId, UserIntegralSourceType.CommodityCode, -item.Count, $"{item.Code} 修改为不可兑换，退回G币 {item.Count}");
                 }
                 else
                 {
-                    await _userService.TryAddGCoins(item.ApplicationUserId, UserIntegralSourceType.CommodityCode, item.Count, $"{item.Code} 修改为可兑换，增加G币：{item.Count}");
+                    await _userService.TryAddGCoins(item.ApplicationUserId, UserIntegralSourceType.CommodityCode, item.Count, $"{item.Code} 修改为可兑换，增加G币 {item.Count}");
                 }
             }
 
@@ -374,7 +374,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var msg = "";
             if (code.Type == CommodityCodeType.GCoins)
             {
-                await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.CommodityCode, code.Count, $"兑换码：{code.Code}");
+                await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.CommodityCode, code.Count, $"使用兑换码 {code.Code}");
                 msg = $"成功兑换 {code.Count} G币";
             }
             else
@@ -399,6 +399,35 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             return new Result { Successful = true, Error = msg };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<GCoinsRecordOverviewModel>> ListGCoinsRecord(QueryParameterModel model)
+        {
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (user == null)
+            {
+                return new QueryResultModel<GCoinsRecordOverviewModel>
+                {
+                    Parameter = model
+                };
+            }
+
+            var (items, total) = await _queryService.QueryAsync<UserIntegral, long>(_userIntegralRepository.GetAll().AsSingleQuery().Where(s => s.Type == UserIntegralType.GCoins && s.ApplicationUserId == user.Id), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)));
+
+            return new QueryResultModel<GCoinsRecordOverviewModel>
+            {
+                Items = await items.Select(s => new GCoinsRecordOverviewModel
+                {
+                    SourceType = s.SourceType,
+                    Count = s.Count,
+                    Note = string.IsNullOrWhiteSpace(s.Note) ? s.SourceType.GetDisplayName() : s.Note,
+                    Time = s.Time,
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
     }
 }

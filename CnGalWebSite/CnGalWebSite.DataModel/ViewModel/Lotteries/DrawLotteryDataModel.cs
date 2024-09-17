@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CnGalWebSite.DataModel.Model;
+using System.Collections.Generic;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {
@@ -7,6 +8,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public long Id { get; set; }
 
         public string Name { get; set; }
+
+        public LotteryType Type { get; set; }
 
         public List<LotteryUserDataModel> NotWinningUsers { get; set; } = new List<LotteryUserDataModel>();
 
@@ -46,6 +49,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public string Id { get; set; }
         public int Number { get; set; }
         public bool IsHidden { get; set; }
+        public int Priority { get; set; }
     }
 
     public class ExportLotteryDataModel

@@ -30,6 +30,9 @@
                             <MTab Value="2">
                                 G币兑换<MIcon>@IconType.Lottery.ToIconString()</MIcon>
                             </MTab>
+                            <MTab Value="3">
+                                G币记录<MIcon>@IconType.Record.ToIconString()</MIcon>
+                            </MTab>
                         </MTabs>
                     </MDCard>
 
@@ -53,6 +56,9 @@
                         </MTabItem>
                         <MTabItem Value="2">
                             <CnGalWebSite.Shared.MasaComponent.PC.Commodities.Codes.MainCard />
+                        </MTabItem>
+                        <MTabItem Value="3">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Commodities.ListGCoinsRecordsCard />
                         </MTabItem>
 
                     </MTabsItems>
@@ -126,6 +132,7 @@
         {
             "Shop" => 1,
             "Code" => 2,
+            "Record" => 3,
             _ => 1
         };
         StateHasChanged();
@@ -152,6 +159,7 @@
         {
             1 => "Shop",
             2 => "Code",
+            3 => "Record",
             _ => ""
         }));
 

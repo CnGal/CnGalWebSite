@@ -1288,19 +1288,27 @@ html {
     word-break: break-all;
 }
 /*分页*/
-.theme--light.m-pagination .m-pagination__item--active {
-    color: var(--md-sys-color-on-primary) !important;
-}
-.theme--light.m-pagination .m-pagination__item {
-    background: var(--md-sys-color-background) !important;
-    color: var(--md-sys-color-on-background) !important;
-}
 .theme--light.m-pagination .m-pagination__navigation {
     background: var(--md-sys-color-background) !important;
 }
+
+.theme--light.m-pagination .m-pagination__item {
+    background: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+}
+
+.theme--light.m-pagination .m-pagination__item--active {
+    color: var(--md-sys-color-on-primary) !important;
+    background: var(--md-sys-color-primary) !important;
+}
+
 /*弹出菜单*/
 .theme--light.m-menu__content {
     background: none!important;
+}
+/*弹窗*/
+.theme--light.m-dialog__content .m-dialog {
+    background: none !important;
 }
 
 /*卡片*/

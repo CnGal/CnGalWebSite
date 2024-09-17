@@ -106,7 +106,7 @@ namespace CnGalWebSite.DataModel.Model
         public LotteryConditionType ConditionType { get; set; }
 
         /// <summary>
-        /// 游戏SteamId
+        /// 游戏SteamId （复用这个字段，用来保存与参与条件相关的信息）
         /// </summary>
         public string GameSteamId { get; set; }
 
@@ -124,6 +124,8 @@ namespace CnGalWebSite.DataModel.Model
         Manual,
         [Display(Name = "自动")]
         Automatic,
+        [Display(Name = "用户权重")]
+        UserWeights,
     }
 
     public enum LotteryConditionType
