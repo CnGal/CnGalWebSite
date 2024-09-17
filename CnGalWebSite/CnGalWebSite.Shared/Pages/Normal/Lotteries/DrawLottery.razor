@@ -73,10 +73,10 @@
             }
 
             @if (string.IsNullOrWhiteSpace(CurrentAward?.Image) == false)
-                {
+            {
 
-                <img src="@CurrentAward.Image" alt="@CurrentAward.Name" style="max-width:200px;width:100%;margin-top:30px;"/>
-                }
+                <img src="@CurrentAward.Image" alt="@CurrentAward.Name" style="max-width:200px;width:100%;margin-top:30px;" />
+            }
 
 
         </div>
@@ -143,7 +143,29 @@
             return;
         }
 
-        var index = new Random().Next(0, Model.NotWinningUsers.Count);
+        // 抽奖
+        int index = 0;
+        if (Model.Type == LotteryType.UserWeights)
+        {
+            // 用户权重计算
+            var random = new Random().Next(0, Model.NotWinningUsers.Sum(s => s.Priority));
+            foreach (var item in Model.NotWinningUsers)
+            {
+                if (random < item.Priority)
+                {
+                    break;
+                }
+
+                random -= item.Priority;
+                index++;
+            }
+        }
+        else
+        {
+            index = new Random().Next(0, Model.NotWinningUsers.Count);
+        }
+
+
         //展示动画
         if (lotteryAnimationCard != null)
         {
@@ -157,11 +179,11 @@
         CurrentAward.WinningUsers.Add(LastWinningUser);
 
         var model = new ManualLotteryModel
-        {
-            LotteryAwardId = CurrentAward.Id,
-            LotteryId = Model.Id,
-            UserId = LastWinningUser.Id
-        };
+            {
+                LotteryAwardId = CurrentAward.Id,
+                LotteryId = Model.Id,
+                UserId = LastWinningUser.Id
+            };
 
         //导出数据
         LotteryResults.Add(model);

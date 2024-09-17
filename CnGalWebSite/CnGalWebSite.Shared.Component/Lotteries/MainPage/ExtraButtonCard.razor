@@ -5,7 +5,7 @@
 
 
 <div style="display: flex; justify-content: center;">
-    @if (Model.Type == LotteryType.Manual && Model.IsEnd == false)
+    @if (Model.Type != LotteryType.Automatic && Model.IsEnd == false)
     {
         <CnGalWebSite.Components.Buttons.MasaButton Fab Icon="mdi-wallet-giftcard " Tooltip="抽奖" OnClick="OnDraw" Color="info" Class="me-3"/>
     }

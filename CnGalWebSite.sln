@@ -121,7 +121,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Kanban.ChatGPT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "审核", "审核", "{0AD54B7F-5170-4B84-A7AA-862A95DD0EE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.ExamineService", "CnGalWebSite\CnGalWebSite.ExamineService\CnGalWebSite.ExamineService.csproj", "{708EADA8-5513-43FD-9005-0DE03A1AD0F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.ExamineService", "CnGalWebSite\CnGalWebSite.ExamineService\CnGalWebSite.ExamineService.csproj", "{708EADA8-5513-43FD-9005-0DE03A1AD0F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
