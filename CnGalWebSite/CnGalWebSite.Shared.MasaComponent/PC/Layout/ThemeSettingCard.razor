@@ -1,5 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
+@inject IHttpService _httpService
 
 <MDialog @bind-Value="Dialog"
          MaxWidth="440">
@@ -18,12 +19,11 @@
 
             <SectionTitleCard Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
             <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.ThemeMode" ValueChanged="ThemeModeValueChanged" TValue="ThemeMode" Label="主题模式" />
-            <AuthorizeView Roles="Tester">
-                <Authorized>
-                    <SectionTitleCard Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
-                    <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban?"浮动按钮组":"看板娘Live2D")" Class="m-0"></MSwitch>
-                </Authorized>
-            </AuthorizeView>
+            @if (Kanban)
+            {
+                <SectionTitleCard Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
+                <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban?"浮动按钮组":"看板娘Live2D")" Class="m-0"></MSwitch>
+            }
             <SectionTitleCard Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
             <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")" Class="m-0"></MSwitch>
 
@@ -48,6 +48,26 @@
 
 @code {
     bool Dialog { get; set; }
+    bool Kanban { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取词条信息
+            var mode = await _httpService.GetAsync<KanbanPermissionsModel>("api/space/GetKanbanPermissions/");
+            Kanban = mode.Permissions;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取看板娘权限失败");
+        }
+    }
+
 
     public void Refresh(bool dialog)
     {
