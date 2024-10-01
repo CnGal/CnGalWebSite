@@ -39,7 +39,9 @@
         </div>
     </MTabItem>
     <MTabItem Value="2">
-        <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries />
+        <div class="anniversary-page">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.PlayedGames.MainCard Anniversaries />
+        </div>
     </MTabItem>
     <MTabItem Value="3">
         <div id="home-page">
@@ -78,8 +80,8 @@
             <MIcon>@IconType.Explore.ToIconString()</MIcon>
         </MButton>
         <MButton ActiveClass="nav-bottom-tab-active" Value="2">
-            <span>周年庆</span>
-            <MIcon>@IconType.Birthday.ToIconString()</MIcon>
+            <span>分享游玩记录</span>
+            <MIcon>@IconType.GameRecord.ToIconString()</MIcon>
         </MButton>
         <MButton ActiveClass="nav-bottom-tab-active" Value="3">
             <span>广场</span>

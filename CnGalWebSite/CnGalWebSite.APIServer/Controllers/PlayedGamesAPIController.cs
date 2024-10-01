@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.SteamInfors;
@@ -50,9 +51,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IOperationRecordService _operationRecordService;
         private readonly IEditRecordService _editRecordService;
         private readonly IQueryService _queryService;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly ILotteryService _lotteryService;
 
-        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, 
-            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService, IQueryService queryService, IRepository<SteamAppRreview, int> steamAppRreviewRepository,
+        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, IRepository<Lottery, long> lotteryRepository, ILotteryService lotteryService,
+        ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService, IQueryService queryService, IRepository<SteamAppRreview, int> steamAppRreviewRepository,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
             _entryRepository = entryRepository;
@@ -70,6 +73,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _queryService = queryService;
             _steamAppRreviewRepository= steamAppRreviewRepository;
+            _lotteryRepository = lotteryRepository;
+            _lotteryService = lotteryService;
         }
 
         /// <summary>
@@ -210,13 +215,26 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             // 周年庆活动
-            if(string.IsNullOrWhiteSpace(model.PlayImpressions) == false)
+            //if(string.IsNullOrWhiteSpace(model.PlayImpressions) == false)
+            //{
+            //    // 有评语 且绑定Steam
+            //    if(user.SteamId != null)
+            //    {
+            //        await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
+            //    }
+            //}
+
+            //判断是否需要参与抽奖
+            var lotteries =await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.BeginTime < game.ScoreTime && s.IsEnd == false&&s.ConditionType== LotteryConditionType.NewGameRecord).ToListAsync();
+            foreach(var item in lotteries)
             {
-                // 有评语 且绑定Steam
-                if(user.SteamId != null)
+                try
                 {
-                    await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesShare, 1, null);
+                    await _lotteryService.AddUserToLottery(item, user, HttpContext, model.Identification);
                 }
+                catch
+                { }
+
             }
 
 

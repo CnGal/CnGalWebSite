@@ -32,7 +32,7 @@
             @if (isReady)
             {
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsAnniversary="IsAnniversary" TotalCount="TotalCount" UserInfoModel="UserInfoModel" />
-                @if (GameRecords.Count == 0)
+                @if (GameRecords.Count(s => s.IsInSteam || IsAnniversary == false) == 0)
                 {
                     @if (IsAnniversary && string.IsNullOrWhiteSpace(SteamId) && IsCurrentUser)
                     {

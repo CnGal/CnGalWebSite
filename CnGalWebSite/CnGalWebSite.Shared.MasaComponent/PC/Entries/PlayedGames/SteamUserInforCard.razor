@@ -10,11 +10,11 @@
                 <div class="name"> @UserInfoModel.BasicInfor.Name</div>
             </div>
             <div class="goal">
-                <div class="value">@(GameRecords.Count)</div>
+                <div class="value">@(GameRecords.Count(s=>s.IsInSteam))</div>
                 <div class="key">总库存</div>
             </div>
             <div class="goal">
-                <div class="value">@((GameRecords.Count*100.0/ TotalCount).ToString("0.0")+" %")</div>
+                <div class="value">@((GameRecords.Count(s => s.IsInSteam) * 100.0 / TotalCount).ToString("0.0") + " %")</div>
                 <div class="key">@($"收集率（站内总计 {TotalCount}）")</div>
             </div>
             <div class="goal">

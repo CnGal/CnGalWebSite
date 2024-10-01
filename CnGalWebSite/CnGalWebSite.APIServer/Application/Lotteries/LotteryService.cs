@@ -228,6 +228,14 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                         return "参加该抽奖需要将游戏添加到愿望单";
                     }
                 }
+                else if (lottery.ConditionType == LotteryConditionType.NewGameRecord)
+                {
+                    if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.ScoreTime > lottery.BeginTime) == false)
+                    {
+                        return "参加该抽奖需要至少有一条游玩记录创建时间大于抽奖开始时间";
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -254,7 +262,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             }
 
             // 周年庆特殊处理 G币
-            if(lottery.Id == 22)
+            if (lottery.Id == 22)
             {
                 //尝试添加G币
                 await _userService.TryAddGCoins(user.Id, UserIntegralSourceType.AnniversariesLotteries, 1, null);
