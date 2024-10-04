@@ -154,7 +154,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     Type = ((steamGames.games.FirstOrDefault(s => s.appid.ToString() == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.UnPlayed,
                     ApplicationUserId = user.Id,
                     ShowPublicly = true,
-                    LastEditTime = now
+                    LastEditTime = now,
+                    ScoreTime = now
                 });
             }
 
@@ -285,7 +286,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
             catch (Exception ex)
             {
-                throw new Exception("获取愿望单失败，请设置Steam个人资料公开",ex);
+                throw new Exception("获取愿望单失败，请设置Steam个人资料公开", ex);
             }
         }
     }

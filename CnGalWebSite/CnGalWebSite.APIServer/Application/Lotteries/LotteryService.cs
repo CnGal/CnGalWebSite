@@ -230,7 +230,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 }
                 else if (lottery.ConditionType == LotteryConditionType.NewGameRecord)
                 {
-                    if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.ScoreTime > lottery.BeginTime) == false)
+                    if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.LastEditTime > lottery.BeginTime && string.IsNullOrWhiteSpace(s.PlayImpressions) == false) == false)
                     {
                         return "参加该抽奖需要至少有一条游玩记录创建时间大于抽奖开始时间";
                     }

@@ -140,7 +140,7 @@ namespace CnGalWebSite.DataModel.Model
         BookingGame,
         [Display(Name = "将游戏加入Steam愿望单")]
         Wishlist,
-        [Display(Name = "抽奖开始后创建了新的游玩记录")]
+        [Display(Name = "抽奖开始后分享了游玩感想")]
         NewGameRecord,
     }
 

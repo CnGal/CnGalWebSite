@@ -64,15 +64,15 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameService = playedGameService;
             _steamInforService = steamInforService;
             _userRepository = userRepository;
-            
+
             _examineService = examineService;
             _userService = userService;
-            _examineRepository=examineRepository;
+            _examineRepository = examineRepository;
             _logger = logger;
             _operationRecordService = operationRecordService;
             _editRecordService = editRecordService;
             _queryService = queryService;
-            _steamAppRreviewRepository= steamAppRreviewRepository;
+            _steamAppRreviewRepository = steamAppRreviewRepository;
             _lotteryRepository = lotteryRepository;
             _lotteryService = lotteryService;
         }
@@ -88,14 +88,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var entry = await _entryRepository.GetAll().Include(s=>s.Releases).FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == id);
+            var entry = await _entryRepository.GetAll().Include(s => s.Releases).FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == id);
             if (entry == null)
             {
                 return NotFound("不存在Id：" + id + " 的游戏");
             }
 
             //获取Steam评价
-            var steamIds = entry.Releases.Where(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).Select(s=>s.Link);
+            var steamIds = entry.Releases.Where(s => s.PublishPlatformType == PublishPlatformType.Steam && string.IsNullOrWhiteSpace(s.Link) == false).Select(s => s.Link);
             var steam = await _steamAppRreviewRepository.FirstOrDefaultAsync(s => s.steamid == user.SteamId && steamIds.Contains(s.appid.ToString()) && string.IsNullOrWhiteSpace(s.review) == false);
 
             //查找是否已经添加
@@ -176,10 +176,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     ScriptSocre = model.ScriptSocre,
                     ShowSocre = model.ShowSocre,
                     MusicSocre = model.MusicSocre,
-                    PaintSocre=model.PaintSocre,
-                    TotalSocre=model.TotalSocre,
-                    SystemSocre=model.SystemSocre,
-                    CVSocre=model.CVSocre,
+                    PaintSocre = model.PaintSocre,
+                    TotalSocre = model.TotalSocre,
+                    SystemSocre = model.SystemSocre,
+                    CVSocre = model.CVSocre,
                 });
 
             }
@@ -209,7 +209,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
 
-            if(game.ShowPublicly == model.ShowPublicly && model.PlayImpressions == game.PlayImpressions)
+            if (game.ShowPublicly == model.ShowPublicly && model.PlayImpressions == game.PlayImpressions)
             {
                 return new Result { Successful = true };
             }
@@ -225,22 +225,26 @@ namespace CnGalWebSite.APIServer.Controllers
             //}
 
             //判断是否需要参与抽奖
-            var lotteries =await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.BeginTime < game.ScoreTime && s.IsEnd == false&&s.ConditionType== LotteryConditionType.NewGameRecord).ToListAsync();
-            foreach(var item in lotteries)
+            if (string.IsNullOrWhiteSpace(game.PlayImpressions) == false)
             {
-                try
+                var lotteries = await _lotteryRepository.GetAll().AsNoTracking().Where(s => s.BeginTime < game.LastEditTime && s.IsEnd == false && s.ConditionType == LotteryConditionType.NewGameRecord && s.IsHidden == false).ToListAsync();
+                foreach (var item in lotteries)
                 {
-                    await _lotteryService.AddUserToLottery(item, user, HttpContext, model.Identification);
-                }
-                catch
-                { }
+                    try
+                    {
+                        await _lotteryService.AddUserToLottery(item, user, HttpContext, model.Identification);
+                    }
+                    catch
+                    { }
 
+                }
             }
+
 
 
             //不公开或没有感想 都可以直接保存
 
-            if  (model.ShowPublicly == false || string.IsNullOrWhiteSpace(model.PlayImpressions))
+            if (model.ShowPublicly == false || string.IsNullOrWhiteSpace(model.PlayImpressions))
             {
                 game.ShowPublicly = model.ShowPublicly;
                 game.PlayImpressions = model.PlayImpressions;
@@ -258,8 +262,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var playedGameMain = new PlayedGameMain
             {
-                PlayImpressions=model.PlayImpressions,
-                ShowPublicly=model.ShowPublicly
+                PlayImpressions = model.PlayImpressions,
+                ShowPublicly = model.ShowPublicly
             };
 
             //保存并尝试应用审核记录
@@ -286,7 +290,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
                 await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.GameIds.Contains(s.EntryId)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsHidden, b => model.IsHidden));
-               
+
 
             }
             return new Result { Successful = true };
@@ -310,7 +314,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
                 await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.GameIds.Contains(s.EntryId)).ExecuteUpdateAsync(s => s.SetProperty(s => s.ShowPublicly, b => model.IsHidden));
-              
+
             }
             return new Result { Successful = true };
         }
@@ -344,10 +348,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var gameIds = games.Select(s => s.Id).ToList();
             //提前加载预览
             //获取审核记录
-            var examines = await _examineRepository.GetAllListAsync(s => s.PlayedGameId!=null&& gameIds.Contains(s.PlayedGameId.Value) && s.ApplicationUserId == user.Id
+            var examines = await _examineRepository.GetAllListAsync(s => s.PlayedGameId != null && gameIds.Contains(s.PlayedGameId.Value) && s.ApplicationUserId == user.Id
               && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null);
 
-            foreach(var item in examines)
+            foreach (var item in examines)
             {
                 _playedGameService.UpdatePlayedGameData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
             }
@@ -396,7 +400,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //获取词条
             var gameIds = await _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
-           
+
 
             return gameIds;
         }
@@ -421,7 +425,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.PlayedGames).ThenInclude(s => s.ApplicationUser)
-                .Include(s=>s.Tags)
+                .Include(s => s.Tags)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (entry == null)
@@ -455,7 +459,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }).ToList(),
             };
             //判断是否有配音
-            if(entry.Tags!=null&&entry.Tags.Any(s=>s.Name=="无配音"))
+            if (entry.Tags != null && entry.Tags.Any(s => s.Name == "无配音"))
             {
                 model.IsDubbing = false;
 
@@ -467,7 +471,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             var gameScores = await _playedGameService.GetGameScores(entry.Id);
-            if(gameScores!=null)
+            if (gameScores != null)
             {
                 model.GameTotalScores.ScriptSocre = gameScores.AllScriptSocre;
                 model.GameTotalScores.TotalSocre = gameScores.AllTotalSocre;
@@ -485,10 +489,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.GameReviewsScores.SystemSocre = gameScores.FilterSystemSocre;
                 model.GameReviewsScores.CVSocre = gameScores.FilterCVSocre;
             }
-         
+
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if (user==null)
+            if (user == null)
             {
                 return model;
             }
@@ -497,7 +501,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (userScore != null)
             {
                 //获取审核记录
-                var examines = await _examineRepository.GetAll().Include(s => s.PlayedGame).Where(s => s.PlayedGameId==userScore.Id  && s.ApplicationUserId == user.Id
+                var examines = await _examineRepository.GetAll().Include(s => s.PlayedGame).Where(s => s.PlayedGameId == userScore.Id && s.ApplicationUserId == user.Id
                   && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null).ToListAsync();
 
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
@@ -506,8 +510,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     _playedGameService.UpdatePlayedGameData(userScore, examine);
                 }
 
-                var current= model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
-                if(current==null)
+                var current = model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
+                if (current == null)
                 {
                     current = new PlayedGameUserScoreModel
                     {
@@ -587,7 +591,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<GameRecordOverviewModel>> List(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<PlayedGame, long>(_playedGameRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s => s.Entry).Where(s=>s.Entry!=null&&s.ApplicationUser!=null), model,
+            var (items, total) = await _queryService.QueryAsync<PlayedGame, long>(_playedGameRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s => s.Entry).Where(s => s.Entry != null && s.ApplicationUser != null), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PlayImpressions.Contains(model.SearchText)));
 
             return new QueryResultModel<GameRecordOverviewModel>
