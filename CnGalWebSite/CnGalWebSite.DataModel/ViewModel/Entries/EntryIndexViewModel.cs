@@ -231,11 +231,16 @@ namespace CnGalWebSite.DataModel.ViewModel
             return GetLink(PublishPlatformType, Link);
         }
 
+        public string GetLinkText()
+        {
+            return GetLinkText(PublishPlatformType, Link);
+        }
+
         public static string GetLink(PublishPlatformType type,string link)
         {
             return type switch
             {
-                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? "https://store.steampowered.com/app/" + link : link,
+                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? ($"https://store.steampowered.com/app/{link}?utm_source=cngal&utm_campaign=entries"): link,
                 PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + link,
                 PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + link,
                 PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" + link,
@@ -243,6 +248,15 @@ namespace CnGalWebSite.DataModel.ViewModel
                 PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + link,
                 PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{link}.html",
                 _ => link
+            };
+        }
+
+        public static string GetLinkText(PublishPlatformType type, string link)
+        {
+            return type switch
+            {
+                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? "https://store.steampowered.com/app/" + link : link,
+                _ => null
             };
         }
     }

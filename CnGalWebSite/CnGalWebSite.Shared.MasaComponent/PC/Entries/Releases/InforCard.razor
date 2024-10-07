@@ -136,7 +136,7 @@
     <div>
         @if (string.IsNullOrWhiteSpace(Model.Link) == false)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Link" Text="链接：" Url="@Model.GetLink()" Class="ma-1" ItemProp="url" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Link" Text="链接：" Url="@Model.GetLink()" UrlText="@Model.GetLinkText()" Class="ma-1" ItemProp="url" />
         }
         @if (string.IsNullOrWhiteSpace(Model.Name) == false)
         {
