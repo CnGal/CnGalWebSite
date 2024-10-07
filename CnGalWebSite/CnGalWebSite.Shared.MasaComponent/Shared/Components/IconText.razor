@@ -22,7 +22,7 @@ else
     <span class="@(Class+" d-flex ma-1")" style=" word-break: break-all; align-items: center;">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" IconString="@IconString" />
         <span style="word-break: keep-all;"> @Text</span>
-        <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
+        <a href="@Url" target="_blank" itemprop="@ItemProp">@(string.IsNullOrWhiteSpace(UrlText) ? Url : UrlText)</a>
     </span>
 }
 
@@ -36,6 +36,8 @@ else
     public string Class { get; set; }
     [Parameter]
     public string Url { get; set; }
+    [Parameter]
+    public string UrlText { get; set; }
     [Parameter]
     public IconType Icon { get; set; }
     [Parameter]
