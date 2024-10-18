@@ -181,7 +181,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
             if (gallery && type == UploadFileType.Image)
             {
-                url = await _uploadService.UploadToTucangCC(filePath) + "?" + url;
+                url = await _uploadService.UploadToTucangCC(filePath,$"{GetSHA1(filePath)}.png") + "?" + url;
             }
 
             return url;
@@ -233,7 +233,7 @@ namespace CnGalWebSite.DrawingBed.Services
             return newPath;
         }
 
-        private string GetSHA1(string path)
+        public string GetSHA1(string path)
         {
             try
             {

@@ -42,7 +42,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery=false)
+        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false)
         {
             if (files.Count == 0)
             {
@@ -53,14 +53,14 @@ namespace CnGalWebSite.DrawingBed.Controllers
             {
                 try
                 {
-                    model.Add(await _fileService.UploadFormFile(item,gallery, x, y, type));
+                    model.Add(await _fileService.UploadFormFile(item, gallery, x, y, type));
                 }
                 catch (Exception ex)
                 {
                     model.Add(new UploadResult
                     {
                         Uploaded = false,
-                        FileName=item.Name,
+                        FileName = item.Name,
                         Error = ex.Message
                     });
                 }
@@ -101,7 +101,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-               var result= await _fileService.TransferDepositFile(url,gallery, x, y, type);
+                var result = await _fileService.TransferDepositFile(url, gallery, x, y, type);
 
                 return result;
             }
@@ -126,18 +126,19 @@ namespace CnGalWebSite.DrawingBed.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<UploadResult>> TransferDepositToTucangCCAsync([FromQuery] string url)
         {
-            string path="";
+            string path = "";
             try
             {
                 path = await _fileService.SaveFileFromUrl(url, UploadFileType.Image);
-                var result = await _uploadService.UploadToTucangCC(path);
+                var sha1 = _fileService.GetSHA1(path);
+                var result = await _uploadService.UploadToTucangCC(path, $"{sha1}.png");
                 _fileService.DeleteFile(path);
 
                 return new UploadResult
                 {
                     Url = result,
                     OriginalUrl = url,
-                    Uploaded=true
+                    Uploaded = true
                 };
             }
             catch (Exception ex)
@@ -212,7 +213,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         public async Task<ActionResult<Result>> GetRandomFileAsync([FromQuery] UploadFileType type)
         {
             var random = new Random();
-            var length = await _uploadRecordRepository.CountAsync(s => string.IsNullOrWhiteSpace(s.Url) == false&&s.Type==type);
+            var length = await _uploadRecordRepository.CountAsync(s => string.IsNullOrWhiteSpace(s.Url) == false && s.Type == type);
             if (length > 0)
             {
                 var p = random.Next(0, length);
