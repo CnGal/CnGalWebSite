@@ -12,5 +12,7 @@ namespace CnGalWebSite.DrawingBed.Services
         Task<string> SaveFileFromUrl(string url, UploadFileType type);
 
         void DeleteFile(string path);
+
+        string GetSHA1(string path);
     }
 }
