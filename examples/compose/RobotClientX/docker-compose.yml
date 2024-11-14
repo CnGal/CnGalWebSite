@@ -1,4 +1,3 @@
-version: "3"
 services:
   robotclientx:
     image: littlefishtentears/cngalwebsiterobotclientx:latest
@@ -15,6 +14,8 @@ services:
       - MiraiUrl=${MiraiUrl}
       # Mirai 验证密匙
       - NormalVerifyKey=${NormalVerifyKey}
+      # QQ频道 AppId
+      - ChannelAppId=${ChannelAppId}
       # QQ频道 Token
       - ChannelToken=${ChannelToken}
       # QQ频道 AppKey
@@ -56,3 +57,6 @@ services:
           memory: ${resources_limits_memory}
     ports:
       - "2004:8080"
+    volumes:
+      - ${MNT_DIR}/robotclientx/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+      - ${MNT_DIR}/robotclientx/Data:/app/wwwroot/Data
