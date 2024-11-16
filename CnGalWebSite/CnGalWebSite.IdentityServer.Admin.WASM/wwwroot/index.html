@@ -16,37 +16,117 @@
 
     <link href="manifest.json" rel="manifest" />
 
-    <!--masa blazor css style-->
-    <link rel="stylesheet" href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
-    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
+    <!--组件库-->
+    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
 
-    <!--icon file,import need to use-->
+    <!--图标-->
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons" />
 
-    <link href="css/app.css" rel="stylesheet" />
+    <!--自定义样式-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
+
+    <!--不同屏幕大小自适应样式-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
+
+    <!--主题颜色-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Components/css/material-theme/color-tokens/color-pink-tokens.css">
+
+    <!--亮色模式-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/light/bundle-light.min.css" />
+
     <link rel="stylesheet" href="_content/CnGalWebSite.IdentityServer.Admin.Shared/css/site.css">
 
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div id="app-laoding" class="background-card" data-nosnippet>
+            <div class="main-card">
+                <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1 class="headline-large">CnGal资料站</h1>
+
+                </div>
+                <div>正在载入APP模式，努力初始化相关资源中，APP模式将会带来更加稳定的编辑体验，还请耐心等待哦</div>
+                <div class="action-card">
+                    <div style="display: flex;justify-content: center;align-items: center;" class="mt-2">
+                        <svg class="loading-progress">
+                            <circle r="40%" cx="50%" cy="50%"></circle>
+                            <circle r="40%" cx="50%" cy="50%"></circle>
+                        </svg>
+                        <div class="loading-progress-text"></div>
+                    </div>
+                </div>
+            </div>
+            <a class="beian" target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备15055899号</a>
+        </div>
+    </div>
+    <div id="blazor-error-ui" data-nosnippet>
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面，如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
+                        </div>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        发生了一个未知错误，请加群 761794704 反馈，或者按下F12查看控制台输出
-        <a href="" class="reload">刷新</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/CnGalWebSite.IdentityServer.Admin.Shared/js/site.js"></script>
+
+    <!--图片裁剪-->
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+
+    <!--身份验证-->
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+
+    <!--压缩程序集下载并解压-->
+    <script src="decode.js"></script>
+
+    <!--运行时-->
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
+    <!--组件库-->
     <script src="https://app.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+
+    <!--服务工作进程-->
+    <script src="service-worker-register.js"></script>
+
+    <!--解压-->
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost' && name != '../appsettings.json') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type ===
+                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray,
+                            { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
 
 </body>
 
