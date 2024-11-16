@@ -6,17 +6,20 @@ namespace CnGalWebSite.GameSite.SSR.Plumbing;
 
 public class CookieEvents : CookieAuthenticationEvents
 {
-    private readonly IUserAccessTokenStore _store;
+    private readonly IUserAccessTokenManagementService _tokenManagementService;
 
-    public CookieEvents(IUserAccessTokenStore store)
+    public CookieEvents(IUserAccessTokenManagementService tokenManagementService)
     {
-        _store = store;
+        _tokenManagementService = tokenManagementService;
     }
-    
+
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {
-        var token = await _store.GetTokenAsync(context.Principal);
-        if (token == null) context.RejectPrincipal();
+        var token = await _tokenManagementService.GetUserAccessTokenAsync(context.Principal);
+        if (token == null)
+        {
+            context.RejectPrincipal();
+        }
 
         await base.ValidatePrincipal(context);
     }

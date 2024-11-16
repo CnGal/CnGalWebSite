@@ -97,7 +97,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             var model = new List<UserClientOverviewModel>();
             foreach (var item in clients)
             {
-                var userClient = userclients.FirstOrDefault(s => s.ClientId == item.Id&&s.IsPassed==null);
+                var userClient = userclients.FirstOrDefault(s => s.ClientId == item.Id && s.IsPassed == null);
                 if (userClient != null && userClient.IsPassed == null)
                 {
                     item.LogoUri = userClient.LogoUri;
@@ -143,7 +143,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             var user = await FindLoginUserAsync();
             var userClient = await _userClientRepository.GetAll().AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null && s.ClientId == client.Id);
-            if(userClient != null)
+            if (userClient != null)
             {
                 client.LogoUri = userClient.LogoUri;
                 client.ClientUri = userClient.ClientUri;
@@ -167,8 +167,14 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 AllowedGrantTypes = client.AllowedGrantTypes.Select(s => s.GrantType).ToList(),
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(s => s.PostLogoutRedirectUri).ToList(),
                 RedirectUris = client.RedirectUris.Select(s => s.RedirectUri).ToList(),
-                RequirePkce=client.RequirePkce,
-                AllowAccessTokensViaBrowser=client.AllowAccessTokensViaBrowser,
+                RequirePkce = client.RequirePkce,
+                AllowAccessTokensViaBrowser = client.AllowAccessTokensViaBrowser,
+                AllowOfflineAccess = client.AllowOfflineAccess,
+                SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime,
+                AbsoluteRefreshTokenLifetime = client.AbsoluteRefreshTokenLifetime,
+                AccessTokenLifetime = client.AccessTokenLifetime,
+                RefreshTokenUsage = (ClientTokenUsage)client.RefreshTokenUsage,
+                RefreshTokenExpiration = (ClientTokenExpiration)client.RefreshTokenExpiration
             };
 
             return model;
@@ -193,9 +199,9 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             string secret = null;
 
             //检测所属
-            if(!User.IsInRole("Admin")&& model.Id!=0)
+            if (!User.IsInRole("Admin") && model.Id != 0)
             {
-                if (!await _userClientRepository.AnyAsync(s=>s.ApplicationUserId== user.Id&&s.ClientId== model.Id))
+                if (!await _userClientRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.ClientId == model.Id))
                 {
                     return new Result { Success = false, Message = "当前用户没有客户端的所有权" };
                 }
@@ -204,7 +210,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             if (model.Id == 0)
             {
                 //检查用户客户端上限
-                if(!User.IsInRole("Admin"))
+                if (!User.IsInRole("Admin"))
                 {
                     if (await _userClientRepository.CountAsync(s => s.ApplicationUserId == user.Id) > 10)
                     {
@@ -225,7 +231,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 _clientRepository.Clear();
             }
 
-         
+
 
             client = await _clientRepository.GetAll()
                 .Include(s => s.AllowedGrantTypes)
@@ -251,7 +257,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                     ApplicationUserId = user.Id,
                     ClientId = client.Id,
                     IsPassed = true
-                }) ;
+                });
             }
             else
             {
@@ -269,6 +275,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                 client.RequireClientSecret = model.RequireClientSecret;
                 client.RequirePkce = model.RequirePkce;
                 client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
+                client.AllowOfflineAccess = model.AllowOfflineAccess;
+                client.AccessTokenLifetime = model.AccessTokenLifetime;
+                client.AbsoluteRefreshTokenLifetime = model.AbsoluteRefreshTokenLifetime;
+                client.SlidingRefreshTokenLifetime = model.SlidingRefreshTokenLifetime;
+                client.RefreshTokenUsage = (int)model.RefreshTokenUsage;
+                client.RefreshTokenExpiration = (int)model.RefreshTokenExpiration;
 
                 await _userClientRepository.UpdateAsync(userClient);
             }
@@ -294,7 +306,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
                     await _examineService.AddExamine(user, examine);
                 }
             }
-           
+
 
             //不需要检查权限
             client.Enabled = model.Enabled;
@@ -401,7 +413,7 @@ namespace CnGalWebSite.IdentityServer.APIControllers
             await _clientRepository.UpdateAsync(client);
 
 
-            return new Result { Success = true,Message= secret };
+            return new Result { Success = true, Message = secret };
         }
 
         private async Task<ApplicationUser> FindLoginUserAsync()
