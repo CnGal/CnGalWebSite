@@ -3,8 +3,8 @@
 @inject IHttpService _httpService
 
 <MRow>
-    <MCol Cols="12" Lg="6" Xl="4">
-        <MCard Class="list-card">
+    <MCol Cols="12" Lg="6" Xl="4" Class="mb-4">
+        <CnGalWebSite.Components.Cards.MDCard Class="list-card">
             <MCardTitle>应用列表</MCardTitle>
             <MCardText>
                 创建第三方应用后，你可以将CnGal资料站作为第三方登入提供商加入到你的网站、APP中，之后你的用户可以使用CnGal资料站的账户登入你的应用
@@ -12,26 +12,30 @@
             <MCardActions>
                 <MSpacer></MSpacer>
                 <MButton Color="primary"
-                         Dark
+                         Dark Rounded
                          OnClick="OnClickAdd">
                     <MIcon Left>mdi-plus</MIcon>
                     创建
                 </MButton>
             </MCardActions>
-        </MCard>
+        </CnGalWebSite.Components.Cards.MDCard>
     </MCol>
     @if (Model == null)
     {
-        <MCol Cols="12" Lg="6" Xl="4">
-            <CnGalWebSite.Components.Progressings.ProgressingCard Class="h-100" />
+        <MCol Cols="12" Lg="6" Xl="4" Class="mb-4">
+            <CnGalWebSite.Components.Cards.MDCard Class="h-100">
+                <MCardText Class="pt-8 pb-8">
+                    <CnGalWebSite.Components.Progressings.ProgressingCard Class="h-100"/>
+                </MCardText>
+            </CnGalWebSite.Components.Cards.MDCard>
         </MCol>
     }
     else
     {
         @foreach (var item in Model)
         {
-            <MCol Cols="12" Lg="6" Xl="4">
-                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card" OnEdited="OnEdited" AllowedScopes="_scopes"/>
+            <MCol Cols="12" Lg="6" Xl="4" Class="mb-4">
+                <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.OverviewCard Model="item" Class="list-card" OnEdited="OnEdited" AllowedScopes="_scopes" />
             </MCol>
         }
     }

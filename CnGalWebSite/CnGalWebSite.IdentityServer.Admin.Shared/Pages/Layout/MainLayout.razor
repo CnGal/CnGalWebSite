@@ -23,19 +23,19 @@
                     <CnGalWebSite.IdentityServer.Admin.Shared.Components.Layout.UserButton />
                 </ChildContent>
                 <ExtensionContent>
-                    <MTabs AlignWithTitle>
-                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/"))">主页</MTab>
-                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">个人信息</MTab>
-                        <MTab OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">应用列表</MTab>
+                    <MTabs AlignWithTitle Routable>
+                        <MTab Href="/">主页</MTab>
+                        <MTab Href="/users/index">个人信息</MTab>
+                        <MTab Href="/users/clients">应用列表</MTab>
 
                         <AuthorizeView Roles="Admin">
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">用户列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">角色列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">客户端列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">审核列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">API范围列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">身份资源列表</MTab>
-                            <MTab OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">操作记录列表</MTab>
+                            <MTab Href="/admin/users">用户列表</MTab>
+                            <MTab Href="/admin/roles">角色列表</MTab>
+                            <MTab Href="/admin/clients">客户端列表</MTab>
+                            <MTab Href="/admin/examines">审核列表</MTab>
+                            <MTab Href="/admin/apiscopes">API范围列表</MTab>
+                            <MTab Href="/admin/identityresources">身份资源列表</MTab>
+                            <MTab Href="/admin/records">操作记录列表</MTab>
                         </AuthorizeView>
 
                     </MTabs>
@@ -43,7 +43,7 @@
             </MAppBar>
             <MSheet Class="overflow-y-auto" Id="main-sheet">
                 <MContainer Style=" margin-top: 250px;">
-                    <ErrorHandler>
+                    <ErrorHandler ShowDetailedErrorInfor>
                         @Body
                     </ErrorHandler>
                 </MContainer>
@@ -52,49 +52,49 @@
     </MMain>
     <MNavigationDrawer @bind-Value="_drawer" Absolute Temporary>
         <div class="nav-drawer">
-            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/"))">
+            <MButton Text Block Color="primary" Href="/">
                 <MIcon Left>mdi-home</MIcon>
                 主页
             </MButton>
-            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/index"))">
+            <MButton Text Block Color="primary" Href="/users/index">
                 <MIcon Left>mdi-account</MIcon>
                 个人信息
             </MButton>
-            <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/users/clients"))">
+            <MButton Text Block Color="primary" Href="/users/clients">
                 <MIcon Left>mdi-application-outline</MIcon>
                 应用列表
             </MButton>
             <AuthorizeView Roles="Admin">
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/users"))">
+                <MButton Text Block Color="primary" Href="/admin/users">
                     <MIcon Left>mdi-account-group</MIcon>
                     用户列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/roles"))">
+                <MButton Text Block Color="primary" Href="/admin/roles">
                     <MIcon Left>mdi-account-lock</MIcon>
                     角色列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/clients"))">
+                <MButton Text Block Color="primary" Href="/admin/clients">
                     <MIcon Left>mdi-application</MIcon>
                     客户端列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/examines"))">
+                <MButton Text Block Color="primary" Href="/admin/examines">
                     <MIcon Left>mdi-bell-outline</MIcon>
                     审核列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/apiscopes"))">
+                <MButton Text Block Color="primary" Href="/admin/apiscopes">
                     <MIcon Left>mdi-lock</MIcon>
                     API范围列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/identityresources"))">
+                <MButton Text Block Color="primary" Href="/admin/identityresources">
                     <MIcon Left>mdi-forest</MIcon>
                     身份资源列表
                 </MButton>
-                <MButton Text Block Color="primary" OnClick="@(()=>NavigationManager.NavigateTo("/admin/records"))">
+                <MButton Text Block Color="primary" Href="/admin/records">
                     <MIcon Left>mdi-record</MIcon>
                     操作记录列表
                 </MButton>
             </AuthorizeView>
-          
+
         </div>
     </MNavigationDrawer>
     <MFooter App Absolute>

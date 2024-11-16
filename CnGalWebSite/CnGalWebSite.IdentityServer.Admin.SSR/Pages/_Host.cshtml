@@ -19,16 +19,28 @@
 
     <base href="~/" />
 
-    <!--masa blazor css style-->
+    <!--组件库-->
+    @* <link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" /> *@
     <link rel="stylesheet" href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
-    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
 
-    <!--icon file,import need to use-->
+    <!--图标-->
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons" />
 
+    <!--自定义样式-->
+    @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle.css"> *@
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
 
-    <link href="css/site.css" rel="stylesheet" />
+    <!--不同屏幕大小自适应样式-->
+    @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
+
+    <!--主题颜色-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Components/css/material-theme/color-tokens/color-pink-tokens.css">
+
+    <!--亮色模式-->
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/light/bundle-light.min.css" />
+    @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/light/bundle-light.css" /> *@
+
     <link rel="stylesheet" href="_content/CnGalWebSite.IdentityServer.Admin.Shared/css/site.css">
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
@@ -36,23 +48,49 @@
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
-    <div id="blazor-error-ui">
-        发生了一个未知错误，请加群 761794704 反馈，或者按下F12查看控制台输出
-        <a href="" class="reload">刷新</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <div id="components-reconnect-modal" style="height:0px;width:0px;">
+    <div id="blazor-error-ui" data-nosnippet>
+        <div class="background-card">
+            <div class="main-card">
+                <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" style="width: 70%;">
+                <div class="content-card">
+                    <h1>发生未知错误</h1>
+                    <div>
+                        <div>
+                            请尝试刷新页面，如果问题无法解决，可加 QQ群 <a class="primary-text" href="https://jq.qq.com/?_wv=1027&k=JzuI1IkF">761794704</a> 进行反馈
+                        </div>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <button class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default error pointer mb-3 me-3 m-btn--rounded" onclick="navigateTo('/')">
+                        <span class="m-btn__content">
+                            <i class="m-icon m-icon--left theme--dark mdi mdi-refresh "></i>
+                            刷新
+                        </span>
+                    </button>
+                </div>
+            </div>
 
+        </div>
     </div>
-    <script src="js/site.js"></script>
+    <div id="components-reconnect-modal">
+    </div>
+
     <script src="_content/CnGalWebSite.IdentityServer.Admin.Shared/js/site.js"></script>
 
-    <!--运行时-->
-    @* <script src="_framework/blazor.server.js"></script> *@
-    <script src="https://res.cngal.org/_framework/blazor.server.8.0.js"></script>
+    <!--图片裁剪-->
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
 
     <!--组件库-->
     @* <script src="_content/BlazorComponent/js/blazor-component.js"></script> *@
-    <script src="https://res.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+    <script src="https://app.cngal.org/_content/BlazorComponent/js/blazor-component.js"></script>
+
+    @* <script src="_framework/blazor.web.js"></script> *@
+    <script src="https://res.cngal.org/_framework/blazor.web.8.0.js" autostart="false"></script>
+
+    <script>
+        Blazor.start({
+            ssr: { disableDomPreservation: true }
+        });
+    </script>
 </body>
 </html>

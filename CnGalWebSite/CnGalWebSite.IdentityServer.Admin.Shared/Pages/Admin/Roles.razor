@@ -27,7 +27,7 @@
 
 <MDialog @bind-Value="_editDialog"
          MaxWidth="500">
-    <MCard>
+    <CnGalWebSite.Components.Cards.MDCard>
         <MCardTitle>
             @(string.IsNullOrWhiteSpace( _tempItem.Id)? "添加角色" : "编辑角色")
         </MCardTitle>
@@ -43,7 +43,7 @@
                 保存
             </MButton>
         </MCardActions>
-    </MCard>
+    </CnGalWebSite.Components.Cards.MDCard>
 </MDialog>
 
 <MDialog @bind-Value="_detailDialog"
