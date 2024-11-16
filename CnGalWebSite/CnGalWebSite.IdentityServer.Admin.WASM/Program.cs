@@ -1,4 +1,4 @@
-﻿using BlazorComponent;
+﻿
 using Blazored.LocalStorage;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Core.Services.Query;

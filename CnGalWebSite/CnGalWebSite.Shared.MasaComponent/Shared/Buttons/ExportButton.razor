@@ -76,11 +76,11 @@
         var output = items.First().ToCsvHeader();
         output += Environment.NewLine;
 
-        items.ForEach(burger =>
+        foreach (var item in items)
         {
-            output += burger.ToCsvRow();
+            output += item.ToCsvRow();
             output += Environment.NewLine;
-        });
+        }
 
         var fileStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(output));
 

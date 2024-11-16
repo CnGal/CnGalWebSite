@@ -1,11 +1,11 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 #FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-FROM littlefishtentears/dotnet-with-curl:8.0 AS base
+FROM littlefishtentears/dotnet-with-curl:9.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["CnGalWebSite/CnGalWebSite.APIServer/CnGalWebSite.APIServer.csproj", "CnGalWebSite/CnGalWebSite.APIServer/"]
 COPY ["CnGalWebSite/CnGalWebSite.DataModel/CnGalWebSite.DataModel.csproj", "CnGalWebSite/CnGalWebSite.DataModel/"]

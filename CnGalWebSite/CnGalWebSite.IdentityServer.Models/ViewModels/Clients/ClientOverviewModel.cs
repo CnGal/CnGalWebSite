@@ -27,7 +27,7 @@ namespace CnGalWebSite.IdentityServer.Models.ViewModels.Clients
 
         public bool AllowAccessTokensViaBrowser { get; set; }
 
-        public bool AllowOfflineAccess { get; set; }
+        public bool AllowOfflineAccess { get; set; } = true;
 
         public int AccessTokenLifetime { get; set; } = 3600;
 

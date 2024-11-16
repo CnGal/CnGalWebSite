@@ -2,7 +2,7 @@
 using Masa.Blazor;
 using Microsoft.Extensions.DependencyInjection;
 using Masa.Blazor.Presets;
-using BlazorComponent;
+
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.Components.Extensions;
 
