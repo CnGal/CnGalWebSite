@@ -16,10 +16,10 @@ namespace CnGalWebSite.EventBus.Services
         private readonly ConcurrentDictionary<string, TaskCompletionSource<byte[]>> callbackMapper = new();
 
         private IConnection _connection;
-        private IModel _channel;
+        private IChannel _channel;
         private string replyQueueName;
 
-        public void Init()
+        public async Task Init()
         {
             if (_channel == null && _connection == null)
             {
@@ -30,15 +30,15 @@ namespace CnGalWebSite.EventBus.Services
                     UserName = _configuration["EventBus_UserName"],
                     Password = _configuration["EventBus_Password"],
                 };
-                _connection = factory.CreateConnection();
-                _channel = _connection.CreateModel();
+                _connection = await factory.CreateConnectionAsync();
+                _channel = await _connection.CreateChannelAsync();
             }
         }
 
-        public void SendMessage<T>(string queue, T message)
+        public async Task SendMessage<T>(string queue, T message)
         {
-            Init();
-            _channel.QueueDeclare(
+            await Init();
+            await _channel.QueueDeclareAsync(
                 queue: queue,   // 队列名称
                 durable: true,     // 是否持久化，true持久化，队列会保存磁盘，服务器重启时可以保证不丢失相关信息
                 exclusive: false,   // 是否排他，如果一个队列声明为排他队列，该队列仅对时候次声明它的连接可见，并在连接断开时自动删除
@@ -48,13 +48,13 @@ namespace CnGalWebSite.EventBus.Services
 
             var json = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(json);
-            _channel.BasicPublish(exchange: "", routingKey: queue, body: body);
+            await _channel.BasicPublishAsync(exchange: "", routingKey: queue, body: body);
         }
 
-        public void SubscribeMessages<T>(string queue, Action<T> action)
+        public async Task SubscribeMessages<T>(string queue, Action<T> action)
         {
-            Init();
-            _channel.QueueDeclare(
+            await Init();
+            await _channel.QueueDeclareAsync(
                 queue: queue,   // 队列名称
                 durable: true,     // 是否持久化，true持久化，队列会保存磁盘，服务器重启时可以保证不丢失相关信息
                 exclusive: false,   // 是否排他，如果一个队列声明为排他队列，该队列仅对时候次声明它的连接可见，并在连接断开时自动删除
@@ -62,8 +62,8 @@ namespace CnGalWebSite.EventBus.Services
                 arguments: null     // 设置队列的其他参数
             );
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, eventArgs) =>
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += async (model, eventArgs) =>
             {
                 var body = eventArgs.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
@@ -71,7 +71,7 @@ namespace CnGalWebSite.EventBus.Services
                 var obj = JsonSerializer.Deserialize<T>(message);
                 action(obj);
             };
-            _channel.BasicConsume(queue: queue, autoAck: true, consumer: consumer);
+            await _channel.BasicConsumeAsync(queue: queue, autoAck: true, consumer: consumer);
         }
 
         /// <summary>
@@ -81,10 +81,10 @@ namespace CnGalWebSite.EventBus.Services
         /// <typeparam name="TOutput"></typeparam>
         /// <param name="queue"></param>
         /// <param name="func"></param>
-        public void CreateRpcServer<TInput, TOutput>(string queue, Func<TInput, Task<TOutput>> func)
+        public async Task CreateRpcServer<TInput, TOutput>(string queue, Func<TInput, Task<TOutput>> func)
         {
-            Init();
-            _channel.QueueDeclare(
+            await Init();
+            await _channel.QueueDeclareAsync(
                 queue: queue,
                 durable: false,
                 exclusive: false,
@@ -93,17 +93,15 @@ namespace CnGalWebSite.EventBus.Services
             );
 
             // 限制每次只传递一个事件
-            _channel.BasicQos(0, 1, false);
+            await _channel.BasicQosAsync(0, 1, false);
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += async (model, ea) =>
             {
                 TOutput response = default;
 
                 var body = ea.Body.ToArray();
                 var props = ea.BasicProperties;
-                var replyProps = _channel.CreateBasicProperties();
-                replyProps.CorrelationId = props.CorrelationId;
 
                 try
                 {
@@ -124,32 +122,32 @@ namespace CnGalWebSite.EventBus.Services
                         var json = JsonSerializer.Serialize(response);
                         var responseBytes = Encoding.UTF8.GetBytes(json);
                         // 发布
-                        _channel.BasicPublish(exchange: "", routingKey: props.ReplyTo, basicProperties: replyProps, body: responseBytes);
+                        await _channel.BasicPublishAsync("", props.ReplyTo, false, new BasicProperties(), responseBytes);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex, "回传RPC结果失败");
                     }
                     finally
                     {
-                        _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                        await _channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
                     }
 
                 }
             };
-            _channel.BasicConsume(queue: queue, autoAck: false, consumer: consumer);
+            await _channel.BasicConsumeAsync(queue: queue, autoAck: false, consumer: consumer);
         }
 
         /// <summary>
         /// 创建RPC客户端 只调用一次
         /// </summary>
-        public void CreateRpcClient()
+        public async Task CreateRpcClient()
         {
-            Init();
+            await Init();
             // declare a server-named queue
-            replyQueueName = _channel.QueueDeclare().QueueName;
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, ea) =>
+            replyQueueName = (await _channel.QueueDeclareAsync()).QueueName;
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += async (model, ea) =>
             {
                 if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out var tcs))
                     return;
@@ -157,9 +155,9 @@ namespace CnGalWebSite.EventBus.Services
                 tcs.TrySetResult(body);
             };
 
-            _channel.BasicConsume(consumer: consumer,
-                                 queue: replyQueueName,
-                                 autoAck: true);
+            await _channel.BasicConsumeAsync(consumer: consumer,
+                                   queue: replyQueueName,
+                                   autoAck: true);
         }
 
         /// <summary>
@@ -171,12 +169,12 @@ namespace CnGalWebSite.EventBus.Services
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<TOutput> CallRpcAsync<TInput, TOutput>(string queue, TInput input, CancellationToken cancellationToken = default)
+        public async Task<TOutput> CallRpcAsync<TInput, TOutput>(string queue, TInput input, CancellationToken cancellationToken = default)
         {
-            Init();
+            await Init();
 
             // 创建唯一标识
-            IBasicProperties props = _channel.CreateBasicProperties();
+            BasicProperties props = new BasicProperties();
             var correlationId = Guid.NewGuid().ToString();
             props.CorrelationId = correlationId;
             props.ReplyTo = replyQueueName;
@@ -191,10 +189,7 @@ namespace CnGalWebSite.EventBus.Services
             callbackMapper.TryAdd(correlationId, tcs);
 
             // 发布
-            _channel.BasicPublish(exchange: string.Empty,
-                                 routingKey: queue,
-                                 basicProperties: props,
-                                 body: messageBytes);
+            await _channel.BasicPublishAsync(string.Empty, queue, true, props, messageBytes);
 
             cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out _));
 
@@ -213,7 +208,7 @@ namespace CnGalWebSite.EventBus.Services
                 return output;
             }, cancellationToken);
 
-            return ret;
+            return await ret;
         }
 
         public void Dispose()

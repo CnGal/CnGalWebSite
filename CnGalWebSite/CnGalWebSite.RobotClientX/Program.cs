@@ -9,7 +9,7 @@ using CnGalWebSite.Core.Services.Query;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
-using BlazorComponent;
+
 using Masa.Blazor.Presets;
 using Masa.Blazor;
 using CnGalWebSite.EventBus.Extensions;
