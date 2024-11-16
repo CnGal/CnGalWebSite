@@ -17,7 +17,7 @@
 
     @if (ShowPreview)
     {
-        <div style="display: flex;">
+        <div style="display: flex;position: relative;">
             <MasaImage Src="@ImagePath" Type="ImageType" Style="width: 100%;border-radius: var( --md-card-border-radius);" Alt="预览图" Class="elevation-2" />
             <div class="ps-4 pt-4" style="position: absolute;display: flex;">
                 <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3 @(Rounded?"m-btn--rounded":"")">

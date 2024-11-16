@@ -1,5 +1,5 @@
 ﻿
-<MCard Class="@Class">
+<CnGalWebSite.Components.Cards.MDCard Class="@Class">
     <MCardTitle>
         @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
         {
@@ -22,12 +22,13 @@
         <MSpacer></MSpacer>
         <MButton Color="primary"
                  Dark
+                 Rounded
                  OnClick="EditItem">
             <MIcon Left>mdi-pencil</MIcon>
             编辑
         </MButton>
     </MCardActions>
-</MCard>
+</CnGalWebSite.Components.Cards.MDCard>
 <MDialog @bind-Value="_editDialog"
          MaxWidth="1200">
     <CnGalWebSite.IdentityServer.Admin.Shared.Components.Clients.EditCard Id="Model.Id" OnEdited="Edited" @ref="editCard" AllowedScopes="AllowedScopes"/>

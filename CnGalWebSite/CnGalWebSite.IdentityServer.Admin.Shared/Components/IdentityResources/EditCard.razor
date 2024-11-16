@@ -4,11 +4,15 @@
 
 @if (Model == null)
 {
-    <ProgressingCard />
+    <CnGalWebSite.Components.Cards.MDCard>
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    </CnGalWebSite.Components.Cards.MDCard>
 }
 else
 {
-    <MCard>
+    <CnGalWebSite.Components.Cards.MDCard>
         <MCardTitle>
             @(Id==0? $"添加{_name}" : $"编辑{_name}")  @Model.Name
         </MCardTitle>
@@ -50,7 +54,7 @@ else
             </MButton>
         </MCardActions>
 
-    </MCard>
+    </CnGalWebSite.Components.Cards.MDCard>
 
 }
 

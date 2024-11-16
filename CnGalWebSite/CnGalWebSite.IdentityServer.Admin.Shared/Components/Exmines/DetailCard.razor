@@ -4,11 +4,15 @@
 
 @if (Model == null)
 {
-    <ProgressingCard />
+    <CnGalWebSite.Components.Cards.MDCard>
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    </CnGalWebSite.Components.Cards.MDCard>
 }
 else
 {
-<MCard>
+    <CnGalWebSite.Components.Cards.MDCard>
     <MCardTitle>
         审核
     </MCardTitle>
@@ -91,7 +95,7 @@ else
         }
 
 
-</MCard>
+</CnGalWebSite.Components.Cards.MDCard>
 
 }
 

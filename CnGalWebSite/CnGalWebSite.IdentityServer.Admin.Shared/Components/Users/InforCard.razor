@@ -3,7 +3,7 @@
 
 <div class="userinfor-card">
     <AuthorizeView>
-        <MCard Class="w-100 mb-4 main">
+        <CnGalWebSite.Components.Cards.MDCard Class="w-100 mb-4 main">
             <MCardText>
                 <div>
                     <div class="name">@context.User.Identity.Name</div>
@@ -14,21 +14,24 @@
                 </MButton>
             </MCardText>
 
-        </MCard>
+        </CnGalWebSite.Components.Cards.MDCard>
     </AuthorizeView>
     <div class="bind mb-4">
         @if (Model == null)
         {
-            <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill/>
+            <CnGalWebSite.Components.Cards.MDCard>
+                <MCardText Class="pt-8 pb-8">
+                    <CnGalWebSite.Components.Progressings.ProgressingCard Class=" w-100" />
+                </MCardText>
+            </CnGalWebSite.Components.Cards.MDCard>
         }
         else
         {
-
             <MRow>
                 @foreach (var item in Model.AccountFields.Where(s => s.Type != Models.ViewModels.Account.SelectModifyFieldType.Password))
                 {
                     <MCol Cols="12" Sm="4" Md="3">
-                        <MCard>
+                        <CnGalWebSite.Components.Cards.MDCard>
                             <MCardText>
                                 <div class="key">
                                     <i class="@item.Icon primary--text"></i>
@@ -49,7 +52,7 @@
                                     </div>
                                 }
                             </MCardText>
-                        </MCard>
+                        </CnGalWebSite.Components.Cards.MDCard>
                     </MCol>
                 }
             </MRow>
@@ -57,7 +60,7 @@
                 @foreach (var item in Model.ExternalFields)
                 {
                     <MCol Cols="12" Sm="4" Md="3">
-                        <MCard>
+                        <CnGalWebSite.Components.Cards.MDCard>
                             <MCardText>
                                 <div class="key">
                                     <i class="@item.Icon primary--text"></i>
@@ -80,7 +83,7 @@
                             </MCardText>
 
 
-                        </MCard>
+                        </CnGalWebSite.Components.Cards.MDCard>
                     </MCol>
                 }
             </MRow>
@@ -88,7 +91,7 @@
         }
     </div>
     <AuthorizeView Context="userContext">
-        <MExpansionPanels Focusable Class="mb-4">
+        <MExpansionPanels Focusable>
             <MExpansionPanel>
                 <MExpansionPanelHeader>
                     本地获取到的信息

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using CnGalWebSite.IdentityServer.Admin.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 //判断是否 SSR
@@ -33,25 +34,10 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 //令牌储存
 builder.Services.AddSingleton<ITokenStoreService, TokenStoreService>();
 builder.Services.AddScoped<INavigationService, NavigationService> ();
-//添加Query
-builder.Services.AddScoped<IQueryService, QueryService>();
-//设置主题
-builder.Services.AddMasaBlazor(options =>
-{
-    //主题
-    options.ConfigureTheme(s =>
-    {
-        if (DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
-        {
-            s.Themes.Light.Primary = "#4CAF50";
-        }
-        else
-        {
-            s.Themes.Light.Primary = "#f06292";
-        }
-        s.Themes.Dark.Primary = "#0078BF";
-    });
-});
+
+//添加Ids管理后台
+builder.Services.AddIdentityServerAdmin();
+
 //使用 IdentityModel 管理刷新令牌
 builder.Services.AddAccessTokenManagement();
 

@@ -1,9 +1,6 @@
 ﻿@inject IPopupService PopupService
 
-<MBorder Color="primary" Style="border-radius:0;height:50%;margin: auto 0;">
-    <MCardTitle>@Title</MCardTitle>
-    <MCardSubtitle>@SubTitle</MCardSubtitle>
-</MBorder>
+<CnGalWebSite.Components.Cards.SectionTitleCard Text="@SubTitle" Title="@Title" />
 <div class="input-string-card">
     <MTextField Label="@Title" @bind-Value="@_item" TValue="string"/>
     <MButton Color="primary"

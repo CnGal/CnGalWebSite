@@ -1,14 +1,18 @@
-﻿@inject IHttpService _httpService
+﻿@using CnGalWebSite.DrawingBed.Models.DataModels
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 
 
 @if (Model == null)
 {
-    <CnGalWebSite.Components.Progressings.ProgressingCard />
-}
+    <CnGalWebSite.Components.Cards.MDCard>
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    </CnGalWebSite.Components.Cards.MDCard>}
 else
 {
-    <MCard>
+    <CnGalWebSite.Components.Cards.MDCard>
         <MCardTitle>
             @(Id==0? "添加应用" : "编辑应用")  @Model.ClientName
         </MCardTitle>
@@ -17,6 +21,11 @@ else
         </MCardText>
         <MCardText>
             <MRow>
+                <MCol Cols="6" Lg="3">
+                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.LogoUri" Type="ImageAspectType._1_1" ShowCropper Class="mb-4"
+                                                                 Text="上传LOGO" />
+                </MCol>
+                <MCol Cols="12"></MCol>
                 <MCol Cols="12" Md="6">
                     <MTextField @bind-Value="Model.ClientName" Label="应用名称" HideDetails="true" />
 
@@ -28,13 +37,7 @@ else
                 <MCol Cols="12">
                     <MTextarea Rows="3" @bind-Value="Model.Description" Label="应用简介" HideDetails="true" />
                 </MCol>
-                <MCol Cols="12">
-                    @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
-                    {
-                        <MImage Height="50" Width="50" Src="@Model.LogoUri" />
-                    }
-                    <MTextField @bind-Value="Model.LogoUri" Label="LOGO（请使用CnGal图床上传正方形图片）" HideDetails="true" />
-                </MCol>
+
                 <MCol Cols="12" Lg="6" Xl="4">
                     <MCheckbox @bind-Value="Model.Enabled" Label="启用" TValue="bool" HideDetails="true" />
 
@@ -53,7 +56,7 @@ else
                         <MCheckbox @bind-Value="Model.AllowAccessTokensViaBrowser" Label="允许客户端通过浏览器接收访问令牌" TValue="bool" HideDetails="true" />
                     </MCol>
                 </AuthorizeView>
-                <MCol Cols="12">
+                <MCol Cols="12" Class="mt-4">
                     <InputCheckboxList Title="使用的授权方式" Items="Model.AllowedGrantTypes" AllItems="_allowedGrantTypes" />
                 </MCol>
                 <MCol Cols="12">
@@ -85,7 +88,7 @@ else
             </MButton>
         </MCardActions>
 
-    </MCard>
+    </CnGalWebSite.Components.Cards.MDCard>
 
 }
 
