@@ -6,6 +6,6 @@
 
         Task<string> UploadToAliyunOSS(string filePath, string shar1);
 
-        Task<string> UploadToTucangCC(string filePath);
+        Task<string> UploadToTucangCC(string filePath, string uploadName);
     }
 }

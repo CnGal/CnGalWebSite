@@ -122,7 +122,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// 转存图片到公共图床
         /// </summary>
         /// <returns></returns>
-        public async Task<string> UploadToTucangCC(string filePath)
+        public async Task<string> UploadToTucangCC(string filePath, string uploadName)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 content.Add(
                     content: fileContent,
                     name: "file",
-                    fileName: "test.png");
+                    fileName: uploadName);
                 content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
 
                 var response = await _httpClient.PostAsync(_configuration["TucangCCAPIUrl"], content);
@@ -143,7 +143,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 if (result["code"].ToObject<int>() == 200)
                 {
 
-                    var url= $"{_configuration["CustomTucangCCUrl"]}{result["data"]["url"].ToObject<string>().Split('/').LastOrDefault()}";
+                    var url = $"{_configuration["CustomTucangCCUrl"]}{result["data"]["url"].ToObject<string>().Split('/').LastOrDefault()}";
                     await _httpClient.GetAsync(url);
                     _logger.LogInformation("成功上传图片到TucangCC：{url}", url);
                     return url;
