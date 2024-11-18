@@ -155,7 +155,7 @@
         }
         @if (Model.GamePlatformTypes.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Game" Title="游戏平台" Text="@string.Join("、", Model.GamePlatformTypes.Select(s=>s.GetDisplayName()))" Class="ma-1" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Game" Title="游戏平台" Text="@string.Join("、", Model.GamePlatformTypes.Select(s=>s.GetDisplayName()))" Class="ma-1" ItemProp="operatingSystem" />
         }
         @if (string.IsNullOrWhiteSpace(Model.Engine) == false)
         {
