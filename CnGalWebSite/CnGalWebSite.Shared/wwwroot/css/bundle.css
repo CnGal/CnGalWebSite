@@ -941,7 +941,7 @@ html {
 }
 
 .theme--light.m-application {
-    background-color: var(--md-sys-color-background);
+    background-color: transparent;
     color: var(--md-sys-color-on-background);
 }
 
@@ -967,6 +967,7 @@ html {
     background-color: transparent;
     text-shadow: none;
 }
+
 
 .m-toast-detail {
     white-space: pre-line;

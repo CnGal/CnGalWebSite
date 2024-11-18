@@ -38,7 +38,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
 {
     <style>
         body {
-            font-family: @_dataCacheService.ThemeSetting.FontFamily !important;
+        font-family: @_dataCacheService.ThemeSetting.FontFamily !important;
         }
     </style>
 }
@@ -55,8 +55,8 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
 {
     <style>
         .variable.container {
-            max-width: none;
-            padding: 0;
+        max-width: none;
+        padding: 0;
         }
     </style>
 }
@@ -170,6 +170,7 @@ else if (_dataCacheService.ThemeSetting.ThemeMode == ThemeMode.Light)
     {
         await InvokeAsync(StateHasChanged);
         _eventService.OnKanbanChanged();
+        _eventService.OnThemeChanged();
     }
 
     #region 释放实例

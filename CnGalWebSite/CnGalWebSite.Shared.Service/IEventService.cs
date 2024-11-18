@@ -17,6 +17,7 @@ namespace CnGalWebSite.Shared.Service
         event Action KanbanChanged;
         event Action UserInfoChanged;
         event Action UserCommodityChanged;
+        event Action ThemeChanged;
 
         void OnKanbanChanged();
 
@@ -37,5 +38,7 @@ namespace CnGalWebSite.Shared.Service
         void OnUserInfoChanged();
 
         void OnUserCommodityChanged();
+
+        void OnThemeChanged();
     }
 }

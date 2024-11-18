@@ -22,6 +22,7 @@ namespace CnGalWebSite.Shared.Service
         public event Action KanbanChanged;
         public event Action UserInfoChanged;
         public event Action UserCommodityChanged;
+        public event Action ThemeChanged;
 
         private readonly IMauiService _mauiService;
         private readonly IJSRuntime JS;
@@ -50,6 +51,12 @@ namespace CnGalWebSite.Shared.Service
         public void OnKanbanChanged()
         {
             KanbanChanged?.Invoke();
+        }
+
+        //主题设置修改
+        public void OnThemeChanged()
+        {
+            ThemeChanged?.Invoke();
         }
 
         //切换词条样式
