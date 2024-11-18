@@ -968,10 +968,6 @@ html {
     text-shadow: none;
 }
 
-.theme--light.m-application {
-    background-color: transparent;
-}
-
 .m-toast-detail {
     white-space: pre-line;
 }

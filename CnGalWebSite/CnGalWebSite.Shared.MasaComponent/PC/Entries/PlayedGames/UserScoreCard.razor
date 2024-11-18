@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 <MDCard Outline="Outline" ShowHoverStyle="Clickable" Class="@($"h-100 pa-3 {(Clickable?"pointer":"")}")" Style="display: flex; flex-direction: column; justify-content: space-between;" OnClick="OnClick">
-    <div>
+    <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
         <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Users.InfoCard Model="Model.User" HideRank Class="mb-2" Outline/>
 
         @if (Model.Socres.IsScored)
@@ -10,7 +10,7 @@
             <div class="label-large pb-2">
                 @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+((IsDubbing&& Model.Socres.CVSocre>0) ? $",配音{Model.Socres.CVSocre}分" : ""))
             </div>
-            <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+            <div>
                 <meta itemprop="worstRating" content="1">
                 <meta itemprop="bestRating" content="10" />
                 <meta itemprop="ratingValue" content="@Model.Socres.TotalSocre" />

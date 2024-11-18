@@ -1,10 +1,10 @@
 ﻿<MDCard Class="@($"md-main-info-card {(Thumbnail?"role":"game")} {(Small?"small":"")} {Class}")" Href="@Href">
 
     <div class="image-card">
-        <img src="@Image" alt="@Name">
+        <img src="@Image" alt="@Name" itemprop="image">
     </div>
     <div class="content-card">
-        <h1 class="title-large">@Name</h1>
+        <h1 class="title-large" itemprop="name">@Name</h1>
 
         @ChildContent
         <div class="brief label-large text-truncate-3 ">
