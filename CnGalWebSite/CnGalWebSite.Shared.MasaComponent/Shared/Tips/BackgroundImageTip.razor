@@ -1,5 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
+@inject IEventService _eventService
+@implements IDisposable
 
 
 @if (_dataCacheService.ThemeSetting.IsTransparent)
@@ -22,6 +24,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _eventService.ThemeChanged -= OnThemeChanged;
+        _eventService.ThemeChanged += OnThemeChanged;
+
+
         var user = await authenticationStateTask;
         if (user.User.Identity.IsAuthenticated&& Model==null)
         {
@@ -41,5 +47,20 @@
 
             }
         }
+
+
     }
+
+    public async void OnThemeChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        _eventService.ThemeChanged -= OnThemeChanged;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }
