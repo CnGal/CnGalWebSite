@@ -267,20 +267,14 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         {
             try
             {
-                var page = 0;
-                while (true)
+                var jsonContent = await _httpClient.GetStringAsync($"https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid={userId}");
+                if (jsonContent.Contains($"\"appid\":{gameId},"))
                 {
-                    var jsonContent = await _httpClient.GetStringAsync($"https://store.steampowered.com/wishlist/profiles/{userId}/wishlistdata/?p={page}");
-                    if (jsonContent == "[]")
-                    {
-                        return false;
-                    }
-                    var obj = JObject.Parse(jsonContent);
-                    if (obj.ContainsKey(gameId))
-                    {
-                        return true;
-                    }
-                    page++;
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
 
             }
