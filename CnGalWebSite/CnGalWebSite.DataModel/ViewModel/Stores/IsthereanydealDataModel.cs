@@ -6,25 +6,47 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.DataModel.ViewModel.Stores
 {
+    public class IsthereanydealGetIdModel
+    {
+        public bool found { get; set; }
+        public IsthereanydealGameInfo game { get; set; }
+    }
+
+    public class IsthereanydealGameInfo
+    {
+        public string id { get; set; }
+    }
+
+
     public class IsthereanydealDataModel
     {
-        public IsthereanydealDataModelPrice Price { get; set; }
-        public IsthereanydealDataModelPriceLowest Lowest { get; set; }
+        public List<IsthereanydealPriceInfo> prices { get; set; }
     }
 
-
-    public class IsthereanydealDataModelPrice
+    public class IsthereanydealPriceInfo
     {
-        public double Price { get; set; }
-        public int Cut { get; set; }
-        public string Price_formatted { get; set; }
+        public IsthereanydealCurrentPrice current { get; set; }
+        public IsthereanydealLowestPrice lowest { get; set; }
     }
 
-    public class IsthereanydealDataModelPriceLowest
+    public class IsthereanydealCurrentPrice
     {
-        public double Price { get; set; }
-        public int Cut { get; set; }
-        public string Price_formatted { get; set; }
-        public long Recorded { get; set; }
+        public IsthereanydealPrice price { get; set; }
+        public IsthereanydealPrice regular { get; set; }
+        public int cut { get; set; }
+    }
+
+    public class IsthereanydealLowestPrice
+    {
+        public IsthereanydealPrice price { get; set; }
+        public IsthereanydealPrice regular { get; set; }
+        public int cut { get; set; }
+    }
+
+    public class IsthereanydealPrice
+    {
+        public double amount { get; set; }
+        public int amountInt { get; set; }
+        public string currency { get; set; }
     }
 }
