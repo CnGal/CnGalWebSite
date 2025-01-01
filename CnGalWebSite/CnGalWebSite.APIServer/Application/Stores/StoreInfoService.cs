@@ -149,13 +149,15 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 Name = storeInfo.Name,
                 Link = storeInfo.Link,
             };
-            var officalApiTask = UpdateSteamInfoFromOfficialAPI(data);
-            var officalHtmlTask = UpdateSteamInfoFromOfficialHtml(data);
-            var isthereanydealTask = UpdateSteamInfoFromIsthereanydeal(data);
-            var xiaoHeiHeTask = UpdateSteamInfoFromXiaoHeiHe(data);
-            var gamalyticTask = UpdateSteamInfoFromGamalytic(data);
 
-            await Task.WhenAll(officalApiTask, officalHtmlTask, isthereanydealTask, xiaoHeiHeTask, gamalyticTask);
+
+            await UpdateSteamInfoFromOfficialAPI(data);
+            await UpdateSteamInfoFromOfficialHtml(data);
+            await UpdateSteamInfoFromIsthereanydeal(data);
+            await UpdateSteamInfoFromXiaoHeiHe(data);
+            await UpdateSteamInfoFromGamalytic(data);
+            await UpdateSteamInfoFromVginsights(data);
+
 
             storeInfo.State = data.State;
             storeInfo.PriceLowest = data.PriceLowest;
@@ -241,8 +243,6 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 {
                     storeInfo.RecommendationRate ??= recommendationRate;
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -259,29 +259,41 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var json = await (await _httpService.GetClientAsync()).GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + storeInfo.Link + "&allowed=steam");
-                var re = JObject.Parse(json);
-                var data = re["data"][$"app/{storeInfo.Link}"].ToObject<IsthereanydealDataModel>();
-                if (data.Price != null)
+                var id = await _httpService.GetAsync<IsthereanydealGetIdModel>($"https://api.isthereanydeal.com/games/lookup/v1?key={_configuration["IsthereanydealAPIToken"]}&appid={storeInfo.Link}");
+
+                if (id.found == false)
+                {
+                    return;
+                }
+
+                var data = await _httpService.PostAsync<List<string>, IsthereanydealDataModel>($"https://api.isthereanydeal.com/games/overview/v2?key={_configuration["IsthereanydealAPIToken"]}&shops=61&country=CN", [id.game.id]);
+
+                if (data.prices == null || data.prices.Count == 0)
+                {
+                    return;
+                }
+                var price = data.prices[0];
+
+                if (price.current != null)
                 {
                     //原价
-                    storeInfo.OriginalPrice ??= data.Price.Cut == 100 ? 0 : data.Price.Price / (100 - data.Price.Cut) * 100;
+                    storeInfo.OriginalPrice ??= price.current.regular.amount;
                     //现价
-                    storeInfo.PriceNow ??= data.Price.Price;
+                    storeInfo.PriceNow ??= price.current.price.amount;
                     //折扣
-                    storeInfo.CutNow ??= data.Price.Cut;
+                    storeInfo.CutNow ??= price.current.cut;
                 }
-                if (data.Lowest != null)
+                if (price.lowest != null)
                 {
                     //历史最低
-                    storeInfo.PriceLowest ??= data.Lowest.Price;
+                    storeInfo.PriceLowest ??= price.lowest.price.amount;
                     //历史最高折扣
-                    storeInfo.CutLowest ??= data.Lowest.Cut;
+                    storeInfo.CutLowest ??= price.lowest.cut;
                 }
                 //状态
                 if (storeInfo.State == StoreState.None)
                 {
-                    if (data.Price != null && data.Lowest != null)
+                    if (price.current != null && price.lowest != null)
                     {
                         storeInfo.State = StoreState.OnSale;
                     }
@@ -335,7 +347,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     //折扣
                     storeInfo.CutNow ??= data.Result.Price.Discount;
                     //历史最低
-                    storeInfo.PriceLowest ??=data.Result.Price.Lowest_price_raw;
+                    storeInfo.PriceLowest ??= data.Result.Price.Lowest_price_raw;
                     //历史最高折扣
                     storeInfo.CutLowest ??= data.Result.Price.Lowest_discount;
                     //状态
@@ -372,12 +384,23 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 storeInfo.RecommendationRate ??= data.ReviewScore;
                 //平均游玩时长
                 storeInfo.PlayTime ??= (int)(data.AvgPlaytime * 60);
-                //估计拥有人数上限
-                storeInfo.EstimationOwnersMax ??= (int)(data.Owners);
-                //估计拥有人数下限
-                storeInfo.EstimationOwnersMin ??= (int)(data.Owners);
-                //销售额
-                storeInfo.Revenue ??= (int)(data.Revenue * 7);
+                //估计拥有人数上限 - 取平均
+                if (storeInfo.EstimationOwnersMax.HasValue)
+                    storeInfo.EstimationOwnersMax = (storeInfo.EstimationOwnersMax.Value + (int)data.Owners) / 2;
+                else
+                    storeInfo.EstimationOwnersMax = (int)data.Owners;
+
+                //估计拥有人数下限 - 取平均
+                if (storeInfo.EstimationOwnersMin.HasValue)
+                    storeInfo.EstimationOwnersMin = (storeInfo.EstimationOwnersMin.Value + (int)data.Owners) / 2;
+                else
+                    storeInfo.EstimationOwnersMin = (int)data.Owners;
+
+                //销售额 - 取平均
+                if (storeInfo.Revenue.HasValue)
+                    storeInfo.Revenue = (storeInfo.Revenue.Value + (int)(data.Revenue * 7)) / 2;
+                else
+                    storeInfo.Revenue = (int)(data.Revenue * 7);
 
                 //状态
                 if (storeInfo.State == StoreState.None && data.Unreleased)
@@ -388,6 +411,56 @@ namespace CnGalWebSite.APIServer.Application.Stores
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取 {name} - {id} gamalytic 数据失败", storeInfo.Name, storeInfo.Link);
+            }
+        }
+
+
+        /// <summary>
+        /// 使用 Vginsights API获取信息
+        /// </summary>
+        /// <param name="storeInfo"></param>
+        /// <returns></returns>
+        public async Task UpdateSteamInfoFromVginsights(StoreInfo storeInfo)
+        {
+            try
+            {
+                var data = await _httpService.GetAsync<VginsightsDataModel>("https://vginsights.com/api/v1/game/" + storeInfo.Link);
+
+                //评测数
+                storeInfo.EvaluationCount ??= data.reviews;
+                //好评率
+                storeInfo.RecommendationRate ??= data.rating;
+                //估计拥有人数上限 - 取平均
+                if (storeInfo.EstimationOwnersMax.HasValue)
+                    storeInfo.EstimationOwnersMax = (storeInfo.EstimationOwnersMax.Value + (int)data.units_sold_vgi) / 2;
+                else
+                    storeInfo.EstimationOwnersMax = (int)data.units_sold_vgi;
+
+                //估计拥有人数下限 - 取平均
+                if (storeInfo.EstimationOwnersMin.HasValue)
+                    storeInfo.EstimationOwnersMin = (storeInfo.EstimationOwnersMin.Value + (int)data.units_sold_vgi) / 2;
+                else
+                    storeInfo.EstimationOwnersMin = (int)data.units_sold_vgi;
+
+                if (int.TryParse(data.revenue_vgi, out var result))
+                {
+                    //销售额 - 取平均
+                    if (storeInfo.Revenue.HasValue)
+                        storeInfo.Revenue = (storeInfo.Revenue.Value + (int)(result * 7)) / 2;
+                    else
+                        storeInfo.Revenue = (int)(result * 7);
+                }
+
+
+                //状态
+                if (storeInfo.State == StoreState.None)
+                {
+                    storeInfo.State = data.isReleased ? StoreState.OnSale : StoreState.NotPublished;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取 {name} - {id} Vginsights 数据失败", storeInfo.Name, storeInfo.Link);
             }
         }
 
@@ -499,7 +572,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 }
 
                 // 评测
-                if(storeInfo.RecommendationRate==null&&string.IsNullOrWhiteSpace(data.Data.Stat?.Rating?.Score)==false)
+                if (storeInfo.RecommendationRate == null && string.IsNullOrWhiteSpace(data.Data.Stat?.Rating?.Score) == false)
                 {
                     if (double.TryParse(data.Data.Stat?.Rating?.Score, out double score))
                     {
