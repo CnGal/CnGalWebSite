@@ -17,10 +17,20 @@
             欢迎同好们一起参与到资料站编辑中
         </div>
         <div class="line-2">
-            ● 销量数据源采用 <a href="https://gamalytic.com/" target="_blank">Gamalytic</a>、<a href="https://www.taptap.cn/" target="_blank">TapTap</a> ，收入是乘以原价获得的。所以肯定不准，图一乐就好
+            ● 销量数据源采用 (<a href="https://gamalytic.com/" target="_blank">Gamalytic</a> + <a href="https://vginsights.com/" target="_blank">VG Insights</a>) / 2 + <a href="https://www.taptap.cn/" target="_blank">TapTap</a> ，收入是乘以原价获得的。所以肯定不准，图一乐就好
         </div>
     </div>
     <div class="year-card">
+        
+        <MRadioGroup Value="Order" ValueChanged="OrderValueChanged" TValue="GameRevenueInfoOrderType" Label="排序" Dense HideDetails="true"
+                     Row>
+            <MRadio Label="收入"
+                    Value="@(GameRevenueInfoOrderType.Revenue)">
+            </MRadio>
+            <MRadio Label="销量"
+                    Value="@(GameRevenueInfoOrderType.Owner)">
+            </MRadio>
+        </MRadioGroup>
         <MButtonGroup Tile Group Value="Year" ValueChanged="ValueChanged" Style=" display: flex; flex-wrap: wrap;" Color="primary">
             <MButton Class="m-0" Value="0">
                 全部
@@ -39,7 +49,11 @@
     [Parameter]
     public int Year { get; set; }
     [Parameter]
+    public GameRevenueInfoOrderType Order { get; set; }
+    [Parameter]
     public EventCallback<int> YearChanged { get; set; }
+    [Parameter]
+    public EventCallback<GameRevenueInfoOrderType> OrderChanged { get; set; }
 
 
     public async Task ValueChanged(StringNumber year)
@@ -49,5 +63,10 @@
             year = 0;
         }
         await YearChanged.InvokeAsync(year.ToInt32());
+    }
+
+    public async Task OrderValueChanged(GameRevenueInfoOrderType order)
+    {
+        await OrderChanged.InvokeAsync(order);
     }
 }

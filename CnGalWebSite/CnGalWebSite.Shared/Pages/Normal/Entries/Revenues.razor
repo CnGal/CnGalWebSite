@@ -13,7 +13,7 @@
 
 <div class="revenues-page">
     <div>
-        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Revenues.ScreenCard Year="@Year" YearChanged="YearChanged" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Revenues.ScreenCard Order="@((GameRevenueInfoOrderType)Order)" OrderChanged="OrderChanged" Year="@Year" YearChanged="YearChanged" />
     </div>
     @if (isReady == false)
     {
@@ -50,6 +50,8 @@
     public int Page { get; set; }
     [SupplyParameterFromQuery]
     public int Year { get; set; }
+    [SupplyParameterFromQuery]
+    public int Order { get; set; }
 
 
     GameRevenueInfoViewModel Model = new();
@@ -81,9 +83,10 @@
                 _dataCacheService.GameRevenueInfoCache.Page = Page;
                 _dataCacheService.GameRevenueInfoCache.Max = Max;
                 _dataCacheService.GameRevenueInfoCache.Year = Year;
+                _dataCacheService.GameRevenueInfoCache.Order = (GameRevenueInfoOrderType)Order;
             }
 
-            Model = await _pageModelCatche.GetCache($"api/storeinfo/GetGameRevenueInfo?page={_dataCacheService.GameRevenueInfoCache.Page - 1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}");
+            Model = await _pageModelCatche.GetCache($"api/storeinfo/GetGameRevenueInfo?page={_dataCacheService.GameRevenueInfoCache.Page - 1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}&order={(int)_dataCacheService.GameRevenueInfoCache.Order}");
             isReady = true;
             StateHasChanged();
 
@@ -109,17 +112,23 @@
         _dataCacheService.GameRevenueInfoCache.Page = Page;
         _dataCacheService.GameRevenueInfoCache.Max = Max;
         _dataCacheService.GameRevenueInfoCache.Year = Year;
+        _dataCacheService.GameRevenueInfoCache.Order = (GameRevenueInfoOrderType)Order;
         await Refresh();
     }
 
     public void YearChanged(int year)
     {
-        NavigationManager.NavigateTo($"/revenues?page={1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={year}");
+        NavigationManager.NavigateTo($"/revenues?page={1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={year}&order={(int)_dataCacheService.GameRevenueInfoCache.Order}");
+    }
+
+    public void OrderChanged(GameRevenueInfoOrderType order)
+    {
+        NavigationManager.NavigateTo($"/revenues?page={1}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}&order={(int)order}");
     }
 
     private void OnPageClick(int pageIndex)
     {
-        NavigationManager.NavigateTo($"/revenues?page={pageIndex}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}");
+        NavigationManager.NavigateTo($"/revenues?page={pageIndex}&max={_dataCacheService.GameRevenueInfoCache.Max}&year={_dataCacheService.GameRevenueInfoCache.Year}&order={(int)_dataCacheService.GameRevenueInfoCache.Order}");
     }
 
     public void Dispose()
