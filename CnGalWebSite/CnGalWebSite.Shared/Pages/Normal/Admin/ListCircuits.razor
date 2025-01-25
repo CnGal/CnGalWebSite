@@ -4,7 +4,10 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="线路版块" />
 
-<CnGalWebSite.Shared.MasaComponent.PC.Admin.Circuits.ListCard/>
+@if (ToolHelper.IsSSR)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Circuits.ListCard/>
+}
 
 @code {
 
