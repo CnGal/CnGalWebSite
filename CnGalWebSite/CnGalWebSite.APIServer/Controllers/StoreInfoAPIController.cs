@@ -102,14 +102,13 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<GameRevenueInfoViewModel>> GetGameRevenueInfo([FromQuery] int year, [FromQuery] int page = 0, [FromQuery] int max = 20)
+        public async Task<ActionResult<GameRevenueInfoViewModel>> GetGameRevenueInfo([FromQuery] int year, [FromQuery] int page = 0, [FromQuery] int max = 20, [FromQuery] int order = 0)
         {
             var games = await _storeInfoRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.PriceNow != null && s.PriceNow > 0 && s.Revenue != null && s.Revenue > 0 && s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0 /*&& s.EstimationOwnersMin != null && s.EstimationOwnersMin > 0*/)
                 .Where(s => s.Entry != null && s.Entry.PubulishTime != null && (year == 0 || s.Entry.PubulishTime.Value.Year == year))
                 .Where(s => s.State == StoreState.OnSale && s.PriceNow != null && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
-                .OrderByDescending(s => s.Revenue)
                 .ToListAsync();
             games = games.DistinctBy(s => s.Link).ToList();
 
@@ -126,7 +125,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var price = item.Min(s => s.OriginalPrice);
 
                 double? score = 0;
-                foreach(var info in item)
+                foreach (var info in item)
                 {
                     score += info.EvaluationCount * info.RecommendationRate;
                 }
@@ -141,6 +140,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             var gameList = groupGames
+                .OrderByDescending(s => ((GameRevenueInfoOrderType)order == GameRevenueInfoOrderType.Revenue) ? s.Revenue : ((s.EstimationOwnersMax + s.EstimationOwnersMin) / 2 ?? 0))
                 .Skip(page * max)
                 .Take(max)
                 .ToList();
@@ -171,6 +171,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 TotalPages = (games.Count + max - 1) / max
             };
         }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<StoreInfoOverviewModel>> List(QueryParameterModel model)

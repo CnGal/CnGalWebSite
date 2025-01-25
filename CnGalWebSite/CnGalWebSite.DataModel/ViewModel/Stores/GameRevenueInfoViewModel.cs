@@ -11,6 +11,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Stores
         public int Max { get; set; }
         public int Page { get; set; }
         public int Year { get; set; }
+        public GameRevenueInfoOrderType Order { get; set; }
     }
 
     public class GameRevenueInfoViewModel
@@ -60,5 +61,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Stores
         public string MainImage { get; set; }
 
         public DateTime? PublishTime { get; set; }
+    }
+
+    public enum GameRevenueInfoOrderType
+    {
+        Revenue,
+        Owner
     }
 }
