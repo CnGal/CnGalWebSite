@@ -3,23 +3,18 @@
 
 @if (Model.UserTotalNumber != 0)
 {
-    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="用户" Icon="@IconType.Users.ToIconString()">
-        <div class="row">
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="用户" Icon="@IconType.Users.ToIconString()" Class="mb-4">
+        <div class="admin-overview-card">
             @foreach (var item in Items)
             {
-                <div class="col-12 col-md-4 col-xxl-3 d-flex mt-4" style=" align-items: center;">
-
-                    <MProgressCircular Value="@item.Percentage" Size="70" Width="5" Rotate="270" Color="primary">@item.Percentage.ToString("0.0")%</MProgressCircular>
-
-
-                    <div style="display: flex; flex-direction: column;" class="ms-4">
-                        <div class="h6 mb-1 fw-bold text-truncate-1">@item.Name</div>
-                        <div class="text-truncate-1">@item.Value</div>
+                <div class="item-card">
+                    <MProgressCircular Value="@item.Percentage" Size="70" Width="5" Rotate="270" Color="primary">@item.Percentage.ToString("0")%</MProgressCircular>
+                    <div class="content-card">
+                        <div class="name-card">@item.Name</div>
+                        <div class="value-card">@item.Value</div>
                     </div>
                 </div>
             }
-
-
         </div>
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
 

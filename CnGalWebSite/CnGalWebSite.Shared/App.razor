@@ -12,13 +12,13 @@
 @using CnGalWebSite.Core.Models;
 @using CnGalWebSite.Shared.Layout;
 
-
+@attribute [StreamRendering]
 
 <MApp>
     <CascadingValue Value="connectionInfo" IsFixed="true">
         <CascadingAuthenticationState>
             <CnGalWebSite.Shared.Components.CnGalRootTip>
-                <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+                <Router AppAssembly="@typeof(App).Assembly">
                     <Found Context="routeData">
                         @if (ToolHelper.IsSSR)
                         {

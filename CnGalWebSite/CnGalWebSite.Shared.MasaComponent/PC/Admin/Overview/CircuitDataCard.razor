@@ -1,0 +1,91 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject ICircuitHandlerService _circuitHandlerService
+@implements IDisposable
+
+@if (Items.Count > 0)
+{
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Title="线路" Icon="@IconType.Circuit.ToIconString()" Class="mb-4">
+        <div class="admin-overview-card">
+            @foreach (var item in Items)
+            {
+                <div class="item-card">
+                    <MProgressCircular Value="@item.Percentage" Size="70" Width="5" Rotate="270" Color="primary">@item.Percentage.ToString("0")%</MProgressCircular>
+                    <div class="content-card">
+                        <div class="name-card">@item.Name</div>
+                        <div class="value-card">@item.Value</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+}
+
+
+@code {
+    private List<InforModel> Items { get; set; } = new List<InforModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    Timer timer;
+
+    class InforModel
+    {
+        public string Name { get; set; }
+        public long Value { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            timer = new System.Threading.Timer(new System.Threading.TimerCallback(SetData), null, 0, 1000);
+        }
+    }
+
+    private void SetData(object o)
+    {
+        var items = _circuitHandlerService.GetItems();
+        Items.Clear();
+
+        if (items.Count != 0)
+        {
+            Items.Add(new InforModel
+                {
+                    Name = "已连接",
+                    Value = items.Count(s => s.IsConnected),
+                    Percentage = 100.0 * items.Count(s => s.IsConnected) / items.Count
+                });
+            Items.Add(new InforModel
+                {
+                    Name = "已断开",
+                    Value = items.Count(s => !s.IsConnected),
+                    Percentage = 100.0 * items.Count(s => !s.IsConnected) / items.Count
+                });
+            Items.Add(new InforModel
+                {
+                    Name = "5分钟内活跃",
+                    Value = items.Count(s => (DateTime.Now - s.LastActiveTime) < TimeSpan.FromMinutes(5)),
+                    Percentage = 100.0 * items.Count(s => (DateTime.Now - s.LastActiveTime) < TimeSpan.FromMinutes(5)) / items.Count
+                });
+            Items.Add(new InforModel
+                {
+                    Name = "在线超过1天",
+                    Value = items.Count(s => (DateTime.Now - s.OpenTime) > TimeSpan.FromDays(1)),
+                    Percentage = 100.0 * items.Count(s => (DateTime.Now - s.OpenTime) > TimeSpan.FromDays(1)) / items.Count
+                });
+        }
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+    public void Dispose()
+    {
+        timer?.Dispose();
+
+        timer = null;
+    }
+
+}

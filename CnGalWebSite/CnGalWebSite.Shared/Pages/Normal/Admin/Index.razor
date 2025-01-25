@@ -32,6 +32,12 @@
     <div class="col-12">
         <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.UserDataCard />
     </div>
+    @if (ToolHelper.IsSSR)
+    {
+        <div class="col-12">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.CircuitDataCard />
+        </div>
+    }
 </div>
 
 @code {

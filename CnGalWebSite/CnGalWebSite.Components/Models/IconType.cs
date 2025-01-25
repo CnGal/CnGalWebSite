@@ -214,7 +214,8 @@ namespace CnGalWebSite.Components.Models
         Flash,
         Board,
         UnCode,
-        Send
+        Send,
+        Circuit
     }
 
     public static class IconTypeHelper
@@ -223,6 +224,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Circuit:
+                    return "mdi-download-network";
                 case IconType.Send:
                     return "mdi-send";
                 case IconType.UnCode:

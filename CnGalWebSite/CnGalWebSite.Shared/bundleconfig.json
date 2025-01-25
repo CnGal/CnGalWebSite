@@ -35,6 +35,7 @@
       "wwwroot/css/share/commodity.css",
       "wwwroot/css/share/magazine.css",
       "wwwroot/css/share/revenues.css",
+      "wwwroot/css/share/admin.css",
       "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
     ]
   },

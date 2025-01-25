@@ -1,0 +1,25 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined Color="@GetColor()" Icon="@GetIcon()" Text="@GetName()" />
+
+
+@code {
+    [Parameter]
+    public bool IsConnected { get; set; }
+
+
+    public string GetColor()
+    {
+        return IsConnected ? "success" : "error";
+    }
+
+    public IconType GetIcon()
+    {
+        return IsConnected ? IconType.Check : IconType.Close;
+    }
+
+    public string GetName()
+    {
+        return IsConnected ? "已连接" : "已断开";
+    }
+}

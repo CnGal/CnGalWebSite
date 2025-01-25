@@ -11,6 +11,8 @@ using System.Reflection.PortableExecutable;
 using CnGalWebSite.BlazorWeb.Plumbing;
 using System.Security.Claims;
 using CnGalWebSite.HealthCheck.Models;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using CnGalWebSite.Shared.Service;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,6 +89,10 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
     client.BaseAddress = new Uri(ToolHelper.WebApiPath);
 });
+
+// 添加空闲线路检查
+builder.Services.AddSingleton<CircuitHandler, IdleCircuitHandler>();
+builder.Services.AddSingleton<ICircuitHandlerService, CircuitHandlerService>();
 
 //添加认身份证
 //services.AddAuthorization(options =>
@@ -201,7 +207,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 //设置Cookies
 app.UseCookiePolicy();
 
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 //添加状态检查终结点
 app.UseHealthChecks("/healthz", ServiceStatus.Options);
