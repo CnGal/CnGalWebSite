@@ -1307,6 +1307,10 @@ html {
 .theme--light.m-dialog__content .m-dialog {
     background: none !important;
 }
+/*卡片*/
+.m-card__title {
+    font-size: 1rem;
+}
 
 /*卡片*/
 .md-card {
@@ -1451,14 +1455,26 @@ html {
         display: flex;
         flex-direction: column;
     }
-/*大图预览*/
-.largeimage-bg {
-    width: 100%;
-    height: calc(100vh);
-    background-color: rgba(0,0,0,.7);
-    position: fixed;
-    z-index: 1050;
+    .title-container-card .button-card {
+        display: flex;
+        align-items: center;
+    }
+    .title-container-card .title-card .title-large-card {
+        font-size:18px;
+        font-weight:bold;
 }
+    .title-container-card .title-card .title-large-card {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    /*大图预览*/
+    .largeimage-bg {
+        width: 100%;
+        height: calc(100vh);
+        background-color: rgba(0,0,0,.7);
+        position: fixed;
+        z-index: 1050;
+    }
 
 
 

@@ -1,5 +1,5 @@
 ﻿
-<MChip Outlined="Outlined" Dark="!Outlined" Small Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href">
+<MChip Outlined="Outlined" Dark="!Outlined" Small Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href" Style="@Style">
     @if (Icon != IconType.None)
     {
         <MIcon Left XSmall>@Icon.ToIconString() </MIcon>
@@ -14,6 +14,8 @@
     public IconType Icon { get; set; }
     [Parameter]
     public string Text { get; set; }
+    [Parameter]
+    public string Style { get; set; }
     [Parameter]
     public string Href { get; set; }
     [Parameter]

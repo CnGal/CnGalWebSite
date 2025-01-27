@@ -3,48 +3,20 @@
 
 <MDCard Href="@GetLink()" Class=" pa-3 pt-2 pb-2" Target="_blank">
     <div class="" style="height: 100%; align-content: center;display:flex;">
-        @if (string.IsNullOrWhiteSpace(GetImage()))
+        @if (string.IsNullOrWhiteSpace(GetImage()) == false)
         {
-            <div style="display: flex; flex-direction: column; justify-content: center;">
-                <div class="text-truncate-2  title-large">
-                   @GetName()
-                </div>
-                <div class="text-truncate-3 label-large">
-                    @GetValue()
-                </div>
+            <div style=" display: flex; flex-direction: column; justify-content: center;" class="pe-3">
+                <img src="@GetImage()" style="width: 40px;" alt="@GetName()" />
             </div>
         }
-        else
-        {
-            if (_dataCatcheService.IsApp)
-            {
-                <div style=" display: flex; flex-direction: column; justify-content: center;">
-                    <img src="@GetImage()" style="width: 50px;" alt="@GetName()" />
-                </div>
-                <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div class="text-truncate-2 title-large">
-                        @GetName()
-                    </div>
-                    <div class="text-truncate-3 label-large">
-                        @GetValue()
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div style=" display: flex; flex-direction: column; justify-content: center;">
-                    <img src="@GetImage()" style="width: 50px;" alt="@GetName()" />
-                </div>
-                <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div class="text-truncate-2 title-large">
-                        @GetName()
-                    </div>
-                    <div class="text-truncate-3 label-large">
-                        @GetValue()
-                    </div>
-                </div>
-            }
-        }
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div class="text-truncate-2 title-medium">
+                @GetName()
+            </div>
+            <div class="text-truncate-3 label-large">
+                @GetValue()
+            </div>
+        </div>
     </div>
 </MDCard>
 
@@ -56,7 +28,7 @@
 
     public string GetImage()
     {
-        var image= Model.DisplayName switch
+        var image = Model.DisplayName switch
         {
             "萌娘百科" => "Moegirl.png",
             "Bangumi" => "Bangumi.png",
@@ -81,7 +53,7 @@
             _ => null
         };
 
-        if(string.IsNullOrWhiteSpace(image))
+        if (string.IsNullOrWhiteSpace(image))
         {
             return null;
         }

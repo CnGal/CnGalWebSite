@@ -1,11 +1,10 @@
-﻿
-@if (Model.Releases.Any() && Model.IsHideOutlink == false)
+﻿@if (Model.Releases.Any() && Model.IsHideOutlink == false)
 {
     <CnGalWebSite.Components.Containers.MiniModeContainer>
         <CnGalWebSite.Components.Containers.MasaTitleContainer Title="发行列表" Icon="@IconType.Publisher.ToIconString()" Outline Collapable>
-            @foreach (var item in Model.Releases.OrderByDescending(s=>s.Time))
+            @foreach (var item in _items)
             {
-                <InforCard Model="item" />
+                <InforCard Model="item" Show="_items.IndexOf(item)==0" />
             }
         </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
@@ -16,4 +15,42 @@
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+
+    public List<GameReleaseViewModel> _items = [];
+
+    protected override void OnParametersSet()
+    {
+        // 如果Steam已发售 直接展开
+
+        // 如果没有Steam已发售 展开第一个已发售
+        // 如果没有已发售 展开第一个已发布的Demo
+        // 如果没有已发布的Demo 展开第一个Steam
+        // 如果以上都没有，展开发售日期最近的
+        _items.Clear();
+
+        var items = new List<(int, GameReleaseViewModel)>();
+        foreach (var item in Model.Releases)
+        {
+            var pro = 0;
+            if (item.PublishPlatformType == PublishPlatformType.Steam)
+            {
+                pro += 10;
+            }
+            if (item.Time != null && item.Time.Value <= DateTime.Now.ToCstTime())
+            {
+                pro += 10;
+            }
+            if (item.Type == GameReleaseType.Official)
+            {
+                pro += 10;
+            }
+            else
+            {
+                pro += 5;
+            }
+            items.Add((pro, item));
+        }
+        _items = items.OrderByDescending(s => s.Item1).ThenByDescending(s => s.Item2.Time).Select(s => s.Item2).ToList();
+
+    }
 }
