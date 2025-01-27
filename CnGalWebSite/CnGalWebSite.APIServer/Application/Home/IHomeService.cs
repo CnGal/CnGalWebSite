@@ -7,6 +7,7 @@ namespace CnGalWebSite.APIServer.Application.Home
 {
     public interface IHomeService
     {
+        Task<List<RecentlyDemoGameItemModel>> ListRecentlyDemoGames();
         /// <summary>
         /// 获取近期发售的游戏
         /// </summary>

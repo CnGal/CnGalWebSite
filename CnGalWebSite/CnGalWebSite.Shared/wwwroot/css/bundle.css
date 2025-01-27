@@ -1938,6 +1938,7 @@ html {
             align-items: center;
             justify-content: center;
             width: 10rem !important;
+            padding: 3rem 0;
         }
 
             #home-page .item.more-link i, #home-page .community-card .item i, #home-page .weekly-news-card .item i, #home-page .announcements-card .item i, #home-page .hot-tags-card .item i, #home-page .support-card .item i {

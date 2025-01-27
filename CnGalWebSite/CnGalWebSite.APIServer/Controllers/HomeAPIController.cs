@@ -91,6 +91,13 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _homeService.ListPublishedGames();
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RecentlyDemoGameItemModel>>> ListRecentlyDemoGames()
+        {
+            return await _homeService.ListRecentlyDemoGames();
+        }
+
         /// <summary>
         /// 获取近期编辑的游戏或制作组
         /// </summary>
