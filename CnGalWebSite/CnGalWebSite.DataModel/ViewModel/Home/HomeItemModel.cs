@@ -55,6 +55,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public string BriefIntroduction { get; set; }
         public List<string> Tags { get; set; }
     }
+    public class RecentlyDemoGameItemModel : HomeItemModel
+    {
+        public string BriefIntroduction { get; set; }
+        public List<string> Tags { get; set; }
+    }
     public class FreeGameItemModel : HomeItemModel
     {
         public string BriefIntroduction { get; set; }

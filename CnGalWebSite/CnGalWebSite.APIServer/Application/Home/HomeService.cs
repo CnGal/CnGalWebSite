@@ -39,6 +39,48 @@ namespace CnGalWebSite.APIServer.Application.Home
             _videoRepository = videoRepository;
         }
 
+        public async Task<List<RecentlyDemoGameItemModel>> ListRecentlyDemoGames()
+        {
+            var model = new List<RecentlyDemoGameItemModel>();
+
+            //获取近期新作
+            var tempDateTimeNow = DateTime.Now.ToCstTime().Date;
+            var entry_result3 = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Tags)
+                .Include(s => s.Releases)
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true)
+                .Where(s => s.Releases.Any(s => (s.Type == GameReleaseType.Demo || s.Type == GameReleaseType.EA) && s.Time != null))
+                .Select(s => new
+                {
+                    s.MainPicture,
+                    s.DisplayName,
+                    s.Id,
+                    s.BriefIntroduction,
+                    s.Tags,
+                    DemoTime = s.Releases.Where(s => s.Type == GameReleaseType.Demo || s.Type == GameReleaseType.EA).OrderByDescending(s => s.Time).First().Time.Value
+                })
+                .Where(s =>  s.DemoTime.Date <= tempDateTimeNow )
+                .OrderByDescending(s => s.DemoTime)
+                .Take(16)
+                .ToListAsync();
+            if (entry_result3 != null)
+            {
+                foreach (var item in entry_result3)
+                {
+                    model.Add(new RecentlyDemoGameItemModel
+                    {
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
+                        BriefIntroduction = item.BriefIntroduction,
+                        Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false && s.Name.Contains("界面") == false).Select(s => s.Name).ToList()
+                    });
+                }
+            }
+
+            return model;
+        }
+
         public async Task<List<PublishedGameItemModel>> ListPublishedGames()
         {
             var model = new List<PublishedGameItemModel>();

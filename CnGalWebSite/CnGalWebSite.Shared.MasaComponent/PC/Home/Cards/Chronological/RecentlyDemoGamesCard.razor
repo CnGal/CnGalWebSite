@@ -1,0 +1,46 @@
+﻿@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject IPageModelCatche< List < RecentlyDemoGameItemModel> > _pageModelCatche
+
+<section class="published-games-card">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="近期试玩" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
+        <MDCard Class="item" Href="@context.Url">
+            <img src="@context.Image" alt="@context.Name" loading="lazy" />
+            <div class="content">
+                <div class="name text-truncate-1 title-large">@context.Name</div>
+                <div class="brief text-truncate-2 label-large">@context.BriefIntroduction</div>
+                <div class="tags">
+                    @foreach (var item in context.Tags.Random().Take(_dataCacheService.IsApp ? 1 : 2))
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Icon="IconType.Tag" Text="@item" />
+                    }
+                </div>
+            </div>
+        </MDCard>
+
+    </CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup>
+</section>
+
+@code {
+
+    List<RecentlyDemoGameItemModel> _items { get; set; } = new List<RecentlyDemoGameItemModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取主页信息
+            _items = await _pageModelCatche.GetCache("api/home/ListRecentlyDemoGames");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取主页近期试玩游戏列表失败");
+        }
+    }
+}
