@@ -489,9 +489,9 @@
     }
 
     .entry-card-default.relevance-card .main-card img.thum {
-        width: 90px;
-        padding: .5rem;
-        padding-right: 0;
+        width: 80px;
+        margin: .5rem;
+        margin-right: 0;
     }
 
     .entry-card-default.relevance-card.big-card-style .content-card {

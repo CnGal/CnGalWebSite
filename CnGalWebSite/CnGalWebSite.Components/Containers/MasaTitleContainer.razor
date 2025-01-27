@@ -8,22 +8,22 @@ else
     <section id="@SectionId" class="@($"{Class}")">
         <MDCard Outline="OutlineHead" Class="@($"title-container-card h-100 {(IsCollapsed ? " mb-3" : "")}")">
             <div class="@($"title-card {(OutlineHead?"":"pa-3")}") ">
-                <h2 class="@($"{ButtonColor}-text title-{(Small?"medium":"large")}")">
+                <h2 class="@($"{ButtonColor}-text title-{(Small?"medium":"large-card")}")">
                     <MIcon Color="@ButtonColor" Class="me-4" Small="Small">@Icon</MIcon>
                     @Title
                 </h2>
-                <div class="d-flex">
+                <div class="button-card">
                     @ButtonContent
                     @if (ShowMoreButton)
                     {
-                        <MButton Small="Small" Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore" Href="@Href" Target="@Target">
+                        <MButton  Rounded Text Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" OnClick="OnClickMore" Href="@Href" Target="@Target">
                              <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
                             @ShowMoreButtonText   
                      </MButton>
                     }
                     @if (Collapable)
                     {
-                        <CnGalWebSite.Components.Buttons.MasaButton Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" Fab XSmall Icon="@(IsCollapsed?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Color="@(string.IsNullOrWhiteSpace(ButtonColor)?"primary":ButtonColor)" TextStyle Small Icon="@(IsCollapsed?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Text="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
                     }
                 </div>
             </div>

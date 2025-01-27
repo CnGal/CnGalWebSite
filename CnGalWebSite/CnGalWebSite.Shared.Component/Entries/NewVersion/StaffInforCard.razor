@@ -2,74 +2,112 @@
 {
     <CnGalWebSite.Components.Containers.MasaTitleContainer Title="Staff" Icon="@IconType.Staff.ToIconString()" Collapable>
         <ButtonContent>
-            <CnGalWebSite.Components.Buttons.MasaButton Fab XSmall Icon="@IconType.Export.ToIconString()" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Small Icon="@IconType.Switch.ToIconString()" Text="@(min?"正常":"缩略")" OnClick="OnMin" StopPropagation Class="me-4" />
         </ButtonContent>
         <ChildContent>
-            <div>
-                @{ int index = 0;}
-                @foreach (var item in Model.Staffs)
+            <div class="entry-card-default staff-card">
+                @foreach (var item in _staffs)
                 {
-                    <div class="@(Model.Staffs.IndexOf(item)<Model.Staffs.Count-1?"mb-2":"")">
-                        @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
-                        {
+                    <div class="@(string.IsNullOrWhiteSpace(item.Modifier)?"group-no":"group")">
+                        <div class="name">
+                            @item.Modifier
+                        </div>
+                        <div class="items">
+                            @foreach (var infor in item.StaffList)
+                            {
+                                <div class="posts">
+                                    <span class="name">
+                                        @infor.Modifier：
+                                    </span>
+                                    <span class="items">
+                                        @foreach (var temp in infor.Names)
+                                        {
+                                            @if (infor.Names.IndexOf(temp) != 0)
+                                            {
+                                                <span>、</span>
+                                            }
+                                            @if (temp.Id > 0)
+                                            {
+                                                <a class="staff-name" href="@($"/entries/index/{temp.Id}")">@temp.DisplayName</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="staff-name">@temp.DisplayName</span>
+                                            }
 
-                            <h3 class="fw-bold ma-1 h6 @ColorExtensions.GetGradientColor(index,true)">
-                                @item.Modifier
-                            </h3>
-                            index++;
-                        }
+                                        }
+                                    </span>
+                                </div>
 
-                        @foreach (var infor in item.StaffList)
-                        {
-                            <div style=" display: flex; flex-wrap: wrap; ">
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="true" Text="@infor.Modifier" Color="@ColorExtensions.GetGradientColor(index)" />
-
-                                @foreach (var temp in infor.Names)
-                                {
-                                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="@temp.Id" Color="@ColorExtensions.GetGradientColor(index)" />
-                                }
-                            </div>
-                            index++;
-                        }
+                            }
+                        </div>
                     </div>
-                
                 }
-
             </div>
         </ChildContent>
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
 }
-@if (export)
-{
-    <MDialog @bind-Value="export"
-             MaxWidth="500">
-        <MDCard>
-            <MCardTitle Class="text-h5">
-                导出STAFF
-            </MCardTitle>
-            <MCardText>
-                <PCopyableText Style=" white-space: pre-line!important; display: flex; flex-direction: column; align-items: flex-start;">
-                    @Model.Staffs.Export()
-                </PCopyableText>
-             
-            </MCardText>
-        </MDCard>
-    </MDialog>
-}
+
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
-    bool export;
+    bool min;
 
-    public string GetColor(int index, bool isText = false)
+    List<StaffInforModel> _staffs = [];
+
+    protected override void OnParametersSet()
     {
-        return ColorExtensions.GetGradientColor(index, isText);
+        Refresh();
     }
 
-    public void OnExport()
+    public void OnMin()
     {
-        export = true;
+        min = !min;
+        Refresh();
         StateHasChanged();
-        
+    }
+
+    public void Refresh()
+    {
+        if (min == false)
+        {
+            _staffs = Model.Staffs.ToList();
+            return;
+        }
+
+        _staffs.Clear();
+
+        foreach (var item in Model.Staffs)
+        {
+            var model = new StaffInforModel
+                {
+                    Modifier = item.Modifier,
+                    StaffList=[]
+                };
+            var staffs = new List<(string, StaffNameModel)>();
+            foreach (var info in item.StaffList)
+            {
+                foreach (var temp in info.Names)
+                {
+                    staffs.Add((info.Modifier, temp));
+                }
+            }
+            var pos = new List<(string, StaffNameModel)>();
+            foreach (var info in staffs.GroupBy(s => $"[{s.Item2.Id}]{s.Item2.DisplayName}"))
+            {
+                pos.Add((string.Join('/', info.Select(s => s.Item1)), info.First().Item2));
+            }
+
+            foreach (var info in pos.GroupBy(s => s.Item1))
+            {
+                model.StaffList.Add(new StaffValue
+                    {
+                        Modifier = info.Key,
+                        Names = info.Select(s => s.Item2).ToList()
+                    });
+            }
+
+            _staffs.Add(model);
+        }
     }
 }

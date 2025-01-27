@@ -62,7 +62,7 @@
     .entry-card-default.relevance-card .content-card {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
+        justify-content: flex-start;
         gap: .2rem;
     }
 
@@ -135,3 +135,45 @@
     justify-content: space-around;
     flex-wrap: wrap;
 }
+/*发行列表*/
+.entry-card-default.store-info-card {
+    padding: .5rem 1rem;
+    display: flex;
+    gap: .5rem;
+}
+
+    .entry-card-default.store-info-card .title-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .entry-card-default.store-info-card .title-card img {
+            width: 40px;
+        }
+
+        .entry-card-default.store-info-card .title-card .main-card {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+            .entry-card-default.store-info-card .title-card .main-card .name-card {
+                font-weight: bold;
+            }
+
+            .entry-card-default.store-info-card .title-card .main-card .text-card {
+                font-size: small
+            }
+            /*Staff*/
+.entry-card-default.staff-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.entry-card-default.staff-card .group>.name{
+    font-weight:bold;
+}
+    .entry-card-default.staff-card a:hover {
+        text-decoration: underline;
+    }

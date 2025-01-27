@@ -388,3 +388,7 @@ html {
 .theme--light.m-dialog__content .m-dialog {
     background: none !important;
 }
+/*卡片*/
+.m-card__title {
+    font-size: 1rem;
+}

@@ -1,187 +1,278 @@
 ﻿@inject IHttpService _httpService
 
 
-<CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@GetIcon()" Title="@(Model.PublishPlatformType== PublishPlatformType.Other&&string.IsNullOrWhiteSpace(Model.PublishPlatformName)==false?Model.PublishPlatformName:Model.PublishPlatformType.GetDisplayName())"
-                                                       Class="entry-card-default store-info-card mb-4">
-    @if (Model.StoreInfor.State != StoreState.None && Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
-    {
-        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-
-            @if (Model.StoreInfor.CurrencyCode == CurrencyCode.CNY)
+<MDCard Class="entry-card-default store-info-card mb-4">
+    <div class="title-card">
+        <div class="main-card">
+            @if (GetImage() != null)
             {
-                @if (Model.StoreInfor.PriceNow > 0)
-                {
-                    <span class="ma-1 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
-                        <span class="me-1">当前价格：¥</span>
-                        @if (Model.StoreInfor.CutNow > 0)
-                        {
-                            <s class="me-1">@(Model.StoreInfor.OriginalPrice.Value.ToString(" 0.00"))</s>
-                        }
-                        <span> @(Model.StoreInfor.PriceNow.Value.ToString("0.00") + (Model.StoreInfor.CutNow > 0 ? " - 折扣 " + Model.StoreInfor.CutNow + "%" : ""))</span>
-                    </span>
-                    @if (Model.StoreInfor.CutLowest > 0)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Chart" Text="@("历史最低：¥ " + Model.StoreInfor.PriceLowest.Value.ToString("0.00") + (Model.StoreInfor.CutLowest > 0 ? " - 折扣 " + Model.StoreInfor.CutLowest + "%" :"" ))" Class="ma-1" />
-                    }
-                }
-                else if (Model.StoreInfor.PriceNow == 0)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Free" Text="当前价格：¥ 0.00 - Free" Class="ma-1" />
+                <img src="@GetImage()" alt="@GetTitle()" />
+            }
 
-                }
-                else if (Model.StoreInfor.State == StoreState.NotPublished && Model.Type != GameReleaseType.Demo)
+            <div class="content-card">
+                <div class="name-card">
+                    @GetTitle()
+
+                </div>
+                <div class="text-card">
+                    @GetTime()
+                </div>
+            </div>
+            <TypeChip Model="Model" />
+        </div>
+        <div class="button-card">
+            <CnGalWebSite.Components.Buttons.MasaButton Rounded Color="primary" TextStyle Small Icon="@(!GetShow()?IconType.Collapsed.ToIconString():IconType.UnCollapsed.ToIconString())" Text="@(!GetShow()?"展开":"折叠")" OnClick="@(() => _show = !GetShow())" />
+        </div>
+    </div>
+    <div class="@(GetShow()?"":"d-none")">
+        @if (Model.StoreInfor.State != StoreState.None && Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
+        {
+            <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+
+                @if (Model.StoreInfor.CurrencyCode == CurrencyCode.CNY)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.State" Text="未发售" Class="ma-1" />
-                    <meta itemprop="availability" content="PreOrder" />
-                }
-                else if (Model.StoreInfor.State == StoreState.Takedown)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Takedown" Text="已下架" Class="ma-1" />
-                    <meta itemprop="availability" content="SoldOut" />
-                }
-                else if (Model.StoreInfor.PriceNow == null)
-                {
-                    @if (Model.StoreInfor.OriginalPrice > 0)
+                    @if (Model.StoreInfor.PriceNow > 0)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Price" Text="@("价格：¥ " + Model.StoreInfor.OriginalPrice.Value.ToString("0.00") + "（数据未更新）")" Class="ma-1" />
+                        <span class="ma-1 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
+                            <span class="me-1">当前价格：¥</span>
+                            @if (Model.StoreInfor.CutNow > 0)
+                            {
+                                <s class="me-1">@(Model.StoreInfor.OriginalPrice.Value.ToString(" 0.00"))</s>
+                            }
+                            <span> @(Model.StoreInfor.PriceNow.Value.ToString("0.00") + (Model.StoreInfor.CutNow > 0 ? " - 折扣 " + Model.StoreInfor.CutNow + "%" : ""))</span>
+                        </span>
+                        @if (Model.StoreInfor.CutLowest > 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Chart" Text="@("历史最低：¥ " + Model.StoreInfor.PriceLowest.Value.ToString("0.00") + (Model.StoreInfor.CutLowest > 0 ? " - 折扣 " + Model.StoreInfor.CutLowest + "%" :"" ))" Class="ma-1" />
+                        }
                     }
-                    else if (Model.StoreInfor.OriginalPrice == 0)
+                    else if (Model.StoreInfor.PriceNow == 0)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="价格：¥ 0.00 - Free（数据未更新）" Class="ma-1" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Free" Text="当前价格：¥ 0.00 - Free" Class="ma-1" />
+
+                    }
+                    else if (Model.StoreInfor.State == StoreState.NotPublished && Model.Type != GameReleaseType.Demo)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.State" Text="未发售" Class="ma-1" />
+                        <meta itemprop="availability" content="PreOrder" />
+                    }
+                    else if (Model.StoreInfor.State == StoreState.Takedown)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Takedown" Text="已下架" Class="ma-1" />
+                        <meta itemprop="availability" content="SoldOut" />
+                    }
+                    else if (Model.StoreInfor.PriceNow == null)
+                    {
+                        @if (Model.StoreInfor.OriginalPrice > 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Price" Text="@("价格：¥ " + Model.StoreInfor.OriginalPrice.Value.ToString("0.00") + "（数据未更新）")" Class="ma-1" />
+                        }
+                        else if (Model.StoreInfor.OriginalPrice == 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="价格：¥ 0.00 - Free（数据未更新）" Class="ma-1" />
+                        }
+                        else
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="数据未更新" Class="ma-1" />
+                        }
+                        <meta itemprop="availability" content="SoldOut" />
+                    }
+                }
+                else
+                {
+                    @if (Model.StoreInfor.PriceNow > 0)
+                    {
+                        <span class="ma-1 d-flex">
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
+                            <span class="me-1">当前价格：(@Model.StoreInfor.CurrencyCode.GetDisplayName())</span>
+                            @if (Model.StoreInfor.CutNow > 0)
+                            {
+                                <s class="me-1">@(Model.StoreInfor.OriginalPrice.Value.ToString(" 0.00"))</s>
+                            }
+                            <span> @(Model.StoreInfor.PriceNow.Value.ToString("0.00") + (Model.StoreInfor.CutNow > 0 ? " - 折扣 " + Model.StoreInfor.CutNow + "%" : ""))</span>
+                        </span>
+                        @if (Model.StoreInfor.CutLowest > 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Chart" Text="@($"历史最低：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) " + Model.StoreInfor.PriceLowest.Value.ToString("0.00") + (Model.StoreInfor.CutLowest > 0 ? " - 折扣 " + Model.StoreInfor.CutLowest + "%" :"" ))" Class="ma-1" />
+                        }
+                    }
+                    else if (Model.StoreInfor.PriceNow == 0)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Free" Text="@($"当前价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) 0.00 - Free")" Class="ma-1" />
+
+                    }
+                    else if (Model.StoreInfor.State == StoreState.NotPublished && Model.Type != GameReleaseType.Demo)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.State" Text="未发售" Class="ma-1" />
+                        <meta itemprop="availability" content="PreOrder" />
+                    }
+                    else if (Model.StoreInfor.State == StoreState.Takedown)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Takedown" Text="已下架" Class="ma-1" />
+                        <meta itemprop="availability" content="SoldOut" />
+                    }
+                    else if (Model.StoreInfor.PriceNow == null)
+                    {
+                        @if (Model.StoreInfor.OriginalPrice > 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Price" Text="@($"价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) " + Model.StoreInfor.OriginalPrice.Value.ToString("0.00") + "（数据未更新）")" Class="ma-1" />
+                        }
+                        else if (Model.StoreInfor.OriginalPrice == 0)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="@($"价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) 0.00 - Free（数据未更新）")" Class="ma-1" />
+                        }
+                        else
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="数据未更新" Class="ma-1" />
+                        }
+                        <meta itemprop="availability" content="SoldOut" />
+                    }
+                }
+
+
+                @if (Model.StoreInfor.PlayTime > 0)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.DeterminedTime" Text="@($"平均游玩时长：{Model.StoreInfor.PlayTime/60.0:0.0} 小时")" Class="ma-1" />
+                }
+
+                @if (Model.StoreInfor.EstimationOwnersMax > 0 && Model.StoreInfor.EstimationOwnersMin > 0)
+                {
+                    @if (Model.StoreInfor.EstimationOwnersMax == Model.StoreInfor.EstimationOwnersMin)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#}")" Class="" />
                     }
                     else
                     {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="数据未更新" Class="ma-1" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#} - {Model.StoreInfor.EstimationOwnersMax:#,#}")" Class="" />
                     }
-                    <meta itemprop="availability" content="SoldOut" />
+                }
+
+                @if (Model.StoreInfor.OriginalPrice >= 0)
+                {
+                    <meta itemprop="priceCurrency" content="CNY" />
+                    <meta itemprop="price" content="@(Model.StoreInfor.OriginalPrice)" />
+                }
+            </div>
+        }
+        <div>
+            @if (string.IsNullOrWhiteSpace(Model.Link) == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Link" Text="链接：" Url="@Model.GetLink()" UrlText="@Model.GetLinkText()" Class="ma-1" ItemProp="url" />
+            }
+            @if (string.IsNullOrWhiteSpace(Model.Name) == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Name" Title="发行名称" Text="@Model.Name" Class="ma-1" />
+            }
+            @if (string.IsNullOrWhiteSpace(Model.TimeNote))
+            {
+                @if (Model.Time != null)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.IndeterminateTime" Title="发行时间" Text="@(Model.Time.Value.ToString("yyyy年M月d日"))" Class="ma-1" />
                 }
             }
             else
             {
-                @if (Model.StoreInfor.PriceNow > 0)
-                {
-                    <span class="ma-1 d-flex">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
-                        <span class="me-1">当前价格：(@Model.StoreInfor.CurrencyCode.GetDisplayName())</span>
-                        @if (Model.StoreInfor.CutNow > 0)
-                        {
-                            <s class="me-1">@(Model.StoreInfor.OriginalPrice.Value.ToString(" 0.00"))</s>
-                        }
-                        <span> @(Model.StoreInfor.PriceNow.Value.ToString("0.00") + (Model.StoreInfor.CutNow > 0 ? " - 折扣 " + Model.StoreInfor.CutNow + "%" : ""))</span>
-                    </span>
-                    @if (Model.StoreInfor.CutLowest > 0)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Chart" Text="@($"历史最低：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) " + Model.StoreInfor.PriceLowest.Value.ToString("0.00") + (Model.StoreInfor.CutLowest > 0 ? " - 折扣 " + Model.StoreInfor.CutLowest + "%" :"" ))" Class="ma-1" />
-                    }
-                }
-                else if (Model.StoreInfor.PriceNow == 0)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Free" Text="@($"当前价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) 0.00 - Free")" Class="ma-1" />
-
-                }
-                else if (Model.StoreInfor.State == StoreState.NotPublished && Model.Type != GameReleaseType.Demo)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.State" Text="未发售" Class="ma-1" />
-                    <meta itemprop="availability" content="PreOrder" />
-                }
-                else if (Model.StoreInfor.State == StoreState.Takedown)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Takedown" Text="已下架" Class="ma-1" />
-                    <meta itemprop="availability" content="SoldOut" />
-                }
-                else if (Model.StoreInfor.PriceNow == null)
-                {
-                    @if (Model.StoreInfor.OriginalPrice > 0)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Price" Text="@($"价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) " + Model.StoreInfor.OriginalPrice.Value.ToString("0.00") + "（数据未更新）")" Class="ma-1" />
-                    }
-                    else if (Model.StoreInfor.OriginalPrice == 0)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="@($"价格：({Model.StoreInfor.CurrencyCode.GetDisplayName()}) 0.00 - Free（数据未更新）")" Class="ma-1" />
-                    }
-                    else
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.OutOfDate" Text="数据未更新" Class="ma-1" />
-                    }
-                    <meta itemprop="availability" content="SoldOut" />
-                }
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.DeterminedTime" Title="发行时间" Text="@Model.TimeNote" Class="ma-1" ItemProp="datePublished" />
             }
-
-
-            @if (Model.StoreInfor.PlayTime > 0)
+            @if (Model.GamePlatformTypes.Any())
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.DeterminedTime" Text="@($"平均游玩时长：{Model.StoreInfor.PlayTime/60.0:0.0} 小时")" Class="ma-1" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Game" Title="游戏平台" Text="@string.Join("、", Model.GamePlatformTypes.Select(s=>s.GetDisplayName()))" Class="ma-1" ItemProp="operatingSystem" />
             }
-
-            @if (Model.StoreInfor.EstimationOwnersMax > 0 && Model.StoreInfor.EstimationOwnersMin > 0)
+            @if (string.IsNullOrWhiteSpace(Model.Engine) == false)
             {
-                @if (Model.StoreInfor.EstimationOwnersMax == Model.StoreInfor.EstimationOwnersMin)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#}")" Class="" />
-                }
-                else
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Users" Text="@($"拥有人数（估计）：{Model.StoreInfor.EstimationOwnersMin:#,#} - {Model.StoreInfor.EstimationOwnersMax:#,#}")" Class="" />
-                }
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Engine" Title="引擎" Text="@Model.Engine" Class="ma-1" />
             }
-
-            @if (Model.StoreInfor.OriginalPrice >= 0)
-            {
-                <meta itemprop="priceCurrency" content="CNY" />
-                <meta itemprop="price" content="@(Model.StoreInfor.OriginalPrice)" />
-            }
+            <TimeChip Model="Model" />
+            <EvaluationChip Model="Model" />
         </div>
-    }
-    <div>
-        @if (string.IsNullOrWhiteSpace(Model.Link) == false)
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Link" Text="链接：" Url="@Model.GetLink()" UrlText="@Model.GetLinkText()" Class="ma-1" ItemProp="url" />
-        }
-        @if (string.IsNullOrWhiteSpace(Model.Name) == false)
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Name" Title="发行名称" Text="@Model.Name" Class="ma-1" />
-        }
-        @if (string.IsNullOrWhiteSpace(Model.TimeNote))
-        {
-            @if (Model.Time != null)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.IndeterminateTime" Title="发行时间" Text="@(Model.Time.Value.ToString("yyyy年M月d日"))" Class="ma-1" />
-            }
-        }
-        else
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.DeterminedTime" Title="发行时间" Text="@Model.TimeNote" Class="ma-1" ItemProp="datePublished" />
-        }
-        @if (Model.GamePlatformTypes.Any())
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Game" Title="游戏平台" Text="@string.Join("、", Model.GamePlatformTypes.Select(s=>s.GetDisplayName()))" Class="ma-1" ItemProp="operatingSystem" />
-        }
-        @if (string.IsNullOrWhiteSpace(Model.Engine) == false)
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="@IconType.Engine" Title="引擎" Text="@Model.Engine" Class="ma-1" />
-        }
-
-        <TypeChip Model="Model" />
-        <TimeChip Model="Model" />
-        <EvaluationChip Model="Model" />
     </div>
-</CnGalWebSite.Components.Containers.MasaTitleContainer>
+</MDCard>
 
 @code {
 
     [Parameter]
     public GameReleaseViewModel Model { get; set; }
+    [Parameter]
+    public bool Show { get; set; }
 
+    bool? _show;
 
-    public string GetIcon()
+    public bool GetShow()
     {
-        return Model.PublishPlatformType switch
+        return _show ?? Show;
+    }
+
+    public string GetTime()
+    {
+        @if (string.IsNullOrWhiteSpace(Model.TimeNote))
         {
-            PublishPlatformType.Steam => "mdi-steam",
-            PublishPlatformType.AppStore => "mdi-apple",
-            PublishPlatformType.GooglePlay => "mdi-google-play",
-            _ => "mdi-pine-tree"
+            @if (Model.Time != null)
+            {
+                return Model.Time.Value.ToString("yyyy年M月d日");
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            return Model.TimeNote;
+        }
+    }
+
+    public string GetImage()
+    {
+        var image = Model.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "Steam.png",
+            PublishPlatformType.AppStore => "AppStore.png",
+            PublishPlatformType.GooglePlay => "GooglePlay.png",
+            PublishPlatformType.DLsite => "DLsite.png",
+            PublishPlatformType.NS => "Nintendo_Switch.png",
+            PublishPlatformType.TapTap => "TapTap.png",
+            PublishPlatformType.Epic => "Epic.png",
+            _ => null
         };
+
+        if (image == null && string.IsNullOrWhiteSpace(Model.PublishPlatformName) == false)
+        {
+            if (Model.PublishPlatformName.ToLower().Contains("b站") || Model.PublishPlatformName.ToLower().Contains("bilibili"))
+            {
+                image = "bilibili.png";
+            }
+            else if (Model.PublishPlatformName.ToLower().Contains("微博"))
+            {
+                image = "weibo.png";
+            }
+            else if (Model.PublishPlatformName.ToLower().Contains("贴吧"))
+            {
+                image = "BaiDuWiki.png";
+            }
+            else if (Model.PublishPlatformName.ToLower().Contains("方块游戏"))
+            {
+                image = "CraftGame.png";
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
+    public string GetTitle()
+    {
+        if (Model.PublishPlatformType == PublishPlatformType.Other && string.IsNullOrWhiteSpace(Model.PublishPlatformName) == false)
+        {
+            return Model.PublishPlatformName;
+        }
+        else
+        {
+            return Model.PublishPlatformType.GetDisplayName();
+        }
     }
 }

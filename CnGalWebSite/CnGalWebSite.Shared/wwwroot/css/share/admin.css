@@ -9,7 +9,7 @@
         align-items: center;
         gap:1rem;
     }
-.name-card {
-    font-size: large;
-    font-weight: bold;
-}
+    .admin-overview-card .name-card {
+        font-size: large;
+        font-weight: bold;
+    }
