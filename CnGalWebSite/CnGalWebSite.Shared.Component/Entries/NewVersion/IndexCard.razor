@@ -35,46 +35,17 @@
         </div>
         @if (_dataCatcheService.IsApp)
         {
-            <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
-                @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
-                {
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
-                     </div>
-                }
-                @if (EntryView.Information.Any())
-                {
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-
-                }
-                @if (EntryView.Tags.Any())
-                {
-                    <div class=" mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-                }
-                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
-
-                @if (EntryView.Type == EntryType.Game)
-                {
-                    <CnGalWebSite.Components.Containers.MiniModeContainer>
-                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
-                    </CnGalWebSite.Components.Containers.MiniModeContainer>
-                }
-            </div>
-            <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
+            <div class="col-12">
                 <MDCard Class="mb-4">
-                    <MTabs @bind-Value="TabIndex" IconsAndText Grow>
+                    <MTabs Value="EntryView.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow>
 
-                         <MTab Value="1">
-                             首页<MIcon>@IconType.Home.ToIconString()</MIcon>
-                         </MTab>
-                         <MTab Value="2">
-                             相关<MIcon>@IconType.Link.ToIconString()</MIcon>
-                         </MTab>
-                         @if (EntryView.Staffs.Count > 0)
+                        <MTab Value="1">
+                            首页<MIcon>@IconType.Home.ToIconString()</MIcon>
+                        </MTab>
+                        <MTab Value="2">
+                            相关<MIcon>@IconType.Link.ToIconString()</MIcon>
+                        </MTab>
+                        @if (EntryView.Staffs.Count > 0)
                         {
                             <MTab Value="3">
                                 Staff<MIcon>@IconType.Staff.ToIconString()</MIcon>
@@ -83,10 +54,38 @@
 
                     </MTabs>
                 </MDCard>
-                   
+
                 <div>
-                    <MTabsItems @bind-Value="TabIndex">
+                    <MTabsItems Value="EntryView.TabIndex">
                         <MTabItem Value="1">
+                            @if (EntryView.Booking != null && EntryView.Booking.Goals.Any())
+                            {
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
+                                </div>
+                            }
+                            @if (EntryView.Information.Any())
+                            {
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                                </div>
+
+                            }
+                            @if (EntryView.Tags.Any())
+                            {
+                                <div class=" mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
+                                </div>
+                            }
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.Releases.MainCard Model="EntryView" />
+
+                            @if (EntryView.Type == EntryType.Game)
+                            {
+                                <CnGalWebSite.Components.Containers.MiniModeContainer>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                                </CnGalWebSite.Components.Containers.MiniModeContainer>
+                            }
+
                             <CnGalWebSite.Components.Containers.MiniModeContainer>
                                 @if (EntryView.Audio.Any())
                                 {
@@ -174,7 +173,7 @@
                         <CnGalWebSite.Components.Containers.MiniModeContainer>
                             <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
 
-                         </CnGalWebSite.Components.Containers.MiniModeContainer>
+                        </CnGalWebSite.Components.Containers.MiniModeContainer>
                     }
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
                     @if (EntryView.NewsOfEntry.Count != 0)
@@ -186,9 +185,9 @@
                     }
                     <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
 
-                     <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game" />
-                     <div>
-                         @if (EntryView.CanComment)
+                    <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game" />
+                    <div>
+                        @if (EntryView.CanComment)
                         {
                             <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                         }
@@ -204,7 +203,7 @@
                     {
                         <div class="mb-4">
                             <CnGalWebSite.Shared.MasaComponent.PC.Entries.Templates.Default.BookingCard Model="EntryView" Dense />
-                         </div>
+                        </div>
                     }
                     @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
                     {
@@ -244,7 +243,7 @@
                 }
                 <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
 
-             </div>
+            </div>
 
         }
 
@@ -257,12 +256,10 @@
     {
         get
         {
-            return (EntryView.Information.Count == 0 && (EntryView.Releases.Any()==false || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
+            return (EntryView.Information.Count == 0 && (EntryView.Releases.Any() == false || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
                       ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }
-
-    public StringNumber TabIndex { get; set; } = 1;
     [Parameter]
     public EntryIndexViewModel EntryView { get; set; }
     [Parameter]
@@ -271,5 +268,25 @@
     public EventCallback<bool> OnPreEdit { get; set; }
     [Parameter]
     public bool CanDeleted { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (EntryView.TabIndex == 3 && EntryView.Staffs.Count == 0)
+        {
+            EntryView.TabIndex = 1;
+        }
+    }
+
+    public void ValueChanged(StringNumber value)
+    {
+        if (value == null)
+        {
+            EntryView.TabIndex = 1;
+        }
+        else
+        {
+            EntryView.TabIndex = value.ToInt32();
+        }
+    }
 
 }
