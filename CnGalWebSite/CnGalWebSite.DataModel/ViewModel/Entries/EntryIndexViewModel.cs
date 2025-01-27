@@ -60,6 +60,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 是否配音 仅限游戏词条
         /// </summary>
         public bool IsDubbing { get; set; } = true;
+        /// <summary>
+        /// 默认的Tab
+        /// </summary>
+        public int TabIndex { get; set; } = 1;
 
         /// <summary>
         /// 制作组
