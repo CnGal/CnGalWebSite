@@ -5,20 +5,24 @@
         </div>
         <div class="pa-3">
             <header style=" display: flex; align-items: center;" class="mb-2">
-                @if (DateTime.Now.ToCstTime() < Model.BeginTime)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="未开始" />
-                }
-                else if (DateTime.Now.ToCstTime() > Model.EndTime)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="已结束" />
-                }
-                else
-                {
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Text="正在进行" />
-                }
+                <div class="text-truncate-2 ">
 
-                <div class="fw-bold mb-0 text-truncate-2 title-large">@Model.Name</div>
+                    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+                    {
+                        <span class="type-inline-chip">未开始</span>
+                    }
+                    else if (DateTime.Now.ToCstTime() > Model.EndTime)
+                    {
+                        <span class="type-inline-chip">已结束</span>
+                    }
+                    else
+                    {
+                        <span class="type-inline-chip">正在进行</span>
+                    }
+
+                    <span class="title-medium">@Model.Name</span>
+
+                </div>
             </header>
             <span class=" text-truncate-3 label-large">
                 @Model.BriefIntroduction

@@ -131,6 +131,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.DisplayName) == false)
                     .Where(s => entryName.Length < 2 ? (s.DisplayName == entryName || s.AnotherName == entryName) : (s.DisplayName.Contains(entryName) || (s.AnotherName != null && s.AnotherName.Contains(entryName))))
                     .Select(s => new { s.Id, s.DisplayName })
+                    .OrderBy(s => s.DisplayName.Length)
                     .FirstOrDefaultAsync();
 
                 if (entry == null)
