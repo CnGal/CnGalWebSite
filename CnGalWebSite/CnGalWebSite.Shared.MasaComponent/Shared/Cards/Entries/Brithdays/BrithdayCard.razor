@@ -1,5 +1,4 @@
-﻿
-@if (Model == null || Model.Any() == false)
+﻿@if (Model == null || Model.Any() == false)
 {
     <div style="display: flex; flex-direction: column; align-items: center;">
         <div class="mb-2" style=" font-size: xxx-large;">🎂</div>
@@ -10,31 +9,31 @@
 }
 else
 {
-<div class="row">
-    @foreach (var item in Model)
-    {
-        <div class="@((Model.Count<=2||(Model.Count%2!=0&&Model.IndexOf(item)==Model.Count-1))?"col-12":"col-6")">
-            <a href="@($"/entries/index/{item.Id}")" class="a-font-color">
-                <div class="pb-4" style=" display: flex; flex-direction: column; align-items: center; ">
-                    <img src="@item.MainImage" alt="@item.Name" style="border-radius: 50%; height: 100px; width: 100px;" class="mb-2">
-                    <div class="text-truncate-2 fw-bold">
-                        @item.Name
-                    </div>
-                    @if (string.IsNullOrWhiteSpace(item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
-                    {
-                        <div class=" text-center" style="color:gray;">
-                            @($"《{item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》")
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="@((Model.Count<=2||(Model.Count%2!=0&&Model.IndexOf(item)==Model.Count-1))?"col-12":"col-6")">
+                <a href="@($"/entries/index/{item.Id}")" class="a-font-color">
+                    <div class="pb-4" style=" display: flex; flex-direction: column; align-items: center; ">
+                        <img src="@item.MainImage" alt="@item.Name" style="border-radius: 50%; height: 100px; width: 100px;" class="mb-2">
+                        <div class="text-truncate-2 fw-bold">
+                            @item.Name
                         </div>
-                    }
-                    <div class="text-truncate-3 text-center">
-                        @item.BriefIntroduction
+                        @if (string.IsNullOrWhiteSpace(item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
+                        {
+                            <div class=" text-center" style="color:gray;">
+                                @($"《{item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》")
+                            </div>
+                        }
+                        <div class="text-truncate-3 text-center">
+                            @item.BriefIntroduction
+                        </div>
                     </div>
-                </div>
-            </a>
-        </div>
-    }
-</div>
-  
+                </a>
+            </div>
+        }
+    </div>
+
 
     <div style=" font-size: large; font-weight: bold; text-align: center; ">🎂 生日快乐</div>
     <div class="mb-2" style="color: gray;text-align: center;">@Text</div>

@@ -142,45 +142,19 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public static List<SearchTimeModel> GetTimes()
         {
-            return new List<SearchTimeModel>
+            var list = new List<SearchTimeModel>();
+            var range = 5;
+            var year = DateTime.Now.Year - range;
+            for (var i = 0; i < range + 1; i++, year++)
             {
-               new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2018,1,1),
-                   BeforeTime=new DateTime(2019,1,1),
-                   Note="2018"
-               },
-                new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2019,1,1),
-                   BeforeTime=new DateTime(2020,1,1),
-                   Note="2019"
-               },
-               new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2020,1,1),
-                   BeforeTime=new DateTime(2021,1,1),
-                   Note="2020"
-               },
-               new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2021,1,1),
-                   BeforeTime=new DateTime(2022,1,1),
-                   Note="2021"
-               },
-               new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2022,1,1),
-                   BeforeTime=new DateTime(2023,1,1),
-                   Note="2022"
-               },
-                new SearchTimeModel
-               {
-                   AfterTime=new DateTime(2023,1,1),
-                   BeforeTime=new DateTime(2024,1,1),
-                   Note="2023"
-               },
-            };
+                list.Add(new SearchTimeModel
+                {
+                    AfterTime = new DateTime(year, 1, 1),
+                    BeforeTime = new DateTime(year + 1, 1, 1),
+                    Note = year.ToString()
+                });
+            }
+            return list;
         }
 
 
@@ -208,7 +182,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                     {
                         try
                         {
-                            model.Types.Add((SearchType)Enum.Parse(typeof(SearchType), item, true));
+                            model.Types.Add(Enum.Parse<SearchType>(item, true));
                         }
                         catch
                         {
@@ -217,7 +191,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                     }
                 }
                 //解析时间
-                if (Times!=null&& Times.Length != 0)
+                if (Times != null && Times.Length != 0)
                 {
                     model.Times.Clear();
                     foreach (var item in Times)
