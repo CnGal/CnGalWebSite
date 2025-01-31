@@ -1009,29 +1009,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new KanbanPermissionsModel { Permissions = false };
             }
 
-            if (_userService.CheckCurrentUserRole("Tester"))
+            if (_userService.CheckCurrentUserRole("User"))
             {
                 return new KanbanPermissionsModel { Permissions = true };
             }
-
-
-            var dateTime = DateTime.Now.ToCstTime();
-
-            if (dateTime < new DateTime(2024, 8, 17, 15, 30, 00))
-            {
-                return new KanbanPermissionsModel { Permissions = false };
-            }
-
-
-            var IsAnniversariesLiveBookings = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesLiveBookings && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime);
-            var IsAnniversariesLottery = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesLotteries && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime);
-            var IsAnniversariesShare = await _userIntegralRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.SourceType == UserIntegralSourceType.AnniversariesShare && s.Type == UserIntegralType.GCoins && s.Time.AddDays(270) > dateTime);
-
-            if (IsAnniversariesLiveBookings && IsAnniversariesLottery && IsAnniversariesShare)
-            {
-                return new KanbanPermissionsModel { Permissions = true };
-            }
-
 
             return new KanbanPermissionsModel { Permissions = false };
 
