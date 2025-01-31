@@ -16,27 +16,24 @@
                             @foreach (var infor in item.StaffList)
                             {
                                 <div class="posts">
-                                    <span class="name">
-                                        @infor.Modifier：
-                                    </span>
-                                    <span class="items">
-                                        @foreach (var temp in infor.Names)
-                                        {
-                                            @if (infor.Names.IndexOf(temp) != 0)
-                                            {
-                                                <span>、</span>
-                                            }
-                                            @if (temp.Id > 0)
-                                            {
-                                                <a class="staff-name" href="@($"/entries/index/{temp.Id}")">@temp.DisplayName</a>
-                                            }
-                                            else
-                                            {
-                                                <span class="staff-name">@temp.DisplayName</span>
-                                            }
+                                    <span class="name">@infor.Modifier：</span>
 
+                                    @foreach (var temp in infor.Names)
+                                    {
+                                        @if (infor.Names.IndexOf(temp) != 0)
+                                        {
+                                            <span>、</span>
                                         }
-                                    </span>
+                                        @if (temp.Id > 0)
+                                        {
+                                            <a class="staff-name" href="@($"/entries/index/{temp.Id}")">@temp.DisplayName</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="staff-name">@temp.DisplayName</span>
+                                        }
+
+                                    }
                                 </div>
 
                             }
@@ -82,7 +79,7 @@
             var model = new StaffInforModel
                 {
                     Modifier = item.Modifier,
-                    StaffList=[]
+                    StaffList = []
                 };
             var staffs = new List<(string, StaffNameModel)>();
             foreach (var info in item.StaffList)
