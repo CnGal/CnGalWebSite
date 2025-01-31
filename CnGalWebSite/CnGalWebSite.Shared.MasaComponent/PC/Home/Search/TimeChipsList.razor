@@ -30,17 +30,20 @@
 <MDialog @bind-Value="dialog"
          Persistent
          MaxWidth="400">
-
-    <MDatePicker @bind-Value="_dates" Locale="zh-CN"
-                 Range Scrollable>
-        <MButton Color="primary" OnClick="ModalCancel">
-            取消
-         </MButton>
-         <MSpacer></MSpacer>
-        <MButton Rounded Color="primary" OnClick="ModalOK">
-            确定
-        </MButton>
-    </MDatePicker>
+    <MDCard>
+        <MDatePicker @bind-Value="_dates" Locale="zh-CN"
+                     Range Scrollable>
+            <MButton Text Rounded Color="primary" OnClick="ModalCancel">
+                <MIcon Left>mdi-close</MIcon>
+                取消
+            </MButton>
+            <MSpacer></MSpacer>
+            <MButton Rounded Color="primary" OnClick="ModalOK">
+                <MIcon Left>mdi-check</MIcon>
+                确定
+            </MButton>
+        </MDatePicker>
+    </MDCard>
 </MDialog>
 @code {
     [Parameter]
@@ -84,8 +87,8 @@
 
     public async Task OnClean()
     {
+        InputData.RemoveAll(s => s.IsSame(customTime));
         customTime = null;
-        InputData.Remove(customTime);
         await OnChanged.InvokeAsync();
     }
 
@@ -107,11 +110,11 @@
         }
 
         customTime = new SearchTimeModel
-        {
-            BeforeTime = _dates[1].ToDateTime(TimeOnly.MinValue),
-            AfterTime = _dates[0].ToDateTime(TimeOnly.MinValue),
-            Note = string.Join(" ~ ", _dates.Select(date => date.ToString("yyyy-MM-dd")))
-        };
+            {
+                BeforeTime = _dates[1].ToDateTime(TimeOnly.MinValue),
+                AfterTime = _dates[0].ToDateTime(TimeOnly.MinValue),
+                Note = string.Join(" ~ ", _dates.Select(date => date.ToString("yyyy-MM-dd")))
+            };
         InputData.Add(customTime);
 
         StateHasChanged();
