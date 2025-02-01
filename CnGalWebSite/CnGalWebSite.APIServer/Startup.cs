@@ -2,13 +2,11 @@
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Search;
-using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Typesense;
 using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.APIServer.Infrastructure;
-using CnGalWebSite.APIServer.MessageHandlers;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Helper;
@@ -35,11 +33,6 @@ using NetCore.AutoRegisterDi;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
 using Newtonsoft.Json;
-using Senparc.Weixin.AspNet;
-using Senparc.Weixin.Entities;
-using Senparc.Weixin.MP;
-using Senparc.Weixin.MP.MessageHandlers.Middleware;
-using Senparc.Weixin.RegisterServices;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.IO;
@@ -72,6 +65,8 @@ namespace CnGalWebSite.APIServer
                     {
                         //全局配置查询拆分模式
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        // 在查询中使用表达式包装集合
+                        o.TranslateParameterizedCollectionsToConstants();
                     }));
 
             //配置Json
@@ -99,7 +94,7 @@ namespace CnGalWebSite.APIServer
             services.AddHttpClient();
             services.AddScoped<IHttpService, HttpService>();
             //添加ElasticSearch服务
-            services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
+            //services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //添加搜索服务
             services.AddScoped<ISearchHelper, TypesenseHelper>()
                 .AddTypesenseClient(config =>
@@ -199,63 +194,11 @@ namespace CnGalWebSite.APIServer
 
             //添加状态检查
             services.AddHealthChecks().AddDbContextCheck<AppDbContext>("DbContext");
-
-            #region 添加微信配置
-
-            //使用本地缓存必须添加
-            services.AddMemoryCache();
-
-            //Senparc.Weixin 注册（必须）
-            services.AddSenparcWeixinServices(Configuration);
-
-            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            #region 启用微信配置
-
-            var senparcWeixinSetting = app.ApplicationServices.GetService<IOptions<SenparcWeixinSetting>>()!.Value;
-
-            //启用微信配置（必须）
-            var registerService = app.UseSenparcWeixin(env,
-                new Senparc.CO2NET.SenparcSetting
-                {
-                    SenparcUnionAgentKey = "#{SenparcUnionAgentKey}#",
-                    Cache_Memcached_Configuration = "#{Cache_Memcached_Configuration}#",
-                    Cache_Redis_Configuration = "#{Cache_Redis_Configuration}#",
-                    DefaultCacheNamespace = "DefaultCache",
-                    IsDebug = true,
-                },
-                new SenparcWeixinSetting
-                {
-                    WeixinAppId = Configuration["WeixinAppId"],
-                    Token = Configuration["WeiXinToken"],
-                    EncodingAESKey = Configuration["WeiXinEncodingAESKey"],
-                    WeixinAppSecret = Configuration["WeiXinAppSecret"],
-
-                },
-                register => { /* CO2NET 全局配置 */ },
-                (register, weixinSetting) =>
-                {
-                    //注册公众号信息（可以执行多次，注册多个公众号）
-                    register.RegisterMpAccount(weixinSetting, "CnGal");
-                });
-
-            #region 使用 MessageHadler 中间件，用于取代创建独立的 Controller
-
-            //MessageHandler 中间件介绍：https://www.cnblogs.com/szw/p/Wechat-MessageHandler-Middleware.html
-            //使用公众号的 MessageHandler 中间件（不再需要创建 Controller）                       --DPBMARK MP
-            app.UseMessageHandlerForMp("/api/weixin", CustomMessageHandler.GenerateMessageHandler, options =>
-            {
-                options.AccountSettingFunc = context => Senparc.Weixin.Config.SenparcWeixinSetting;
-            });
-            #endregion
-
-            #endregion
-
             app.UseDeveloperExceptionPage();
 
             //添加真实IP中间件
@@ -269,7 +212,10 @@ namespace CnGalWebSite.APIServer
             app.UseSwaggerUI();
 
             //添加状态检查终结点
-            app.UseHealthChecks("/healthz", ServiceStatus.Options);
+            app.UseHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+            {
+
+            });
 
             //添加路由中间件
             app.UseRouting();

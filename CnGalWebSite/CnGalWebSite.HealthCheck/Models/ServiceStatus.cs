@@ -16,7 +16,7 @@ namespace CnGalWebSite.HealthCheck.Models
         public HealthStatus Status { get; set; }
         public List<KeyValuePair<string,object>> Data { get; set; }
 
-        public static  HealthCheckOptions Options = new()
+        public static HealthCheckOptions Options = new()
         {
             ResponseWriter = async (c, r) => {
 

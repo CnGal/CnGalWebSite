@@ -4,9 +4,6 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 {
     public interface IWeiXinService
     {
-
-        void CreateMenu();
-
         Task<string> GetNewestPublishGames(bool plainText = false);
 
         Task<string> GetNewestUnPublishGames(bool plainText = false);

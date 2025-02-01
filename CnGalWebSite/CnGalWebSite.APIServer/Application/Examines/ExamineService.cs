@@ -40,7 +40,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

@@ -7,7 +7,7 @@ using CnGalWebSite.DataModel.ViewModel.Stores;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using Senparc.Weixin.MP.AdvancedAPIs.Card;
+
 using System.Net.Http;
 using System.Net.Http.Json;
 

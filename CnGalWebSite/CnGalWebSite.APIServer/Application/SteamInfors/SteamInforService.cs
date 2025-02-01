@@ -7,9 +7,9 @@ using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Nest;
+
 using Newtonsoft.Json.Linq;
-using Senparc.CO2NET.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

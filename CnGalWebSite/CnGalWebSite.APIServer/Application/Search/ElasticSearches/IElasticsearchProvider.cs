@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿#if false
 
 namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {
@@ -7,3 +7,4 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
         IElasticClient GetClient();
     }
 }
+#endif

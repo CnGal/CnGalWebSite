@@ -11,9 +11,6 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Nest;
-using Senparc.Weixin.MP.CommonAPIs;
-using Senparc.Weixin.MP.Entities.Menu;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -50,7 +47,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             _entryService = entryService;
             _roleBirthdayRepository = roleBirthdayRepository;
         }
-
+        /*
         public void CreateMenu()
         {
             var bg = new ButtonGroup();
@@ -108,7 +105,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             bg.button.Add(subButton);
             _ = CommonApi.CreateMenu(null, bg);
 
-        }
+        }*/
 
         public string GetAboutUsage()
         {

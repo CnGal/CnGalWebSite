@@ -7,8 +7,6 @@ using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MimeKit;
-using Senparc.NeuChar.NeuralSystems;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

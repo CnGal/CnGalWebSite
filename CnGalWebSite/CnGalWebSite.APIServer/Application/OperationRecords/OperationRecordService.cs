@@ -8,7 +8,7 @@ using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Senparc.CO2NET.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

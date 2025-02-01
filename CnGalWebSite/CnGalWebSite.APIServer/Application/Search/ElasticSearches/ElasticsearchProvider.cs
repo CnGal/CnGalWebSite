@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Nest;
+﻿#if false
+using Microsoft.Extensions.Configuration;
+
 using System;
 
 namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
@@ -31,3 +32,4 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
         }
     }
 }
+#endif

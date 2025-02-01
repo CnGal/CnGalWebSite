@@ -30,6 +30,8 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
         {
             //全局配置查询拆分模式
             o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            // 在查询中使用表达式包装集合
+            o.TranslateParameterizedCollectionsToConstants();
         }));
 
 //注册Swagger生成器，定义一个或多个Swagger文件

@@ -24,7 +24,6 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using CnGalWebSite.EventBus.Services;
 using CnGalWebSite.Helper.Extensions;
-using Elasticsearch.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +33,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
-using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
+
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,6 +1,7 @@
-﻿using CnGalWebSite.APIServer.Application.WeiXin;
+﻿#if false
+using CnGalWebSite.APIServer.Application.WeiXin;
 using Microsoft.Extensions.DependencyInjection;
-using Senparc.NeuChar.Entities;
+
 using Senparc.NeuChar.Entities.Request;
 using Senparc.Weixin;
 using Senparc.Weixin.MP.Entities;
@@ -212,3 +213,4 @@ namespace CnGalWebSite.APIServer.MessageHandlers
 
     }
 }
+#endif
