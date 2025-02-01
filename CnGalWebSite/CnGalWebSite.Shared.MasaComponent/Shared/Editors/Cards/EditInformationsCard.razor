@@ -4,7 +4,7 @@
     {
         <MCol Cols="12" Md="6">
             <CnGalWebSite.Components.Inputs.MasaDatePicker NullableValue="Birthday" NullableValueChanged="BirthdayChanged" ShowDate ShowTime="false" Nullable="true" Label="生日" />
-         </MCol>
+        </MCol>
     }
     else if (item.Name == "性别")
     {
@@ -43,7 +43,14 @@
             }
             else
             {
-                Birthday = DateTime.ParseExact(text, "M月d日", null);
+                if (DateTime.TryParseExact(text, "M月d日", null, DateTimeStyles.None, out DateTime dateTime))
+                {
+                    Birthday = dateTime;
+                }
+                else
+                {
+                    Birthday = null;
+                }
             }
         }
 
