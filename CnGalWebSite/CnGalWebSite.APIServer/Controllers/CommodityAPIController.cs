@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nest;
+
 using ReverseMarkdown.Converters;
-using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
+
 using System;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Result = CnGalWebSite.DataModel.Model.Result;

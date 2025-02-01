@@ -18,7 +18,6 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using NETCore.MailKit.Core;
 using Newtonsoft.Json;
 using NuGet.Packaging;

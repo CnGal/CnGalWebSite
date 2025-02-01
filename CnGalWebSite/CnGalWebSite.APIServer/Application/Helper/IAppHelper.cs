@@ -40,37 +40,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         string GetStringAbbreviation(string str, int length);
 
         /// <summary>
-        /// 判断该 文章 部分是否被锁定
-        /// </summary>
-        /// <param name="articleId">文章Id</param>
-        /// <param name="userId">用户Id</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <returns>是否被锁定</returns>
-        Task<bool> IsArticleLockedAsync(long articleId, string userId, Operation operation);
-
-        /// <summary>
-        /// 获取数字令牌
-        /// </summary>
-        /// <param name="longToken">字符令牌</param>
-        /// <param name="userName">用户名</param>
-        /// <returns>数字令牌</returns>
-        Task<int> GetShortTokenAsync(string longToken, string userName);
-        /// <summary>
-        /// 获取字符令牌 失效时间一小时
-        /// </summary>
-        /// <param name="shortToken">字符令牌</param>
-        /// <returns>失效或未找到</returns>
-        Task<string> GetLongTokenAsync(string shortToken);
-        /// <summary>
-        /// 发送验证邮箱 自动转换短令牌
-        /// </summary>
-        /// <param name="longToken">令牌</param>
-        /// <param name="email">邮箱</param>
-        /// <param name="userName">用户名</param>
-        /// <returns>是否成功发送</returns>
-        Task<string> SendVerificationEmailAsync(string longToken, string email, string userName);
-
-        /// <summary>
         /// 在API方法中获取登入用户
         /// </summary>
         /// <param name="context"></param>
@@ -180,15 +149,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="favoriteFolderIds">收藏夹Id</param>
         /// <returns></returns>
         Task UpdateFavoritesCountAsync(long[] favoriteFolderIds);
-        /// <summary>
-        /// 发送验证短信
-        /// </summary>
-        /// <param name="longToken">长令牌</param>
-        /// <param name="phone">电话号码</param>
-        /// <param name="userName">用户名</param>
-        /// <param name="type">验证类型</param>
-        /// <returns></returns>
-        Task<string> SendVerificationSMSAsync(string longToken, string phone, string userName, SMSType type);
         /// <summary>
         /// 检查发送验证码是否超过上限
         /// </summary>

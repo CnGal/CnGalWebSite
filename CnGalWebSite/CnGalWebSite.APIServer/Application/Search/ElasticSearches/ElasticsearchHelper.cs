@@ -1,11 +1,12 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿#if false
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
-using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -464,3 +465,4 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
         }
     }
 }
+#endif

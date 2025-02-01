@@ -65,6 +65,8 @@ namespace CnGalWebSite.IdentityServer
                     {
                         //全局配置查询拆分模式
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        // 在查询中使用表达式包装集合
+                        o.TranslateParameterizedCollectionsToConstants();
                     }));
 
             //依赖注入仓储
@@ -142,14 +144,22 @@ namespace CnGalWebSite.IdentityServer
             })
                 .AddConfigurationStore(options =>
                 {
-                    options.ConfigureDbContext = b => b.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]), sql => sql.MigrationsAssembly(migrationsAssembly));
+                    options.ConfigureDbContext = b => b.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]), sql =>
+                    {
+                        sql.MigrationsAssembly(migrationsAssembly);
+                        sql.TranslateParameterizedCollectionsToConstants();
+                    });
                 })
                 .AddOperationalStore(options =>
                 {
-                    options.ConfigureDbContext = b => b.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]), sql => sql.MigrationsAssembly(migrationsAssembly));
+                    options.ConfigureDbContext = b => b.UseMySql(Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(Configuration["DefaultDBConnection"]), sql =>
+                    {
+                        sql.MigrationsAssembly(migrationsAssembly);
+                        sql.TranslateParameterizedCollectionsToConstants();
+                    });
                 })
                 .AddAspNetIdentity<ApplicationUser>();
-                //.AddProfileService<ImplicitProfileService>();
+            //.AddProfileService<ImplicitProfileService>();
 
             //设置证书
             if (string.IsNullOrWhiteSpace(Configuration["CertPath"]) || string.IsNullOrWhiteSpace(Configuration["CertPassword"]))
@@ -187,10 +197,10 @@ namespace CnGalWebSite.IdentityServer
                     options.ClientId = Configuration["GiteeClientId"];
                     options.ClientSecret = Configuration["GiteeClientSecret"];
                 });
-                //.AddSteam(options =>
-                //{
-                //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                //});
+            //.AddSteam(options =>
+            //{
+            //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+            //});
 
             //API终结点
             builder.Services.AddEndpointsApiExplorer();

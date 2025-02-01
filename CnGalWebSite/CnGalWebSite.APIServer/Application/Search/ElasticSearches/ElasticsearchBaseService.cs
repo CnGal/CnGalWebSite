@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿#if false
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,3 +134,4 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
         }
     }
 }
+#endif

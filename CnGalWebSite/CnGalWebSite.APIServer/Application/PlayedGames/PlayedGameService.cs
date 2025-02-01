@@ -9,7 +9,6 @@ using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Newtonsoft.Json;
 using NuGet.Packaging;
 using System;

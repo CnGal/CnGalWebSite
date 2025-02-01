@@ -21,8 +21,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using Nest;
-using Senparc.Weixin.MP.AdvancedAPIs.CV.OCR;
+
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
