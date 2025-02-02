@@ -10,12 +10,18 @@
 </section>
 
 
+<div class="d-none">
+    @foreach (var item in Images)
+    {
+        <img src="@item.Image" />
+    }
+</div>
+
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 @code {
 
     private List<CarouselViewModel> Images = new List<CarouselViewModel>();
-    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -25,7 +31,7 @@
     {
         try
         {
-            Carousels = await _pageModelCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
+            var Carousels = await _pageModelCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 
             Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
             if (Carousels.Count >= 6)
