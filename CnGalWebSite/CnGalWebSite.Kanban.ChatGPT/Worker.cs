@@ -54,38 +54,38 @@ namespace CnGalWebSite.Kanban.ChatGPT
             _eventBusService.InitRpcClient();
 
 
-            // 1
-            var message = "你是傻逼";
-            // _logger.LogInformation("客户端发送消息：{message}", message);
+            //// 1
+            //var message = "你是傻逼";
+            //// _logger.LogInformation("客户端发送消息：{message}", message);
 
-            var re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
-            {
-                Message = message,
-                IsFirst = true,
-                UserId = "123",
-                MessageMax = 3
-            }, stoppingToken);
-
-
-            if (re.Success == false)
-            {
-                _logger.LogError("接收失败：{re}", re.Message);
-            }
+            //var re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            //{
+            //    Message = message,
+            //    IsFirst = true,
+            //    UserId = "123",
+            //    MessageMax = 3
+            //}, stoppingToken);
 
 
+            //if (re.Success == false)
+            //{
+            //    _logger.LogError("接收失败：{re}", re.Message);
+            //}
 
-            // 2
-            message = "你是傻逼";
 
-            re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
-            {
-                Message = message,
-                IsFirst = false,
-                UserId = "123",
-                MessageMax = 3
-            }, stoppingToken);
 
-            _logger.LogInformation("接收消息{re}", re.Success ? "成功" : "失败");
+            //// 2
+            //message = "你是傻逼";
+
+            //re = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            //{
+            //    Message = message,
+            //    IsFirst = false,
+            //    UserId = "123",
+            //    MessageMax = 3
+            //}, stoppingToken);
+
+            //_logger.LogInformation("接收消息{re}", re.Success ? "成功" : "失败");
 
             //// 3
             //message = "不对哦~《硅心》是由呐呐呐制作组制作的galgame。讲述了突然到来的机器人少女，打破了某自由插画师的隐世单机生活，一场人机恋爱喜剧由此开的故事。";

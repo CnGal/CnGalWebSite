@@ -4,13 +4,13 @@ namespace CnGalWebSite.EventBus.Services
 {
     public interface IEventBus
     {
-        Task SendMessage<T>(string queue, T message);
+        void SendMessage<T>(string queue, T message);
 
-        Task SubscribeMessages<T>(string queue, Action<T> action);
+        void SubscribeMessages<T>(string queue, Action<T> action);
 
-        Task CreateRpcServer<TInput, TOutput>(string queue, Func<TInput, Task<TOutput>> func);
+        void CreateRpcServer<TInput, TOutput>(string queue, Func<TInput, Task<TOutput>> func);
 
-        Task CreateRpcClient();
+        void CreateRpcClient();
 
         Task<TOutput> CallRpcAsync<TInput, TOutput>(string queue, TInput input, CancellationToken cancellationToken = default);
     }

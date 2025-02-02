@@ -39,15 +39,15 @@ namespace CnGalWebSite.EamineService
                 });
             });
 
-            _logger.LogInformation("客户端上线");
-            _eventBusService.InitRpcClient();
+            //_logger.LogInformation("客户端上线");
+            //_eventBusService.InitRpcClient();
 
-            var re = await _eventBusService.CallSensitiveWordsCheck(new SensitiveWordsCheckModel
-            {
-                Texts = ["傻逼煞笔沙比","12122112"] 
-            }, stoppingToken);
+            //var re = await _eventBusService.CallSensitiveWordsCheck(new SensitiveWordsCheckModel
+            //{
+            //    Texts = ["傻逼煞笔沙比","12122112"] 
+            //}, stoppingToken);
 
-            _logger.LogError("检查到 {re} 个敏感词：\n      {}", re.Words.Count, string.Join("\n      ", re.Words));
+            //_logger.LogError("检查到 {re} 个敏感词：\n      {}", re.Words.Count, string.Join("\n      ", re.Words));
 
 
 
