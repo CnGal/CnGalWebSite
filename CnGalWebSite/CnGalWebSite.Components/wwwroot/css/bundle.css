@@ -1,4 +1,4 @@
-.primary {
+﻿.primary {
     background-color: var(--md-sys-color-primary);
 }
 
@@ -1023,10 +1023,6 @@ html {
     padding: 0;
 }
 /*Masa卡片*/
-.theme--light.m-card {
-    background-color: transparent;
-    color: inherit;
-}
 
     .theme--light.m-card > .m-card__subtitle, .theme--light.m-card > .m-card__text, .m-toast-detail {
         color: inherit
