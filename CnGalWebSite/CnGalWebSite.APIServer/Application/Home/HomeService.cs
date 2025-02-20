@@ -50,6 +50,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 .Include(s => s.Releases)
                 .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true)
                 .Where(s => s.Releases.Any(s => (s.Type == GameReleaseType.Demo || s.Type == GameReleaseType.EA) && s.Time != null))
+                .Where(s=> s.PubulishTime == null || s.PubulishTime.Value.Date > tempDateTimeNow)
                 .Select(s => new
                 {
                     s.MainPicture,
