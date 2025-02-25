@@ -20,42 +20,42 @@
 @font-face {
     font-family: "AlimamaShuHeiTi-Regular";
     font-weight: 700;
-    src: url("/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/AlimamaShuHeiTi-Bold.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Heavy";
     font-weight: 800;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Heavy.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Regular";
     font-weight: 400;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Normal.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "MiSans-Bold";
     font-weight: 700;
-    src: url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/MiSans-Bold.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "OPPOSans-H";
     font-weight: 800;
-    src: url("/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/OPlusSans3-Bold.woff") format("woff");
     font-display: swap;
 }
 
 @font-face {
     font-family: "SourceHanSerifCN-Heavy";
     font-weight: 800;
-    src: url("/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff2") format("woff2"), url("/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff") format("woff");
+    src: url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff2") format("woff2"), url("https://res.cngal.org/_content/CnGalWebSite.Shared/font/SourceHanSerifCN-Heavy.woff") format("woff");
     font-display: swap;
 }
 /*覆盖全局样式*/
