@@ -25,6 +25,8 @@ services:
       - ChatGPTApiUrl=${ChatGPTApiUrl}
       # GPT 提示词
       - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
+      # GPT 单次对话长度限制
+      - ChatGPTLimit_Length=${ChatGPTLimit_Length}
       # GPT 对话示例，用户部分
       - ChatGPT_Sample_User=${ChatGPT_Sample_User}
       # GPT 对话示例，看板娘部分
