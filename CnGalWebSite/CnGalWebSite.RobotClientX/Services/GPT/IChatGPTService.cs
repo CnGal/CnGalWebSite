@@ -8,6 +8,6 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
 {
     public interface IChatGPTService
     {
-        Task<string> GetReply(string question);
+        Task<string> GetReply(long sendTo);
     }
 }

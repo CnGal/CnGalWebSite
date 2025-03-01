@@ -21,7 +21,7 @@ using CnGalWebSite.RobotClientX.Services.GPT;
 
 namespace CnGalWebSite.RobotClientX.Services.Messages
 {
-    public class MessageService :  IMessageService
+    public class MessageService : IMessageService
     {
         private readonly IRepository<RobotReply> _robotReplyRepository;
         private readonly IRepository<RobotFace> _robotFaceRepository;
@@ -31,11 +31,12 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         private readonly IExternalDataService _externalDataService;
         private readonly IHttpService _httpService;
         private readonly IChatGPTService _chatGPTService;
+        private readonly IQQGroupMemberCacheService _memberCacheService;
 
         public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, IHttpService httpService, IChatGPTService chatGPTService,
         ILogger<MessageService> logger,
         IConfiguration configuration,
-            ISensitiveWordService sensitiveWordService)
+            ISensitiveWordService sensitiveWordService, IQQGroupMemberCacheService memberCacheService)
         {
             _robotReplyRepository = robotReplyRepository;
             _sensitiveWordService = sensitiveWordService;
@@ -45,6 +46,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             _externalDataService = externalDataService;
             _httpService = httpService;
             _chatGPTService = chatGPTService;
+            _memberCacheService = memberCacheService;
         }
 
         /// <summary>
@@ -73,13 +75,14 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             //检查是否含有变量替换 如果有 则检查输入是否包含敏感词
             if (reply.Value.Contains('$'))
             {
-                List<string> words =await _sensitiveWordService.Check(message);
+                List<string> words = await _sensitiveWordService.Check(message);
 
                 if (words.Count != 0)
                 {
-                    return new RobotReply {
+                    return new RobotReply
+                    {
                         Key = message,
-                        Value = _configuration["SensitiveReply"] ?? $"{ _configuration["RobotName"]}不知道哦~"
+                        Value = _configuration["SensitiveReply"] ?? $"{_configuration["RobotName"]}不知道哦~"
                     };
                 }
             }
@@ -97,13 +100,13 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="ArgError"></exception>
-        public async Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range, string reply, string message, string regex, long qq, string name)
+        public async Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range, string reply, string message, string regex, long qq, string name, long sendto)
         {
 
             List<KeyValuePair<string, string>> args = new();
             try
             {
-                await ProcMessageArgument(reply, message, regex, qq, name, args);
+                await ProcMessageArgument(reply, message, regex, qq, name, args, sendto);
                 ProcMessageReplaceInput(reply, message, regex, args);
                 ProcMessageFace(reply, args);
             }
@@ -150,10 +153,10 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
             {
                 return new SendMessageModel
                 {
-                    SendTo=qq,
+                    SendTo = qq,
                     MasudaMessage = ProcMessageToMasuda(reply),
                     Range = range,
-                    Text= reply
+                    Text = reply
                 };
             }
             else
@@ -183,10 +186,10 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
 
             List<Message> messages = new();
 
-            while(true)
+            while (true)
             {
                 var item = vaule.MidStrEx("[", "]");
-                if(string.IsNullOrWhiteSpace(item))
+                if (string.IsNullOrWhiteSpace(item))
                 {
                     messages.Add(new Plain(vaule));
                     break;
@@ -195,17 +198,17 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                 {
                     var infor = "";
                     //尝试获取命令前方的字符串
-                    if (vaule.StartsWith($"[{item}]")==false)
+                    if (vaule.StartsWith($"[{item}]") == false)
                     {
-                        infor =  vaule.Split($"[{item}]").FirstOrDefault();
+                        infor = vaule.Split($"[{item}]").FirstOrDefault();
                         messages.Add(new Plain(infor));
                     }
                     //删除命令及前方字符串
                     vaule = vaule.Replace($"{infor}[{item}]", "");
-                  
+
                     if (item.StartsWith("image="))
                     {
-                        string imageStr = item.Replace("image=","");
+                        string imageStr = item.Replace("image=", "");
 
                         if (string.IsNullOrWhiteSpace(imageStr) == false)
                         {
@@ -219,7 +222,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                     }
                     else if (item.StartsWith("声音="))
                     {
-                        string voiceStr = item.Replace("声音=","");
+                        string voiceStr = item.Replace("声音=", "");
 
                         if (string.IsNullOrWhiteSpace(voiceStr) == false)
                         {
@@ -362,7 +365,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// <param name="name"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public async Task ProcMessageArgument(string reply, string message, string regex, long qq, string name, List<KeyValuePair<string, string>> args)
+        public async Task ProcMessageArgument(string reply, string message, string regex, long qq, string name, List<KeyValuePair<string, string>> args, long sendto)
         {
             while (true)
             {
@@ -376,12 +379,12 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                 {
                     "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
                     "qq" => qq.ToString(),
-                    "weather" => await _externalDataService.GetWeather(),
+                    "weather" => await _chatGPTService.GetReply(sendto),//await _externalDataService.GetWeather(),
                     "sender" => name,
                     "n" => "\n",
                     "r" => "\r",
-                    "chatgpt"=>await _chatGPTService.GetReply(message),
-                    "introduce" => await GetArgValue(argument, Regex.Split(message, regex).LastOrDefault(s => !string.IsNullOrWhiteSpace(s)).Replace("一下",""), qq),
+                    "chatgpt" => await _chatGPTService.GetReply(sendto),
+                    "introduce" => await GetArgValue(argument, Regex.Split(message, regex).LastOrDefault(s => !string.IsNullOrWhiteSpace(s)).Replace("一下", ""), qq),
                     "facelist" => "该功能暂未实装",
                     _ => await GetArgValue(argument, message, qq)
                 };

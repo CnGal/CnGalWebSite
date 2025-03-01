@@ -22,25 +22,35 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         private readonly ILogger<ChatGPTService> _logger;
         private readonly IMemoryCache _memoryCache;
         private readonly ISensitiveWordService _sensitiveWordService;
+        private readonly IFunctionCallingService _functionCallingService;
 
         private static List<DateTime> _record = new List<DateTime>();
         private readonly HttpClient _httpClient;
+        private string? _lastToolCallHash;
+        private int _recursionCount;
+        private readonly int MaxRecursionDepth;
 
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
         };
 
-        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IMemoryCache memoryCache, ISensitiveWordService sensitiveWordService)
+        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger,
+            IMemoryCache memoryCache, ISensitiveWordService sensitiveWordService, IFunctionCallingService functionCallingService)
         {
             _httpService = httpService;
             _configuration = configuration;
             _logger = logger;
             _memoryCache = memoryCache;
             _sensitiveWordService = sensitiveWordService;
+            _functionCallingService = functionCallingService;
 
             _httpClient = _httpService.GetClientAsync().GetAwaiter().GetResult();
             _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
+            if (!int.TryParse(_configuration["MaxRecursionDepth"], out MaxRecursionDepth))
+            {
+                MaxRecursionDepth = 10;
+            }
         }
 
 
@@ -103,10 +113,40 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             return true;
         }
 
+        private string GetToolCallHash(List<ToolCall> toolCalls)
+        {
+            if (toolCalls == null || !toolCalls.Any())
+                return string.Empty;
 
+            var sb = new StringBuilder();
+            foreach (var call in toolCalls)
+            {
+                sb.Append(call.Function.Name)
+                  .Append(':')
+                  .Append(call.Function.Arguments)
+                  .Append(';');
+            }
+            return sb.ToString().GetSha1();
+        }
 
         public async Task<ChatGPTSendMessageResult> SendMessages(List<ChatCompletionMessage> messages)
         {
+            // 检查递归深度
+            if (_recursionCount >= MaxRecursionDepth)
+            {
+                _logger.LogWarning("检测到可能的无限递归，已达到最大递归深度 {depth}", MaxRecursionDepth);
+
+                _recursionCount = 0;
+
+                return new ChatGPTSendMessageResult
+                {
+                    Success = false,
+                    Message = "看板娘陷入了思考的循环中..."
+                };
+            }
+
+            _recursionCount++;
+
             // 判断空值
             if (messages.Count == 0 || string.IsNullOrWhiteSpace(messages.Last().Content))
             {
@@ -128,7 +168,6 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 };
             }
 
-
             //检查上限
             if (CheckLimit() == false)
             {
@@ -139,7 +178,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 };
             }
 
-            string? reply;
+            string? reply = null;
 
             // 检查敏感词
             var words = await _sensitiveWordService.Check(messages.Last().Content!);
@@ -157,15 +196,27 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 //添加记录
                 _record.Add(DateTime.Now);
 
-
                 // api
                 var url = _configuration["ChatGPTApiUrl"];
 
-                var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
+                var model = new ChatCompletionModel
                 {
                     Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"]!,
                     Messages = messages
-                });
+                };
+
+
+                if (_configuration["EnableFunctionCalling"] == "True")
+                {
+                    // 添加可用的工具
+                    var tools = _functionCallingService.GetAvailableTools();
+                    if (tools.Any())
+                    {
+                        model.Tools = tools;
+                    }
+                }
+
+                var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", model);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -180,8 +231,100 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 string jsonContent = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
 
-                reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
-                if (result == null || string.IsNullOrWhiteSpace(reply))
+                if (result == null)
+                {
+                    return new ChatGPTSendMessageResult
+                    {
+                        Success = false,
+                        Message = "回复为空"
+                    };
+                }
+
+                reply = result.Choices?.FirstOrDefault()?.Message?.Content;
+
+                // 调用完直接输出用量统计
+                _logger.LogInformation("收到ChatGPT的回复：{reply}\n      消耗 {} Token，回复占比 {}%（{}），命中缓存 {}%（{}）\n", reply, result.Usage.Total_tokens, (result.Usage.Completion_tokens * 100.0 / result.Usage.Total_tokens).ToString("0.0"), result.Usage.Completion_tokens, (result.Usage.prompt_cache_hit_tokens * 100.0 / result.Usage.Prompt_tokens).ToString("0.0"), result.Usage.prompt_cache_hit_tokens);
+
+
+                // 处理函数调用
+                var toolCalls = result.Choices?.FirstOrDefault()?.Message?.tool_calls;
+
+                bool toolFail = false;
+
+                if (toolCalls != null && toolCalls.Count != 0)
+                {
+                    // 检查是否与上一次工具调用相同
+                    var currentHash = GetToolCallHash(toolCalls);
+                    if (currentHash == _lastToolCallHash)
+                    {
+                        _logger.LogWarning("检测到重复的工具调用，终止递归");
+
+                        _lastToolCallHash = null;
+
+                        return new ChatGPTSendMessageResult
+                        {
+                            Success = false,
+                            Message = "看板娘陷入了重复的操作中..."
+                        };
+                    }
+                    _lastToolCallHash = currentHash;
+
+                    foreach (var toolCall in toolCalls)
+                    {
+                        try
+                        {
+                            var functionResult = await _functionCallingService.ExecuteFunction(
+                                toolCall.Function.Name,
+                                toolCall.Function.Arguments
+                            );
+
+                            // 将函数调用结果添加到消息列表
+                            messages.Add(new ChatCompletionMessage
+                            {
+                                Role = "assistant",
+                                Content = null,
+                                tool_calls = new List<ToolCall> { toolCall }
+                            });
+
+                            messages.Add(new ChatCompletionMessage
+                            {
+                                Role = "tool",
+                                Content = functionResult,
+                                tool_call_id = toolCall.Id
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "执行函数 {functionName} 失败", toolCall.Function.Name);
+                            toolFail = true;
+                            break;
+                        }
+                    }
+
+                    if (toolFail == false)
+                    {
+                        // 继续对话
+                        return await SendMessages(messages);
+                    }
+                }
+                else
+                {
+                    // 重置递归计数和工具调用哈希
+                    _recursionCount = 0;
+                    _lastToolCallHash = null;
+                }
+
+                // 调用工具失败
+                if (toolFail)
+                {
+                    return new ChatGPTSendMessageResult
+                    {
+                        Success = false,
+                        Message = "呜呜呜~~~"
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(reply))
                 {
                     return new ChatGPTSendMessageResult
                     {
@@ -199,14 +342,13 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     // 默认回复
                     reply = "看板娘不知道哦~";
                 }
-
-                _logger.LogInformation("收到ChatGPT的回复：{reply}\n      消耗 {} Token，回复占比 {}%（{}）\n", reply, result.Usage.Total_tokens, (result.Usage.Completion_tokens * 100.0 / result.Usage.Total_tokens).ToString("0.0"), result.Usage.Completion_tokens);
-
             }
 
-
             // 缓存回复
-            SetCache(messages, reply);
+            if (!string.IsNullOrWhiteSpace(reply))
+            {
+                SetCache(messages, reply);
+            }
 
             return new ChatGPTSendMessageResult
             {

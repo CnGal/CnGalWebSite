@@ -49,6 +49,11 @@ namespace CnGalWebSite.EventBus.Services
             _eventBus.CreateRpcServer("kanban_chatgpt", func);
         }
 
+        public void CreateKanbanGroupServer(Func<KanbanGroupGptModel, Task<KanbanChatGPTReceiveModel>> func)
+        {
+            _eventBus.CreateRpcServer("kanban_group_chatgpt", func);
+        }
+
         public void CreateSensitiveWordsCheckServer(Func<SensitiveWordsCheckModel, Task<SensitiveWordsResultModel>> func)
         {
             _eventBus.CreateRpcServer("sensitive_words_check", func);
@@ -65,6 +70,11 @@ namespace CnGalWebSite.EventBus.Services
             }
 
             _eventBus.CreateRpcClient();
+        }
+
+        public async Task<KanbanChatGPTReceiveModel> CallKanbanGroupChatGPT(KanbanGroupGptModel model, CancellationToken cancellationToken = default)
+        {
+            return await _eventBus.CallRpcAsync<KanbanGroupGptModel, KanbanChatGPTReceiveModel>("kanban_group_chatgpt", model, cancellationToken);
         }
 
         public async Task<KanbanChatGPTReceiveModel> CallKanbanChatGPT(KanbanChatGPTSendModel model, CancellationToken cancellationToken = default)

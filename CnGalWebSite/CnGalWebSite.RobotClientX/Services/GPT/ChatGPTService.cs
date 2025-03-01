@@ -1,130 +1,85 @@
 ﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.EventBus.Models;
+using CnGalWebSite.EventBus.Services;
 using CnGalWebSite.RobotClientX.Models.GPT;
+using CnGalWebSite.RobotClientX.Models.Messages;
 using CnGalWebSite.RobotClientX.Services.ExternalDatas;
+using CnGalWebSite.RobotClientX.Services.Messages;
 using System.Text.Json;
 
 namespace CnGalWebSite.RobotClientX.Services.GPT
 {
     public class ChatGPTService : IChatGPTService
     {
-        private readonly IHttpService _httpService;
         private readonly IConfiguration _configuration;
-        private readonly IExternalDataService _externalDataService;
         private readonly ILogger<ChatGPTService> _logger;
+        private readonly IGroupMessageCacheService _groupMessageCacheService;
+        private readonly IEventBusService _eventBusService;
 
-        private static List<DateTime> _record = new List<DateTime>();
-        private readonly HttpClient _httpClient;
-
-        private readonly JsonSerializerOptions _jsonOptions = new()
+        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IGroupMessageCacheService groupMessageCacheService, IEventBusService eventBusService)
         {
-            PropertyNameCaseInsensitive = true,
-        };
-
-        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger, IExternalDataService externalDataService)
-        {
-            _httpService = httpService;
             _configuration = configuration;
             _logger = logger;
-            _externalDataService = externalDataService;
-
-            _httpClient = _httpService.GetClientAsync().GetAwaiter().GetResult();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
+            _groupMessageCacheService = groupMessageCacheService;
+            _eventBusService = eventBusService;
         }
 
-        public async Task<string> GetReply(string question)
+        public async Task<string> GetReply(long sendTo)
         {
-            var datetime = DateTime.Now;
-            //检查上限
-            if (_record.Count(s => s > datetime.AddMinutes(-1)) > int.Parse(_configuration["ChatGPTLimit"] ?? "10"))
+            var kanban = _configuration["QQ"];
+            if (!long.TryParse(kanban, out long qq))
             {
-                return "哀家累了呢~";
-            }
-            //清理过期的记录
-            _record.RemoveAll(s => s < datetime.AddMinutes(-1));
-
-            //读取配置
-            var sys = _configuration["ChatGPT_SystemMessageTemplate"];
-            var user = _configuration["ChatGPT_UserMessageTemplate"];
-            var url = _configuration["ChatGPTApiUrl"];
-
-            if (string.IsNullOrWhiteSpace(sys) || string.IsNullOrWhiteSpace(user))
-            {
+                _logger.LogError("看板娘QQ不正确：{id}", kanban);
                 return null;
             }
-            //替换文字
-            question = question.Replace(_configuration["RobotName"], "").Replace($"[@{_configuration["QQ"]}]", "");
+            var messages = _groupMessageCacheService.GetGroupMessages(sendTo);
 
-            //填充消息模板
-            sys = sys.Replace("{time}", datetime.ToString("HH:mm:ss"));
-            sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
-            user = user.Replace("{question}", question);
-
-            //日志
-            _logger.LogInformation("向ChatGPT发送消息：{question}", question);
-            //添加记录
-            _record.Add(datetime);
-
-            var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", new ChatCompletionModel
+            if (messages.Count == 0)
             {
-                Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"],
-                Messages = new List<ChatCompletionMessage>
+                _logger.LogError("无法获取群聊历史记录：{id}", sendTo);
+                return null;
+            }
+
+            // 判断是否需要清理历史消息
+            var GroupHistoryMax = _configuration["GroupHistoryMax"];
+            if (!int.TryParse(GroupHistoryMax, out int max))
+            {
+                max = 30;
+            }
+            var GroupHistoryMin = _configuration["GroupHistoryMin"];
+            if (!int.TryParse(GroupHistoryMin, out int min))
+            {
+                min = 10;
+            }
+
+            if (_groupMessageCacheService.GetGroupMessages(sendTo).Count > max)
+            {
+                _groupMessageCacheService.KeepLatestMessages(sendTo, min);
+            }
+
+            // 拼接历史消息
+            var model = new KanbanGroupGptModel
+            {
+                Messages = messages.Select(s => new KanbanGroupMessageModel
                 {
-                    new ChatCompletionMessage
-                    {
-                        Role="system",
-                        Content=sys
-                    },
-                    new ChatCompletionMessage
-                    {
-                        Role="user",
-                        Content=user
-                    }
-                }
-            });
+                    IsAssistant = s.SenderId == qq,
+                    Name = s.SenderName,
+                    Text = s.Content
+                }).ToList()
+            };
 
-            if (!response.IsSuccessStatusCode)
+            // 打印请求信息
+            _logger.LogInformation("向看板娘发送请求：{model}", JsonSerializer.Serialize(model, new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+
+            var result = await _eventBusService.CallKanbanGroupChatGPT(model);
+            if (result == null || result.Success == false)
             {
-                _logger.LogError("请求ChatGPT回复失败，正文：{msg}", await response.Content.ReadAsStringAsync());
+                _logger.LogError("获取GPT回复失败：{id}", sendTo);
                 return null;
             }
 
-            string jsonContent = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ChatResult>(jsonContent, _jsonOptions);
 
-            var reply = result?.Choices?.FirstOrDefault()?.Message?.Content;
-            if (string.IsNullOrWhiteSpace(reply))
-            {
-                return null;
-            }
-
-            _logger.LogInformation("收到ChatGPT的回复：{reply}", reply);
-
-
-
-            return await ProcReply(reply);
-        }
-
-        public async Task<string> ProcReply(string reply)
-        {
-            var list = new List<string>();
-            while (true)
-            {
-                var name = reply.MidStrEx("【", "】");
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    break;
-                }
-
-                list.Add(await _externalDataService.GetArgValue("introduce", name, -1, null));
-                reply = reply.Replace($"【{name}】", "");
-            }
-
-            if (list.Any())
-            {
-                return string.Join("", list);
-            }
-
-            return reply;
+            return result.Message.Replace($"【看板娘】\n", "");
         }
     }
 }

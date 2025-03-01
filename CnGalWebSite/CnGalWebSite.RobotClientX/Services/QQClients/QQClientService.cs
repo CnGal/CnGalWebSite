@@ -27,6 +27,10 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private readonly IEventService _eventService;
         private readonly IEventBusService _eventBusService;
         private readonly ILogger<QQClientService> _logger;
+        private readonly IGroupMessageCacheService _groupMessageCacheService;
+        private readonly IQQGroupMemberCacheService _memberCacheService;
+
+
         public MasudaBot MasudaClient { get; set; }
         public Client MiraiClient { get; set; }
         private string _miraiSession;
@@ -36,7 +40,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
         public QQClientService(IRepository<RobotGroup> robotGroupRepository, IRepository<PostLog> postLogRepository,
             IConfiguration configuration, ILogger<QQClientService> logger, IEventService eventService, IEventBusService eventBusService,
-        IMessageService messageService, IRepository<RobotEvent> robotEventRepository)
+        IMessageService messageService, IRepository<RobotEvent> robotEventRepository, IGroupMessageCacheService groupMessageCacheService, IQQGroupMemberCacheService memberCacheService)
         {
             _robotGroupRepository = robotGroupRepository;
             _configuration = configuration;
@@ -46,6 +50,8 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             _eventService = eventService;
             _robotEventRepository = robotEventRepository;
             _eventBusService = eventBusService;
+            _groupMessageCacheService = groupMessageCacheService;
+            _memberCacheService = memberCacheService;
         }
 
         public void InitMasuda()
@@ -141,7 +147,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                         var message = _eventService.GetCurrentTimeEvent();
                         if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
 
                             if (result != null)
                             {
@@ -169,7 +175,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                         var message = _eventService.GetProbabilityEvents();
                         if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
 
                             if (result != null)
                             {
@@ -294,6 +300,35 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             }
             //检查是否符合强制匹配
             string message = ConversionMeaasge(msg);
+
+            // 检查需要需要更新群员列表缓存
+            if (_memberCacheService.NeedUpdate(s.group.id))
+            {
+                var list = MessageUtil.GetMemberList(new MeowMiraiLib.GenericModel.QQGroup(s.group.id, "", ""), MiraiClient);
+                _memberCacheService.UpdateGroupMembers(s.group.id, list.Select(x => new QQGroupMemberInfo
+                {
+                    GroupNumber = s.group.id,
+                    NickName = x.memberName,
+                    QQNumber = x.id
+                }).ToList());
+            }
+
+            // 获取QQ
+            var kanban = _configuration["QQ"];
+            if (!long.TryParse(kanban, out long qq))
+            {
+                qq = 0;
+            }
+
+            // 添加消息到缓存
+            _groupMessageCacheService.AddMessage(s.group.id, new GroupMessageRecord
+            {
+                SenderId = s.id,
+                SenderName = s.memberName,
+                Content = message.ReplaceAtTags(s.group.id, _memberCacheService, qq, _configuration["RobotName"]),// 替换掉@再保存
+                SendTime = DateTime.Now
+            });
+
             if (group.ForceMatch)
             {
                 string name = _configuration["RobotName"] ?? "看板娘";
@@ -328,7 +363,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
             //尝试找出所有匹配的回复
-            RobotReply reply =await _messageService.GetAutoReply(message, range);
+            RobotReply reply = await _messageService.GetAutoReply(message, range);
 
             if (reply == null)
             {
@@ -340,7 +375,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             try
             {
                 //处理消息
-                result = await _messageService.ProcMessageAsync(range, reply.Value, message, reply.Key, memberId, memberName);
+                result = await _messageService.ProcMessageAsync(range, reply.Value, message, reply.Key, memberId, memberName, sendto);
             }
             catch (ArgError ae)
             {
@@ -406,7 +441,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             //检查上限
             if (singleCount == singleLimit)
             {
-                SendMessageModel result = await _messageService.ProcMessageAsync(range, _robotEventRepository.GetAll().FirstOrDefault(s => s.Note == "消息上限警告")?.Text ?? $"[image=https://image.cngal.org/kanbanFace/hhzywx.png][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, memberId, memberName);
+                SendMessageModel result = await _messageService.ProcMessageAsync(range, _robotEventRepository.GetAll().FirstOrDefault(s => s.Note == "消息上限警告")?.Text ?? $"[image=https://image.cngal.org/kanbanFace/hhzywx.png][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, memberId, memberName, sendto);
                 result.SendTo = sendto;
                 await SendMessage(result, msg);
                 return true;
@@ -414,7 +449,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
             if (totalCount == totalLimit)
             {
-                SendMessageModel result = await _messageService.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName);
+                SendMessageModel result = await _messageService.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName, sendto);
                 result.SendTo = sendto;
                 await SendMessage(result, msg);
                 return true;
@@ -482,7 +517,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
                 _ = await MasudaClient.ReplyMessageAsync(msg, model.MasudaMessage);
 
-                _logger.LogInformation("向频道发送“{消息}”", model.Text);
+                _logger.LogInformation("向频道发送\"{text}\"", model.Text);
 
             }
             else if (model.Range == RobotReplyRange.Friend)
@@ -490,12 +525,27 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
                 model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
 
-                _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
+                _logger.LogInformation("向 {group} 发送\"{text}\"成功", model.SendTo, model.Text);
             }
             else
             {
                 model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
-                _logger.LogInformation("向 {group} 发送“{消息}”成功", model.SendTo, model.Text);
+                _logger.LogInformation("向 {group} 发送\"{text}\"成功", model.SendTo, model.Text);
+
+                // 添加消息到历史记录
+                var kanban = _configuration["QQ"];
+                if (!long.TryParse(kanban, out long qq))
+                {
+                    return;
+                }
+
+                _groupMessageCacheService.AddMessage(model.SendTo, new GroupMessageRecord
+                {
+                    SenderId = qq,
+                    SenderName = _configuration["RobotName"],
+                    Content = $"【看板娘】\n{model.Text}",
+                    SendTime = DateTime.Now
+                });
             }
 
             return;
