@@ -1,13 +1,13 @@
 services:
   robotclientx:
-    image: littlefishtentears/cngalwebsiterobotclientx:latest
+    image: littlefishtentears/cngalwebsiterobotclientx:${IMAGE_TAG:-latest}
     container_name: robotclientx
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       # 账号
       - QQ=${QQ}
       # 称呼
-      - RobotName=${RobotName}
+      - RobotName=${RobotName:-看板娘}
       # 接收预警的QQ群
       - WarningQQGroup=${WarningQQGroup}
       # Mirai Url
@@ -21,22 +21,22 @@ services:
       # QQ频道 AppKey
       - ChannelAppKey=${ChannelAppKey}
       # CnGal资料站 API
-      - WebApiPath=${WebApiPath}
+      - WebApiPath=${WebApiPath:-https://api.cngal.org/}
       # 网站名称
-      - WebSiteName=${WebSiteName}
+      - WebSiteName=${WebSiteName:-看板娘在这里哦}
       # 网站背景图
-      - WebSiteImage=${WebSiteImage}
+      - WebSiteImage=${WebSiteImage:-https://res.cngal.org/_content/CnGalWebSite.Shared/images/game_head.png}
       # 网站主题颜色
-      - WebSiteTheme=${WebSiteTheme}
+      - WebSiteTheme=${WebSiteTheme:-#f06292}
       # 事件总线
       - EventBus_HostName=${EventBus_HostName}
-      - EventBus_Port=${EventBus_Port}
+      - EventBus_Port=${EventBus_Port:-5672}
       - EventBus_UserName=${EventBus_UserName}
       - EventBus_Password=${EventBus_Password}
       # 群聊历史记录最大条数
-      - GroupHistoryMax=${GroupHistoryMax}
+      - GroupHistoryMax=${GroupHistoryMax:-30}
       # 群聊历史记录达到最大条数后，保留最近N条消息
-      - GroupHistoryMin=${GroupHistoryMin}
+      - GroupHistoryMin=${GroupHistoryMin:-10}
     hostname: robotclientx
     restart: always
     healthcheck:
@@ -48,9 +48,26 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-200m}
     ports:
-      - "2004:8080"
+      - ${PORT:-2004}:8080
     volumes:
-      - ${MNT_DIR}/robotclientx/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-      - ${MNT_DIR}/robotclientx/Data:/app/wwwroot/Data
+      - drawingbed-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - ${MNT_DIR:-/mnt/docker}/robotclientx/Data:/app/wwwroot/Data
+    labels:
+      # traefik
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.robotclientx.rule=Host(`${HOST:-robotclientx.localhost}`)
+      - traefik.http.services.robotclientx.loadbalancer.server.port=8080
+      # watchtower
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true}
+    networks:
+      - web
+
+volumes:
+  drawingbed-DataProtection-Keys:
+
+networks:
+  web:
+    external: true

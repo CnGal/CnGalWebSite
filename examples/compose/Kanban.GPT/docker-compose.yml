@@ -1,14 +1,13 @@
-version: "3"
 services:
   apiserver:
-    image: littlefishtentears/cngalwebsitekanbangpt:latest
+    image: littlefishtentears/cngalwebsitekanbangpt:${IMAGE_TAG:-latest}
     container_name: kanbangpt
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       # 事件总线 主机名称
       - EventBus_HostName=${EventBus_HostName}
       # 事件总线 端口
-      - EventBus_Port=${EventBus_Port}
+      - EventBus_Port=${EventBus_Port:-5672}
       # 事件总线 用户名
       - EventBus_UserName=${EventBus_UserName}
       # 事件总线 密码
@@ -16,30 +15,33 @@ services:
       # GPT API KEY
       - ChatGPTApiKey=${ChatGPTApiKey}
       # 1分钟所有用户调用次数限制
-      - ChatGPTLimit_1_Minute=${ChatGPTLimit_1_Minute}
+      - ChatGPTLimit_1_Minute=${ChatGPTLimit_1_Minute:-30}
       # 1天所有用户调用次数限制
-      - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day}
+      - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day:-1000}
       # GPT 模型
-      - ChatGPTModel=${ChatGPTModel}
+      - ChatGPTModel=${ChatGPTModel:-gpt-3.5-turbo-0125}
       # GPT API url
       - ChatGPTApiUrl=${ChatGPTApiUrl}
       # GPT 提示词
       - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
       # GPT 单次对话长度限制
-      - ChatGPTLimit_Length=${ChatGPTLimit_Length}
+      - ChatGPTLimit_Length=${ChatGPTLimit_Length:-30}
       # GPT 对话示例，用户部分
       - ChatGPT_Sample_User=${ChatGPT_Sample_User}
       # GPT 对话示例，看板娘部分
       - ChatGPT_Sample_Kanban=${ChatGPT_Sample_Kanban}
       # GPT 最大递归调用深度
-      - MaxRecursionDepth=${MaxRecursionDepth}
+      - MaxRecursionDepth=${MaxRecursionDepth:-10}
       # CnGal API 路径
-      - WebApiPath=${WebApiPath}
+      - WebApiPath=${WebApiPath:-https://api.cngal.org/}
       # 是否启用函数调用 启用后不能使用r1模型
-      - EnableFunctionCalling=${EnableFunctionCalling}
+      - EnableFunctionCalling=${EnableFunctionCalling:-true}
     hostname: kanbangpt
     restart: always
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-100m}
+    labels:
+      # watchtower
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true}
