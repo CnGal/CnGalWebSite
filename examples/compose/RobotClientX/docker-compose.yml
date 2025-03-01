@@ -20,16 +20,6 @@ services:
       - ChannelToken=${ChannelToken}
       # QQ频道 AppKey
       - ChannelAppKey=${ChannelAppKey}
-      # GPT对话上限每分钟
-      - ChatGPTLimit=${ChatGPTLimit}
-      # GPT API Url
-      - ChatGPTApiUrl=${ChatGPTApiUrl}
-      # GPT Key
-      - ChatGPTApiKey=${ChatGPTApiKey}
-      # GPT 提示词
-      - ChatGPT_SystemMessageTemplate=${ChatGPT_SystemMessageTemplate}
-      # GPT 消息模板
-      - ChatGPT_UserMessageTemplate=${ChatGPT_UserMessageTemplate}
       # CnGal资料站 API
       - WebApiPath=${WebApiPath}
       # 网站名称
@@ -43,6 +33,10 @@ services:
       - EventBus_Port=${EventBus_Port}
       - EventBus_UserName=${EventBus_UserName}
       - EventBus_Password=${EventBus_Password}
+      # 群聊历史记录最大条数
+      - GroupHistoryMax=${GroupHistoryMax}
+      # 群聊历史记录达到最大条数后，保留最近N条消息
+      - GroupHistoryMin=${GroupHistoryMin}
     hostname: robotclientx
     restart: always
     healthcheck:

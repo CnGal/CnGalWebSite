@@ -31,5 +31,9 @@ namespace CnGalWebSite.EventBus.Services
         Task<SensitiveWordsResultModel> CallSensitiveWordsCheck(SensitiveWordsCheckModel model, CancellationToken cancellationToken = default);
 
         void CreateSensitiveWordsCheckServer(Func<SensitiveWordsCheckModel, Task<SensitiveWordsResultModel>> func);
+
+        void CreateKanbanGroupServer(Func<KanbanGroupGptModel, Task<KanbanChatGPTReceiveModel>> func);
+
+        Task<KanbanChatGPTReceiveModel> CallKanbanGroupChatGPT(KanbanGroupGptModel model, CancellationToken cancellationToken = default);
     }
 }

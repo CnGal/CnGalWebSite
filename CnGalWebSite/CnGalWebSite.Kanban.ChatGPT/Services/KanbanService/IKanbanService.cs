@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
+﻿using CnGalWebSite.EventBus.Models;
+using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
     public interface IKanbanService
     {
         Task<ChatGPTSendMessageResult> GetReply(string message, string userId, bool first, int messageMax);
+
+        Task<ChatGPTSendMessageResult> GetGroupReply(List<KanbanGroupMessageModel> messages);
     }
 }

@@ -14,6 +14,7 @@ using Masa.Blazor.Presets;
 using Masa.Blazor;
 using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.EventBus.Services;
+using CnGalWebSite.RobotClientX.Services.Messages;
 
 var builder = WebApplication.CreateBuilder(args);
 //自动重置配置
@@ -27,6 +28,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton(sp => new HttpClient());
 //自定义服务
 builder.Services.AddScoped<IHttpService, HttpService>();
+//添加群消息缓存服务
+builder.Services.AddSingleton<IGroupMessageCacheService, GroupMessageCacheService>();
+//添加QQ群成员缓存服务
+builder.Services.AddSingleton<IQQGroupMemberCacheService, QQGroupMemberCacheService>();
 //修改Masa主题
 builder.Services.AddMasaBlazor(options =>
 {

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.EventBus.Models;
 using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
 using CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService;
 using Microsoft.Extensions.Caching.Memory;
@@ -188,6 +189,63 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
 
             SetCache(messageList, userId);
 
+            return result;
+        }
+
+        public async Task<ChatGPTSendMessageResult> GetGroupReply(List<KanbanGroupMessageModel> messages)
+        {
+            var messageList = new List<ChatCompletionMessage>();
+
+            var datetime = DateTime.Now.ToCstTime();
+
+            // 拼接开场白
+            var sys = _configuration["ChatGPT_SystemMessageTemplate"];
+
+            if (string.IsNullOrWhiteSpace(sys))
+            {
+                return new ChatGPTSendMessageResult
+                {
+                    Success = false,
+                    Message = "消息模板为空"
+                };
+            }
+
+            //填充消息模板
+            sys = sys.Replace("{time}", datetime.ToString("HH:mm:ss"));
+            sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
+
+
+            messageList.Add(new ChatCompletionMessage
+            {
+                Role = "system",
+                Content = sys
+            });
+
+            // 拼接示例问答
+            var user = _configuration["ChatGPT_Sample_User"];
+            var kanban = _configuration["ChatGPT_Sample_Kanban"];
+            if (string.IsNullOrWhiteSpace(user) == false && string.IsNullOrWhiteSpace(kanban)==false)
+            {
+                messageList.Add(new ChatCompletionMessage
+                {
+                    Role = "user",
+                    Content = user
+                });
+                messageList.Add(new ChatCompletionMessage
+                {
+                    Role = "assistant",
+                    Content = kanban
+                });
+            }
+
+            // 往后拼接群聊消息
+            messageList.AddRange(messages.Select(s => new ChatCompletionMessage
+            {
+                Role = s.IsAssistant ? "assistant" : "user",
+                Content = $"【{s.Name}】\n{s.Text}"
+            }));
+
+            var result = await _chatGPTService.SendMessages(messageList);
             return result;
         }
 

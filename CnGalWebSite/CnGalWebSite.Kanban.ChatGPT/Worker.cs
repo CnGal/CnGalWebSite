@@ -49,6 +49,25 @@ namespace CnGalWebSite.Kanban.ChatGPT
                 };
 
             });
+            _eventBusService.CreateKanbanGroupServer(async (input) =>
+            {
+                //_logger.LogInformation("收到客户端消息：{input}", input.Message);
+
+                var result = await _kanbanService.GetGroupReply(input.Messages);
+
+                if (result.Success == false)
+                {
+                    _logger.LogError("发送群聊回复：{re}", result.Message);
+                }
+
+
+                return new EventBus.Models.KanbanChatGPTReceiveModel
+                {
+                    Success = result.Success,
+                    Message = result.Message
+                };
+
+            });
 
             _logger.LogInformation("客户端上线");
             _eventBusService.InitRpcClient();
