@@ -140,7 +140,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
                 return new ChatGPTSendMessageResult
                 {
-                    Success = false,
+                    Success = true,
                     Message = "看板娘陷入了思考的循环中..."
                 };
             }
@@ -269,7 +269,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
                         return new ChatGPTSendMessageResult
                         {
-                            Success = false,
+                            Success = true,
                             Message = "看板娘陷入了重复的操作中..."
                         };
                     }
