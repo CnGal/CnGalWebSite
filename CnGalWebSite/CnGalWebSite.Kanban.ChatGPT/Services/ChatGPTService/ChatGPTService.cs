@@ -206,7 +206,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 };
 
 
-                if (_configuration["EnableFunctionCalling"] == "True")
+                if (_configuration["EnableFunctionCalling"]?.ToLower() == "true")
                 {
                     // 添加可用的工具
                     var tools = _functionCallingService.GetAvailableTools();
