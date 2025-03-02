@@ -180,8 +180,14 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
             string? reply = null;
 
-            // 检查敏感词
-            var words = await _sensitiveWordService.Check(messages.Last().Content!);
+
+            // 检查敏感词 如果属于递归调用，不对内部输入检查敏感词
+            var words = new List<string>();
+            if (_recursionCount <= 1)
+            {
+                words = await _sensitiveWordService.Check(messages.Last().Content!);
+            }
+
             if (words.Count != 0)
             {
                 _logger.LogError("提问中检查到 {re} 个敏感词：\n      {}", words.Count, string.Join("\n      ", words));
