@@ -340,14 +340,14 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                 }
 
                 // 检查敏感词
-                words = await _sensitiveWordService.Check(reply);
-                if (words.Count != 0)
-                {
-                    _logger.LogError("回复中检查到 {re} 个敏感词：\n      {}", words.Count, string.Join("\n      ", words));
+                //words = await _sensitiveWordService.Check(reply);
+                //if (words.Count != 0)
+                //{
+                //    _logger.LogError("回复中检查到 {re} 个敏感词：\n      {}", words.Count, string.Join("\n      ", words));
 
-                    // 默认回复
-                    reply = "看板娘不知道哦~";
-                }
+                //    // 默认回复
+                //    reply = "看板娘不知道哦~";
+                //}
             }
 
             // 缓存回复
