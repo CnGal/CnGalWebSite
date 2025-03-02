@@ -79,7 +79,7 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
             }
 
 
-            return result.Message.Replace($"【看板娘】\n", "");
+            return result.Message.Replace($"【看板娘】\n", "").Replace("【看板娘】\\n", "").Replace("【看板娘】", "").Replace("\\n", "");
         }
     }
 }
