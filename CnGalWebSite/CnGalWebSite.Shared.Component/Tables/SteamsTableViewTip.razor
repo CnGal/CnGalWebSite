@@ -68,6 +68,6 @@
 
     public async Task LookItem(StoreInfoViewModel model)
     {
-        await _eventService.OpenNewPage(GameReleaseViewModel.GetLink(model.PlatformType, model.Link));
+        await _eventService.OpenNewPage(GameReleaseViewModel.GetLink(model.PlatformType, model.Link, null));
     }
 }

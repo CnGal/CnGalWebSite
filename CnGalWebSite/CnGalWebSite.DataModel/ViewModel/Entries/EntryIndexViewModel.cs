@@ -232,7 +232,7 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         public string GetLink()
         {
-            return GetLink(PublishPlatformType, Link);
+            return GetLink(PublishPlatformType, Link,Time);
         }
 
         public string GetLinkText()
@@ -240,17 +240,17 @@ namespace CnGalWebSite.DataModel.ViewModel
             return GetLinkText(PublishPlatformType, Link);
         }
 
-        public static string GetLink(PublishPlatformType type,string link)
+        public static string GetLink(PublishPlatformType type, string link,DateTime? time)
         {
             return type switch
             {
-                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? ($"https://store.steampowered.com/app/{link}?utm_source=cngal&utm_campaign=entries"): link,
+                PublishPlatformType.Steam => int.TryParse(link, out int steamId) ? ($"https://store.steampowered.com/app/{link}?utm_source=cngal&utm_campaign=entries") : link,
                 PublishPlatformType.AppStore => "https://apps.apple.com/cn/app/" + link,
                 PublishPlatformType.GooglePlay => "https://play.google.com/store/apps/details?id=" + link,
                 PublishPlatformType.Epic => "https://store.epicgames.com/zh-CN/p/" + link,
                 PublishPlatformType.TapTap => "https://www.taptap.cn/app/" + link,
                 PublishPlatformType.NS => "https://ec.nintendo.com/HK/zh/titles/" + link,
-                PublishPlatformType.DLsite => $"https://www.dlsite.com/maniax/work/=/product_id/{link}.html",
+                PublishPlatformType.DLsite => time == null || time.Value.Date <= DateTime.Now.Date ? $"https://www.dlsite.com/home/announce/=/product_id/{link}.html" : $"https://www.dlsite.com/maniax/work/=/product_id/{link}.html",
                 _ => link
             };
         }
@@ -265,7 +265,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         }
     }
 
-    public class EntryRoleViewModel:EntryInforTipViewModel
+    public class EntryRoleViewModel : EntryInforTipViewModel
     {
         public EntryRoleViewModel() { }
 
