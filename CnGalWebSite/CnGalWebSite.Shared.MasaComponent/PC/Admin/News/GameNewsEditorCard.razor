@@ -29,6 +29,9 @@
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间" />
             </MCol>
+            <MCol Cols="6">
+                <RssTypeChip Type="Model.RssType"/>
+            </MCol>
             <MCol Cols="12">
                 <MTextField @bind-Value="Model.Link" Label="原文链接" AppendIcon="mdi-open-in-app" OnAppendClick="OnAppendClick" />
             </MCol>
