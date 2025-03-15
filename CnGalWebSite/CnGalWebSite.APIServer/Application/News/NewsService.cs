@@ -65,12 +65,15 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task UpdateNewestGameNews()
         {
             //查找最新的RSS源的时间
-            var time = await _gameNewsRepository.GetAll().AnyAsync() ?
-                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Weibo || s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+            var weiboTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Weibo) ?
+                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Weibo).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+
+            var bilibiliTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Bilibili) ?
+                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
             // 获取rss源
-            var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), time);
-            rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time));
+            var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
+            rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), bilibiliTime));
 
             //var rss = await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time);
 
