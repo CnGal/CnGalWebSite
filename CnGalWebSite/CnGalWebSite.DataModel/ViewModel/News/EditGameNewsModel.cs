@@ -23,6 +23,8 @@ namespace CnGalWebSite.DataModel.ViewModel.News
         public string NewsType { get; set; }
         [Display(Name = "原文发布时间")]
         public DateTime PublishTime { get; set; }
+        [Display(Name = "来源类型")]
+        public OriginalRSSType RssType { get; set; }
 
 
         [Display(Name = "作者")]

@@ -1,0 +1,17 @@
+﻿@if (Type == OriginalRSSType.Weibo)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="red" Icon="IconType.Weibo" Text="微博" />
+}
+else if (Type == OriginalRSSType.Bilibili)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="pink" Icon="IconType.Bilibili" Text="B站" />
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="success" Icon="IconType.Edit" Text="自定义" />
+}
+
+@code {
+    [Parameter]
+    public OriginalRSSType Type { get; set; }
+}

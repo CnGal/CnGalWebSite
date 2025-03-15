@@ -31,7 +31,7 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/news/[action]")]
     public class NewsAPIController : ControllerBase
     {
-        
+
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
@@ -43,11 +43,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IQueryService _queryService;
 
-        public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository,  IArticleService articleService, IUserService userService, INewsService newsService,
+        public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository, IArticleService articleService, IUserService userService, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<ApplicationUser, string> userRepository, IQueryService queryService,
         IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
-            
+
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _userService = userService;
@@ -65,7 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             if (model.IsIgnore == true)
             {
-                await _gameNewsRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.State, b => GameNewsState.Ignore));
+                await _gameNewsRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.State, b => GameNewsState.Ignore));
                 return new Result { Successful = true };
 
             }
@@ -90,7 +90,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<EditGameNewsModel>> EditGameNewsAsync(long id)
         {
-            var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == id);
+            var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).Include(s => s.RSS).FirstOrDefaultAsync(s => s.Id == id);
 
             if (gameNews == null)
             {
@@ -116,6 +116,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Type = gameNews.Type,
                 WeiboId = (author == null || author?.WeiboId == 0) ? "" : author.WeiboId.ToString(),
                 ArticleId = gameNews.ArticleId,
+                RssType = gameNews.RSS?.Type ?? OriginalRSSType.Custom,
             };
 
             foreach (var item in gameNews.Entries)
@@ -150,7 +151,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var author = await _weiboUserInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
 
             //查看是否修正了作者信息
-            if (string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false&&( model.AuthorEntryName != author?.Entry?.Name  || model.WeiboId != author.WeiboId.ToString()))
+            if (string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false && (model.AuthorEntryName != author?.Entry?.Name || model.WeiboId != author.WeiboId.ToString()))
             {
                 try
                 {
@@ -311,7 +312,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s=>s.Id== article.CreateUserId);
+            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == article.CreateUserId);
 
             //正常流程初始化
             var model = new ArticleViewModel
@@ -513,7 +514,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s=>s.Id== article.CreateUserId);
+            article.CreateUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == article.CreateUserId);
 
             //正常流程初始化
             var model = new ArticleViewModel
@@ -556,7 +557,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     BriefIntroduction = s.BriefIntroduction,
                     PublishTime = s.PublishTime,
                     Title = s.Title,
-                    ArticleId = s.ArticleId??0,
+                    ArticleId = s.ArticleId ?? 0,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
@@ -578,8 +579,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     BriefIntroduction = s.BriefIntroduction,
                     PublishTime = s.PublishTime,
                     Title = s.Title,
-                    ArticleId = s.ArticleId??0,
-                    CreateTime= s.CreateTime,
+                    ArticleId = s.ArticleId ?? 0,
+                    CreateTime = s.CreateTime,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model

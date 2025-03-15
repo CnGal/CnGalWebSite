@@ -94,6 +94,8 @@ namespace CnGalWebSite.DataModel.Model
         Weibo,
         [Display(Name = "自定义")]
         Custom,
+        [Display(Name = "B站")]
+        Bilibili,
     }
 
     public class WeeklyNews

@@ -328,7 +328,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _storeInfoService.BatchUpdate(10);
+                await _newsService.UpdateNewestGameNews();
 
                 return new Result { Successful = true };
             }

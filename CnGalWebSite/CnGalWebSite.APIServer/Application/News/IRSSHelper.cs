@@ -14,5 +14,7 @@ namespace CnGalWebSite.APIServer.Application.News
         Task<OriginalRSS> CorrectOriginalWeiboInfor(string Text, long id);
 
         Task<OriginalRSS> GetOriginalWeibo(long id, string keyWord);
+
+        Task<List<OriginalRSS>> GetOriginalBilibili(long id, DateTime fromTime);
     }
 }

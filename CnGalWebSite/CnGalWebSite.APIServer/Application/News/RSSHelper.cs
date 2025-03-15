@@ -77,8 +77,6 @@ namespace CnGalWebSite.APIServer.Application.News
             return model;
         }
 
-
-
         public async Task<WeiboUserInfor> GetWeiboUserInfor(long id)
         {
             var model = new WeiboUserInfor
@@ -199,5 +197,55 @@ namespace CnGalWebSite.APIServer.Application.News
 
             return null;
         }
+
+        public async Task<List<OriginalRSS>> GetOriginalBilibili(long id, DateTime fromTime)
+        {
+            var model = new List<OriginalRSS>();
+
+            //获取最新B站数据
+            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "bilibili/user/dynamic/" + id);
+            //反序列化数据
+            var doc = new XmlDocument();
+            doc.LoadXml(xmlStr);
+
+            var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
+            foreach (XmlNode item in items)
+            {
+                var weibo = new OriginalRSS
+                {
+                    Type = OriginalRSSType.Bilibili
+                };
+
+                var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
+                weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
+
+                //微博时间是否早于起始时间
+                if (weibo.PublishTime <= fromTime)
+                {
+                    return model;
+                }
+                var title = (XmlElement)item.SelectSingleNode("title");
+                weibo.Title = title.InnerText;
+
+                var author = (XmlElement)item.SelectSingleNode("author");
+                weibo.Author = author.InnerText;
+
+                var description = (XmlElement)item.SelectSingleNode("description");
+                weibo.Description = description.InnerText;
+                var link = (XmlElement)item.SelectSingleNode("link");
+                weibo.Link = link.InnerText;
+
+                model.Add(weibo);
+            }
+
+            //将图片上传到图床
+            foreach (var item in model)
+            {
+                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+            }
+
+            return model;
+        }
+
     }
 }
