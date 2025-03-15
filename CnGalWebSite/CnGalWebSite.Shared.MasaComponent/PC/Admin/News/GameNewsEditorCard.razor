@@ -1,24 +1,24 @@
 ﻿@inject IHttpService _httpService
-
+@inject IEventService _eventService
 
 <div>
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Home.ToIconString()" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
-             </MCol>
-             <MCol Cols="12">
-                 <MTextField @bind-Value="Model.Title" Label="标题" />
-             </MCol>
-             <MCol Cols="12">
-                 <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
-             </MCol>
-             <MCol Cols="12">
-                 <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
-             </MCol>
-         </MRow>
-     </CnGalWebSite.Components.Containers.MasaTitleContainer>
-     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+            </MCol>
+            <MCol Cols="12">
+                <MTextField @bind-Value="Model.Title" Label="标题" />
+            </MCol>
+            <MCol Cols="12">
+                <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
+            </MCol>
+            <MCol Cols="12">
+                <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
+            </MCol>
+        </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
@@ -28,13 +28,13 @@
             </MCol>
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间" />
-             </MCol>
-             <MCol Cols="12">
-                 <MTextField @bind-Value="Model.Link" Label="原文链接" />
-             </MCol>
-         </MRow>
-     </CnGalWebSite.Components.Containers.MasaTitleContainer>
-     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
+            </MCol>
+            <MCol Cols="12">
+                <MTextField @bind-Value="Model.Link" Label="原文链接" AppendIcon="mdi-open-in-app" OnAppendClick="OnAppendClick" />
+            </MCol>
+        </MRow>
+    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
                 <MTextField @bind-Value="Model.Author" Label="作者" />
@@ -45,7 +45,7 @@
             <MCol Cols="12" Md="6">
                 <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.AuthorEntryName" Label="关联词条名称" AutoCompleteItems="Items" />
             </MCol>
-            </MRow>
+        </MRow>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="词条"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
 </div>
@@ -68,5 +68,10 @@
         {
             await ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
         }
+    }
+
+    public async Task OnAppendClick()
+    {
+        await _eventService.OpenNewPage(Model.Link);
     }
 }

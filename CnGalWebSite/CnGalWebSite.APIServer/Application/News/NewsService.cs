@@ -50,7 +50,7 @@ namespace CnGalWebSite.APIServer.Application.News
             _weiboUserInforRepository = weiboUserInforRepository;
             _gameNewsRepository = gameNewsRepository;
             _examineService = examineService;
-            
+
             _articleRepository = articleRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
             _fileService = fileService;
@@ -65,10 +65,14 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task UpdateNewestGameNews()
         {
             //查找最新的RSS源的时间
-
             var time = await _gameNewsRepository.GetAll().AnyAsync() ?
-                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Weibo).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
-            var weiboes = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), time);
+                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Weibo || s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+
+            // 获取rss源
+            //var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), time);
+            //rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time));
+
+            var rss = await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time);
 
             //获取周报
             var weekly = await _weeklyNewsRepository.GetAll().Include(s => s.News).OrderByDescending(s => s.CreateTime).FirstOrDefaultAsync();
@@ -77,12 +81,13 @@ namespace CnGalWebSite.APIServer.Application.News
                 weekly = await GenerateNewestWeeklyNews();
             }
 
-            if (weiboes.Count == 0)
+            if (rss.Count == 0)
             {
                 return;
             }
+
             //处理原始数据
-            foreach (var item in weiboes)
+            foreach (var item in rss)
             {
                 try
                 {
@@ -399,7 +404,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var article = new Article
             {
                 Name = weeklyNews.Title,
-                DisplayName= weeklyNews.Title,
+                DisplayName = weeklyNews.Title,
                 MainPage = mainPage,
                 BriefIntroduction = weeklyNews.BriefIntroduction,
                 MainPicture = weeklyNews.MainPicture,
@@ -479,7 +484,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     Name = "微博",
                     Link = "https://weibo.com/u/" + weiboId,
                 });
-            }           
+            }
             user.EntryId = entry.Id;
 
             if (user.Id == 0)
@@ -571,9 +576,12 @@ namespace CnGalWebSite.APIServer.Application.News
             return originalRSS.Type switch
             {
                 OriginalRSSType.Weibo => await ProcessingMicroblog(originalRSS, entries, users),
+                OriginalRSSType.Bilibili => await ProcessingBilibili(originalRSS, entries, users),
                 _ => null
             };
         }
+
+        #region 微博
 
         public async Task<GameNews> ProcessingMicroblog(OriginalRSS originalRSS, List<string> entries, List<WeiboUserInfor> users)
         {
@@ -582,10 +590,10 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 Type = ArticleType.News,
                 RSS = originalRSS,
-                Title =(await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15)).Trim().Replace("\n","").Replace("\r", ""),
-                BriefIntroduction =await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
+                Title = (await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15)).Trim().Replace("\n", "").Replace("\r", ""),
+                BriefIntroduction = await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
                 Author = authorString,
-                MainPage =await GetMicroblogMainPage(originalRSS.Description, authorString),
+                MainPage = await GetMicroblogMainPage(originalRSS.Description, authorString),
                 Link = originalRSS.Link,
                 MainPicture = await GetMicroblogMainImage(await GetMicroblogMainPage(originalRSS.Description, authorString)),
                 PublishTime = originalRSS.PublishTime,
@@ -657,35 +665,6 @@ namespace CnGalWebSite.APIServer.Application.News
             return model;
         }
 
-        public List<string> ScreenRelatedEntry(List<string> entries)
-        {
-            //清除重复
-            ToolHelper.Purge(ref entries);
-
-            var result = new List<string>();
-            var keyword = new List<string>
-            {
-                "Unity",
-                "Steam",
-                "平安夜"
-            };
-            foreach (var entry in entries)
-            {
-                if (long.TryParse(entry, out var temp) == false)
-                {
-                    if (entry.Length > 2)
-                    {
-                        if (keyword.Contains(entry) == false)
-                        {
-                            result.Add(entry);
-                        }
-                    }
-
-                }
-            }
-
-            return result;
-        }
 
         public async Task<string> GetMicroblogTitle(string title, string description, string author, int maxLength)
         {
@@ -705,7 +684,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 title = temp[1];
             }
 
-            //去除 图片 
+            //去除 图片
             do
             {
                 var midStr = ToolHelper.MidStrEx(title, "[", "]");
@@ -768,7 +747,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             var converter = new ReverseMarkdown.Converter();
 
-            var markdown= converter.Convert(description).Replace("\\[\\]", "[]");
+            var markdown = converter.Convert(description).Replace("\\[\\]", "[]");
 
             //处理视频
             if (markdown.Contains("<video controls=\"controls\""))
@@ -781,7 +760,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     //提取链接
                     var link = videoHtml.MidStrEx("<a href=\"", "\"");
                     //替换
-                    markdown = markdown.Replace($"<video{videoHtml}</video>", $"![]({await _fileUploadService.TransformImageAsync( image)})\n视频无法显示，请前往[微博视频]({link})观看\n");
+                    markdown = markdown.Replace($"<video{videoHtml}</video>", $"![]({await _fileUploadService.TransformImageAsync(image)})\n视频无法显示，请前往[微博视频]({link})观看\n");
                 }
 
             }
@@ -794,6 +773,182 @@ namespace CnGalWebSite.APIServer.Application.News
             var links = description.GetImageLinks();
             return links.Any() ? await _fileUploadService.TransformImageAsync(links.Last(), 460, 215) : "";
         }
+
+        #endregion
+
+        #region B站
+
+        public string GetBilibiliAuthor(string description)
+        {
+            return ToolHelper.MidStrEx(description, "//转发自: @", ":");
+        }
+
+        public string GetBilibiliTitle(string description, string author, int maxLength)
+        {
+            var title = description.Split($"//转发自: @{author}:").Last().Trim();
+
+            // 去掉title开头的换行符
+            if (title.StartsWith("\n"))
+            {
+                title = title.Substring(1);
+            }
+
+            title = title.Split("\n").First();
+
+            return _appHelper.GetStringAbbreviation(title, maxLength);
+        }
+
+        public string GetBilibiliBriefIntroduction(string description, string author, int maxLength)
+        {
+            // 转成markdowm 方便去除图片
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            var title = Markdown.ToPlainText(GetBilibiliMainPage(description, author), pipeline);
+
+            //去除 图片
+            do
+            {
+                var midStr = ToolHelper.MidStrEx(title, "[", "]");
+                title = title.Replace($"[{midStr}]", "");
+
+            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "[", "]")) == false);
+            //去除 话题
+            do
+            {
+                var midStr = ToolHelper.MidStrEx(title, "#", "#");
+                title = title.Replace($"#{midStr}#", "");
+
+            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "#", "#")) == false);
+
+
+
+            return _appHelper.GetStringAbbreviation(title.Trim(), maxLength);
+        }
+
+        public string GetBilibiliMainPage(string description, string author)
+        {
+            var text = description.Split($"//转发自: @{author}: ").Last();
+
+            var title = text.Split("\n").First();
+
+            // 如果标题小于50字，在正文里吧标题去掉
+            string brief;
+            if (title.Length > 50)
+            {
+                brief = text;
+            }
+            else
+            {
+                brief = string.Join("\n", text.Split("\n").Skip(1));
+            }
+
+            // 去除末尾的链接
+            var link = GetBilibiliLink(description);
+            brief = brief.Replace($"图文地址：<a href=\"{link}\">{link}</a>", "").Replace($"视频地址：<a href=\"{link}\">{link}</a>", "").Replace($"专栏地址：<a href=\"{link}\">{link}</a>", "");
+
+            var converter = new ReverseMarkdown.Converter();
+
+            var markdown = converter.Convert(brief).Replace("\\[\\]", "[]");
+
+
+            return markdown;
+        }
+
+        public async Task<string> GetBilibiliMainImage(string description)
+        {
+            var links = description.GetImageLinks();
+            return links.Any() ? await _fileUploadService.TransformImageAsync(links.Last(), 460, 215) : "";
+        }
+
+        public string GetBilibiliLink(string description)
+        {
+            var link = description.Split("地址：<a href=\"https://www.bilibili.com/").Last();
+            return ToolHelper.MidStrEx(link, "\">", "</a>");
+        }
+
+        public async Task<GameNews> ProcessingBilibili(OriginalRSS originalRSS, List<string> entries, List<WeiboUserInfor> users)
+        {
+            var authorString = GetBilibiliAuthor(originalRSS.Description);
+            var model = new GameNews
+            {
+                Type = ArticleType.News,
+                RSS = originalRSS,
+                Title = (GetBilibiliTitle(originalRSS.Description, authorString, 20)),
+                BriefIntroduction = GetBilibiliBriefIntroduction(originalRSS.Description, authorString, 500),
+                Author = authorString,
+                MainPage = GetBilibiliMainPage(originalRSS.Description, authorString),
+                Link = GetBilibiliLink(originalRSS.Description),
+                MainPicture = await GetBilibiliMainImage(GetBilibiliMainPage(originalRSS.Description, authorString)),
+                PublishTime = originalRSS.PublishTime,
+                State = GameNewsState.Edit
+            };
+
+            //检查是否重复
+            if (await _gameNewsRepository.GetAll().Include(s => s.RSS).AnyAsync(s => (s.RSS.Link == model.Link || s.Link == model.Link) && s.Title != "已删除"))
+            {
+                throw new Exception("该B站动态已存在");
+            }
+
+            //修正作者
+            if (string.IsNullOrWhiteSpace(model.Author))
+            {
+                model.Author = originalRSS.Author;
+            }
+
+            //查找关联词条
+            var relatedEntries = new List<string>();
+            foreach (var item in entries)
+            {
+                if (originalRSS.Description.Contains(item))
+                {
+                    relatedEntries.Add(item);
+                }
+            }
+
+            //过滤关联词条
+            relatedEntries = ScreenRelatedEntry(relatedEntries);
+
+            foreach (var item in relatedEntries)
+            {
+                model.Entries.Add(new GameNewsRelatedEntry
+                {
+                    EntryName = item
+                });
+            }
+
+            return model;
+        }
+        #endregion
+
+        public List<string> ScreenRelatedEntry(List<string> entries)
+        {
+            //清除重复
+            ToolHelper.Purge(ref entries);
+
+            var result = new List<string>();
+            var keyword = new List<string>
+            {
+                "Unity",
+                "Steam",
+                "平安夜"
+            };
+            foreach (var entry in entries)
+            {
+                if (long.TryParse(entry, out var temp) == false)
+                {
+                    if (entry.Length > 2)
+                    {
+                        if (keyword.Contains(entry) == false)
+                        {
+                            result.Add(entry);
+                        }
+                    }
+
+                }
+            }
+
+            return result;
+        }
+
 
         private int WeekOfYear(DateTime curDay)
         {
