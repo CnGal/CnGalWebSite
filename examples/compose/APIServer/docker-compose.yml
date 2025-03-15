@@ -46,6 +46,8 @@ services:
       - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day}
       # GPT单个对话回复次数上限
       - ChatGPTLimit_PreConversationMax=${ChatGPTLimit_PreConversationMax}
+      # B站动态采集用户id
+      - RSSBilibiliUserId=${RSSBilibiliUserId}
     hostname: apiserver
     restart: always
     healthcheck:
