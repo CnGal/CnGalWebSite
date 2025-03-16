@@ -788,8 +788,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public string GetBilibiliTitle(string description, string author, int maxLength)
         {
-            var title = description.Split($"//转发自: @{author}:").Last().Trim();
-
+            var title = description.Split($"//转发自: @{author}:").Last().Trim().Replace("<br>", "\n");
             // 去掉title开头的换行符
             if (title.StartsWith("\n"))
             {
