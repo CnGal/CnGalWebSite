@@ -129,7 +129,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     score += info.EvaluationCount * info.RecommendationRate;
                 }
-                temp.RecommendationRate = score / evaluationCount;
+                temp.RecommendationRate = evaluationCount == 0 ? 0 : score / evaluationCount;
                 temp.Revenue = revenue;
                 temp.EstimationOwnersMin = estimationOwnersMin;
                 temp.EstimationOwnersMax = estimationOwnersMax;
