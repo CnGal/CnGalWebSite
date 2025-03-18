@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //添加数据库连接池
 builder.Services.AddDbContextPool<AppDbContext>(options =>
-    options.UseMySql(builder.Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(builder.Configuration["DefaultDBConnection"]),
+   options.UseMySql(builder.Configuration["DefaultDBConnection"], ServerVersion.AutoDetect(builder.Configuration["DefaultDBConnection"]),
         o =>
         {
             //全局配置查询拆分模式

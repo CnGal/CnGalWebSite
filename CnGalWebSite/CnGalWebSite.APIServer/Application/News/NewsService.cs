@@ -806,6 +806,13 @@ namespace CnGalWebSite.APIServer.Application.News
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
             var title = Markdown.ToPlainText(GetBilibiliMainPage(description, author), pipeline);
 
+            //去除 视频
+            do
+            {
+                var midStr = ToolHelper.MidStrEx(title, "<iframe ", "</iframe>");
+                title = title.Replace($"<iframe {midStr}</iframe>", "");
+
+            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "<iframe ", "</iframe>")) == false);
             //去除 图片
             do
             {
