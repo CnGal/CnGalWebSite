@@ -314,7 +314,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>("https://n8n.sliots.top/webhook/game/get_game_detail/?h_src=game_rec_a&appid=" + storeInfo.Link);
+                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>(_configuration["HeyboxGetGameDetailUrl"] + storeInfo.Link);
                 if (data.Status != "ok")
                 {
                     _logger.LogError("获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
