@@ -806,13 +806,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
             var title = Markdown.ToPlainText(GetBilibiliMainPage(description, author), pipeline);
 
-            //去除 视频
-            do
-            {
-                var midStr = ToolHelper.MidStrEx(title, "<iframe ", "</iframe>");
-                title = title.Replace($"<iframe {midStr}</iframe>", "");
-
-            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "<iframe ", "</iframe>")) == false);
+           
             //去除 图片
             do
             {
@@ -857,6 +851,16 @@ namespace CnGalWebSite.APIServer.Application.News
             var converter = new ReverseMarkdown.Converter();
 
             var markdown = converter.Convert(brief).Replace("\\[\\]", "[]");
+
+            //去除 视频
+            do
+            {
+                var midStr = ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>");
+                var bvid = ToolHelper.MidStrEx(midStr, "bvid=", "\"");
+
+                markdown = markdown.Replace($"<iframe {markdown}</iframe>", $"\n[](https://www.bilibili.com/video/{bvid})\n");
+
+            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>")) == false);
 
 
             return markdown;
