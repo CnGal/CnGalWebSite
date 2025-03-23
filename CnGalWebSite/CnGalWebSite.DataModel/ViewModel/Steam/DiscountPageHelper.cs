@@ -8,21 +8,23 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public List<StoreInfoCardModel> Model = new List<StoreInfoCardModel>();
         public IEnumerable<StoreInfoCardModel> Items = new List<StoreInfoCardModel>();
 
-        public List<int> PurchasedGames=new List<int>();
+        public List<int> PurchasedGames = new List<int>();
 
         public int TabIndex { get; set; } = 1;
 
         private int maxCount = 12;
-        public int MaxCount {
+        public int MaxCount
+        {
             get => maxCount;
-            set {
+            set
+            {
                 maxCount = value;
                 CurrentPage = 1;
                 SetItems();
             }
-        } 
+        }
 
-        public int TotalPages => ((Items.Count()-1) / MaxCount) + 1;
+        public int TotalPages => ((Items.Count() - 1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
 
@@ -71,7 +73,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public SteamDisplayType SteamDisplayType { get; set; }
 
-        public bool ShowAdvancedOptions { get; set; }
+        public bool ShowAdvancedOptions { get; set; } = true;
 
         private bool showNoDiscountGames;
         public bool ShowNoDiscountGames
@@ -84,7 +86,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             }
         }
 
-        public const double MaxOriginalPriceLimit= 55;
+        public const double MaxOriginalPriceLimit = 55;
 
         private double maxOriginalPrice = MaxOriginalPriceLimit;
         public double MaxOriginalPrice
@@ -93,6 +95,18 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             set
             {
                 maxOriginalPrice = value;
+                SetItems();
+            }
+        }
+
+
+        private double minRecommendationRate;
+        public double MinRecommendationRate
+        {
+            get => minRecommendationRate;
+            set
+            {
+                minRecommendationRate = value;
                 SetItems();
             }
         }
@@ -113,7 +127,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public void SetItems()
         {
             //显示未打折的游戏
-            if(ShowNoDiscountGames)
+            if (ShowNoDiscountGames)
             {
                 Items = Model;
             }
@@ -128,6 +142,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                 Items = Items.Where(s => s.OriginalPrice <= maxOriginalPrice);
             }
 
+            Items = Items.Where(s => s.RecommendationRate >= minRecommendationRate);
+
 
             switch (ScreenType)
             {
@@ -140,7 +156,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                 case ScreenSteamType.FlatHistoryLow:
                     Items = Items.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0);
                     break;
-            };
+            }
+            ;
 
             switch (PurchasedType)
             {
@@ -151,9 +168,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     Items = Items.Where(s => PurchasedGames.Contains(s.Id));
                     break;
                 case PurchasedSteamType.UnPurchased:
-                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)==false);
+                    Items = Items.Where(s => PurchasedGames.Contains(s.Id) == false);
                     break;
-            };
+            }
+            ;
 
 
             switch (OrderType)
@@ -263,7 +281,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
                     }
                     break;
-            };
+            }
+            ;
         }
     }
 }

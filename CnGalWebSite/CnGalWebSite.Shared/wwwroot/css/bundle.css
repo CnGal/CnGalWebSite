@@ -3682,6 +3682,11 @@ div.prizeTips {
             padding-top: 0;
         }
 /*折扣页面*/
+.discount-screen-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
 .discount-screen-card .title-card {
     display: flex;
     justify-content: space-between;
