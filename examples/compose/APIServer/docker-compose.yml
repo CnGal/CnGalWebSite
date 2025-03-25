@@ -1,10 +1,9 @@
-version: "3"
 services:
   apiserver:
-    image: littlefishtentears/cngalwebsiteapiserver:latest
+    image: littlefishtentears/cngalwebsiteapiserver:${IMAGE_TAG:-latest}
     container_name: apiserver
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       - CnGalDBConnection=${CnGalDBConnection}
       - Password=${Password}
       - WeiboAppKey=${WeiboAppKey}
@@ -27,14 +26,14 @@ services:
       - TucangCCAPIToken=${TucangCCAPIToken}
       - BilibiliCookie=${BilibiliCookie}
       # Ids 地址
-      - Authority=${Authority}
+      - Authority=${Authority:-https://oauth2.cngal.org}
       # 图床API
-      - ImageApiPath=${ImageApiPath}
+      - ImageApiPath=${ImageApiPath:-https://api.cngal.top/}
       # IP 白名单
       - IpWhitelist=${IpWhitelist}
       # 事件总线
       - EventBus_HostName=${EventBus_HostName}
-      - EventBus_Port=${EventBus_Port}
+      - EventBus_Port=${EventBus_Port:-5672}
       - EventBus_UserName=${EventBus_UserName}
       - EventBus_Password=${EventBus_Password}
       # 反代
@@ -60,9 +59,21 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-2G}
     ports:
-      - "3001:8081"
       - "2001:8080"
+      # - "3001:8081"
     volumes:
-      - ${MNT_DIR}/apiserver/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+      - apiserver-DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+    labels:
+      # watchtower
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true}
+    networks:
+      - web
+
+volumes:
+  apiserver-DataProtection-Keys:
+
+networks:
+  web:
+    external: true
