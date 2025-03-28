@@ -49,6 +49,8 @@ services:
       - ChatGPTLimit_PreConversationMax=${ChatGPTLimit_PreConversationMax}
       # B站动态采集用户id
       - RSSBilibiliUserId=${RSSBilibiliUserId}
+      # RSS
+      - RSSUrl=${RSSUrl}
     hostname: apiserver
     restart: always
     healthcheck:
