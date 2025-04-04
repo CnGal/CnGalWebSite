@@ -858,7 +858,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 var midStr = ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>");
                 var bvid = ToolHelper.MidStrEx(midStr, "bvid=", "\"");
 
-                markdown = markdown.Replace($"<iframe {markdown}</iframe>", $"\n[](https://www.bilibili.com/video/{bvid})\n");
+                markdown = markdown.Replace($"<iframe {midStr}</iframe>", $"\n[](https://www.bilibili.com/video/{bvid})\n");
 
             } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>")) == false);
 
