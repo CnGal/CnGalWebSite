@@ -7,7 +7,7 @@
                 <div class="number-card">@(Model.Owner >= 10000000 ? ($"{Model.Owner * 0.0001:G4}万") : (Model.Owner > 10000 ? ($"{Model.Owner * 0.0001:G3}万") : ($"{Model.Owner}")))</div>
             </div>
             <div class="text-number-card">
-                <div class="text-card">收入</div>
+                <div class="text-card">销售额</div>
                 <div class="number-card">@(Model.Revenue >= 10000000 ? ($"{Model.Revenue * 0.0001:G4}万") : (Model.Revenue > 10000 ? ($"{Model.Revenue * 0.0001:G3}万") : ($"{Model.Revenue}")))</div>
             </div>
         </div>
