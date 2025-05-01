@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Net.Http.Json;
+using System.Net.Security;
 
 namespace Live2DTest.DataRepositories
 {
@@ -21,7 +22,18 @@ namespace Live2DTest.DataRepositories
 
         public Repository(HttpClient httpClient, IConfiguration configuration)
         {
-           _httpClient = httpClient;
+            if (ToolHelper.IsSSR)
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                };
+                _httpClient = new HttpClient(handler);
+            }
+            else
+            {
+                _httpClient = httpClient;
+            }
             _configuration = configuration;
         }
 
