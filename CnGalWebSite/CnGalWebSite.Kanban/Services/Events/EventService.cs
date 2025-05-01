@@ -45,7 +45,18 @@ namespace CnGalWebSite.Kanban.Services.Events
         public EventService(ILocalStorageService localStorageService, HttpClient httpClient, IConfiguration configuration, IDialogBoxService dialogBoxService, ILogger<EventService> logger, NavigationManager navigationManager, IJSRuntime jSRuntime)
         {
             _localStorageService = localStorageService;
-            _httpClient = httpClient;
+            if (ToolHelper.IsSSR)
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                };
+                _httpClient = new HttpClient(handler);
+            }
+            else
+            {
+                _httpClient = httpClient;
+            }
             _configuration = configuration;
             _dialogBoxService = dialogBoxService;
             _logger = logger;
@@ -146,7 +157,7 @@ namespace CnGalWebSite.Kanban.Services.Events
             try
             {
                 var content = model.Contents[_random.Next(0, model.Contents.Count)];
-                _dialogBoxService.ShowDialogBox(content,model.Priority);
+                _dialogBoxService.ShowDialogBox(content, model.Priority);
             }
             catch (Exception ex)
             {
