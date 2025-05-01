@@ -1,11 +1,11 @@
-﻿
+﻿using CnGalWebSite.DataModel.Helper;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 
 namespace Live2DTest.DataRepositories
 {
-  
+
     /// <summary>
     /// 此接口是所有仓储的约定，此接口仅作为约定，用于标识它们
     /// </summary>
@@ -27,9 +27,25 @@ namespace Live2DTest.DataRepositories
 
         public async Task LoadAsync()
         {
-            var list = await _httpClient.GetFromJsonAsync<List<TEntity>>(_configuration["Live2D_DataUrl"] + _index);
-            _repository.Clear();
-            _repository.AddRange(list);
+            try
+            {
+                // 使用 HttpClient 获取响应
+                var response = await _httpClient.GetAsync(_configuration["Live2D_DataUrl"] + _index);
+                response.EnsureSuccessStatusCode();
+
+                // 使用 Stream 读取内容
+                using var stream = await response.Content.ReadAsStreamAsync();
+                var list = await System.Text.Json.JsonSerializer.DeserializeAsync<List<TEntity>>(stream, ToolHelper.options);
+
+                _repository.Clear();
+                _repository.AddRange(list);
+            }
+            catch (Exception ex)
+            {
+                // 如果加载失败，清空仓库
+                _repository.Clear();
+                throw;
+            }
         }
 
         public List<TEntity> GetAll()

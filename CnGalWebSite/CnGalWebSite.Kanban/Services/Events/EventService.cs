@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Kanban.Models;
 using CnGalWebSite.Kanban.Services.Core;
 using CnGalWebSite.Kanban.Services.Dialogs;
@@ -62,7 +63,14 @@ namespace CnGalWebSite.Kanban.Services.Events
                 {
                     localData = new EventGroupModel();
                 }
-                _eventGroupModel = await _httpClient.GetFromJsonAsync<EventGroupModel>(_configuration["Live2D_DataUrl"] + _remoteKey);
+
+                // 使用 HttpClient 获取响应
+                var response = await _httpClient.GetAsync(_configuration["Live2D_DataUrl"] + _remoteKey);
+                response.EnsureSuccessStatusCode();
+
+                // 使用 Stream 读取内容
+                using var stream = await response.Content.ReadAsStreamAsync();
+                _eventGroupModel = await System.Text.Json.JsonSerializer.DeserializeAsync<EventGroupModel>(stream, ToolHelper.options);
 
                 //复制最后执行时间
                 CopyData(localData.CustomEvents, _eventGroupModel.CustomEvents);
@@ -73,7 +81,6 @@ namespace CnGalWebSite.Kanban.Services.Events
 
                 //保存数据
                 await SaveAsync();
-
             }
             catch (Exception ex)
             {

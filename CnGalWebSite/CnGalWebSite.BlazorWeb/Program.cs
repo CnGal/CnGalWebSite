@@ -22,8 +22,9 @@ builder.Services.AddServerSideBlazor().AddCircuitOptions(option =>
     {
         option.DisconnectedCircuitMaxRetained = 30; // default is 100
         option.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2); // default is 3 minutes
+        option.DetailedErrors = true;
     });
-builder.Services.AddRazorComponents()
+builder.Services.AddRazorComponents(options => options.DetailedErrors = true)
     .AddInteractiveServerComponents().AddHubOptions(options =>
     {
         options.MaximumReceiveMessageSize = int.MaxValue;
