@@ -33,40 +33,60 @@ namespace CnGalWebSite.Kanban.ChatGPT
             _eventBusService.CreateKanbanServer(async (input) =>
             {
                 //_logger.LogInformation("收到客户端消息：{input}", input.Message);
-
-                var result = await _kanbanService.GetReply(input.Message, input.UserId, input.IsFirst, input.MessageMax);
-
-                if (result.Success == false)
+                try
                 {
-                    _logger.LogError("发送回复：{re}", result.Message);
+                    var result = await _kanbanService.GetReply(input.Message, input.UserId, input.IsFirst, input.MessageMax);
+
+                    if (result.Success == false)
+                    {
+                        _logger.LogError("发送回复：{re}", result.Message);
+                    }
+
+
+                    return new EventBus.Models.KanbanChatGPTReceiveModel
+                    {
+                        Success = result.Success,
+                        Message = result.Message
+                    };
                 }
-
-
-                return new EventBus.Models.KanbanChatGPTReceiveModel
+                catch (Exception ex)
                 {
-                    Success = result.Success,
-                    Message = result.Message
-                };
-
+                    _logger.LogError(ex, "处理客户端消息失败");
+                    return new EventBus.Models.KanbanChatGPTReceiveModel
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
             });
             _eventBusService.CreateKanbanGroupServer(async (input) =>
             {
                 //_logger.LogInformation("收到客户端消息：{input}", input.Message);
-
-                var result = await _kanbanService.GetGroupReply(input.Messages);
-
-                if (result.Success == false)
+                try
                 {
-                    _logger.LogError("发送群聊回复：{re}", result.Message);
+                    var result = await _kanbanService.GetGroupReply(input.Messages);
+
+                    if (result.Success == false)
+                    {
+                        _logger.LogError("发送群聊回复：{re}", result.Message);
+                    }
+
+
+                    return new EventBus.Models.KanbanChatGPTReceiveModel
+                    {
+                        Success = result.Success,
+                        Message = result.Message
+                    };
                 }
-
-
-                return new EventBus.Models.KanbanChatGPTReceiveModel
+                catch (Exception ex)
                 {
-                    Success = result.Success,
-                    Message = result.Message
-                };
-
+                    _logger.LogError(ex, "处理客户端消息失败");
+                    return new EventBus.Models.KanbanChatGPTReceiveModel
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
             });
 
             _logger.LogInformation("客户端上线");

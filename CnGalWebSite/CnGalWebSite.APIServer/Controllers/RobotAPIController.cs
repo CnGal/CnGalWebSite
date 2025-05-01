@@ -235,25 +235,36 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "身份识别失败" };
             }
 
-            // 请求数据
-            var result = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+            try
             {
-                IsFirst = model.IsFirst,
-                Message = model.Message,
-                UserId = user.Id,
-                MessageMax = int.Parse(_configuration["ChatGPTLimit_PreConversationMax"] ?? "5")
-            });
+                // 请求数据
+                var result = await _eventBusService.CallKanbanChatGPT(new EventBus.Models.KanbanChatGPTSendModel
+                {
+                    IsFirst = model.IsFirst,
+                    Message = model.Message,
+                    UserId = user.Id,
+                    MessageMax = int.Parse(_configuration["ChatGPTLimit_PreConversationMax"] ?? "5")
+                });
 
-            if (result == null)
-            {
-                return new Result { Successful = false, Error = "后端返回结果为空" };
+                if (result == null)
+                {
+                    return new Result { Successful = false, Error = "后端返回结果为空" };
+                }
+
+                return new Result
+                {
+                    Successful = result.Success,
+                    Error = result.Message
+                };
             }
-
-            return new Result
+            catch (Exception ex)
             {
-                Successful = result.Success,
-                Error = result.Message
-            };
+                return new Result
+                {
+                    Successful = false,
+                    Error = ex.Message
+                };
+            }
         }
     }
 }
