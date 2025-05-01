@@ -53,7 +53,7 @@
             @if (Chats != null)
             {
 
-                <MTextField @bind-Value="@InputText" TValue="string" HideDetails="true" Placeholder="来聊天吧~" Dense />
+                <MTextField @bind-Value="@InputText" TValue="string" HideDetails="true" Placeholder="来聊天吧~" Dense OnKeyDown="OnKeyDown" />
                 <div>
                     <CnGalWebSite.Components.Buttons.MasaButton Icon="@IconType.Send.ToIconString()" TextStyle OnClick="Add" Tooltip="发送" Disabled="_proc" />
                 </div>
@@ -154,7 +154,7 @@
         {
             _proc = false;
             StateHasChanged();
-            await PopupService.ToastErrorAsync(ex.Message);
+            await PopupService.ToastErrorAsync("获取看板娘回复失败",ex.Message);
         }
 
     }
@@ -178,6 +178,14 @@
     public void OnSettingChanged()
     {
         StateHasChanged();
+    }
+
+    public async Task OnKeyDown(KeyboardEventArgs arg)
+    {
+        if(arg.Key == "Enter")
+        {
+            await Add();
+        }
     }
 
     public void Dispose()

@@ -18,6 +18,7 @@ namespace CnGalWebSite.EventBus.Services
         private IConnection _connection;
         private IModel _channel;
         private string replyQueueName;
+        private string _clientId;
 
         public void Init()
         {
@@ -146,8 +147,19 @@ namespace CnGalWebSite.EventBus.Services
         public void CreateRpcClient()
         {
             Init();
-            // declare a server-named queue
-            replyQueueName = _channel.QueueDeclare().QueueName;
+
+            // 生成唯一的客户端ID
+            _clientId = $"rpc.client-{Guid.NewGuid()}";
+
+            // 使用持久化的回调队列
+            replyQueueName = $"reply-queue-{_clientId}";
+            _channel.QueueDeclare(
+                queue: replyQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: true,  // 当最后一个消费者断开时自动删除
+                arguments: null);
+
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, ea) =>
             {
@@ -157,9 +169,10 @@ namespace CnGalWebSite.EventBus.Services
                 tcs.TrySetResult(body);
             };
 
-            _channel.BasicConsume(consumer: consumer,
-                                 queue: replyQueueName,
-                                 autoAck: true);
+            _channel.BasicConsume(
+                consumer: consumer,
+                queue: replyQueueName,
+                autoAck: true);
         }
 
         /// <summary>
@@ -171,7 +184,7 @@ namespace CnGalWebSite.EventBus.Services
         /// <param name="input"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<TOutput> CallRpcAsync<TInput, TOutput>(string queue, TInput input, CancellationToken cancellationToken = default)
+        public async Task<TOutput> CallRpcAsync<TInput, TOutput>(string queue, TInput input, CancellationToken cancellationToken = default)
         {
             Init();
 
@@ -181,7 +194,6 @@ namespace CnGalWebSite.EventBus.Services
             props.CorrelationId = correlationId;
             props.ReplyTo = replyQueueName;
 
-
             // 序列化输入
             var json = JsonSerializer.Serialize(input);
             var messageBytes = Encoding.UTF8.GetBytes(json);
@@ -190,34 +202,49 @@ namespace CnGalWebSite.EventBus.Services
             var tcs = new TaskCompletionSource<byte[]>();
             callbackMapper.TryAdd(correlationId, tcs);
 
-            // 发布
-            _channel.BasicPublish(exchange: string.Empty,
-                                 routingKey: queue,
-                                 basicProperties: props,
-                                 body: messageBytes);
-
-            cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out _));
-
-
-            // 创建解析任务
-            var ret = Task.Run(() =>
+            try
             {
-                // 等待响应完成
-                var responseTask = tcs.Task;
-                responseTask.Wait(cancellationToken);
+                // 发布
+                _channel.BasicPublish(exchange: string.Empty,
+                                     routingKey: queue,
+                                     basicProperties: props,
+                                     body: messageBytes);
+
+                cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out _));
+
+                // 等待响应完成，添加60秒超时
+                var response = await tcs.Task.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
 
                 // 输出响应结果
-                var response = responseTask.Result;
                 var output = JsonSerializer.Deserialize<TOutput>(response);
-
                 return output;
-            }, cancellationToken);
-
-            return ret;
+            }
+            catch (TimeoutException)
+            {
+                callbackMapper.TryRemove(correlationId, out _);
+                throw new TimeoutException("RPC调用超时（60秒）");
+            }
+            finally
+            {
+                callbackMapper.TryRemove(correlationId, out _);
+            }
         }
 
         public void Dispose()
         {
+            try
+            {
+                if (_channel?.IsOpen == true && !string.IsNullOrEmpty(replyQueueName))
+                {
+                    // 删除回调队列
+                    _channel.QueueDelete(replyQueueName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "删除回调队列失败");
+            }
+
             _connection?.Dispose();
             _connection = null;
             _channel?.Dispose();
