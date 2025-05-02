@@ -212,6 +212,15 @@ builder.Services.AddLocalization();
 
 var app = builder.Build();
 
+// 设置请求来源
+if (!app.Environment.IsDevelopment())
+{
+    app.Use((context, next) =>
+    {
+        context.Request.Scheme = "https";
+        return next();
+    });
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
