@@ -1,42 +1,11 @@
 ﻿@page "/"
 
-@inject IHttpService _httpService
-@inject IPopupService _popupService
-
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
-<CnGalWebSite.Expo.Components.Cards.Users.LogInOrOut />
-
-@if (Model != null)
-{
-    <p>@Model.Id</p>
-    <p>@Model.Name</p>
-    <p>@Model.Email</p>
-}
-
-<CnGalWebSite.Components.Buttons.MasaButton Text="刷新" Icon="mdi-refresh" OnClick="OnClick" />
-
 @code {
-    UserInfoModel Model;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await OnClick();
-    }
-
-    public async Task OnClick()
-    {
-        try
-        {
-            Model = await _httpService.GetAsync<UserInfoModel>("api/account/GetUserInfo");
-        }
-        catch (Exception ex)
-        {
-            await _popupService.EnqueueSnackbarAsync("获取用户信息失败", ex.Message, AlertTypes.Error);
-        }
-    }
 }
