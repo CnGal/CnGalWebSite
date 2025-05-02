@@ -41,6 +41,7 @@
 :root {
     --md-card-border-radius: 12px;
     --md-card-active-border-radius: 24px;
+    --background-image-primary: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
 }
 /*覆盖默认值*/
 .m-menu__content, .m-card, .m-sheet.m-card, .m-slide-group__wrapper, .m-dialog {
@@ -62,9 +63,13 @@
     font-size: small;
     padding: .5rem;
 }
+.m-main {
+    padding-bottom: 36px;
+    padding-top:64px;
+}
 /*导航栏*/
 .app-bar-card {
-    background-color: var(--m-theme-primary) !important;
+    background-image: var(--background-image-primary);
 }
 
     .app-bar-card > div {
@@ -76,12 +81,13 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        color: white;
-        text-decoration: none!important;
+        color: var(--m-theme-primary) !important;
+        text-decoration: none !important;
     }
 
         .app-bar-card .logo-card img {
             height: 40px;
+            width: 40px;
             border-radius: 10px;
         }
 
@@ -102,8 +108,8 @@
 
 .user-button img {
     width: 40px;
+    height: 40px;
     border-radius: 50%;
-    aspect-ratio: 1;
 }
 /*用户卡片*/
 .user-info-card .head-card img {

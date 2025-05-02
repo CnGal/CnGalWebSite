@@ -171,16 +171,23 @@ builder.Services.AddHttpClient("AuthAPI")
       .AddHttpMessageHandler<TokenHandler>();
 
 //Masa Blazor 组件库
-builder.Services.AddMasaBlazor(options => {
+builder.Services.AddMasaBlazor(options =>
+{
     //主题
     options.ConfigureTheme(s =>
     {
-        s.Themes.Light.Primary = "#e54a88";
+        s.Themes.Light.Primary = "#b5353a";
         s.Themes.Light.Secondary = "#75565b";
         s.Themes.Light.Error = "#ba1a1a";
     });
     // 本地化
     options.Locale = new Locale("zh-CN", "en-US");
+    // 配置SSR
+    options.ConfigureSsr(options =>
+    {
+        options.Bar = 64;
+        options.Footer = 36;
+    });
     // 提示框
     options.Defaults = new Dictionary<string, IDictionary<string, object>>()
                 {
