@@ -1,0 +1,123 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="600">
+    @if (Model == null)
+    {
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    }
+    else
+    {
+        <MCardTitle>
+            @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.Name
+        </MCardTitle>
+        <MCardText Class="ot-0 pb-0">
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow Dense>
+                <MCol Cols="6">
+                    <MTextField HideDetails="true" @bind-Value="@Model.Name" Label="名称" />
+                </MCol>
+                <MCol Cols="6">
+                    <MTextField HideDetails="true" @bind-Value="@Model.Priority" Label="优先级" />
+                </MCol>
+                <MCol Cols="6">
+                    <MCheckbox HideDetails="true" @bind-Value="@Model.Hidden" Label="是否隐藏" />
+                </MCol>
+
+
+                <MCol Cols="12">
+                    <CnGalWebSite.Components.Cards.SectionTitleCard Title="游戏" />
+                </MCol>
+
+                @foreach (var item in Model.Games)
+                {
+                    <MCol Cols="4">
+                        <CnGalWebSite.Components.Inputs.MasaAutoComplete HideDetails="true" @bind-Value="@item.Name" Label="唯一名称" AutoCompleteItems="GameNames" />
+                    </MCol>
+                }
+                <MCol Cols="4">
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="OnAddinfor" Icon="mdi-plus" />
+                </MCol>
+            </MRow>
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary" Rounded OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    }
+
+</MDialog>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public List<string> GameNames { get; set; }
+    [Parameter]
+    public List<string> TagNames { get; set; }
+
+    ExpoTagEditModel Model = new();
+
+    private string _baseUrl = "api/expo/";
+    private string _name = "标签";
+
+    private bool _editDialog;
+
+    public async Task Refresh(long id)
+    {
+        try
+        {
+            _editDialog = true;
+            Model = null;
+            StateHasChanged();
+            Model = id == 0 ? new ExpoTagEditModel() : await _httpService.GetAsync<ExpoTagEditModel>($"{_baseUrl}edittag?id={id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync($"获取{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<ExpoTagEditModel, Result>($"{_baseUrl}edittag", Model);
+            if (result.Successful)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    await _popupService.EnqueueSnackbarAsync(result.Error, AlertTypes.Success);
+                }
+                _editDialog = false;
+                await OnEdited.InvokeAsync();
+                StateHasChanged();
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync(Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+
+    }
+
+    public void OnAddinfor()
+    {
+        Model.Games.Add(new ExpoGameTagOverviewModel());
+    }
+}

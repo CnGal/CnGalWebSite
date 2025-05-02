@@ -1,0 +1,53 @@
+﻿@implements IDisposable
+@inject NavigationManager Navigation
+
+
+<CnGalWebSite.Components.Cards.MDCard Class="user-info-card">
+    <div class="head-card">
+        <img src="@Model.PhotoPath" alt="@Model.Name" />
+        <div class="content-card">
+            <div class="name-card">@Model.Name</div>
+            <div class="text-card">@Model.PersonalSignature</div>
+        </div>
+    </div>
+    <MDivider></MDivider>
+    <div class="action-card">
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <CnGalWebSite.Components.Buttons.MasaButton Text="管理员后台" Icon="mdi-key-variant" TextStyle Href="/admin" OnClick="OnClick" />
+            </Authorized>
+        </AuthorizeView>
+        <form action="authentication/logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+            <MButton Text Block Color="primary" Type="submit">
+                <MIcon Left>mdi-logout</MIcon>
+                退出登入
+            </MButton>
+        </form>
+    </div>
+</CnGalWebSite.Components.Cards.MDCard>
+
+
+@code {
+    [Parameter]
+    public UserInforViewModel Model { get; set; } = new UserInforViewModel();
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = Navigation.Uri;
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = Navigation.Uri;
+        StateHasChanged();
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

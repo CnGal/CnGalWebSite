@@ -1,0 +1,12 @@
+﻿@if (Tags != null)
+{
+    @foreach (var item in Tags)
+    {
+        <CnGalWebSite.Expo.Components.Cards.Shared.IconChip Outlined Color="primary" Icon="mdi-tag" Text="@item.Name" />
+    }
+}
+
+@code {
+    [Parameter]
+    public List<ExpoGameTagOverviewModel> Tags { get; set; }
+}

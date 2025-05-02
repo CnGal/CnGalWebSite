@@ -1,0 +1,27 @@
+services:
+  expo:
+    image: littlefishtentears/cngalwebsiteexpo:latest
+    container_name: expo
+    environment:
+      - TZ=${TZ}
+      - WebApiPath=${WebApiPath}
+      - Authority=${Authority}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+    hostname: expo
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: ${resources_limits_memory}
+    ports:
+      - "3302:8081"
+      - "2202:8080"
+    volumes:
+      - ${MNT_DIR}/blazorserver/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys

@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+
+<MApp>
+    <MAppBar App Class="elevation-2 app-bar-card">
+        <a class="logo-card" href="/" draggable="false">
+            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" draggable="false"/>
+            <div class="name-card">
+                CNGAL线上展示会
+            </div>
+        </a>
+        <div class="tabs-card">
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Color="white" Icon="mdi-home" Text="首页" Href="/" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Color="white" Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Color="white" Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
+            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Color="white" Icon="mdi-email" Text="联系我们" Href="/contact" />
+            <CnGalWebSite.Expo.Components.Cards.Users.LoginButton />
+        </div>
+    </MAppBar>
+    <MMain>
+        <MContainer Fluid>
+            @Body
+        </MContainer>
+    </MMain>
+    <MFooter App Padless Absolute>
+        &copy; 2025 - CnGal资料站
+        &nbsp;&nbsp;&nbsp;<a target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备2023071243号</a>
+        &nbsp;&nbsp;&nbsp;不良信息举报邮箱：help@cngal.org
+    </MFooter>
+</MApp>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

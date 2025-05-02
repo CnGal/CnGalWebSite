@@ -1,0 +1,14 @@
+﻿@if (Hidden)
+{
+    <MIcon Small Color="error">mdi-close-thick</MIcon>
+}
+else
+{
+    <MIcon Small Color="success">mdi-check-bold</MIcon>
+
+}
+
+@code {
+    [Parameter]
+    public bool Hidden{ get; set; }
+}
