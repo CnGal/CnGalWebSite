@@ -1,0 +1,69 @@
+﻿@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+@if (Model != null)
+{
+    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+        <ActivatorContent Context="m">
+            <MTooltip Bottom>
+                <ActivatorContent Context="c">
+                    @{
+                        var attrs = new Dictionary<string, object>();
+                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    }
+                    <MButton Icon @attributes="@attrs" Class="user-button">
+                        <img src="@Model.PhotoPath" alt="@Model.Name" />
+                    </MButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@Model.Name</span>
+                </ChildContent>
+            </MTooltip>
+        </ActivatorContent>
+
+        <ChildContent>
+            <UserInforCard Model="@Model" OnClick="OnClosed" />
+        </ChildContent>
+    </MMenu>
+}
+
+
+@code {
+    UserInforViewModel Model;
+    bool menu;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshUserInfor();
+    }
+
+    public async Task RefreshUserInfor()
+    {
+        try
+        {
+            if (AuthState == null)
+            {
+                return;
+            }
+
+            var authState = await AuthState;
+            Model = await _httpService.GetAsync<UserInforViewModel>($"api/space/GetUserData/{authState.User.Claims.GetUserId()}");
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取用户信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public void OnClosed()
+    {
+        menu = false;
+        StateHasChanged();
+    }
+}

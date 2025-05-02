@@ -1,0 +1,26 @@
+﻿
+<MChip Outlined="Outlined" Dark="!Outlined" Small Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href" Style="@Style">
+    @if (string.IsNullOrWhiteSpace(Icon) == false)
+    {
+        <MIcon Left XSmall>@Icon</MIcon>
+    }
+    @Text
+</MChip>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
+    public bool Outlined { get; set; }
+    [Parameter]
+    public string Color { get; set; } = "primary";
+
+}

@@ -1,0 +1,103 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoTagOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == nameof(ExpoTagOverviewModel.Games))
+        {
+            @context.Item.Games.Count
+        }
+        else if (context.Header.Value == nameof(ExpoTagOverviewModel.Hidden))
+        {
+            <CnGalWebSite.Expo.Components.Cards.Admin.Games.HiddenChip Hidden="context.Item.Hidden" />
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Class="me-4" Text="刷新" Icon="mdi-refresh" OnClick="OnRefresh" />
+    </ButtonContent>
+</CnGalWebSite.Components.DataTables.DataTableCard>
+
+
+
+<EditCard OnEdited="OnEdited" @ref="editCard" GameNames="EntryGameItems" TagNames="TagItems" />
+
+@code {
+    private string _baseUrl = "api/expo/listtag";
+    private string _name = "标签";
+
+    private List<DataTableHeader<ExpoTagOverviewModel>> _headers = new List<DataTableHeader<ExpoTagOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoTagOverviewModel.Id)
+          },
+          new (){ Text= "名称", Value= nameof(ExpoTagOverviewModel.Name),Sortable=false},
+          new (){ Text= "游戏数量", Value= nameof(ExpoTagOverviewModel.Games),Sortable=false},
+          new (){ Text= "优先级", Value= nameof(ExpoTagOverviewModel.Priority)},
+          new (){ Text= "显示", Value= nameof(ExpoTagOverviewModel.Hidden)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoTagOverviewModel> dataTableCard;
+
+    EditCard editCard;
+
+    private List<string> EntryGameItems { get; set; } = new List<string>();
+    private List<string> TagItems { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnRefresh();
+    }
+
+    public async void EditItem(ExpoTagOverviewModel item)
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(item.Id);
+        }
+    }
+
+    public void OnEdited()
+    {
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task OnRefresh()
+    {
+        OnEdited();
+        try
+        {
+            EntryGameItems = await _httpService.GetAsync<List<string>>("api/entries/GetAllEntries/0");
+            TagItems = (await _httpService.GetAsync<List<ExpoTagViewModel>>("api/expo/GetAllTags")).Select(s => s.Name).ToList();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取所有游戏词条和标签失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public async Task AddItem()
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(0);
+        }
+    }
+}

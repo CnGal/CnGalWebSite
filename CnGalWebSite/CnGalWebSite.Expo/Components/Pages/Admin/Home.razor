@@ -1,0 +1,30 @@
+﻿@page "/admin"
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>管理员后台</PageTitle>
+
+<div class="admin-page">
+    <MCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
+             <MTab Value="1">
+                游戏<MIcon>mdi-gamepad-variant</MIcon>
+             </MTab>
+             <MTab Value="2">
+                标签<MIcon>mdi-tag-multiple</MIcon>
+             </MTab>
+         </MTabs>
+    </MCard>
+
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+           <CnGalWebSite.Expo.Components.Cards.Admin.Games.ListCard/>
+        </MTabItem>
+        <MTabItem Value="2">
+            <CnGalWebSite.Expo.Components.Cards.Admin.Tags.ListCard/>
+        </MTabItem>
+    </MTabsItems>
+</div>
+
+@code {
+    public StringNumber TabIndex { get; set; } = 1;
+}

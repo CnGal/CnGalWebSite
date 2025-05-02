@@ -1,0 +1,45 @@
+﻿@page "/games"
+
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<div class="games-page">
+    <div class="tag-list-card">
+        @foreach (var item in _tagItems)
+        {
+            <div>@item.Name</div>
+        }
+    </div>
+
+    <div class="game-list-card">
+        <MRow>
+            @foreach (var item in _gameItems)
+            {
+                <MCol Cols="12">
+                    <CnGalWebSite.Expo.Components.Cards.Games.GameCard Model="item" />
+                </MCol>
+            }
+        </MRow>
+       
+    </div>
+
+</div>
+
+
+@code {
+    List<ExpoGameViewModel> _gameItems = [];
+    List<ExpoTagViewModel> _tagItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _gameItems = await _httpService.GetAsync<List<ExpoGameViewModel>>("api/expo/GetAllGames");
+            _tagItems = await _httpService.GetAsync<List<ExpoTagViewModel>>("api/expo/GetAllTags");
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取游戏和标签列表失败", ex.Message, AlertTypes.Error);
+        }
+    }
+}

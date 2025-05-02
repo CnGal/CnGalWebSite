@@ -4,8 +4,11 @@
     <div class="consent-card mdl-card mdl-shadow--2dp">
         <img class="head-logo" src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/head_logo_6th.png">
         <div class="mdl-card__title app-name">
-            <img src="@Model.ClientLogoUrl">
-            <h1> @(string.IsNullOrWhiteSpace(Model.ClientName)?"待审核应用": Model.ClientName)) <small class="text-muted">正在请求你的授权</small></h1>
+            @if (string.IsNullOrWhiteSpace(Model.ClientLogoUrl) == false)
+            {
+                <img src="@Model.ClientLogoUrl">
+            }
+            <h1> @(string.IsNullOrWhiteSpace(Model.ClientName)?"待审核应用": Model.ClientName) <small class="text-muted">正在请求你的授权</small></h1>
         </div>
         <div class="mdl-card__supporting-text text-center">
             取消勾选你不希望授权的项目

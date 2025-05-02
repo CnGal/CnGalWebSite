@@ -1,0 +1,15 @@
+﻿<MCard Class="game-item-card" Href="@Model.Url">
+    <img src="@Model.Image" loading="lazy" />
+    <div class="name-card">@Model.GameName</div>
+    <div class="tags-card">
+        @foreach (var item in Model.Tags)
+        {
+            <div>@item.Name</div>
+        }
+    </div>
+</MCard>
+
+@code {
+    [Parameter]
+    public ExpoGameViewModel Model { get; set; }
+}

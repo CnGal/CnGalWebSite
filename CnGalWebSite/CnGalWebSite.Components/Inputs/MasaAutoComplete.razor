@@ -4,7 +4,9 @@
                OnSearchInputUpdate="QuerySelections"
                 ItemValue="r=>r"
                 ItemText="r=>r"
-                Label="@Label"></MAutocomplete>
+                Label="@Label"
+               Dense="Dense"
+               HideDetails="HideDetails"></MAutocomplete>
  @code {
     [Parameter]
     public List<string> AutoCompleteItems { get; set; }
@@ -12,6 +14,10 @@
     public string Value { get; set; }
     [Parameter]
     public string Label { get; set; }
+    [Parameter]
+    public bool Dense { get; set; }
+    [Parameter]
+    public bool? HideDetails { get; set; }
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 

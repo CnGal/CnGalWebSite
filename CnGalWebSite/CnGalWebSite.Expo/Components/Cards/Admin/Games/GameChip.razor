@@ -1,0 +1,18 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Expo.Components.Cards.Shared.IconChip Outlined Color="primary" Icon="mdi-gamepad-variant" Text="@Name" OnClick="OnClick" />
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public int? Id { get; set; }
+
+    public void OnClick()
+    {
+        @if (Id != null)
+        {
+            NavigationManager.NavigateTo($"https://www.cngal.org/entries/index/{Id}");
+        }
+    }
+}
