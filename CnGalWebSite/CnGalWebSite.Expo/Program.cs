@@ -92,15 +92,15 @@ builder.Services.AddAuthentication(CNGAL_OIDC_SCHEME)
         // single-tenant apps, but it requires a custom IssuerValidator as shown 
         // in the comments below. 
 
-        oidcOptions.Authority = "https://localhost:5001/";
+        oidcOptions.Authority = builder.Configuration["Authority"];
         // ........................................................................
 
         // ........................................................................
         // Set the Client ID for the app. Set the {CLIENT ID} placeholder to
         // the Client ID.
 
-        oidcOptions.ClientId = "f7fe44ba-fa90-4303-920f-4355865bd994";
-        oidcOptions.ClientSecret = "7e6c1730-0439-43d9-b602-30036ca792fe";
+        oidcOptions.ClientId = builder.Configuration["ClientId"];
+        oidcOptions.ClientSecret = builder.Configuration["ClientSecret"];
         // ........................................................................
 
         // ........................................................................
