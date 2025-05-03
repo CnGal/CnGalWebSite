@@ -75,6 +75,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return _expoGameRepository.GetAll().AsNoTracking()
                  .Include(s => s.Game)
                  .Include(s => s.Tags)
+                 .Where(s => s.Game != null)
                  .Select(s => new ExpoGameViewModel
                  {
                      Id = s.Id,
@@ -87,7 +88,8 @@ namespace CnGalWebSite.APIServer.Controllers
                      {
                          Id = s.Id,
                          Name = s.Name,
-                     }).ToList()
+                     }).ToList(),
+                     Url = s.Game.Releases.Any(s=>s.PublishPlatformType == PublishPlatformType.Steam)?$"https://store.steampowered.com/app/{s.Game.Releases.Where(s=>s.PublishPlatformType == PublishPlatformType.Steam).OrderBy(s=>s.Type).First().Link}":$"https://www.cngal.org/entries/index/{s.Game.Id}"
                  })
                  .AsAsyncEnumerable();
         }

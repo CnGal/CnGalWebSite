@@ -1,0 +1,21 @@
+﻿<a class="image-button-card" href="@Url" target="_blank">
+    <img src="@Image" alt="@Name" loading="lazy" />
+    @if (ShowName)
+    {
+        <div class="name-card">@Name</div>
+    }
+</a>
+
+@code {
+    [Parameter]
+    public string Image{ get; set; }
+
+    [Parameter]
+    public string Name{ get; set; }
+
+    [Parameter]
+    public string Url { get; set; }
+
+    [Parameter]
+    public bool ShowName { get; set; }
+}

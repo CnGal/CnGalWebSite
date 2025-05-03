@@ -3,32 +3,42 @@
 @inject IHttpService _httpService
 @inject IPopupService _popupService
 
+<PageTitle>CNGAL线上展示会 - 游戏列表</PageTitle>
+
 <div class="games-page">
+    <CnGalWebSite.Expo.Components.Cards.Games.RandomCard ButtonIcon="mdi-refresh" ButtonText="换一批" Items="_gameItems" Title="随机推荐" />
+    <div class="divid-card">
+        <div class="title-card">
+            <span>
+                游戏列表
+            </span>
+        </div>
+    </div>
     <div class="tag-list-card">
+        <div class="tag-item @(_selectedTagId == 0 ? "active" : "")" @onclick="() => SelectTag(0)">全部</div>
         @foreach (var item in _tagItems)
         {
-            <div>@item.Name</div>
+            <div class="tag-item @(_selectedTagId == item.Id ? "active" : "")" @onclick="() => SelectTag(item.Id)">@item.Name</div>
         }
     </div>
 
     <div class="game-list-card">
         <MRow>
-            @foreach (var item in _gameItems)
+            @foreach (var item in _filteredGameItems)
             {
-                <MCol Cols="12">
-                    <CnGalWebSite.Expo.Components.Cards.Games.GameCard Model="item" />
+                <MCol Cols="6" Md="4" Lg="3">
+                    <CnGalWebSite.Expo.Components.Cards.Games.GameCard Model="item" OnClickTag="OnClickTag" />
                 </MCol>
             }
         </MRow>
-       
     </div>
-
 </div>
-
 
 @code {
     List<ExpoGameViewModel> _gameItems = [];
+    List<ExpoGameViewModel> _filteredGameItems = [];
     List<ExpoTagViewModel> _tagItems = [];
+    long _selectedTagId = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,10 +46,29 @@
         {
             _gameItems = await _httpService.GetAsync<List<ExpoGameViewModel>>("api/expo/GetAllGames");
             _tagItems = await _httpService.GetAsync<List<ExpoTagViewModel>>("api/expo/GetAllTags");
+            _filteredGameItems = _gameItems;
         }
         catch (Exception ex)
         {
             await _popupService.EnqueueSnackbarAsync("获取游戏和标签列表失败", ex.Message, AlertTypes.Error);
         }
+    }
+
+    private void SelectTag(long tagId)
+    {
+        _selectedTagId = tagId;
+        if (tagId == 0)
+        {
+            _filteredGameItems = _gameItems;
+        }
+        else
+        {
+            _filteredGameItems = _gameItems.Where(g => g.Tags.Any(t => t.Id == tagId)).ToList();
+        }
+    }
+
+    public void OnClickTag(ExpoGameTagOverviewModel model)
+    {
+        SelectTag(model.Id);
     }
 }
