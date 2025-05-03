@@ -42,6 +42,7 @@
     --md-card-border-radius: 12px;
     --md-card-active-border-radius: 24px;
     --background-image-primary: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+    --background-color-primary: #ff9a9e;
 }
 /*覆盖默认值*/
 .m-menu__content, .m-card, .m-sheet.m-card, .m-slide-group__wrapper, .m-dialog {
@@ -62,10 +63,12 @@
     justify-content: center;
     font-size: small;
     padding: .5rem;
+    background-image: var(--background-image-primary);
 }
+
 .m-main {
     padding-bottom: 36px;
-    padding-top:64px;
+    padding-top: 64px;
 }
 /*导航栏*/
 .app-bar-card {
@@ -164,38 +167,331 @@
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: space-between;
+    margin-bottom: 4rem;
 }
+
 .game-item-card {
-    width: 300px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: .5rem;
-    /* padding: .5rem; */
 }
-    .game-item-card  img {
+
+    .game-item-card img {
         width: 100%;
         border-radius: 12px;
     }
+
     .game-item-card .name-card {
-        font-size: larger;
         font-weight: bold;
-        padding: 0 .5rem;
     }
+
     .game-item-card .tags-card {
         display: flex;
         flex-wrap: wrap;
         gap: .5rem;
-        padding: 0 .5rem;
-        padding: 0 .5rem .5rem 0.5rem;
     }
-        .game-item-card .tags-card >div {
-            background-color: var(--m-theme-primary) !important;
-            color: white;
+
+        .game-item-card .tags-card > div {
             padding: 0 .5rem;
-            border-radius: 8px;
+            font-size: small;
+            color: var(--background-color-primary);
         }
-.admin-page {
+
+        .game-item-card .tags-card > div, .games-page .tag-list-card > div {
+            border: 2px solid transparent;
+            border-radius: 4px;
+            background-clip: padding-box, border-box;
+            background-origin: padding-box, border-box;
+            background-image: linear-gradient(to right, #ffffff, #ffffff), var(--background-image-primary);
+        }
+
+            .game-item-card .tags-card > div:hover {
+                cursor: pointer;
+                background-image: var(--background-image-primary);
+                color: white;
+            }
+
+.admin-page, .game-list-card {
     max-width: 1200px;
     justify-self: center;
     width: 100%;
+    padding: 1rem;
+}
+/*标签列表*/
+.games-page .tag-list-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding: 0 0 4rem 0;
+    width: 50%;
+    justify-self: center;
+}
+
+    .games-page .tag-list-card > div {
+        font-size: large;
+        font-weight: bold;
+        color: var(--background-color-primary);
+        padding: .2rem 1.5rem;
+        border-radius: 12px;
+    }
+
+        .games-page .tag-list-card > div:hover, .games-page .tag-list-card > div.active {
+            cursor: pointer;
+            background-image: var(--background-image-primary);
+            color: white;
+        }
+/*主页*/
+/*头部*/
+.home-head-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .home-head-card .image-card {
+        display: flex;
+    }
+
+        .home-head-card .image-card img:first-child {
+            width: 60%;
+        }
+
+        .home-head-card .image-card img:nth-child(2) {
+            width: 40%;
+        }
+
+    .home-head-card .post-card {
+        display: flex;
+        justify-content: space-evenly;
+        background-image: var(--background-image-primary);
+        padding: .5rem;
+        font-weight: bold;
+        color: var(--m-theme-primary);
+        align-items: center;
+    }
+
+        .home-head-card .post-card div:nth-child(1) {
+            font-size: x-large;
+        }
+
+        .home-head-card .post-card div:nth-child(2) {
+            font-size: large;
+        }
+
+        .home-head-card .post-card .button-card {
+            border: 3px solid var(--m-theme-primary);
+            padding: .3rem 3rem;
+            cursor: pointer;
+            transition: .5s;
+        }
+
+            .home-head-card .post-card .button-card:hover {
+                color: white;
+                background-color: var(--m-theme-primary);
+            }
+
+    .home-head-card .cngal-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+    }
+
+        .home-head-card .cngal-card span:nth-child(1) {
+            background-image: var(--background-image-primary);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -ms-background-clip: text;
+            color: transparent;
+            font-size: xxx-large;
+            font-weight: bold;
+            padding-right: 42rem;
+        }
+
+        .home-head-card .cngal-card span:nth-child(2) {
+            text-align: center;
+            font-size: xx-large;
+            font-weight: bold;
+            background-image: var(--background-image-primary);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -ms-background-clip: text;
+            color: transparent;
+        }
+
+        .home-head-card .cngal-card span:nth-child(3) {
+            background-image: var(--background-image-primary);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -ms-background-clip: text;
+            color: transparent;
+            font-size: xxx-large;
+            font-weight: bold;
+            padding-left: 42rem;
+        }
+/*简介*/
+.home-brief-card {
+    display: flex;
+    flex-direction: column;
+}
+
+    .home-brief-card .actions-card {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 2rem;
+        padding: 0 2rem;
+    }
+
+    .home-brief-card .content-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 4rem 2rem;
+        gap: 1rem;
+    }
+
+    .home-brief-card .title-card {
+        font-size: xx-large;
+        font-weight: bold;
+    }
+
+    .home-brief-card .text-card {
+        font-size: larger;
+    }
+
+    .home-brief-card .image-card {
+        width: 70%;
+        align-self: center;
+        border-radius: 12px;
+    }
+/*赞助商*/
+.home-sponsors-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4rem;
+}
+
+    .home-sponsors-card .sponsors-card, .home-sponsors-card .media-partners-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 70%;
+    }
+
+    .home-sponsors-card .title-card {
+        font-size: xx-large;
+        font-weight: bold;
+        padding: 4rem;
+    }
+
+    .home-sponsors-card .items-card {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .home-sponsors-card .image-button-card {
+        width: 30%;
+        border-radius: 12px;
+    }
+
+    .home-sponsors-card .media-partners-card .image-button-card {
+        width: 22%;
+    }
+/*图片按钮*/
+.image-button-card {
+    display: flex;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+}
+
+    .image-button-card img {
+        width: 100%;
+        transition: .5s;
+    }
+
+    .image-button-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .image-button-card .name-card {
+        position: absolute;
+        color: white;
+        font-size: xx-large;
+        font-weight: bold;
+        background-color: #00000036;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+/*下划线*/
+.home-page .title-card span, .games-page .title-card span {
+    background: var(--background-image-primary) no-repeat right bottom;
+    background-size: 100% 3px;
+    transition: background-size 1000ms;
+    padding-bottom: .5rem;
+}
+/*随机推荐*/
+.game-random-card .content-card .game-item-card {
+    min-width: 250px;
+    max-width: 250px;
+}
+
+.game-random-card .content-card .m-slide-group__content {
+    gap: 1rem;
+}
+
+.games-page .title-card, .game-random-card .title-card {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 3rem;
+}
+
+.game-random-card .content-card {
+    padding: 0 2rem;
+}
+
+.game-random-card .title-card {
+    padding-bottom: 1rem;
+}
+
+.game-random-card .action-card {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 3rem;
+    padding-bottom: 1rem;
+}
+/*slide*/
+.game-random-card .content-card .m-icon.m-icon {
+    border: 4px solid transparent;
+    border-radius: 50%;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image: linear-gradient(to right, #ffffff, #ffffff), var(--background-image-primary);
+    /* padding: .5rem; */
+    /* margin: .5rem; */
+    color: var(--background-color-primary) !important;
+    font-size: 36px;
+    transition: .3s;
+}
+
+.game-random-card .content-card .m-slide-group__next, .m-slide-group__prev {
+    flex: 0 1 90px;
+    min-width: 90px;
+}
+
+.game-random-card.content-card .m-icon.m-icon--disabled {
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(to right, gray, gray);
+    color: gray !important;
+}
+
+.game-random-card .content-card .m-slide-group__wrapper {
+    border-radius: 0px;
 }

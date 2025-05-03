@@ -1,11 +1,28 @@
 ﻿@page "/"
+@inject IHttpService _httpService
+@inject IPopupService _popupService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>CNGAL线上展示会 - 首页</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="home-page">
+    <CnGalWebSite.Expo.Components.Cards.Home.HeadCard />
+    <CnGalWebSite.Expo.Components.Cards.Home.BriefCard />
+    <CnGalWebSite.Expo.Components.Cards.Games.RandomCard ButtonIcon="mdi-gamepad-variant" ButtonText="查看所有参展游戏" Items="_gameItems" Title="参展游戏" Href="/games"/>
+    <CnGalWebSite.Expo.Components.Cards.Home.SponsorsCard />
 
-Welcome to your new app.
-
+</div>
 @code {
+    List<ExpoGameViewModel> _gameItems = [];
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _gameItems = await _httpService.GetAsync<List<ExpoGameViewModel>>("api/expo/GetAllGames");
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取游戏列表失败", ex.Message, AlertTypes.Error);
+        }
+    }
 }

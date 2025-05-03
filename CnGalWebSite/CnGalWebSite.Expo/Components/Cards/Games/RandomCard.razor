@@ -1,0 +1,50 @@
+﻿<div class="game-random-card">
+    <div class="title-card">
+        <span>
+            @Title
+        </span>
+    </div>
+    <div class="action-card">
+        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Color="primary" Icon="@ButtonIcon" Href="@Href" Text="@ButtonText" OnClick="RefreshRandomGames" />
+    </div>
+    <div class="content-card">
+        <MSlideGroup ShowArrows="true">
+            @foreach (var item in _randomGameItems)
+            {
+                <MSlideItem>
+                    <CnGalWebSite.Expo.Components.Cards.Games.GameCard Model="item" />
+                </MSlideItem>
+            }
+        </MSlideGroup>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<ExpoGameViewModel> Items { get; set; } = [];
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string ButtonText { get; set; }
+    [Parameter]
+    public string ButtonIcon { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+
+    List<ExpoGameViewModel> _randomGameItems = [];
+    private const int RandomGameCount = 20;
+
+    protected override void OnParametersSet()
+    {
+        RefreshRandomGames();
+    }
+
+    private void RefreshRandomGames()
+    {
+        var random = new Random();
+        _randomGameItems = Items
+            .OrderBy(x => random.Next())
+            .Take(RandomGameCount)
+            .ToList();
+    }
+}

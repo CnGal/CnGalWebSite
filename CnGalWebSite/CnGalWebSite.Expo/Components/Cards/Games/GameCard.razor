@@ -1,15 +1,18 @@
-﻿<MCard Class="game-item-card" Href="@Model.Url">
-    <img src="@Model.Image" loading="lazy" alt="@Model.GameName"/>
+﻿
+<div class="game-item-card">
+    <CnGalWebSite.Expo.Components.Cards.Home.ImageButtonCard Image="@Model.Image" Name="@Model.GameName" Url="@Model.Url" />
     <div class="name-card">@Model.GameName</div>
     <div class="tags-card">
         @foreach (var item in Model.Tags)
         {
-            <div class="elevation-2">@item.Name</div>
+            <div @onclick="@(async()=>await OnClickTag.InvokeAsync(item))">@item.Name</div>
         }
     </div>
-</MCard>
+</div>
 
 @code {
     [Parameter]
     public ExpoGameViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<ExpoGameTagOverviewModel> OnClickTag { get; set; }
 }
