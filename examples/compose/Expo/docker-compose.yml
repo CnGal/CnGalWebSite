@@ -8,6 +8,8 @@ services:
       - Authority=${Authority:-https://oauth2.cngal.org}
       - ClientId=${ClientId}
       - ClientSecret=${ClientSecret}
+      # 图床API
+      - ImageApiPath=${ImageApiPath}
     hostname: expo
     restart: always
     healthcheck:
