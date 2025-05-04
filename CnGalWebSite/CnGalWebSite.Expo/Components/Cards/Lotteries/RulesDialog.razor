@@ -1,0 +1,31 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="600">
+    <MCardTitle>
+        规则说明
+    </MCardTitle>
+    <MCardText>
+        一、抽奖次数获取规则:<br />
+        活动期间每位用户每日登录即可参加一次。<br />
+        <br />
+        二、奖品发放及使用规则:<br />
+        激活码在“我的奖品”中查看，仅限本人使用。<br />
+        <br />
+        本次活动禁止恶意刷奖行为。对于恶意刷奖，CnGal资料站有权取消获奖者获奖资格。<br />
+        活动过程中，用户所中奖项，以最终收集的中奖信息为准，如信息不准确导致发奖失败，CnGal资料站免责。
+    </MCardText>
+
+</MDialog>
+
+@code {
+    bool _editDialog;
+
+    public void Refresh()
+    {
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,104 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoAwardOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+        }
+        else if (context.Header.Value == nameof(ExpoAwardOverviewModel.Type))
+        {
+            <span>@GetAwardTypeName(context.Item.Type)</span>
+        }
+        else if (context.Header.Value == nameof(ExpoAwardOverviewModel.Image))
+        {
+            @if (!string.IsNullOrEmpty(context.Item.Image))
+            {
+                <img style="width:100px;padding: .5rem;" Src="@context.Item.Image" alt="@context.Item.Name">
+            }
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Class="me-4" Text="刷新" Icon="mdi-refresh" OnClick="OnRefresh" />
+    </ButtonContent>
+
+</CnGalWebSite.Components.DataTables.DataTableCard>
+
+<EditCard OnEdited="OnEdited" @ref="editCard" />
+
+@code {
+    private string _baseUrl = "api/expo/listaward";
+    private string _name = "奖项";
+
+    private List<DataTableHeader<ExpoAwardOverviewModel>> _headers = new List<DataTableHeader<ExpoAwardOverviewModel>>
+    {
+        new ()
+        {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoAwardOverviewModel.Id)
+        },
+        new (){ Text= "名称", Value= nameof(ExpoAwardOverviewModel.Name)},
+        new (){ Text= "图片", Value= nameof(ExpoAwardOverviewModel.Image)},
+        new (){ Text= "类型", Value= nameof(ExpoAwardOverviewModel.Type)},
+        new (){ Text= "数量", Value= nameof(ExpoAwardOverviewModel.Count), Sortable=false},
+        new (){ Text= "已分配数", Value= nameof(ExpoAwardOverviewModel.PrizeCount), Sortable=false},
+        new (){ Text= "操作", Value= "actions", Sortable=false }
+    };
+
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoAwardOverviewModel> dataTableCard;
+
+    EditCard editCard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnRefresh();
+    }
+
+    private string GetAwardTypeName(ExpoAwardType type)
+    {
+        var field = typeof(ExpoAwardType).GetField(type.ToString());
+        var attribute = field.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                            .Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>()
+                            .FirstOrDefault();
+
+        return attribute?.Name ?? type.ToString();
+    }
+
+    public async void EditItem(ExpoAwardOverviewModel item)
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(item.Id);
+        }
+    }
+
+    public void OnEdited()
+    {
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task OnRefresh()
+    {
+        OnEdited();
+    }
+
+    public async Task AddItem()
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(0);
+        }
+    }
+}

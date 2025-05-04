@@ -10,6 +10,7 @@ using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Expo.Services;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.DrawingBed.Helper.Services;
 
 const string CNGAL_OIDC_SCHEME = "cngal";
 
@@ -161,7 +162,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents().AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = null;
+        options.EnableDetailedErrors = true;
+    });
 
 builder.Services.AddHttpContextAccessor();
 
@@ -213,6 +218,9 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 
 // 查询服务
 builder.Services.AddScoped<IQueryService, QueryService>();
+
+// 文件上传服务
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 //本地化
 builder.Services.AddLocalization();

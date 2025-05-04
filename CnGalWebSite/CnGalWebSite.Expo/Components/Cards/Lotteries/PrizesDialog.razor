@@ -1,0 +1,89 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <MCardTitle>
+        我的奖品
+    </MCardTitle>
+
+    <MCardText>
+
+
+        @if (_loading)
+        {
+            <div class="d-flex justify-center">
+                <MProgressCircular Indeterminate Color="primary"></MProgressCircular>
+            </div>
+        }
+        else if (_prizes == null || _prizes.Count == 0)
+        {
+            <div class="text-center pa-4">
+                <div class="text-subtitle-1">暂无奖品</div>
+                <div class="text-body-2 mt-2">继续参与抽奖，获取更多奖品吧！</div>
+            </div>
+        }
+        else
+        {
+            <MSimpleTable>
+                <thead>
+                    <tr>
+                        <th>奖品名称</th>
+                        <th>奖品内容</th>
+                        <th>获得时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prize in _prizes)
+                    {
+                        <tr>
+                            <td>@prize.AwardName</td>
+                            <td>@prize.Content</td>
+                            <td>@prize.DrawTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </MSimpleTable>
+        }
+        <div class="d-flex align-center">
+            <MSpacer></MSpacer>
+            <MButton Small Text OnClick="LoadPrizes" Color="primary" Class="mr-2">
+                <MIcon Left>mdi-refresh</MIcon>
+                刷新
+            </MButton>
+        </div>
+    </MCardText>
+</MDialog>
+
+@code {
+    bool _editDialog;
+    List<ExpoPrizeOverviewModel> _prizes = new List<ExpoPrizeOverviewModel>();
+    bool _loading = false;
+
+    public async Task Refresh()
+    {
+        _editDialog = true;
+        StateHasChanged();
+        await LoadPrizes();
+    }
+
+    private async Task LoadPrizes()
+    {
+        try
+        {
+            _loading = true;
+            StateHasChanged();
+
+            var prizes = await _httpService.GetAsync<List<ExpoPrizeOverviewModel>>("api/expo/GetUserPrizes");
+            _prizes = prizes.Where(s => s.AwardType != ExpoAwardType.NoEntry).ToList();
+            _loading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _loading = false;
+            await _popupService.EnqueueSnackbarAsync("获取奖品失败", ex.Message, AlertTypes.Error);
+            StateHasChanged();
+        }
+    }
+}

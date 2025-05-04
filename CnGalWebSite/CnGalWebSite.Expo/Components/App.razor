@@ -7,7 +7,7 @@
     <meta name="description" content="CnGal是一个非营利性的，立志于收集整理国内制作组创作及中文化的中文Galgame/AVG的介绍、攻略、评测、感想等内容的资料性质的网站。 此外，CnGal官方还会与圈内中文AVG制作组进行友好合作，如免费提供Banner广告位，网站服务器资源等。">
     <base href="/" />
     <MSsrThemeProvider />
-    <link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["CnGalWebSite.Expo.styles.css"]" />
@@ -18,8 +18,15 @@
 
 <body>
     <Routes @rendermode="InteractiveServer" />
+
+    <!--图片裁剪-->
+    <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+
+    <!--组件库-->
+    <script src="https://res.cngal.org/_content/Masa.Blazor/js/masa-blazor.js"></script>
+
+    <!--运行时-->
     <script src="_framework/blazor.web.js"></script>
-    <script src="_content/Masa.Blazor/js/masa-blazor.js"></script>
 </body>
 
 </html>

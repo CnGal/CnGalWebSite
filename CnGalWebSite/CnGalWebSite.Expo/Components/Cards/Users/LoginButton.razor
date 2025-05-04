@@ -6,7 +6,7 @@
         <UserButton/>
     </Authorized>
     <NotAuthorized>
-        <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-login" TextStyle Text="登入" Href="authentication/login" />
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-login" TextStyle Text="登入" Href="@($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}")" />
     </NotAuthorized>
 </AuthorizeView>
 

@@ -4,6 +4,7 @@ using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250504094730_AddExpoTask")]
+    partial class AddExpoTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -358,7 +361,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "b0970625-cdf9-4512-9004-aa9b88b8b430",
+                            ConcurrencyStamp = "a827a740-a1ca-4573-9d3c-2b3d91f55651",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -380,7 +383,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2025, 5, 4, 19, 33, 17, 281, DateTimeKind.Utc).AddTicks(4526),
+                            RegistTime = new DateTime(2025, 5, 4, 17, 47, 27, 644, DateTimeKind.Utc).AddTicks(9592),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -1470,34 +1473,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("Examines");
                 });
 
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoAward", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ExpoAwards");
-                });
-
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoGame", b =>
                 {
                     b.Property<long>("Id")
@@ -1520,35 +1495,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("GameId");
 
                     b.ToTable("ExpoGames");
-                });
-
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoPrize", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<long>("AwardId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("DrawTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("AwardId");
-
-                    b.ToTable("ExpoPrizes");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoTag", b =>
@@ -5041,24 +4987,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Game");
                 });
 
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoPrize", b =>
-                {
-                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CnGalWebSite.DataModel.Model.ExpoAward", "Award")
-                        .WithMany("Prizes")
-                        .HasForeignKey("AwardId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Award");
-                });
-
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoTask", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
@@ -5968,11 +5896,6 @@ namespace CnGalWebSite.APIServer.Migrations
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
                 {
                     b.Navigation("ReviewUsers");
-                });
-
-            modelBuilder.Entity("CnGalWebSite.DataModel.Model.ExpoAward", b =>
-                {
-                    b.Navigation("Prizes");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FavoriteFolder", b =>

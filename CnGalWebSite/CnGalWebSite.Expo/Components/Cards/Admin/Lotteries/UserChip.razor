@@ -1,0 +1,10 @@
+﻿
+<CnGalWebSite.Expo.Components.Cards.Shared.IconChip Outlined Color="primary" Icon="mdi-account" Text="@UserName" Href="@($"https://app.cngal.org/space/index/{UserId}")" />
+
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public string UserName { get; set; }
+}

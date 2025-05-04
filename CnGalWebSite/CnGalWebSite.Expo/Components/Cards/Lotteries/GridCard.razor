@@ -1,0 +1,340 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager Navigation
+
+<div class="lottery-grid-card">
+    <div class="head-card">
+        <div class="count-card">
+            <MIcon Color="primary">mdi-gift</MIcon>
+            <div>
+                ×@Model.LotteryCount
+            </div>
+        </div>
+    </div>
+    <div class="divid-card">
+    </div>
+    <div class="lottery-content-card">
+        <div class="grid-row-card">
+            <GridPrizeCard Items="_items" Take="3" ActiveIndex="_activeIndex" />
+        </div>
+        <div class="grid-row-card">
+            <div class="grid-col-card">
+                <GridPrizeCard Items="_items" Skip="3" Take="1" ActiveIndex="_activeIndex" />
+            </div>
+
+            <div class="action-card" @onclick="OnClickStart">
+                <div class="go-card">GO</div>
+                <div class="text-card">参加抽奖</div>
+            </div>
+            <div class="grid-col-card">
+                <GridPrizeCard Items="_items" Skip="4" Take="1" ActiveIndex="_activeIndex" />
+            </div>
+        </div>
+        <div class="grid-row-card">
+            <GridPrizeCard Items="_items" Skip="5" Take="3" ActiveIndex="_activeIndex" />
+        </div>
+    </div>
+</div>
+<div class="lottery-action-card">
+    <div class="button-card" @onclick="OnClickRules">
+        抽奖规则
+    </div>
+    <div class="button-card" @onclick="OnClickPrizes">
+        我的奖品
+    </div>
+</div>
+
+<RulesDialog @ref="rulesDialog" />
+<PrizesDialog @ref="prizesDialog" />
+@code {
+    [Parameter]
+    public ExpoUserTaskModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
+    List<ExpoAwardOverviewModel> _items = [];
+
+    private int _activeIndex = -1;
+    private int _targetIndex = -1;
+    private int _currentSpeed = 200; // 初始速度
+    private int _maxSpeed = 50; // 最快速度（值最小）
+    private int _minSpeed = 200; // 最慢速度（值最大）
+    private Timer _animationTimer;
+    private bool _isAnimating = false;
+    private int _animationCount = 0;
+    private int _totalAnimationCount = 50; // 增加总动画次数以延长整体时间
+    // 定义九宫格顺时针动画顺序
+    private int[] _animationSequence = new int[] { 0, 1, 2, 4, 7, 6, 5, 3 };
+    private int _sequenceIndex = 0;
+
+
+    List<ExpoAwardOverviewModel> AwardModel = new();
+
+    RulesDialog rulesDialog;
+    PrizesDialog prizesDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            AwardModel = await _httpService.GetAsync<List<ExpoAwardOverviewModel>>("api/expo/GetAllAwards");
+            _items.Clear();
+            if (AwardModel.Count < 8)
+            {
+                // 复制已有奖项，按照Id排序以确保稳定顺序
+                var sortedAwards = AwardModel.OrderBy(a => a.Id).ToList();
+                _items.AddRange(sortedAwards);
+
+                // 补充剩余空位
+                int needToAdd = 8 - AwardModel.Count;
+                // 用已有奖项补充剩余位置，优先使用可用数量的奖项，且确保顺序稳定
+                List<ExpoAwardOverviewModel> availableAwards = AwardModel
+                    .Where(a => a.Count > a.PrizeCount) // 只选择还有剩余数量的奖项
+                    .OrderBy(a => a.Id) // 按Id排序确保稳定顺序
+                    .ToList();
+
+                if (availableAwards.Count == 0 && AwardModel.Count > 0)
+                {
+                    // 如果没有可用奖项但有已有奖项，就用已有奖项复制
+                    availableAwards = AwardModel.OrderBy(a => a.Id).ToList();
+                }
+
+                for (int i = 0; i < needToAdd; i++)
+                {
+                    // 如果有可用奖项，则从中循环选择
+                    if (availableAwards.Count > 0)
+                    {
+                        // 按固定顺序循环使用可用奖项
+                        var award = availableAwards[i % availableAwards.Count];
+
+                        // 创建新的奖品实例
+                        _items.Add(new ExpoAwardOverviewModel
+                            {
+                                Count = award.Count,
+                                Id = _items.Max(s => s.Id) + 1,
+                                Image = award.Image,
+                                Type = award.Type,
+                                Url = award.Url,
+                                Name = award.Name,
+                                PrizeCount = award.PrizeCount
+                            });
+                    }
+                }
+            }
+            else
+            {
+                // 直接复制到_items，保持稳定顺序
+                _items.AddRange(AwardModel.OrderBy(a => a.Id).Take(8));
+                await _popupService.EnqueueSnackbarAsync("获取奖项失败", "奖项超过8个", AlertTypes.Error);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取奖项失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public async Task<bool> CheckLogin()
+    {
+        if (AuthState == null)
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        else
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
+    }
+
+    public async Task OnClickStart()
+    {
+        if (_isAnimating) return;
+
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+
+        if (Model.LotteryCount <= 0)
+        {
+            await _popupService.EnqueueSnackbarAsync("抽奖失败", "剩余的抽奖次数不足", AlertTypes.Error);
+            return;
+        }
+
+        await Refresh();
+
+        long awardId = 0;
+        try
+        {
+            var ret = await _httpService.PostAsync<string, Result>("api/expo/Lottery", null);
+
+            await OnChanged.InvokeAsync();
+
+            if (ret.Successful == false)
+            {
+                await _popupService.EnqueueSnackbarAsync("抽奖失败", ret.Error, AlertTypes.Error);
+                return;
+            }
+            else
+            {
+                if (long.TryParse(ret.Error, out awardId) == false)
+                {
+                    await _popupService.EnqueueSnackbarAsync("抽奖失败", "获取奖项Id失败", AlertTypes.Error);
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("抽奖失败", ex.Message, AlertTypes.Error);
+            return;
+        }
+
+
+        _isAnimating = true;
+
+        // 根据awardId查找对应的奖项索引
+        int itemIndex = -1;
+        for (int i = 0; i < _items.Count; i++)
+        {
+            if (_items[i].Id == awardId)
+            {
+                itemIndex = i;
+                break;
+            }
+        }
+
+        // 如果找不到对应的奖项，使用随机索引
+        if (itemIndex == -1)
+        {
+            await _popupService.EnqueueSnackbarAsync("抽奖失败", "找不到对应的奖项", AlertTypes.Error);
+            return;
+        }
+        else
+        {
+            // 将奖项索引转换为动画序列中的索引
+            _targetIndex = itemIndex;
+            // 确保目标索引在动画序列中
+            if (!_animationSequence.Contains(_targetIndex))
+            {
+                await _popupService.EnqueueSnackbarAsync("抽奖失败", "找不到对应的奖项", AlertTypes.Error);
+                return;
+            }
+        }
+
+        _currentSpeed = _minSpeed; // 从最慢速度开始
+        _animationCount = 0;
+        _activeIndex = -1; // 重置 active 状态
+        _sequenceIndex = -1; // 重置顺序索引
+
+        // 创建一个只执行一次的定时器
+        _animationTimer = new Timer(UpdateAnimation, null, 0, Timeout.Infinite);
+    }
+
+    private async void UpdateAnimation(object state)
+    {
+        if (!_isAnimating) return;
+
+        _animationCount++;
+
+        // 更新当前激活的格子，使用自定义顺序
+        _sequenceIndex = (_sequenceIndex + 1) % _animationSequence.Length;
+        _activeIndex = _animationSequence[_sequenceIndex];
+
+        // 计算动画速度
+        if (_animationCount < _totalAnimationCount / 3)
+        {
+            // 第一阶段：加速（减小间隔时间）
+            _currentSpeed = Math.Max(_maxSpeed, _currentSpeed - 5);
+        }
+        else if (_animationCount < _totalAnimationCount * 2 / 3)
+        {
+            // 第二阶段：保持高速
+            _currentSpeed = _maxSpeed;
+        }
+        else
+        {
+            // 第三阶段：减速（增加间隔时间）
+            _currentSpeed = Math.Min(_minSpeed, _currentSpeed + 5);
+        }
+
+        // 检查是否到达目标
+        if (_animationCount >= _totalAnimationCount)
+        {
+            // 计算剩余的轮数，使动画在目标位置停止
+            int targetSequenceIndex = Array.IndexOf(_animationSequence, _targetIndex);
+            int currentSequenceIndex = _sequenceIndex;
+
+            // 如果当前位置已经超过了目标位置，则需要再转一圈才能到达目标
+            if (currentSequenceIndex >= targetSequenceIndex)
+            {
+                targetSequenceIndex += _animationSequence.Length;
+            }
+
+            // 计算还需要移动几步
+            int stepsToTarget = targetSequenceIndex - currentSequenceIndex;
+
+            // 如果已经在目标位置，则结束动画
+            if (stepsToTarget == 0 || _activeIndex == _targetIndex)
+            {
+                _isAnimating = false;
+                _animationTimer.Dispose();
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            // 否则继续移动直到到达目标位置
+            // 最后阶段，减速更明显
+            _currentSpeed = _minSpeed;
+        }
+
+        await InvokeAsync(StateHasChanged);
+
+        // 停止当前定时器并重新设置
+        // 设置下一次触发的时间间隔为_currentSpeed，而不是立即触发
+        _animationTimer.Change(_currentSpeed, Timeout.Infinite);
+    }
+
+    public void OnClickRules()
+    {
+        if (rulesDialog != null)
+        {
+            rulesDialog.Refresh();
+        }
+    }
+
+
+    public void OnClickPrizes()
+    {
+        if (prizesDialog != null)
+        {
+            prizesDialog.Refresh();
+        }
+    }
+
+
+
+    public void Dispose()
+    {
+        _animationTimer?.Dispose();
+    }
+}

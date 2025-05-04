@@ -1,0 +1,44 @@
+﻿@page "/lottery"
+
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<PageTitle>CNGAL线上展示会 - 预约抽奖</PageTitle>
+
+<div class="lottery-page">
+    <div class="cngal-card">
+        <span>『</span>
+        <span>
+            大概是一段引导用语，让大家积极参与到抽奖活动中<br />
+            让大伙看了之后都非常感动
+
+        </span>
+        <span>』</span>
+    </div>
+    <div class="booking-card">
+        <CnGalWebSite.Expo.Components.Cards.Lotteries.GridCard Model="Model" OnChanged="OnChanged" />
+        <CnGalWebSite.Expo.Components.Cards.Lotteries.TasksCard Model="Model" OnChanged="OnChanged" />
+    </div>
+</div>
+
+@code {
+    ExpoUserTaskModel Model = new ExpoUserTaskModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnChanged();
+    }
+
+    public async Task OnChanged()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<ExpoUserTaskModel>("api/expo/GetUserTask");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // await _popupService.EnqueueSnackbarAsync("获取用户任务失败", ex.Message, AlertTypes.Error);
+        }
+    }
+}
