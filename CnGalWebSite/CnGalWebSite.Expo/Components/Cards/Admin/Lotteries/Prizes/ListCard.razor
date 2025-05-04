@@ -1,0 +1,65 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoPrizeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ExpoPrizeOverviewModel.DrawTime))
+        {
+            <span>@(context.Item.DrawTime == DateTime.MinValue ? "未分配" : context.Item.DrawTime.ToString("yyyy-MM-dd HH:mm"))</span>
+        }
+        else if (context.Header.Value == nameof(ExpoPrizeOverviewModel.UserId))
+        {
+            @if (!string.IsNullOrEmpty(context.Item.UserId))
+            {
+                <UserChip UserId="@context.Item.UserId" UserName="@context.Item.UserName"/>
+            }
+            else
+            {
+                <span>未分配</span>
+            }
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Class="me-4" Text="刷新" Icon="mdi-refresh" OnClick="OnRefresh" />
+    </ButtonContent>
+
+</CnGalWebSite.Components.DataTables.DataTableCard>
+
+@code {
+    private string _baseUrl = "api/expo/listprize";
+    private string _name = "奖品";
+
+    private List<DataTableHeader<ExpoPrizeOverviewModel>> _headers = new List<DataTableHeader<ExpoPrizeOverviewModel>>
+    {
+        new ()
+        {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoPrizeOverviewModel.Id)
+        },
+        new (){ Text= "奖品内容", Value= nameof(ExpoPrizeOverviewModel.Content)},
+        new (){ Text= "所属奖项", Value= nameof(ExpoPrizeOverviewModel.AwardName), Sortable=false},
+        new (){ Text= "中奖用户", Value= nameof(ExpoPrizeOverviewModel.UserId), Sortable=false},
+        new (){ Text= "抽奖时间", Value= nameof(ExpoPrizeOverviewModel.DrawTime), Sortable=false}
+    };
+
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoPrizeOverviewModel> dataTableCard;
+
+    protected override void OnInitialized()
+    {
+         OnRefresh();
+    }
+
+    public void OnRefresh()
+    {
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+}

@@ -1,0 +1,132 @@
+﻿@inject IHttpService _httpService
+@inject NavigationManager NavigationManager
+@inject IPopupService _popupService
+
+
+<MDialog @bind-Value="Dialog"
+         Width="700">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            绑定Steam账号
+        </MCardTitle>
+        <MCardText>
+            绑定后可以同步Steam库存
+        </MCardText>
+
+        <MCardText Class="pt-0">
+            <CnGalWebSite.Components.Buttons.MasaButton Text="添加" IsAsync="true" OnClick="OnClickAdd" Icon="mdi-plus" Rounded />
+            <MSimpleTable Class="mb-4">
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            SteamId
+                        </th>
+                        <th class="text-left">
+                            操作
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SteamIds)
+                    {
+                        <tr @key="item">
+                            <td style="min-width: 50px; ">@item</td>
+                            <td>
+                                <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>DeleteOther(item))" Icon="mdi-trash-can" Color="error" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </MSimpleTable>
+            <MAlert Type="AlertTypes.Info" Outlined Color="primary">
+                Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦，<a href="/articles/index/5" class="primary--text fw-bold">点击阅读教程</a>
+            </MAlert>
+        </MCardText>
+        <MCardText Class="d-flex pt-0">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Components.Buttons.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-content-save" Rounded />
+        </MCardText>
+    </MCard>
+</MDialog>
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> OnChanged { get; set; }
+
+    public EditUserDataViewModel Model = new EditUserDataViewModel();
+
+    bool Dialog { get; set; }
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _httpService.GetAsync<EditUserDataViewModel>("api/space/EditUserData");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取编辑用户信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
+            foreach (var item in Model.SteamIds)
+            {
+                if (regex.IsMatch(item) == false)
+                {
+                    await _popupService.EnqueueSnackbarAsync("编辑用户Steam信息失败", "SteamId需为64位纯数字", AlertTypes.Error);
+                    return;
+                }
+            }
+
+            var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/EditUserData", Model);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await _popupService.EnqueueSnackbarAsync("编辑用户Steam信息失败", obj.Error ?? "参数不符合要求", AlertTypes.Error);
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync("编辑用户Steam信息成功", "编辑用户Steam信息成功", AlertTypes.Error);
+                Dialog = false;
+                StateHasChanged();
+                await OnChanged.InvokeAsync(string.Join(",", Model.SteamIds));
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("编辑用户Steam信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public void OnClickAdd()
+    {
+        var returnUrl = $"{NavigationManager.BaseUri}bind-steam/{ToolHelper.Base64EncodeUrl(NavigationManager.Uri)}/";
+        NavigationManager.NavigateTo($"https://steamcommunity.com/openid/login?openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.realm={NavigationManager.BaseUri}&openid.return_to={returnUrl}&openid.ns.ax=http%3A%2F%2Fopenid.net%2Fsrv%2Fax%2F1.0&openid.ax.mode=fetch_request&openid.ax.type.email=http%3A%2F%2Faxschema.org%2Fcontact%2Femail&openid.ax.type.name=http%3A%2F%2Faxschema.org%2FnamePerson&openid.ax.type.first=http%3A%2F%2Faxschema.org%2FnamePerson%2Ffirst&openid.ax.type.last=http%3A%2F%2Faxschema.org%2FnamePerson%2Flast&openid.ax.type.email2=http%3A%2F%2Fschema.openid.net%2Fcontact%2Femail&openid.ax.type.name2=http%3A%2F%2Fschema.openid.net%2FnamePerson&openid.ax.type.first2=http%3A%2F%2Fschema.openid.net%2FnamePerson%2Ffirst&openid.ax.type.last2=http%3A%2F%2Fschema.openid.net%2FnamePerson%2Flast&openid.ax.required=email,name,first,last,email2,name2,first2,last2");
+
+    }
+
+    public void Refresh(bool dialog)
+    {
+        Dialog = dialog;
+        StateHasChanged();
+
+    }
+
+    public void DeleteOther(string steamId)
+    {
+        Model.SteamIds.Remove(steamId);
+        StateHasChanged();
+    }
+
+
+}

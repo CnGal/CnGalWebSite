@@ -18,6 +18,7 @@
     <ProjectReference Include="..\CnGalWebSite.Components\CnGalWebSite.Components.csproj" />
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
     <ProjectReference Include="..\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
   </ItemGroup>
 
 </Project>

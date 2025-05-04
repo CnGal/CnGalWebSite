@@ -1,0 +1,43 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ExpoTaskOverviewModel.UserId))
+        {
+            <UserChip UserId="@context.Item.UserId" UserName="@context.Item.UserName"/>
+        }
+        else if (context.Header.Value == nameof(ExpoTaskOverviewModel.Type))
+        {
+            @context.Item.Type.GetDisplayName()
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</CnGalWebSite.Components.DataTables.DataTableCard>
+
+
+@code {
+    private string _baseUrl = "api/expo/listtask";
+    private string _name = "任务";
+
+    private List<DataTableHeader<ExpoTaskOverviewModel>> _headers = new List<DataTableHeader<ExpoTaskOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoTaskOverviewModel.Id)
+          },
+          new (){ Text= "用户", Value= nameof(ExpoTaskOverviewModel.UserId),Sortable=false},
+          new (){ Text= "类型", Value= nameof(ExpoTaskOverviewModel.Type),Sortable=false},
+          new (){ Text= "时间", Value= nameof(ExpoTaskOverviewModel.Time)},
+          new (){ Text= "抽奖次数", Value= nameof(ExpoTaskOverviewModel.LotteryCount)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoTaskOverviewModel> dataTableCard;
+}

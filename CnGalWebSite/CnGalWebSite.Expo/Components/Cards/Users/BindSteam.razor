@@ -1,0 +1,63 @@
+﻿@page "/bind-steam/{returnurl}"
+
+@inject NavigationManager NavigationManager
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+
+@code {
+    [SupplyParameterFromQuery(Name = "openid.claimed_id")]
+    [Parameter]
+    public string openid_claimed_id { get; set; }
+
+    [Parameter]
+    public string returnurl { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(openid_claimed_id))
+                {
+                    throw new Exception("openid.claimed_id 为空");
+                }
+                var model = await _httpService.GetAsync<EditUserDataViewModel>("api/space/EditUserData");
+
+                var ids = openid_claimed_id.Split("/");
+                if (ids.Length < 2)
+                {
+                    throw new Exception("openid.claimed_id 格式不正确");
+                }
+
+                if (model.SteamIds.Any(s => s == ids.Last()))
+                {
+
+                    throw new Exception("SteamId已绑定");
+
+                }
+
+                model.SteamIds.Add(ids.Last());
+
+                var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/EditUserData", model);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    throw new Exception(obj.Error);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo(ToolHelper.Base64DecodeUrl(returnurl));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await _popupService.EnqueueSnackbarAsync("绑定Steam失败", ex.Message, AlertTypes.Error);
+                NavigationManager.NavigateTo(ToolHelper.Base64DecodeUrl(returnurl));
+                return;
+            }
+        }
+    }
+}

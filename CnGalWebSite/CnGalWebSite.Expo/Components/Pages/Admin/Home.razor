@@ -12,7 +12,13 @@
              <MTab Value="2">
                 标签<MIcon>mdi-tag-multiple</MIcon>
              </MTab>
-         </MTabs>
+            <MTab Value="3">
+                任务<MIcon>mdi-calendar-check</MIcon>
+            </MTab>
+            <MTab Value="4">
+                奖品<MIcon>mdi-gift</MIcon>
+            </MTab>
+        </MTabs>
     </MCard>
 
     <MTabsItems @bind-Value="TabIndex">
@@ -21,6 +27,14 @@
         </MTabItem>
         <MTabItem Value="2">
             <CnGalWebSite.Expo.Components.Cards.Admin.Tags.ListCard/>
+        </MTabItem>
+        <MTabItem Value="3">
+            <CnGalWebSite.Expo.Components.Cards.Admin.Lotteries.ListCard />
+        </MTabItem>
+        <MTabItem Value="4">
+            <CnGalWebSite.Expo.Components.Cards.Admin.Lotteries.Awards.ListCard />
+            <div class="mb-4"></div>
+            <CnGalWebSite.Expo.Components.Cards.Admin.Lotteries.Prizes.ListCard/>
         </MTabItem>
     </MTabsItems>
 </div>

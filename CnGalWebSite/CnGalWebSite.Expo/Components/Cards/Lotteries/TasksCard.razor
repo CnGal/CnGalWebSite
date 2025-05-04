@@ -1,0 +1,216 @@
+﻿@inject NavigationManager Navigation
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject IJSRuntime JS;
+
+<div class="lottery-tasks-card">
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                预约CnGal十周年庆直播
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">×1</div>
+                </div>
+                @if (Model.IsBooking)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickBooking">
+                        去完成
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                晒出Steam游戏库
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">×1</div>
+                </div>
+                @if (Model.IsPickUpSharedGames)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    @if (Model.IsSharedGames)
+                    {
+                        <div class="action-card" @onclick="@OnClickShareGames">
+                            去完成
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="action-card" @onclick="@OnClickOpenShareGames">
+                            去完成
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                每日签到
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">×1</div>
+                </div>
+                @if (Model.IsSignIn)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickSignIn">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<AuthorizeView>
+    <Authorized>
+        <CnGalWebSite.Expo.Components.Cards.Users.EditUserSteamInforTip @ref="editUserSteamInforTip" />
+    </Authorized>
+</AuthorizeView>
+@code {
+    [Parameter]
+    public ExpoUserTaskModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
+    CnGalWebSite.Expo.Components.Cards.Users.EditUserSteamInforTip editUserSteamInforTip;
+
+    public void OnEditSteam()
+    {
+        editUserSteamInforTip?.Refresh(true);
+    }
+
+
+    public async Task<bool> CheckLogin()
+    {
+        if (AuthState == null)
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        else
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
+    }
+
+    public async Task FinshTask(ExpoTaskType type)
+    {
+        try
+        {
+            var ret = await _httpService.PostAsync<ExpoFinshTaskModel, Result>("api/expo/UserFinshTask", new ExpoFinshTaskModel
+                {
+                    Type = type
+                });
+            if (ret.Successful == false)
+            {
+                await _popupService.EnqueueSnackbarAsync("完成用户任务失败", ret.Error, AlertTypes.Error);
+                return;
+            }
+
+            await OnChanged.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("完成用户任务失败", ex.Message, AlertTypes.Error);
+            return;
+        }
+    }
+
+    public async Task OnClickBooking()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsBooking)
+        {
+            return;
+        }
+
+        await JS.InvokeVoidAsync("window.open", "https://space.bilibili.com/145239325", "_blank");
+
+        await FinshTask(ExpoTaskType.Booking);
+    }
+
+    public async Task OnClickShareGames()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsPickUpSharedGames)
+        {
+            return;
+        }
+        await FinshTask(ExpoTaskType.ShareGames);
+    }
+
+    public async Task OnClickOpenShareGames()
+    {
+        // 判断是否已经绑定Steam账号
+        var model = await _httpService.GetAsync<EditUserDataViewModel>("api/space/EditUserData");
+        if (model.SteamIds.Count == 0)
+        {
+            OnEditSteam();
+            return;
+        }
+
+        await OnClickShareGames();
+    }
+
+    public async Task OnClickSignIn()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsSignIn)
+        {
+            return;
+        }
+        await FinshTask(ExpoTaskType.SignIn);
+    }
+}

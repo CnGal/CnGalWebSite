@@ -1,0 +1,24 @@
+﻿@foreach (var item in Items.Skip(Skip).Take(Take))
+{
+    var active = ActiveIndex == Items.IndexOf(item);
+    <div class="prize-card @(active ? "active" : "")">
+        <div>
+            @if (string.IsNullOrWhiteSpace(item.Image) == false)
+            {
+                <CnGalWebSite.Expo.Components.Cards.Home.ImageButtonCard Image="@item.Image" Name="@item.Name" Url="@item.Url" />
+            }
+            <div class="name-card">@item.Name ×1</div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<ExpoAwardOverviewModel> Items { get; set; }
+    [Parameter]
+    public int ActiveIndex { get; set; }
+    [Parameter]
+    public int Take { get; set; }
+    [Parameter]
+    public int Skip { get; set; }
+}

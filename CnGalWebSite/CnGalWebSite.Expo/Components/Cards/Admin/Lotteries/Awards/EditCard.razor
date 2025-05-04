@@ -1,0 +1,240 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="600">
+    @if (Model == null)
+    {
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    }
+    else
+    {
+        <MCardTitle>
+            @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}")  @Model.Name
+        </MCardTitle>
+        <MCardText Class="ot-0 pb-0">
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow Dense>
+                <MCol Cols="6">
+                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.Image" ShowCropper Class="mb-4"
+                                                                 Type="DrawingBed.Models.DataModels.ImageAspectType._16_9"
+                                                                 Text="上传图片" Gallery />
+                </MCol>
+                <MCol Cols="12"></MCol>
+                <MCol Cols="6">
+                    <MTextField HideDetails="true" @bind-Value="@Model.Name" Label="名称" />
+                </MCol>
+                <MCol Cols="6">
+                    <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="@Model.Type" TValue="ExpoAwardType" Label="类型" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextField @bind-Value="@Model.Url" Label="链接" />
+                </MCol>
+  
+                @if (Model.Type == ExpoAwardType.NoEntry)
+                {
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@Model.Count" Label="数量" />
+                    </MCol>
+                }
+                else
+                {
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="奖品列表" Dense />
+                    </MCol>
+                    <MCol Cols="12">
+                        <MSimpleTable>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Id
+                                    </th>
+                                    <th >
+                                        奖品内容
+                                    </th>
+                                    <th>
+                                        已分配
+                                    </th>
+                                    <th>
+                                        操作
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Prizes)
+                                {
+                                    <tr @key="Model.Prizes.IndexOf(item)">
+                                        <td>@item.Id</td>
+                                        <td>@item.Content</td>
+                                        <td>@(item.Allocated?"✅":"")</td>
+                                        <td>
+                                            <MButton Icon Color="success" Small OnClick="() => EditPrize(item)">
+                                                <MIcon>mdi-pencil</MIcon>
+                                            </MButton>
+                                            <MButton Icon Color="error" Small OnClick="() => DeletePrize(item)">
+                                                <MIcon>mdi-delete</MIcon>
+                                            </MButton>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </MSimpleTable>
+                    </MCol>
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Text="添加奖品" OnClick="() => AddPrize()" Icon="mdi-plus" />
+                    </MCol>
+                }
+            </MRow>
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary" Rounded OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    }
+</MDialog>
+
+<MDialog @bind-Value="_prizeEditDialog"
+         MaxWidth="400">
+    @if (_currentPrize != null)
+    {
+        <MCardTitle>
+            @(_currentPrize.Id == 0 ? "添加奖品" : "编辑奖品")
+        </MCardTitle>
+        <MCardText>
+            <MRow Dense>
+                <MCol Cols="12">
+                    <MTextField HideDetails="true" @bind-Value="@_currentPrize.Content" Label="奖品内容" />
+                </MCol>
+            </MRow>
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary" Rounded OnClick="SavePrizeEdit">
+                <MIcon Left>mdi-check</MIcon>
+                确定
+            </MButton>
+        </MCardActions>
+    }
+</MDialog>
+
+@code {
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+    [Parameter]
+    public List<string> GameNames { get; set; }
+    [Parameter]
+    public List<string> TagNames { get; set; }
+
+    ExpoAwardEditModel Model = new();
+
+    private string _baseUrl = "api/expo/";
+    private string _name = "奖项";
+
+    private bool _editDialog;
+    private bool _prizeEditDialog;
+    private ExpoPrizeEditModel _currentPrize;
+    private bool _isAddingNewPrize;
+    private ExpoPrizeEditModel _editingPrize;
+
+    private string GetDisplayName(ExpoAwardType type)
+    {
+        var field = typeof(ExpoAwardType).GetField(type.ToString());
+        var attribute = field.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                            .Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>()
+                            .FirstOrDefault();
+
+        return attribute?.Name ?? type.ToString();
+    }
+
+    public async Task Refresh(long id)
+    {
+        try
+        {
+            _editDialog = true;
+            Model = null;
+            StateHasChanged();
+            Model = id == 0 ? new ExpoAwardEditModel() : await _httpService.GetAsync<ExpoAwardEditModel>($"{_baseUrl}editaward?id={id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync($"获取{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<ExpoAwardEditModel, Result>($"{_baseUrl}editaward", Model);
+            if (result.Successful)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    await _popupService.EnqueueSnackbarAsync(result.Error, AlertTypes.Success);
+                }
+                _editDialog = false;
+                await OnEdited.InvokeAsync();
+                StateHasChanged();
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync(Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private void AddPrize()
+    {
+        _currentPrize = new ExpoPrizeEditModel();
+        _isAddingNewPrize = true;
+        _editingPrize = null;
+        _prizeEditDialog = true;
+    }
+
+    private void EditPrize(ExpoPrizeEditModel prize)
+    {
+        _editingPrize = prize;
+        _currentPrize = new ExpoPrizeEditModel
+            {
+                Id = prize.Id,
+                Content = prize.Content
+            };
+        _isAddingNewPrize = false;
+        _prizeEditDialog = true;
+    }
+
+    private void DeletePrize(ExpoPrizeEditModel prize)
+    {
+        Model.Prizes.Remove(prize);
+    }
+
+    private void SavePrizeEdit()
+    {
+        if (_isAddingNewPrize)
+        {
+            // 添加新奖品
+            Model.Prizes.Add(_currentPrize);
+        }
+        else
+        {
+            // 更新现有奖品
+            if (_editingPrize != null)
+            {
+                _editingPrize.Content = _currentPrize.Content;
+            }
+        }
+        _prizeEditDialog = false;
+    }
+}
