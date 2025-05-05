@@ -1,0 +1,17 @@
+﻿[
+  {
+    "outputFileName": "wwwroot/js/bundle.js",
+    "inputFiles": [
+      "wwwroot/js/lottery.js",
+      "wwwroot/js/app.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bundle.css",
+    "inputFiles": [
+      "wwwroot/css/app.css",
+      "wwwroot/css/lottery.css",
+      "wwwroot/css/mobile.css",
+    ]
+  }
+]

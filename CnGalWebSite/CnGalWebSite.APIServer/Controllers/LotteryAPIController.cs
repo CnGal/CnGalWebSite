@@ -738,14 +738,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
             try
             {
-                await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                var number = await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                return new Result { Successful = true, Error = number.ToString() };
             }
             catch (Exception ex)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
 
-            return new Result { Successful = true };
+
         }
 
         [Authorize(Roles = "Admin")]

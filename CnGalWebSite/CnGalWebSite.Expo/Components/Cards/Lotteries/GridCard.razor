@@ -23,8 +23,10 @@
             </div>
 
             <div class="action-card" @onclick="OnClickStart">
-                <div class="go-card">GO</div>
-                <div class="text-card">参加抽奖</div>
+                <div>
+                    <div class="go-card">GO</div>
+                    <div class="text-card">参加抽奖</div>
+                </div>
             </div>
             <div class="grid-col-card">
                 <GridPrizeCard Items="_items" Skip="4" Take="1" ActiveIndex="_activeIndex" />
@@ -209,6 +211,7 @@
             return;
         }
 
+        await OnChanged.InvokeAsync();
 
         _isAnimating = true;
 

@@ -1,0 +1,237 @@
+﻿@media (max-width: 960px) {
+    .home-head-card .image-card {
+        flex-direction: column;
+    }
+
+        .home-head-card .image-card img:first-child, .home-head-card .image-card img:nth-child(2) {
+            width: 100%;
+        }
+
+    .home-head-card .post-card div:nth-child(1) {
+        font-size: inherit;
+    }
+
+    .home-head-card .post-card div:nth-child(2) {
+        font-size: small;
+    }
+
+    .home-head-card .post-card .button-card {
+        padding: .3rem 1rem;
+    }
+
+    .cngal-card {
+        padding: 2rem 1rem;
+    }
+
+        .cngal-card span:nth-child(1) {
+            font-size: x-large;
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .cngal-card span:nth-child(2) {
+            font-size: larger;
+        }
+
+        .cngal-card span:nth-child(3) {
+            font-size: x-large;
+            padding-left: 0;
+            width: 100%;
+            text-align: right;
+        }
+
+    .home-brief-card .actions-card {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .home-brief-card .content-card {
+        padding: 2rem 0;
+    }
+
+    .home-brief-card {
+        padding: 0 2rem;
+    }
+
+    .image-button-card img {
+        object-fit: cover;
+    }
+
+    .home-brief-card .actions-card .image-button-card {
+        height: 5rem;
+    }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(1) {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(2) {
+            border-radius: 0;
+        }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(3) {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+    .image-button-card .name-card {
+        font-size: x-large;
+    }
+
+    .home-brief-card .actions-card {
+        gap: 2px;
+    }
+
+    .home-brief-card .text-card {
+        font-size: large;
+    }
+
+    .home-brief-card .image-card {
+        width: 100%;
+    }
+
+    .home-sponsors-card .items-card {
+        flex-direction: column;
+        gap: 0;
+        row-gap: 1rem;
+
+    }
+    .home-sponsors-card .image-button-card{
+        width:100%;
+    }
+    .media-partners-card .items-card {
+        flex-direction: row;
+    }
+    .home-sponsors-card .media-partners-card .image-button-card {
+        width: 48%;
+    }
+    .home-sponsors-card .sponsors-card, .home-sponsors-card .media-partners-card {
+        width: 100%;
+        padding: 0 2rem;
+    }
+    .game-random-card .action-card {
+        justify-content: center;
+        padding-right:0;
+    }
+    .game-random-card .content-card {
+        padding: 0;
+    }
+        .game-random-card .content-card .game-item-card {
+            min-width: 120px;
+            max-width: 120px;
+        }
+    .game-item-card .name-card {
+        word-break: break-all;
+        white-space: pre-wrap;
+        font-size: small;
+        font-weight:inherit;
+    }
+    .game-item-card {
+        justify-content: space-evenly;
+    }
+    .games-page .tag-list-card {
+        padding: 0 1rem 2rem 1rem;
+         width: 100%;
+        gap: 1rem;
+    }
+        .games-page .tag-list-card > div {
+            font-size: inherit;
+            padding: .1rem 1rem;
+        }
+    .game-item-card .name-card{
+        font-size:inherit;
+    }
+    .user-info-card {
+         padding: 0; 
+         width: 100%;
+    }
+    .lottery-page .cngal-card span:nth-child(1) {
+        padding: 0;
+    }
+    .lottery-page .cngal-card span:nth-child(3) {
+        padding: 0;
+    }
+    .lottery-grid-card .prize-card .name-card {
+        font-size: x-small;
+    }
+    .lottery-grid-card .prize-card{
+        aspect-ratio:inherit;
+    }
+    .lottery-grid-card .grid-col-card .prize-card {
+        min-height: 100%;
+    }
+    .lottery-grid-card .lottery-content-card {
+        padding: 2px
+    }
+    .lottery-grid-card .prize-card {
+        padding: 2px;
+    }
+        .lottery-grid-card .prize-card > div {
+            padding: 2px;
+        }
+        .lottery-grid-card .prize-card .image-button-card {
+            border-radius: 4px;
+        }
+    .lottery-page .lottery-tasks-card .task-card .action-card {
+        padding: .5rem 1rem;
+        font-size:inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card .content-card {
+        gap: 1rem;
+    }
+        .lottery-page .lottery-tasks-card .task-card .content-card i {
+            font-size: 24px;
+            padding: .5rem;
+        }
+    .lottery-page .lottery-tasks-card .task-card .count-card {
+        width: 44px;
+        left: 2px;
+        font-size: inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card > div {
+        padding: .5rem .5rem;
+    }
+    .lottery-page .lottery-tasks-card .task-card .name-card{
+        font-size:inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card > div {
+        background-size: calc(100% - 100px) 100%;
+    }
+    .lottery-anniversary-card .brief-card {
+        white-space: pre-wrap;
+        text-align: center;
+    }
+    .slotMachine-box {
+        transform: scale(0.45) translate(-500px, -200px);
+    }
+
+    .lottery-anniversary-card {
+        width: 100%;
+        overflow: hidden;
+    }
+        .lottery-anniversary-card .number-card {
+            height:200px;
+            overflow: hidden;
+        }
+        .lottery-anniversary-card .brief-card {
+            padding-bottom: 0rem;
+        }
+    .lottery-page .title-card {
+        padding-bottom: 1rem;
+    }
+    .lottery-anniversary-card .award-card {
+        width: 48%;
+    }
+    .lottery-anniversary-card .award-list-card {
+        gap: 0;
+        row-gap: 1rem;
+        padding-top: 2rem;
+    }
+    .lottery-anniversary-card .award-card > div {
+        justify-content: space-evenly;
+    }
+   .contact-card .title-card {
+        padding: 2rem;
+    }
+}

@@ -10,13 +10,14 @@
             <div class="text-card">@Model.PersonalSignature</div>
         </div>
     </div>
-    <MDivider></MDivider>
+    <div class="divid-card"></div>
     <div class="action-card">
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <CnGalWebSite.Components.Buttons.MasaButton Text="管理员后台" Icon="mdi-key-variant" TextStyle Href="/admin" OnClick="OnClick" />
             </Authorized>
         </AuthorizeView>
+        <CnGalWebSite.Components.Buttons.MasaButton Text="编辑个人资料" Icon="mdi-pencil" TextStyle Href="@($"https://app.cngal.org/space/editdata/{Model.Id}")"/>
         <form action="authentication/logout" method="post">
             <AntiforgeryToken />
             <input type="hidden" name="ReturnUrl" value="@currentUrl" />

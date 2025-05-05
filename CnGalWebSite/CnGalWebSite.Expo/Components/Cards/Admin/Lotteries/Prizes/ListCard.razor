@@ -2,7 +2,7 @@
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoPrizeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoPrizeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard" ShowAddButton="false">
     <ItemColContent>
         @if (context.Header.Value == nameof(ExpoPrizeOverviewModel.DrawTime))
         {

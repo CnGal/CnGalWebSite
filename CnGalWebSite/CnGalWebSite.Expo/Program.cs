@@ -11,6 +11,8 @@ using CnGalWebSite.Core.Services;
 using CnGalWebSite.Expo.Services;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.Helper.Services;
+using Microsoft.AspNetCore.HttpOverrides;
+using Blazored.LocalStorage;
 
 const string CNGAL_OIDC_SCHEME = "cngal";
 
@@ -225,6 +227,16 @@ builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 //本地化
 builder.Services.AddLocalization();
 
+//添加真实IP
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
+//本地储存
+builder.Services.AddBlazoredLocalStorage();
+
 var app = builder.Build();
 
 // 设置请求来源
@@ -243,6 +255,12 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+//转发Ip
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseHttpsRedirection();
 

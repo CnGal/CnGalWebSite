@@ -15,7 +15,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
         Task ClearLottery(long id);
 
-        Task AddUserToLottery(Lottery lottery, ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification);
+        Task<int> AddUserToLottery(Lottery lottery, ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification);
 
         Task CopyUserFromBookingToLottery(Booking booking, Lottery lottery);
 

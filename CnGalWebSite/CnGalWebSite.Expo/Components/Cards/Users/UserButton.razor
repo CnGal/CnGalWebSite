@@ -4,33 +4,43 @@
 
 @if (Model != null)
 {
-    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
-        <ActivatorContent Context="m">
-            <MTooltip Bottom>
-                <ActivatorContent Context="c">
-                    @{
-                        var attrs = new Dictionary<string, object>();
-                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                    }
-                    <MButton Icon @attributes="@attrs" Class="user-button">
-                        <img src="@Model.PhotoPath" alt="@Model.Name" />
-                    </MButton>
-                </ActivatorContent>
-                <ChildContent>
-                    <span>@Model.Name</span>
-                </ChildContent>
-            </MTooltip>
-        </ActivatorContent>
+    @if (App)
+    {
+        <UserInforCard Model="@Model" OnClick="OnClosed" />
+    }
+    else
+    {
+        <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+            <ActivatorContent Context="m">
+                <MTooltip Bottom>
+                    <ActivatorContent Context="c">
+                        @{
+                            var attrs = new Dictionary<string, object>();
+                            m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                            c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        }
+                        <MButton Icon @attributes="@attrs" Class="user-button">
+                            <img src="@Model.PhotoPath" alt="@Model.Name" />
+                        </MButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <span>@Model.Name</span>
+                    </ChildContent>
+                </MTooltip>
+            </ActivatorContent>
 
-        <ChildContent>
-            <UserInforCard Model="@Model" OnClick="OnClosed" />
-        </ChildContent>
-    </MMenu>
+            <ChildContent>
+                <UserInforCard Model="@Model" OnClick="OnClosed" />
+            </ChildContent>
+        </MMenu>
+    }
 }
 
 
 @code {
+    [Parameter]
+    public bool App { get; set; }
+
     UserInforViewModel Model;
     bool menu;
 

@@ -6,7 +6,6 @@
     <MCardTitle>
         我的奖品
     </MCardTitle>
-
     <MCardText>
 
 
@@ -45,14 +44,11 @@
                 </tbody>
             </MSimpleTable>
         }
-        <div class="d-flex align-center">
-            <MSpacer></MSpacer>
-            <MButton Small Text OnClick="LoadPrizes" Color="primary" Class="mr-2">
-                <MIcon Left>mdi-refresh</MIcon>
-                刷新
-            </MButton>
-        </div>
     </MCardText>
+    <MCardActions Class="pa-4 pt-0">
+        <MSpacer></MSpacer>
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-refresh" Text="刷新" OnClick="LoadPrizes" TextStyle />
+    </MCardActions>
 </MDialog>
 
 @code {

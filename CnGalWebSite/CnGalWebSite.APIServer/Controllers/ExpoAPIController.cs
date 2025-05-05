@@ -402,7 +402,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsSharedGames = string.IsNullOrWhiteSpace(user.SteamId) == false,
                 IsSignIn = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
                 IsBooking = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking),
-                LotteryCount = await _expoTaskRepository.GetAll().SumAsync(s => s.LotteryCount)
+                LotteryCount = await _expoTaskRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.LotteryCount)
             };
 
             return model;
