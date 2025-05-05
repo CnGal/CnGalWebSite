@@ -1,0 +1,152 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager Navigation
+
+<div class="lottery-anniversary-card">
+    <div class="title-card">
+        <span>CnGal十周年庆直播抽奖</span>
+    </div>
+    <div class="brief-card">
+        点击下方按钮抽取幸运号码，CnGal十周年庆将于8月2日19点在B站直播间 • <a href="https://live.bilibili.com/4622426" target="_blank">4622426</a> 进行抽奖。更多精彩奖品，敬请期待！
+    </div>
+    <div class="number-card">
+        <LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnClickStart" />
+    </div>
+    @if (ViewModel != null)
+    {
+        <div class="title-card">
+            <span>奖品一览</span>
+        </div>
+        <div class="award-list-card">
+            @foreach (var item in ViewModel.Awards)
+            {
+                <div class="award-card">
+                    <div>
+                        <img src="@item.Image" alt="@item.Name" />
+                        <div class="content-card">
+                            <div class="name-card">
+                                <strong>@item.Name</strong>    ×@item.Count
+                            </div>
+                            <div class="sponsor-card">
+                                赞助商：<strong>@item.Sponsor</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
+    LotteryViewModel ViewModel;
+    UserLotteryStateModel StateModel;
+
+    LotteryAnimationCard lotteryAnimationCard;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
+
+    bool isDrawing;
+    long _lotteryId = 3;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            ViewModel = await _httpService.GetAsync<LotteryViewModel>("api/lotteries/GetLotteryView/" + _lotteryId);
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取抽奖信息失败", ex.Message, AlertTypes.Error);
+        }
+
+
+        var user = await AuthState;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                StateModel = await _httpService.GetAsync<UserLotteryStateModel>("api/lotteries/GetUserLotteryState/" + _lotteryId);
+                await lotteryAnimationCard.Roll(StateModel.Number);
+            }
+            catch (Exception ex)
+            {
+                await _popupService.EnqueueSnackbarAsync("获取用户抽奖状态失败", ex.Message, AlertTypes.Error);
+            }
+        }
+        StateHasChanged();
+    }
+
+    public async Task<int?> ParticipateInLottery()
+    {
+        // 尝试参与抽奖
+        try
+        {
+            var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+                {
+                    Id = _lotteryId,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+                });
+            if (obj.Successful)
+            {
+                if (int.TryParse(obj.Error, out int number) == false)
+                {
+                    await _popupService.EnqueueSnackbarAsync("参与抽奖失败", "获取号码失败", AlertTypes.Error);
+                    return null;
+                }
+                else
+                {
+                    return number;
+                }
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync("参与抽奖失败", obj.Error, AlertTypes.Error);
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("参与抽奖失败", ex.Message, AlertTypes.Error);
+            return null;
+        }
+    }
+
+    public async Task OnClickStart()
+    {
+        if (isDrawing)
+        {
+            return;
+        }
+        isDrawing = true;
+
+        var number = await ParticipateInLottery();
+
+        if (number == null)
+        {
+            isDrawing = false;
+            return;
+        }
+
+
+        //展示动画
+        if (lotteryAnimationCard != null)
+        {
+            await lotteryAnimationCard.Roll(number.Value);
+        }
+        await Task.Delay(1000);
+
+        isDrawing = false;
+    }
+}

@@ -1,4 +1,4 @@
-﻿h1:focus {
+h1:focus {
     outline: none;
 }
 
@@ -121,11 +121,11 @@
 }
 
 .user-info-card {
-    display: inline-grid;
-    align-items: center;
+    display: flex;
     padding: 1rem;
     width: 300px;
     gap: .5rem;
+    flex-direction: column;
 }
 
     .user-info-card .head-card {
@@ -715,17 +715,21 @@
 
     .lottery-grid-card .action-card {
         width: 33%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-image: var(--background-image-primary);
-        border-radius: 50%;
-        color: white;
-        cursor: pointer;
-    }
 
-        .lottery-grid-card .action-card div:nth-child(1) {
+    }
+        .lottery-grid-card .action-card > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: var(--background-image-primary);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            aspect-ratio: 1;
+        }
+
+        .lottery-grid-card .action-card> div div:nth-child(1) {
             font-size: xxx-large;
         }
 
@@ -757,4 +761,392 @@
     justify-self: center;
     width: 100%;
     padding: 1rem;
+}
+    .contact-card a {
+        color: #b5353a !important;
+    }
+        .contact-card a:hover {
+            text-decoration: underline;
+        }
+        /*周年庆*/
+.lottery-anniversary-card {
+    padding-top: 4rem;
+}
+    .lottery-anniversary-card .brief-card a {
+        color: #b5353a !important;
+    }
+
+        .lottery-anniversary-card .brief-card a:hover {
+            text-decoration: underline;
+        }
+    .lottery-anniversary-card .brief-card {
+        font-size: larger;
+        justify-self: center;
+        padding-bottom: 3rem;
+    }
+    /*奖品列表*/
+    .lottery-anniversary-card .award-list-card {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 1200px;
+    }
+    .lottery-anniversary-card .award-card {
+        width: 24%;
+        background-color: rgba(255, 154, 158, 0.2);
+        border-radius: 4px;
+        padding: 0.5rem;
+    }
+        .lottery-anniversary-card .award-card > div {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #ff9a9e82;
+            border-radius: 4px;
+            padding: .5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            justify-content: center;
+            justify-content: space-between;
+        }
+    .lottery-anniversary-card img {
+        width: 100%;
+        border-radius: 12px;
+    }
+.sponsor-card {
+    font-size: small;
+}
+
+.nav-drawer-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: .5rem;
+}
+    .user-info-card .divid-card, .nav-drawer-card .divid-card {
+        height: 1px;
+        background-image: var(--background-image-primary);
+    }
+
+.slotMachine-box {
+    min-height: calc(100% - 341px);
+    width: 848px;
+    margin: 0 auto;
+}
+
+.slotMachine {
+    background: url(https://res.cngal.org/images/expo/raffleBg.png) no-repeat;
+    width: 692px;
+    height: 313px;
+    position: relative;
+}
+
+.slotMachine-btn {
+    position: absolute;
+    right: -156px;
+    top: calc(50% - 66px);
+}
+
+.slot {
+    width: 106px;
+    height: 163px;
+    overflow: hidden;
+    position: absolute;
+    background-color: rgba(250,249,250,1);
+    top: 103px;
+    border: 1px solid rgba(253,138,197,1);
+}
+
+    .slot li {
+        display: block;
+        width: 106px;
+        height: 163px;
+        font-size: 72px;
+        text-align: center;
+        line-height: 163px;
+    }
+
+.slot1 {
+    left: 185px;
+}
+
+.slot2 {
+    left: 305px;
+}
+
+.slot3 {
+    left: 425px;
+}
+
+.slot4 {
+    left: 545px;
+}
+
+.slotAnimation {
+    animation: slotSlice 1s linear 0s 1;
+}
+
+@keyframes slotSlice {
+    0% {
+        transform: translateY(0px)
+    }
+
+    100% {
+        transform: translateY(-4890px)
+    }
+}
+
+div.prizeTips {
+    padding: 1em 0 0;
+    text-align: center;
+    font-size: 18px;
+}
+
+    div.prizeTips > span {
+        font-weight: bold;
+        color: rgba(253,138,197,1);
+        padding: 0 0.5em;
+    }
+
+.slotMachine-box ul {
+    padding: 0;
+}
+
+@media (max-width: 960px) {
+    .home-head-card .image-card {
+        flex-direction: column;
+    }
+
+        .home-head-card .image-card img:first-child, .home-head-card .image-card img:nth-child(2) {
+            width: 100%;
+        }
+
+    .home-head-card .post-card div:nth-child(1) {
+        font-size: inherit;
+    }
+
+    .home-head-card .post-card div:nth-child(2) {
+        font-size: small;
+    }
+
+    .home-head-card .post-card .button-card {
+        padding: .3rem 1rem;
+    }
+
+    .cngal-card {
+        padding: 2rem 1rem;
+    }
+
+        .cngal-card span:nth-child(1) {
+            font-size: x-large;
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .cngal-card span:nth-child(2) {
+            font-size: larger;
+        }
+
+        .cngal-card span:nth-child(3) {
+            font-size: x-large;
+            padding-left: 0;
+            width: 100%;
+            text-align: right;
+        }
+
+    .home-brief-card .actions-card {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .home-brief-card .content-card {
+        padding: 2rem 0;
+    }
+
+    .home-brief-card {
+        padding: 0 2rem;
+    }
+
+    .image-button-card img {
+        object-fit: cover;
+    }
+
+    .home-brief-card .actions-card .image-button-card {
+        height: 5rem;
+    }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(1) {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(2) {
+            border-radius: 0;
+        }
+
+        .home-brief-card .actions-card .image-button-card:nth-child(3) {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+    .image-button-card .name-card {
+        font-size: x-large;
+    }
+
+    .home-brief-card .actions-card {
+        gap: 2px;
+    }
+
+    .home-brief-card .text-card {
+        font-size: large;
+    }
+
+    .home-brief-card .image-card {
+        width: 100%;
+    }
+
+    .home-sponsors-card .items-card {
+        flex-direction: column;
+        gap: 0;
+        row-gap: 1rem;
+
+    }
+    .home-sponsors-card .image-button-card{
+        width:100%;
+    }
+    .media-partners-card .items-card {
+        flex-direction: row;
+    }
+    .home-sponsors-card .media-partners-card .image-button-card {
+        width: 48%;
+    }
+    .home-sponsors-card .sponsors-card, .home-sponsors-card .media-partners-card {
+        width: 100%;
+        padding: 0 2rem;
+    }
+    .game-random-card .action-card {
+        justify-content: center;
+        padding-right:0;
+    }
+    .game-random-card .content-card {
+        padding: 0;
+    }
+        .game-random-card .content-card .game-item-card {
+            min-width: 120px;
+            max-width: 120px;
+        }
+    .game-item-card .name-card {
+        word-break: break-all;
+        white-space: pre-wrap;
+        font-size: small;
+        font-weight:inherit;
+    }
+    .game-item-card {
+        justify-content: space-evenly;
+    }
+    .games-page .tag-list-card {
+        padding: 0 1rem 2rem 1rem;
+         width: 100%;
+        gap: 1rem;
+    }
+        .games-page .tag-list-card > div {
+            font-size: inherit;
+            padding: .1rem 1rem;
+        }
+    .game-item-card .name-card{
+        font-size:inherit;
+    }
+    .user-info-card {
+         padding: 0; 
+         width: 100%;
+    }
+    .lottery-page .cngal-card span:nth-child(1) {
+        padding: 0;
+    }
+    .lottery-page .cngal-card span:nth-child(3) {
+        padding: 0;
+    }
+    .lottery-grid-card .prize-card .name-card {
+        font-size: x-small;
+    }
+    .lottery-grid-card .prize-card{
+        aspect-ratio:inherit;
+    }
+    .lottery-grid-card .grid-col-card .prize-card {
+        min-height: 100%;
+    }
+    .lottery-grid-card .lottery-content-card {
+        padding: 2px
+    }
+    .lottery-grid-card .prize-card {
+        padding: 2px;
+    }
+        .lottery-grid-card .prize-card > div {
+            padding: 2px;
+        }
+        .lottery-grid-card .prize-card .image-button-card {
+            border-radius: 4px;
+        }
+    .lottery-page .lottery-tasks-card .task-card .action-card {
+        padding: .5rem 1rem;
+        font-size:inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card .content-card {
+        gap: 1rem;
+    }
+        .lottery-page .lottery-tasks-card .task-card .content-card i {
+            font-size: 24px;
+            padding: .5rem;
+        }
+    .lottery-page .lottery-tasks-card .task-card .count-card {
+        width: 44px;
+        left: 2px;
+        font-size: inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card > div {
+        padding: .5rem .5rem;
+    }
+    .lottery-page .lottery-tasks-card .task-card .name-card{
+        font-size:inherit;
+    }
+    .lottery-page .lottery-tasks-card .task-card > div {
+        background-size: calc(100% - 100px) 100%;
+    }
+    .lottery-anniversary-card .brief-card {
+        white-space: pre-wrap;
+        text-align: center;
+    }
+    .slotMachine-box {
+        transform: scale(0.45) translate(-500px, -200px);
+    }
+
+    .lottery-anniversary-card {
+        width: 100%;
+        overflow: hidden;
+    }
+        .lottery-anniversary-card .number-card {
+            height:200px;
+            overflow: hidden;
+        }
+        .lottery-anniversary-card .brief-card {
+            padding-bottom: 0rem;
+        }
+    .lottery-page .title-card {
+        padding-bottom: 1rem;
+    }
+    .lottery-anniversary-card .award-card {
+        width: 48%;
+    }
+    .lottery-anniversary-card .award-list-card {
+        gap: 0;
+        row-gap: 1rem;
+        padding-top: 2rem;
+    }
+    .lottery-anniversary-card .award-card > div {
+        justify-content: space-evenly;
+    }
+   .contact-card .title-card {
+        padding: 2rem;
+    }
 }

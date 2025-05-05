@@ -1,0 +1,83 @@
+﻿.slotMachine-box {
+    min-height: calc(100% - 341px);
+    width: 848px;
+    margin: 0 auto;
+}
+
+.slotMachine {
+    background: url(https://res.cngal.org/images/expo/raffleBg.png) no-repeat;
+    width: 692px;
+    height: 313px;
+    position: relative;
+}
+
+.slotMachine-btn {
+    position: absolute;
+    right: -156px;
+    top: calc(50% - 66px);
+}
+
+.slot {
+    width: 106px;
+    height: 163px;
+    overflow: hidden;
+    position: absolute;
+    background-color: rgba(250,249,250,1);
+    top: 103px;
+    border: 1px solid rgba(253,138,197,1);
+}
+
+    .slot li {
+        display: block;
+        width: 106px;
+        height: 163px;
+        font-size: 72px;
+        text-align: center;
+        line-height: 163px;
+    }
+
+.slot1 {
+    left: 185px;
+}
+
+.slot2 {
+    left: 305px;
+}
+
+.slot3 {
+    left: 425px;
+}
+
+.slot4 {
+    left: 545px;
+}
+
+.slotAnimation {
+    animation: slotSlice 1s linear 0s 1;
+}
+
+@keyframes slotSlice {
+    0% {
+        transform: translateY(0px)
+    }
+
+    100% {
+        transform: translateY(-4890px)
+    }
+}
+
+div.prizeTips {
+    padding: 1em 0 0;
+    text-align: center;
+    font-size: 18px;
+}
+
+    div.prizeTips > span {
+        font-weight: bold;
+        color: rgba(253,138,197,1);
+        padding: 0 0.5em;
+    }
+
+.slotMachine-box ul {
+    padding: 0;
+}

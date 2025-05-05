@@ -1,26 +1,56 @@
 ﻿@inherits LayoutComponentBase
+@inject MasaBlazor MasaBlazor
+@implements IDisposable
 
 <MApp>
-    <MAppBar App Class="elevation-2 app-bar-card">
-        <a class="logo-card" href="/" draggable="false">
-            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" draggable="false"/>
-            <div class="name-card">
-                CNGAL线上展示会
+    @if (MasaBlazor.Breakpoint.Name >= Breakpoints.Md)
+    {
+        <MAppBar App Class="elevation-2 app-bar-card">
+            <a class="logo-card" href="/" draggable="false">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" draggable="false" />
+                <div class="name-card">
+                    CNGAL线上展示会
+                </div>
+            </a>
+            <div class="tabs-card">
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" />
+                <CnGalWebSite.Expo.Components.Cards.Users.LoginButton />
             </div>
-        </a>
-        <div class="tabs-card">
-            <CnGalWebSite.Components.Buttons.MasaButton TextStyle  Icon="mdi-home" Text="首页" Href="/" />
-            <CnGalWebSite.Components.Buttons.MasaButton TextStyle  Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
-            <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
-            <CnGalWebSite.Components.Buttons.MasaButton TextStyle  Icon="mdi-email" Text="联系我们" Href="/contact" />
-            <CnGalWebSite.Expo.Components.Cards.Users.LoginButton />
-        </div>
-    </MAppBar>
+        </MAppBar>
+    }
+    else
+    {
+        <MAppBar App Class="app-bar-card">
+            <a class="logo-card" href="/" draggable="false">
+                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" draggable="false" />
+                <div class="name-card">
+                    CNGAL线上展示会
+                </div>
+            </a>
+            <MSpacer></MSpacer>
+            <MAppBarNavIcon Color="primary" @onclick="() => _drawer = !(_drawer ?? false)"></MAppBarNavIcon>
+        </MAppBar>
+        <MNavigationDrawer @bind-Value="_drawer" App Right Temporary>
+            <div class="nav-drawer-card">
+                <CnGalWebSite.Expo.Components.Cards.Users.LoginButton App />
+                <div class="divid-card"></div>
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" OnClick="@(()=>_drawer=false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" OnClick="@(()=>_drawer=false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" OnClick="@(()=>_drawer=false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" OnClick="@(()=>_drawer=false)" />
+            </div>
+        </MNavigationDrawer>
+    }
+
     <MMain>
         <MContainer Fluid Class="pa-0">
             @Body
         </MContainer>
     </MMain>
+
     <MFooter App Padless Absolute>
         &copy; 2025 - CnGal资料站
         &nbsp;&nbsp;&nbsp;<a target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备2023071243号</a>
@@ -33,3 +63,31 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+@code {
+    private bool? _drawer;
+    private StringNumber _value = default;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        MasaBlazor.BreakpointChanged += BreakpointOnOnUpdate;
+    }
+
+    private void BreakpointOnOnUpdate(object? sender, BreakpointChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+
+    void ValueChanged(StringNumber value)
+    {
+        _value = value;
+        _drawer = false;
+    }
+
+    public void Dispose()
+    {
+        MasaBlazor.BreakpointChanged -= BreakpointOnOnUpdate;
+    }
+}

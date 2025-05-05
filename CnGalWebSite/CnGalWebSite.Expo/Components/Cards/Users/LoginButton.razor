@@ -3,7 +3,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <UserButton/>
+        <UserButton App="App" />
     </Authorized>
     <NotAuthorized>
         <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-login" TextStyle Text="登入" Href="@($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}")" />
@@ -11,6 +11,9 @@
 </AuthorizeView>
 
 @code {
+    [Parameter]
+    public bool App { get; set; }
+
     private string currentUrl;
 
     protected override void OnInitialized()

@@ -9,7 +9,7 @@
     <MSsrThemeProvider />
     <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["css/bundle.css"]" />
     <link rel="stylesheet" href="@Assets["CnGalWebSite.Expo.styles.css"]" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="InteractiveServer" connectionInfo="connectionInfo" />
 
     <!--图片裁剪-->
     <script src="https://res.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
@@ -25,8 +25,31 @@
     <!--组件库-->
     <script src="https://res.cngal.org/_content/Masa.Blazor/js/masa-blazor.js"></script>
 
+    <!--脚本-->
+    <script src="js/bundle.min.js"></script>
+
     <!--运行时-->
     <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    bool mobile;
+    CnGalWebSite.Core.Models.ConnectionInfo connectionInfo = new Core.Models.ConnectionInfo();
+
+    protected override void OnInitialized()
+    {
+        var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(ip))
+        {
+            ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        }
+        connectionInfo.RemoteIpAddress = ip;
+
+        mobile = HttpContext.Request.IsMobileBrowser();
+    }
+}

@@ -7,7 +7,7 @@
             {
                 <CnGalWebSite.Expo.Components.Cards.Home.ImageButtonCard Image="@item.Image" Name="@item.Name" Url="@item.Url" />
             }
-            <div class="name-card">@item.Name ×1</div>
+            <div class="name-card">@($"{item.Name}{(item.Type != ExpoAwardType.NoEntry?" ×1":"")}")</div>
         </div>
     </div>
 }

@@ -247,7 +247,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             return null;
         }
 
-        public async Task AddUserToLottery(Lottery lottery, ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification)
+        public async Task<int> AddUserToLottery(Lottery lottery, ApplicationUser user, HttpContext httpContext, DeviceIdentificationModel identification)
         {
             //检查抽奖条件
             var result = await CheckCondition(user, lottery);
@@ -270,7 +270,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
 
             var time = DateTime.Now.ToCstTime();
-            await _lotteryUserRepository.InsertAsync(new LotteryUser
+
+            var lotteryUser = new LotteryUser
             {
                 ApplicationUserId = user.Id,
                 LotteryId = lottery.Id,
@@ -278,8 +279,9 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 Number = lottery.Users.Count + 1,
                 //查找是否有相同的特征值
                 IsHidden = await _operationRecordService.CheckOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, identification, httpContext)
-            });
+            };
 
+            await _lotteryUserRepository.InsertAsync(lotteryUser);
 
             try
             {
@@ -289,6 +291,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
+
+            return lotteryUser.Number;
         }
 
         public async Task CopyUserFromBookingToLottery(Booking booking, Lottery lottery)
