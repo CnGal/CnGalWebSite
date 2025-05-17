@@ -1,11 +1,11 @@
 services:
   expo:
-    image: littlefishtentears/cngalwebsiteexpo:latest
+    image: littlefishtentears/cngalwebsiteexpo:${IMAGE_TAG:-latest}
     container_name: expo
     environment:
-      - TZ=${TZ}
-      - WebApiPath=${WebApiPath}
-      - Authority=${Authority}
+      - TZ=${TZ:-Asia/Shanghai}
+      - WebApiPath=${WebApiPath:-https://api.cngal.org/}
+      - Authority=${Authority:-https://oauth2.cngal.org}
       - ClientId=${ClientId}
       - ClientSecret=${ClientSecret}
       # 图床API
@@ -21,9 +21,19 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-1.5G}
     ports:
-      - "3302:8081"
       - "2202:8080"
+      # - "3302:8081"
     volumes:
-      - ${MNT_DIR}/blazorserver/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - expo-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+    labels:
+      # watchtower
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true}
+    networks:
+      - web
+volumes:
+  expo-DataProtection-Keys:
+networks:
+  web:
+    external: true
