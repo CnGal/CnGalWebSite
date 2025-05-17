@@ -1,11 +1,13 @@
 ﻿
 using CnGalWebSite.RobotClientX.Models.Robots;
+using Masuda.Net.HelpMessage;
+using MeowMiraiLib.Msg.Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnifyBot.Message.Chain;
+using Message = MeowMiraiLib.Msg.Type.Message;
 
 namespace CnGalWebSite.RobotClientX.DataModels
 {
@@ -17,6 +19,8 @@ namespace CnGalWebSite.RobotClientX.DataModels
 
         public long SendTo { get; set; }
 
-        public MessageChain Messages { get; set; }
+        public Message[] MiraiMessage { get; set; } = Array.Empty<Message>();
+
+        public MessageBase[] MasudaMessage { get; set; }
     }
 }

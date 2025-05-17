@@ -4,16 +4,16 @@ using CnGalWebSite.RobotClientX.DataRepositories;
 using CnGalWebSite.RobotClientX.Extentions;
 using CnGalWebSite.RobotClientX.Services.Events;
 using CnGalWebSite.RobotClientX.Services.Messages;
+using Masuda.Net;
+using MeowMiraiLib;
+using MeowMiraiLib.Msg.Sender;
+using MeowMiraiLib.Msg.Type;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Message = MeowMiraiLib.Msg.Type.Message;
 using CnGalWebSite.RobotClientX.DataModels;
 using CnGalWebSite.EventBus.Services;
-using UnifyBot.Model;
-using UnifyBot;
-using System.Reactive.Linq;
-using UnifyBot.Receiver.MessageReceiver;
-using UnifyBot.Receiver;
-using UnifyBot.Utils;
-using UnifyBot.Message.Chain;
-using UnifyBot.Message;
+using RabbitMQ.Client.Events;
 
 namespace CnGalWebSite.RobotClientX.Services.QQClients
 {
@@ -31,7 +31,8 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         private readonly IQQGroupMemberCacheService _memberCacheService;
 
 
-        public Bot _unifyBot { get; set; }
+        public MasudaBot MasudaClient { get; set; }
+        public Client MiraiClient { get; set; }
         private string _miraiSession;
 
         System.Timers.Timer t = new(1000 * 60);
@@ -53,6 +54,49 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             _memberCacheService = memberCacheService;
         }
 
+        public void InitMasuda()
+        {
+            if (int.TryParse(_configuration["ChannelAppId"], out int appId) == false)
+            {
+                _logger.LogError("初始化频道失败，ChannelAppId无效");
+                return;
+            }
+            try
+            {
+                MasudaClient = new MasudaBot(appId, _configuration["ChannelAppKey"], _configuration["ChannelToken"], BotType.Private);
+
+                _logger.LogInformation("成功初始化 Masuda 客户端");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "初始化 Masuda 客户端失败，配置文件错误或 依赖项 未正确启动");
+            }
+
+        }
+
+        public async Task InitMirai()
+        {
+            try
+            {
+                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
+                MiraiClient._OnServeiceConnected += MiraiClient__OnServeiceConnected; ;
+                if (await MiraiClient.ConnectAsync())
+                {
+                    _logger.LogInformation("成功初始化 Mirai 客户端");
+                }
+                else
+                {
+                    _logger.LogError("初始化 Mirai 客户端失败");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "初始化 Mirai 客户端失败");
+            }
+
+        }
+
         public void InitEventBus()
         {
             if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
@@ -68,165 +112,204 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             }
         }
 
-        public async Task InitUnifyBot()
+        private void MiraiClient__OnServeiceConnected(string e)
         {
-            Connect connect = new(_configuration["OneBotHost"], int.Parse(_configuration["OneBotWsPort"]), int.Parse(_configuration["OneBotHttpPort"]), _configuration["OneBotToken"]);//token可选参数
-            _unifyBot = new(connect);
-            await _unifyBot.StartAsync();
 
-            _unifyBot.MessageReceived.OfType<MessageReceiverBase>().Subscribe(x =>
+            if (string.IsNullOrWhiteSpace(e))
             {
-                //能接收到所有消息和事件
-                Console.WriteLine(x.ToJsonStr());
-            });
-            _unifyBot.MessageReceived.OfType<MessageReceiver>().Subscribe(x =>
+                return;
+            }
+            var session = e.MidStrEx("\"session\": \"", "\"");
+            if (string.IsNullOrWhiteSpace(session))
             {
-                //只能接收到消息（所有类型）
-                Console.WriteLine(x.ToJsonStr());
-            });
-            _unifyBot.MessageReceived.OfType<GroupReceiver>().Subscribe(async x =>
-            {
-                //只能接收到群消息
-                Console.WriteLine(x.ToJsonStr());
-                try
-                {
-                    await ReplyFromGroupAsync(x);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "无法回复群聊消息");
-                }
-            });
-            _unifyBot.MessageReceived.OfType<PrivateReceiver>().Subscribe(async x =>
-            {
-                //只能接收到好友消息
-                Console.WriteLine(x.ToJsonStr());
-                try
-                {
-                    await ReplyFromFriendAsync(x);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "无法回复好友消息");
-                }
-            });
-            _unifyBot.UnknownMessageReceived.OfType<string>().Subscribe(x =>
-            {
-                //未知事件
-                Console.WriteLine(x);
-            });
+                return;
+            }
+            _miraiSession = session;
+            _logger.LogInformation("成功连接Mirai服务器，Session：{Session}", session);
         }
 
         public async Task Init()
         {
-            // 初始化onebot
-            await InitUnifyBot();
-
-            ////初始化事件总线
+            //初始化QQ群
+            await InitMirai();
+            //初始化事件总线
             InitEventBus();
 
-
-            //定时任务计时器
-            t.Start(); //启动计时器
-            t.Elapsed += async (s, e) =>
+            if (MiraiClient != null)
             {
-                try
-                {
-                    var message = _eventService.GetCurrentTimeEvent();
-                    if (string.IsNullOrWhiteSpace(message) == false)
-                    {
-                        var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
 
-                        if (result != null)
+                //定时任务计时器
+                t.Start(); //启动计时器
+                t.Elapsed += async (s, e) =>
+                {
+                    try
+                    {
+                        var message = _eventService.GetCurrentTimeEvent();
+                        if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
+
+                            if (result != null)
                             {
-                                result.SendTo = item.GroupId;
-                                await SendMessage(result);
+                                foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                                {
+                                    result.SendTo = item.GroupId;
+                                    await SendMessage(result);
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "定时任务异常");
-                }
-
-            };
-
-            //随机任务计时器
-            t2.Start(); //启动计时器
-            t2.Elapsed += async (s, e) =>
-            {
-                try
-                {
-                    var message = _eventService.GetProbabilityEvents();
-                    if (string.IsNullOrWhiteSpace(message) == false)
+                    catch (Exception ex)
                     {
-                        var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
+                        _logger.LogError(ex, "定时任务异常");
+                    }
 
-                        if (result != null)
+                };
+
+                //随机任务计时器
+                t2.Start(); //启动计时器
+                t2.Elapsed += async (s, e) =>
+                {
+                    try
+                    {
+                        var message = _eventService.GetProbabilityEvents();
+                        if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null, 0);
+
+                            if (result != null)
                             {
-                                result.SendTo = item.GroupId;
-                                await SendMessage(result);
+                                foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                                {
+                                    result.SendTo = item.GroupId;
+                                    await SendMessage(result);
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "随机任务异常");
+                    }
+
+                };
+
+                //好友消息事件
+                MiraiClient.OnFriendMessageReceive += async (s, e) =>
                 {
-                    _logger.LogError(ex, "随机任务异常");
-                }
+                    try
+                    {
+                        await ReplyFromFriendAsync(s, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "无法回复好友消息");
+                    }
 
-            };
+                };
 
-            _logger.LogInformation("CnGal资料站 看板娘 v3.5.0");
+
+                //群聊消息事件
+                MiraiClient.OnGroupMessageReceive += async (s, e) =>
+                {
+                    try
+                    {
+                        await ReplyFromGroupAsync(s, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "无法回复群聊消息");
+                    }
+
+                };
+            }
+
+
+            //初始化频道
+
+            InitMasuda();
+
+
+            if (MasudaClient != null)
+            {
+                // 普通消息事件注册(需要私域)
+                MasudaClient.MessageAction += async (bot, msg, type) =>
+                 {
+                     try
+                     {
+                         await ReplyFromChannelAsync(msg);
+                     }
+                     catch (Exception ex)
+                     {
+                         _logger.LogError(ex, "回复消息失败");
+                     }
+                 };
+            }
+
+            _logger.LogInformation("CnGal资料站 看板娘 v3.4.10");
+
+        }
+
+        /// <summary>
+        /// 回复频道消息
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public async Task ReplyFromChannelAsync(Masuda.Net.Models.Message msg)
+        {
+            //过滤非水区的发言
+            if ((await MasudaClient.GetChannelAsync(msg.ChannelId)).Name.Contains("水区") == false)
+            {
+                return;
+            }
+
+            var messgae = MessageHelper.GetPureMessage(msg.Content);
+            if (string.IsNullOrWhiteSpace(messgae))
+            {
+                return;
+            }
+            await ReplyMessageAsync(RobotReplyRange.Channel, MessageHelper.GetPureMessage(msg.Content), 0, 0, msg.Author.Username, msg);
 
         }
 
         /// <summary>
         /// 回复好友消息
         /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        /// <param name="range"></param>
         /// <returns></returns>
-        public async Task ReplyFromFriendAsync(PrivateReceiver model)
+        public async Task ReplyFromFriendAsync(FriendMessageSender s, MeowMiraiLib.Msg.Type.Message[] msg)
         {
-            string message = ConversionMeaasge(model.Message);
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                return;
-            }
-            await ReplyMessageAsync(RobotReplyRange.Friend, message, model.SenderQQ, model.SenderQQ, model.Sender.Nickname);
+            await ReplyMessageAsync(RobotReplyRange.Friend, ConversionMeaasge(msg), s.id, s.id, s.nickname);
         }
 
         /// <summary>
         /// 回复群聊消息
         /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
         /// <returns></returns>
-        public async Task ReplyFromGroupAsync(GroupReceiver model)
+        public async Task ReplyFromGroupAsync(GroupMessageSender s, MeowMiraiLib.Msg.Type.Message[] msg)
         {
             //忽略未关注的群聊
-            RobotGroup group = _robotGroupRepository.GetAll().FirstOrDefault(x => x.GroupId == model.GroupQQ && x.IsHidden == false);
+            RobotGroup group = _robotGroupRepository.GetAll().FirstOrDefault(x => x.GroupId == s.group.id && x.IsHidden == false);
             if (group == null)
             {
                 return;
             }
             //检查是否符合强制匹配
-            string message = ConversionMeaasge(model.Message);
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                return;
-            }
+            string message = ConversionMeaasge(msg);
 
             // 检查需要需要更新群员列表缓存
-            if (_memberCacheService.NeedUpdate(model.GroupQQ))
+            if (_memberCacheService.NeedUpdate(s.group.id))
             {
-                _memberCacheService.UpdateGroupMembers(model.GroupQQ, model.Group.Members.Select(x => new QQGroupMemberInfo
+                var list = MessageUtil.GetMemberList(new MeowMiraiLib.GenericModel.QQGroup(s.group.id, "", ""), MiraiClient);
+                _memberCacheService.UpdateGroupMembers(s.group.id, list.Select(x => new QQGroupMemberInfo
                 {
-                    GroupNumber = model.GroupQQ,
-                    NickName = x.Nickname,
-                    QQNumber = x.QQ
+                    GroupNumber = s.group.id,
+                    NickName = x.memberName,
+                    QQNumber = x.id
                 }).ToList());
             }
 
@@ -238,11 +321,11 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             }
 
             // 添加消息到缓存
-            _groupMessageCacheService.AddMessage(model.GroupQQ, new GroupMessageRecord
+            _groupMessageCacheService.AddMessage(s.group.id, new GroupMessageRecord
             {
-                SenderId = model.SenderQQ,
-                SenderName = model.Sender.Nickname,
-                Content = message.ReplaceAtTags(model.GroupQQ, _memberCacheService, qq, _configuration["RobotName"]),// 替换掉@再保存
+                SenderId = s.id,
+                SenderName = s.memberName,
+                Content = message.ReplaceAtTags(s.group.id, _memberCacheService, qq, _configuration["RobotName"]),// 替换掉@再保存
                 SendTime = DateTime.Now
             });
 
@@ -254,7 +337,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                     return;
                 }
             }
-            await ReplyMessageAsync(RobotReplyRange.Group, message, model.GroupQQ, model.SenderQQ, model.Sender.Nickname);
+            await ReplyMessageAsync(RobotReplyRange.Group, message, s.group.id, s.id, s.memberName);
         }
 
         /// <summary>
@@ -262,13 +345,13 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private string ConversionMeaasge(MessageChain e)
+        private string ConversionMeaasge(MeowMiraiLib.Msg.Type.Message[] e)
         {
-            string message = string.Concat(e.GetTextChain());
-            var at = e.FirstOrDefault(s => s.Type == UnifyBot.Model.Messages.At);
+            string message = e.MGetPlainString();
+            Message at = e.FirstOrDefault(s => s.type == "At");
             if (at != null)
             {
-                long atTarget = long.Parse(((AtMessage)at).Data.QQ);
+                long atTarget = (at as At).target;
                 message += "[@" + atTarget.ToString() + "]";
             }
             return message;
@@ -277,7 +360,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         /// <summary>
         /// 回复消息
         /// </summary>
-        private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName)
+        private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
             //尝试找出所有匹配的回复
             RobotReply reply = await _messageService.GetAutoReply(message, range);
@@ -299,7 +382,8 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 if (long.TryParse(_configuration["WarningQQGroup"], out long warningQQGroup))
                 {
                     //发送警告
-                    await SendMessage(RobotReplyRange.Group, warningQQGroup, ae.Error);
+                    await SendMessage(new SendMessageModel { SendTo = warningQQGroup, MiraiMessage = new MeowMiraiLib.Msg.Type.Message[] { new Plain(ae.Error) }, Range = RobotReplyRange.Group });
+
                 }
             }
 
@@ -319,14 +403,14 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             });
 
             //检查上限
-            if (await CheckLimit(range, sendto, memberId, memberName))
+            if (await CheckLimit(range, sendto, memberId, memberName, msg))
             {
                 return;
             }
 
             //发送消息
             result.SendTo = sendto;
-            await SendMessage(result);
+            await SendMessage(result, msg);
 
 
         }
@@ -338,7 +422,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         /// <param name="memberId"></param>
         /// <param name="memberName"></param>
         /// <returns>是否超过限制</returns>
-        private async Task<bool> CheckLimit(RobotReplyRange range, long sendto, long memberId, string memberName)
+        private async Task<bool> CheckLimit(RobotReplyRange range, long sendto, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
             //判断该用户是否连续10次互动 1分钟内
             int singleCount = _postLogRepository.GetAll().Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == memberId);
@@ -359,7 +443,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             {
                 SendMessageModel result = await _messageService.ProcMessageAsync(range, _robotEventRepository.GetAll().FirstOrDefault(s => s.Note == "消息上限警告")?.Text ?? $"[image=https://image.cngal.org/kanbanFace/hhzywx.png][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, memberId, memberName, sendto);
                 result.SendTo = sendto;
-                await SendMessage(result);
+                await SendMessage(result, msg);
                 return true;
             }
 
@@ -367,7 +451,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
             {
                 SendMessageModel result = await _messageService.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName, sendto);
                 result.SendTo = sendto;
-                await SendMessage(result);
+                await SendMessage(result, msg);
                 return true;
             }
 
@@ -387,35 +471,65 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
         /// <summary>
         /// 发送消息
         /// </summary>
-        public async Task SendMessage(RobotReplyRange range, long sendto, string text)
+        /// <param name="range"></param>
+        /// <param name="id"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public async Task SendMessage(RobotReplyRange range, long sendto, string text, Masuda.Net.Models.Message msg = null)
         {
-            await SendMessage(new SendMessageModel
+            if (range == RobotReplyRange.Channel)
             {
-                Text = text,
-                SendTo = sendto,
-                Messages = _messageService.ProcMessageToOneBot(text),
-                Range = range,
-            });
+                await SendMessage(new SendMessageModel
+                {
+                    Text = text,
+                    MasudaMessage = _messageService.ProcMessageToMasuda(text),
+                    Range = range,
+                }, msg);
+            }
+            else
+            {
+                await SendMessage(new SendMessageModel
+                {
+                    Text = text,
+                    SendTo = sendto,
+                    MiraiMessage = _messageService.ProcMessageToMirai(text),
+                    Range = range,
+                });
+            }
+
         }
 
-        public async Task SendMessage(SendMessageModel model)
+        public async Task SendMessage(SendMessageModel model, Masuda.Net.Models.Message msg = null)
         {
 
-            if (model == null || model.Messages == null)
+            if (model.MiraiMessage == null && model.MasudaMessage == null)
             {
                 return;
             }
 
 
-            if (model.Range == RobotReplyRange.Friend)
+            if (model.Range == RobotReplyRange.Channel)
             {
-                await _unifyBot.SendPrivateMessage(model.SendTo, model.Messages);
+                if (model.MasudaMessage == null)
+                {
+                    return;
+                }
+
+                _ = await MasudaClient.ReplyMessageAsync(msg, model.MasudaMessage);
+
+                _logger.LogInformation("向频道发送\"{text}\"", model.Text);
+
+            }
+            else if (model.Range == RobotReplyRange.Friend)
+            {
+
+                model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
 
                 _logger.LogInformation("向 {group} 发送\"{text}\"成功", model.SendTo, model.Text);
             }
             else
             {
-                await _unifyBot.SendGroupMessage(model.SendTo, model.Messages);
+                model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
                 _logger.LogInformation("向 {group} 发送\"{text}\"成功", model.SendTo, model.Text);
 
                 // 添加消息到历史记录
