@@ -19,6 +19,7 @@
 [![standard-repository](https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat.svg)](https://github.com/misitebao/standard-repository)
 [![stars](https://img.shields.io/github/stars/CnGal/CnGalWebSite)](https://github.com/CnGal/CnGalWebSite)
 [![爱发电](https://afdian.moeci.com/3/badge.svg)](https://afdian.com/@cngal)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/CnGal/CnGalWebSite)
 
 </div>
 
