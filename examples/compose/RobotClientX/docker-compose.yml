@@ -10,16 +10,14 @@ services:
       - RobotName=${RobotName:-看板娘}
       # 接收预警的QQ群
       - WarningQQGroup=${WarningQQGroup}
-      # Mirai Url
-      - MiraiUrl=${MiraiUrl}
-      # Mirai 验证密匙
-      - NormalVerifyKey=${NormalVerifyKey}
-      # QQ频道 AppId
-      - ChannelAppId=${ChannelAppId}
-      # QQ频道 Token
-      - ChannelToken=${ChannelToken}
-      # QQ频道 AppKey
-      - ChannelAppKey=${ChannelAppKey}
+      # OneBot Host（只支持IP）
+      - OneBotHost=${OneBotHost}
+      # OneBot Websocket端口（必填）
+      - OneBotWsPort=${OneBotWsPort}
+      # OneBot Http端口（必填）
+      - OneBotHttpPort=${OneBotHttpPort}
+      # OneBot Token
+      - OneBotToken=${OneBotToken}
       # CnGal资料站 API
       - WebApiPath=${WebApiPath:-https://api.cngal.org/}
       # 网站名称

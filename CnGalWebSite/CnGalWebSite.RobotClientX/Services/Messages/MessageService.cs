@@ -1,15 +1,12 @@
-﻿using MeowMiraiLib.Msg.Type;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using CnGalWebSite.RobotClientX.DataRepositories;
 using CnGalWebSite.RobotClientX.Services.SensitiveWords;
 using CnGalWebSite.RobotClientX.Extentions;
-using Message = MeowMiraiLib.Msg.Type.Message;
 using CnGalWebSite.RobotClientX.Services.ExternalDatas;
 using System.Text.Json;
 using System.Net.Http.Json;
-using Masuda.Net.HelpMessage;
 using CnGalWebSite.RobotClientX.Models.Messages;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
@@ -18,6 +15,8 @@ using CnGalWebSite.RobotClientX.Models.Robots;
 using CnGalWebSite.RobotClientX.DataModels;
 using Result = CnGalWebSite.RobotClientX.Models.Messages.Result;
 using CnGalWebSite.RobotClientX.Services.GPT;
+using UnifyBot.Message.Chain;
+using UnifyBot.Message;
 
 namespace CnGalWebSite.RobotClientX.Services.Messages
 {
@@ -149,27 +148,14 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                 reply = reply.Replace(item.Key, item.Value);
             }
 
-            if (range == RobotReplyRange.Channel)
-            {
-                return new SendMessageModel
-                {
-                    SendTo = qq,
-                    MasudaMessage = ProcMessageToMasuda(reply),
-                    Range = range,
-                    Text = reply
-                };
-            }
-            else
-            {
 
-                return new SendMessageModel
-                {
-                    SendTo = qq,
-                    MiraiMessage = ProcMessageToMirai(reply),
-                    Range = range,
-                    Text = reply
-                };
-            }
+            return new SendMessageModel
+            {
+                SendTo = qq,
+                Messages = ProcMessageToOneBot(reply),
+                Range = range,
+                Text = reply
+            };
         }
 
         /// <summary>
@@ -177,21 +163,24 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
         /// </summary>
         /// <param name="vaule"></param>
         /// <returns></returns>
-        public Message[] ProcMessageToMirai(string vaule)
+        public MessageChain ProcMessageToOneBot(string vaule)
         {
             if (string.IsNullOrWhiteSpace(vaule))
             {
                 return null;
             }
 
-            List<Message> messages = new();
+            MessageChain messages = new();
 
             while (true)
             {
                 var item = vaule.MidStrEx("[", "]");
                 if (string.IsNullOrWhiteSpace(item))
                 {
-                    messages.Add(new Plain(vaule));
+                    if (string.IsNullOrWhiteSpace(vaule) == false)
+                    {
+                        messages.Add(new TextMessage(vaule));
+                    }
                     break;
                 }
                 else
@@ -201,7 +190,10 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                     if (vaule.StartsWith($"[{item}]") == false)
                     {
                         infor = vaule.Split($"[{item}]").FirstOrDefault();
-                        messages.Add(new Plain(infor));
+                        if (string.IsNullOrWhiteSpace(infor) == false)
+                        {
+                            messages.Add(new TextMessage(infor));
+                        }
                     }
                     //删除命令及前方字符串
                     vaule = vaule.Replace($"{infor}[{item}]", "");
@@ -217,7 +209,7 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
                             {
                                 imageStr = "https:" + imageStr;
                             }
-                            messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/").Split('?').Last()));
+                            messages.Add(new ImageMessage(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/").Split('?').Last()));
                         }
                     }
                     else if (item.StartsWith("声音="))
@@ -226,106 +218,25 @@ namespace CnGalWebSite.RobotClientX.Services.Messages
 
                         if (string.IsNullOrWhiteSpace(voiceStr) == false)
                         {
-                            messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
-
+                            messages.Add(new RecordMessage(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
                         }
                     }
-
                     else if (item.StartsWith("@"))
                     {
                         string idStr = item.Replace("@", "");
                         if (long.TryParse(idStr, out long id))
                         {
-                            messages.Add(new At(id, idStr));
+                            messages.Add(new AtMessage(id));
                         }
                     }
                     else
                     {
-                        messages.Add(new Plain($"[{item}]"));
+                        messages.Add(new TextMessage($"[{item}]"));
                     }
                 }
             }
 
-            return string.IsNullOrWhiteSpace(vaule) && messages.Count == 0 ? null : messages.ToArray();
-        }
-
-        /// <summary>
-        /// 将纯文本回复转换成可发送的消息数组
-        /// </summary>
-        /// <param name="vaule"></param>
-        /// <returns></returns>
-        public MessageBase[] ProcMessageToMasuda(string vaule)
-        {
-            if (string.IsNullOrWhiteSpace(vaule))
-            {
-                return null;
-            }
-
-            var messages = new List<MessageBase>();
-
-            while (true)
-            {
-                if (vaule.Contains("[image="))
-                {
-                    var imageStr = vaule.MidStrEx("[image=", "]");
-
-                    if (string.IsNullOrWhiteSpace(imageStr) == false)
-                    {
-                        vaule = vaule.Replace("[image=" + imageStr + "]", "");
-                        //修正一部分图片链接缺省协议
-                        if (imageStr.Contains("http") == false)
-                        {
-                            imageStr = "https:" + imageStr;
-                        }
-                        messages.Add(new ImageMessage(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/").Split('?').Last()));
-                    }
-                }
-                else if (vaule.Contains("[声音="))
-                {
-                    //var voiceStr = vaule.MidStrEx("[声音=", "]");
-
-                    //if (string.IsNullOrWhiteSpace(voiceStr) == false)
-                    //{
-                    //    vaule = vaule.Replace("[声音=" + voiceStr + "]", "");
-                    //    messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
-
-                    //}
-
-                    return null;
-                }
-
-                else if (vaule.Contains("[@"))
-                {
-                    var idStr = vaule.MidStrEx("[@", "]");
-                    if (long.TryParse(idStr, out var id))
-                    {
-
-                        vaule = vaule.Replace("[@" + idStr + "]", "");
-                        messages.Add(new AtMessage(idStr));
-                    }
-                }
-                else
-                {
-                    break;
-                }
-
-
-            }
-
-
-            if (string.IsNullOrWhiteSpace(vaule) == false)
-            {
-                messages.Add(new PlainMessage(vaule.TrimStart('\n')));
-            }
-
-            if (string.IsNullOrWhiteSpace(vaule) && messages.Count == 0)
-            {
-                return null;
-            }
-            else
-            {
-                return messages.ToArray();
-            }
+            return messages.Count > 0 ? messages : null;
         }
 
         /// <summary>
