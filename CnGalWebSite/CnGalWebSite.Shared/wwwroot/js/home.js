@@ -50,7 +50,11 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
     // 临时修改样式确保元素完全可见
     element.classList.remove("mobile-card");
     var originalWidth = element.style.width;
-    element.style.width = "1200px";
+
+    // 只有当元素宽度小于1000px时才将其调整为1200px
+    if (element.offsetWidth < 1000) {
+        element.style.width = "1200px";
+    }
 
     html2canvas(element, {
         scale: 2, // 缩放比例，提高清晰度
@@ -101,13 +105,13 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
 
         // 恢复原始样式
         element.style.width = originalWidth;
-        element.classList.add("mobile-card"); 
+        element.classList.add("mobile-card");
     }).catch(error => {
         console.error('截图出错：', error);
 
         // 发生错误时也要恢复原始样式
         element.style.width = originalWidth;
-        element.classList.add("mobile-card"); 
+        element.classList.add("mobile-card");
     });
 }
 
@@ -136,7 +140,7 @@ function fallbackCopyToClipboard(imgURL, fileName) {
         // 尝试复制
         const success = document.execCommand('copy');
         if (success) {
-            alert('图片已复制到剪贴板');
+
         } else {
             // 如果复制失败，尝试下载
             const anchorElement = document.createElement('a');

@@ -33,7 +33,7 @@
                     <div class="games-card">
                         @foreach (var info in item.Games)
                         {
-                            <div class="@($"game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
+                            <div class="@($"game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1&&item.Games.Count==12?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
                                 <div class="text-truncate-3">
 
                                     @info.Name

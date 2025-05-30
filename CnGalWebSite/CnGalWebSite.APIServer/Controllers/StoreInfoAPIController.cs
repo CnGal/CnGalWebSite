@@ -281,12 +281,16 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<List<CnGalGenerationYearModel>> GetCnGalGeneration()
         {
+            int[] excludeEntryIds = [196, 197, 198];
+
             // 获取商店信息中的游戏
             var games = await _storeInfoRepository.GetAll().AsNoTracking()
                .Include(s => s.Entry)
                .Where(s => s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0)
                .Where(s => s.Entry != null && s.Entry.PubulishTime != null)
                .Where(s => s.State == StoreState.OnSale && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
+               // 排除指定ID的词条
+               .Where(s => !excludeEntryIds.Contains(s.Entry.Id))
                .ToListAsync();
             games = [.. games.DistinctBy(s => s.Link)];
 
@@ -328,6 +332,8 @@ namespace CnGalWebSite.APIServer.Controllers
             // 获取所有游戏词条，用于补充缺失的年份和不足12个游戏的年份
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Where(e => e.Type == EntryType.Game && e.PubulishTime != null && e.IsHidden == false && string.IsNullOrWhiteSpace(e.DisplayName) == false)
+                // 排除指定ID的词条
+                .Where(e => !excludeEntryIds.Contains(e.Id))
                 .OrderByDescending(e => e.ReaderCount)
                 .Select(e => new
                 {
@@ -341,6 +347,10 @@ namespace CnGalWebSite.APIServer.Controllers
             // 获取所有可能的年份范围 - 限制在今年往前20年
             int currentYear = DateTime.Now.Year;
             int oldestYear = currentYear - 21;
+            if (oldestYear < 2007)
+            {
+                oldestYear = 2007;
+            }
 
             // 确保年份范围不超出限制
             int minYear = Math.Min(
