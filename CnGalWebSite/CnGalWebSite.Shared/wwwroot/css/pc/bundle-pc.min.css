@@ -1,1 +1,1 @@
-tbody,td,tfoot,th,thead,tr{border-style:none}.d-pc{display:flex}.d-app{display:none}
+tbody,td,tfoot,th,thead,tr{border-style:none}.d-pc{display:flex}.d-app{display:none}.sedai-card .games-card:has(:nth-child(1)):not(:has(:nth-child(12))) .game-card:last-child{border-right:var(--md-sys-color-on-background) 1px solid}
