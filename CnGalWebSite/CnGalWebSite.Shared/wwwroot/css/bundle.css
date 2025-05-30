@@ -4433,6 +4433,80 @@ a.user-info-card {
         font-weight: bold;
     }
 
+.sedai-card {
+}
+
+    .sedai-card .title-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: larger;
+        font-weight: bold;
+        padding: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .sedai-card .table-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sedai-card .item-card {
+        display: flex;
+        width: 100%;
+        min-height: 4rem;
+        border-top: var(--md-sys-color-on-background) 1px solid;
+    }
+
+    .sedai-card .games-card {
+        display: flex;
+        width: 100%;
+        font-size: 14px;
+      
+    }
+
+.sedai-page .actions-card {
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    padding: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sedai-card .game-card {
+    width: 100%;
+    word-break: break-word;
+    text-align: center;
+    align-content: center;
+    padding: 5px;
+    border-left: var(--md-sys-color-on-background) 1px solid;
+    cursor: pointer;
+}
+    .sedai-card .game-card.active {
+        background-color: var(--m-theme-secondary);
+        color: var(--md-sys-color-on-secondary);
+    }
+    .sedai-card .year-card {
+        word-break: break-word;
+        text-align: center;
+        align-content: center;
+        width: 7.69%;
+        font-weight: bold;
+        background-color: var(--m-theme-primary);
+        color: var(--md-sys-color-on-primary);
+    }
+.sedai-page .about-card {
+    padding: 1rem;
+    text-align: center;
+}
+.sedai-page .site-card {
+    font-size: medium;
+    color: gray;
+    font-weight: normal;
+}
+
 /*全局*/
 
 /*最外层卡片*/

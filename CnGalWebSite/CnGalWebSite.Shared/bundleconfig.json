@@ -36,6 +36,7 @@
       "wwwroot/css/share/magazine.css",
       "wwwroot/css/share/revenues.css",
       "wwwroot/css/share/admin.css",
+      "wwwroot/css/share/sedai.css",
       "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
     ]
   },
@@ -72,7 +73,8 @@
       "wwwroot/css/app/article.css",
       "wwwroot/css/app/official-website.css",
       "wwwroot/css/app/revenues.css",
-      "wwwroot/css/app/lottery.css"
+      "wwwroot/css/app/lottery.css",
+      "wwwroot/css/app/sedai.css"
     ]
   }
 ]

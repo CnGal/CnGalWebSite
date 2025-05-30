@@ -5,6 +5,7 @@ using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Stores;
@@ -273,6 +274,128 @@ namespace CnGalWebSite.APIServer.Controllers
             await _storeInfoRepository.UpdateAsync(item);
 
             return new Result { Successful = true };
+        }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<List<CnGalGenerationYearModel>> GetCnGalGeneration()
+        {
+            // 获取商店信息中的游戏
+            var games = await _storeInfoRepository.GetAll().AsNoTracking()
+               .Include(s => s.Entry)
+               .Where(s => s.EstimationOwnersMax != null && s.EstimationOwnersMax > 0)
+               .Where(s => s.Entry != null && s.Entry.PubulishTime != null)
+               .Where(s => s.State == StoreState.OnSale && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
+               .ToListAsync();
+            games = [.. games.DistinctBy(s => s.Link)];
+
+            //将相同游戏的商店信息合并
+            var groupGames = new List<StoreInfo>();
+            foreach (var item in games.GroupBy(s => s.EntryId))
+            {
+                var temp = item.First();
+                var revenue = item.Sum(s => s.Revenue);
+                var estimationOwnersMin = item.Sum(s => s.EstimationOwnersMin);
+                var estimationOwnersMax = item.Sum(s => s.EstimationOwnersMax);
+                var evaluationCount = item.Sum(s => s.EvaluationCount);
+                var price = item.Min(s => s.OriginalPrice);
+
+                double? score = 0;
+                foreach (var info in item)
+                {
+                    score += info.EvaluationCount * info.RecommendationRate;
+                }
+                temp.RecommendationRate = evaluationCount == 0 ? 0 : score / evaluationCount;
+                temp.Revenue = revenue;
+                temp.EstimationOwnersMin = estimationOwnersMin;
+                temp.EstimationOwnersMax = estimationOwnersMax;
+                temp.EvaluationCount = evaluationCount;
+                temp.OriginalPrice = price;
+                groupGames.Add(temp);
+            }
+
+            // 获取每年销量前12的游戏
+            var result = groupGames.GroupBy(s => s.Entry.PubulishTime.Value.Year).Select(s => new CnGalGenerationYearModel
+            {
+                Year = s.First().Entry.PubulishTime.Value.Year,
+                Games = [.. s.OrderByDescending(s=>(s.EstimationOwnersMax+s.EstimationOwnersMin)/2).Take(12).Select(s => new CnGalGenerationModel
+                {
+                    Name = s.Entry.DisplayName
+                })]
+            }).OrderBy(s => s.Year).ToList();
+
+            // 获取所有游戏词条，用于补充缺失的年份和不足12个游戏的年份
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Where(e => e.Type == EntryType.Game && e.PubulishTime != null && e.IsHidden == false && string.IsNullOrWhiteSpace(e.DisplayName) == false)
+                .OrderByDescending(e => e.ReaderCount)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.DisplayName,
+                    Year = e.PubulishTime.Value.Year,
+                    e.ReaderCount
+                })
+                .ToListAsync();
+
+            // 获取所有可能的年份范围 - 限制在今年往前20年
+            int currentYear = DateTime.Now.Year;
+            int oldestYear = currentYear - 20;
+
+            // 确保年份范围不超出限制
+            int minYear = Math.Max(
+                entries.Any() ? Math.Max(entries.Min(e => e.Year), oldestYear) : currentYear,
+                result.Any() ? Math.Max(result.Min(r => r.Year), oldestYear) : currentYear
+            );
+            int maxYear = Math.Min(
+                entries.Any() ? Math.Min(entries.Max(e => e.Year), currentYear) : currentYear,
+                result.Any() ? Math.Min(result.Max(r => r.Year), currentYear) : currentYear
+            );
+
+            // 补充缺失的年份和不足12个游戏的年份
+            var finalResult = new List<CnGalGenerationYearModel>();
+            for (int year = minYear; year <= maxYear; year++)
+            {
+                var yearModel = result.FirstOrDefault(r => r.Year == year);
+
+                if (yearModel == null)
+                {
+                    // 如果该年份在商店信息中不存在，则创建新的年份模型
+                    yearModel = new CnGalGenerationYearModel
+                    {
+                        Year = year,
+                        Games = new List<CnGalGenerationModel>()
+                    };
+                }
+
+                // 计算需要补充的游戏数量
+                int needToAdd = 12 - yearModel.Games.Count;
+                if (needToAdd > 0)
+                {
+                    // 获取该年份中阅读量最高的游戏，排除已经在列表中的游戏
+                    var existingGameNames = yearModel.Games.Select(g => g.Name).ToHashSet();
+                    var additionalGames = entries
+                        .Where(e => e.Year == year && !existingGameNames.Contains(e.DisplayName))
+                        .OrderByDescending(e => e.ReaderCount)
+                        .Take(needToAdd)
+                        .Select(e => new CnGalGenerationModel
+                        {
+                            Name = e.DisplayName
+                        })
+                        .ToList();
+
+                    // 添加补充的游戏
+                    yearModel.Games.AddRange(additionalGames);
+                }
+
+                // 只保留有游戏的年份
+                if (yearModel.Games.Count > 0)
+                {
+                    finalResult.Add(yearModel);
+                }
+            }
+
+            return finalResult.OrderBy(r => r.Year).ToList();
         }
     }
 }
