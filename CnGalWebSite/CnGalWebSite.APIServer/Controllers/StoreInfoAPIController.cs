@@ -340,14 +340,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
             // 获取所有可能的年份范围 - 限制在今年往前20年
             int currentYear = DateTime.Now.Year;
-            int oldestYear = currentYear - 20;
+            int oldestYear = currentYear - 21;
 
             // 确保年份范围不超出限制
-            int minYear = Math.Max(
+            int minYear = Math.Min(
                 entries.Any() ? Math.Max(entries.Min(e => e.Year), oldestYear) : currentYear,
                 result.Any() ? Math.Max(result.Min(r => r.Year), oldestYear) : currentYear
             );
-            int maxYear = Math.Min(
+            int maxYear = Math.Max(
                 entries.Any() ? Math.Min(entries.Max(e => e.Year), currentYear) : currentYear,
                 result.Any() ? Math.Min(result.Max(r => r.Year), currentYear) : currentYear
             );
@@ -395,6 +395,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
+            finalResult.RemoveAll(s => s.Year == currentYear);
             return finalResult.OrderBy(r => r.Year).ToList();
         }
     }

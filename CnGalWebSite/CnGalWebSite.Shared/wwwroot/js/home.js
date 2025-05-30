@@ -48,9 +48,9 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
     var element = document.getElementById(id);
 
     // 临时修改样式确保元素完全可见
-    var originalPosition = element.style.position;
-    var originalZIndex = element.style.zIndex;
-    var originalTransform = element.style.transform;
+    element.classList.remove("mobile-card");
+    var originalWidth = element.style.width;
+    element.style.width = "1200px";
 
     html2canvas(element, {
         scale: 2, // 缩放比例，提高清晰度
@@ -100,16 +100,14 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
         }
 
         // 恢复原始样式
-        element.style.position = originalPosition;
-        element.style.zIndex = originalZIndex;
-        element.style.transform = originalTransform;
+        element.style.width = originalWidth;
+        element.classList.add("mobile-card"); 
     }).catch(error => {
         console.error('截图出错：', error);
 
         // 发生错误时也要恢复原始样式
-        element.style.position = originalPosition;
-        element.style.zIndex = originalZIndex;
-        element.style.transform = originalTransform;
+        element.style.width = originalWidth;
+        element.classList.add("mobile-card"); 
     });
 }
 

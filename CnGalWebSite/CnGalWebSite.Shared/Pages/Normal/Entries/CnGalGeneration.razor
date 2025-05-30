@@ -8,7 +8,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="CnGal世代" Description="点击选择你玩过的国产Galgame" />
 
 <div class="sedai-page">
-    <MDCard Class="sedai-card mb-4" Id="sedai-content">
+    <MDCard Class="sedai-card mb-4 mobile-card" Id="sedai-content">
         <div class="title-card">
             <div class="name-card">
                 <div class="conten-card">
@@ -33,8 +33,11 @@
                     <div class="games-card">
                         @foreach (var info in item.Games)
                         {
-                            <div class="@($"text-truncate-3 game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
-                                @info.Name
+                            <div class="@($"game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
+                                <div class="text-truncate-3">
+
+                                    @info.Name
+                                </div>
                             </div>
                         }
                     </div>
