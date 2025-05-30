@@ -706,3 +706,68 @@
     width: 100%;
     aspect-ratio: 460 / 215;
 }
+
+.sedai-card .title-card {
+    font-size: medium;
+    padding: .5rem;
+}
+.sedai-card .selected-card {
+
+}
+.sedai-page .site-card {
+    font-size: small;
+}
+.sedai-card .title-card {
+    gap: .5rem;
+}
+.sedai-card .games-card {
+    font-size: x-small;
+    flex-wrap: wrap;
+}
+.sedai-card .game-card {
+    width: 25%;
+    min-height: 4rem;
+}
+.sedai-card .item-card {
+    min-height: inherit;
+}
+
+/* 当元素总数为5-8个时，前4个元素有底部边框 */
+.sedai-card .games-card:has(:nth-child(5)):not(:has(:nth-child(9))) .game-card:nth-child(-n+4) {
+    border-bottom: var(--md-sys-color-on-background) 1px solid;
+}
+
+/* 当元素总数为9-12个时，前8个元素有底部边框 */
+.sedai-card .games-card:has(:nth-child(9)):not(:has(:nth-child(13))) .game-card:nth-child(-n+8) {
+    border-bottom: var(--md-sys-color-on-background) 1px solid;
+}
+
+/* 当元素总数小于4时，最后一个元素有右边框 */
+.sedai-card .games-card:not(:has(:nth-child(4))) .game-card:last-child {
+    border-right: var(--md-sys-color-on-background) 1px solid;
+}
+
+/* 当元素总数为5-7个时，最后一个元素有右边框 */
+.sedai-card .games-card:has(:nth-child(5)):not(:has(:nth-child(8))) .game-card:last-child {
+    border-right: var(--md-sys-color-on-background) 1px solid;
+}
+
+/* 当元素总数为9-11个时，最后一个元素有右边框 */
+.sedai-card .games-card:has(:nth-child(9)):not(:has(:nth-child(12))) .game-card:last-child {
+    border-right: var(--md-sys-color-on-background) 1px solid;
+}
+
+.sedai-card .year-card {
+    font-size: small;
+    word-break: keep-all;
+    width: auto;
+    padding: .5rem;
+}
+.sedai-page .about-card {
+    font-size: x-small;
+    padding: .5rem;
+}
+.sedai-page .actions-card {
+    padding: .5rem;
+    gap:.5rem;
+}

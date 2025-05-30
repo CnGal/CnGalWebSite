@@ -1,0 +1,135 @@
+﻿@page "/sedai"
+
+@inject IPageModelCatche<List<CnGalGenerationYearModel>> _pageModelCatche
+@inject IJSRuntime JS
+@inject IPopupService _popupService
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="CnGal世代" Description="点击选择你玩过的国产Galgame" />
+
+<div class="sedai-page">
+    <MDCard Class="sedai-card mb-4" Id="sedai-content">
+        <div class="title-card">
+            <div class="name-card">
+                <div class="conten-card">
+                    CnGal世代 - 点击选择你玩过的国产Galgame
+                </div>
+                <div class="site-card">
+                    www.cngal.org/sedai
+                </div>
+            </div>
+
+            <div class="selected-card">
+                @($"我玩过 {_games.Sum(s => s.Games.Count(s => s.Selected))}/{_games.Sum(s => s.Games.Count)} 部国产Galgame")
+            </div>
+        </div>
+        <div class="table-card">
+            @foreach (var item in _games)
+            {
+                <div class="item-card">
+                    <div class="year-card" style="@(_games.IndexOf(item) == _games.Count-1?"border-bottom-left-radius: var(--md-card-border-radius);":"")">
+                        @item.Year
+                    </div>
+                    <div class="games-card">
+                        @foreach (var info in item.Games)
+                        {
+                            <div class="@($"text-truncate-3 game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
+                                @info.Name
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </MDCard>
+    <MDCard Class="actions-card mb-4">
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="全选" Icon="mdi-checkbox-multiple-outline" OnClick="OnClickSelectedAll" Small="_dataCacheService.IsApp" />
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="清除" Icon="mdi-close-box-multiple-outline" OnClick="OnClickCleanAll" Small="_dataCacheService.IsApp" />
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="复制图片" Icon="mdi-content-copy" OnClick="OnClickCopy" Small="_dataCacheService.IsApp" />
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="下载图片" Icon="mdi-download" OnClick="OnClickDownload" Small="_dataCacheService.IsApp" />
+    </MDCard>
+    <MDCard Class="text-card mb-4">
+        <div class="about-card">
+            历年关注最多的国产Galgame作品，数据来自 cngal.org <br />
+            如有年份错误、作品遗漏，欢迎同好们前来反馈勘误：<a href="https://space.bilibili.com/145239325" target="_blank">@@CnGal资料站</a> <br />
+            本项目参考自 <a href="https://x.com/localhost_4173" target="_blank">低空飞行</a> 制作的“动画世代”，<a href="https://github.com/egoist/anime-sedai" target="_blank">查看代码</a> ；同时本项目亦已开源，<a href="https://github.com/CnGal/CnGalWebSite" target="_blank">查看代码</a>
+
+        </div>
+    </MDCard>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    List<CnGalGenerationYearModel> _games = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _games = await _pageModelCatche.GetCache($"api/storeinfo/GetCnGalGeneration");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取历年关注度的游戏失败");
+        }
+    }
+
+    public void OnClick(CnGalGenerationModel model)
+    {
+        model.Selected = !model.Selected;
+        StateHasChanged();
+    }
+
+    public void OnClickSelectedAll()
+    {
+        foreach (var item in _games)
+        {
+            foreach (var info in item.Games)
+            {
+                info.Selected = true;
+            }
+        }
+    }
+
+    public void OnClickCleanAll()
+    {
+        foreach (var item in _games)
+        {
+            foreach (var info in item.Games)
+            {
+                info.Selected = false;
+            }
+        }
+    }
+
+    public async Task OnClickDownload()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("saveDivAsImage", "sedai-content", "CnGal世代", false);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "下载图片失败");
+        }
+    }
+
+    public async Task OnClickCopy()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("saveDivAsImage", "sedai-content", "CnGal世代", true);
+            await _popupService.EnqueueSnackbarAsync("复制图片成功", AlertTypes.Success);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "复制图片失败");
+        }
+    }
+
+}
