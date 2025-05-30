@@ -26,23 +26,37 @@
         <div class="table-card">
             @foreach (var item in _games)
             {
-                <div class="item-card">
-                    <div class="year-card" style="@(_games.IndexOf(item) == _games.Count-1?"border-bottom-left-radius: var(--md-card-border-radius);":"")">
+                    <div class="item-card">
+                        <div class="year-card" style="@(_games.IndexOf(item) == _games.Count-1?"border-bottom-left-radius: var(--md-card-border-radius);":"")">
                         @item.Year
-                    </div>
-                    <div class="games-card">
+                        </div>
+                        <div class="games-card">
                         @foreach (var info in item.Games)
                         {
-                            <div class="@($"game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1&&item.Games.Count==12?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
-                                <div class="text-truncate-3">
+                                    <div class="@($"game-card {(info.Selected?"active":"")}")" @onclick="@(()=>OnClick(info))" style="@(_games.IndexOf(item) == _games.Count-1&&item.Games.IndexOf(info) == item.Games.Count-1&&item.Games.Count==12?"border-bottom-right-radius: var(--md-card-border-radius);":"")">
+                                        <div class="text-truncate-3">
 
                                     @info.Name
-                                </div>
-                            </div>
+                                        </div>
+                                    </div>
                         }
+                        </div>
                     </div>
-                </div>
             }
+        </div>
+ <div class="title-card">
+            <div class="name-card">
+                <div class="conten-card">
+                    CnGal世代 - 点击选择你玩过的国产Galgame
+                </div>
+                <div class="site-card">
+                    www.cngal.org/sedai
+                </div>
+            </div>
+
+            <div class="selected-card">
+                @($"我玩过 {_games.Sum(s => s.Games.Count(s => s.Selected))}/{_games.Sum(s => s.Games.Count)} 部国产Galgame")
+            </div>
         </div>
     </MDCard>
     <MDCard Class="actions-card mb-4">

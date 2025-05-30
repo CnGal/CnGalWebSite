@@ -43,7 +43,8 @@
   {
     "outputFileName": "wwwroot/css/pc/bundle-pc.css",
     "inputFiles": [
-      "wwwroot/css/pc/common-pc.css"
+      "wwwroot/css/pc/common-pc.css",
+      "wwwroot/css/pc/sedai.css"
     ]
   },
   {
