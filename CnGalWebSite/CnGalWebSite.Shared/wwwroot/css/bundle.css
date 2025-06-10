@@ -3739,6 +3739,12 @@ div.prizeTips {
     .entry-card-default.staff-card a:hover {
         text-decoration: underline;
     }
+    /*staff备注*/
+.staff-note {
+    color: gray;
+    font-size: small;
+    padding-bottom: .5rem;
+}
 
 .markdown-body {
     display: flex;

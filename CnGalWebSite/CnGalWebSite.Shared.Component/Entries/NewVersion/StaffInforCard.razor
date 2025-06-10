@@ -5,6 +5,7 @@
             <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Small Icon="@IconType.Switch.ToIconString()" Text="@(min?"正常":"缩略")" OnClick="OnMin" StopPropagation Class="me-4" />
         </ButtonContent>
         <ChildContent>
+            <div class="staff-note">（排名不分先后顺序）</div>
             <div class="entry-card-default staff-card">
                 @foreach (var item in _staffs)
                 {
