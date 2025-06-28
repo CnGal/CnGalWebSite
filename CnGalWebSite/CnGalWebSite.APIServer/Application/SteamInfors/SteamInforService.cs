@@ -112,11 +112,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             var appids = steamGames.games.Select(s => s.appid.ToString()).Distinct();
             var steams = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Releases)
-                .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link)))
+                .Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && s.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link) && s.Type == GameReleaseType.Official))
                 .Select(s => new
                 {
                     EntryId = s.Id,
-                    SteamId = s.Releases.First(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link)).Link
+                    SteamId = s.Releases.Where(s => s.PublishPlatformType == PublishPlatformType.Steam && appids.Contains(s.Link) && s.Type == GameReleaseType.Official).First().Link
                 })
                 .ToListAsync();
 
