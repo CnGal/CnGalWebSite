@@ -1,0 +1,105 @@
+﻿<div class="questionnaire-completion-card">
+    <MCard Class="text-center completion-main-card mt-8">
+        <MCardText Class="pa-8">
+            <!-- 成功图标动画 -->
+            <div class="success-animation">
+                <MIcon Size="80" Color="success" Class="completion-icon">mdi-check-circle</MIcon>
+            </div>
+
+            <!-- 感谢标题 -->
+            <div class="completion-title">
+                <h2>问卷提交成功！</h2>
+            </div>
+
+            <!-- 感谢信息 -->
+            <div class="completion-message">
+                @if (!string.IsNullOrEmpty(Questionnaire.ThankYouMessage))
+                {
+                    <p class="custom-thank-message">@Questionnaire.ThankYouMessage</p>
+                }
+                else
+                {
+                    <p class="default-thank-message">
+                        感谢您参与《@Questionnaire.DisplayName》问卷调查！<br />
+                        您的宝贵意见将帮助我们改进服务质量。
+                    </p>
+                }
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="completion-stats">
+                <MRow>
+                    <MCol Cols="4">
+                        <div class="stat-item">
+                            <MIcon Large Color="primary">mdi-help-circle</MIcon>
+                            <div class="stat-number">@Questionnaire.Questions.Count</div>
+                            <div class="stat-label">题目总数</div>
+                        </div>
+                    </MCol>
+                    <MCol Cols="4">
+                        <div class="stat-item">
+                            <MIcon Large Color="success">mdi-clock-check</MIcon>
+                            <div class="stat-number">@GetCompletionTime()</div>
+                            <div class="stat-label">完成时间</div>
+                        </div>
+                    </MCol>
+                    <MCol Cols="4">
+                        <div class="stat-item">
+                            <MIcon Large Color="info">mdi-account-group</MIcon>
+                            <div class="stat-number">@(Questionnaire.ResponseCount + 1)</div>
+                            <div class="stat-label">参与人数</div>
+                        </div>
+                    </MCol>
+                </MRow>
+            </div>
+
+            <MDivider/>
+
+            <!-- 操作按钮 -->
+            <div class="completion-actions">
+                <MButton Color="primary" Large Text Class="mr-4" OnClick="HandleReturnToList">
+                    <MIcon Left>mdi-home</MIcon>
+                    返回主页
+                </MButton>
+            </div>
+        </MCardText>
+    </MCard>
+</div>
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IPopupService _popupService
+
+@code {
+    [Parameter]
+    public QuestionnaireViewModel Questionnaire { get; set; }
+
+    [Parameter]
+    public EventCallback OnReturnToList { get; set; }
+
+    private bool _shareDialog = false;
+    private string _shareUrl = "";
+
+    protected override void OnInitialized()
+    {
+        _shareUrl = $"{NavigationManager.BaseUri}questionnaires/{Questionnaire.Id}";
+    }
+
+    private string GetCompletionTime()
+    {
+        return DateTime.Now.ToString("HH:mm");
+    }
+
+    private void CloseShareDialog()
+    {
+        _shareDialog = false;
+    }
+
+    private async Task HandleReturnToList()
+    {
+        if (OnReturnToList.HasDelegate)
+        {
+            await OnReturnToList.InvokeAsync();
+        }
+    }
+}

@@ -1,0 +1,103 @@
+﻿@page "/questionnaires"
+
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<PageTitle>CNGAL线上展示会 - 问卷调查</PageTitle>
+
+<div class="questionnaires-page">
+    <div class="divid-card">
+        <div class="title-card">
+            <span>
+                问卷调查
+            </span>
+        </div>
+    </div>
+    <div class="cngal-card">
+        <span>『</span>
+        <span>
+            大概是一段引导用语，让大家积极参与到问卷调查中<br />
+            让大伙看了之后都非常感动
+        </span>
+        <span>』</span>
+    </div>
+    <div class="questionnaire-list-card">
+        @if (_questionnaires?.Any() == true)
+        {
+            @foreach (var questionnaire in _questionnaires)
+            {
+                <CnGalWebSite.Expo.Components.Cards.Questionnaires.QuestionnaireCard Model="questionnaire" OnClick="OnQuestionnaireClick" />
+            }
+        }
+        else if (_loading)
+        {
+            <div class="loading-card">
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            </div>
+        }
+        else
+        {
+            <MCard Class="text-center pa-8">
+                <MCardText>
+                    <MIcon Size="64" Color="grey lighten-1">mdi-clipboard-text-off</MIcon>
+                    <div class="mt-4 text-h6 grey--text">暂无可用问卷</div>
+                    <div class="text-body-2 grey--text">请稍后再来查看</div>
+                </MCardText>
+            </MCard>
+        }
+    </div>
+</div>
+
+@code {
+    private List<QuestionnaireCardViewModel> _questionnaires = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _questionnaires = await _httpService.GetAsync<List<QuestionnaireCardViewModel>>("api/questionnaires/GetQuestionnaireCards");
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("获取问卷列表失败", ex.Message, AlertTypes.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async void OnQuestionnaireClick(QuestionnaireCardViewModel questionnaire)
+    {
+        // 检查提交状态
+        if (questionnaire.HasParticipated && !questionnaire.AllowMultipleSubmissions)
+        {
+            await _popupService.EnqueueSnackbarAsync("提示", "您已经提交过此问卷，不允许重复提交", AlertTypes.Warning);
+            return;
+        }
+
+        // 检查问卷状态
+        if (questionnaire.Status == QuestionnaireStatus.NotStarted)
+        {
+            await _popupService.EnqueueSnackbarAsync("提示", "问卷尚未开始", AlertTypes.Info);
+            return;
+        }
+
+        if (questionnaire.Status == QuestionnaireStatus.Ended)
+        {
+            await _popupService.EnqueueSnackbarAsync("提示", "问卷已结束", AlertTypes.Info);
+            return;
+        }
+
+        if (questionnaire.Status == QuestionnaireStatus.Inactive)
+        {
+            await _popupService.EnqueueSnackbarAsync("提示", "问卷未激活", AlertTypes.Info);
+            return;
+        }
+
+        // 导航到问卷详情页
+        NavigationManager.NavigateTo($"/questionnaires/{questionnaire.Id}");
+    }
+}

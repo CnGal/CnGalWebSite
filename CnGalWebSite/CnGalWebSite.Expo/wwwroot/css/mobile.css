@@ -143,7 +143,7 @@
         font-size:inherit;
     }
     .user-info-card {
-         padding: 0; 
+         padding: 0;
          width: 100%;
     }
     .lottery-page .cngal-card span:nth-child(1) {
@@ -234,4 +234,32 @@
    .contact-card .title-card {
         padding: 2rem;
     }
+
+    /*问卷调查*/
+    .questionnaires-page,
+    .questionnaire-detail-page {
+        padding: 0 0.5rem;
+    }
+
+    .questionnaire-header-card .questionnaire-hero .hero-overlay {
+        padding: 1rem;
+    }
+
+        .questionnaire-header-card .questionnaire-hero .hero-overlay .questionnaire-title {
+            font-size: 1.5rem;
+        }
+
+        .questionnaire-header-card .questionnaire-hero .hero-overlay .questionnaire-description {
+            font-size: 1rem;
+        }
+
+    .completion-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .completion-actions .m-btn {
+            width: 100%;
+            max-width: 280px;
+        }
 }

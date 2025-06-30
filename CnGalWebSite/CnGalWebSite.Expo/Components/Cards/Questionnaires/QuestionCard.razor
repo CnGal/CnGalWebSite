@@ -1,0 +1,253 @@
+﻿<MCard Class="question-answer-card">
+    <MCardTitle>
+        <div class="question-header">
+            <div class="question-number">
+                <MChip Color="primary" Label>第 @QuestionIndex 题</MChip>
+            </div>
+            <div class="question-type">
+                <MChip Small Outlined>@Question.QuestionType.GetDisplayName()</MChip>
+                @if (Question.IsRequired)
+                {
+                    <MChip Small Color="error" Label>必填</MChip>
+                }
+            </div>
+        </div>
+    </MCardTitle>
+
+    <MCardText>
+        <div class="question-title">
+            @Question.Title
+        </div>
+
+        @if (!string.IsNullOrEmpty(Question.Description))
+        {
+            <div class="question-description">
+                @Question.Description
+            </div>
+        }
+
+        <div class="question-answer-area">
+            @switch (Question.QuestionType)
+            {
+                case QuestionType.SingleChoice:
+                    <div class="single-choice-area">
+                        <MRadioGroup @bind-Value="Answer" Color="primary">
+                            @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+                            {
+                                <MRadio Value="@option.Value" Label="@option.Text" />
+                            }
+                        </MRadioGroup>
+                    </div>
+                    break;
+
+                case QuestionType.MultipleChoice:
+                    <div class="multiple-choice-area">
+                        @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+                        {
+                            <MCheckbox Value="@IsOptionSelected(option.Value)" TValue="bool"
+                                      ValueChanged="@(value => ToggleOption(option.Value, value))"
+                                      Label="@option.Text"
+                                      Color="primary" />
+                        }
+                    </div>
+                    break;
+
+                case QuestionType.Essay:
+                    <div class="essay-area">
+                        <MTextarea @bind-Value="Answer"
+                                  Label="请输入您的答案"
+                                  Placeholder="@Question.TextPlaceholder"
+                                  Rows="4"
+                                  Outlined
+                                  Counter="@Question.MaxTextLength"
+                                  Class="mt-2" />
+                        @if (Question.MaxTextLength.HasValue)
+                        {
+                            <div class="text-hint">
+                                最多输入 @Question.MaxTextLength 个字符
+                            </div>
+                        }
+                    </div>
+                    break;
+
+                case QuestionType.Numeric:
+                    <div class="numeric-area">
+                        <MTextField @bind-Value="Answer"
+                                   Label="请输入数值"
+                                   Type="number"
+                                   Placeholder="@Question.TextPlaceholder"
+                                   Outlined
+                                   Class="mt-2" />
+                    </div>
+                    break;
+
+                case QuestionType.Rating:
+                    <div class="rating-area">
+                        <div class="rating-question">请为此项评分：</div>
+                        <MRating @bind-Value="_ratingValue"
+                                Length="@(Question.Options.Count)"
+                                Color="amber"
+                                EmptyIcon="mdi-star-outline"
+                                HalfIcon="mdi-star-half-full"
+                                FullIcon="mdi-star"
+                                Hover
+                                Size="32"
+                                Class="mt-2" />
+                        <div class="rating-labels">
+                            @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+                            {
+                                <span class="rating-label">@option.Text</span>
+                            }
+                        </div>
+                    </div>
+                    break;
+
+                case QuestionType.Ranking:
+                    <div class="ranking-area">
+                        <div class="ranking-instruction">请拖拽下方选项进行排序（第一个为最优选）：</div>
+                        <div class="ranking-list">
+                            @for (int i = 0; i < _rankingOptions.Count; i++)
+                            {
+                                var option = _rankingOptions[i];
+                                var index = i;
+                                <div class="ranking-item" draggable="true"
+                                     @ondragstart="@(e => OnDragStart(index))"
+                                     @ondrop="@(e => OnDrop(index))"
+                                     @ondragover="@OnDragOver"
+                                     @ondragover:preventDefault="true">
+                                    <MIcon Left>mdi-drag</MIcon>
+                                    <span class="ranking-number">@(i + 1)</span>
+                                    <span class="ranking-text">@option.Text</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    break;
+
+                default:
+                    <div class="unsupported-area">
+                        <MAlert Type="AlertTypes.Warning" Text>
+                            暂不支持此题目类型
+                        </MAlert>
+                    </div>
+                    break;
+            }
+        </div>
+
+        @if (Question.IsRequired)
+        {
+            <div class="question-required-hint">
+                <MIcon Small Color="error">mdi-asterisk</MIcon>
+                <span>此题为必答题</span>
+            </div>
+        }
+    </MCardText>
+</MCard>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    [Parameter]
+    public int QuestionIndex { get; set; }
+
+    [Parameter]
+    public int TotalQuestions { get; set; }
+
+    private double _ratingValue = 0;
+    private List<QuestionOptionViewModel> _rankingOptions = new();
+    private int _draggedIndex = -1;
+
+    protected override void OnParametersSet()
+    {
+        // 初始化排序题目选项
+        if (Question?.QuestionType == QuestionType.Ranking && Question.Options?.Any() == true)
+        {
+            if (!_rankingOptions.Any())
+            {
+                _rankingOptions = Question.Options.OrderBy(o => o.SortOrder).ToList();
+            }
+        }
+
+        // 处理评分题的初始值
+        if (Question?.QuestionType == QuestionType.Rating && !string.IsNullOrEmpty(Answer))
+        {
+            if (double.TryParse(Answer, out var rating))
+            {
+                _ratingValue = rating;
+            }
+        }
+    }
+
+    private bool IsOptionSelected(string optionValue)
+    {
+        if (string.IsNullOrEmpty(Answer)) return false;
+        var selectedOptions = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        return selectedOptions.Contains(optionValue);
+    }
+
+    private async Task ToggleOption(string optionValue, bool isSelected)
+    {
+        var selectedOptions = string.IsNullOrEmpty(Answer)
+            ? new List<string>()
+            : Answer.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+        if (isSelected && !selectedOptions.Contains(optionValue))
+        {
+            selectedOptions.Add(optionValue);
+        }
+        else if (!isSelected && selectedOptions.Contains(optionValue))
+        {
+            selectedOptions.Remove(optionValue);
+        }
+
+        Answer = string.Join(",", selectedOptions);
+        await AnswerChanged.InvokeAsync(Answer);
+    }
+
+    private async Task OnRatingChanged()
+    {
+        Answer = _ratingValue.ToString();
+        await AnswerChanged.InvokeAsync(Answer);
+    }
+
+    // 排序相关方法
+    private void OnDragStart(int index)
+    {
+        _draggedIndex = index;
+    }
+
+    private async Task OnDrop(int targetIndex)
+    {
+        if (_draggedIndex >= 0 && _draggedIndex != targetIndex)
+        {
+            var draggedItem = _rankingOptions[_draggedIndex];
+            _rankingOptions.RemoveAt(_draggedIndex);
+            _rankingOptions.Insert(targetIndex, draggedItem);
+
+            // 更新答案
+            Answer = string.Join(",", _rankingOptions.Select(o => o.Value));
+            await AnswerChanged.InvokeAsync(Answer);
+        }
+        _draggedIndex = -1;
+    }
+
+    private void OnDragOver(DragEventArgs e)
+    {
+        // 允许拖放
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Question?.QuestionType == QuestionType.Rating)
+        {
+            await OnRatingChanged();
+        }
+    }
+}
