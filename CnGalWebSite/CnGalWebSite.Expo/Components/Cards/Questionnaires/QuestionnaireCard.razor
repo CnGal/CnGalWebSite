@@ -38,8 +38,8 @@
                     <div class="info-item">
                         @if (Model.AllowMultipleSubmissions)
                         {
-                            <MIcon Small Left Color="info">mdi-refresh-circle</MIcon>
-                            <span>可重复参与</span>
+                            <MIcon Small Left Color="info">mdi-edit</MIcon>
+                            <span>可修改答案</span>
                         }
                         else
                         {
@@ -148,7 +148,7 @@
     private string GetButtonText()
     {
         if (Model.HasParticipated && Model.AllowMultipleSubmissions)
-            return "再次参与";
+            return "修改答案";
 
         return "开始答题";
     }
@@ -156,7 +156,7 @@
     private string GetButtonIcon()
     {
         if (Model.HasParticipated && Model.AllowMultipleSubmissions)
-            return "mdi-refresh";
+            return "mdi-pencil";
 
         return "mdi-play";
     }

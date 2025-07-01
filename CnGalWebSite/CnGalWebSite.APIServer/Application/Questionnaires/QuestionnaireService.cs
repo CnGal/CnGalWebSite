@@ -77,12 +77,13 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                 ResponseCount = questionnaire.ResponseCount
             };
 
-            // 检查用户是否已提交
+            // 检查用户是否已提交并加载用户答案
             if (!string.IsNullOrEmpty(userId))
             {
                 viewModel.HasSubmitted = await HasUserSubmittedAsync(id, userId);
-                if (viewModel.HasSubmitted && !questionnaire.AllowMultipleSubmissions)
+                if (viewModel.HasSubmitted)
                 {
+                    // 如果用户已提交过，无论是否允许修改都要加载之前的答案
                     viewModel.UserResponse = await GetUserResponseAsync(id, userId);
                 }
             }
@@ -134,6 +135,19 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                 }
 
                 viewModel.Questions.Add(questionViewModel);
+            }
+
+            // 如果用户已提交过，加载每个题目的用户答案
+            if (viewModel.HasSubmitted && viewModel.UserResponse != null)
+            {
+                foreach (var question in viewModel.Questions)
+                {
+                    var userQuestionResponse = viewModel.UserResponse.QuestionResponses.FirstOrDefault(qr => qr.QuestionId == question.Id);
+                    if (userQuestionResponse != null)
+                    {
+                        question.UserResponse = userQuestionResponse;
+                    }
+                }
             }
 
             return viewModel;
@@ -193,10 +207,12 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                 return validationResult;
             }
 
-            // 获取问卷
+            // 获取问卷（包含显示条件）
             var questionnaire = await _questionnaireRepository.GetAll()
                 .Include(q => q.Questions)
                     .ThenInclude(qq => qq.Options)
+                .Include(q => q.Questions)
+                    .ThenInclude(qq => qq.DisplayConditions)
                 .FirstOrDefaultAsync(q => q.Id == model.QuestionnaireId);
 
             if (questionnaire == null)
@@ -220,40 +236,76 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
             }
 
             // 检查用户是否已提交
-            if (!questionnaire.AllowMultipleSubmissions && !string.IsNullOrEmpty(userId))
+            var existingResponse = await _responseRepository.GetAll()
+                .Include(r => r.QuestionResponses)
+                .FirstOrDefaultAsync(r => r.QuestionnaireId == model.QuestionnaireId &&
+                                       r.ApplicationUserId == userId &&
+                                       r.IsCompleted);
+
+            QuestionnaireResponse questionnaireResponse;
+            bool isNewSubmission = existingResponse == null;
+
+            if (existingResponse != null)
             {
-                var hasSubmitted = await HasUserSubmittedAsync(model.QuestionnaireId, userId);
-                if (hasSubmitted)
+                if (!questionnaire.AllowMultipleSubmissions)
                 {
-                    return new Result { Successful = false, Error = "您已经提交过此问卷" };
+                    return new Result { Successful = false, Error = "您已经提交过此问卷，不允许修改" };
+                }
+                else
+                {
+                    // 允许修改答案：更新现有的问卷回答记录
+                    existingResponse.SubmitTime = DateTime.Now.ToCstTime();
+                    existingResponse.IpAddress = ipAddress;
+                    existingResponse.UserAgent = userAgent;
+                    existingResponse.SessionId = model.SessionId;
+                    existingResponse.CompletionTimeSeconds = model.CompletionTimeSeconds;
+                    questionnaireResponse = await _responseRepository.UpdateAsync(existingResponse);
+
+                    // 删除原有的题目回答
+                    var questionResponsesToDelete = await _questionResponseRepository.GetAll()
+                        .Where(qr => qr.QuestionnaireResponseId == existingResponse.Id)
+                        .ToListAsync();
+
+                    foreach (var oldQuestionResponse in questionResponsesToDelete)
+                    {
+                        await _questionResponseRepository.DeleteAsync(oldQuestionResponse);
+                    }
                 }
             }
-
-            // 验证必填题目
-            var requiredQuestions = questionnaire.Questions.Where(q => q.IsRequired).ToList();
-            foreach (var requiredQuestion in requiredQuestions)
+            else
             {
-                var response = model.Responses.FirstOrDefault(r => r.QuestionId == requiredQuestion.Id);
-                if (response == null || IsEmptyResponse(response, requiredQuestion.QuestionType))
+                // 验证必填题目（只检查应该显示的必填题目）
+                var validationResult1 = ValidateRequiredVisibleQuestions(questionnaire, model.Responses);
+                if (!validationResult1.Successful)
                 {
-                    return new Result { Successful = false, Error = $"题目{requiredQuestion.Title}为必填项" };
+                    return validationResult1;
                 }
+
+                // 创建新的问卷回答
+                questionnaireResponse = new QuestionnaireResponse
+                {
+                    QuestionnaireId = model.QuestionnaireId,
+                    ApplicationUserId = userId,
+                    SubmitTime = DateTime.Now.ToCstTime(),
+                    IsCompleted = true,
+                    IpAddress = ipAddress,
+                    UserAgent = userAgent,
+                    SessionId = model.SessionId,
+                    CompletionTimeSeconds = model.CompletionTimeSeconds
+                };
+
+                questionnaireResponse = await _responseRepository.InsertAsync(questionnaireResponse);
             }
 
-            // 创建问卷回答
-            var questionnaireResponse = new QuestionnaireResponse
+            // 验证必填题目（对于修改答案的情况也要验证）
+            if (!isNewSubmission)
             {
-                QuestionnaireId = model.QuestionnaireId,
-                ApplicationUserId = userId,
-                SubmitTime = DateTime.Now.ToCstTime(),
-                IsCompleted = true,
-                IpAddress = ipAddress,
-                UserAgent = userAgent,
-                SessionId = model.SessionId,
-                CompletionTimeSeconds = model.CompletionTimeSeconds
-            };
-
-            questionnaireResponse = await _responseRepository.InsertAsync(questionnaireResponse);
+                var validationResult2 = ValidateRequiredVisibleQuestions(questionnaire, model.Responses);
+                if (!validationResult2.Successful)
+                {
+                    return validationResult2;
+                }
+            }
 
             // 创建题目回答
             foreach (var responseModel in model.Responses)
@@ -272,9 +324,12 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                 await _questionResponseRepository.InsertAsync(questionResponse);
             }
 
-            // 更新问卷回答数
-            questionnaire.ResponseCount++;
-            await _questionnaireRepository.UpdateAsync(questionnaire);
+            // 只有新提交时才增加回答数
+            if (isNewSubmission)
+            {
+                questionnaire.ResponseCount++;
+                await _questionnaireRepository.UpdateAsync(questionnaire);
+            }
 
             return new Result { Successful = true };
         }
@@ -412,10 +467,13 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
 
         public async Task<QuestionnaireResponseViewModel> GetUserResponseAsync(long questionnaireId, string userId)
         {
+            // 优先获取已完成的回答，如果没有则获取草稿
             var response = await _responseRepository.GetAll()
                 .Include(r => r.QuestionResponses)
-                .FirstOrDefaultAsync(r => r.QuestionnaireId == questionnaireId &&
-                                       r.ApplicationUserId == userId);
+                .Where(r => r.QuestionnaireId == questionnaireId && r.ApplicationUserId == userId)
+                .OrderByDescending(r => r.IsCompleted)  // 优先已完成的
+                .ThenByDescending(r => r.SubmitTime)    // 然后按时间排序
+                .FirstOrDefaultAsync();
 
             if (response == null)
             {
@@ -462,6 +520,56 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
         }
 
         #region 私有方法
+
+        private Result ValidateRequiredVisibleQuestions(Questionnaire questionnaire, List<SubmitQuestionResponseModel> responses)
+        {
+            // 将提交的响应转换为条件验证所需的格式
+            var questionResponses = ConvertToQuestionResponses(questionnaire, responses);
+
+            var requiredQuestions = questionnaire.Questions.Where(q => q.IsRequired).ToList();
+
+            foreach (var requiredQuestion in requiredQuestions)
+            {
+                // 检查题目是否应该显示
+                var shouldDisplay = EvaluateDisplayConditions(requiredQuestion.DisplayConditions.ToList(), questionResponses);
+
+                if (shouldDisplay)
+                {
+                    // 只有应该显示的必填题目才需要验证
+                    var response = responses.FirstOrDefault(r => r.QuestionId == requiredQuestion.Id);
+                    if (response == null || IsEmptyResponse(response, requiredQuestion.QuestionType))
+                    {
+                        return new Result { Successful = false, Error = $"题目{requiredQuestion.Title}为必填项" };
+                    }
+                }
+            }
+
+            return new Result { Successful = true };
+        }
+
+        private List<QuestionResponse> ConvertToQuestionResponses(Questionnaire questionnaire, List<SubmitQuestionResponseModel> responses)
+        {
+            var questionResponses = new List<QuestionResponse>();
+
+            foreach (var response in responses)
+            {
+                var question = questionnaire.Questions.FirstOrDefault(q => q.Id == response.QuestionId);
+                if (question == null) continue;
+
+                var questionResponse = new QuestionResponse
+                {
+                    QuestionId = response.QuestionId,
+                    TextAnswer = response.TextAnswer,
+                    NumericAnswer = response.NumericAnswer,
+                    SelectedOptionIds = response.SelectedOptionIds?.Count > 0 ? JsonSerializer.Serialize(response.SelectedOptionIds) : null,
+                    SortedOptionIds = response.SortedOptionIds?.Count > 0 ? JsonSerializer.Serialize(response.SortedOptionIds) : null
+                };
+
+                questionResponses.Add(questionResponse);
+            }
+
+            return questionResponses;
+        }
 
         private static QuestionnaireStatus GetQuestionnaireStatus(Questionnaire questionnaire)
         {

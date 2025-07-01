@@ -111,7 +111,8 @@
                         }
 
                         <MCol Cols="12">
-                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加选项" OnClick="AddOption" Icon="mdi-plus" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加选项" OnClick="AddOption" Icon="mdi-plus" Class="mr-2" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="批量导入" OnClick="OpenBatchImportDialog" Icon="mdi-import" />
                         </MCol>
                     }
 
@@ -152,20 +153,20 @@
                                                          TItemValue="long?"
                                                          ValueChanged="@(value => OnTriggerQuestionChanged(condition, value))" />
                                             </MCol>
-                                                                                    @if (ShowTriggerOption(condition))
-                                        {
-                                            <MCol Cols="3">
-                                                <MSelect Value="@condition.TriggerOptionId"
-                                                         Label="触发选项"
-                                                         Items="@GetAvailableOptions(condition.TriggerQuestionId)"
-                                                         ItemText="@(item => item.Text)"
-                                                         ItemValue="@(item => item.Value)"
-                                                         TValue="long?"
-                                                         TItem="SelectItemModel<long?>"
-                                                         TItemValue="long?"
-                                                         ValueChanged="@(value => condition.TriggerOptionId = value)" />
-                                            </MCol>
-                                        }
+                                            @if (ShowTriggerOption(condition))
+                                            {
+                                                <MCol Cols="3">
+                                                    <MSelect Value="@condition.TriggerOptionId"
+                                                             Label="触发选项"
+                                                             Items="@GetAvailableOptions(condition.TriggerQuestionId)"
+                                                             ItemText="@(item => item.Text)"
+                                                             ItemValue="@(item => item.Value)"
+                                                             TValue="long?"
+                                                             TItem="SelectItemModel<long?>"
+                                                             TItemValue="long?"
+                                                             ValueChanged="@(value => condition.TriggerOptionId = value)" />
+                                                </MCol>
+                                            }
                                             else if (ShowExpectedValue(condition))
                                             {
                                                 <MCol Cols="3">
@@ -178,17 +179,17 @@
                                                     <!-- 占位列 -->
                                                 </MCol>
                                             }
-                                                                                    <MCol Cols="2">
-                                            <MSelect Value="@condition.LogicalOperator"
-                                                     Label="逻辑操作符"
-                                                     Items="@LogicalOperatorItems"
-                                                     ItemText="@(item => item.Text)"
-                                                     ItemValue="@(item => item.Value)"
-                                                     TValue="LogicalOperator"
-                                                     TItem="SelectItemModel<LogicalOperator>"
-                                                     TItemValue="LogicalOperator"
-                                                     ValueChanged="@(value => condition.LogicalOperator = value)" />
-                                        </MCol>
+                                            <MCol Cols="2">
+                                                <MSelect Value="@condition.LogicalOperator"
+                                                         Label="逻辑操作符"
+                                                         Items="@LogicalOperatorItems"
+                                                         ItemText="@(item => item.Text)"
+                                                         ItemValue="@(item => item.Value)"
+                                                         TValue="LogicalOperator"
+                                                         TItem="SelectItemModel<LogicalOperator>"
+                                                         TItemValue="LogicalOperator"
+                                                         ValueChanged="@(value => condition.LogicalOperator = value)" />
+                                            </MCol>
                                             <MCol Cols="1" Class="text-right">
                                                 <CnGalWebSite.Components.Buttons.MasaButton Small Fab Icon="mdi-delete" Color="error" OnClick="()=>DeleteCondition(index)" />
                                             </MCol>
@@ -216,6 +217,42 @@
     </MCard>
 </MDialog>
 
+<!-- 批量导入选项对话框 -->
+<MDialog @bind-Value="_batchImportDialog" MaxWidth="600">
+    <MCard>
+        <MCardTitle>
+            批量导入选项
+        </MCardTitle>
+        <MCardText>
+            请输入选项内容，每行一个选项。程序将自动为每个选项分配序号作为选项值。
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextarea @bind-Value="_batchImportText"
+                               Label="选项内容"
+                               Placeholder="请输入选项内容，每行一个选项，例如：&#10;苹果&#10;香蕉&#10;橙子&#10;葡萄"
+                               Rows="10"
+                               Rules="@_batchImportRules" />
+                </MCol>
+                <MCol Cols="6">
+                    <MCheckbox @bind-Value="_clearExistingOptions" Label="清空现有选项" />
+                </MCol>
+                <MCol Cols="6">
+                    <MCheckbox @bind-Value="_autoGenerateValues" Label="自动生成选项值" />
+                </MCol>
+            </MRow>
+        </MCardText>
+        <MCardActions>
+            <MSpacer />
+            <MButton Color="primary" Rounded OnClick="ImportOptions" Class="ml-2">
+                <MIcon Left>mdi-import</MIcon>
+                导入
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
 @code {
     [Parameter]
     public EventCallback OnSaved { get; set; }
@@ -227,9 +264,19 @@
     private bool _editDialog = false;
     private EditQuestionnaireQuestionModel _originalQuestionReference = null;
 
+    // 批量导入相关字段
+    private bool _batchImportDialog = false;
+    private string _batchImportText = "";
+    private bool _clearExistingOptions = false;
+    private bool _autoGenerateValues = true;
+
     // 验证规则
     private readonly List<Func<string, StringBoolean>> _titleRules = [
         value => string.IsNullOrWhiteSpace(value) ? "题目标题不能为空" : true
+    ];
+
+    private readonly List<Func<string, StringBoolean>> _batchImportRules = [
+        value => string.IsNullOrWhiteSpace(value) ? "请输入选项内容" : true
     ];
 
     // 选择项数据
@@ -564,6 +611,85 @@
     {
         _editDialog = false;
         _originalQuestionReference = null; // 清空引用
+    }
+
+    // 批量导入相关方法
+    private void OpenBatchImportDialog()
+    {
+        _batchImportText = "";
+        _clearExistingOptions = false;
+        _autoGenerateValues = true;
+        _batchImportDialog = true;
+        StateHasChanged();
+    }
+
+    private void CloseBatchImportDialog()
+    {
+        _batchImportDialog = false;
+        _batchImportText = "";
+        StateHasChanged();
+    }
+
+    private async Task ImportOptions()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_batchImportText))
+            {
+                await _popupService.EnqueueSnackbarAsync("提示", "请输入选项内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 解析输入的文本
+            var lines = _batchImportText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(line => line.Trim())
+                                       .Where(line => !string.IsNullOrEmpty(line))
+                                       .ToList();
+
+            if (lines.Count == 0)
+            {
+                await _popupService.EnqueueSnackbarAsync("提示", "没有有效的选项内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 清空现有选项（如果选择了该选项）
+            if (_clearExistingOptions)
+            {
+                Model.Options.Clear();
+            }
+
+            // 获取起始排序号
+            int startSortOrder = Model.Options.Count > 0 ? Model.Options.Max(o => o.SortOrder) + 1 : 1;
+
+            // 为每行文本创建选项
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var optionText = lines[i];
+                var optionValue = _autoGenerateValues ? (startSortOrder + i).ToString() : optionText;
+
+                var newOption = new EditQuestionOptionModel
+                    {
+                        Id = 0, // 新选项ID为0
+                        Text = optionText,
+                        Value = optionValue,
+                        SortOrder = startSortOrder + i,
+                        IsEnabled = true,
+                        Image = "" // 默认没有图片
+                    };
+
+                Model.Options.Add(newOption);
+            }
+
+            _batchImportDialog = false;
+            _batchImportText = "";
+
+            await _popupService.EnqueueSnackbarAsync("导入成功", $"成功导入 {lines.Count} 个选项", AlertTypes.Success);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("导入失败", ex.Message, AlertTypes.Error);
+        }
     }
 
     public class SelectItemModel<T>

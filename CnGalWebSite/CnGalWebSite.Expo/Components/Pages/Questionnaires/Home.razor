@@ -74,7 +74,7 @@
         // 检查提交状态
         if (questionnaire.HasParticipated && !questionnaire.AllowMultipleSubmissions)
         {
-            await _popupService.EnqueueSnackbarAsync("提示", "您已经提交过此问卷，不允许重复提交", AlertTypes.Warning);
+            await _popupService.EnqueueSnackbarAsync("提示", "您已经提交过此问卷，不允许修改答案", AlertTypes.Warning);
             return;
         }
 

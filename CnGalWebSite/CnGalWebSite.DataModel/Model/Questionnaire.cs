@@ -71,7 +71,7 @@ namespace CnGalWebSite.DataModel.Model
         public bool IsHidden { get; set; } = false;
 
         /// <summary>
-        /// 是否允许多次提交
+        /// 是否允许修改答案
         /// </summary>
         public bool AllowMultipleSubmissions { get; set; } = false;
 

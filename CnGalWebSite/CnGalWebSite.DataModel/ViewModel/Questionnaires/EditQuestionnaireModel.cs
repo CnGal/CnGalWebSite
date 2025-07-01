@@ -33,7 +33,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         [Display(Name = "是否激活")]
         public bool IsActive { get; set; } = true;
 
-        [Display(Name = "允许多次提交")]
+        [Display(Name = "允许修改答案")]
         public bool AllowMultipleSubmissions { get; set; } = false;
 
         [Display(Name = "是否需要登录")]

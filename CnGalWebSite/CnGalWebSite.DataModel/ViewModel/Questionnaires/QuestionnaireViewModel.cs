@@ -28,6 +28,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
 
         public bool IsActive { get; set; }
 
+        /// <summary>
+        /// 是否允许修改答案
+        /// </summary>
         public bool AllowMultipleSubmissions { get; set; }
 
         public bool RequireLogin { get; set; }

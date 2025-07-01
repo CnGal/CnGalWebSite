@@ -81,7 +81,7 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-                var questionnaire = await _questionnaireService.GetQuestionnaireDetailAsync(id, user.Id);
+                var questionnaire = await _questionnaireService.GetQuestionnaireDetailAsync(id, user?.Id);
 
                 if (questionnaire == null)
                 {
@@ -125,7 +125,7 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-                var cards = await _questionnaireService.GetQuestionnaireCardsAsync(user.Id);
+                var cards = await _questionnaireService.GetQuestionnaireCardsAsync(user?.Id);
                 return Ok(cards);
             }
             catch (Exception ex)
@@ -146,6 +146,12 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+                if (user == null || string.IsNullOrEmpty(user.Id))
+                {
+                    return BadRequest("用户未登录");
+                }
+
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
                 var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
@@ -172,7 +178,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-                if (string.IsNullOrEmpty(user.Id))
+                if (user == null || string.IsNullOrEmpty(user.Id))
                 {
                     return BadRequest("用户未登录");
                 }
@@ -199,7 +205,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-                if (string.IsNullOrEmpty(user.Id))
+                if (user == null || string.IsNullOrEmpty(user.Id))
                 {
                     return BadRequest("用户未登录");
                 }

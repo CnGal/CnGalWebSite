@@ -430,7 +430,7 @@ h1:focus {
         align-items: center;
     }
 /*下划线*/
-.home-page .title-card span, .games-page .title-card span, .lottery-page .title-card span, .contact-card .title-card span, .questionnaires-page .title-card span, .contact-card .title-card span {
+.home-page .title-card span, .games-page .title-card span, .lottery-page .title-card span, .contact-card .title-card span, .questionnaires-page .title-card span, .contact-card .title-card span, .questionnaire-detail-page .title-card span, .contact-card .title-card span {
     background: var(--background-image-primary) no-repeat right bottom;
     background-size: 100% 3px;
     transition: background-size 1000ms;
@@ -954,15 +954,11 @@ h1:focus {
 
 /*问卷详情页样式*/
 .questionnaire-detail-page {
-    padding: 0 1rem;
-    margin-bottom: 2rem;
-}
-
-.questionnaire-header-card .questionnaire-hero {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-    border-radius: 12px 12px 0 0;
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 2rem;
+    align-items: center;
 }
 
     .questionnaire-header-card .questionnaire-hero .hero-image {
@@ -1006,7 +1002,7 @@ h1:focus {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-top: 1rem;
+    justify-content: center;
 }
 
     .questionnaire-meta .meta-item {
@@ -1026,7 +1022,7 @@ h1:focus {
 
 /*问题卡片样式*/
 .question-answer-card {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
     .question-answer-card .question-header {
@@ -1035,6 +1031,7 @@ h1:focus {
         align-items: center;
         gap: 1rem;
         margin-bottom: 1rem;
+        width: 100%;
     }
 
         .question-answer-card .question-header .question-type {
@@ -1063,9 +1060,8 @@ h1:focus {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        color: #e53e3e;
+        color: var(--m-theme-primary) !important;
         font-size: 0.9rem;
-        margin-top: 1rem;
     }
 
     .question-answer-card .text-hint {
@@ -1268,6 +1264,64 @@ h1:focus {
 
 .questionnaires-page .cngal-card span:nth-child(3) {
     padding-left: 55rem;
+}
+.questionnaire-detail-page .title-card {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 2rem;
+}
+.questionnaire-detail-page >div{
+    max-width:900px;
+    width:100%;
+}
+.questionnaire-hero p {
+    justify-self: center;
+}
+.questionnaire-detail-page .navigation-card .m-btn__content {
+    padding-right: .5rem;
+}
+
+/* 多选排序题样式 */
+.multiple-ranking-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .multiple-ranking-area .selection-area {
+        background-color: rgba(0, 0, 0, 0.02);
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+        .multiple-ranking-area .selection-area .selection-instruction {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: rgba(0, 0, 0, 0.87);
+        }
+
+        .multiple-ranking-area .selection-area .option-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+    .multiple-ranking-area .ranking-area .ranking-instruction {
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.87);
+    }
+
+    .multiple-ranking-area .no-selection-hint {
+        text-align: center;
+        padding: 20px;
+    }
+
+.ranking-list .ranking-item.selected {
+    background-color: rgba(25, 118, 210, 0.08);
+    border-color: rgba(25, 118, 210, 0.3);
 }
 
 .slotMachine-box {

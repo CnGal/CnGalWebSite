@@ -1,4 +1,5 @@
-@page "/questionnaires/{Id:long}"
+﻿@page "/questionnaires/{Id:long}"
+@using CnGalWebSite.DataModel.Model
 
 @inject IHttpService _httpService
 @inject IPopupService _popupService
@@ -30,9 +31,8 @@
     else if (_completed)
     {
         <!-- 完成页面 -->
-        <CnGalWebSite.Expo.Components.Cards.Questionnaires.CompletionCard
-            Questionnaire="_questionnaire"
-            OnReturnToList="ReturnToList" />
+        <CnGalWebSite.Expo.Components.Cards.Questionnaires.CompletionCard Questionnaire="_questionnaire"
+                                                                          OnReturnToList="ReturnToList" />
     }
     else
     {
@@ -44,33 +44,52 @@
                     {
                         <img src="@_questionnaire.MainPicture" alt="@_questionnaire.DisplayName" class="hero-image" />
                     }
-                    <div class="hero-content">
-                        <div class="hero-overlay">
-                            <h1 class="questionnaire-title">@_questionnaire.DisplayName</h1>
-                            @if (!string.IsNullOrEmpty(_questionnaire.Description))
-                            {
-                                <p class="questionnaire-description">@_questionnaire.Description</p>
-                            }
+                    <div class="divid-card">
+                        <div class="title-card">
+                            <span>
+                                @_questionnaire.DisplayName
+                            </span>
                         </div>
                     </div>
+                    @if (!string.IsNullOrEmpty(_questionnaire.Description))
+                    {
+                        <p class="questionnaire-description">@_questionnaire.Description</p>
+                    }
                 </div>
 
                 <MCardText>
                     <div class="questionnaire-meta">
                         <div class="meta-item">
-                            <MIcon Left>mdi-help-circle</MIcon>
-                            <span>共 @_questionnaire.Questions.Count 题</span>
+                            <MIcon Color="primary">mdi-help-circle</MIcon>
+                            <span>共 @_visibleQuestions.Count 题</span>
                         </div>
                         <div class="meta-item">
-                            <MIcon Left>mdi-account-group</MIcon>
+                            <MIcon Color="primary">mdi-account-group</MIcon>
                             <span>@_questionnaire.ResponseCount 人已参与</span>
                         </div>
                         @if (_questionnaire.EndTime.HasValue)
                         {
                             <div class="meta-item">
-                                <MIcon Left>mdi-clock-outline</MIcon>
+                                <MIcon Color="primary">mdi-clock-outline</MIcon>
                                 <span>截止：@_questionnaire.EndTime.Value.ToString("yyyy-MM-dd HH:mm")</span>
                             </div>
+                        }
+                        @if (_questionnaire.HasSubmitted)
+                        {
+                            @if (_questionnaire.AllowMultipleSubmissions)
+                            {
+                                <div class="meta-item">
+                                    <MIcon Color="primary">mdi-pencil</MIcon>
+                                    <span>您正在修改之前的答案</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="meta-item">
+                                    <MIcon Color="primary">mdi-check-circle</MIcon>
+                                    <span>您已完成此问卷</span>
+                                </div>
+                            }
                         }
                     </div>
                 </MCardText>
@@ -83,9 +102,9 @@
                 <MCardText>
                     <div class="progress-info">
                         <span>答题进度</span>
-                        <span>@(_currentQuestionIndex + 1) / @_questionnaire.Questions.Count</span>
+                        <span>@(GetCurrentVisibleQuestionIndex() + 1) / @_visibleQuestions.Count</span>
                     </div>
-                    <MProgressLinear Value="@GetProgress()" Height="8" Color="primary" Class="mt-2" />
+                    <MProgressLinear Value="@GetProgress()" Height="8" Color="primary" Class="mt-2" Rounded />
                 </MCardText>
             </MCard>
         </div>
@@ -94,12 +113,11 @@
         <div class="question-card">
             @if (_currentQuestion != null)
             {
-                <CnGalWebSite.Expo.Components.Cards.Questionnaires.QuestionCard
-                    Question="_currentQuestion"
-                    Answer="_currentAnswer"
-                    AnswerChanged="OnAnswerChanged"
-                    QuestionIndex="_currentQuestionIndex + 1"
-                    TotalQuestions="_questionnaire.Questions.Count" />
+                <CnGalWebSite.Expo.Components.Cards.Questionnaires.QuestionCard Question="@_currentQuestion"
+                                                                                Answer="@_currentAnswer"
+                                                                                AnswerChanged="OnAnswerChanged"
+                                                                                QuestionIndex="GetCurrentVisibleQuestionIndex() + 1"
+                                                                                TotalQuestions="_visibleQuestions.Count" />
             }
         </div>
 
@@ -107,37 +125,23 @@
         <div class="navigation-card">
             <MCard>
                 <MCardActions Class="justify-space-between pa-4">
-                    <MButton Color="grey" Outlined
-                             OnClick="PreviousQuestion"
-                             Disabled="@(_currentQuestionIndex <= 0)">
-                        <MIcon Left>mdi-arrow-left</MIcon>
-                        上一题
-                    </MButton>
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Icon="mdi-arrow-left" Text="上一题"
+                                                                OnClick="PreviousQuestion"
+                                                                Disabled="@(GetCurrentVisibleQuestionIndex() <= 0)" />
 
-                    @if (_currentQuestionIndex < _questionnaire.Questions.Count - 1)
+                    @if (GetCurrentVisibleQuestionIndex() < _visibleQuestions.Count - 1)
                     {
-                        <MButton Color="primary"
-                                 OnClick="NextQuestion"
-                                 Disabled="@(!IsCurrentAnswerValid())">
-                            下一题
-                            <MIcon Right>mdi-arrow-right</MIcon>
-                        </MButton>
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-arrow-right" Text="下一题"
+                                                                    OnClick="NextQuestion"
+                                                                    Disabled="@(!IsCurrentAnswerValid())" />
+
+
                     }
                     else
                     {
-                        <MButton Color="success"
-                                 OnClick="SubmitQuestionnaire"
-                                 Disabled="@(!IsCurrentAnswerValid() || !CanSubmitQuestionnaire() || _submitting)">
-                            @if (_submitting)
-                            {
-                                <MProgressCircular Indeterminate Size="20" Class="mr-2" />
-                            }
-                            else
-                            {
-                                <MIcon Left>mdi-check</MIcon>
-                            }
-                            提交问卷
-                        </MButton>
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@GetSubmitButtonIcon()" Text="@GetSubmitButtonText()" IsAsync
+                                                                    OnClick="SubmitQuestionnaire"
+                                                                    Disabled="@(!IsCurrentAnswerValid() || !CanSubmitQuestionnaire())" />
                     }
                 </MCardActions>
             </MCard>
@@ -149,7 +153,7 @@
     [Parameter]
     public long Id { get; set; }
 
-        private QuestionnaireViewModel _questionnaire;
+    private QuestionnaireViewModel _questionnaire;
     private bool _loading = true;
     private bool _completed = false;
     private bool _submitting = false;
@@ -160,6 +164,10 @@
 
     private string _currentAnswer = "";
     private Dictionary<long, string> _answers = new();
+
+    // 添加可见题目列表和条件验证相关字段
+    private List<QuestionnaireQuestionViewModel> _visibleQuestions = new();
+    private Dictionary<long, bool> _questionVisibility = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,14 +185,11 @@
                 // 确保问题按排序顺序排列
                 _questionnaire.Questions = _questionnaire.Questions.OrderBy(q => q.SortOrder).ToList();
 
-                // 为所有题目初始化空答案
-                foreach (var question in _questionnaire.Questions)
-                {
-                    if (!_answers.ContainsKey(question.Id))
-                    {
-                        _answers[question.Id] = "";
-                    }
-                }
+                // 初始化答案（为空答案或加载用户之前的答案）
+                InitializeAnswers();
+
+                // 初始化题目可见性
+                UpdateQuestionVisibility();
 
                 LoadCurrentAnswer();
             }
@@ -199,11 +204,245 @@
         }
     }
 
+    private void InitializeAnswers()
+    {
+        foreach (var question in _questionnaire.Questions)
+        {
+            var answerValue = "";
+
+            // 如果用户之前有回答，加载之前的答案
+            if (question.UserResponse != null)
+            {
+                answerValue = ConvertUserResponseToAnswerString(question);
+            }
+
+            _answers[question.Id] = answerValue;
+        }
+    }
+
+    // 新增：更新题目可见性
+    private void UpdateQuestionVisibility()
+    {
+        _questionVisibility.Clear();
+        _visibleQuestions.Clear();
+
+        foreach (var question in _questionnaire.Questions)
+        {
+            var isVisible = EvaluateQuestionVisibility(question);
+            _questionVisibility[question.Id] = isVisible;
+
+            if (isVisible)
+            {
+                _visibleQuestions.Add(question);
+            }
+        }
+
+        // 如果当前题目不可见，切换到第一个可见题目
+        if (_visibleQuestions.Any())
+        {
+            var currentQuestionVisible = _currentQuestion != null && _questionVisibility.GetValueOrDefault(_currentQuestion.Id, false);
+            if (!currentQuestionVisible)
+            {
+                // 找到第一个可见题目的索引
+                var firstVisibleQuestion = _visibleQuestions.First();
+                _currentQuestionIndex = _questionnaire.Questions.IndexOf(firstVisibleQuestion);
+                LoadCurrentAnswer();
+            }
+        }
+    }
+
+    // 新增：评估单个题目的可见性
+    private bool EvaluateQuestionVisibility(QuestionnaireQuestionViewModel question)
+    {
+        if (question.DisplayConditions?.Any() != true)
+        {
+            return true; // 没有条件则显示
+        }
+
+        // 按条件组分组
+        var conditionGroups = question.DisplayConditions.GroupBy(c => c.ConditionGroup);
+
+        foreach (var group in conditionGroups)
+        {
+            var groupResult = true;
+            var groupConditions = group.OrderBy(c => c.Id).ToList();
+
+            for (int i = 0; i < groupConditions.Count; i++)
+            {
+                var condition = groupConditions[i];
+                var conditionResult = EvaluateSingleCondition(condition);
+
+                if (i == 0)
+                {
+                    groupResult = conditionResult;
+                }
+                else
+                {
+                    if (condition.LogicalOperator == LogicalOperator.And)
+                    {
+                        groupResult = groupResult && conditionResult;
+                    }
+                    else // Or
+                    {
+                        groupResult = groupResult || conditionResult;
+                    }
+                }
+            }
+
+            if (groupResult)
+            {
+                return true; // 任何一个组满足条件就显示
+            }
+        }
+
+        return false;
+    }
+
+    // 新增：评估单个条件
+    private bool EvaluateSingleCondition(QuestionDisplayConditionViewModel condition)
+    {
+        var answer = _answers.GetValueOrDefault(condition.TriggerQuestionId, "");
+        var triggerQuestion = _questionnaire.Questions.FirstOrDefault(q => q.Id == condition.TriggerQuestionId);
+
+        if (triggerQuestion == null)
+        {
+            return false;
+        }
+
+        // 检查是否有答案
+        var hasAnswer = !string.IsNullOrWhiteSpace(answer);
+
+        switch (condition.ConditionType)
+        {
+            case ConditionType.OptionSelected:
+                if (condition.TriggerOptionId.HasValue && hasAnswer)
+                {
+                    var selectedValues = answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    var triggerOption = triggerQuestion.Options.FirstOrDefault(o => o.Id == condition.TriggerOptionId.Value);
+                    return triggerOption != null && selectedValues.Contains(triggerOption.Value);
+                }
+                return false;
+
+            case ConditionType.OptionNotSelected:
+                if (condition.TriggerOptionId.HasValue)
+                {
+                    if (!hasAnswer) return true; // 没有答案就是没有选择
+                    var selectedValues = answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    var triggerOption = triggerQuestion.Options.FirstOrDefault(o => o.Id == condition.TriggerOptionId.Value);
+                    return triggerOption == null || !selectedValues.Contains(triggerOption.Value);
+                }
+                return true;
+
+            case ConditionType.TextContains:
+                return hasAnswer && answer.Contains(condition.ExpectedValue ?? "");
+
+            case ConditionType.TextNotContains:
+                return !hasAnswer || !answer.Contains(condition.ExpectedValue ?? "");
+
+            case ConditionType.NumericEquals:
+                if (decimal.TryParse(condition.ExpectedValue, out var expectedValue) &&
+                    decimal.TryParse(answer, out var actualValue))
+                {
+                    return actualValue == expectedValue;
+                }
+                return false;
+
+            case ConditionType.NumericGreaterThan:
+                if (decimal.TryParse(condition.ExpectedValue, out var greaterValue) &&
+                    decimal.TryParse(answer, out var actualGreaterValue))
+                {
+                    return actualGreaterValue > greaterValue;
+                }
+                return false;
+
+            case ConditionType.NumericLessThan:
+                if (decimal.TryParse(condition.ExpectedValue, out var lessValue) &&
+                    decimal.TryParse(answer, out var actualLessValue))
+                {
+                    return actualLessValue < lessValue;
+                }
+                return false;
+
+            case ConditionType.Answered:
+                return hasAnswer;
+
+            case ConditionType.NotAnswered:
+                return !hasAnswer;
+
+            default:
+                return false;
+        }
+    }
+
+    private string ConvertUserResponseToAnswerString(QuestionnaireQuestionViewModel question)
+    {
+        var userResponse = question.UserResponse;
+        if (userResponse == null) return "";
+
+        switch (question.QuestionType)
+        {
+            case QuestionType.Essay:
+                return userResponse.TextAnswer ?? "";
+
+            case QuestionType.Numeric:
+            case QuestionType.Rating:
+                return userResponse.NumericAnswer?.ToString() ?? "";
+
+            case QuestionType.SingleChoice:
+            case QuestionType.MultipleChoice:
+                if (userResponse.SelectedOptionIds?.Any() == true)
+                {
+                    var selectedValues = new List<string>();
+                    foreach (var optionId in userResponse.SelectedOptionIds)
+                    {
+                        var option = question.Options.FirstOrDefault(o => o.Id == optionId);
+                        if (option != null)
+                        {
+                            selectedValues.Add(option.Value ?? option.Id.ToString());
+                        }
+                    }
+                    return string.Join(",", selectedValues);
+                }
+                return "";
+
+            case QuestionType.Ranking:
+            case QuestionType.MultipleRanking:
+                if (userResponse.SortedOptionIds?.Any() == true)
+                {
+                    var sortedValues = new List<string>();
+                    foreach (var optionId in userResponse.SortedOptionIds)
+                    {
+                        var option = question.Options.FirstOrDefault(o => o.Id == optionId);
+                        if (option != null)
+                        {
+                            sortedValues.Add(option.Value ?? option.Id.ToString());
+                        }
+                    }
+                    return string.Join(",", sortedValues);
+                }
+                return "";
+
+            default:
+                return userResponse.TextAnswer ?? "";
+        }
+    }
+
+    private int GetCurrentVisibleQuestionIndex()
+    {
+        if (_currentQuestion != null && _visibleQuestions?.Count > 0)
+        {
+            var index = _visibleQuestions.IndexOf(_currentQuestion);
+            return index >= 0 ? index : 0;
+        }
+        return 0;
+    }
+
     private double GetProgress()
     {
-        if (_questionnaire?.Questions?.Count > 0)
+        if (_visibleQuestions?.Count > 0)
         {
-            return ((double)(_currentQuestionIndex + 1) / _questionnaire.Questions.Count) * 100;
+            var currentVisibleIndex = GetCurrentVisibleQuestionIndex();
+            return ((double)(currentVisibleIndex + 1) / _visibleQuestions.Count) * 100;
         }
         return 0;
     }
@@ -220,10 +459,14 @@
         }
     }
 
-    private async Task OnAnswerChanged(string newAnswer)
+    private void OnAnswerChanged(string newAnswer)
     {
         _currentAnswer = newAnswer;
         SaveCurrentAnswer();
+
+        // 答案改变时重新计算题目可见性
+        UpdateQuestionVisibility();
+
         StateHasChanged();
     }
 
@@ -240,26 +483,83 @@
     {
         if (_currentQuestion == null) return false;
 
-        // 检查当前题目是否为必填且未回答
-        if (_currentQuestion.IsRequired && string.IsNullOrWhiteSpace(_currentAnswer))
+        // 如果题目不可见，则认为有效（跳过验证）
+        var isVisible = _questionVisibility.GetValueOrDefault(_currentQuestion.Id, true);
+        if (!isVisible)
+        {
+            return true;
+        }
+
+        // 如果不是必填题，总是有效
+        if (!_currentQuestion.IsRequired)
+        {
+            return true;
+        }
+
+        // 根据题目类型检查答案是否有效
+        return IsAnswerValidForQuestionType(_currentQuestion, _currentAnswer);
+    }
+
+    private bool IsAnswerValidForQuestionType(QuestionnaireQuestionViewModel question, string answer)
+    {
+        if (string.IsNullOrWhiteSpace(answer))
         {
             return false;
         }
 
-        return true;
+        switch (question.QuestionType)
+        {
+            case QuestionType.Essay:
+                return !string.IsNullOrWhiteSpace(answer);
+
+            case QuestionType.Numeric:
+            case QuestionType.Rating:
+                return decimal.TryParse(answer, out _);
+
+            case QuestionType.SingleChoice:
+                // 单选题应该有一个选项值
+                return !string.IsNullOrWhiteSpace(answer) && !answer.Contains(',');
+
+            case QuestionType.MultipleChoice:
+                // 多选题应该至少有一个选项，并且符合最小选择数量要求
+                if (string.IsNullOrWhiteSpace(answer)) return false;
+
+                var selectedCount = answer.Split(',', StringSplitOptions.RemoveEmptyEntries).Length;
+
+                if (question.MinSelectionCount.HasValue && selectedCount < question.MinSelectionCount.Value)
+                {
+                    return false;
+                }
+
+                if (question.MaxSelectionCount.HasValue && selectedCount > question.MaxSelectionCount.Value)
+                {
+                    return false;
+                }
+
+                return selectedCount > 0;
+
+            case QuestionType.Ranking:
+            case QuestionType.MultipleRanking:
+                // 排序题应该至少有一个选项
+                return !string.IsNullOrWhiteSpace(answer) && answer.Split(',', StringSplitOptions.RemoveEmptyEntries).Length > 0;
+
+            default:
+                return !string.IsNullOrWhiteSpace(answer);
+        }
     }
 
     private bool CanSubmitQuestionnaire()
     {
         if (_questionnaire?.Questions == null) return false;
 
-        // 检查所有必填题目是否都已回答
+        // 只检查可见的必填题目是否都已正确回答
         foreach (var question in _questionnaire.Questions)
         {
-            if (question.IsRequired)
+            var isVisible = _questionVisibility.GetValueOrDefault(question.Id, true);
+            if (isVisible && question.IsRequired)
             {
                 var answer = _answers.ContainsKey(question.Id) ? _answers[question.Id] : "";
-                if (string.IsNullOrWhiteSpace(answer))
+                if (!IsAnswerValidForQuestionType(question, answer))
                 {
                     return false;
                 }
@@ -273,9 +573,13 @@
     {
         SaveCurrentAnswer();
 
-        if (_currentQuestionIndex < _questionnaire.Questions.Count - 1)
+        // 在可见题目中找到当前题目的位置
+        var currentVisibleIndex = _visibleQuestions.IndexOf(_currentQuestion);
+        if (currentVisibleIndex >= 0 && currentVisibleIndex < _visibleQuestions.Count - 1)
         {
-            _currentQuestionIndex++;
+            // 移动到下一个可见题目
+            var nextVisibleQuestion = _visibleQuestions[currentVisibleIndex + 1];
+            _currentQuestionIndex = _questionnaire.Questions.IndexOf(nextVisibleQuestion);
             LoadCurrentAnswer();
             StateHasChanged();
         }
@@ -285,9 +589,13 @@
     {
         SaveCurrentAnswer();
 
-        if (_currentQuestionIndex > 0)
+        // 在可见题目中找到当前题目的位置
+        var currentVisibleIndex = _visibleQuestions.IndexOf(_currentQuestion);
+        if (currentVisibleIndex > 0)
         {
-            _currentQuestionIndex--;
+            // 移动到上一个可见题目
+            var previousVisibleQuestion = _visibleQuestions[currentVisibleIndex - 1];
+            _currentQuestionIndex = _questionnaire.Questions.IndexOf(previousVisibleQuestion);
             LoadCurrentAnswer();
             StateHasChanged();
         }
@@ -300,30 +608,35 @@
             _submitting = true;
             SaveCurrentAnswer();
 
-            // 确保为所有题目创建响应，即使是空答案
+            // 只为可见的题目创建响应
             var responses = new List<SubmitQuestionResponseModel>();
 
             foreach (var question in _questionnaire.Questions)
             {
-                var answerValue = _answers.ContainsKey(question.Id) ? _answers[question.Id] : "";
-                var response = CreateQuestionResponse(question.Id, answerValue);
-
-                // 只要题目存在就添加响应，即使是空答案
-                responses.Add(response);
+                var isVisible = _questionVisibility.GetValueOrDefault(question.Id, true);
+                if (isVisible)
+                {
+                    var answerValue = _answers.ContainsKey(question.Id) ? _answers[question.Id] : "";
+                    var response = CreateQuestionResponse(question.Id, answerValue);
+                    responses.Add(response);
+                }
             }
 
             var submitModel = new SubmitQuestionnaireModel
-            {
-                QuestionnaireId = Id,
-                Responses = responses
-            };
+                {
+                    QuestionnaireId = Id,
+                    Responses = responses
+                };
 
             var result = await _httpService.PostAsync<SubmitQuestionnaireModel, Result>("api/questionnaires/SubmitQuestionnaire", submitModel);
 
             if (result.Successful)
             {
                 _completed = true;
-                await _popupService.EnqueueSnackbarAsync("问卷提交成功", "感谢您的参与！", AlertTypes.Success);
+                var isModifying = _questionnaire?.HasSubmitted == true && _questionnaire.AllowMultipleSubmissions;
+                var title = isModifying ? "修改保存成功" : "问卷提交成功";
+                var message = isModifying ? "您的答案已成功更新！" : "感谢您的参与！";
+                await _popupService.EnqueueSnackbarAsync(title, message, AlertTypes.Success);
             }
             else
             {
@@ -354,9 +667,9 @@
         }
 
         var response = new SubmitQuestionResponseModel
-        {
-            QuestionId = questionId
-        };
+            {
+                QuestionId = questionId
+            };
 
         switch (question.QuestionType)
         {
@@ -424,5 +737,23 @@
         }
 
         return response;
+    }
+
+    private string GetSubmitButtonText()
+    {
+        if (_questionnaire?.HasSubmitted == true && _questionnaire.AllowMultipleSubmissions)
+        {
+            return "保存修改";
+        }
+        return "提交问卷";
+    }
+
+    private string GetSubmitButtonIcon()
+    {
+        if (_questionnaire?.HasSubmitted == true && _questionnaire.AllowMultipleSubmissions)
+        {
+            return "mdi-content-save";
+        }
+        return "mdi-check";
     }
 }

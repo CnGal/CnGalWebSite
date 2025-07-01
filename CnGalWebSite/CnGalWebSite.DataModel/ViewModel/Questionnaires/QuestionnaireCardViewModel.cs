@@ -40,7 +40,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public bool HasParticipated { get; set; }
 
         /// <summary>
-        /// 是否允许多次提交
+        /// 是否允许修改答案
         /// </summary>
         public bool AllowMultipleSubmissions { get; set; }
 
