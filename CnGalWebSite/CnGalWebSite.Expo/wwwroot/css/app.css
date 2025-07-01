@@ -430,7 +430,7 @@
         align-items: center;
     }
 /*下划线*/
-.home-page .title-card span, .games-page .title-card span, .lottery-page .title-card span, .contact-card .title-card span {
+.home-page .title-card span, .games-page .title-card span, .lottery-page .title-card span, .contact-card .title-card span, .questionnaires-page .title-card span, .contact-card .title-card span, .questionnaire-detail-page .title-card span, .contact-card .title-card span {
     background: var(--background-image-primary) no-repeat right bottom;
     background-size: 100% 3px;
     transition: background-size 1000ms;
@@ -569,21 +569,23 @@
                 align-items: center;
                 color: var(--background-color-primary) !important;
                 font-size: larger;
-                cursor:pointer;
+                cursor: pointer;
             }
 
                 .lottery-page .lottery-tasks-card .task-card .action-card:hover, .lottery-page .lottery-tasks-card .task-card .action-card.active {
                     background-image: var(--background-image-primary);
                     color: white !important;
                 }
-                    .lottery-page .lottery-tasks-card .task-card .action-card.active{
-                        cursor:inherit;
-                    }
-                    .lottery-page .lottery-tasks-card .task-card .content-card {
-                        display: flex;
-                        align-items: center;
-                        gap: 3rem;
-                    }
+
+                .lottery-page .lottery-tasks-card .task-card .action-card.active {
+                    cursor: inherit;
+                }
+
+            .lottery-page .lottery-tasks-card .task-card .content-card {
+                display: flex;
+                align-items: center;
+                gap: 3rem;
+            }
 
                 .lottery-page .lottery-tasks-card .task-card .content-card i {
                     border: 2px solid transparent;
@@ -715,8 +717,8 @@
 
     .lottery-grid-card .action-card {
         width: 33%;
-
     }
+
         .lottery-grid-card .action-card > div {
             display: flex;
             flex-direction: column;
@@ -729,9 +731,9 @@
             aspect-ratio: 1;
         }
 
-        .lottery-grid-card .action-card> div div:nth-child(1) {
-            font-size: xxx-large;
-        }
+            .lottery-grid-card .action-card > div div:nth-child(1) {
+                font-size: xxx-large;
+            }
 
     .lottery-grid-card .prize-card .name-card {
         text-align: center;
@@ -741,37 +743,41 @@
         background-image: var(--background-image-primary);
         height: 2px;
     }
-    /*抽奖按钮*/
+/*抽奖按钮*/
 .lottery-action-card {
     display: flex;
     justify-content: space-evenly;
     width: 100%;
 }
+
     .lottery-action-card .button-card {
         background-image: var(--background-image-primary);
         color: white !important;
         padding: .5rem 2rem;
         font-size: larger;
         border-radius: 12px;
-        cursor:pointer;
+        cursor: pointer;
     }
-    /*联系我们*/
+/*联系我们*/
 .contact-card {
     max-width: 800px;
     justify-self: center;
     width: 100%;
     padding: 1rem;
 }
+
     .contact-card a {
         color: #b5353a !important;
     }
+
         .contact-card a:hover {
             text-decoration: underline;
         }
-        /*周年庆*/
+/*周年庆*/
 .lottery-anniversary-card {
     padding-top: 4rem;
 }
+
     .lottery-anniversary-card .brief-card a {
         color: #b5353a !important;
     }
@@ -779,6 +785,7 @@
         .lottery-anniversary-card .brief-card a:hover {
             text-decoration: underline;
         }
+
     .lottery-anniversary-card .brief-card {
         font-size: larger;
         justify-self: center;
@@ -792,12 +799,14 @@
         gap: 1rem;
         max-width: 1200px;
     }
+
     .lottery-anniversary-card .award-card {
         width: 24%;
         background-color: rgba(255, 154, 158, 0.2);
         border-radius: 4px;
         padding: 0.5rem;
     }
+
         .lottery-anniversary-card .award-card > div {
             width: 100%;
             height: 100%;
@@ -810,10 +819,12 @@
             justify-content: center;
             justify-content: space-between;
         }
+
     .lottery-anniversary-card img {
         width: 100%;
         border-radius: 12px;
     }
+
 .sponsor-card {
     font-size: small;
 }
@@ -824,7 +835,491 @@
     padding: 1rem;
     gap: .5rem;
 }
+
     .user-info-card .divid-card, .nav-drawer-card .divid-card {
         height: 1px;
         background-image: var(--background-image-primary);
     }
+/*分段标题*/
+.m-border .m-card__title {
+    color: black;
+}
+
+.h-100 {
+    height: 100%;
+}
+
+/*问卷页面样式*/
+.questionnaires-page {
+    padding: 0 1rem;
+    margin-bottom: 4rem;
+}
+
+.questionnaire-intro-card .intro-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.questionnaire-list-card {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading-card {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+/*问卷卡片样式*/
+.questionnaire-item-card {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-bottom: 1rem;
+    width: 600px;
+}
+
+    .questionnaire-item-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .questionnaire-item-card .questionnaire-image-card {
+        position: relative;
+        height: 160px;
+        overflow: hidden;
+        border-radius: 12px 12px 0 0;
+    }
+
+        .questionnaire-item-card .questionnaire-image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .questionnaire-item-card .questionnaire-image-card .default-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background-image: var(--background-image-primary);
+        }
+
+    .questionnaire-item-card .questionnaire-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        line-height: 1.4;
+        padding: 1rem 1rem 0.5rem;
+    }
+
+    .questionnaire-item-card .questionnaire-description {
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .questionnaire-item-card .questionnaire-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+        .questionnaire-item-card .questionnaire-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+    .questionnaire-item-card .questionnaire-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+        .questionnaire-item-card .questionnaire-status .end-time {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+/*问卷详情页样式*/
+.questionnaire-detail-page {
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 2rem;
+    align-items: center;
+}
+
+    .questionnaire-header-card .questionnaire-hero .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .questionnaire-header-card .questionnaire-hero .hero-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+            .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-title {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+
+            .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-description {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+.questionnaire-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+    .questionnaire-meta .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+    }
+
+.progress-card .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/*问题卡片样式*/
+.question-answer-card {
+    margin-bottom: 1rem;
+}
+
+    .question-answer-card .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+        .question-answer-card .question-header .question-type {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+    .question-answer-card .question-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+
+    .question-answer-card .question-description {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .question-answer-card .question-answer-area {
+        margin: 2rem 0;
+    }
+
+    .question-answer-card .question-required-hint {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--m-theme-primary) !important;
+        font-size: 0.9rem;
+    }
+
+    .question-answer-card .text-hint {
+        font-size: 0.8rem;
+        color: #999;
+        margin-top: 0.5rem;
+    }
+
+/*答题区域样式*/
+.single-choice-area .m-radio,
+.multiple-choice-area .m-checkbox {
+    margin-bottom: 0.5rem;
+}
+
+.rating-area {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+    .rating-area .rating-question {
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .rating-area .rating-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+.ranking-area .ranking-instruction {
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+    .ranking-list .ranking-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        cursor: move;
+        transition: all 0.2s ease;
+    }
+
+        .ranking-list .ranking-item:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .ranking-list .ranking-item .ranking-number {
+            background: var(--background-color-primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .ranking-list .ranking-item .ranking-text {
+            flex: 1;
+        }
+
+/*问卷完成页样式*/
+.questionnaire-completion-card {
+    padding: 0 1rem;
+}
+
+.completion-main-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.success-animation {
+    margin-bottom: 2rem;
+}
+
+    .success-animation .completion-icon {
+        animation: checkmark 0.6s ease-in-out;
+    }
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.completion-title h2 {
+    color: #28a745;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+.completion-message {
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+    .completion-message .custom-thank-message {
+        font-size: 1.1rem;
+        color: #495057;
+    }
+
+    .completion-message .default-thank-message {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+
+.completion-stats {
+    margin-bottom: 2rem;
+}
+
+    .completion-stats .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+        .completion-stats .stat-item .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+            margin: 0.5rem 0;
+        }
+
+        .completion-stats .stat-item .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+.completion-actions {
+    margin: 2rem 0 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.completion-recommendation {
+    margin-top: 2rem;
+}
+
+    .completion-recommendation .recommendation-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        justify-content: center;
+    }
+
+    .completion-recommendation .recommendation-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+.share-content p {
+    margin-bottom: 1rem;
+    color: #6c757d;
+}
+/*问卷主页*/
+
+.questionnaires-page .title-card {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 3rem;
+}
+
+.questionnaires-page .cngal-card span:nth-child(1) {
+    padding-right: 55rem;
+}
+
+.questionnaires-page .cngal-card span:nth-child(3) {
+    padding-left: 55rem;
+}
+.questionnaire-detail-page .title-card {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 2rem;
+}
+.questionnaire-detail-page >div{
+    max-width:900px;
+    width:100%;
+}
+.questionnaire-hero p {
+    justify-self: center;
+}
+.questionnaire-detail-page .navigation-card .m-btn__content {
+    padding-right: .5rem;
+}
+
+/* 多选排序题样式 */
+.multiple-ranking-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .multiple-ranking-area .selection-area {
+        background-color: rgba(0, 0, 0, 0.02);
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+        .multiple-ranking-area .selection-area .selection-instruction {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: rgba(0, 0, 0, 0.87);
+        }
+
+        .multiple-ranking-area .selection-area .option-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+    .multiple-ranking-area .ranking-area .ranking-instruction {
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.87);
+    }
+
+    .multiple-ranking-area .no-selection-hint {
+        text-align: center;
+        padding: 20px;
+    }
+
+.ranking-list .ranking-item.selected {
+    background-color: rgba(25, 118, 210, 0.08);
+    border-color: rgba(25, 118, 210, 0.3);
+}

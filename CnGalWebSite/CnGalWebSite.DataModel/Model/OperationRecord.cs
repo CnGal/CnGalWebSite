@@ -42,5 +42,7 @@ namespace CnGalWebSite.DataModel.Model
         Redeemed,
         [Display(Name = "聊天")]
         Chat,
+        [Display(Name = "问卷")]
+        Questionnaire,
     }
 }

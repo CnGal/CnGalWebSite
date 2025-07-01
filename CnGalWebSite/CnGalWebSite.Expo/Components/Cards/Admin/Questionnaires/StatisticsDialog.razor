@@ -1,0 +1,269 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_statisticsDialog" MaxWidth="1200" Scrollable>
+    <MCard Class="pa-4">
+        <MCardTitle>
+            <MRow>
+                <MCol Cols="10">
+                    <MIcon Left>mdi-chart-bar</MIcon>
+                    问卷统计 - @(Statistics?.QuestionnaireName ?? "加载中...")
+                </MCol>
+                <MCol Cols="2" Class="text-right">
+                    <MButton Color="primary" Icon="@true" OnClick="OnRefresh">
+                        <MIcon>mdi-refresh</MIcon>
+                    </MButton>
+                </MCol>
+            </MRow>
+        </MCardTitle>
+
+        <MCardText>
+            @if (Statistics == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            }
+            else
+            {
+                <MRow>
+                    <!-- 基础统计 -->
+                    <MCol Cols="12" Md="3">
+                        <MCard Color="primary" Dark Class="text-center pa-4">
+                            <div class="text-h5">@Statistics.TotalResponses</div>
+                            <div class="text-subtitle-2">总回答数</div>
+                        </MCard>
+                    </MCol>
+
+                    <MCol Cols="12" Md="3">
+                        <MCard Color="success" Dark Class="text-center pa-4">
+                            <div class="text-h5">@Statistics.CompletedResponses</div>
+                            <div class="text-subtitle-2">完成回答数</div>
+                        </MCard>
+                    </MCol>
+
+                    <MCol Cols="12" Md="3">
+                        <MCard Color="warning" Dark Class="text-center pa-4">
+                            <div class="text-h5">@Statistics.DraftResponses</div>
+                            <div class="text-subtitle-2">草稿数</div>
+                        </MCard>
+                    </MCol>
+
+                    <MCol Cols="12" Md="3">
+                        <MCard Color="info" Dark Class="text-center pa-4">
+                            <div class="text-h5">@(Statistics.CompletionRate.ToString("P1"))</div>
+                            <div class="text-subtitle-2">完成率</div>
+                        </MCard>
+                    </MCol>
+
+                    <!-- 时间统计 -->
+                    <MCol Cols="12">
+                        <MCard Class="pa-4">
+                            <MCardTitle Class="text-h6">时间统计</MCardTitle>
+                            <MCardText>
+                                <MRow>
+                                    <MCol Cols="6" Md="3">
+                                        <div class="text-subtitle-2">平均完成时间</div>
+                                        <div class="text-body-1 font-weight-bold">@FormatDuration(Statistics.AverageCompletionTimeSeconds)</div>
+                                    </MCol>
+                                    <MCol Cols="6" Md="3">
+                                        <div class="text-subtitle-2">首次回答时间</div>
+                                        <div class="text-body-1 font-weight-bold">@(Statistics.FirstResponseTime?.ToString("yyyy-MM-dd HH:mm") ?? "无")</div>
+                                    </MCol>
+                                    <MCol Cols="6" Md="3">
+                                        <div class="text-subtitle-2">最后回答时间</div>
+                                        <div class="text-body-1 font-weight-bold">@(Statistics.LastResponseTime?.ToString("yyyy-MM-dd HH:mm") ?? "无")</div>
+                                    </MCol>
+                                    <MCol Cols="6" Md="3">
+                                        <div class="text-subtitle-2">总运行天数</div>
+                                        <div class="text-body-1 font-weight-bold">@CalculateRunningDays()</div>
+                                    </MCol>
+                                </MRow>
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+
+                    <!-- 完成率图表和参与度信息 -->
+                    <MCol Cols="12" Md="6">
+                        <MCard Class="pa-4 h-100">
+                            <MCardTitle Class="text-h6">完成率分析</MCardTitle>
+                            <MCardText>
+                                <div class="d-flex justify-center">
+                                    <MProgressCircular Size="120"
+                                                       Width="12"
+                                                       Color="primary"
+                                                       Value="@(Statistics.CompletionRate * 100)">
+                                        <div class="text-h6">@(Statistics.CompletionRate.ToString("P1"))</div>
+                                        <div class="text-caption">完成率</div>
+                                    </MProgressCircular>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-space-between">
+                                        <span>已完成</span>
+                                        <span class="font-weight-bold">@Statistics.CompletedResponses</span>
+                                    </div>
+                                    <div class="d-flex justify-space-between">
+                                        <span>草稿</span>
+                                        <span class="font-weight-bold">@Statistics.DraftResponses</span>
+                                    </div>
+                                </div>
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+
+                    <MCol Cols="12" Md="6">
+                        <MCard Class="pa-4 h-100">
+                            <MCardTitle Class="text-h6">参与度信息</MCardTitle>
+                            <MCardText>
+                                <div class="text-subtitle-2 mb-2">当前状态</div>
+                                <MChip Color="@GetStatusColor()" TextColor="white" Class="mb-3">
+                                    @GetStatusText()
+                                </MChip>
+
+                                @if (Statistics.TotalResponses > 0)
+                                {
+                                    <div class="mb-3">
+                                        <div class="text-subtitle-2">参与度评级</div>
+                                        <div class="d-flex align-center mt-2">
+                                            <MRating Readonly
+                                                     Value="@CalculateParticipationRating()"
+                                                     Length="5"
+                                                     Color="orange"
+                                                     Size="10" />
+                                            <span class="ml-2 text-body-2">(@GetParticipationLevel())</span>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div>
+                                    <div class="text-subtitle-2">推荐操作</div>
+                                    <div class="text-body-2 mt-1">
+                                        @GetRecommendation()
+                                    </div>
+                                </div>
+                            </MCardText>
+                        </MCard>
+                    </MCol>
+                </MRow>
+            }
+        </MCardText>
+    </MCard>
+</MDialog>
+
+@code {
+    private bool _statisticsDialog = false;
+    private long _questionnaireId;
+    private QuestionnaireStatisticsModel Statistics;
+
+    public async Task ShowStatistics(long questionnaireId)
+    {
+        _questionnaireId = questionnaireId;
+        Statistics = null;
+        _statisticsDialog = true;
+        StateHasChanged();
+
+        await LoadStatistics();
+    }
+
+    private async Task LoadStatistics()
+    {
+        try
+        {
+            Statistics = await _httpService.GetAsync<QuestionnaireStatisticsModel>($"api/questionnaires/GetQuestionnaireStatistics/{_questionnaireId}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("加载统计信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private async Task OnRefresh()
+    {
+        Statistics = null;
+        StateHasChanged();
+        await LoadStatistics();
+    }
+
+    private void CloseDialog()
+    {
+        _statisticsDialog = false;
+    }
+
+    private string FormatDuration(double seconds)
+    {
+        if (seconds <= 0) return "未知";
+
+        var timeSpan = TimeSpan.FromSeconds(seconds);
+        if (timeSpan.TotalMinutes < 1)
+            return $"{(int)seconds}秒";
+        else if (timeSpan.TotalHours < 1)
+            return $"{(int)timeSpan.TotalMinutes}分{timeSpan.Seconds}秒";
+        else
+            return $"{(int)timeSpan.TotalHours}小时{timeSpan.Minutes}分";
+    }
+
+    private string CalculateRunningDays()
+    {
+        if (Statistics.FirstResponseTime == null || Statistics.LastResponseTime == null)
+            return "0天";
+
+        var days = (Statistics.LastResponseTime.Value - Statistics.FirstResponseTime.Value).Days + 1;
+        return $"{days}天";
+    }
+
+    private string GetStatusColor()
+    {
+        if (Statistics.TotalResponses >= 100) return "success";
+        if (Statistics.TotalResponses >= 50) return "warning";
+        if (Statistics.TotalResponses >= 10) return "info";
+        return "error";
+    }
+
+    private string GetStatusText()
+    {
+        if (Statistics.TotalResponses >= 100) return "热门";
+        if (Statistics.TotalResponses >= 50) return "活跃";
+        if (Statistics.TotalResponses >= 10) return "一般";
+        return "冷门";
+    }
+
+    private int CalculateParticipationRating()
+    {
+        if (Statistics.TotalResponses >= 500) return 5;
+        if (Statistics.TotalResponses >= 200) return 4;
+        if (Statistics.TotalResponses >= 100) return 3;
+        if (Statistics.TotalResponses >= 50) return 2;
+        if (Statistics.TotalResponses >= 10) return 1;
+        return 0;
+    }
+
+    private string GetParticipationLevel()
+    {
+        var rating = CalculateParticipationRating();
+        return rating switch
+        {
+            5 => "非常热门",
+            4 => "很受欢迎",
+            3 => "中等参与",
+            2 => "较少参与",
+            1 => "初期阶段",
+            _ => "待激活"
+        };
+    }
+
+    private string GetRecommendation()
+    {
+        var completionRate = Statistics.CompletionRate;
+        var totalResponses = Statistics.TotalResponses;
+
+        if (totalResponses < 10)
+            return "问卷刚刚起步，建议加强推广，提高知名度。";
+        if (completionRate < 0.5)
+            return "完成率较低，建议检查问卷设计，优化用户体验。";
+        if (completionRate > 0.8 && totalResponses > 50)
+            return "问卷表现优秀！可以考虑扩大推广范围。";
+        if (Statistics.DraftResponses > Statistics.CompletedResponses)
+            return "草稿数量较多，建议简化问卷内容，提高完成率。";
+
+        return "问卷运行正常，继续保持当前状态。";
+    }
+}

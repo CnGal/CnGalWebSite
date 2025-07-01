@@ -111,6 +111,12 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<ExpoTask> ExpoTasks { get; set; }
         public DbSet<ExpoAward> ExpoAwards { get; set; }
         public DbSet<ExpoPrize> ExpoPrizes { get; set; }
+        public DbSet<Questionnaire> Questionnaires { get; set; }
+        public DbSet<QuestionnaireQuestion> QuestionnaireQuestions { get; set; }
+        public DbSet<QuestionOption> QuestionOptions { get; set; }
+        public DbSet<QuestionDisplayCondition> QuestionDisplayConditions { get; set; }
+        public DbSet<QuestionnaireResponse> QuestionnaireResponses { get; set; }
+        public DbSet<QuestionResponse> QuestionResponses { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -161,6 +167,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Video>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<EntryInformationType>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Commodity>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Questionnaire>().HasIndex(g => g.Name).IsUnique();
 
             //限定外键唯一
             modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();
@@ -359,6 +366,91 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 Name = "制作组"
             }
             );
+
+            //配置问卷相关实体关系
+            //问卷题目与问卷的关系
+            modelBuilder.Entity<QuestionnaireQuestion>()
+                .HasOne(q => q.Questionnaire)
+                .WithMany(qn => qn.Questions)
+                .HasForeignKey(q => q.QuestionnaireId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //题目选项与题目的关系
+            modelBuilder.Entity<QuestionOption>()
+                .HasOne(o => o.Question)
+                .WithMany(q => q.Options)
+                .HasForeignKey(o => o.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //题目显示条件与题目的关系
+            modelBuilder.Entity<QuestionDisplayCondition>()
+                .HasOne(c => c.ControlledQuestion)
+                .WithMany(q => q.DisplayConditions)
+                .HasForeignKey(c => c.ControlledQuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<QuestionDisplayCondition>()
+                .HasOne(c => c.TriggerQuestion)
+                .WithMany(q => q.TriggeredConditions)
+                .HasForeignKey(c => c.TriggerQuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<QuestionDisplayCondition>()
+                .HasOne(c => c.TriggerOption)
+                .WithMany(o => o.TriggeredConditions)
+                .HasForeignKey(c => c.TriggerOptionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //问卷回答与问卷的关系
+            modelBuilder.Entity<QuestionnaireResponse>()
+                .HasOne(r => r.Questionnaire)
+                .WithMany(q => q.Responses)
+                .HasForeignKey(r => r.QuestionnaireId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //问卷回答与用户的关系
+            modelBuilder.Entity<QuestionnaireResponse>()
+                .HasOne(r => r.ApplicationUser)
+                .WithMany()
+                .HasForeignKey(r => r.ApplicationUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            //题目回答与问卷回答的关系
+            modelBuilder.Entity<QuestionResponse>()
+                .HasOne(r => r.QuestionnaireResponse)
+                .WithMany(qr => qr.QuestionResponses)
+                .HasForeignKey(r => r.QuestionnaireResponseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //题目回答与题目的关系
+            modelBuilder.Entity<QuestionResponse>()
+                .HasOne(r => r.Question)
+                .WithMany(q => q.Responses)
+                .HasForeignKey(r => r.QuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //设置索引
+            modelBuilder.Entity<QuestionnaireQuestion>()
+                .HasIndex(q => new { q.QuestionnaireId, q.SortOrder });
+
+            modelBuilder.Entity<QuestionOption>()
+                .HasIndex(o => new { o.QuestionId, o.SortOrder });
+
+            modelBuilder.Entity<QuestionnaireResponse>()
+                .HasIndex(r => new { r.QuestionnaireId, r.ApplicationUserId, r.SubmitTime });
+
+            modelBuilder.Entity<QuestionResponse>()
+                .HasIndex(r => new { r.QuestionnaireResponseId, r.QuestionId });
+
+            //设置复合唯一索引（防止同一用户多次提交同一问卷，如果不允许多次提交）
+            modelBuilder.Entity<QuestionnaireResponse>()
+                .HasIndex(r => new { r.QuestionnaireId, r.ApplicationUserId })
+                .HasDatabaseName("IX_QuestionnaireResponse_Questionnaire_User");
+
+            //设置复合唯一索引（防止同一问卷回答中重复回答同一题目）
+            modelBuilder.Entity<QuestionResponse>()
+                .HasIndex(r => new { r.QuestionnaireResponseId, r.QuestionId })
+                .IsUnique();
 
         }
     }

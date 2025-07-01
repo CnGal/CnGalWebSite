@@ -1,0 +1,142 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="QuestionnaireOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <ItemColContent>
+        @if (context.Header.Value == "actions")
+        {
+            <MIcon Color="success"
+                   Class="mr-2"
+                   OnClick="()=>EditItem(context.Item)">mdi-pencil</MIcon>
+            <MIcon Color="info"
+                   Class="mr-2"
+                   OnClick="()=>ViewStatistics(context.Item)">mdi-chart-bar</MIcon>
+            <MIcon Color="@(context.Item.IsHidden ? "error" : "warning")"
+                   OnClick="()=>ToggleHidden(context.Item)">@(context.Item.IsHidden ? "mdi-eye-off" : "mdi-eye")</MIcon>
+        }
+        else if (context.Header.Value == nameof(QuestionnaireOverviewModel.IsActive))
+        {
+            <MChip Small Color="@(context.Item.IsActive ? "success" : "error")" TextColor="white">
+                @(context.Item.IsActive ? "激活" : "未激活")
+            </MChip>
+        }
+        else if (context.Header.Value == nameof(QuestionnaireOverviewModel.IsHidden))
+        {
+            <MChip Small Color="@(context.Item.IsHidden ? "error" : "success")" TextColor="white">
+                @(context.Item.IsHidden ? "隐藏" : "显示")
+            </MChip>
+        }
+        else if (context.Header.Value == nameof(QuestionnaireOverviewModel.BeginTime))
+        {
+            @(context.Item.BeginTime?.ToString("yyyy-MM-dd HH:mm") ?? "无限制")
+        }
+        else if (context.Header.Value == nameof(QuestionnaireOverviewModel.EndTime))
+        {
+            @(context.Item.EndTime?.ToString("yyyy-MM-dd HH:mm") ?? "无限制")
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+    <ButtonContent>
+        <CnGalWebSite.Components.Buttons.MasaButton Rounded Class="me-4" Text="刷新" Icon="mdi-refresh" OnClick="OnRefresh" />
+    </ButtonContent>
+</CnGalWebSite.Components.DataTables.DataTableCard>
+
+<EditCard OnEdited="OnEdited" @ref="editCard" />
+<StatisticsDialog @ref="statisticsCard" />
+
+@code {
+    private string _baseUrl = "api/questionnaires/List";
+    private string _name = "问卷";
+
+    private List<DataTableHeader<QuestionnaireOverviewModel>> _headers = new List<DataTableHeader<QuestionnaireOverviewModel>>
+    {
+        new ()
+        {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(QuestionnaireOverviewModel.Id)
+        },
+        new (){ Text= "名称", Value= nameof(QuestionnaireOverviewModel.DisplayName), Sortable=false},
+        new (){ Text= "唯一名", Value= nameof(QuestionnaireOverviewModel.Name), Sortable=false},
+        new (){ Text= "状态", Value= nameof(QuestionnaireOverviewModel.IsActive), Sortable=false},
+        new (){ Text= "显示", Value= nameof(QuestionnaireOverviewModel.IsHidden), Sortable=false},
+        new (){ Text= "开始时间", Value= nameof(QuestionnaireOverviewModel.BeginTime), Sortable=false},
+        new (){ Text= "结束时间", Value= nameof(QuestionnaireOverviewModel.EndTime), Sortable=false},
+        new (){ Text= "提交数", Value= nameof(QuestionnaireOverviewModel.ResponseCount)},
+        new (){ Text= "优先级", Value= nameof(QuestionnaireOverviewModel.Priority)},
+        new (){ Text= "操作", Value= "actions", Sortable=false }
+    };
+
+    CnGalWebSite.Components.DataTables.DataTableCard<QuestionnaireOverviewModel> dataTableCard;
+    EditCard editCard;
+    StatisticsDialog statisticsCard;
+
+    protected override void OnInitialized()
+    {
+        OnRefresh();
+    }
+
+    public async void EditItem(QuestionnaireOverviewModel item)
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(item.Id);
+        }
+    }
+
+    public async Task ViewStatistics(QuestionnaireOverviewModel item)
+    {
+        if (statisticsCard != null)
+        {
+            await statisticsCard.ShowStatistics(item.Id);
+        }
+    }
+
+    public async Task ToggleHidden(QuestionnaireOverviewModel item)
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<HiddenQuestionnaireModel, Result>("api/questionnaires/HiddenQuestionnaire",
+                new HiddenQuestionnaireModel { Id = item.Id, IsHidden = !item.IsHidden });
+
+            if (result.Successful)
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? $"成功{(item.IsHidden ? "显示" : "隐藏")}问卷", AlertTypes.Success);
+                OnEdited();
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("操作失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public void OnEdited()
+    {
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public void OnRefresh()
+    {
+        OnEdited();
+    }
+
+    public async Task AddItem()
+    {
+        if (editCard != null)
+        {
+            await editCard.Refresh(0);
+        }
+    }
+}

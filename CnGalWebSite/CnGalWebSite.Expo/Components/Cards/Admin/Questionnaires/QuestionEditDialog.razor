@@ -1,0 +1,700 @@
+﻿@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog" MaxWidth="800">
+    <MCard>
+        @if (Model == null)
+        {
+            <MCardText Class="pt-8 pb-8">
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            </MCardText>
+        }
+        else
+        {
+            <MCardTitle>
+                @(Model.Id == 0 ? "添加题目" : "编辑题目")
+            </MCardTitle>
+            <MCardText Class="overflow-auto" Style="max-height:900px;">
+                <MRow Dense>
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="基本信息" />
+                    </MCol>
+
+                    <MCol Cols="8">
+                        <MTextField @bind-Value="@Model.Title" Label="题目标题" Rules="@_titleRules" />
+                    </MCol>
+                    <MCol Cols="4">
+                        <MTextField @bind-Value="@Model.SortOrder" Label="排序" Type="number" />
+                    </MCol>
+
+                    <MCol Cols="12">
+                        <MTextarea @bind-Value="@Model.Description" Label="题目描述" Rows="2" />
+                    </MCol>
+
+                    <MCol Cols="4">
+                        <CnGalWebSite.Components.Inputs.MasaSelecte Value="@Model.QuestionType" TValue="QuestionType"
+                                                                    Label="题目类型"
+                                                                    ValueChanged="OnQuestionTypeChanged" />
+                    </MCol>
+                    <MCol Cols="4">
+                        <MTextField @bind-Value="@Model.TextPlaceholder" Label="提示文本" />
+                    </MCol>
+                    <MCol Cols="4">
+                        <MCheckbox @bind-Value="@Model.IsRequired" Label="是否必填" />
+                    </MCol>
+
+                    <!-- 验证规则 -->
+                    @if (ShowSelectionLimits)
+                    {
+                        <MCol Cols="12">
+                            <CnGalWebSite.Components.Cards.SectionTitleCard Title="选择限制" />
+                        </MCol>
+                        <MCol Cols="6">
+                            <MTextField @bind-Value="@Model.MinSelectionCount" Label="最少选择数量" Type="number" />
+                        </MCol>
+                        <MCol Cols="6">
+                            <MTextField @bind-Value="@Model.MaxSelectionCount" Label="最多选择数量" Type="number" />
+                        </MCol>
+                    }
+
+                    @if (ShowTextLengthLimit)
+                    {
+                        <MCol Cols="12">
+                            <CnGalWebSite.Components.Cards.SectionTitleCard Title="文本限制" />
+                        </MCol>
+                        <MCol Cols="6">
+                            <MTextField @bind-Value="@Model.MaxTextLength" Label="最大文本长度" Type="number" />
+                        </MCol>
+                    }
+
+                    <!-- 选项管理 -->
+                    @if (ShowOptions)
+                    {
+                        <MCol Cols="12">
+                            <CnGalWebSite.Components.Cards.SectionTitleCard Title="选项管理" />
+                        </MCol>
+
+                        @if (Model.Options?.Any() == true)
+                        {
+                            @for (int i = 0; i < Model.Options.Count; i++)
+                            {
+                                var option = Model.Options[i];
+                                var index = i; // 避免闭包问题
+                                <MCol Cols="12">
+                                    <MCard Class="mb-2" Outlined>
+                                        <MCardText>
+                                            <MRow Dense>
+                                                <MCol Cols="6">
+                                                    <MTextField @bind-Value="@option.Text" Label="选项文本" />
+                                                </MCol>
+                                                <MCol Cols="3">
+                                                    <MTextField @bind-Value="@option.Value" Label="选项值" />
+                                                </MCol>
+                                                <MCol Cols="2">
+                                                    <MTextField @bind-Value="@option.SortOrder" Label="排序" Type="number" />
+                                                </MCol>
+                                                <MCol Cols="1" Class="text-right">
+                                                    <CnGalWebSite.Components.Buttons.MasaButton Small Fab Icon="mdi-delete" Color="error" OnClick="()=>DeleteOption(index)" />
+                                                </MCol>
+                                                <MCol Cols="6">
+                                                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@option.Image" ShowCropper
+                                                                                                 Type="DrawingBed.Models.DataModels.ImageAspectType.None"
+                                                                                                 Text="上传选项图片" Gallery />
+                                                </MCol>
+                                                <MCol Cols="6">
+                                                    <MCheckbox @bind-Value="@option.IsEnabled" Label="是否启用" />
+                                                </MCol>
+                                            </MRow>
+                                        </MCardText>
+                                    </MCard>
+                                </MCol>
+                            }
+                        }
+
+                        <MCol Cols="12">
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加选项" OnClick="AddOption" Icon="mdi-plus" Class="mr-2" />
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="批量导入" OnClick="OpenBatchImportDialog" Icon="mdi-import" />
+                        </MCol>
+                    }
+
+                    <!-- 显示条件 -->
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="显示条件" />
+                    </MCol>
+
+                    @if (Model.DisplayConditions?.Any() == true)
+                    {
+                        @for (int i = 0; i < Model.DisplayConditions.Count; i++)
+                        {
+                            var condition = Model.DisplayConditions[i];
+                            var index = i;
+                            <MCol Cols="12">
+                                <MCard Class="mb-2" Outlined>
+                                    <MCardText>
+                                        <MRow Dense>
+                                            <MCol Cols="3">
+                                                <MSelect Value="@condition.ConditionType"
+                                                         Label="条件类型"
+                                                         Items="@ConditionTypeItems"
+                                                         ItemText="@(item => item.Text)"
+                                                         ItemValue="@(item => item.Value)"
+                                                         TValue="ConditionType"
+                                                         TItem="SelectItemModel<ConditionType>"
+                                                         TItemValue="ConditionType"
+                                                         ValueChanged="@(value => OnConditionTypeChanged(condition, value))" />
+                                            </MCol>
+                                            <MCol Cols="3">
+                                                <MSelect Value="@condition.TriggerQuestionId"
+                                                         Label="触发题目"
+                                                         Items="@GetAvailableQuestions()"
+                                                         ItemText="@(item => item.Text)"
+                                                         ItemValue="@(item => item.Value)"
+                                                         TValue="long?"
+                                                         TItem="SelectItemModel<long?>"
+                                                         TItemValue="long?"
+                                                         ValueChanged="@(value => OnTriggerQuestionChanged(condition, value))" />
+                                            </MCol>
+                                            @if (ShowTriggerOption(condition))
+                                            {
+                                                <MCol Cols="3">
+                                                    <MSelect Value="@condition.TriggerOptionId"
+                                                             Label="触发选项"
+                                                             Items="@GetAvailableOptions(condition.TriggerQuestionId)"
+                                                             ItemText="@(item => item.Text)"
+                                                             ItemValue="@(item => item.Value)"
+                                                             TValue="long?"
+                                                             TItem="SelectItemModel<long?>"
+                                                             TItemValue="long?"
+                                                             ValueChanged="@(value => condition.TriggerOptionId = value)" />
+                                                </MCol>
+                                            }
+                                            else if (ShowExpectedValue(condition))
+                                            {
+                                                <MCol Cols="3">
+                                                    <MTextField @bind-Value="@condition.ExpectedValue" Label="预期值" />
+                                                </MCol>
+                                            }
+                                            else
+                                            {
+                                                <MCol Cols="3">
+                                                    <!-- 占位列 -->
+                                                </MCol>
+                                            }
+                                            <MCol Cols="2">
+                                                <MSelect Value="@condition.LogicalOperator"
+                                                         Label="逻辑操作符"
+                                                         Items="@LogicalOperatorItems"
+                                                         ItemText="@(item => item.Text)"
+                                                         ItemValue="@(item => item.Value)"
+                                                         TValue="LogicalOperator"
+                                                         TItem="SelectItemModel<LogicalOperator>"
+                                                         TItemValue="LogicalOperator"
+                                                         ValueChanged="@(value => condition.LogicalOperator = value)" />
+                                            </MCol>
+                                            <MCol Cols="1" Class="text-right">
+                                                <CnGalWebSite.Components.Buttons.MasaButton Small Fab Icon="mdi-delete" Color="error" OnClick="()=>DeleteCondition(index)" />
+                                            </MCol>
+                                        </MRow>
+                                    </MCardText>
+                                </MCard>
+                            </MCol>
+                        }
+                    }
+
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加显示条件" OnClick="AddDisplayCondition" Icon="mdi-plus" />
+                    </MCol>
+                </MRow>
+            </MCardText>
+            <MCardActions Class="pb-6 ps-6 pe-6">
+                <MSpacer></MSpacer>
+                <MButton Color="primary" Rounded OnClick="SaveQuestion" Class="ml-2">
+                    <MIcon Left>mdi-check</MIcon>
+                    保存
+                </MButton>
+            </MCardActions>
+        }
+
+    </MCard>
+</MDialog>
+
+<!-- 批量导入选项对话框 -->
+<MDialog @bind-Value="_batchImportDialog" MaxWidth="600">
+    <MCard>
+        <MCardTitle>
+            批量导入选项
+        </MCardTitle>
+        <MCardText>
+            请输入选项内容，每行一个选项。程序将自动为每个选项分配序号作为选项值。
+        </MCardText>
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MTextarea @bind-Value="_batchImportText"
+                               Label="选项内容"
+                               Placeholder="请输入选项内容，每行一个选项，例如：&#10;苹果&#10;香蕉&#10;橙子&#10;葡萄"
+                               Rows="10"
+                               Rules="@_batchImportRules" />
+                </MCol>
+                <MCol Cols="6">
+                    <MCheckbox @bind-Value="_clearExistingOptions" Label="清空现有选项" />
+                </MCol>
+                <MCol Cols="6">
+                    <MCheckbox @bind-Value="_autoGenerateValues" Label="自动生成选项值" />
+                </MCol>
+            </MRow>
+        </MCardText>
+        <MCardActions>
+            <MSpacer />
+            <MButton Color="primary" Rounded OnClick="ImportOptions" Class="ml-2">
+                <MIcon Left>mdi-import</MIcon>
+                导入
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    [Parameter]
+    public List<EditQuestionnaireQuestionModel> Questions { get; set; } = new();
+
+    private EditQuestionnaireQuestionModel Model = new();
+    private bool _editDialog = false;
+    private EditQuestionnaireQuestionModel _originalQuestionReference = null;
+
+    // 批量导入相关字段
+    private bool _batchImportDialog = false;
+    private string _batchImportText = "";
+    private bool _clearExistingOptions = false;
+    private bool _autoGenerateValues = true;
+
+    // 验证规则
+    private readonly List<Func<string, StringBoolean>> _titleRules = [
+        value => string.IsNullOrWhiteSpace(value) ? "题目标题不能为空" : true
+    ];
+
+    private readonly List<Func<string, StringBoolean>> _batchImportRules = [
+        value => string.IsNullOrWhiteSpace(value) ? "请输入选项内容" : true
+    ];
+
+    // 选择项数据
+    private List<SelectItemModel<QuestionType>> QuestionTypeItems = new()
+    {
+        new() { Text = "单选题", Value = QuestionType.SingleChoice },
+        new() { Text = "多选题", Value = QuestionType.MultipleChoice },
+        new() { Text = "排序题", Value = QuestionType.Ranking },
+        new() { Text = "多选排序题", Value = QuestionType.MultipleRanking },
+        new() { Text = "主观题", Value = QuestionType.Essay },
+        new() { Text = "数值输入", Value = QuestionType.Numeric },
+        new() { Text = "评分题", Value = QuestionType.Rating }
+    };
+
+    private List<SelectItemModel<ConditionType>> ConditionTypeItems = new()
+    {
+        new() { Text = "选择了指定选项", Value = ConditionType.OptionSelected },
+        new() { Text = "没有选择指定选项", Value = ConditionType.OptionNotSelected },
+        new() { Text = "文本包含", Value = ConditionType.TextContains },
+        new() { Text = "文本不包含", Value = ConditionType.TextNotContains },
+        new() { Text = "数值等于", Value = ConditionType.NumericEquals },
+        new() { Text = "数值大于", Value = ConditionType.NumericGreaterThan },
+        new() { Text = "数值小于", Value = ConditionType.NumericLessThan },
+        new() { Text = "已回答", Value = ConditionType.Answered },
+        new() { Text = "未回答", Value = ConditionType.NotAnswered }
+    };
+
+    private List<SelectItemModel<LogicalOperator>> LogicalOperatorItems = new()
+    {
+        new() { Text = "并且", Value = LogicalOperator.And },
+        new() { Text = "或者", Value = LogicalOperator.Or }
+    };
+
+    // 计算属性
+    private bool ShowOptions => Model.QuestionType == QuestionType.SingleChoice ||
+                               Model.QuestionType == QuestionType.MultipleChoice ||
+                               Model.QuestionType == QuestionType.Ranking ||
+                               Model.QuestionType == QuestionType.MultipleRanking ||
+                               Model.QuestionType == QuestionType.Rating;
+
+    private bool ShowSelectionLimits => Model.QuestionType == QuestionType.MultipleChoice ||
+                                      Model.QuestionType == QuestionType.MultipleRanking;
+
+    private bool ShowTextLengthLimit => Model.QuestionType == QuestionType.Essay;
+
+    public void EditQuestion(EditQuestionnaireQuestionModel question)
+    {
+        // 记录原始题目引用，用于后续的更新操作
+        _originalQuestionReference = question;
+
+        Model = new EditQuestionnaireQuestionModel
+            {
+                Id = question.Id,
+                Title = question.Title,
+                Description = question.Description,
+                QuestionType = question.QuestionType,
+                IsRequired = question.IsRequired,
+                SortOrder = question.SortOrder,
+                MinSelectionCount = question.MinSelectionCount,
+                MaxSelectionCount = question.MaxSelectionCount,
+                MaxTextLength = question.MaxTextLength,
+                TextPlaceholder = question.TextPlaceholder,
+                Options = question.Options.Select(o => new EditQuestionOptionModel
+                {
+                    Id = o.Id,
+                    Text = o.Text,
+                    Value = o.Value,
+                    SortOrder = o.SortOrder,
+                    IsEnabled = o.IsEnabled,
+                    Image = o.Image
+                }).ToList(),
+                DisplayConditions = question.DisplayConditions.Select(c => new EditQuestionDisplayConditionModel
+                {
+                    Id = c.Id,
+                    ConditionType = c.ConditionType,
+                    LogicalOperator = c.LogicalOperator,
+                    TriggerQuestionId = c.TriggerQuestionId,
+                    TriggerOptionId = c.TriggerOptionId,
+                    ExpectedValue = c.ExpectedValue,
+                    ConditionGroup = c.ConditionGroup
+                }).ToList()
+            };
+
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+    public void CreateQuestion()
+    {
+        // 清空原始题目引用，因为这是创建新题目
+        _originalQuestionReference = null;
+
+        Model = new EditQuestionnaireQuestionModel
+            {
+                Id = 0,
+                Title = "新题目",
+                QuestionType = QuestionType.SingleChoice,
+                SortOrder = (Questions.Count == 0 ? 0 : Questions?.Max(q => q.SortOrder) ?? 0) + 1,
+                IsRequired = false,
+                Options = new List<EditQuestionOptionModel>(),
+                DisplayConditions = new List<EditQuestionDisplayConditionModel>()
+            };
+
+        _editDialog = true;
+        StateHasChanged();
+    }
+
+    private void OnQuestionTypeChanged(QuestionType questionType)
+    {
+        Model.QuestionType = questionType;
+
+        // 根据题目类型自动添加默认选项
+        if (ShowOptions && Model.Options.Count == 0)
+        {
+            Model.Options.Add(new EditQuestionOptionModel
+                {
+                    Text = "选项1",
+                    Value = "1",
+                    SortOrder = 1,
+                    IsEnabled = true
+                });
+            Model.Options.Add(new EditQuestionOptionModel
+                {
+                    Text = "选项2",
+                    Value = "2",
+                    SortOrder = 2,
+                    IsEnabled = true
+                });
+        }
+
+        StateHasChanged();
+    }
+
+    private void AddOption()
+    {
+        Model.Options.Add(new EditQuestionOptionModel
+            {
+                Text = $"选项{Model.Options.Count + 1}",
+                Value = (Model.Options.Count + 1).ToString(),
+                SortOrder = Model.Options.Count + 1,
+                IsEnabled = true
+            });
+        StateHasChanged();
+    }
+
+    private void DeleteOption(int index)
+    {
+        if (index >= 0 && index < Model.Options.Count)
+        {
+            Model.Options.RemoveAt(index);
+            // 重新排序
+            for (int i = 0; i < Model.Options.Count; i++)
+            {
+                Model.Options[i].SortOrder = i + 1;
+            }
+            StateHasChanged();
+        }
+    }
+
+    // 获取可用的触发题目列表（排除当前题目和之后的题目）
+    private List<SelectItemModel<long?>> GetAvailableQuestions()
+    {
+        var availableQuestions = new List<SelectItemModel<long?>>();
+
+        foreach (var question in Questions.Where(q => q.SortOrder < Model.SortOrder).OrderBy(q => q.SortOrder))
+        {
+            availableQuestions.Add(new SelectItemModel<long?>
+                {
+                    Text = $"{question.SortOrder}. {question.Title}",
+                    Value = question.Id == 0 ? (long?)null : question.Id
+                });
+        }
+
+        return availableQuestions;
+    }
+
+    // 根据触发题目获取可用选项列表
+    private List<SelectItemModel<long?>> GetAvailableOptions(long? triggerQuestionId)
+    {
+        var availableOptions = new List<SelectItemModel<long?>>();
+
+        if (triggerQuestionId.HasValue)
+        {
+            var triggerQuestion = Questions.FirstOrDefault(q => q.Id == triggerQuestionId.Value);
+            if (triggerQuestion?.Options?.Any() == true)
+            {
+                foreach (var option in triggerQuestion.Options.OrderBy(o => o.SortOrder))
+                {
+                    availableOptions.Add(new SelectItemModel<long?>
+                        {
+                            Text = option.Text,
+                            Value = option.Id == 0 ? (long?)null : option.Id
+                        });
+                }
+            }
+        }
+
+        return availableOptions;
+    }
+
+    // 判断是否显示触发选项选择器
+    private bool ShowTriggerOption(EditQuestionDisplayConditionModel condition)
+    {
+        return condition.ConditionType == ConditionType.OptionSelected ||
+               condition.ConditionType == ConditionType.OptionNotSelected;
+    }
+
+    // 判断是否显示预期值输入框
+    private bool ShowExpectedValue(EditQuestionDisplayConditionModel condition)
+    {
+        return condition.ConditionType == ConditionType.TextContains ||
+               condition.ConditionType == ConditionType.TextNotContains ||
+               condition.ConditionType == ConditionType.NumericEquals ||
+               condition.ConditionType == ConditionType.NumericGreaterThan ||
+               condition.ConditionType == ConditionType.NumericLessThan;
+    }
+
+    // 条件类型改变时的处理
+    private void OnConditionTypeChanged(EditQuestionDisplayConditionModel condition, ConditionType conditionType)
+    {
+        condition.ConditionType = conditionType;
+
+        // 清空相关字段
+        if (!ShowTriggerOption(condition))
+        {
+            condition.TriggerOptionId = null;
+        }
+
+        if (!ShowExpectedValue(condition))
+        {
+            condition.ExpectedValue = null;
+        }
+
+        StateHasChanged();
+    }
+
+    // 触发题目改变时的处理
+    private void OnTriggerQuestionChanged(EditQuestionDisplayConditionModel condition, long? triggerQuestionId)
+    {
+        condition.TriggerQuestionId = triggerQuestionId;
+
+        // 清空触发选项
+        condition.TriggerOptionId = null;
+
+        StateHasChanged();
+    }
+
+    private void AddDisplayCondition()
+    {
+        Model.DisplayConditions.Add(new EditQuestionDisplayConditionModel
+            {
+                ConditionType = ConditionType.OptionSelected,
+                LogicalOperator = LogicalOperator.And,
+                ConditionGroup = 1,
+                TriggerQuestionId = null,
+                TriggerOptionId = null,
+                ExpectedValue = null
+            });
+        StateHasChanged();
+    }
+
+    private void DeleteCondition(int index)
+    {
+        if (index >= 0 && index < Model.DisplayConditions.Count)
+        {
+            Model.DisplayConditions.RemoveAt(index);
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveQuestion()
+    {
+        try
+        {
+            var validationResult = Model.Validate();
+            if (!validationResult.Successful)
+            {
+                await _popupService.EnqueueSnackbarAsync("验证失败", validationResult.Error, AlertTypes.Error);
+                return;
+            }
+
+            // 检查是否已经存在该题目（通过引用或ID匹配）
+            EditQuestionnaireQuestionModel existingQuestion = null;
+            int existingIndex = -1;
+
+            // 首先通过原始引用查找（针对新创建的题目）
+            if (_originalQuestionReference != null)
+            {
+                existingIndex = Questions.IndexOf(_originalQuestionReference);
+                if (existingIndex >= 0)
+                {
+                    existingQuestion = _originalQuestionReference;
+                }
+            }
+
+            // 如果通过引用没找到，且ID不为0，则通过ID查找
+            if (existingQuestion == null && Model.Id != 0)
+            {
+                for (int i = 0; i < Questions.Count; i++)
+                {
+                    if (Questions[i].Id == Model.Id)
+                    {
+                        existingQuestion = Questions[i];
+                        existingIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (existingQuestion != null && existingIndex >= 0)
+            {
+                // 更新现有题目
+                Questions[existingIndex] = Model;
+            }
+            else
+            {
+                // 新增题目
+                Questions.Add(Model);
+            }
+
+            _editDialog = false;
+            _originalQuestionReference = null; // 清空引用
+            await OnSaved.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("保存失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private void CloseDialog()
+    {
+        _editDialog = false;
+        _originalQuestionReference = null; // 清空引用
+    }
+
+    // 批量导入相关方法
+    private void OpenBatchImportDialog()
+    {
+        _batchImportText = "";
+        _clearExistingOptions = false;
+        _autoGenerateValues = true;
+        _batchImportDialog = true;
+        StateHasChanged();
+    }
+
+    private void CloseBatchImportDialog()
+    {
+        _batchImportDialog = false;
+        _batchImportText = "";
+        StateHasChanged();
+    }
+
+    private async Task ImportOptions()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_batchImportText))
+            {
+                await _popupService.EnqueueSnackbarAsync("提示", "请输入选项内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 解析输入的文本
+            var lines = _batchImportText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(line => line.Trim())
+                                       .Where(line => !string.IsNullOrEmpty(line))
+                                       .ToList();
+
+            if (lines.Count == 0)
+            {
+                await _popupService.EnqueueSnackbarAsync("提示", "没有有效的选项内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 清空现有选项（如果选择了该选项）
+            if (_clearExistingOptions)
+            {
+                Model.Options.Clear();
+            }
+
+            // 获取起始排序号
+            int startSortOrder = Model.Options.Count > 0 ? Model.Options.Max(o => o.SortOrder) + 1 : 1;
+
+            // 为每行文本创建选项
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var optionText = lines[i];
+                var optionValue = _autoGenerateValues ? (startSortOrder + i).ToString() : optionText;
+
+                var newOption = new EditQuestionOptionModel
+                    {
+                        Id = 0, // 新选项ID为0
+                        Text = optionText,
+                        Value = optionValue,
+                        SortOrder = startSortOrder + i,
+                        IsEnabled = true,
+                        Image = "" // 默认没有图片
+                    };
+
+                Model.Options.Add(newOption);
+            }
+
+            _batchImportDialog = false;
+            _batchImportText = "";
+
+            await _popupService.EnqueueSnackbarAsync("导入成功", $"成功导入 {lines.Count} 个选项", AlertTypes.Success);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("导入失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public class SelectItemModel<T>
+    {
+        public string Text { get; set; }
+        public T Value { get; set; }
+    }
+}

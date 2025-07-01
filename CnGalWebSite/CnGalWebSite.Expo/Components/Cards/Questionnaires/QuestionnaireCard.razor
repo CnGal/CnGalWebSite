@@ -1,0 +1,171 @@
+﻿<div class="questionnaire-item-card">
+    <MCard Class="h-100" Outlined Hover OnClick="OnCardClick">
+        <div class="questionnaire-image-card">
+            @if (!string.IsNullOrEmpty(Model.Thumbnail))
+            {
+                <img src="@Model.Thumbnail" alt="@Model.DisplayName" />
+            }
+            else
+            {
+                <div class="default-image">
+                    <MIcon Size="48" Color="primary">mdi-clipboard-text</MIcon>
+                </div>
+            }
+        </div>
+
+        <MCardTitle Class="questionnaire-title">
+            @Model.DisplayName
+        </MCardTitle>
+
+        <MCardText>
+            <div class="questionnaire-description">
+                @Model.Description
+            </div>
+
+            <div class="questionnaire-info">
+                <div class="info-item">
+                    <MIcon Small Left>mdi-clock-outline</MIcon>
+                    <span>@GetEstimatedTime()</span>
+                </div>
+
+                <div class="info-item">
+                    <MIcon Small Left>mdi-account-group</MIcon>
+                    <span>@Model.ResponseCount 人参与</span>
+                </div>
+
+                @if (Model.HasParticipated)
+                {
+                    <div class="info-item">
+                        @if (Model.AllowMultipleSubmissions)
+                        {
+                            <MIcon Small Left Color="info">mdi-edit</MIcon>
+                            <span>可修改答案</span>
+                        }
+                        else
+                        {
+                            <MIcon Small Left Color="success">mdi-check-circle</MIcon>
+                            <span>已完成</span>
+                        }
+                    </div>
+                }
+            </div>
+
+                        <div class="questionnaire-status">
+                @if (Model.Status == QuestionnaireStatus.Active)
+                {
+                    <MChip Small Color="success" Label>
+                        <MIcon Small Left>mdi-check-circle</MIcon>
+                        进行中
+                    </MChip>
+                }
+                else if (Model.Status == QuestionnaireStatus.NotStarted)
+                {
+                    <MChip Small Color="warning" Label>
+                        <MIcon Small Left>mdi-clock</MIcon>
+                        即将开始
+                    </MChip>
+                }
+                else if (Model.Status == QuestionnaireStatus.Ended)
+                {
+                    <MChip Small Color="error" Label>
+                        <MIcon Small Left>mdi-stop-circle</MIcon>
+                        已结束
+                    </MChip>
+                }
+                else if (Model.Status == QuestionnaireStatus.Inactive)
+                {
+                    <MChip Small Color="grey" Label>
+                        <MIcon Small Left>mdi-pause-circle</MIcon>
+                        未激活
+                    </MChip>
+                }
+
+                @if (Model.EndTime.HasValue)
+                {
+                    <div class="end-time">
+                        截止：@Model.EndTime.Value.ToString("MM-dd HH:mm")
+                    </div>
+                }
+            </div>
+        </MCardText>
+
+        <MCardActions Class="pb-4 pe-4">
+            <MSpacer />
+            @if (CanParticipate())
+            {
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@GetButtonIcon()" Text="@GetButtonText()" Color="@GetButtonColor()" Onclick="OnCardClick"/>
+            }
+            else
+            {
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-check-circle" Text="已完成" Color="grey" Disabled="true"/>
+            }
+        </MCardActions>
+    </MCard>
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireCardViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback<QuestionnaireCardViewModel> OnClick { get; set; }
+
+    private async Task OnCardClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Model);
+        }
+    }
+
+    private string GetEstimatedTime()
+    {
+        // 根据题目数量估算时间
+        var questionCount = Model.QuestionCount;
+        var estimatedMinutes = questionCount * 1; // 每题约1分钟
+
+        if (estimatedMinutes < 1)
+            return "约1分钟";
+        else if (estimatedMinutes < 60)
+            return $"约{estimatedMinutes}分钟";
+        else
+            return $"约{estimatedMinutes / 60}小时{estimatedMinutes % 60}分钟";
+    }
+
+    private bool CanParticipate()
+    {
+        // 检查是否可以参与
+        if (Model.Status != QuestionnaireStatus.Active)
+            return false;
+
+        // 如果已参与且不允许多次提交，则不能再参与
+        if (Model.HasParticipated && !Model.AllowMultipleSubmissions)
+            return false;
+
+        return true;
+    }
+
+    private string GetButtonText()
+    {
+        if (Model.HasParticipated && Model.AllowMultipleSubmissions)
+            return "修改答案";
+
+        return "开始答题";
+    }
+
+    private string GetButtonIcon()
+    {
+        if (Model.HasParticipated && Model.AllowMultipleSubmissions)
+            return "mdi-pencil";
+
+        return "mdi-play";
+    }
+
+    private string GetButtonColor()
+    {
+        if (Model.HasParticipated && Model.AllowMultipleSubmissions)
+            return "info";
+
+        return "primary";
+    }
+}

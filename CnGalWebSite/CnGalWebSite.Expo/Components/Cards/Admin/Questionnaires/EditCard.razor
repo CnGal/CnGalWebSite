@@ -1,0 +1,318 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_editDialog" MaxWidth="900">
+    <MCard>
+        @if (Model == null)
+        {
+            <MCardText Class="pt-8 pb-8">
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            </MCardText>
+        }
+        else
+        {
+            <MCardTitle>
+                @(Model.Id == 0 ? $"添加{_name}" : $"编辑{_name}") @Model.DisplayName
+            </MCardTitle>
+            <MCardText Class="ot-0 pb-0">
+                Id：@Model.Id
+            </MCardText>
+            <MCardText Class="overflow-auto" Style="max-height:900px;">
+                <MRow Dense>
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="基本信息" />
+                    </MCol>
+                    <MCol Cols="6">
+                        <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.MainPicture" ShowCropper
+                                                                     Type="DrawingBed.Models.DataModels.ImageAspectType._16_9"
+                                                                     Text="上传主图" Gallery />
+                    </MCol>
+                    <MCol Cols="6">
+                        <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.Thumbnail" ShowCropper
+                                                                     Type="DrawingBed.Models.DataModels.ImageAspectType._1_1"
+                                                                     Text="上传缩略图" Gallery />
+                    </MCol>
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@Model.Name" Label="唯一名称" />
+                    </MCol>
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@Model.DisplayName" Label="显示名称" />
+                    </MCol>
+
+                    <MCol Cols="12">
+                        <MTextarea HideDetails="true" @bind-Value="@Model.Description" Label="描述" Rows="3" />
+                    </MCol>
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="时间设置" />
+                    </MCol>
+
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@BeginTimeString" Label="开始时间" Type="datetime-local" />
+                    </MCol>
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@EndTimeString" Label="结束时间" Type="datetime-local" />
+                    </MCol>
+
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="设置选项" />
+                    </MCol>
+
+                    <MCol Cols="4">
+                        <MCheckbox HideDetails="true" @bind-Value="@Model.IsActive" Label="是否激活" />
+                    </MCol>
+                    <MCol Cols="4">
+                        <MCheckbox HideDetails="true" @bind-Value="@Model.AllowMultipleSubmissions" Label="允许修改答案" />
+                    </MCol>
+                    <MCol Cols="4">
+                        <MCheckbox HideDetails="true" @bind-Value="@Model.RequireLogin" Label="需要登录" />
+                    </MCol>
+
+                    <MCol Cols="6">
+                        <MTextField HideDetails="true" @bind-Value="@Model.Priority" Label="优先级" Type="number" />
+                    </MCol>
+
+                    <MCol Cols="12">
+                        <MTextarea HideDetails="true" @bind-Value="@Model.ThankYouMessage" Label="感谢消息" Rows="2" />
+                    </MCol>
+
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Cards.SectionTitleCard Title="题目管理" />
+                    </MCol>
+
+                    @if (Model.Questions?.Any() == true)
+                    {
+                        @foreach (var question in Model.Questions.OrderBy(q => q.SortOrder))
+                        {
+                            <MCol Cols="12">
+                                <MCard Class="mb-2" Outlined>
+                                    <MCardText>
+                                        <MRow Dense>
+                                            <MCol Cols="8">
+                                                <strong>@question.Title</strong>
+                                                <MChip Small Class="ml-2">@question.QuestionType.GetDisplayName()</MChip>
+                                                @if (question.IsRequired)
+                                                {
+                                                    <MChip Small Color="error" Class="ml-1">必填</MChip>
+                                                }
+                                                <div class="text-caption">
+                                                    排序: @question.SortOrder | 选项数: @question.Options.Count
+                                                </div>
+                                            </MCol>
+                                            <MCol Cols="4" Class="text-right">
+                                                <MButton Small Color="primary" OnClick="()=>EditQuestion(question)" Class="mr-1">
+                                                    <MIcon>mdi-pencil</MIcon>
+                                                </MButton>
+                                                <MButton Small Color="warning" OnClick="()=>MoveQuestion(question, -1)" Class="mr-1" Disabled="question.SortOrder <= 1">
+                                                    <MIcon>mdi-arrow-up</MIcon>
+                                                </MButton>
+                                                <MButton Small Color="warning" OnClick="()=>MoveQuestion(question, 1)" Class="mr-1" Disabled="question.SortOrder >= Model.Questions.Count">
+                                                    <MIcon>mdi-arrow-down</MIcon>
+                                                </MButton>
+                                                <MButton Small Color="error" OnClick="()=>DeleteQuestion(question)">
+                                                    <MIcon>mdi-delete</MIcon>
+                                                </MButton>
+                                            </MCol>
+                                        </MRow>
+                                    </MCardText>
+                                </MCard>
+                            </MCol>
+                        }
+                    }
+
+                    <MCol Cols="12">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加题目" OnClick="AddQuestion" Icon="mdi-plus" />
+                    </MCol>
+                </MRow>
+            </MCardText>
+            <MCardActions Class="pb-6 ps-6 pe-6">
+                <MSpacer></MSpacer>
+                <MButton Color="primary" Rounded OnClick="SaveEdit" Class="ml-2">
+                    <MIcon Left>mdi-check</MIcon>
+                    保存
+                </MButton>
+            </MCardActions>
+        }
+
+    </MCard>
+</MDialog>
+
+@if (Model != null)
+{
+    <!-- 题目编辑对话框 -->
+    <QuestionEditDialog @ref="questionEditDialog" OnSaved="OnQuestionSaved" Questions="Model.Questions" />
+
+}
+
+
+@code {
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    EditQuestionnaireModel Model = new();
+    QuestionEditDialog questionEditDialog;
+
+    private string _baseUrl = "api/questionnaires/";
+    private string _name = "问卷";
+
+    private bool _editDialog;
+
+    // 时间字符串绑定
+    private string BeginTimeString
+    {
+        get => Model.BeginTime?.ToString("yyyy-MM-ddTHH:mm") ?? "";
+        set
+        {
+            if (DateTime.TryParse(value, out var dateTime))
+            {
+                Model.BeginTime = dateTime;
+            }
+            else
+            {
+                Model.BeginTime = null;
+            }
+        }
+    }
+
+    private string EndTimeString
+    {
+        get => Model.EndTime?.ToString("yyyy-MM-ddTHH:mm") ?? "";
+        set
+        {
+            if (DateTime.TryParse(value, out var dateTime))
+            {
+                Model.EndTime = dateTime;
+            }
+            else
+            {
+                Model.EndTime = null;
+            }
+        }
+    }
+
+    public async Task Refresh(long id)
+    {
+        try
+        {
+            _editDialog = true;
+            Model = null;
+            StateHasChanged();
+
+            if (id == 0)
+            {
+                Model = new EditQuestionnaireModel
+                    {
+                        Priority = 0,
+                        IsActive = true,
+                        AllowMultipleSubmissions = false,
+                        RequireLogin = true,
+                        Questions = new List<EditQuestionnaireQuestionModel>()
+                    };
+            }
+            else
+            {
+                Model = await _httpService.GetAsync<EditQuestionnaireModel>($"{_baseUrl}EditQuestionnaire/{id}");
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync($"获取{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var validationResult = Model.Validate();
+            if (!validationResult.Successful)
+            {
+                await _popupService.EnqueueSnackbarAsync("验证失败", validationResult.Error, AlertTypes.Error);
+                return;
+            }
+
+            Result result;
+            if (Model.Id == 0)
+            {
+                result = await _httpService.PostAsync<EditQuestionnaireModel, Result>($"{_baseUrl}CreateQuestionnaire", Model);
+            }
+            else
+            {
+                result = await _httpService.PostAsync<EditQuestionnaireModel, Result>($"{_baseUrl}EditQuestionnaire", Model);
+            }
+
+            if (result.Successful)
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? $"成功{(Model.Id == 0 ? "添加" : "编辑")}{_name}", AlertTypes.Success);
+                _editDialog = false;
+                await OnEdited.InvokeAsync();
+                StateHasChanged();
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync(Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    public void AddQuestion()
+    {
+        if (questionEditDialog != null)
+        {
+            questionEditDialog.CreateQuestion();
+        }
+    }
+
+    public void EditQuestion(EditQuestionnaireQuestionModel question)
+    {
+        if (questionEditDialog != null)
+        {
+            questionEditDialog.EditQuestion(question);
+        }
+    }
+
+    public void MoveQuestion(EditQuestionnaireQuestionModel question, int direction)
+    {
+        var currentIndex = Model.Questions.IndexOf(question);
+        var targetIndex = currentIndex + direction;
+
+        if (targetIndex >= 0 && targetIndex < Model.Questions.Count)
+        {
+            // 交换排序
+            var targetQuestion = Model.Questions[targetIndex];
+            var tempSort = question.SortOrder;
+            question.SortOrder = targetQuestion.SortOrder;
+            targetQuestion.SortOrder = tempSort;
+
+            // 重新排序列表
+            Model.Questions = Model.Questions.OrderBy(q => q.SortOrder).ToList();
+            StateHasChanged();
+        }
+    }
+
+    public void DeleteQuestion(EditQuestionnaireQuestionModel question)
+    {
+        Model.Questions.Remove(question);
+        // 重新排序
+        for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            Model.Questions[i].SortOrder = i + 1;
+        }
+        StateHasChanged();
+    }
+
+    public void OnQuestionSaved()
+    {
+        StateHasChanged();
+    }
+
+    private void CloseDialog()
+    {
+        _editDialog = false;
+    }
+}
