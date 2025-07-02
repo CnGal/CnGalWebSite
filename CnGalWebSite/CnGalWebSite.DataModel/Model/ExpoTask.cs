@@ -45,6 +45,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "更换默认签名")]
         ChangeSignature,
         [Display(Name = "填写国G世代")]
-        SaveGGeneration
+        SaveGGeneration,
+        [Display(Name = "领取抽奖号码")]
+        LotteryNumber
     }
 }

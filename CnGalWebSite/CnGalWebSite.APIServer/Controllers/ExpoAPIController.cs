@@ -27,10 +27,11 @@ namespace CnGalWebSite.APIServer.Controllers
         public readonly IRepository<QuestionnaireResponse, long> _questionnaireResponseRepository;
         public readonly IRepository<PlayedGame, long> _playedGameRepository;
         public readonly IRepository<ApplicationUser, string> _userRepository;
+        public readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         public readonly IAppHelper _appHelper;
         private readonly IQueryService _queryService;
 
-        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository)
+        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository, IRepository<LotteryUser, long> lotteryUserRepository)
         {
             _appHelper = appHelper;
             _queryService = queryService;
@@ -43,6 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _questionnaireResponseRepository = questionnaireResponseRepository;
             _playedGameRepository = playedGameRepository;
             _userRepository = userRepository;
+            _lotteryUserRepository = lotteryUserRepository;
         }
 
         #region 游戏
@@ -408,6 +410,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 ExpoTaskType.ChangeAvatar => 20,
                 ExpoTaskType.ChangeSignature => 20,
                 ExpoTaskType.SaveGGeneration => 20,
+                ExpoTaskType.LotteryNumber => 100,
                 _ => 0
             };
         }
@@ -466,6 +469,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsChangeAvatar = userTasks.Any(s => s.Type == ExpoTaskType.ChangeAvatar),
                 IsChangeSignature = userTasks.Any(s => s.Type == ExpoTaskType.ChangeSignature),
                 IsSaveGGeneration = userTasks.Any(s => s.Type == ExpoTaskType.SaveGGeneration),
+                IsLotteryNumber = userTasks.Any(s => s.Type == ExpoTaskType.LotteryNumber),
                 TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };
 
@@ -592,6 +596,20 @@ namespace CnGalWebSite.APIServer.Controllers
                     errorMessage = "填写国G世代奖励已经领取过了";
                     break;
 
+                case ExpoTaskType.LotteryNumber:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber);
+                    if (!taskExists)
+                    {
+                        // 验证用户是否真的参与了抽奖（ID=3）
+                        var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 3);
+                        if (!hasJoinedLottery)
+                        {
+                            return new Result { Successful = false, Error = "请先参与十周年庆典抽奖后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "领取抽奖号码奖励已经领取过了";
+                    break;
+
                 default:
                     return new Result { Successful = false, Error = "未知的任务类型" };
             }
@@ -687,6 +705,25 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var hasChangedSignature = await CheckUserHasChangedSignature(user.Id);
             return hasChangedSignature;
+        }
+
+        /// <summary>
+        /// 检查用户是否参与了抽奖
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<bool>> CheckUserJoinedLottery()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return BadRequest("找不到该用户");
+            }
+
+            var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 3); // 检查抽奖ID=3
+            return hasJoinedLottery;
         }
 
         [HttpPost]
@@ -1313,6 +1350,30 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 // 个人签名不为空时表示已更换
                 return user != null && !string.IsNullOrWhiteSpace(user.PersonalSignature) && user.PersonalSignature != "哇，这里什么都没有呢" && user.PersonalSignature != "这个人太懒了，什么也没写额(～￣▽￣)～";
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 检查用户是否参与了指定抽奖
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="lotteryId">抽奖ID</param>
+        /// <returns>是否参与了抽奖</returns>
+        private async Task<bool> CheckUserHasJoinedLottery(string userId, long lotteryId)
+        {
+            try
+            {
+                // 检查用户是否参与了指定的抽奖
+                var hasJoined = await _lotteryUserRepository.GetAll()
+                    .AsNoTracking()
+                    .AnyAsync(l => l.ApplicationUserId == userId && l.LotteryId == lotteryId);
+
+                return hasJoined;
             }
             catch (Exception)
             {
