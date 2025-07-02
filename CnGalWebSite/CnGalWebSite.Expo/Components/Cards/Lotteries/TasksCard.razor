@@ -4,6 +4,7 @@
 @inject IJSRuntime JS;
 
 @using CnGalWebSite.DataModel.ViewModel.Questionnaires
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
 
 <div class="lottery-tasks-card">
     <div class="task-card">
@@ -247,12 +248,46 @@
             </div>
         </div>
     </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                领取抽奖号码
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">100点</div>
+                </div>
+                @if (Model.IsLotteryNumber)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickLotteryNumber" disabled="@isDrawing">
+                        @if (isDrawing)
+                        {
+                            <span>抽奖中</span>
+                        }
+                        else
+                        {
+                            <span>去完成</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
 <AuthorizeView>
     <Authorized>
         <CnGalWebSite.Expo.Components.Cards.Users.EditUserSteamInforTip @ref="editUserSteamInforTip" />
     </Authorized>
 </AuthorizeView>
+<CnGalWebSite.Components.Verifications.DeviceIdentification @ref="deviceIdentification" />
+
 @code {
     [Parameter]
     public ExpoUserTaskModel Model { get; set; }
@@ -264,6 +299,10 @@
     private Task<AuthenticationState> AuthState { get; set; }
 
     CnGalWebSite.Expo.Components.Cards.Users.EditUserSteamInforTip editUserSteamInforTip;
+    CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
+
+    bool isDrawing = false;
+    long lotteryId = 3;
 
     public void OnEditSteam()
     {
@@ -580,5 +619,89 @@
 
         // 您可以根据实际需求修改跳转逻辑
         await FinshTask(ExpoTaskType.SaveGGeneration);
+    }
+
+    public async Task OnClickLotteryNumber()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsLotteryNumber)
+        {
+            return;
+        }
+
+        if (isDrawing)
+        {
+            return;
+        }
+        isDrawing = true;
+
+        try
+        {
+            // 检查用户是否已经参与了十周年庆典抽奖
+            var hasJoinedLottery = await _httpService.GetAsync<bool>("api/expo/CheckUserJoinedLottery");
+
+            if (hasJoinedLottery)
+            {
+                // 用户已参与抽奖，直接完成任务
+                await FinshTask(ExpoTaskType.LotteryNumber);
+            }
+            else
+            {
+                // 用户未参与抽奖，直接参与抽奖
+                var number = await ParticipateInLottery();
+                if (number != null)
+                {
+                    // 参与成功后，完成任务
+                    await FinshTask(ExpoTaskType.LotteryNumber);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("操作失败", ex.Message, AlertTypes.Error);
+        }
+        finally
+        {
+            isDrawing = false;
+        }
+    }
+
+    public async Task<int?> ParticipateInLottery()
+    {
+        // 尝试参与抽奖
+        try
+        {
+            var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+                {
+                    Id = lotteryId,
+                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
+                });
+            if (obj.Successful)
+            {
+                if (int.TryParse(obj.Error, out int number) == false)
+                {
+                    await _popupService.EnqueueSnackbarAsync("参与抽奖失败", "获取号码失败", AlertTypes.Error);
+                    return null;
+                }
+                else
+                {
+                    return number;
+                }
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync("参与抽奖失败", obj.Error, AlertTypes.Error);
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("参与抽奖失败", ex.Message, AlertTypes.Error);
+            return null;
+        }
     }
 }

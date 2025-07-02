@@ -64,6 +64,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
         public bool IsSaveGGeneration { get; set; }
 
         /// <summary>
+        /// 是否领取抽奖号码
+        /// </summary>
+        public bool IsLotteryNumber { get; set; }
+
+        /// <summary>
         /// 总点数
         /// </summary>
         public int TotalPoints { get; set; }
