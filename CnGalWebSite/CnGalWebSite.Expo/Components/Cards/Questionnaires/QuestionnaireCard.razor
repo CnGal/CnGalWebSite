@@ -24,21 +24,29 @@
 
             <div class="questionnaire-info">
                 <div class="info-item">
-                    <MIcon Small Left>mdi-clock-outline</MIcon>
+                    <MIcon Small Left Color="primary">mdi-clock-outline</MIcon>
                     <span>@GetEstimatedTime()</span>
                 </div>
 
                 <div class="info-item">
-                    <MIcon Small Left>mdi-account-group</MIcon>
+                    <MIcon Small Left Color="primary">mdi-account-group</MIcon>
                     <span>@Model.ResponseCount 人参与</span>
                 </div>
+
+                @if (Model.RequireLogin)
+                {
+                    <div class="info-item">
+                        <MIcon Small Left Color="primary">mdi-account-key</MIcon>
+                        <span>需要登录</span>
+                    </div>
+                }
 
                 @if (Model.HasParticipated)
                 {
                     <div class="info-item">
                         @if (Model.AllowMultipleSubmissions)
                         {
-                            <MIcon Small Left Color="info">mdi-edit</MIcon>
+                            <MIcon Small Left Color="primary">mdi-pencil</MIcon>
                             <span>可修改答案</span>
                         }
                         else
@@ -93,11 +101,11 @@
             <MSpacer />
             @if (CanParticipate())
             {
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@GetButtonIcon()" Text="@GetButtonText()" Color="@GetButtonColor()" Onclick="OnCardClick"/>
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="@GetButtonIcon()" Text="@GetButtonText()" Onclick="OnCardClick"/>
             }
             else
             {
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-check-circle" Text="已完成" Color="grey" Disabled="true"/>
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-check-circle" Text="已完成" Disabled="true"/>
             }
         </MCardActions>
     </MCard>

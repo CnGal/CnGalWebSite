@@ -61,6 +61,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
 
         public decimal? NumericAnswer { get; set; }
 
+        /// <summary>
+        /// 题目用时（秒）
+        /// </summary>
+        public int? QuestionDurationSeconds { get; set; }
+
         public Result Validate()
         {
             if (QuestionId <= 0)

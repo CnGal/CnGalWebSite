@@ -1,0 +1,251 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_userResponseDetailDialog" MaxWidth="900" Scrollable>
+    <MCard Class="pa-4">
+        <MCardTitle>
+            <MRow>
+                <MCol Cols="10">
+                    <MIcon Left>mdi-account-details</MIcon>
+                    用户回答详情 - @(UserResponseDetail?.UserDisplayName ?? "加载中...")
+                </MCol>
+                <MCol Cols="2" Class="text-right">
+                    <MButton Icon="@true" OnClick="CloseDialog">
+                        <MIcon>mdi-close</MIcon>
+                    </MButton>
+                </MCol>
+            </MRow>
+        </MCardTitle>
+
+        <MCardText>
+            @if (UserResponseDetail == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            }
+            else
+            {
+                <!-- 用户信息 -->
+                <MCard Class="mb-4 pa-4">
+                    <MCardTitle Class="text-h6">用户信息</MCardTitle>
+                    <MRow>
+                        <MCol Cols="6" Md="3">
+                            <div class="text-subtitle-2">用户名</div>
+                            <div class="font-weight-bold">@UserResponseDetail.UserDisplayName</div>
+                        </MCol>
+                        <MCol Cols="6" Md="3">
+                            <div class="text-subtitle-2">提交时间</div>
+                            <div class="font-weight-bold">@UserResponseDetail.SubmitTime.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                        </MCol>
+                        <MCol Cols="6" Md="3">
+                            <div class="text-subtitle-2">状态</div>
+                            @if (UserResponseDetail.IsCompleted)
+                            {
+                                <MChip Color="success" TextColor="white" Small>
+                                    <MIcon Left Small>mdi-check</MIcon>
+                                    已完成
+                                </MChip>
+                            }
+                            else
+                            {
+                                <MChip Color="warning" TextColor="white" Small>
+                                    <MIcon Left Small>mdi-pencil</MIcon>
+                                    草稿
+                                </MChip>
+                            }
+                        </MCol>
+                        <MCol Cols="6" Md="3">
+                            <div class="text-subtitle-2">完成用时</div>
+                            @if (UserResponseDetail.CompletionTimeSeconds.HasValue)
+                            {
+                                <div class="font-weight-bold">@FormatDuration(UserResponseDetail.CompletionTimeSeconds.Value)</div>
+                            }
+                            else
+                            {
+                                <div class="grey--text">-</div>
+                            }
+                        </MCol>
+                    </MRow>
+                </MCard>
+
+                <!-- 答案列表 -->
+                <MCard Class="pa-4">
+                    <MCardTitle Class="text-h6">回答详情</MCardTitle>
+
+                    @foreach (var answer in UserResponseDetail.Answers)
+                    {
+                        <MCard Class="mb-3 pa-3" Outlined>
+                            <div class="d-flex align-start">
+                                <div class="question-number mr-3">
+                                    <MChip Color="primary" TextColor="white" Small>
+                                        Q@(UserResponseDetail.Answers.IndexOf(answer) + 1)
+                                    </MChip>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <!-- 题目信息 -->
+                                    <div class="question-info mb-2">
+                                        <div class="text-h6 mb-1">@answer.QuestionTitle</div>
+                                        <MChip Color="grey" TextColor="white" XSmall Class="mr-2">
+                                            @GetQuestionTypeText(answer.QuestionType)
+                                        </MChip>
+                                    </div>
+
+                                    <!-- 答案内容 -->
+                                    <div class="answer-content">
+                                        @switch (answer.QuestionType)
+                                        {
+                                            case QuestionType.Essay:
+                                                @if (!string.IsNullOrWhiteSpace(answer.TextAnswer))
+                                                {
+                                                    <MCard Class="grey lighten-5 pa-3">
+                                                        <div style="white-space: pre-wrap;">@answer.TextAnswer</div>
+                                                    </MCard>
+                                                }
+                                                else
+                                                {
+                                                    <div class="grey--text font-italic">未回答</div>
+                                                }
+                                                break;
+
+                                            case QuestionType.SingleChoice:
+                                            case QuestionType.MultipleChoice:
+                                                @if (answer.SelectedOptions.Any())
+                                                {
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @foreach (var option in answer.SelectedOptions)
+                                                        {
+                                                            <MChip Color="primary" Small>
+                                                                <MIcon Left Small>mdi-check</MIcon>
+                                                                @option
+                                                            </MChip>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="grey--text font-italic">未选择</div>
+                                                }
+                                                break;
+
+                                            case QuestionType.Numeric:
+                                            case QuestionType.Rating:
+                                                @if (answer.NumericAnswer.HasValue)
+                                                {
+                                                    <MChip Color="info" Small>
+                                                        <MIcon Left Small>mdi-numeric</MIcon>
+                                                        @answer.NumericAnswer.Value
+                                                    </MChip>
+                                                }
+                                                else
+                                                {
+                                                    <div class="grey--text font-italic">未填写</div>
+                                                }
+                                                break;
+
+                                            case QuestionType.Ranking:
+                                            case QuestionType.MultipleRanking:
+                                                @if (answer.SortedOptions.Any())
+                                                {
+                                                    <div class="ranking-list">
+                                                        @{
+                                                            var sortedOptionsWithIndex = answer.SortedOptions.Select((option, index) => new { option, index }).ToList();
+                                                        }
+                                                        @foreach (var item in sortedOptionsWithIndex)
+                                                        {
+                                                            <div class="d-flex align-center mb-1">
+                                                                <MChip Color="accent" Small Class="mr-2">
+                                                                    第@(item.index + 1)位
+                                                                </MChip>
+                                                                <span>@item.option</span>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="grey--text font-italic">未排序</div>
+                                                }
+                                                break;
+                                        }
+                                    </div>
+
+                                    <!-- 回答时间和用时 -->
+                                    <div class="answer-time mt-2">
+                                        <div class="text-caption grey--text">
+                                            回答时间：@answer.ResponseTime.ToString("HH:mm:ss")
+                                        </div>
+                                        @if (answer.QuestionDurationSeconds.HasValue && answer.QuestionDurationSeconds.Value > 0)
+                                        {
+                                            <div class="text-caption grey--text">
+                                                题目用时：@FormatDuration(answer.QuestionDurationSeconds.Value)
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </MCard>
+                    }
+                </MCard>
+            }
+        </MCardText>
+    </MCard>
+</MDialog>
+
+@code {
+    private bool _userResponseDetailDialog = false;
+    private long _responseId;
+    private UserResponseDetailModel UserResponseDetail;
+
+    public async Task ShowUserResponseDetail(long responseId)
+    {
+        _responseId = responseId;
+        UserResponseDetail = null;
+        _userResponseDetailDialog = true;
+        StateHasChanged();
+
+        await LoadUserResponseDetail();
+    }
+
+    private async Task LoadUserResponseDetail()
+    {
+        try
+        {
+            UserResponseDetail = await _httpService.GetAsync<UserResponseDetailModel>($"api/questionnaires/GetUserResponseDetail?id={_responseId}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("加载用户回答详情失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private void CloseDialog()
+    {
+        _userResponseDetailDialog = false;
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        var timeSpan = TimeSpan.FromSeconds(seconds);
+        if (timeSpan.TotalMinutes < 1)
+            return $"{seconds}秒";
+        else if (timeSpan.TotalHours < 1)
+            return $"{(int)timeSpan.TotalMinutes}分{timeSpan.Seconds}秒";
+        else
+            return $"{(int)timeSpan.TotalHours}小时{timeSpan.Minutes}分";
+    }
+
+    private string GetQuestionTypeText(QuestionType questionType)
+    {
+        return questionType switch
+        {
+            QuestionType.SingleChoice => "单选题",
+            QuestionType.MultipleChoice => "多选题",
+            QuestionType.Essay => "主观题",
+            QuestionType.Numeric => "数值题",
+            QuestionType.Rating => "评分题",
+            QuestionType.Ranking => "排序题",
+            QuestionType.MultipleRanking => "多选排序题",
+            _ => "未知类型"
+        };
+    }
+}

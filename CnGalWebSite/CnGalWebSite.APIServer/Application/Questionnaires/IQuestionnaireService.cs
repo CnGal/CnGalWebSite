@@ -70,5 +70,26 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
         Task<QuestionnaireResponseViewModel> GetUserResponseAsync(long questionnaireId, string userId);
+
+        /// <summary>
+        /// 获取问卷的所有用户回答列表
+        /// </summary>
+        /// <param name="questionnaireId">问卷ID</param>
+        /// <returns></returns>
+        Task<UserResponseListModel> GetUserResponseListAsync(long questionnaireId);
+
+        /// <summary>
+        /// 获取用户回答详情
+        /// </summary>
+        /// <param name="responseId">回答ID</param>
+        /// <returns></returns>
+        Task<UserResponseDetailModel> GetUserResponseDetailAsync(long responseId);
+
+        /// <summary>
+        /// 获取问卷题目分析数据
+        /// </summary>
+        /// <param name="questionnaireId">问卷ID</param>
+        /// <returns></returns>
+        Task<QuestionAnalysisModel> GetQuestionAnalysisAsync(long questionnaireId);
     }
 }

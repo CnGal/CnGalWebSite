@@ -1280,7 +1280,7 @@ h1:focus {
     justify-self: center;
 }
 .questionnaire-detail-page .navigation-card .m-btn__content {
-    padding-right: .5rem;
+/*    padding-right: .5rem;*/
 }
 
 /* 多选排序题样式 */

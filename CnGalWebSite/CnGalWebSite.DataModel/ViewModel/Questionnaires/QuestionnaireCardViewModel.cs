@@ -53,6 +53,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         /// 预计用时（分钟）
         /// </summary>
         public int EstimatedTimeMinutes { get; set; }
+
+        /// <summary>
+        /// 是否需要登录
+        /// </summary>
+        public bool RequireLogin { get; set; }
     }
 
     /// <summary>

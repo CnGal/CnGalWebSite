@@ -12,6 +12,12 @@
             <MIcon Color="info"
                    Class="mr-2"
                    OnClick="()=>ViewStatistics(context.Item)">mdi-chart-bar</MIcon>
+            <MIcon Color="primary"
+                   Class="mr-2"
+                   OnClick="()=>ViewUserResponses(context.Item)">mdi-account-multiple</MIcon>
+            <MIcon Color="purple"
+                   Class="mr-2"
+                   OnClick="()=>ViewQuestionAnalysis(context.Item)">mdi-chart-line</MIcon>
             <MIcon Color="@(context.Item.IsHidden ? "error" : "warning")"
                    OnClick="()=>ToggleHidden(context.Item)">@(context.Item.IsHidden ? "mdi-eye-off" : "mdi-eye")</MIcon>
         }
@@ -47,6 +53,8 @@
 
 <EditCard OnEdited="OnEdited" @ref="editCard" />
 <StatisticsDialog @ref="statisticsCard" />
+<UserResponsesDialog @ref="userResponsesDialog" />
+<QuestionAnalysisDialog @ref="questionAnalysisDialog" />
 
 @code {
     private string _baseUrl = "api/questionnaires/List";
@@ -74,6 +82,8 @@
     CnGalWebSite.Components.DataTables.DataTableCard<QuestionnaireOverviewModel> dataTableCard;
     EditCard editCard;
     StatisticsDialog statisticsCard;
+    UserResponsesDialog userResponsesDialog;
+    QuestionAnalysisDialog questionAnalysisDialog;
 
     protected override void OnInitialized()
     {
@@ -93,6 +103,22 @@
         if (statisticsCard != null)
         {
             await statisticsCard.ShowStatistics(item.Id);
+        }
+    }
+
+    public async Task ViewUserResponses(QuestionnaireOverviewModel item)
+    {
+        if (userResponsesDialog != null)
+        {
+            await userResponsesDialog.ShowUserResponses(item.Id);
+        }
+    }
+
+    public async Task ViewQuestionAnalysis(QuestionnaireOverviewModel item)
+    {
+        if (questionAnalysisDialog != null)
+        {
+            await questionAnalysisDialog.ShowQuestionAnalysis(item.Id);
         }
     }
 

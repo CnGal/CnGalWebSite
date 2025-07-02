@@ -125,24 +125,31 @@
         <div class="navigation-card">
             <MCard>
                 <MCardActions Class="justify-space-between pa-4">
-                    <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Icon="mdi-arrow-left" Text="上一题"
-                                                                OnClick="PreviousQuestion"
-                                                                Disabled="@(GetCurrentVisibleQuestionIndex() <= 0)" />
+                    <div class="d-flex">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Icon="mdi-arrow-left" Text="上一题"
+                                                                    OnClick="PreviousQuestion"
+                                                                    Disabled="@(GetCurrentVisibleQuestionIndex() <= 0)" />
+                    </div>
 
-                    @if (GetCurrentVisibleQuestionIndex() < _visibleQuestions.Count - 1)
-                    {
-                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-arrow-right" Text="下一题"
-                                                                    OnClick="NextQuestion"
-                                                                    Disabled="@(!IsCurrentAnswerValid())" />
+                    <div class="d-flex gap-2">
+                        <!-- 保存草稿按钮 -->
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Icon="mdi-content-save-outline" Text="保存草稿" IsAsync
+                                                                    OnClick="SaveDraft"
+                                                                    Disabled="@_savingDraft" Class="me-4"/>
 
-
-                    }
-                    else
-                    {
-                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@GetSubmitButtonIcon()" Text="@GetSubmitButtonText()" IsAsync
-                                                                    OnClick="SubmitQuestionnaire"
-                                                                    Disabled="@(!IsCurrentAnswerValid() || !CanSubmitQuestionnaire())" />
-                    }
+                        @if (GetCurrentVisibleQuestionIndex() < _visibleQuestions.Count - 1)
+                        {
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-arrow-right" Text="下一题"
+                                                                        OnClick="NextQuestion"
+                                                                        Disabled="@(!IsCurrentAnswerValid())" />
+                        }
+                        else
+                        {
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="@GetSubmitButtonIcon()" Text="@GetSubmitButtonText()" IsAsync
+                                                                        OnClick="SubmitQuestionnaire"
+                                                                        Disabled="@(!IsCurrentAnswerValid() || !CanSubmitQuestionnaire())" />
+                        }
+                    </div>
                 </MCardActions>
             </MCard>
         </div>
@@ -153,10 +160,14 @@
     [Parameter]
     public long Id { get; set; }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
     private QuestionnaireViewModel _questionnaire;
     private bool _loading = true;
     private bool _completed = false;
     private bool _submitting = false;
+    private bool _savingDraft = false;
 
     private int _currentQuestionIndex = 0;
     private QuestionnaireQuestionViewModel _currentQuestion =>
@@ -169,6 +180,11 @@
     private List<QuestionnaireQuestionViewModel> _visibleQuestions = new();
     private Dictionary<long, bool> _questionVisibility = new();
 
+    // 用时相关字段
+    private DateTime _questionnaireStartTime;
+    private DateTime _currentQuestionStartTime;
+    private Dictionary<long, int> _questionDurations = new(); // 题目用时（秒）
+
     protected override async Task OnInitializedAsync()
     {
         await LoadQuestionnaire();
@@ -180,18 +196,30 @@
         {
             _questionnaire = await _httpService.GetAsync<QuestionnaireViewModel>($"api/questionnaires/GetQuestionnaire/{Id}");
 
-            if (_questionnaire?.Questions?.Any() == true)
+            if (_questionnaire != null)
             {
-                // 确保问题按排序顺序排列
-                _questionnaire.Questions = _questionnaire.Questions.OrderBy(q => q.SortOrder).ToList();
+                // 检查是否需要登录
+                if (_questionnaire.RequireLogin && !await CheckLogin())
+                {
+                    return;
+                }
 
-                // 初始化答案（为空答案或加载用户之前的答案）
-                InitializeAnswers();
+                if (_questionnaire.Questions?.Any() == true)
+                {
+                    // 确保问题按排序顺序排列
+                    _questionnaire.Questions = _questionnaire.Questions.OrderBy(q => q.SortOrder).ToList();
 
-                // 初始化题目可见性
-                UpdateQuestionVisibility();
+                    // 初始化答案（为空答案或加载用户之前的答案）
+                    InitializeAnswers();
 
-                LoadCurrentAnswer();
+                    // 初始化题目可见性
+                    UpdateQuestionVisibility();
+
+                    LoadCurrentAnswer();
+
+                    // 开始计时
+                    InitializeTiming();
+                }
             }
         }
         catch (Exception ex)
@@ -572,6 +600,7 @@
     private void NextQuestion()
     {
         SaveCurrentAnswer();
+        SaveCurrentQuestionDuration();
 
         // 在可见题目中找到当前题目的位置
         var currentVisibleIndex = _visibleQuestions.IndexOf(_currentQuestion);
@@ -581,6 +610,7 @@
             var nextVisibleQuestion = _visibleQuestions[currentVisibleIndex + 1];
             _currentQuestionIndex = _questionnaire.Questions.IndexOf(nextVisibleQuestion);
             LoadCurrentAnswer();
+            StartCurrentQuestionTiming();
             StateHasChanged();
         }
     }
@@ -588,6 +618,7 @@
     private void PreviousQuestion()
     {
         SaveCurrentAnswer();
+        SaveCurrentQuestionDuration();
 
         // 在可见题目中找到当前题目的位置
         var currentVisibleIndex = _visibleQuestions.IndexOf(_currentQuestion);
@@ -597,6 +628,7 @@
             var previousVisibleQuestion = _visibleQuestions[currentVisibleIndex - 1];
             _currentQuestionIndex = _questionnaire.Questions.IndexOf(previousVisibleQuestion);
             LoadCurrentAnswer();
+            StartCurrentQuestionTiming();
             StateHasChanged();
         }
     }
@@ -607,6 +639,10 @@
         {
             _submitting = true;
             SaveCurrentAnswer();
+            SaveCurrentQuestionDuration();
+
+            // 计算总用时
+            var totalCompletionTimeSeconds = (int)(DateTime.Now - _questionnaireStartTime).TotalSeconds;
 
             // 只为可见的题目创建响应
             var responses = new List<SubmitQuestionResponseModel>();
@@ -625,7 +661,8 @@
             var submitModel = new SubmitQuestionnaireModel
                 {
                     QuestionnaireId = Id,
-                    Responses = responses
+                    Responses = responses,
+                    CompletionTimeSeconds = totalCompletionTimeSeconds
                 };
 
             var result = await _httpService.PostAsync<SubmitQuestionnaireModel, Result>("api/questionnaires/SubmitQuestionnaire", submitModel);
@@ -658,6 +695,54 @@
         _navigationManager.NavigateTo("/questionnaires");
     }
 
+    private async Task SaveDraft()
+    {
+        try
+        {
+            _savingDraft = true;
+            SaveCurrentAnswer();
+            SaveCurrentQuestionDuration();
+
+            // 创建草稿响应
+            var responses = new List<SubmitQuestionResponseModel>();
+
+            foreach (var question in _questionnaire.Questions)
+            {
+                var answerValue = _answers.ContainsKey(question.Id) ? _answers[question.Id] : "";
+                if (!string.IsNullOrWhiteSpace(answerValue))
+                {
+                    var response = CreateQuestionResponse(question.Id, answerValue);
+                    responses.Add(response);
+                }
+            }
+
+            var draftModel = new SaveDraftModel
+            {
+                QuestionnaireId = Id,
+                Responses = responses
+            };
+
+            var result = await _httpService.PostAsync<SaveDraftModel, Result>("api/questionnaires/SaveDraft", draftModel);
+
+            if (result.Successful)
+            {
+                await _popupService.EnqueueSnackbarAsync("保存成功", "草稿已保存，您可以稍后继续填写", AlertTypes.Success);
+            }
+            else
+            {
+                await _popupService.EnqueueSnackbarAsync("保存失败", result.Error, AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("保存草稿失败", ex.Message, AlertTypes.Error);
+        }
+        finally
+        {
+            _savingDraft = false;
+        }
+    }
+
     private SubmitQuestionResponseModel CreateQuestionResponse(long questionId, string answerValue)
     {
         var question = _questionnaire.Questions.FirstOrDefault(q => q.Id == questionId);
@@ -668,7 +753,8 @@
 
         var response = new SubmitQuestionResponseModel
             {
-                QuestionId = questionId
+                QuestionId = questionId,
+                QuestionDurationSeconds = _questionDurations.GetValueOrDefault(questionId, 0)
             };
 
         switch (question.QuestionType)
@@ -756,4 +842,75 @@
         }
         return "mdi-check";
     }
+
+    #region 计时相关方法
+
+    private void InitializeTiming()
+    {
+        _questionnaireStartTime = DateTime.Now;
+        StartCurrentQuestionTiming();
+    }
+
+    private void StartCurrentQuestionTiming()
+    {
+        _currentQuestionStartTime = DateTime.Now;
+    }
+
+    private void SaveCurrentQuestionDuration()
+    {
+        if (_currentQuestion != null)
+        {
+            var currentDuration = (int)(DateTime.Now - _currentQuestionStartTime).TotalSeconds;
+
+            // 累计用时（如果用户回到之前的题目）
+            var existingDuration = _questionDurations.GetValueOrDefault(_currentQuestion.Id, 0);
+            _questionDurations[_currentQuestion.Id] = existingDuration + currentDuration;
+        }
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        if (seconds < 60)
+        {
+            return $"{seconds}秒";
+        }
+        else if (seconds < 3600)
+        {
+            var minutes = seconds / 60;
+            var remainingSeconds = seconds % 60;
+            return remainingSeconds > 0 ? $"{minutes}分{remainingSeconds}秒" : $"{minutes}分钟";
+        }
+        else
+        {
+            var hours = seconds / 3600;
+            var remainingMinutes = (seconds % 3600) / 60;
+            return remainingMinutes > 0 ? $"{hours}小时{remainingMinutes}分钟" : $"{hours}小时";
+        }
+    }
+
+    #endregion
+
+    #region 登录检查
+
+    private async Task<bool> CheckLogin()
+    {
+        if (AuthState == null)
+        {
+            _navigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(_navigationManager.Uri)}", true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        else
+        {
+            _navigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(_navigationManager.Uri)}", true);
+            return false;
+        }
+    }
+
+    #endregion
 }

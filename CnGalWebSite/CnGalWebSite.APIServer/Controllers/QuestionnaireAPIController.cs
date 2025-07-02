@@ -541,6 +541,87 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
+        /// 获取问卷用户回答列表
+        /// </summary>
+        /// <param name="id">问卷ID</param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<UserResponseListModel>> GetUserResponseListAsync(long id)
+        {
+            try
+            {
+                var result = await _questionnaireService.GetUserResponseListAsync(id);
+
+                if (result == null)
+                {
+                    return NotFound("未找到指定的问卷");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取用户回答列表时发生错误，问卷ID: {QuestionnaireId}", id);
+                return StatusCode(500, "服务器内部错误");
+            }
+        }
+
+        /// <summary>
+        /// 获取用户回答详情
+        /// </summary>
+        /// <param name="id">回答ID</param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<UserResponseDetailModel>> GetUserResponseDetailAsync(long id)
+        {
+            try
+            {
+                var result = await _questionnaireService.GetUserResponseDetailAsync(id);
+
+                if (result == null)
+                {
+                    return NotFound("未找到指定的回答");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取用户回答详情时发生错误，回答ID: {ResponseId}", id);
+                return StatusCode(500, "服务器内部错误");
+            }
+        }
+
+        /// <summary>
+        /// 获取问卷题目分析数据
+        /// </summary>
+        /// <param name="id">问卷ID</param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult<QuestionAnalysisModel>> GetQuestionAnalysisAsync(long id)
+        {
+            try
+            {
+                var result = await _questionnaireService.GetQuestionAnalysisAsync(id);
+
+                if (result == null)
+                {
+                    return NotFound("未找到指定的问卷");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取题目分析数据时发生错误，问卷ID: {QuestionnaireId}", id);
+                return StatusCode(500, "服务器内部错误");
+            }
+        }
+
+        /// <summary>
         /// 获取问卷管理列表
         /// </summary>
         /// <param name="model">查询参数</param>
