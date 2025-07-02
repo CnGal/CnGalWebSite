@@ -1,0 +1,252 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_userResponsesDialog" MaxWidth="1400" Scrollable>
+    <MCard Class="pa-4">
+        <MCardTitle>
+            <MRow>
+                <MCol Cols="10">
+                    <MIcon Left>mdi-account-multiple</MIcon>
+                    用户回答列表 - @(UserResponseList?.QuestionnaireName ?? "加载中...")
+                </MCol>
+                <MCol Cols="2" Class="text-right">
+                    <MButton Color="primary" Icon="@true" OnClick="OnRefresh">
+                        <MIcon>mdi-refresh</MIcon>
+                    </MButton>
+                </MCol>
+            </MRow>
+        </MCardTitle>
+
+        <MCardText>
+            @if (UserResponseList == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            }
+            else if (!UserResponseList.Responses.Any())
+            {
+                <MCard Class="text-center pa-8">
+                    <MCardText>
+                        <MIcon Size="64" Color="grey lighten-1">mdi-clipboard-text-off</MIcon>
+                        <div class="mt-4 text-h6 grey--text">暂无用户回答</div>
+                        <div class="text-body-2 grey--text">还没有用户提交这个问卷</div>
+                    </MCardText>
+                </MCard>
+            }
+            else
+            {
+                <!-- 统计概览 -->
+                <MCard Class="mb-4 pa-4">
+                    <MCardTitle Class="text-h6">回答概览</MCardTitle>
+                    <MRow>
+                        <MCol Cols="6" Sm="3">
+                            <div class="text-center">
+                                <div class="text-h5 primary--text">@UserResponseList.Responses.Count</div>
+                                <div class="text-subtitle-2">总回答数</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="6" Sm="3">
+                            <div class="text-center">
+                                <div class="text-h5 success--text">@UserResponseList.Responses.Count(r => r.IsCompleted)</div>
+                                <div class="text-subtitle-2">已完成</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="6" Sm="3">
+                            <div class="text-center">
+                                <div class="text-h5 warning--text">@UserResponseList.Responses.Count(r => !r.IsCompleted)</div>
+                                <div class="text-subtitle-2">草稿</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="6" Sm="3">
+                            <div class="text-center">
+                                <div class="text-h5 info--text">@(UserResponseList.Responses.Any() ? UserResponseList.Responses.Average(r => r.CompletionPercentage).ToString("F1") : "0")%</div>
+                                <div class="text-subtitle-2">平均完成度</div>
+                            </div>
+                        </MCol>
+                    </MRow>
+                    <MRow Class="mt-2">
+                        <MCol Cols="12">
+                            <div class="text-center">
+                                @{
+                                    var completedResponses = UserResponseList.Responses.Where(r => r.IsCompleted && r.CompletionTimeSeconds.HasValue);
+                                }
+                                @if (completedResponses.Any())
+                                {
+                                    <div class="text-h6 secondary--text">@FormatDuration((int)completedResponses.Average(r => r.CompletionTimeSeconds.Value))</div>
+                                    <div class="text-subtitle-2">平均完成用时</div>
+                                }
+                                else
+                                {
+                                    <div class="text-h6 grey--text">-</div>
+                                    <div class="text-subtitle-2">平均完成用时</div>
+                                }
+                            </div>
+                        </MCol>
+                    </MRow>
+                </MCard>
+
+                <!-- 用户回答列表 -->
+                <MDataTable Headers="_headers"
+                           Items="UserResponseList.Responses"
+                           ItemsPerPage="10"
+                           Loading="false"
+                           Class="elevation-1">
+                    <ItemColContent>
+                        @{
+                            var item = context.Item;
+                        }
+                        @switch (context.Header.Value)
+                        {
+                            case nameof(UserResponseSummaryModel.UserDisplayName):
+                                <div>
+                                    <div class="font-weight-bold">@item.UserDisplayName</div>
+                                </div>
+                                break;
+
+                            case nameof(UserResponseSummaryModel.SubmitTime):
+                                <div>
+                                    <div>@item.SubmitTime.ToString("yyyy-MM-dd")</div>
+                                    <div class="text-caption">@item.SubmitTime.ToString("HH:mm:ss")</div>
+                                </div>
+                                break;
+
+                            case nameof(UserResponseSummaryModel.IsCompleted):
+                                @if (item.IsCompleted)
+                                {
+                                    <MChip Color="success" TextColor="white" Small>
+                                        <MIcon Left Small>mdi-check</MIcon>
+                                        已完成
+                                    </MChip>
+                                }
+                                else
+                                {
+                                    <MChip Color="warning" TextColor="white" Small>
+                                        <MIcon Left Small>mdi-pencil</MIcon>
+                                        草稿
+                                    </MChip>
+                                }
+                                break;
+
+                            case nameof(UserResponseSummaryModel.CompletionPercentage):
+                                <div class="d-flex align-center">
+                                    <MProgressLinear Value="@item.CompletionPercentage"
+                                                    Color="@GetProgressColor(item.CompletionPercentage)"
+                                                    Height="8"
+                                                    Rounded
+                                                    Class="flex-grow-1 mr-2" />
+                                    <span class="text-caption">@item.CompletionPercentage.ToString("F1")%</span>
+                                </div>
+                                break;
+
+                            case nameof(UserResponseSummaryModel.CompletionTimeSeconds):
+                                @if (item.CompletionTimeSeconds.HasValue)
+                                {
+                                    <span>@FormatDuration(item.CompletionTimeSeconds.Value)</span>
+                                }
+                                else
+                                {
+                                    <span class="grey--text">-</span>
+                                }
+                                break;
+
+                            case "actions":
+                                <div>
+                                    <MButton Color="primary" Small Text OnClick="() => ViewUserResponse(item)">
+                                        <MIcon Left Small>mdi-eye</MIcon>
+                                        查看详情
+                                    </MButton>
+                                </div>
+                                break;
+
+                            default:
+                                @context.Value
+                                break;
+                        }
+                    </ItemColContent>
+                </MDataTable>
+            }
+        </MCardText>
+    </MCard>
+</MDialog>
+
+<!-- 用户回答详情对话框 -->
+<UserResponseDetailDialog @ref="userResponseDetailDialog" />
+
+@code {
+    private bool _userResponsesDialog = false;
+    private long _questionnaireId;
+    private UserResponseListModel UserResponseList;
+    private UserResponseDetailDialog userResponseDetailDialog;
+
+    private List<DataTableHeader<UserResponseSummaryModel>> _headers = new List<DataTableHeader<UserResponseSummaryModel>>
+    {
+        new() { Text = "用户", Value = nameof(UserResponseSummaryModel.UserDisplayName), Sortable = false },
+        new() { Text = "提交时间", Value = nameof(UserResponseSummaryModel.SubmitTime) },
+        new() { Text = "状态", Value = nameof(UserResponseSummaryModel.IsCompleted), Sortable = false },
+        new() { Text = "完成度", Value = nameof(UserResponseSummaryModel.CompletionPercentage), Sortable = false },
+        new() { Text = "用时", Value = nameof(UserResponseSummaryModel.CompletionTimeSeconds) },
+        new() { Text = "操作", Value = "actions", Sortable = false }
+    };
+
+    public async Task ShowUserResponses(long questionnaireId)
+    {
+        _questionnaireId = questionnaireId;
+        UserResponseList = null;
+        _userResponsesDialog = true;
+        StateHasChanged();
+
+        await LoadUserResponses();
+    }
+
+    private async Task LoadUserResponses()
+    {
+        try
+        {
+            UserResponseList = await _httpService.GetAsync<UserResponseListModel>($"api/questionnaires/GetUserResponseList?id={_questionnaireId}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("加载用户回答失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private async Task OnRefresh()
+    {
+        UserResponseList = null;
+        StateHasChanged();
+        await LoadUserResponses();
+    }
+
+    private void CloseDialog()
+    {
+        _userResponsesDialog = false;
+    }
+
+    private async Task ViewUserResponse(UserResponseSummaryModel response)
+    {
+        if (userResponseDetailDialog != null)
+        {
+            await userResponseDetailDialog.ShowUserResponseDetail(response.ResponseId);
+        }
+    }
+
+    private string GetProgressColor(double percentage)
+    {
+        if (percentage >= 100) return "success";
+        if (percentage >= 75) return "primary";
+        if (percentage >= 50) return "orange";
+        if (percentage >= 25) return "warning";
+        return "error";
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        var timeSpan = TimeSpan.FromSeconds(seconds);
+        if (timeSpan.TotalMinutes < 1)
+            return $"{seconds}秒";
+        else if (timeSpan.TotalHours < 1)
+            return $"{(int)timeSpan.TotalMinutes}分{timeSpan.Seconds}秒";
+        else
+            return $"{(int)timeSpan.TotalHours}小时{timeSpan.Minutes}分";
+    }
+}

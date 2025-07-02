@@ -50,6 +50,9 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; }
+
     private List<QuestionnaireCardViewModel> _questionnaires = new();
     private bool _loading = true;
 
@@ -71,6 +74,12 @@
 
     private async void OnQuestionnaireClick(QuestionnaireCardViewModel questionnaire)
     {
+        // 检查登录状态
+        if (questionnaire.RequireLogin && !await CheckLogin())
+        {
+            return;
+        }
+
         // 检查提交状态
         if (questionnaire.HasParticipated && !questionnaire.AllowMultipleSubmissions)
         {
@@ -99,5 +108,25 @@
 
         // 导航到问卷详情页
         NavigationManager.NavigateTo($"/questionnaires/{questionnaire.Id}");
+    }
+
+    private async Task<bool> CheckLogin()
+    {
+        if (AuthState == null)
+        {
+            NavigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}", true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}", true);
+            return false;
+        }
     }
 }

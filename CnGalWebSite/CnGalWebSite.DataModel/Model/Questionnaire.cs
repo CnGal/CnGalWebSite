@@ -378,6 +378,11 @@ namespace CnGalWebSite.DataModel.Model
         public DateTime ResponseTime { get; set; }
 
         /// <summary>
+        /// 题目用时（秒）
+        /// </summary>
+        public int? QuestionDurationSeconds { get; set; }
+
+        /// <summary>
         /// 所属问卷回答
         /// </summary>
         public long QuestionnaireResponseId { get; set; }

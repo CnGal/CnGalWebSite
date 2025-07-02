@@ -33,6 +33,18 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "分享游戏库")]
         ShareGames,
         [Display(Name = "抽奖")]
-        Lottery
+        Lottery,
+        [Display(Name = "填写问卷")]
+        Survey,
+        [Display(Name = "给游戏评分")]
+        RateGame,
+        [Display(Name = "绑定群聊QQ")]
+        BindQQ,
+        [Display(Name = "更换默认头像")]
+        ChangeAvatar,
+        [Display(Name = "更换默认签名")]
+        ChangeSignature,
+        [Display(Name = "填写国G世代")]
+        SaveGGeneration
     }
 }

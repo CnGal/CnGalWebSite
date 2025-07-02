@@ -1,0 +1,381 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService _popupService
+
+<MDialog @bind-Value="_questionAnalysisDialog" MaxWidth="1200" Scrollable>
+    <MCard Class="pa-4">
+        <MCardTitle>
+            <MRow>
+                <MCol Cols="10">
+                    <MIcon Left>mdi-chart-line</MIcon>
+                    题目分析 - @(QuestionAnalysis?.QuestionnaireName ?? "加载中...")
+                </MCol>
+                <MCol Cols="2" Class="text-right">
+                    <MButton Color="primary" Icon="@true" OnClick="OnRefresh">
+                        <MIcon>mdi-refresh</MIcon>
+                    </MButton>
+                </MCol>
+            </MRow>
+        </MCardTitle>
+
+        <MCardText>
+            @if (QuestionAnalysis == null)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard />
+            }
+            else if (!QuestionAnalysis.Questions.Any())
+            {
+                <MCard Class="text-center pa-8">
+                    <MCardText>
+                        <MIcon Size="64" Color="grey lighten-1">mdi-chart-bar-stacked</MIcon>
+                        <div class="mt-4 text-h6 grey--text">暂无题目数据</div>
+                        <div class="text-body-2 grey--text">问卷中没有题目或没有用户回答</div>
+                    </MCardText>
+                </MCard>
+            }
+            else
+            {
+                <!-- 题目概览 -->
+                <MCard Class="mb-4 pa-4">
+                    <MCardTitle Class="text-h6">题目概览</MCardTitle>
+                    <MRow>
+                        <MCol Cols="3">
+                            <div class="text-center">
+                                <div class="text-h5 primary--text">@QuestionAnalysis.Questions.Count</div>
+                                <div class="text-subtitle-2">题目总数</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="3">
+                            <div class="text-center">
+                                <div class="text-h5 success--text">@QuestionAnalysis.Questions.Average(q => q.ResponseRate).ToString("F1")%</div>
+                                <div class="text-subtitle-2">平均回答率</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="3">
+                            <div class="text-center">
+                                <div class="text-h5 info--text">@QuestionAnalysis.Questions.Count(q => q.IsRequired)</div>
+                                <div class="text-subtitle-2">必填题数</div>
+                            </div>
+                        </MCol>
+                        <MCol Cols="3">
+                            <div class="text-center">
+                                <div class="text-h5 warning--text">@QuestionAnalysis.Questions.Count(q => q.ResponseRate < 50)</div>
+                                <div class="text-subtitle-2">低回答率题目</div>
+                            </div>
+                        </MCol>
+                    </MRow>
+                </MCard>
+
+                <!-- 题目分析列表 -->
+                <div class="questions-analysis-list">
+                    @foreach (var question in QuestionAnalysis.Questions.OrderBy(q => q.SortOrder))
+                    {
+                        <MCard Class="mb-4 pa-4" Outlined>
+                            <!-- 题目基本信息 -->
+                            <div class="question-header mb-3">
+                                <MRow>
+                                    <MCol Cols="8">
+                                        <div class="d-flex align-center">
+                                            <MChip Color="primary" TextColor="white" Small Class="mr-2">
+                                                Q@(question.SortOrder)
+                                            </MChip>
+                                            <div>
+                                                <div class="text-h6">@question.Title</div>
+                                                @if (!string.IsNullOrEmpty(question.Description))
+                                                {
+                                                    <div class="text-caption grey--text">@question.Description</div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </MCol>
+                                    <MCol Cols="4" Class="text-right">
+                                        <div class="question-meta">
+                                            <MChip Color="grey" TextColor="white" XSmall Class="mr-1">
+                                                @GetQuestionTypeText(question.QuestionType)
+                                            </MChip>
+                                            @if (question.IsRequired)
+                                            {
+                                                <MChip Color="error" TextColor="white" XSmall Class="mr-1">
+                                                    必填
+                                                </MChip>
+                                            }
+                                            <MChip Color="@GetResponseRateColor(question.ResponseRate)" TextColor="white" XSmall>
+                                                回答率: @question.ResponseRate.ToString("F1")%
+                                            </MChip>
+                                        </div>
+                                    </MCol>
+                                </MRow>
+                            </div>
+
+                            <!-- 统计信息 -->
+                            <MRow Class="mb-3">
+                                <MCol Cols="4">
+                                    <div class="text-center">
+                                        <div class="text-h6">@question.TotalResponses</div>
+                                        <div class="text-caption">总回答数</div>
+                                    </div>
+                                </MCol>
+                                <MCol Cols="4">
+                                    <div class="text-center">
+                                        <div class="text-h6">@question.ValidResponses</div>
+                                        <div class="text-caption">有效回答数</div>
+                                    </div>
+                                </MCol>
+                                <MCol Cols="4">
+                                    <div class="text-center">
+                                        <div class="text-h6">@(question.TotalResponses - question.ValidResponses)</div>
+                                        <div class="text-caption">跳过数</div>
+                                    </div>
+                                </MCol>
+                            </MRow>
+
+                            <!-- 题目类型特定的分析 -->
+                            @switch (question.QuestionType)
+                            {
+                                case QuestionType.SingleChoice:
+                                case QuestionType.MultipleChoice:
+                                    <div class="choice-analysis">
+                                        <div class="text-h6 mb-2">选项分析</div>
+                                        @foreach (var option in question.OptionStatistics.OrderByDescending(o => o.SelectionCount))
+                                        {
+                                            <div class="option-stat mb-2">
+                                                <div class="d-flex justify-space-between align-center mb-1">
+                                                    <span class="font-weight-medium">@option.OptionText</span>
+                                                    <span class="text-caption">@option.SelectionCount 次 (@option.SelectionPercentage.ToString("F1")%)</span>
+                                                </div>
+                                                <MProgressLinear Value="@option.SelectionPercentage"
+                                                                Color="primary"
+                                                                Height="8"
+                                                                Rounded />
+                                            </div>
+                                        }
+                                    </div>
+                                    break;
+
+                                case QuestionType.Essay:
+                                    <div class="essay-analysis">
+                                        <div class="text-h6 mb-2">文本回答摘要</div>
+                                        @if (question.TextAnswers.Any())
+                                        {
+                                            <div class="text-caption mb-2">共 @question.TextAnswers.Count 条回答，平均长度：@(question.TextAnswers.Average(a => a.Length).ToString("F0")) 个字符</div>
+                                            <MExpansionPanels>
+                                                <MExpansionPanel>
+                                                    <MExpansionPanelHeader>
+                                                        <MIcon Left>mdi-text</MIcon>
+                                                        查看所有文本回答 (@question.TextAnswers.Count 条)
+                                                    </MExpansionPanelHeader>
+                                                    <MExpansionPanelContent>
+                                                        <div class="text-answers-list">
+                                                            @foreach (var (answer, index) in question.TextAnswers.Select((a, i) => (a, i + 1)))
+                                                            {
+                                                                <MCard Class="mb-2 pa-2" Outlined>
+                                                                    <div class="d-flex">
+                                                                        <MChip Color="grey" TextColor="white" XSmall Class="mr-2">
+                                                                            @index
+                                                                        </MChip>
+                                                                        <div style="white-space: pre-wrap;">@answer</div>
+                                                                    </div>
+                                                                </MCard>
+                                                            }
+                                                        </div>
+                                                    </MExpansionPanelContent>
+                                                </MExpansionPanel>
+                                            </MExpansionPanels>
+                                        }
+                                        else
+                                        {
+                                            <div class="grey--text font-italic">暂无文本回答</div>
+                                        }
+                                    </div>
+                                    break;
+
+                                case QuestionType.Numeric:
+                                case QuestionType.Rating:
+                                    @if (question.NumericValues.Any())
+                                    {
+                                        <div class="numeric-analysis">
+                                            <div class="text-h6 mb-2">数值分析</div>
+                                            <MRow>
+                                                <MCol Cols="3">
+                                                    <div class="text-center">
+                                                        <div class="text-h6">@question.AverageNumericValue?.ToString("F2")</div>
+                                                        <div class="text-caption">平均值</div>
+                                                    </div>
+                                                </MCol>
+                                                <MCol Cols="3">
+                                                    <div class="text-center">
+                                                        <div class="text-h6">@question.MinNumericValue</div>
+                                                        <div class="text-caption">最小值</div>
+                                                    </div>
+                                                </MCol>
+                                                <MCol Cols="3">
+                                                    <div class="text-center">
+                                                        <div class="text-h6">@question.MaxNumericValue</div>
+                                                        <div class="text-caption">最大值</div>
+                                                    </div>
+                                                </MCol>
+                                                <MCol Cols="3">
+                                                    <div class="text-center">
+                                                        <div class="text-h6">@question.NumericValues.Count</div>
+                                                        <div class="text-caption">有效值数量</div>
+                                                    </div>
+                                                </MCol>
+                                            </MRow>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="grey--text font-italic">暂无数值数据</div>
+                                    }
+                                    break;
+
+                                case QuestionType.Ranking:
+                                case QuestionType.MultipleRanking:
+                                    @if (question.RankingStatistics.Any())
+                                    {
+                                        <div class="ranking-analysis">
+                                            <div class="text-h6 mb-2">排序分析</div>
+                                            @foreach (var ranking in question.RankingStatistics.OrderBy(r => r.AverageRank))
+                                            {
+                                                <div class="ranking-stat mb-2">
+                                                    <div class="d-flex justify-space-between align-center mb-1">
+                                                        <span class="font-weight-medium">@ranking.OptionText</span>
+                                                        <span class="text-caption">平均排名：第 @ranking.AverageRank.ToString("F1") 位</span>
+                                                    </div>
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach (var rankCount in ranking.RankCounts.OrderBy(kv => kv.Key))
+                                                        {
+                                                            <MChip XSmall Color="info">
+                                                                第@(rankCount.Key)位: @rankCount.Value 次
+                                                            </MChip>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="grey--text font-italic">暂无排序数据</div>
+                                    }
+                                    break;
+                            }
+
+                            <!-- 用时分析 -->
+                            @if (question.QuestionDurations.Any())
+                            {
+                                <MDivider Class="my-3" />
+                                <div class="duration-analysis">
+                                    <div class="text-h6 mb-2">
+                                        <MIcon Left>mdi-timer</MIcon>
+                                        用时分析
+                                    </div>
+                                    <MRow>
+                                        <MCol Cols="3">
+                                            <div class="text-center">
+                                                <div class="text-h6">@FormatDuration((int)question.AverageQuestionDurationSeconds.GetValueOrDefault(0))</div>
+                                                <div class="text-caption">平均用时</div>
+                                            </div>
+                                        </MCol>
+                                        <MCol Cols="3">
+                                            <div class="text-center">
+                                                <div class="text-h6">@FormatDuration(question.MinQuestionDurationSeconds.GetValueOrDefault(0))</div>
+                                                <div class="text-caption">最短用时</div>
+                                            </div>
+                                        </MCol>
+                                        <MCol Cols="3">
+                                            <div class="text-center">
+                                                <div class="text-h6">@FormatDuration(question.MaxQuestionDurationSeconds.GetValueOrDefault(0))</div>
+                                                <div class="text-caption">最长用时</div>
+                                            </div>
+                                        </MCol>
+                                        <MCol Cols="3">
+                                            <div class="text-center">
+                                                <div class="text-h6">@question.QuestionDurations.Count</div>
+                                                <div class="text-caption">有效记录</div>
+                                            </div>
+                                        </MCol>
+                                    </MRow>
+                                </div>
+                            }
+                        </MCard>
+                    }
+                </div>
+            }
+        </MCardText>
+    </MCard>
+</MDialog>
+
+@code {
+    private bool _questionAnalysisDialog = false;
+    private long _questionnaireId;
+    private QuestionAnalysisModel QuestionAnalysis;
+
+    public async Task ShowQuestionAnalysis(long questionnaireId)
+    {
+        _questionnaireId = questionnaireId;
+        QuestionAnalysis = null;
+        _questionAnalysisDialog = true;
+        StateHasChanged();
+
+        await LoadQuestionAnalysis();
+    }
+
+    private async Task LoadQuestionAnalysis()
+    {
+        try
+        {
+            QuestionAnalysis = await _httpService.GetAsync<QuestionAnalysisModel>($"api/questionnaires/GetQuestionAnalysis?id={_questionnaireId}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("加载题目分析失败", ex.Message, AlertTypes.Error);
+        }
+    }
+
+    private async Task OnRefresh()
+    {
+        QuestionAnalysis = null;
+        StateHasChanged();
+        await LoadQuestionAnalysis();
+    }
+
+    private void CloseDialog()
+    {
+        _questionAnalysisDialog = false;
+    }
+
+    private string GetQuestionTypeText(QuestionType questionType)
+    {
+        return questionType switch
+        {
+            QuestionType.SingleChoice => "单选题",
+            QuestionType.MultipleChoice => "多选题",
+            QuestionType.Essay => "主观题",
+            QuestionType.Numeric => "数值题",
+            QuestionType.Rating => "评分题",
+            QuestionType.Ranking => "排序题",
+            QuestionType.MultipleRanking => "多选排序题",
+            _ => "未知类型"
+        };
+    }
+
+    private string GetResponseRateColor(double responseRate)
+    {
+        if (responseRate >= 80) return "success";
+        if (responseRate >= 60) return "primary";
+        if (responseRate >= 40) return "warning";
+        return "error";
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        var timeSpan = TimeSpan.FromSeconds(seconds);
+        if (timeSpan.TotalMinutes < 1)
+            return $"{seconds}秒";
+        else if (timeSpan.TotalHours < 1)
+            return $"{(int)timeSpan.TotalMinutes}分{timeSpan.Seconds}秒";
+        else
+            return $"{(int)timeSpan.TotalHours}小时{timeSpan.Minutes}分";
+    }
+}

@@ -24,10 +24,13 @@ namespace CnGalWebSite.APIServer.Controllers
         public readonly IRepository<Entry, int> _entryRepository;
         public readonly IRepository<ExpoAward, long> _expoAwardRepository;
         public readonly IRepository<ExpoPrize, long> _expoPrizeRepository;
+        public readonly IRepository<QuestionnaireResponse, long> _questionnaireResponseRepository;
+        public readonly IRepository<PlayedGame, long> _playedGameRepository;
+        public readonly IRepository<ApplicationUser, string> _userRepository;
         public readonly IAppHelper _appHelper;
         private readonly IQueryService _queryService;
 
-        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository)
+        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository)
         {
             _appHelper = appHelper;
             _queryService = queryService;
@@ -37,6 +40,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _expoTaskRepository = expoTaskRepository;
             _expoAwardRepository = expoAwardRepository;
             _expoPrizeRepository = expoPrizeRepository;
+            _questionnaireResponseRepository = questionnaireResponseRepository;
+            _playedGameRepository = playedGameRepository;
+            _userRepository = userRepository;
         }
 
         #region 游戏
@@ -383,6 +389,29 @@ namespace CnGalWebSite.APIServer.Controllers
 
         #region 任务
 
+        /// <summary>
+        /// 获取任务对应的点数
+        /// </summary>
+        /// <param name="taskType">任务类型</param>
+        /// <returns>点数</returns>
+        private int GetTaskPoints(ExpoTaskType taskType)
+        {
+            return taskType switch
+            {
+                ExpoTaskType.SignIn => 20,
+                ExpoTaskType.Booking => 50,
+                ExpoTaskType.ShareGames => 50,
+                ExpoTaskType.Lottery => -100, // 抽奖消耗100点
+                ExpoTaskType.Survey => 100,
+                ExpoTaskType.RateGame => 20,
+                ExpoTaskType.BindQQ => 20,
+                ExpoTaskType.ChangeAvatar => 20,
+                ExpoTaskType.ChangeSignature => 20,
+                ExpoTaskType.SaveGGeneration => 20,
+                _ => 0
+            };
+        }
+
         [HttpGet]
         public async Task<ActionResult<ExpoUserTaskModel>> GetUserTask()
         {
@@ -396,13 +425,48 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var now = DateTime.Now.ToCstTime();
 
+            // 获取用户的所有任务
+            var userTasks = await _expoTaskRepository.GetAll()
+                .Where(s => s.ApplicationUserId == user.Id)
+                .ToListAsync();
+
+            // 计算签到天数（限制最多5天）
+            var signInDays = Math.Min(5, userTasks.Count(s => s.Type == ExpoTaskType.SignIn));
+
+            // 计算总点数
+            var totalPoints = 0;
+            foreach (var task in userTasks)
+            {
+                var points = GetTaskPoints(task.Type);
+                if (task.Type == ExpoTaskType.SignIn)
+                {
+                    // 签到任务：前5天每天20点，超过5天的不算点数
+                    var signInTasksCount = userTasks.Count(s => s.Type == ExpoTaskType.SignIn && s.Id <= task.Id);
+                    if (signInTasksCount <= 5)
+                    {
+                        totalPoints += points;
+                    }
+                }
+                else
+                {
+                    totalPoints += points;
+                }
+            }
+
             var model = new ExpoUserTaskModel
             {
-                IsPickUpSharedGames = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames),
+                IsPickUpSharedGames = userTasks.Any(s => s.Type == ExpoTaskType.ShareGames),
                 IsSharedGames = string.IsNullOrWhiteSpace(user.SteamId) == false,
-                IsSignIn = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
-                IsBooking = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking),
-                LotteryCount = await _expoTaskRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.LotteryCount)
+                IsSignIn = userTasks.Any(s => s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
+                IsBooking = userTasks.Any(s => s.Type == ExpoTaskType.Booking),
+                SignInDays = signInDays,
+                IsSurvey = userTasks.Any(s => s.Type == ExpoTaskType.Survey),
+                IsRateGame = userTasks.Any(s => s.Type == ExpoTaskType.RateGame),
+                IsBindQQ = userTasks.Any(s => s.Type == ExpoTaskType.BindQQ),
+                IsChangeAvatar = userTasks.Any(s => s.Type == ExpoTaskType.ChangeAvatar),
+                IsChangeSignature = userTasks.Any(s => s.Type == ExpoTaskType.ChangeSignature),
+                IsSaveGGeneration = userTasks.Any(s => s.Type == ExpoTaskType.SaveGGeneration),
+                TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };
 
             return model;
@@ -420,67 +484,210 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             var now = DateTime.Now.ToCstTime();
+            var points = GetTaskPoints(model.Type);
 
-            if (model.Type == ExpoTaskType.Booking)
+            // 检查任务是否已经完成过了
+            var taskExists = false;
+            var errorMessage = "";
+
+            switch (model.Type)
             {
-                if (await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking))
-                {
-                    return new Result { Successful = false, Error = "该奖励已经领取过了" };
-                }
-                else
-                {
-                    await _expoTaskRepository.InsertAsync(new ExpoTask
+                case ExpoTaskType.Booking:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking);
+                    errorMessage = "预约直播奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.ShareGames:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames);
+                    if (string.IsNullOrWhiteSpace(user.SteamId))
                     {
-                        ApplicationUserId = user.Id,
-                        Time = now,
-                        Type = ExpoTaskType.Booking,
-                        LotteryCount = 1
-                    });
-                }
-            }
-            else if (model.Type == ExpoTaskType.ShareGames)
-            {
-                if (await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames))
-                {
-                    return new Result { Successful = false, Error = "该奖励已经领取过了" };
-                }
-                else if (string.IsNullOrWhiteSpace(user.SteamId))
-                {
-                    return new Result { Successful = false, Error = "需要先绑定Steam" };
-                }
-                else
-                {
-                    await _expoTaskRepository.InsertAsync(new ExpoTask
+                        return new Result { Successful = false, Error = "需要先绑定Steam" };
+                    }
+                    errorMessage = "分享游戏库奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.SignIn:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date);
+                    // 检查签到天数是否已达上限
+                    var signInCount = await _expoTaskRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn);
+                    if (signInCount >= 5)
                     {
-                        ApplicationUserId = user.Id,
-                        Time = now,
-                        Type = ExpoTaskType.ShareGames,
-                        LotteryCount = 1
-                    });
-                }
-            }
-            else if (model.Type == ExpoTaskType.SignIn)
-            {
-                if (await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date))
-                {
-                    return new Result { Successful = false, Error = "该奖励已经领取过了" };
-                }
-                else
-                {
-                    await _expoTaskRepository.InsertAsync(new ExpoTask
+                        return new Result { Successful = false, Error = "签到奖励已达上限（5天）" };
+                    }
+                    errorMessage = "今日已经签到过了";
+                    break;
+
+                case ExpoTaskType.Survey:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey);
+                    if (!taskExists)
                     {
-                        ApplicationUserId = user.Id,
-                        Time = now,
-                        Type = ExpoTaskType.SignIn,
-                        LotteryCount = 1
-                    });
-                }
+                        // 验证用户是否真的完成了问卷(ID=1)
+                        var hasCompletedSurvey = await CheckUserCompletedSurvey(user.Id, 1);
+                        if (!hasCompletedSurvey)
+                        {
+                            return new Result { Successful = false, Error = "请先完成问卷后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "填写问卷奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.RateGame:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame);
+                    if (!taskExists)
+                    {
+                        // 验证用户是否真的有游戏评分记录
+                        var hasGameRating = await CheckUserHasGameRating(user.Id);
+                        if (!hasGameRating)
+                        {
+                            return new Result { Successful = false, Error = "请先给游戏评分后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "给游戏评分奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.BindQQ:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ);
+                    if (!taskExists)
+                    {
+                        // 验证用户是否真的绑定了群聊QQ
+                        var hasBoundQQ = await CheckUserHasBoundQQ(user.Id);
+                        if (!hasBoundQQ)
+                        {
+                            return new Result { Successful = false, Error = "请先绑定群聊QQ后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "绑定群聊QQ奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.ChangeAvatar:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar);
+                    if (!taskExists)
+                    {
+                        // 验证用户是否真的更换了默认头像
+                        var hasChangedAvatar = await CheckUserHasChangedAvatar(user.Id);
+                        if (!hasChangedAvatar)
+                        {
+                            return new Result { Successful = false, Error = "请先更换默认头像后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "更换默认头像奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.ChangeSignature:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature);
+                    if (!taskExists)
+                    {
+                        // 验证用户是否真的更换了默认签名
+                        var hasChangedSignature = await CheckUserHasChangedSignature(user.Id);
+                        if (!hasChangedSignature)
+                        {
+                            return new Result { Successful = false, Error = "请先更换默认签名后再领取奖励" };
+                        }
+                    }
+                    errorMessage = "更换默认签名奖励已经领取过了";
+                    break;
+
+                case ExpoTaskType.SaveGGeneration:
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration);
+                    errorMessage = "填写国G世代奖励已经领取过了";
+                    break;
+
+                default:
+                    return new Result { Successful = false, Error = "未知的任务类型" };
             }
 
+            if (taskExists)
+            {
+                return new Result { Successful = false, Error = errorMessage };
+            }
+
+            // 创建任务记录
+            await _expoTaskRepository.InsertAsync(new ExpoTask
+            {
+                ApplicationUserId = user.Id,
+                Time = now,
+                Type = model.Type,
+                LotteryCount = points // 使用点数系统，向下兼容
+            });
 
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 检查用户是否有游戏评分记录
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<bool>> CheckUserGameRating()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return BadRequest("找不到该用户");
+            }
+
+            var hasRating = await CheckUserHasGameRating(user.Id);
+            return hasRating;
+        }
+
+        /// <summary>
+        /// 检查用户是否绑定了群聊QQ
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<bool>> CheckUserBindQQ()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return BadRequest("找不到该用户");
+            }
+
+            var hasBoundQQ = await CheckUserHasBoundQQ(user.Id);
+            return hasBoundQQ;
+        }
+
+        /// <summary>
+        /// 检查用户是否更换了默认头像
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<bool>> CheckUserChangeAvatar()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return BadRequest("找不到该用户");
+            }
+
+            var hasChangedAvatar = await CheckUserHasChangedAvatar(user.Id);
+            return hasChangedAvatar;
+        }
+
+        /// <summary>
+        /// 检查用户是否更换了默认签名
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<bool>> CheckUserChangeSignature()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return BadRequest("找不到该用户");
+            }
+
+            var hasChangedSignature = await CheckUserHasChangedSignature(user.Id);
+            return hasChangedSignature;
+        }
 
         [HttpPost]
         public async Task<QueryResultModel<ExpoTaskOverviewModel>> ListTask(QueryParameterModel model)
@@ -716,17 +923,36 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var now = DateTime.Now.ToCstTime();
 
-            // 检查用户是否有抽奖次数
-            var lotteryCount = await _expoTaskRepository.GetAll()
+            // 计算用户当前总点数
+            var userTasks = await _expoTaskRepository.GetAll()
                 .Where(s => s.ApplicationUserId == user.Id)
-                .SumAsync(s => s.LotteryCount);
+                .ToListAsync();
 
-            if (lotteryCount <= 0)
+            var totalPoints = 0;
+            foreach (var task in userTasks)
+            {
+                var points = GetTaskPoints(task.Type);
+                if (task.Type == ExpoTaskType.SignIn)
+                {
+                    // 签到任务：前5天每天20点，超过5天的不算点数
+                    var signInTasksCount = userTasks.Count(s => s.Type == ExpoTaskType.SignIn && s.Id <= task.Id);
+                    if (signInTasksCount <= 5)
+                    {
+                        totalPoints += points;
+                    }
+                }
+                else
+                {
+                    totalPoints += points;
+                }
+            }
+
+            if (totalPoints < 100)
             {
                 return new Result
                 {
                     Successful = false,
-                    Error = "抽奖次数不足"
+                    Error = "点数不足，需要100点才能抽奖"
                 };
             }
 
@@ -827,13 +1053,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 };
             }
 
-            // 使用一次抽奖次数
+            // 消耗100点数进行抽奖
             await _expoTaskRepository.InsertAsync(new ExpoTask
             {
                 ApplicationUserId = user.Id,
                 Time = now,
                 Type = ExpoTaskType.Lottery,
-                LotteryCount = -1 // 消耗抽奖次数
+                LotteryCount = -100 // 消耗100点数
             });
 
             // 处理不同类型的奖项
@@ -969,6 +1195,130 @@ namespace CnGalWebSite.APIServer.Controllers
                 Total = total,
                 Parameter = model
             };
+        }
+
+        #endregion
+
+        #region 私有方法
+
+        /// <summary>
+        /// 检查用户是否完成了指定问卷
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="questionnaireId">问卷ID</param>
+        /// <returns>是否完成</returns>
+        private async Task<bool> CheckUserCompletedSurvey(string userId, long questionnaireId)
+        {
+            try
+            {
+                // 检查用户是否已提交问卷回答
+                var response = await _questionnaireResponseRepository.GetAll()
+                    .FirstOrDefaultAsync(r => r.ApplicationUserId == userId && r.QuestionnaireId == questionnaireId && r.IsCompleted);
+
+                return response != null;
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
+        }
+
+                /// <summary>
+        /// 检查用户是否有游戏评分记录
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>是否有评分</returns>
+        private async Task<bool> CheckUserHasGameRating(string userId)
+        {
+            try
+            {
+                // 检查用户是否有有效的游戏评分记录
+                // 有效评分定义：至少有3个评分项不为0，且总评分不为0
+                var hasValidRating = await _playedGameRepository.GetAll()
+                    .AnyAsync(r => r.ApplicationUserId == userId &&
+                                 r.TotalSocre > 0 &&
+                                 (new[] { r.ScriptSocre, r.ShowSocre, r.MusicSocre, r.PaintSocre, r.SystemSocre, r.CVSocre })
+                                 .Count(score => score > 0) >= 3);
+
+                return hasValidRating;
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 检查用户是否绑定了群聊QQ
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>是否绑定QQ</returns>
+        private async Task<bool> CheckUserHasBoundQQ(string userId)
+        {
+            try
+            {
+                // 检查用户是否绑定了群聊QQ（GroupQQ > 0表示已绑定）
+                var user = await _userRepository.GetAll()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                return user != null && user.GroupQQ > 0;
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 检查用户是否更换了默认头像
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>是否更换了头像</returns>
+        private async Task<bool> CheckUserHasChangedAvatar(string userId)
+        {
+            try
+            {
+                // 检查用户是否设置了非默认头像（PhotoPath不为空且不为默认值）
+                var user = await _userRepository.GetAll()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                // 头像路径不为空且不为默认头像文件名时表示已更换
+                return user != null && !string.IsNullOrWhiteSpace(user.PhotoPath);
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 检查用户是否更换了默认签名
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>是否更换了签名</returns>
+        private async Task<bool> CheckUserHasChangedSignature(string userId)
+        {
+            try
+            {
+                // 检查用户是否设置了非默认签名（PersonalSignature不为空）
+                var user = await _userRepository.GetAll()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                // 个人签名不为空时表示已更换
+                return user != null && !string.IsNullOrWhiteSpace(user.PersonalSignature) && user.PersonalSignature != "哇，这里什么都没有呢" && user.PersonalSignature != "这个人太懒了，什么也没写额(～￣▽￣)～";
+            }
+            catch (Exception)
+            {
+                // 如果查询失败，返回false，确保安全
+                return false;
+            }
         }
 
         #endregion

@@ -734,10 +734,12 @@ h1:focus {
             .lottery-grid-card .action-card > div div:nth-child(1) {
                 font-size: xxx-large;
             }
-
-    .lottery-grid-card .prize-card .name-card {
-        text-align: center;
-    }
+        .lottery-grid-card .action-card .points-text-card {
+            font-size: small;
+        }
+        .lottery-grid-card .prize-card .name-card {
+            text-align: center;
+        }
 
     .lottery-grid-card .divid-card {
         background-image: var(--background-image-primary);
@@ -1280,7 +1282,7 @@ h1:focus {
     justify-self: center;
 }
 .questionnaire-detail-page .navigation-card .m-btn__content {
-    padding-right: .5rem;
+/*    padding-right: .5rem;*/
 }
 
 /* 多选排序题样式 */
