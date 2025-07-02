@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IPopupService _popupService
+@using CnGalWebSite.Extensions
 
 <MDialog @bind-Value="_userResponseDetailDialog" MaxWidth="900" Scrollable>
     <MCard Class="pa-4">
@@ -132,7 +133,7 @@
                                 {
                                     <MChip Color="info" Small>
                                         <MIcon Left Small>mdi-numeric</MIcon>
-                                        @FormatNumeric(answer.NumericAnswer.Value)
+                                        @answer.NumericAnswer.Value.ToFormattedString()
                                     </MChip>
                                 }
                                 else
@@ -249,17 +250,5 @@
         };
     }
 
-    private string FormatNumeric(decimal value)
-    {
-        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
-        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
-        {
-            return Math.Round(value).ToString("F0");
-        }
-        else
-        {
-            // 移除尾随的零
-            return value.ToString("G29");
-        }
-    }
+
 }

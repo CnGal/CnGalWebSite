@@ -1,4 +1,6 @@
-﻿<MCard Class="question-answer-card">
+﻿@using CnGalWebSite.Extensions
+
+<MCard Class="question-answer-card">
     <MCardTitle>
         <div class="question-header">
             <div class="question-number">
@@ -349,7 +351,7 @@
     private async Task OnRatingValueChanged(double value)
     {
         _ratingValue = value;
-        Answer = FormatNumeric((decimal)_ratingValue);
+        Answer = ((decimal)_ratingValue).ToFormattedString();
         await AnswerChanged.InvokeAsync(Answer);
     }
 
@@ -435,18 +437,6 @@
         _selectedDraggedIndex = -1;
     }
 
-    private string FormatNumeric(decimal value)
-    {
-        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
-        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
-        {
-            return Math.Round(value).ToString("F0");
-        }
-        else
-        {
-            // 移除尾随的零
-            return value.ToString("G29");
-        }
-    }
+
 
 }
