@@ -414,7 +414,7 @@
 
             case QuestionType.Numeric:
             case QuestionType.Rating:
-                return userResponse.NumericAnswer?.ToString() ?? "";
+                return userResponse.NumericAnswer.HasValue ? FormatNumeric(userResponse.NumericAnswer.Value) : "";
 
             case QuestionType.SingleChoice:
             case QuestionType.MultipleChoice:
@@ -909,6 +909,24 @@
         {
             _navigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(_navigationManager.Uri)}", true);
             return false;
+        }
+    }
+
+    #endregion
+
+    #region 数值格式化方法
+
+    private string FormatNumeric(decimal value)
+    {
+        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
+        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
+        {
+            return Math.Round(value).ToString("F0");
+        }
+        else
+        {
+            // 移除尾随的零
+            return value.ToString("G29");
         }
     }
 
