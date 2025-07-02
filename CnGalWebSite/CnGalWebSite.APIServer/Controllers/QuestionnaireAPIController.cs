@@ -682,6 +682,27 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var question in questionsToDelete)
             {
+                // 先删除与该题目相关的用户回答记录，避免外键约束错误
+                var questionResponses = await _questionResponseRepository.GetAll()
+                    .Where(qr => qr.QuestionId == question.Id)
+                    .ToListAsync();
+
+                foreach (var questionResponse in questionResponses)
+                {
+                    await _questionResponseRepository.DeleteAsync(questionResponse);
+                }
+
+                // 删除以该题目作为触发条件的显示条件
+                var triggeredConditions = await _conditionRepository.GetAll()
+                    .Where(c => c.TriggerQuestionId == question.Id)
+                    .ToListAsync();
+
+                foreach (var condition in triggeredConditions)
+                {
+                    await _conditionRepository.DeleteAsync(condition);
+                }
+
+                // 然后删除题目本身
                 await _questionRepository.DeleteAsync(question);
             }
 
@@ -741,6 +762,17 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var option in optionsToDelete)
             {
+                // 先删除引用该选项的显示条件，避免外键约束错误
+                var optionConditions = await _conditionRepository.GetAll()
+                    .Where(c => c.TriggerOptionId == option.Id)
+                    .ToListAsync();
+
+                foreach (var condition in optionConditions)
+                {
+                    await _conditionRepository.DeleteAsync(condition);
+                }
+
+                // 然后删除选项本身
                 await _optionRepository.DeleteAsync(option);
             }
 
