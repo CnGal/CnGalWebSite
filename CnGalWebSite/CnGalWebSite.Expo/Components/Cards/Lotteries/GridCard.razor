@@ -7,7 +7,7 @@
         <div class="count-card">
             <MIcon Color="primary">mdi-gift</MIcon>
             <div>
-                ×@Model.LotteryCount
+                ×@Model.TotalPoints
             </div>
         </div>
     </div>
@@ -26,6 +26,8 @@
                 <div>
                     <div class="go-card">GO</div>
                     <div class="text-card">参加抽奖</div>
+                    <div class="points-text-card">（每次抽奖消耗100点）</div>
+
                 </div>
             </div>
             <div class="grid-col-card">
@@ -176,9 +178,9 @@
         }
 
 
-        if (Model.LotteryCount <= 0)
+        if (Model.TotalPoints < 100)
         {
-            await _popupService.EnqueueSnackbarAsync("抽奖失败", "剩余的抽奖次数不足", AlertTypes.Error);
+            await _popupService.EnqueueSnackbarAsync("抽奖失败", $"点数不足，需要100点才能抽奖（当前{Model.TotalPoints}点）", AlertTypes.Error);
             return;
         }
 

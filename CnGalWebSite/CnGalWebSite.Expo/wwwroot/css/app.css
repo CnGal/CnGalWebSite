@@ -734,10 +734,12 @@
             .lottery-grid-card .action-card > div div:nth-child(1) {
                 font-size: xxx-large;
             }
-
-    .lottery-grid-card .prize-card .name-card {
-        text-align: center;
-    }
+        .lottery-grid-card .action-card .points-text-card {
+            font-size: small;
+        }
+        .lottery-grid-card .prize-card .name-card {
+            text-align: center;
+        }
 
     .lottery-grid-card .divid-card {
         background-image: var(--background-image-primary);

@@ -3,6 +3,8 @@
 @inject IPopupService _popupService
 @inject IJSRuntime JS;
 
+@using CnGalWebSite.DataModel.ViewModel.Questionnaires
+
 <div class="lottery-tasks-card">
     <div class="task-card">
         <div>
@@ -12,7 +14,7 @@
             <div class="content-card">
                 <div class="gift-card">
                     <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">×1</div>
+                    <div class="count-card">50点</div>
                 </div>
                 @if (Model.IsBooking)
                 {
@@ -38,7 +40,7 @@
             <div class="content-card">
                 <div class="gift-card">
                     <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">×1</div>
+                    <div class="count-card">50点</div>
                 </div>
                 @if (Model.IsPickUpSharedGames)
                 {
@@ -67,14 +69,45 @@
     <div class="task-card">
         <div>
             <div class="name-card">
-                每日签到
+                每日签到 (@Model.SignInDays/5)
             </div>
             <div class="content-card">
                 <div class="gift-card">
                     <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">×1</div>
+                    <div class="count-card">20点</div>
                 </div>
-                @if (Model.IsSignIn)
+                @if (Model.SignInDays >= 5)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else if (Model.IsSignIn)
+                {
+                    <div class="action-card active">
+                        已签到
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickSignIn">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                填写问卷
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">100点</div>
+                </div>
+                @if (Model.IsSurvey)
                 {
                     <div class="action-card active">
                         已完成
@@ -82,7 +115,132 @@
                 }
                 else
                 {
-                    <div class="action-card" @onclick="@OnClickSignIn">
+                    <div class="action-card" @onclick="@OnClickSurvey">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                给游戏评分
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">20点</div>
+                </div>
+                @if (Model.IsRateGame)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickRateGame">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                绑定群聊QQ
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">20点</div>
+                </div>
+                @if (Model.IsBindQQ)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickBindQQ">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                更换默认头像
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">20点</div>
+                </div>
+                @if (Model.IsChangeAvatar)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickChangeAvatar">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                更换默认签名
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">20点</div>
+                </div>
+                @if (Model.IsChangeSignature)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickChangeSignature">
+                        去完成
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="task-card">
+        <div>
+            <div class="name-card">
+                填写国G世代
+            </div>
+            <div class="content-card">
+                <div class="gift-card">
+                    <MIcon>mdi-gift</MIcon>
+                    <div class="count-card">20点</div>
+                </div>
+                @if (Model.IsSaveGGeneration)
+                {
+                    <div class="action-card active">
+                        已完成
+                    </div>
+                }
+                else
+                {
+                    <div class="action-card" @onclick="@OnClickSaveGGeneration">
                         去完成
                     </div>
                 }
@@ -211,6 +369,216 @@
         {
             return;
         }
+
+        if (Model.SignInDays >= 5)
+        {
+            await _popupService.EnqueueSnackbarAsync("签到失败", "签到奖励已达上限（5天）", AlertTypes.Error);
+            return;
+        }
+
         await FinshTask(ExpoTaskType.SignIn);
+    }
+
+    public async Task OnClickSurvey()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsSurvey)
+        {
+            return;
+        }
+
+        try
+        {
+            // 检查用户是否已经完成问卷 (ID=1)
+            var response = await _httpService.GetAsync<QuestionnaireResponseViewModel>("api/questionnaires/GetUserResponse/1");
+
+            if (response != null)
+            {
+                // 用户已完成问卷，直接完成任务
+                await FinshTask(ExpoTaskType.Survey);
+            }
+            else
+            {
+                // 用户未完成问卷，跳转到问卷页面
+                Navigation.NavigateTo("/questionnaires");
+            }
+        }
+        catch (Exception)
+        {
+            // 如果API调用失败（可能是用户未完成问卷），跳转到问卷页面
+            Navigation.NavigateTo("/questionnaires");
+        }
+    }
+
+    public async Task OnClickRateGame()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsRateGame)
+        {
+            return;
+        }
+
+        try
+        {
+            // 检查用户是否有有效的游戏评分记录
+            var hasRating = await _httpService.GetAsync<bool>("api/expo/CheckUserGameRating");
+
+            if (hasRating)
+            {
+                // 用户有有效评分记录，直接完成任务
+                await FinshTask(ExpoTaskType.RateGame);
+            }
+            else
+            {
+                // 用户没有有效评分记录，引导去评分
+                await _popupService.EnqueueSnackbarAsync("提示", "请先对游戏进行评分后再领取奖励", AlertTypes.Info);
+                await JS.InvokeVoidAsync("window.open", "https://www.cngal.org/sharegames/new", "_blank");
+            }
+        }
+        catch (Exception)
+        {
+            // 如果API调用失败，直接跳转到游戏评分页面
+            await JS.InvokeVoidAsync("window.open", "https://www.cngal.org/sharegames/new", "_blank");
+        }
+    }
+
+    public async Task OnClickBindQQ()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsBindQQ)
+        {
+            return;
+        }
+
+        try
+        {
+            // 检查用户是否已经绑定了群聊QQ
+            var hasBoundQQ = await _httpService.GetAsync<bool>("api/expo/CheckUserBindQQ");
+
+            if (hasBoundQQ)
+            {
+                // 用户已绑定QQ，直接完成任务
+                await FinshTask(ExpoTaskType.BindQQ);
+            }
+            else
+            {
+                // 用户未绑定QQ，跳转到个人设置页面绑定
+                await _popupService.EnqueueSnackbarAsync("提示", "请先绑定群聊QQ后再领取奖励", AlertTypes.Info);
+
+                await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+            }
+        }
+        catch (Exception)
+        {
+            // 如果API调用失败，直接跳转到个人设置页面
+            await _popupService.EnqueueSnackbarAsync("提示", "请先绑定群聊QQ后再领取奖励", AlertTypes.Info);
+            await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        }
+    }
+
+    public async Task OnClickChangeAvatar()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsChangeAvatar)
+        {
+            return;
+        }
+
+        try
+        {
+            // 检查用户是否已经更换了默认头像
+            var hasChangedAvatar = await _httpService.GetAsync<bool>("api/expo/CheckUserChangeAvatar");
+
+            if (hasChangedAvatar)
+            {
+                // 用户已更换头像，直接完成任务
+                await FinshTask(ExpoTaskType.ChangeAvatar);
+            }
+            else
+            {
+                // 用户未更换头像，跳转到个人设置页面
+                await _popupService.EnqueueSnackbarAsync("提示", "请先更换默认头像后再领取奖励", AlertTypes.Info);
+                await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+            }
+        }
+        catch (Exception)
+        {
+            // 如果API调用失败，直接跳转到个人设置页面
+            await _popupService.EnqueueSnackbarAsync("提示", "请先更换默认头像后再领取奖励", AlertTypes.Info);
+            await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        }
+    }
+
+    public async Task OnClickChangeSignature()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsChangeSignature)
+        {
+            return;
+        }
+
+        try
+        {
+            // 检查用户是否已经更换了默认签名
+            var hasChangedSignature = await _httpService.GetAsync<bool>("api/expo/CheckUserChangeSignature");
+
+            if (hasChangedSignature)
+            {
+                // 用户已更换签名，直接完成任务
+                await FinshTask(ExpoTaskType.ChangeSignature);
+            }
+            else
+            {
+                // 用户未更换签名，跳转到个人设置页面
+                await _popupService.EnqueueSnackbarAsync("提示", "请先更换默认签名后再领取奖励", AlertTypes.Info);
+                await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+            }
+        }
+        catch (Exception)
+        {
+            // 如果API调用失败，直接跳转到个人设置页面
+            await _popupService.EnqueueSnackbarAsync("提示", "请先更换默认签名后再领取奖励", AlertTypes.Info);
+            await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        }
+    }
+
+    public async Task OnClickSaveGGeneration()
+    {
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
+        if (Model.IsSaveGGeneration)
+        {
+            return;
+        }
+
+        // 这里可以跳转到国G世代填写页面，目前直接完成任务
+
+        await JS.InvokeVoidAsync("window.open", "https://www.cngal.org/sedai", "_blank");
+
+        // 您可以根据实际需求修改跳转逻辑
+        await FinshTask(ExpoTaskType.SaveGGeneration);
     }
 }
