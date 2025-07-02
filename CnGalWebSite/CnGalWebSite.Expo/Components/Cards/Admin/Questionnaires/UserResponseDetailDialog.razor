@@ -126,20 +126,20 @@
                                                 }
                                                 break;
 
-                                            case QuestionType.Numeric:
-                                            case QuestionType.Rating:
-                                                @if (answer.NumericAnswer.HasValue)
-                                                {
-                                                    <MChip Color="info" Small>
-                                                        <MIcon Left Small>mdi-numeric</MIcon>
-                                                        @answer.NumericAnswer.Value
-                                                    </MChip>
-                                                }
-                                                else
-                                                {
-                                                    <div class="grey--text font-italic">未填写</div>
-                                                }
-                                                break;
+                                                                        case QuestionType.Numeric:
+                            case QuestionType.Rating:
+                                @if (answer.NumericAnswer.HasValue)
+                                {
+                                    <MChip Color="info" Small>
+                                        <MIcon Left Small>mdi-numeric</MIcon>
+                                        @FormatNumeric(answer.NumericAnswer.Value)
+                                    </MChip>
+                                }
+                                else
+                                {
+                                    <div class="grey--text font-italic">未填写</div>
+                                }
+                                break;
 
                                             case QuestionType.Ranking:
                                             case QuestionType.MultipleRanking:
@@ -247,5 +247,19 @@
             QuestionType.MultipleRanking => "多选排序题",
             _ => "未知类型"
         };
+    }
+
+    private string FormatNumeric(decimal value)
+    {
+        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
+        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
+        {
+            return Math.Round(value).ToString("F0");
+        }
+        else
+        {
+            // 移除尾随的零
+            return value.ToString("G29");
+        }
     }
 }

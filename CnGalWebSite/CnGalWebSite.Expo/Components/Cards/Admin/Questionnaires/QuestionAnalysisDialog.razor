@@ -197,19 +197,19 @@
                                             <MRow>
                                                 <MCol Cols="3">
                                                     <div class="text-center">
-                                                        <div class="text-h6">@question.AverageNumericValue?.ToString("F2")</div>
+                                                        <div class="text-h6">@(question.AverageNumericValue.HasValue ? FormatNumericWithPrecision(question.AverageNumericValue.Value) : "-")</div>
                                                         <div class="text-caption">平均值</div>
                                                     </div>
                                                 </MCol>
                                                 <MCol Cols="3">
                                                     <div class="text-center">
-                                                        <div class="text-h6">@question.MinNumericValue</div>
+                                                        <div class="text-h6">@(question.MinNumericValue.HasValue ? FormatNumeric(question.MinNumericValue.Value) : "-")</div>
                                                         <div class="text-caption">最小值</div>
                                                     </div>
                                                 </MCol>
                                                 <MCol Cols="3">
                                                     <div class="text-center">
-                                                        <div class="text-h6">@question.MaxNumericValue</div>
+                                                        <div class="text-h6">@(question.MaxNumericValue.HasValue ? FormatNumeric(question.MaxNumericValue.Value) : "-")</div>
                                                         <div class="text-caption">最大值</div>
                                                     </div>
                                                 </MCol>
@@ -377,5 +377,34 @@
             return $"{(int)timeSpan.TotalMinutes}分{timeSpan.Seconds}秒";
         else
             return $"{(int)timeSpan.TotalHours}小时{timeSpan.Minutes}分";
+    }
+
+    private string FormatNumeric(decimal value)
+    {
+        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
+        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
+        {
+            return Math.Round(value).ToString("F0");
+        }
+        else
+        {
+            // 移除尾随的零
+            return value.ToString("G29");
+        }
+    }
+
+    private string FormatNumericWithPrecision(decimal value)
+    {
+        // 平均值通常需要保留更多精度，但如果是整数或接近整数则显示为整数
+        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
+        {
+            return Math.Round(value).ToString("F0");
+        }
+        else
+        {
+            // 对于平均值，保留最多2位小数，但移除尾随的零
+            var rounded = Math.Round(value, 2);
+            return rounded.ToString("G29");
+        }
     }
 }

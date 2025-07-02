@@ -159,7 +159,7 @@
                                             <MIcon Left>mdi-drag</MIcon>
                                             <span class="ranking-number">@(i + 1)</span>
                                             <span class="ranking-text">@option.Text</span>
-                                            <MIconButton Icon="mdi-close" Size="Size.Small"
+                                            <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-close" Small TextStyle
                                                         OnClick="@(() => RemoveFromRanking(option.Value))"
                                                         Class="ml-2" />
                                         </div>
@@ -349,7 +349,7 @@
     private async Task OnRatingValueChanged(double value)
     {
         _ratingValue = value;
-        Answer = _ratingValue.ToString();
+        Answer = FormatNumeric((decimal)_ratingValue);
         await AnswerChanged.InvokeAsync(Answer);
     }
 
@@ -435,5 +435,18 @@
         _selectedDraggedIndex = -1;
     }
 
+    private string FormatNumeric(decimal value)
+    {
+        // 考虑浮点数误差，如果与整数的差值小于0.000001，则认为是整数
+        if (Math.Abs(value - Math.Round(value)) < 0.000001m)
+        {
+            return Math.Round(value).ToString("F0");
+        }
+        else
+        {
+            // 移除尾随的零
+            return value.ToString("G29");
+        }
+    }
 
 }
