@@ -146,6 +146,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         /// 题目用时（秒）
         /// </summary>
         public int? QuestionDurationSeconds { get; set; }
+        /// <summary>
+        /// "其他"选项的自定义文本
+        /// </summary>
+        public Dictionary<string, string> OtherOptionTexts { get; set; } = new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -205,6 +209,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public string OptionValue { get; set; }
         public int SelectionCount { get; set; }
         public double SelectionPercentage { get; set; }
+        /// <summary>
+        /// 是否为"其他"选项
+        /// </summary>
+        public bool IsOtherOption { get; set; }
+        /// <summary>
+        /// "其他"选项的自定义文本列表
+        /// </summary>
+        public List<string> OtherTexts { get; set; } = new List<string>();
     }
 
     /// <summary>
@@ -217,5 +229,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public double AverageRank { get; set; }
         public List<int> RankPositions { get; set; } = new List<int>(); // 每次被排在第几位
         public Dictionary<int, int> RankCounts { get; set; } = new Dictionary<int, int>(); // 各排名的次数
+        /// <summary>
+        /// 是否为"其他"选项
+        /// </summary>
+        public bool IsOtherOption { get; set; }
+        /// <summary>
+        /// "其他"选项的自定义文本列表
+        /// </summary>
+        public List<string> OtherTexts { get; set; } = new List<string>();
     }
 }

@@ -62,6 +62,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public decimal? NumericAnswer { get; set; }
 
         /// <summary>
+        /// "其他"选项的自定义文本（JSON格式存储）
+        /// </summary>
+        public string OtherOptionTexts { get; set; }
+
+        /// <summary>
         /// 题目用时（秒）
         /// </summary>
         public int? QuestionDurationSeconds { get; set; }

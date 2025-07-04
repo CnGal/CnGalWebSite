@@ -140,13 +140,49 @@
                                         {
                                             <div class="option-stat mb-2">
                                                 <div class="d-flex justify-space-between align-center mb-1">
-                                                    <span class="font-weight-medium">@option.OptionText</span>
+                                                    <span class="font-weight-medium">
+                                                        @option.OptionText
+                                                        @if (option.IsOtherOption)
+                                                        {
+                                                            <MChip Color="orange" TextColor="white" XSmall Class="ml-1">
+                                                                其他选项
+                                                            </MChip>
+                                                        }
+                                                    </span>
                                                     <span class="text-caption">@option.SelectionCount 次 (@option.SelectionPercentage.ToString("F1")%)</span>
                                                 </div>
                                                 <MProgressLinear Value="@option.SelectionPercentage"
-                                                                Color="primary"
-                                                                Height="8"
-                                                                Rounded />
+                                                                 Color="primary"
+                                                                 Height="8"
+                                                                 Rounded />
+
+                                                @* 显示"其他"选项的自定义文本 *@
+                                                @if (option.IsOtherOption && option.OtherTexts.Any())
+                                                {
+                                                    <MExpansionPanels Class="mt-2">
+                                                        <MExpansionPanel>
+                                                            <MExpansionPanelHeader>
+                                                                <MIcon Left Small>mdi-pencil</MIcon>
+                                                                查看用户自定义输入 (@option.OtherTexts.Count 条)
+                                                            </MExpansionPanelHeader>
+                                                            <MExpansionPanelContent>
+                                                                <div class="other-texts-list">
+                                                                    @foreach (var (text, index) in option.OtherTexts.Select((t, i) => (t, i + 1)))
+                                                                    {
+                                                                        <MCard Class="mb-1 pa-2" Outlined Small>
+                                                                            <div class="d-flex">
+                                                                                <MChip Color="grey" TextColor="white" XSmall Class="mr-2">
+                                                                                    @index
+                                                                                </MChip>
+                                                                                <div class="text-body-2">@text</div>
+                                                                            </div>
+                                                                        </MCard>
+                                                                    }
+                                                                </div>
+                                                            </MExpansionPanelContent>
+                                                        </MExpansionPanel>
+                                                    </MExpansionPanels>
+                                                }
                                             </div>
                                         }
                                     </div>
@@ -239,10 +275,18 @@
                                             {
                                                 <div class="ranking-stat mb-2">
                                                     <div class="d-flex justify-space-between align-center mb-1">
-                                                        <span class="font-weight-medium">@ranking.OptionText</span>
+                                                        <div class="d-flex align-center">
+                                                            <span class="font-weight-medium">@ranking.OptionText</span>
+                                                            @if (ranking.IsOtherOption)
+                                                            {
+                                                                <MChip XSmall Color="orange" TextColor="white" Class="ml-2">
+                                                                    其他选项
+                                                                </MChip>
+                                                            }
+                                                        </div>
                                                         <span class="text-caption">平均排名：第 @ranking.AverageRank.ToString("F1") 位</span>
                                                     </div>
-                                                    <div class="d-flex flex-wrap gap-1">
+                                                    <div class="d-flex flex-wrap gap-1 mb-2">
                                                         @foreach (var rankCount in ranking.RankCounts.OrderBy(kv => kv.Key))
                                                         {
                                                             <MChip XSmall Color="info">
@@ -250,6 +294,34 @@
                                                             </MChip>
                                                         }
                                                     </div>
+
+                                                    @* 显示"其他"选项的自定义文本 *@
+                                                    @if (ranking.IsOtherOption && ranking.OtherTexts.Any())
+                                                    {
+                                                        <MExpansionPanels>
+                                                            <MExpansionPanel>
+                                                                <MExpansionPanelHeader>
+                                                                    <MIcon Left>mdi-text</MIcon>
+                                                                    查看自定义输入内容 (@ranking.OtherTexts.Count 条)
+                                                                </MExpansionPanelHeader>
+                                                                <MExpansionPanelContent>
+                                                                    <div class="other-texts-list">
+                                                                        @foreach (var (text, index) in ranking.OtherTexts.Select((t, i) => (t, i + 1)))
+                                                                        {
+                                                                            <MCard Class="mb-2 pa-2" Outlined>
+                                                                                <div class="d-flex">
+                                                                                    <MChip Color="grey" TextColor="white" XSmall Class="mr-2">
+                                                                                        @index
+                                                                                    </MChip>
+                                                                                    <div>@text</div>
+                                                                                </div>
+                                                                            </MCard>
+                                                                        }
+                                                                    </div>
+                                                                </MExpansionPanelContent>
+                                                            </MExpansionPanel>
+                                                        </MExpansionPanels>
+                                                    }
                                                 </div>
                                             }
                                         </div>

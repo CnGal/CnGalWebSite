@@ -100,8 +100,12 @@
                                                                                                  Type="DrawingBed.Models.DataModels.ImageAspectType.None"
                                                                                                  Text="上传选项图片" Gallery />
                                                 </MCol>
-                                                <MCol Cols="6">
+                                                <MCol Cols="3">
                                                     <MCheckbox @bind-Value="@option.IsEnabled" Label="是否启用" />
+                                                </MCol>
+                                                <MCol Cols="3">
+                                                    <MCheckbox @bind-Value="@option.IsOtherOption" Label="其他选项" Color="primary"
+                                                               Hint="选择此项用户可输入自定义文本" />
                                                 </MCol>
                                             </MRow>
                                         </MCardText>

@@ -102,6 +102,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public string Image { get; set; }
 
         /// <summary>
+        /// 是否为"其他"选项（用户可自定义文本）
+        /// </summary>
+        public bool IsOtherOption { get; set; } = false;
+
+        /// <summary>
         /// 选择该选项的人数（统计模式）
         /// </summary>
         public int SelectionCount { get; set; }
@@ -154,5 +159,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         public DateTime ResponseTime { get; set; }
 
         public long QuestionId { get; set; }
+
+        /// <summary>
+        /// "其他"选项的自定义文本（JSON格式存储：{optionId: customText}）
+        /// </summary>
+        public string OtherOptionTexts { get; set; }
     }
 }

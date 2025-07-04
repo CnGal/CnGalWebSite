@@ -1,0 +1,256 @@
+﻿@using CnGalWebSite.Extensions
+@using System.Text.Json
+
+<div class="multiple-ranking-area">
+    <div class="ranking-instruction">请按照您的偏好顺序勾选选项（先勾选的排名靠前）：</div>
+    <div class="ranking-list">
+        @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+        {
+            var isSelected = _selectedOptions.ContainsKey(option.Id);
+            var rankNumber = isSelected ? _selectedOptions[option.Id] : 0;
+
+            <div class="ranking-item @(isSelected ? "selected" : "") clickable"
+                 @onclick="() => OnCardClicked(option)">
+                <MCheckbox Value="@isSelected" TValue="bool"
+                          ValueChanged="@(value => OnOptionToggled(option, value))"
+                          Class="ranking-checkbox mt-0" Dense HideDetails="true"
+                          @onclick:stopPropagation="true" />
+                @if (isSelected)
+                {
+                    <span class="ranking-number">@rankNumber</span>
+                }
+                else
+                {
+                    <span class="ranking-number-placeholder">-</span>
+                }
+                <span class="ranking-text">@option.Text</span>
+            </div>
+
+            @* "其他"选项的自定义文本输入 *@
+            @if (option.IsOtherOption && isSelected)
+            {
+                <div class="other-option-input">
+                    <MTextField Value="@GetOtherText(option.Value)" TValue="string" Outlined HideDetails="true" Class="mt-2"
+                               ValueChanged="@(value => OnOtherTextChanged(option.Value, value))"
+                               Label="请输入具体内容"
+                               Dense />
+                </div>
+            }
+        }
+    </div>
+
+    @if (_selectedOptions.Any())
+    {
+        <div class="ranking-summary">
+            <div class="ranking-summary-title">当前排序：</div>
+            <div class="ranking-summary-list">
+                @foreach (var kvp in _selectedOptions.OrderBy(x => x.Value))
+                {
+                    var option = Question.Options.FirstOrDefault(o => o.Id == kvp.Key);
+                    if (option != null)
+                    {
+                        <span class="ranking-summary-item">@kvp.Value. @option.Text</span>
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    [Parameter]
+    public string OtherTexts { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> OtherTextsChanged { get; set; }
+
+    // 存储已选择的选项及其排序号
+    private Dictionary<long, int> _selectedOptions = new();
+
+    // 下一个排序号
+    private int _nextRankNumber = 1;
+
+    // 存储"其他"选项的自定义文本
+    private Dictionary<string, string> _otherTexts = new();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        InitializeSelectedOptions();
+        InitializeOtherTexts();
+    }
+
+    private void InitializeSelectedOptions()
+    {
+        if (Question?.Options?.Any() != true) return;
+
+        // 重置
+        _selectedOptions.Clear();
+        _nextRankNumber = 1;
+
+        if (!string.IsNullOrEmpty(Answer))
+        {
+            // 根据已有答案恢复选择状态
+            var sortedValues = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < sortedValues.Length; i++)
+            {
+                var option = Question.Options.FirstOrDefault(o => o.Value == sortedValues[i]);
+                if (option != null)
+                {
+                    _selectedOptions[option.Id] = i + 1;
+                }
+            }
+
+            _nextRankNumber = _selectedOptions.Count + 1;
+        }
+    }
+
+    private void InitializeOtherTexts()
+    {
+        _otherTexts.Clear();
+        if (!string.IsNullOrEmpty(OtherTexts))
+        {
+            try
+            {
+                var otherTextsDict = JsonSerializer.Deserialize<Dictionary<string, string>>(OtherTexts);
+                if (otherTextsDict != null)
+                {
+                    foreach (var kvp in otherTextsDict)
+                    {
+                        _otherTexts[kvp.Key] = kvp.Value;
+                    }
+                }
+            }
+            catch
+            {
+                // 反序列化失败时忽略
+            }
+        }
+    }
+
+    private async Task OnCardClicked(QuestionOptionViewModel option)
+    {
+        var isSelected = _selectedOptions.ContainsKey(option.Id);
+        await OnOptionToggled(option, !isSelected);
+    }
+
+    private async Task OnOptionToggled(QuestionOptionViewModel option, bool isSelected)
+    {
+        if (isSelected)
+        {
+            // 添加选项到选择列表
+            if (!_selectedOptions.ContainsKey(option.Id))
+            {
+                _selectedOptions[option.Id] = _nextRankNumber;
+                _nextRankNumber++;
+            }
+        }
+        else
+        {
+            // 从选择列表中移除选项
+            if (_selectedOptions.ContainsKey(option.Id))
+            {
+                var removedRank = _selectedOptions[option.Id];
+                _selectedOptions.Remove(option.Id);
+
+                // 如果是"其他"选项，清除对应的自定义文本
+                if (option.IsOtherOption)
+                {
+                    _otherTexts.Remove(option.Value);
+                }
+
+                // 重新整理排序号，将大于被移除排序号的都减1
+                var keysToUpdate = _selectedOptions.Where(kvp => kvp.Value > removedRank).ToList();
+                foreach (var kvp in keysToUpdate)
+                {
+                    _selectedOptions[kvp.Key] = kvp.Value - 1;
+                }
+
+                _nextRankNumber = _selectedOptions.Count + 1;
+            }
+        }
+
+        await UpdateAnswer();
+        StateHasChanged();
+    }
+
+    private string GetOtherText(string optionValue)
+    {
+        return _otherTexts.TryGetValue(optionValue, out var text) ? text : "";
+    }
+
+    private async Task OnOtherTextChanged(string optionValue, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            _otherTexts.Remove(optionValue);
+        }
+        else
+        {
+            _otherTexts[optionValue] = value;
+        }
+
+        await UpdateOtherTexts();
+    }
+
+    private async Task UpdateAnswer()
+    {
+        if (!_selectedOptions.Any())
+        {
+            if (!string.IsNullOrEmpty(Answer))
+            {
+                await AnswerChanged.InvokeAsync("");
+            }
+            await UpdateOtherTexts();
+            return;
+        }
+
+        // 根据排序生成答案
+        var orderedValues = _selectedOptions
+            .OrderBy(kvp => kvp.Value)
+            .Select(kvp =>
+            {
+                var option = Question.Options.FirstOrDefault(o => o.Id == kvp.Key);
+                return option?.Value ?? "";
+            })
+            .Where(value => !string.IsNullOrEmpty(value))
+            .ToList();
+
+        var newAnswer = string.Join(",", orderedValues);
+        if (newAnswer != Answer)
+        {
+            await AnswerChanged.InvokeAsync(newAnswer);
+        }
+
+        await UpdateOtherTexts();
+    }
+
+    private async Task UpdateOtherTexts()
+    {
+        if (OtherTextsChanged.HasDelegate)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(_otherTexts);
+                if (json != OtherTexts)
+                {
+                    await OtherTextsChanged.InvokeAsync(json);
+                }
+            }
+            catch
+            {
+                // 序列化失败时忽略
+            }
+        }
+    }
+}

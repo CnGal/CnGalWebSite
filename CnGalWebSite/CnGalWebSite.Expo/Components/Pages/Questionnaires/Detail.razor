@@ -58,20 +58,20 @@
                     }
                 </div>
 
-                <MCardText>
+                <MCardText Class="@(ToolHelper.IsApp?"pa-2 pt-0":"")">
                     <div class="questionnaire-meta">
                         <div class="meta-item">
-                            <MIcon Color="primary">mdi-help-circle</MIcon>
+                            <MIcon Small="ToolHelper.IsApp" Color="primary">mdi-help-circle</MIcon>
                             <span>共 @_visibleQuestions.Count 题</span>
                         </div>
                         <div class="meta-item">
-                            <MIcon Color="primary">mdi-account-group</MIcon>
+                            <MIcon Small="ToolHelper.IsApp" Color="primary">mdi-account-group</MIcon>
                             <span>@_questionnaire.ResponseCount 人已参与</span>
                         </div>
                         @if (_questionnaire.EndTime.HasValue)
                         {
                             <div class="meta-item">
-                                <MIcon Color="primary">mdi-clock-outline</MIcon>
+                                <MIcon Small="ToolHelper.IsApp" Color="primary">mdi-clock-outline</MIcon>
                                 <span>截止：@_questionnaire.EndTime.Value.ToString("yyyy-MM-dd HH:mm")</span>
                             </div>
                         }
@@ -80,14 +80,14 @@
                             @if (_questionnaire.AllowMultipleSubmissions)
                             {
                                 <div class="meta-item">
-                                    <MIcon Color="primary">mdi-pencil</MIcon>
+                                    <MIcon Small="ToolHelper.IsApp" Color="primary">mdi-pencil</MIcon>
                                     <span>您正在修改之前的答案</span>
                                 </div>
                             }
                             else
                             {
                                 <div class="meta-item">
-                                    <MIcon Color="primary">mdi-check-circle</MIcon>
+                                    <MIcon Small="ToolHelper.IsApp" Color="primary">mdi-check-circle</MIcon>
                                     <span>您已完成此问卷</span>
                                 </div>
                             }
@@ -117,6 +117,8 @@
                 <CnGalWebSite.Expo.Components.Cards.Questionnaires.QuestionCard Question="@_currentQuestion"
                                                                                 Answer="@_currentAnswer"
                                                                                 AnswerChanged="OnAnswerChanged"
+                                                                                OtherTexts="@_currentOtherTexts"
+                                                                                OtherTextsChanged="OnOtherTextsChanged"
                                                                                 QuestionIndex="GetCurrentVisibleQuestionIndex() + 1"
                                                                                 TotalQuestions="_visibleQuestions.Count" />
             }
@@ -176,6 +178,10 @@
 
     private string _currentAnswer = "";
     private Dictionary<long, string> _answers = new();
+
+    // "其他"选项的自定义文本存储
+    private string _currentOtherTexts = "";
+    private Dictionary<long, string> _otherTexts = new();
 
     // 添加可见题目列表和条件验证相关字段
     private List<QuestionnaireQuestionViewModel> _visibleQuestions = new();
@@ -238,14 +244,17 @@
         foreach (var question in _questionnaire.Questions)
         {
             var answerValue = "";
+            var otherTextsValue = "";
 
             // 如果用户之前有回答，加载之前的答案
             if (question.UserResponse != null)
             {
                 answerValue = ConvertUserResponseToAnswerString(question);
+                otherTextsValue = question.UserResponse.OtherOptionTexts ?? "";
             }
 
             _answers[question.Id] = answerValue;
+            _otherTexts[question.Id] = otherTextsValue;
         }
     }
 
@@ -486,6 +495,16 @@
         {
             _currentAnswer = "";
         }
+
+        // 加载"其他"选项的文本
+        if (_currentQuestion != null && _otherTexts.ContainsKey(_currentQuestion.Id))
+        {
+            _currentOtherTexts = _otherTexts[_currentQuestion.Id];
+        }
+        else
+        {
+            _currentOtherTexts = "";
+        }
     }
 
     private void OnAnswerChanged(string newAnswer)
@@ -499,12 +518,22 @@
         StateHasChanged();
     }
 
+    private void OnOtherTextsChanged(string newOtherTexts)
+    {
+        _currentOtherTexts = newOtherTexts;
+        SaveCurrentAnswer();
+        StateHasChanged();
+    }
+
     private void SaveCurrentAnswer()
     {
         if (_currentQuestion != null)
         {
             // 保存所有答案，包括空答案
             _answers[_currentQuestion.Id] = _currentAnswer ?? "";
+
+            // 保存"其他"选项的文本
+            _otherTexts[_currentQuestion.Id] = _currentOtherTexts ?? "";
         }
     }
 
@@ -795,6 +824,13 @@
                         }
                     }
                     response.SelectedOptionIds = selectedOptionIds;
+
+                    // 添加"其他"选项的自定义文本
+                    var otherTexts = _otherTexts.GetValueOrDefault(questionId, "");
+                    if (!string.IsNullOrEmpty(otherTexts))
+                    {
+                        response.OtherOptionTexts = otherTexts;
+                    }
                 }
                 break;
 
@@ -815,6 +851,13 @@
                         }
                     }
                     response.SortedOptionIds = sortedOptionIds;
+
+                    // 添加排序题"其他"选项的自定义文本
+                    var otherTexts = _otherTexts.GetValueOrDefault(questionId, "");
+                    if (!string.IsNullOrEmpty(otherTexts))
+                    {
+                        response.OtherOptionTexts = otherTexts;
+                    }
                 }
                 break;
 
