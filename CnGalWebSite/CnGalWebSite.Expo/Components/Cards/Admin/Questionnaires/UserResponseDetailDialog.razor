@@ -120,6 +120,26 @@
                                                             </MChip>
                                                         }
                                                     </div>
+
+                                                    @* 显示"其他"选项的自定义文本 *@
+                                                    @if (answer.OtherOptionTexts != null && answer.OtherOptionTexts.Any())
+                                                    {
+                                                        <div class="mt-2">
+                                                            @foreach (var otherText in answer.OtherOptionTexts)
+                                                            {
+                                                                @if (!string.IsNullOrWhiteSpace(otherText.Value))
+                                                                {
+                                                                    <MCard Class="grey lighten-5 pa-2 mt-1" Small>
+                                                                        <div class="text-caption grey--text mb-1">
+                                                                            <MIcon Small>mdi-pencil</MIcon>
+                                                                            自定义输入：
+                                                                        </div>
+                                                                        <div class="text-body-2">@otherText.Value</div>
+                                                                    </MCard>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -160,6 +180,26 @@
                                                             </div>
                                                         }
                                                     </div>
+
+                                                    @* 显示排序题"其他"选项的自定义文本 *@
+                                                    @if (answer.OtherOptionTexts != null && answer.OtherOptionTexts.Any())
+                                                    {
+                                                        <div class="mt-2">
+                                                            @foreach (var otherText in answer.OtherOptionTexts)
+                                                            {
+                                                                @if (!string.IsNullOrWhiteSpace(otherText.Value))
+                                                                {
+                                                                    <MCard Class="grey lighten-5 pa-2 mt-1" Small>
+                                                                        <div class="text-caption grey--text mb-1">
+                                                                            <MIcon Small>mdi-pencil</MIcon>
+                                                                            自定义输入：
+                                                                        </div>
+                                                                        <div class="text-body-2">@otherText.Value</div>
+                                                                    </MCard>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    }
                                                 }
                                                 else
                                                 {

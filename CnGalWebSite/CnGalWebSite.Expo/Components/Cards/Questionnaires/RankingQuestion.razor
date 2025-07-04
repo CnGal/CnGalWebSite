@@ -1,0 +1,188 @@
+﻿@using CnGalWebSite.Extensions
+
+<div class="ranking-area">
+    <div class="ranking-instruction">请按照您的偏好顺序勾选选项（先勾选的排名靠前）：</div>
+    <div class="ranking-list">
+        @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+        {
+            var isSelected = _selectedOptions.ContainsKey(option.Id);
+            var rankNumber = isSelected ? _selectedOptions[option.Id] : 0;
+
+            <div class="ranking-item @(isSelected ? "selected" : "") clickable"
+                 @onclick="() => OnCardClicked(option)">
+                <MCheckbox Value="@isSelected" TValue="bool" Dense HideDetails="true"
+                          ValueChanged="@(value => OnOptionToggled(option, value))"
+                          Class="ranking-checkbox mt-0"
+                          @onclick:stopPropagation="true" />
+                @if (isSelected)
+                {
+                    <span class="ranking-number">@rankNumber</span>
+                }
+                else
+                {
+                    <span class="ranking-number-placeholder">-</span>
+                }
+                <span class="ranking-text">@option.Text</span>
+            </div>
+        }
+    </div>
+
+    @if (_selectedOptions.Any())
+    {
+        <div class="ranking-summary">
+            <div class="ranking-summary-title">当前排序：</div>
+            <div class="ranking-summary-list">
+                @foreach (var kvp in _selectedOptions.OrderBy(x => x.Value))
+                {
+                    var option = Question.Options.FirstOrDefault(o => o.Id == kvp.Key);
+                    if (option != null)
+                    {
+                        <span class="ranking-summary-item">@kvp.Value. @option.Text</span>
+                    }
+                }
+            </div>
+        </div>
+    }
+
+    @if (!IsAllOptionsSelected())
+    {
+        <div class="ranking-warning">
+            <MAlert Type="AlertTypes.Warning" Dense Text>
+                请勾选所有选项进行排序（还需勾选 @(Question.Options.Count - _selectedOptions.Count) 个选项）
+            </MAlert>
+        </div>
+    }
+    else
+    {
+        <div class="ranking-complete">
+            <MAlert Type="AlertTypes.Success" Dense Text>
+                排序完成！您已对所有选项进行了排序。
+            </MAlert>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    // 存储已选择的选项及其排序号
+    private Dictionary<long, int> _selectedOptions = new();
+
+    // 下一个排序号
+    private int _nextRankNumber = 1;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        InitializeSelectedOptions();
+    }
+
+    private void InitializeSelectedOptions()
+    {
+        if (Question?.Options?.Any() != true) return;
+
+        // 重置
+        _selectedOptions.Clear();
+        _nextRankNumber = 1;
+
+        if (!string.IsNullOrEmpty(Answer))
+        {
+            // 根据已有答案恢复选择状态
+            var sortedValues = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < sortedValues.Length; i++)
+            {
+                var option = Question.Options.FirstOrDefault(o => o.Value == sortedValues[i]);
+                if (option != null)
+                {
+                    _selectedOptions[option.Id] = i + 1;
+                }
+            }
+
+            _nextRankNumber = _selectedOptions.Count + 1;
+        }
+    }
+
+    private bool IsAllOptionsSelected()
+    {
+        return Question?.Options?.Count > 0 && _selectedOptions.Count == Question.Options.Count;
+    }
+
+    private async Task OnCardClicked(QuestionOptionViewModel option)
+    {
+        var isSelected = _selectedOptions.ContainsKey(option.Id);
+        await OnOptionToggled(option, !isSelected);
+    }
+
+    private async Task OnOptionToggled(QuestionOptionViewModel option, bool isSelected)
+    {
+        if (isSelected)
+        {
+            // 添加选项到选择列表
+            if (!_selectedOptions.ContainsKey(option.Id))
+            {
+                _selectedOptions[option.Id] = _nextRankNumber;
+                _nextRankNumber++;
+            }
+        }
+        else
+        {
+            // 从选择列表中移除选项
+            if (_selectedOptions.ContainsKey(option.Id))
+            {
+                var removedRank = _selectedOptions[option.Id];
+                _selectedOptions.Remove(option.Id);
+
+                // 重新整理排序号，将大于被移除排序号的都减1
+                var keysToUpdate = _selectedOptions.Where(kvp => kvp.Value > removedRank).ToList();
+                foreach (var kvp in keysToUpdate)
+                {
+                    _selectedOptions[kvp.Key] = kvp.Value - 1;
+                }
+
+                _nextRankNumber = _selectedOptions.Count + 1;
+            }
+        }
+
+        await UpdateAnswer();
+        StateHasChanged();
+    }
+
+    private async Task UpdateAnswer()
+    {
+        // 只有当所有选项都被勾选时才提交答案
+        if (!IsAllOptionsSelected())
+        {
+            // 如果之前有答案但现在不完整，清空答案
+            if (!string.IsNullOrEmpty(Answer))
+            {
+                await AnswerChanged.InvokeAsync("");
+            }
+            return;
+        }
+
+        // 根据排序生成答案
+        var orderedValues = _selectedOptions
+            .OrderBy(kvp => kvp.Value)
+            .Select(kvp =>
+            {
+                var option = Question.Options.FirstOrDefault(o => o.Id == kvp.Key);
+                return option?.Value ?? "";
+            })
+            .Where(value => !string.IsNullOrEmpty(value))
+            .ToList();
+
+        var newAnswer = string.Join(",", orderedValues);
+        if (newAnswer != Answer)
+        {
+            await AnswerChanged.InvokeAsync(newAnswer);
+        }
+    }
+}

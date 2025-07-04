@@ -882,7 +882,8 @@
     cursor: pointer;
     transition: transform 0.2s ease;
     margin-bottom: 1rem;
-    width: 600px;
+    max-width: 600px;
+    width: 100%;
 }
 
     .questionnaire-item-card:hover {
@@ -1116,8 +1117,8 @@
         background: #f8f9fa;
         border: 1px solid #dee2e6;
         border-radius: 8px;
-        cursor: move;
         transition: all 0.2s ease;
+        cursor: pointer;
     }
 
         .ranking-list .ranking-item:hover {
@@ -1324,4 +1325,26 @@
 .ranking-list .ranking-item.selected {
     background-color: rgba(25, 118, 210, 0.08);
     border-color: rgba(25, 118, 210, 0.3);
+}
+.ranking-summary,.ranking-list {
+    margin-bottom: 1rem;
+}
+.ranking-summary-list {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+/* "其他"选项样式 */
+.option-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.other-option-input {
+    width: calc(100% - 2rem);
+    max-width: 500px;
 }

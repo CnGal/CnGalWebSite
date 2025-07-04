@@ -202,6 +202,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Questionnaires
         [Display(Name = "选项图片")]
         public string Image { get; set; }
 
+        [Display(Name = "是否为其他选项")]
+        public bool IsOtherOption { get; set; } = false;
+
         public Result Validate()
         {
             if (string.IsNullOrWhiteSpace(Text))

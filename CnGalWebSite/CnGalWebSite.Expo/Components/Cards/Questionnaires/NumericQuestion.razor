@@ -1,0 +1,30 @@
+@using CnGalWebSite.Extensions
+
+<div class="numeric-area">
+    <MTextField Value="@Answer" TValue="string"
+                ValueChanged="@OnAnswerChanged"
+                Label="请输入数值"
+                Type="number"
+                Placeholder="@Question.TextPlaceholder"
+                Outlined
+                Class="mt-2" />
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    private async Task OnAnswerChanged(string value)
+    {
+        if (value != Answer)
+        {
+            await AnswerChanged.InvokeAsync(value);
+        }
+    }
+}

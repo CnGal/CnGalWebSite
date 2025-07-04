@@ -1,0 +1,134 @@
+﻿@using CnGalWebSite.Extensions
+@using System.Text.Json
+
+<div class="multiple-choice-area">
+    @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+    {
+        <div class="option-container">
+            <MCheckbox Value="@IsOptionSelected(option.Value)" TValue="bool"
+                       ValueChanged="@(value => ToggleOption(option.Value, value))"
+                       Label="@option.Text"
+                       Color="primary" Dense="ToolHelper.IsApp" HideDetails="ToolHelper.IsApp" />
+            @if (option.IsOtherOption && IsOptionSelected(option.Value))
+            {
+                <div class="other-option-input">
+                    <MTextField Value="@GetOtherText(option.Value)" Outlined
+                               ValueChanged="@((string newValue) => OnOtherTextChanged(option.Value, newValue))"
+                               Label="请输入具体内容"
+                               Dense="ToolHelper.IsApp"
+                               HideDetails="ToolHelper.IsApp"
+                               Class="ml-8 mt-4"
+                               Placeholder="请输入您的答案..." />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    [Parameter]
+    public string OtherTexts { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> OtherTextsChanged { get; set; }
+
+    private Dictionary<string, string> _otherOptionTexts = new();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        LoadOtherTexts();
+    }
+
+    private void LoadOtherTexts()
+    {
+        if (!string.IsNullOrEmpty(OtherTexts))
+        {
+            try
+            {
+                _otherOptionTexts = JsonSerializer.Deserialize<Dictionary<string, string>>(OtherTexts) ?? new();
+            }
+            catch
+            {
+                _otherOptionTexts = new();
+            }
+        }
+        else
+        {
+            _otherOptionTexts = new();
+        }
+    }
+
+    private string GetOtherText(string optionValue)
+    {
+        return _otherOptionTexts.GetValueOrDefault(optionValue, "");
+    }
+
+    private bool IsOptionSelected(string optionValue)
+    {
+        if (string.IsNullOrEmpty(Answer)) return false;
+        var selectedOptions = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        return selectedOptions.Contains(optionValue);
+    }
+
+    private async Task ToggleOption(string optionValue, bool isSelected)
+    {
+        var selectedOptions = string.IsNullOrEmpty(Answer)
+            ? new List<string>()
+            : Answer.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+        if (isSelected && !selectedOptions.Contains(optionValue))
+        {
+            selectedOptions.Add(optionValue);
+        }
+        else if (!isSelected && selectedOptions.Contains(optionValue))
+        {
+            selectedOptions.Remove(optionValue);
+
+            // 如果取消选择"其他"选项，则清除对应的自定义文本
+            var option = Question.Options.FirstOrDefault(o => o.Value == optionValue);
+            if (option?.IsOtherOption == true)
+            {
+                _otherOptionTexts.Remove(optionValue);
+                await SaveOtherTexts();
+            }
+        }
+
+        var newAnswer = string.Join(",", selectedOptions);
+        if (newAnswer != Answer)
+        {
+            await AnswerChanged.InvokeAsync(newAnswer);
+        }
+    }
+
+    private async Task OnOtherTextChanged(string optionValue, string newText)
+    {
+        _otherOptionTexts[optionValue] = newText ?? "";
+        await SaveOtherTexts();
+    }
+
+    private async Task SaveOtherTexts()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_otherOptionTexts);
+            if (json != OtherTexts)
+            {
+                await OtherTextsChanged.InvokeAsync(json);
+            }
+        }
+        catch
+        {
+            // 序列化失败时忽略
+        }
+    }
+}

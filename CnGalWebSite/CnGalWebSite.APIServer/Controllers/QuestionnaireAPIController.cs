@@ -350,7 +350,8 @@ namespace CnGalWebSite.APIServer.Controllers
                             Value = option.Value,
                             SortOrder = option.SortOrder,
                             IsEnabled = option.IsEnabled,
-                            Image = option.Image
+                            Image = option.Image,
+                            IsOtherOption = option.IsOtherOption
                         });
                     }
 
@@ -796,6 +797,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 option.SortOrder = optionModel.SortOrder;
                 option.IsEnabled = optionModel.IsEnabled;
                 option.Image = optionModel.Image;
+                option.IsOtherOption = optionModel.IsOtherOption;
 
                 if (optionModel.Id > 0)
                 {

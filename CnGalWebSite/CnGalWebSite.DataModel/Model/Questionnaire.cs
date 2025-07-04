@@ -226,6 +226,11 @@ namespace CnGalWebSite.DataModel.Model
         public string Image { get; set; }
 
         /// <summary>
+        /// 是否为"其他"选项（用户可自定义文本）
+        /// </summary>
+        public bool IsOtherOption { get; set; } = false;
+
+        /// <summary>
         /// 所属题目
         /// </summary>
         public long QuestionId { get; set; }
@@ -371,6 +376,12 @@ namespace CnGalWebSite.DataModel.Model
         /// 数值回答（用于数值输入题）
         /// </summary>
         public decimal? NumericAnswer { get; set; }
+
+        /// <summary>
+        /// "其他"选项的自定义文本（JSON格式存储，键为选项ID，值为自定义文本）
+        /// </summary>
+        [StringLength(2000)]
+        public string OtherOptionTexts { get; set; }
 
         /// <summary>
         /// 回答时间

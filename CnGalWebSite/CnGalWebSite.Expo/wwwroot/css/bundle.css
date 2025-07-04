@@ -882,7 +882,8 @@ h1:focus {
     cursor: pointer;
     transition: transform 0.2s ease;
     margin-bottom: 1rem;
-    width: 600px;
+    max-width: 600px;
+    width: 100%;
 }
 
     .questionnaire-item-card:hover {
@@ -1116,8 +1117,8 @@ h1:focus {
         background: #f8f9fa;
         border: 1px solid #dee2e6;
         border-radius: 8px;
-        cursor: move;
         transition: all 0.2s ease;
+        cursor: pointer;
     }
 
         .ranking-list .ranking-item:hover {
@@ -1325,6 +1326,28 @@ h1:focus {
     background-color: rgba(25, 118, 210, 0.08);
     border-color: rgba(25, 118, 210, 0.3);
 }
+.ranking-summary,.ranking-list {
+    margin-bottom: 1rem;
+}
+.ranking-summary-list {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+/* "其他"选项样式 */
+.option-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.other-option-input {
+    width: calc(100% - 2rem);
+    max-width: 500px;
+}
 
 .slotMachine-box {
     min-height: calc(100% - 341px);
@@ -1507,150 +1530,188 @@ div.prizeTips {
         flex-direction: column;
         gap: 0;
         row-gap: 1rem;
+    }
 
+    .home-sponsors-card .image-button-card {
+        width: 100%;
     }
-    .home-sponsors-card .image-button-card{
-        width:100%;
-    }
+
     .media-partners-card .items-card {
         flex-direction: row;
     }
+
     .home-sponsors-card .media-partners-card .image-button-card {
         width: 48%;
     }
+
     .home-sponsors-card .sponsors-card, .home-sponsors-card .media-partners-card {
         width: 100%;
         padding: 0 2rem;
     }
+
     .game-random-card .action-card {
         justify-content: center;
-        padding-right:0;
+        padding-right: 0;
     }
+
     .game-random-card .content-card {
         padding: 0;
     }
+
         .game-random-card .content-card .game-item-card {
             min-width: 120px;
             max-width: 120px;
         }
+
     .game-item-card .name-card {
         word-break: break-all;
         white-space: pre-wrap;
         font-size: small;
-        font-weight:inherit;
+        font-weight: inherit;
     }
+
     .game-item-card {
         justify-content: space-evenly;
     }
+
     .games-page .tag-list-card {
         padding: 0 1rem 2rem 1rem;
-         width: 100%;
+        width: 100%;
         gap: 1rem;
     }
+
         .games-page .tag-list-card > div {
             font-size: inherit;
             padding: .1rem 1rem;
         }
-    .game-item-card .name-card{
-        font-size:inherit;
+
+    .game-item-card .name-card {
+        font-size: inherit;
     }
+
     .user-info-card {
-         padding: 0;
-         width: 100%;
+        padding: 0;
+        width: 100%;
     }
+
     .lottery-page .cngal-card span:nth-child(1) {
         padding: 0;
     }
+
     .lottery-page .cngal-card span:nth-child(3) {
         padding: 0;
     }
+
     .lottery-grid-card .prize-card .name-card {
         font-size: x-small;
     }
-    .lottery-grid-card .prize-card{
-        aspect-ratio:inherit;
+
+    .lottery-grid-card .prize-card {
+        aspect-ratio: inherit;
     }
+
     .lottery-grid-card .grid-col-card .prize-card {
         min-height: 100%;
     }
+
     .lottery-grid-card .lottery-content-card {
         padding: 2px
     }
+
     .lottery-grid-card .prize-card {
         padding: 2px;
     }
+
         .lottery-grid-card .prize-card > div {
             padding: 2px;
         }
+
         .lottery-grid-card .prize-card .image-button-card {
             border-radius: 4px;
         }
+
     .lottery-page .lottery-tasks-card .task-card .action-card {
         padding: .5rem 1rem;
-        font-size:inherit;
+        font-size: inherit;
     }
+
     .lottery-page .lottery-tasks-card .task-card .content-card {
         gap: 1rem;
     }
+
         .lottery-page .lottery-tasks-card .task-card .content-card i {
             font-size: 24px;
             padding: .5rem;
         }
+
     .lottery-page .lottery-tasks-card .task-card .count-card {
         width: 44px;
         left: 2px;
         font-size: inherit;
     }
+
     .lottery-page .lottery-tasks-card .task-card > div {
         padding: .5rem .5rem;
     }
-    .lottery-page .lottery-tasks-card .task-card .name-card{
-        font-size:inherit;
+
+    .lottery-page .lottery-tasks-card .task-card .name-card {
+        font-size: inherit;
+        width: calc(100% - 160px);
     }
+
     .lottery-page .lottery-tasks-card .task-card > div {
         background-size: calc(100% - 100px) 100%;
     }
+
     .lottery-anniversary-card .brief-card {
         white-space: pre-wrap;
         text-align: center;
     }
+
     .slotMachine-box {
-        transform: scale(0.45) translate(-500px, -200px);
+        transform: scale(0.35) translate(-700px, -200px);
     }
 
     .lottery-anniversary-card {
         width: 100%;
         overflow: hidden;
     }
+
         .lottery-anniversary-card .number-card {
-            height:200px;
+            height: 200px;
             overflow: hidden;
         }
+
         .lottery-anniversary-card .brief-card {
             padding-bottom: 0rem;
         }
+
     .lottery-page .title-card {
         padding-bottom: 1rem;
     }
+
     .lottery-anniversary-card .award-card {
         width: 48%;
     }
+
     .lottery-anniversary-card .award-list-card {
         gap: 0;
         row-gap: 1rem;
         padding-top: 2rem;
     }
+
     .lottery-anniversary-card .award-card > div {
         justify-content: space-evenly;
     }
-   .contact-card .title-card {
+
+    .contact-card .title-card {
         padding: 2rem;
     }
 
     /*问卷调查*/
     .questionnaires-page,
     .questionnaire-detail-page {
-        padding: 0 0.5rem;
+        padding: 1rem 0.5rem 2rem 0.5rem;
     }
 
     .questionnaire-header-card .questionnaire-hero .hero-overlay {
@@ -1674,4 +1735,58 @@ div.prizeTips {
             width: 100%;
             max-width: 280px;
         }
+
+    .questionnaires-page .cngal-card span:nth-child(1) {
+        padding: 0;
+    }
+
+    .questionnaires-page .cngal-card span:nth-child(3) {
+        padding: 0;
+    }
+
+    .questionnaire-detail-page .title-card {
+        font-size: large;
+        padding: .5rem;
+    }
+
+    .questionnaire-meta {
+        gap: .5rem;
+        font-size: smaller;
+    }
+
+    .question-answer-card .question-title {
+        font-size: large;
+        margin-bottom: .5rem;
+    }
+
+    .question-answer-card .question-answer-area {
+        margin: 0;
+    }
+
+    .question-answer-card .question-header {
+        margin-bottom: 0;
+    }
+
+    .ranking-list {
+        margin-bottom: .5rem;
+    }
+
+        .ranking-list .ranking-item .ranking-number {
+            width: 20px;
+            height: 20px;
+        }
+    .other-option-input {
+        width: calc(100% - 1rem);
+    }
+    .ranking-list .ranking-item {
+        padding: 0.5rem 1rem;
+    }
+    .lottery-grid-card .action-card .points-text-card {
+        font-size: x-small;
+        text-align: center;
+        width: calc(100% - 5px);
+    }
+    .lottery-grid-card .action-card > div div:nth-child(1) {
+        font-size: x-large;
+    }
 }

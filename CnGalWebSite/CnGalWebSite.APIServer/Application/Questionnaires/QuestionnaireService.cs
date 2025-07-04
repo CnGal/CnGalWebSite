@@ -115,7 +115,8 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                         Value = option.Value,
                         SortOrder = option.SortOrder,
                         IsEnabled = option.IsEnabled,
-                        Image = option.Image
+                        Image = option.Image,
+                        IsOtherOption = option.IsOtherOption
                     });
                 }
 
@@ -335,6 +336,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     SelectedOptionIds = responseModel.SelectedOptionIds.Count > 0 ? JsonSerializer.Serialize(responseModel.SelectedOptionIds) : null,
                     SortedOptionIds = responseModel.SortedOptionIds.Count > 0 ? JsonSerializer.Serialize(responseModel.SortedOptionIds) : null,
                     NumericAnswer = responseModel.NumericAnswer,
+                    OtherOptionTexts = responseModel.OtherOptionTexts,
                     ResponseTime = DateTime.Now.ToCstTime(),
                     QuestionDurationSeconds = responseModel.QuestionDurationSeconds
                 };
@@ -429,6 +431,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     SelectedOptionIds = responseModel.SelectedOptionIds.Count > 0 ? JsonSerializer.Serialize(responseModel.SelectedOptionIds) : null,
                     SortedOptionIds = responseModel.SortedOptionIds.Count > 0 ? JsonSerializer.Serialize(responseModel.SortedOptionIds) : null,
                     NumericAnswer = responseModel.NumericAnswer,
+                    OtherOptionTexts = responseModel.OtherOptionTexts,
                     ResponseTime = DateTime.Now.ToCstTime(),
                     QuestionDurationSeconds = responseModel.QuestionDurationSeconds
                 };
@@ -569,6 +572,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     SelectedOptionIds = selectedOptionIds,
                     SortedOptionIds = sortedOptionIds,
                     NumericAnswer = questionResponse.NumericAnswer,
+                    OtherOptionTexts = questionResponse.OtherOptionTexts,
                     ResponseTime = questionResponse.ResponseTime,
                     QuestionId = questionResponse.QuestionId
                 });
@@ -860,7 +864,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     QuestionType = question.QuestionType,
                     ResponseTime = questionResponse?.ResponseTime ?? response.SubmitTime,
                     QuestionDurationSeconds = questionResponse?.QuestionDurationSeconds
-                };
+                                };
 
                 if (questionResponse != null)
                 {
@@ -895,6 +899,50 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                                 .Select(id => question.Options.FirstOrDefault(o => o.Id == id)?.Text)
                                 .Where(text => !string.IsNullOrEmpty(text))
                                 .ToList();
+                        }
+                        catch
+                        {
+                            // 如果反序列化失败，忽略
+                        }
+                    }
+
+                                                            // 处理"其他"选项的自定义文本
+                    if (!string.IsNullOrEmpty(questionResponse.OtherOptionTexts))
+                    {
+                        try
+                        {
+                            var otherTexts = JsonSerializer.Deserialize<Dictionary<string, string>>(questionResponse.OtherOptionTexts);
+                            if (otherTexts != null)
+                            {
+                                // 处理其他选项文本映射
+                                foreach (var kvp in otherTexts)
+                                {
+                                    // 首先尝试根据选项Value查找（正确方式）
+                                    var optionByValue = question.Options.FirstOrDefault(o => o.Value == kvp.Key);
+                                    if (optionByValue != null)
+                                    {
+                                        answer.OtherOptionTexts[optionByValue.Text] = kvp.Value;
+                                    }
+                                    // 如果找不到，尝试根据选项ID查找（向后兼容）
+                                    else if (long.TryParse(kvp.Key, out var optionId))
+                                    {
+                                        var optionById = question.Options.FirstOrDefault(o => o.Id == optionId);
+                                        if (optionById != null)
+                                        {
+                                            answer.OtherOptionTexts[optionById.Text] = kvp.Value;
+                                        }
+                                        else
+                                        {
+                                            answer.OtherOptionTexts[$"选项ID:{optionId}"] = kvp.Value;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 如果键既不是有效的Value也不是数字ID，直接使用（向后兼容）
+                                        answer.OtherOptionTexts[kvp.Key] = kvp.Value;
+                                    }
+                                }
+                            }
                         }
                         catch
                         {
@@ -987,6 +1035,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
         private void AnalyzeChoiceQuestion(QuestionnaireQuestion question, List<QuestionResponse> responses, QuestionStatisticsModel stats)
         {
             var optionCounts = new Dictionary<long, int>();
+            var otherTexts = new Dictionary<long, List<string>>();
             var totalSelections = 0;
 
             foreach (var response in responses)
@@ -1007,6 +1056,33 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                         // 忽略解析错误
                     }
                 }
+
+                // 收集"其他"选项的自定义文本
+                if (!string.IsNullOrEmpty(response.OtherOptionTexts))
+                {
+                    try
+                    {
+                        var responseOtherTexts = JsonSerializer.Deserialize<Dictionary<string, string>>(response.OtherOptionTexts);
+                        if (responseOtherTexts != null)
+                        {
+                            foreach (var kvp in responseOtherTexts)
+                            {
+                                if (long.TryParse(kvp.Key, out var optionId) && !string.IsNullOrWhiteSpace(kvp.Value))
+                                {
+                                    if (!otherTexts.ContainsKey(optionId))
+                                    {
+                                        otherTexts[optionId] = new List<string>();
+                                    }
+                                    otherTexts[optionId].Add(kvp.Value);
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // 忽略解析错误
+                    }
+                }
             }
 
             foreach (var option in question.Options)
@@ -1016,14 +1092,18 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     ? (double)count / stats.ValidResponses * 100
                     : totalSelections > 0 ? (double)count / totalSelections * 100 : 0;
 
-                stats.OptionStatistics.Add(new OptionStatisticsModel
+                var optionStat = new OptionStatisticsModel
                 {
                     OptionId = option.Id,
                     OptionText = option.Text,
                     OptionValue = option.Value,
                     SelectionCount = count,
-                    SelectionPercentage = percentage
-                });
+                    SelectionPercentage = percentage,
+                    IsOtherOption = option.IsOtherOption,
+                    OtherTexts = otherTexts.GetValueOrDefault(option.Id, new List<string>())
+                };
+
+                stats.OptionStatistics.Add(optionStat);
             }
         }
 
@@ -1054,6 +1134,7 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
         private void AnalyzeRankingQuestion(QuestionnaireQuestion question, List<QuestionResponse> responses, QuestionStatisticsModel stats)
         {
             var rankingData = new Dictionary<long, List<int>>();
+            var otherTexts = new Dictionary<long, List<string>>();
 
             foreach (var response in responses)
             {
@@ -1070,6 +1151,46 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                                 rankingData[optionId] = new List<int>();
                             }
                             rankingData[optionId].Add(i + 1); // 排名从1开始
+                        }
+                    }
+                    catch
+                    {
+                        // 忽略解析错误
+                    }
+                }
+
+                // 收集排序题中"其他"选项的自定义文本
+                if (!string.IsNullOrEmpty(response.OtherOptionTexts))
+                {
+                    try
+                    {
+                        var responseOtherTexts = JsonSerializer.Deserialize<Dictionary<string, string>>(response.OtherOptionTexts);
+                        if (responseOtherTexts != null)
+                        {
+                            foreach (var kvp in responseOtherTexts)
+                            {
+                                if (long.TryParse(kvp.Key, out var optionId) && !string.IsNullOrWhiteSpace(kvp.Value))
+                                {
+                                    if (!otherTexts.ContainsKey(optionId))
+                                    {
+                                        otherTexts[optionId] = new List<string>();
+                                    }
+                                    otherTexts[optionId].Add(kvp.Value);
+                                }
+                                else
+                                {
+                                    // 处理选项Value作为键的情况
+                                    var option = question.Options.FirstOrDefault(o => o.Value == kvp.Key);
+                                    if (option != null && !string.IsNullOrWhiteSpace(kvp.Value))
+                                    {
+                                        if (!otherTexts.ContainsKey(option.Id))
+                                        {
+                                            otherTexts[option.Id] = new List<string>();
+                                        }
+                                        otherTexts[option.Id].Add(kvp.Value);
+                                    }
+                                }
+                            }
                         }
                     }
                     catch
@@ -1095,7 +1216,9 @@ namespace CnGalWebSite.APIServer.Application.Questionnaires
                     OptionText = option.Text,
                     AverageRank = ranks.Any() ? ranks.Average() : 0,
                     RankPositions = ranks,
-                    RankCounts = rankCounts
+                    RankCounts = rankCounts,
+                    IsOtherOption = option.IsOtherOption,
+                    OtherTexts = otherTexts.GetValueOrDefault(option.Id, new List<string>())
                 });
             }
         }

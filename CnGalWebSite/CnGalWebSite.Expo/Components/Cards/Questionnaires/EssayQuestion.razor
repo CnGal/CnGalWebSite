@@ -1,0 +1,37 @@
+@using CnGalWebSite.Extensions
+
+<div class="essay-area">
+    <MTextarea Value="@Answer"
+               ValueChanged="@OnAnswerChanged"
+               Label="请输入您的答案"
+               Placeholder="@Question.TextPlaceholder"
+               Rows="4"
+               Outlined
+               Counter="@Question.MaxTextLength"
+               Class="mt-2" />
+    @if (Question.MaxTextLength.HasValue)
+    {
+        <div class="text-hint">
+            最多输入 @Question.MaxTextLength 个字符
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    private async Task OnAnswerChanged(string value)
+    {
+        if (value != Answer)
+        {
+            await AnswerChanged.InvokeAsync(value);
+        }
+    }
+}

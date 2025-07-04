@@ -1,0 +1,135 @@
+﻿@using CnGalWebSite.Extensions
+@using System.Text.Json
+
+<div class="single-choice-area">
+    <MRadioGroup Value="@GetSelectedValue()" TValue="string"
+                 ValueChanged="@OnRadioChanged"
+                 Color="primary" Dense="ToolHelper.IsApp" HideDetails="ToolHelper.IsApp">
+        @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
+        {
+            <div class="option-container">
+                <MRadio Value="@option.Value" Label="@option.Text" />
+                @if (option.IsOtherOption && GetSelectedValue() == option.Value)
+                {
+                    <div class="other-option-input">
+                        <MTextField Value="@_otherText" TValue="string" Outlined
+                                   ValueChanged="@OnOtherTextValueChanged"
+                                   Label="请输入具体内容"
+                                   Dense="ToolHelper.IsApp"
+                                   HideDetails="ToolHelper.IsApp"
+                                   Class="mt-2"
+                                   Placeholder="请输入您的答案..." />
+                    </div>
+                }
+            </div>
+        }
+    </MRadioGroup>
+</div>
+
+@code {
+    [Parameter]
+    public QuestionnaireQuestionViewModel Question { get; set; }
+
+    [Parameter]
+    public string Answer { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> AnswerChanged { get; set; }
+
+    [Parameter]
+    public string OtherTexts { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> OtherTextsChanged { get; set; }
+
+    private string _otherText = "";
+    private Dictionary<string, string> _otherOptionTexts = new();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        LoadOtherTexts();
+        UpdateOtherText();
+    }
+
+    private void LoadOtherTexts()
+    {
+        if (!string.IsNullOrEmpty(OtherTexts))
+        {
+            try
+            {
+                _otherOptionTexts = JsonSerializer.Deserialize<Dictionary<string, string>>(OtherTexts) ?? new();
+            }
+            catch
+            {
+                _otherOptionTexts = new();
+            }
+        }
+        else
+        {
+            _otherOptionTexts = new();
+        }
+    }
+
+    private void UpdateOtherText()
+    {
+        var selectedValue = GetSelectedValue();
+        if (!string.IsNullOrEmpty(selectedValue))
+        {
+            var selectedOption = Question.Options.FirstOrDefault(o => o.Value == selectedValue);
+            if (selectedOption?.IsOtherOption == true)
+            {
+                _otherText = _otherOptionTexts.GetValueOrDefault(selectedValue, "");
+            }
+        }
+    }
+
+    private string GetSelectedValue()
+    {
+        return Answer;
+    }
+
+    private async Task OnRadioChanged(string value)
+    {
+        if (value != Answer)
+        {
+            await AnswerChanged.InvokeAsync(value);
+
+            // 更新"其他"选项的文本
+            UpdateOtherText();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnOtherTextValueChanged(string newText)
+    {
+        _otherText = newText ?? "";
+
+        var selectedValue = GetSelectedValue();
+        if (!string.IsNullOrEmpty(selectedValue))
+        {
+            var selectedOption = Question.Options.FirstOrDefault(o => o.Value == selectedValue);
+            if (selectedOption?.IsOtherOption == true)
+            {
+                _otherOptionTexts[selectedValue] = _otherText;
+                await SaveOtherTexts();
+            }
+        }
+    }
+
+    private async Task SaveOtherTexts()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_otherOptionTexts);
+            if (json != OtherTexts)
+            {
+                await OtherTextsChanged.InvokeAsync(json);
+            }
+        }
+        catch
+        {
+            // 序列化失败时忽略
+        }
+    }
+}
