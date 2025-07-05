@@ -51,7 +51,7 @@
     CnGalWebSite.Components.Verifications.DeviceIdentification deviceIdentification;
 
     bool isDrawing;
-    long _lotteryId = 3;
+    long _lotteryId = 38;
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,10 +92,10 @@
         try
         {
             var obj = await _httpService.PostAsync<ParticipateInLotteryModel, Result>("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
-                {
-                    Id = _lotteryId,
-                    Identification = await deviceIdentification.GetDeviceIdentificationModel()
-                });
+            {
+                Id = _lotteryId,
+                Identification = await deviceIdentification.GetDeviceIdentificationModel()
+            });
             if (obj.Successful)
             {
                 if (int.TryParse(obj.Error, out int number) == false)
