@@ -1004,7 +1004,7 @@ h1:focus {
 .questionnaire-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    column-gap: 1rem;
     justify-content: center;
 }
 
@@ -1750,7 +1750,7 @@ div.prizeTips {
     }
 
     .questionnaire-meta {
-        gap: .5rem;
+        column-gap: .5rem;
         font-size: smaller;
     }
 

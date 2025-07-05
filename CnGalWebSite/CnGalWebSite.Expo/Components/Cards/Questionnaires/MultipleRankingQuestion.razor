@@ -2,7 +2,7 @@
 @using System.Text.Json
 
 <div class="multiple-ranking-area">
-    <div class="ranking-instruction">请按照您的偏好顺序勾选选项（先勾选的排名靠前）：</div>
+    <div class="ranking-instruction">请按照您的偏好顺序点击选项（先点击的排名靠前）：</div>
     <div class="ranking-list">
         @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
         {
@@ -11,10 +11,6 @@
 
             <div class="ranking-item @(isSelected ? "selected" : "") clickable"
                  @onclick="() => OnCardClicked(option)">
-                <MCheckbox Value="@isSelected" TValue="bool"
-                          ValueChanged="@(value => OnOptionToggled(option, value))"
-                          Class="ranking-checkbox mt-0" Dense HideDetails="true"
-                          @onclick:stopPropagation="true" />
                 @if (isSelected)
                 {
                     <span class="ranking-number">@rankNumber</span>

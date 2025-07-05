@@ -1,7 +1,7 @@
 ﻿@using CnGalWebSite.Extensions
 
 <div class="ranking-area">
-    <div class="ranking-instruction">请按照您的偏好顺序勾选选项（先勾选的排名靠前）：</div>
+    <div class="ranking-instruction">请按照您的偏好顺序点击选项（先点击的排名靠前）：</div>
     <div class="ranking-list">
         @foreach (var option in Question.Options.OrderBy(o => o.SortOrder))
         {
@@ -10,10 +10,6 @@
 
             <div class="ranking-item @(isSelected ? "selected" : "") clickable"
                  @onclick="() => OnCardClicked(option)">
-                <MCheckbox Value="@isSelected" TValue="bool" Dense HideDetails="true"
-                          ValueChanged="@(value => OnOptionToggled(option, value))"
-                          Class="ranking-checkbox mt-0"
-                          @onclick:stopPropagation="true" />
                 @if (isSelected)
                 {
                     <span class="ranking-number">@rankNumber</span>
@@ -48,7 +44,7 @@
     {
         <div class="ranking-warning">
             <MAlert Type="AlertTypes.Warning" Dense Text>
-                请勾选所有选项进行排序（还需勾选 @(Question.Options.Count - _selectedOptions.Count) 个选项）
+                请点击所有选项进行排序（还需点击 @(Question.Options.Count - _selectedOptions.Count) 个选项）
             </MAlert>
         </div>
     }
