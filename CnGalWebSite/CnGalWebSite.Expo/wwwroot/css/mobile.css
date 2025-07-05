@@ -315,7 +315,7 @@
     }
 
     .questionnaire-meta {
-        gap: .5rem;
+        column-gap: .5rem;
         font-size: smaller;
     }
 
