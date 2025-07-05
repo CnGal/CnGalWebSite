@@ -16,6 +16,7 @@
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" />
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-wallet-giftcard" Text="直播抽号" Href="/anniversary" />
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-clipboard-text" Text="问卷调查" Href="/questionnaires" />
                 <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" />
                 <CnGalWebSite.Expo.Components.Cards.Users.LoginButton />
@@ -38,11 +39,12 @@
             <div class="nav-drawer-card">
                 <CnGalWebSite.Expo.Components.Cards.Users.LoginButton App />
                 <div class="divid-card"></div>
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" OnClick="@(()=>_drawer=false)" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" OnClick="@(()=>_drawer=false)" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" OnClick="@(()=>_drawer=false)" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-clipboard-text" Text="问卷调查" Href="/questionnaires" OnClick="@(()=>_drawer=false)" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" OnClick="@(()=>_drawer=false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" OnClick="@(() => _drawer = false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" OnClick="@(() => _drawer = false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" OnClick="@(() => _drawer = false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-wallet-giftcard" Text="直播抽号" Href="/anniversary" OnClick="@(() => _drawer = false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-clipboard-text" Text="问卷调查" Href="/questionnaires" OnClick="@(() => _drawer = false)" />
+                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" OnClick="@(() => _drawer = false)" />
             </div>
         </MNavigationDrawer>
     }
@@ -52,7 +54,6 @@
             @Body
         </MContainer>
     </MMain>
-
     <MFooter App Padless Absolute>
         &copy; 2025 - CnGal资料站
         &nbsp;&nbsp;&nbsp;<a target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">粤ICP备2023071243号</a>
