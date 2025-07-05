@@ -600,8 +600,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber);
                     if (!taskExists)
                     {
-                        // 验证用户是否真的参与了抽奖（ID=3）
-                        var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 3);
+                        // 验证用户是否真的参与了抽奖（ID=38）
+                        var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38);
                         if (!hasJoinedLottery)
                         {
                             return new Result { Successful = false, Error = "请先参与十周年庆典抽奖后再领取奖励" };
@@ -722,7 +722,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("找不到该用户");
             }
 
-            var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 3); // 检查抽奖ID=3
+            var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38); // 检查抽奖ID=38
             return hasJoinedLottery;
         }
 
