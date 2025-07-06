@@ -5,281 +5,50 @@
 
 @using CnGalWebSite.DataModel.ViewModel.Questionnaires
 @using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using System.Linq
 
 <div class="lottery-tasks-card">
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                预约CnGal十周年庆直播
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">50点</div>
+    @foreach (var task in GetSortedTasks())
+    {
+        <div class="task-card">
+            <div>
+                <div class="name-card">
+                    @task.Name
                 </div>
-                @if (Model.IsBooking)
-                {
-                    <div class="action-card active">
-                        已完成
+                <div class="content-card">
+                    <div class="gift-card">
+                        <MIcon>mdi-gift</MIcon>
+                        <div class="count-card">@task.Points 点</div>
                     </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickBooking">
-                        去完成
-                    </div>
-                }
-
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                晒出Steam游戏库
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">50点</div>
-                </div>
-                @if (Model.IsPickUpSharedGames)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    @if (Model.IsSharedGames)
+                    @if (task.IsCompleted)
                     {
-                        <div class="action-card" @onclick="@OnClickShareGames">
-                            去完成
+                        <div class="action-card active">
+                            已完成
+                        </div>
+                    }
+                    else if (task.IsSignedIn)
+                    {
+                        <div class="action-card active">
+                            已签到
                         </div>
                     }
                     else
                     {
-                        <div class="action-card" @onclick="@OnClickOpenShareGames">
-                            去完成
+                        <div class="action-card" @onclick="@task.OnClick" disabled="@task.IsLoading">
+                            @if (task.IsLoading)
+                            {
+                                <span>@task.LoadingText</span>
+                            }
+                            else
+                            {
+                                <span>去完成</span>
+                            }
                         </div>
                     }
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                每日签到 (@Model.SignInDays/5)
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
                 </div>
-                @if (Model.SignInDays >= 5)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else if (Model.IsSignIn)
-                {
-                    <div class="action-card active">
-                        已签到
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickSignIn">
-                        去完成
-                    </div>
-                }
             </div>
         </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                填写问卷
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">100点</div>
-                </div>
-                @if (Model.IsSurvey)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickSurvey">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                给游戏评分
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
-                </div>
-                @if (Model.IsRateGame)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickRateGame">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                绑定群聊QQ
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
-                </div>
-                @if (Model.IsBindQQ)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickBindQQ">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                更换默认头像
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
-                </div>
-                @if (Model.IsChangeAvatar)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickChangeAvatar">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                更换默认签名
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
-                </div>
-                @if (Model.IsChangeSignature)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickChangeSignature">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                填写国G世代
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">20点</div>
-                </div>
-                @if (Model.IsSaveGGeneration)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickSaveGGeneration">
-                        去完成
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="task-card">
-        <div>
-            <div class="name-card">
-                领取抽奖号码
-            </div>
-            <div class="content-card">
-                <div class="gift-card">
-                    <MIcon>mdi-gift</MIcon>
-                    <div class="count-card">100点</div>
-                </div>
-                @if (Model.IsLotteryNumber)
-                {
-                    <div class="action-card active">
-                        已完成
-                    </div>
-                }
-                else
-                {
-                    <div class="action-card" @onclick="@OnClickLotteryNumber" disabled="@isDrawing">
-                        @if (isDrawing)
-                        {
-                            <span>抽奖中</span>
-                        }
-                        else
-                        {
-                            <span>去完成</span>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
+    }
 </div>
 <AuthorizeView>
     <Authorized>
@@ -303,6 +72,99 @@
 
     bool isDrawing = false;
     long lotteryId = 38;
+
+    public class TaskItem
+    {
+        public string Name { get; set; }
+        public int Points { get; set; }
+        public bool IsCompleted { get; set; }
+        public bool IsSignedIn { get; set; }
+        public bool IsLoading { get; set; }
+        public string LoadingText { get; set; }
+        public Func<Task> OnClick { get; set; }
+    }
+
+    public List<TaskItem> GetSortedTasks()
+    {
+        var tasks = new List<TaskItem>
+        {
+            new TaskItem
+            {
+                Name = "预约CnGal十周年庆直播",
+                Points = 50,
+                IsCompleted = Model.IsBooking,
+                OnClick = OnClickBooking
+            },
+            new TaskItem
+            {
+                Name = "晒出Steam游戏库",
+                Points = 50,
+                IsCompleted = Model.IsPickUpSharedGames,
+                OnClick = Model.IsSharedGames ? OnClickShareGames : OnClickOpenShareGames
+            },
+            new TaskItem
+            {
+                Name = $"每日签到 ({Model.SignInDays}/5)",
+                Points = 20,
+                IsCompleted = Model.IsSignIn,
+                OnClick = OnClickSignIn
+            },
+            new TaskItem
+            {
+                Name = "填写问卷",
+                Points = 100,
+                IsCompleted = Model.IsSurvey,
+                OnClick = OnClickSurvey
+            },
+            new TaskItem
+            {
+                Name = "给游戏评分",
+                Points = 20,
+                IsCompleted = Model.IsRateGame,
+                OnClick = OnClickRateGame
+            },
+            new TaskItem
+            {
+                Name = "绑定群聊QQ",
+                Points = 20,
+                IsCompleted = Model.IsBindQQ,
+                OnClick = OnClickBindQQ
+            },
+            new TaskItem
+            {
+                Name = "更换默认头像",
+                Points = 20,
+                IsCompleted = Model.IsChangeAvatar,
+                OnClick = OnClickChangeAvatar
+            },
+            new TaskItem
+            {
+                Name = "更换默认签名",
+                Points = 20,
+                IsCompleted = Model.IsChangeSignature,
+                OnClick = OnClickChangeSignature
+            },
+            new TaskItem
+            {
+                Name = "填写国G世代",
+                Points = 20,
+                IsCompleted = Model.IsSaveGGeneration,
+                OnClick = OnClickSaveGGeneration
+            },
+            new TaskItem
+            {
+                Name = "领取抽奖号码",
+                Points = 100,
+                IsCompleted = Model.IsLotteryNumber,
+                IsLoading = isDrawing,
+                LoadingText = "抽奖中",
+                OnClick = OnClickLotteryNumber
+            }
+        };
+
+        // 按完成状态排序：未完成在前，完成在后
+        return tasks.OrderBy(t => t.IsCompleted ? 1 : 0).ToList();
+    }
 
     public void OnEditSteam()
     {
