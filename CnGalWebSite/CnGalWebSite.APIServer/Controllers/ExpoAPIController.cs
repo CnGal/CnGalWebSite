@@ -458,18 +458,18 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new ExpoUserTaskModel
             {
-                IsPickUpSharedGames = userTasks.Any(s => s.Type == ExpoTaskType.ShareGames),
+                IsPickUpSharedGames = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames),
                 IsSharedGames = string.IsNullOrWhiteSpace(user.SteamId) == false,
-                IsSignIn = userTasks.Any(s => s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
-                IsBooking = userTasks.Any(s => s.Type == ExpoTaskType.Booking),
+                IsSignIn = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
+                IsBooking = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking),
                 SignInDays = signInDays,
-                IsSurvey = userTasks.Any(s => s.Type == ExpoTaskType.Survey),
-                IsRateGame = userTasks.Any(s => s.Type == ExpoTaskType.RateGame),
-                IsBindQQ = userTasks.Any(s => s.Type == ExpoTaskType.BindQQ),
-                IsChangeAvatar = userTasks.Any(s => s.Type == ExpoTaskType.ChangeAvatar),
-                IsChangeSignature = userTasks.Any(s => s.Type == ExpoTaskType.ChangeSignature),
-                IsSaveGGeneration = userTasks.Any(s => s.Type == ExpoTaskType.SaveGGeneration),
-                IsLotteryNumber = userTasks.Any(s => s.Type == ExpoTaskType.LotteryNumber),
+                IsSurvey = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey),
+                IsRateGame = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame),
+                IsBindQQ = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ),
+                IsChangeAvatar = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar),
+                IsChangeSignature = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature),
+                IsSaveGGeneration = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration),
+                IsLotteryNumber = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber),
                 TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };
 

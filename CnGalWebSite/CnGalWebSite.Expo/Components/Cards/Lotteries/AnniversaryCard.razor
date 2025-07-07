@@ -127,6 +127,13 @@
         {
             return;
         }
+
+        // 检查登录状态
+        if (await CheckLogin() == false)
+        {
+            return;
+        }
+
         isDrawing = true;
 
         var number = await ParticipateInLottery();
@@ -146,5 +153,25 @@
         await Task.Delay(1000);
 
         isDrawing = false;
+    }
+
+    public async Task<bool> CheckLogin()
+    {
+        if (AuthState == null)
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        else
+        {
+            Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}", true);
+            return false;
+        }
     }
 }

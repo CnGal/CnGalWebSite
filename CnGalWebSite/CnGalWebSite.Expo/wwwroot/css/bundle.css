@@ -1349,6 +1349,14 @@ h1:focus {
     max-width: 500px;
 }
 
+/*任务链接*/
+.lottery-page .lottery-tasks-card .task-card .name-card a {
+    color: var(--m-theme-primary) !important;
+}
+    .lottery-page .lottery-tasks-card .task-card .name-card a:hover {
+        text-decoration: underline!important;
+    }
+
 .slotMachine-box {
     min-height: calc(100% - 341px);
     width: 848px;
@@ -1789,4 +1797,7 @@ div.prizeTips {
     .lottery-grid-card .action-card > div div:nth-child(1) {
         font-size: x-large;
     }
+}
+.lottery-page {
+    padding-bottom: 2rem;
 }
