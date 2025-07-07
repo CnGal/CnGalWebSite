@@ -1348,3 +1348,11 @@
     width: calc(100% - 2rem);
     max-width: 500px;
 }
+
+/*任务链接*/
+.lottery-page .lottery-tasks-card .task-card .name-card a {
+    color: var(--m-theme-primary) !important;
+}
+    .lottery-page .lottery-tasks-card .task-card .name-card a:hover {
+        text-decoration: underline!important;
+    }

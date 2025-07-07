@@ -13,7 +13,16 @@
         <div class="task-card">
             <div>
                 <div class="name-card">
-                    @task.Name
+                    @if (!string.IsNullOrEmpty(task.Link))
+                    {
+                        <a href="@task.Link" target="_blank" style="color: inherit; text-decoration: none;">
+                            @task.Name
+                        </a>
+                    }
+                    else
+                    {
+                        @task.Name
+                    }
                 </div>
                 <div class="content-card">
                     <div class="gift-card">
@@ -81,6 +90,7 @@
         public bool IsSignedIn { get; set; }
         public bool IsLoading { get; set; }
         public string LoadingText { get; set; }
+        public string Link { get; set; }
         public Func<Task> OnClick { get; set; }
     }
 
@@ -93,6 +103,7 @@
                 Name = "预约CnGal十周年庆直播",
                 Points = 50,
                 IsCompleted = Model.IsBooking,
+                Link = "https://space.bilibili.com/145239325",
                 OnClick = OnClickBooking
             },
             new TaskItem
@@ -121,6 +132,7 @@
                 Name = "给游戏评分",
                 Points = 20,
                 IsCompleted = Model.IsRateGame,
+                Link = "https://www.cngal.org/sharegames/new",
                 OnClick = OnClickRateGame
             },
             new TaskItem
@@ -128,6 +140,7 @@
                 Name = "绑定群聊QQ",
                 Points = 20,
                 IsCompleted = Model.IsBindQQ,
+                Link = "https://app.cngal.org/space/editdata",
                 OnClick = OnClickBindQQ
             },
             new TaskItem
@@ -135,6 +148,7 @@
                 Name = "更换默认头像",
                 Points = 20,
                 IsCompleted = Model.IsChangeAvatar,
+                Link = "https://app.cngal.org/space/editdata",
                 OnClick = OnClickChangeAvatar
             },
             new TaskItem
@@ -142,6 +156,7 @@
                 Name = "更换默认签名",
                 Points = 20,
                 IsCompleted = Model.IsChangeSignature,
+                Link = "https://app.cngal.org/space/editdata",
                 OnClick = OnClickChangeSignature
             },
             new TaskItem
@@ -149,6 +164,7 @@
                 Name = "填写国G世代",
                 Points = 20,
                 IsCompleted = Model.IsSaveGGeneration,
+                Link = "https://www.cngal.org/sedai",
                 OnClick = OnClickSaveGGeneration
             },
             new TaskItem
@@ -495,41 +511,8 @@
             return;
         }
 
-        if (isDrawing)
-        {
-            return;
-        }
-        isDrawing = true;
-
-        try
-        {
-            // 检查用户是否已经参与了十周年庆典抽奖
-            var hasJoinedLottery = await _httpService.GetAsync<bool>("api/expo/CheckUserJoinedLottery");
-
-            if (hasJoinedLottery)
-            {
-                // 用户已参与抽奖，直接完成任务
-                await FinshTask(ExpoTaskType.LotteryNumber);
-            }
-            else
-            {
-                // 用户未参与抽奖，直接参与抽奖
-                var number = await ParticipateInLottery();
-                if (number != null)
-                {
-                    // 参与成功后，完成任务
-                    await FinshTask(ExpoTaskType.LotteryNumber);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            await _popupService.EnqueueSnackbarAsync("操作失败", ex.Message, AlertTypes.Error);
-        }
-        finally
-        {
-            isDrawing = false;
-        }
+        // 直接跳转到周年庆页面
+        Navigation.NavigateTo("/anniversary");
     }
 
     public async Task<int?> ParticipateInLottery()
