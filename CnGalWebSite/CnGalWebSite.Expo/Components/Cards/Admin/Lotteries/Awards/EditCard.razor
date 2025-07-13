@@ -31,10 +31,13 @@
                 <MCol Cols="6">
                     <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="@Model.Type" TValue="ExpoAwardType" Label="类型" />
                 </MCol>
+                <MCol Cols="6">
+                    <MSwitch @bind-Value="@Model.IsEnabled" Label="启用状态" Color="success" />
+                </MCol>
                 <MCol Cols="12">
                     <MTextField @bind-Value="@Model.Url" Label="链接" />
                 </MCol>
-  
+
                 @if (Model.Type == ExpoAwardType.NoEntry)
                 {
                     <MCol Cols="6">
