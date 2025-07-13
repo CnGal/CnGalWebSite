@@ -8,7 +8,7 @@
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
         {
-            <span style="font-size: small;" class="pb-2">绑定QQ号可以向看板娘查询信息，点击绑定获取身份识别码，并在群聊中发送【看板娘，绑定+身份识别码】即可绑定</span>
+            <span style="font-size: small;" class="pb-2">点击【绑定】获取身份识别码，并在群聊中发送指定信息即可绑定</span>
         }
         else
         {
@@ -46,7 +46,7 @@
             身份识别码
         </MCardTitle>
         <MCardText>
-            在群聊中发送【看板娘，绑定+身份识别码】即可绑定，90分钟内有效，仅可使用一次
+            在QQ群(490888010)中发送【看板娘，绑定+身份识别码】即可绑定，90分钟内有效，仅可使用一次（可以直接复制下面的文本）
         </MCardText>
         <MCardText>
             <PCopyableText>
