@@ -160,11 +160,11 @@
     }
 
     .lottery-page .cngal-card span:nth-child(1) {
-        padding: 0;
+        padding-right: 14rem;
     }
 
     .lottery-page .cngal-card span:nth-child(3) {
-        padding: 0;
+        padding-left: 14rem;
     }
 
     .lottery-grid-card .prize-card .name-card {
@@ -210,8 +210,8 @@
         }
 
     .lottery-page .lottery-tasks-card .task-card .count-card {
-        width: 44px;
-        left: 2px;
+        width: 50px;
+        left: 0px;
         font-size: inherit;
     }
 
@@ -340,21 +340,33 @@
             width: 20px;
             height: 20px;
         }
+
     .other-option-input {
         width: calc(100% - 1rem);
     }
+
     .ranking-list .ranking-item {
         padding: 0.5rem 1rem;
     }
+
     .lottery-grid-card .action-card .points-text-card {
         font-size: x-small;
         text-align: center;
         width: calc(100% - 5px);
     }
+
     .lottery-grid-card .action-card > div div:nth-child(1) {
         font-size: x-large;
     }
-}
-.lottery-page {
-    padding-bottom: 2rem;
+
+    .lottery-page {
+        padding-bottom: 2rem;
+    }
+
+    .home-head-card .image-card img {
+        content: url(https://res.cngal.org/images/expo/mobile_1.png);
+    }
+    .home-head-card .image-card .img-btn{
+        display:none;
+    }
 }

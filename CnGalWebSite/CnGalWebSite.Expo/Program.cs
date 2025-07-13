@@ -183,7 +183,7 @@ builder.Services.AddMasaBlazor(options =>
     //主题
     options.ConfigureTheme(s =>
     {
-        s.Themes.Light.Primary = "#b5353a";
+        s.Themes.Light.Primary = "#e135b9";
         s.Themes.Light.Secondary = "#75565b";
         s.Themes.Light.Error = "#ba1a1a";
     });
