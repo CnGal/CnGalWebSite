@@ -737,6 +737,17 @@ h1:focus {
         .lottery-grid-card .action-card .points-text-card {
             font-size: small;
         }
+
+        /* 禁用状态的抽奖按钮 */
+        .lottery-grid-card .action-card.disabled > div {
+            background-image: linear-gradient(135deg, #999999, #666666);
+            cursor: not-allowed;
+        }
+
+        .lottery-grid-card .action-card.disabled > div:hover {
+            background-image: linear-gradient(135deg, #999999, #666666);
+        }
+
         .lottery-grid-card .prize-card .name-card {
             text-align: center;
         }
