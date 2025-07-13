@@ -100,6 +100,15 @@
         {
             new TaskItem
             {
+                Name = "领取抽奖号码",
+                Points = 100,
+                IsCompleted = Model.IsLotteryNumber,
+                IsLoading = isDrawing,
+                LoadingText = "抽奖中",
+                OnClick = OnClickLotteryNumber
+            },
+            new TaskItem
+            {
                 Name = "预约CnGal十周年庆直播",
                 Points = 50,
                 IsCompleted = Model.IsBooking,
@@ -167,15 +176,6 @@
                 IsCompleted = Model.IsSaveGGeneration,
                 Link = "https://www.cngal.org/sedai",
                 OnClick = OnClickSaveGGeneration
-            },
-            new TaskItem
-            {
-                Name = "领取抽奖号码",
-                Points = 100,
-                IsCompleted = Model.IsLotteryNumber,
-                IsLoading = isDrawing,
-                LoadingText = "抽奖中",
-                OnClick = OnClickLotteryNumber
             }
         };
 
