@@ -56,7 +56,7 @@
                                     <th>
                                         Id
                                     </th>
-                                    <th >
+                                    <th>
                                         奖品内容
                                     </th>
                                     <th>
@@ -73,7 +73,7 @@
                                     <tr @key="Model.Prizes.IndexOf(item)">
                                         <td>@item.Id</td>
                                         <td>@item.Content</td>
-                                        <td>@(item.Allocated?"✅":"")</td>
+                                        <td>@(item.Allocated ? "✅" : "")</td>
                                         <td>
                                             <MButton Icon Color="success" Small OnClick="() => EditPrize(item)">
                                                 <MIcon>mdi-pencil</MIcon>
@@ -89,6 +89,7 @@
                     </MCol>
                     <MCol Cols="12">
                         <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Text="添加奖品" OnClick="() => AddPrize()" Icon="mdi-plus" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded TextStyle Text="批量导入" OnClick="() => OpenBatchImportDialog()" Icon="mdi-file-import" Class="ms-2" />
                     </MCol>
                 }
             </MRow>
@@ -127,6 +128,32 @@
     }
 </MDialog>
 
+<MDialog @bind-Value="_batchImportDialog"
+         MaxWidth="500">
+    <MCardTitle>
+        批量导入奖品
+    </MCardTitle>
+    <MCardText>
+        <MRow Dense>
+            <MCol Cols="12">
+                <MTextarea @bind-Value="@_batchImportContent"
+                           Label="奖品内容"
+                           Hint="请输入奖品内容，每行一个奖品"
+                           Rows="10"
+                           NoResize
+                           HideDetails="false" />
+            </MCol>
+        </MRow>
+    </MCardText>
+    <MCardActions Class="pb-6 ps-6 pe-6">
+        <MSpacer></MSpacer>
+        <MButton Color="primary" Rounded OnClick="SaveBatchImport" Class="ms-2">
+            <MIcon Left>mdi-check</MIcon>
+            导入
+        </MButton>
+    </MCardActions>
+</MDialog>
+
 @code {
     [Parameter]
     public EventCallback OnEdited { get; set; }
@@ -142,9 +169,11 @@
 
     private bool _editDialog;
     private bool _prizeEditDialog;
+    private bool _batchImportDialog;
     private ExpoPrizeEditModel _currentPrize;
     private bool _isAddingNewPrize;
     private ExpoPrizeEditModel _editingPrize;
+    private string _batchImportContent = "";
 
     private string GetDisplayName(ExpoAwardType type)
     {
@@ -210,10 +239,10 @@
     {
         _editingPrize = prize;
         _currentPrize = new ExpoPrizeEditModel
-            {
-                Id = prize.Id,
-                Content = prize.Content
-            };
+        {
+            Id = prize.Id,
+            Content = prize.Content
+        };
         _isAddingNewPrize = false;
         _prizeEditDialog = true;
     }
@@ -239,5 +268,55 @@
             }
         }
         _prizeEditDialog = false;
+    }
+
+    private void OpenBatchImportDialog()
+    {
+        _batchImportContent = "";
+        _batchImportDialog = true;
+    }
+
+    private async Task SaveBatchImport()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_batchImportContent))
+            {
+                await _popupService.EnqueueSnackbarAsync("请输入奖品内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 按换行分割奖品内容
+            var lines = _batchImportContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (lines.Length == 0)
+            {
+                await _popupService.EnqueueSnackbarAsync("请输入有效的奖品内容", AlertTypes.Warning);
+                return;
+            }
+
+            // 添加奖品到列表
+            foreach (var line in lines)
+            {
+                var trimmedLine = line.Trim();
+                if (!string.IsNullOrWhiteSpace(trimmedLine))
+                {
+                    Model.Prizes.Add(new ExpoPrizeEditModel
+                    {
+                        Content = trimmedLine
+                    });
+                }
+            }
+
+            _batchImportDialog = false;
+            _batchImportContent = "";
+
+            await _popupService.EnqueueSnackbarAsync($"成功导入 {lines.Length} 个奖品", AlertTypes.Success);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await _popupService.EnqueueSnackbarAsync("批量导入失败", ex.Message, AlertTypes.Error);
+        }
     }
 }

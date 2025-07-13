@@ -22,12 +22,20 @@
                 <GridPrizeCard Items="_items" Skip="3" Take="1" ActiveIndex="_activeIndex" />
             </div>
 
-            <div class="action-card" @onclick="OnClickStart">
+            <div class="action-card @(HasAvailablePrizes ? "" : "disabled")" @onclick="OnClickStart">
                 <div>
-                    <div class="go-card">GO</div>
-                    <div class="text-card">参加抽奖</div>
-                    <div class="points-text-card">（每次抽奖消耗100点）</div>
-
+                    @if (HasAvailablePrizes)
+                    {
+                        <div class="go-card">GO</div>
+                        <div class="text-card">参加抽奖</div>
+                        <div class="points-text-card">（每次抽奖消耗100点）</div>
+                    }
+                    else
+                    {
+                        <div class="go-card">×</div>
+                        <div class="text-card">暂无奖品</div>
+                        <div class="points-text-card">（我们会尽快补充）</div>
+                    }
                 </div>
             </div>
             <div class="grid-col-card">
@@ -81,6 +89,11 @@
     RulesDialog rulesDialog;
     PrizesDialog prizesDialog;
 
+    /// <summary>
+    /// 是否有可用的奖品（只考虑激活码类型，无实体奖品视为谢谢参与）
+    /// </summary>
+    private bool HasAvailablePrizes => AwardModel.Any(a => a.Type == ExpoAwardType.Key && a.Count > a.PrizeCount);
+
     protected override async Task OnInitializedAsync()
     {
         await Refresh();
@@ -122,15 +135,16 @@
 
                         // 创建新的奖品实例
                         _items.Add(new ExpoAwardOverviewModel
-                            {
-                                Count = award.Count,
-                                Id = _items.Max(s => s.Id) + 1,
-                                Image = award.Image,
-                                Type = award.Type,
-                                Url = award.Url,
-                                Name = award.Name,
-                                PrizeCount = award.PrizeCount
-                            });
+                        {
+                            Count = award.Count,
+                            Id = _items.Max(s => s.Id) + 1,
+                            Image = award.Image,
+                            Type = award.Type,
+                            Url = award.Url,
+                            Name = award.Name,
+                            PrizeCount = award.PrizeCount,
+                            IsEnabled = award.IsEnabled
+                        });
                     }
                 }
             }
@@ -177,6 +191,12 @@
             return;
         }
 
+        // 如果没有可用奖品，直接返回
+        if (!HasAvailablePrizes)
+        {
+            await _popupService.EnqueueSnackbarAsync("抽奖失败", "暂无可用奖品，我们会尽快补充奖品", AlertTypes.Error);
+            return;
+        }
 
         if (Model.TotalPoints < 100)
         {
