@@ -435,26 +435,36 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("找不到该用户");
             }
 
-            var now = DateTime.Now.ToCstTime();
-
+           
             // 获取用户的所有任务
             var userTasks = await _expoTaskRepository.GetAll()
                 .Where(s => s.ApplicationUserId == user.Id)
                 .ToListAsync();
 
-            // 计算签到天数（限制最多5天）
-            var signInDays = Math.Min(5, userTasks.Count(s => s.Type == ExpoTaskType.SignIn));
+            // 计算签到天数（限制最多5天，按不同日期计算）
+            var signInDays = Math.Min(5, userTasks.Where(s => s.Type == ExpoTaskType.SignIn)
+                .Select(s => s.Time.Date)
+                .Distinct()
+                .Count());
 
             // 计算总点数
             var totalPoints = 0;
+
+            // 获取所有不同日期的签到任务，按日期排序，最多取前5天
+            var signInDates = userTasks.Where(s => s.Type == ExpoTaskType.SignIn)
+                .Select(s => s.Time.Date)
+                .Distinct()
+                .OrderBy(date => date)
+                .Take(5)
+                .ToList();
+
             foreach (var task in userTasks)
             {
                 var points = GetTaskPoints(task.Type);
                 if (task.Type == ExpoTaskType.SignIn)
                 {
                     // 签到任务：前5天每天20点，超过5天的不算点数
-                    var signInTasksCount = userTasks.Count(s => s.Type == ExpoTaskType.SignIn && s.Id <= task.Id);
-                    if (signInTasksCount <= 5)
+                    if (signInDates.Contains(task.Time.Date))
                     {
                         totalPoints += points;
                     }
@@ -464,6 +474,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     totalPoints += points;
                 }
             }
+
+            // 因为数据库里是+8的时区，所以这里需要用+8的时区去比较。但是如果是把数据拿出来，就不需要+8了
+            // 之前留的大坑orz
+            var now = DateTime.Now.ToCstTime().AddHours(8);
 
             var model = new ExpoUserTaskModel
             {
@@ -520,12 +534,16 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.SignIn:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.AddHours(8).Date);
                     // 检查签到天数是否已达上限
                     var signInCount = await _expoTaskRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn);
                     if (signInCount >= 5)
                     {
                         return new Result { Successful = false, Error = "签到奖励已达上限（5天）" };
+                    }
+                    if (taskExists)
+                    {
+                        return new Result { Successful = false, Error = "今天已经签到了，明天再来吧" };
                     }
                     errorMessage = "今日已经签到过了";
                     break;
@@ -981,14 +999,22 @@ namespace CnGalWebSite.APIServer.Controllers
                 .ToListAsync();
 
             var totalPoints = 0;
+
+            // 获取所有不同日期的签到任务，按日期排序，最多取前5天
+            var signInDates = userTasks.Where(s => s.Type == ExpoTaskType.SignIn)
+                .Select(s => s.Time.Date)
+                .Distinct()
+                .OrderBy(date => date)
+                .Take(5)
+                .ToList();
+
             foreach (var task in userTasks)
             {
                 var points = GetTaskPoints(task.Type);
                 if (task.Type == ExpoTaskType.SignIn)
                 {
                     // 签到任务：前5天每天20点，超过5天的不算点数
-                    var signInTasksCount = userTasks.Count(s => s.Type == ExpoTaskType.SignIn && s.Id <= task.Id);
-                    if (signInTasksCount <= 5)
+                    if (signInDates.Contains(task.Time.Date))
                     {
                         totalPoints += points;
                     }
