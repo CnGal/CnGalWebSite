@@ -83,16 +83,13 @@
     private int[] _animationSequence = new int[] { 0, 1, 2, 4, 7, 6, 5, 3 };
     private int _sequenceIndex = 0;
 
-
-    List<ExpoAwardOverviewModel> AwardModel = new();
-
     RulesDialog rulesDialog;
     PrizesDialog prizesDialog;
 
     /// <summary>
     /// 是否有可用的奖品（只考虑激活码类型，无实体奖品视为谢谢参与）
     /// </summary>
-    private bool HasAvailablePrizes => AwardModel.Any(a => a.Type == ExpoAwardType.Key && a.Count > a.PrizeCount);
+    private bool HasAvailablePrizes => _items.Any(a => a.Type == ExpoAwardType.Key && a.Count > a.PrizeCount);
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,7 +100,7 @@
     {
         try
         {
-            AwardModel = await _httpService.GetAsync<List<ExpoAwardOverviewModel>>("api/expo/GetAllAwards");
+            var AwardModel = await _httpService.GetAsync<List<ExpoAwardOverviewModel>>("api/expo/GetAllAwards");
             _items.Clear();
             if (AwardModel.Count < 8)
             {
@@ -148,10 +145,13 @@
                     }
                 }
             }
-            else
+            else if (AwardModel.Count == 8)
             {
                 // 直接复制到_items，保持稳定顺序
                 _items.AddRange(AwardModel.OrderBy(a => a.Id).Take(8));
+            }
+            else
+            {
                 await _popupService.EnqueueSnackbarAsync("获取奖项失败", "奖项超过8个", AlertTypes.Error);
             }
             StateHasChanged();
@@ -348,11 +348,11 @@
     }
 
 
-    public void OnClickPrizes()
+    public async Task OnClickPrizes()
     {
         if (prizesDialog != null)
         {
-            prizesDialog.Refresh();
+            await prizesDialog.Refresh();
         }
     }
 
