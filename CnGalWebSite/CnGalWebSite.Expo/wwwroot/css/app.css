@@ -839,7 +839,7 @@
 
     .lottery-anniversary-card .award-card {
         width: 24%;
-        background-color: rgba(255, 154, 158, 0.2);
+        background-color: rgb(255 154 228 / 20%);
         border-radius: 4px;
         padding: 0.5rem;
     }
@@ -847,7 +847,7 @@
         .lottery-anniversary-card .award-card > div {
             width: 100%;
             height: 100%;
-            border: 2px dashed #ff9a9e82;
+            border: 2px dashed #fe7fd982;
             border-radius: 4px;
             padding: .5rem;
             display: flex;
