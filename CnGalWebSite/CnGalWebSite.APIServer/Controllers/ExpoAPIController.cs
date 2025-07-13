@@ -84,9 +84,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public IAsyncEnumerable<ExpoGameViewModel> GetAllGamesAsync()
+        public async IAsyncEnumerable<ExpoGameViewModel> GetAllGamesAsync()
         {
-            return _expoGameRepository.GetAll().AsNoTracking()
+            var games = await _expoGameRepository.GetAll().AsNoTracking()
                  .Include(s => s.Game)
                  .Include(s => s.Tags)
                  .Where(s => s.Game != null)
@@ -105,7 +105,16 @@ namespace CnGalWebSite.APIServer.Controllers
                      }).ToList(),
                      Url = s.Game.Releases.Any(s => s.PublishPlatformType == PublishPlatformType.Steam) ? $"https://store.steampowered.com/app/{s.Game.Releases.Where(s => s.PublishPlatformType == PublishPlatformType.Steam).OrderBy(s => s.Type).First().Link}" : $"https://www.cngal.org/entries/index/{s.Game.Id}"
                  })
-                 .AsAsyncEnumerable();
+                 .ToListAsync();
+
+            // 在内存中进行随机排序
+            var random = new Random();
+            var shuffledGames = games.OrderBy(x => random.Next()).ToList();
+
+            foreach (var game in shuffledGames)
+            {
+                yield return game;
+            }
         }
 
         [HttpGet]
@@ -773,6 +782,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Image = item.Image,
                 Name = item.Name,
                 Url = item.Url,
+                IsEnabled = item.IsEnabled,
                 Prizes = item.Prizes.Select(s => new ExpoPrizeOverviewModel
                 {
                     Id = s.Id,
@@ -792,6 +802,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return _expoAwardRepository.GetAll().AsNoTracking()
                  .Include(s => s.Prizes)
+                 .Where(s => s.IsEnabled) // 只返回启用的奖项
                  .Select(s => new ExpoAwardOverviewModel
                  {
                      Id = s.Id,
@@ -800,6 +811,7 @@ namespace CnGalWebSite.APIServer.Controllers
                      Image = s.Image,
                      Name = s.Name,
                      Url = s.Url,
+                     IsEnabled = s.IsEnabled,
                      PrizeCount = s.Prizes.Count(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) == false)
                  })
                  .Where(s => s.Count > s.PrizeCount)
@@ -831,6 +843,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Image = item.Image,
                 Name = item.Name,
                 Url = item.Url,
+                IsEnabled = item.IsEnabled,
                 Prizes = item.Prizes.Select(s => new ExpoPrizeEditModel
                 {
                     Id = s.Id,
@@ -881,6 +894,7 @@ namespace CnGalWebSite.APIServer.Controllers
             item.Image = model.Image;
             item.Name = model.Name;
             item.Url = model.Url;
+            item.IsEnabled = model.IsEnabled;
 
             // 处理奖品
             if (model.Type == ExpoAwardType.Key)
@@ -936,6 +950,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Image = s.Image,
                     Name = s.Name,
                     Url = s.Url,
+                    IsEnabled = s.IsEnabled,
                     PrizeCount = s.Prizes.Count(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) == false)
                 }).ToListAsync(),
                 Total = total,
@@ -993,9 +1008,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 };
             }
 
-            // 获取所有奖项
+            // 获取所有启用的奖项
             var awards = await _expoAwardRepository.GetAll().AsNoTracking()
                 .Include(s => s.Prizes)
+                .Where(s => s.IsEnabled) // 只考虑启用的奖项
                 .ToListAsync();
 
             // 检查每个奖项是否还有剩余

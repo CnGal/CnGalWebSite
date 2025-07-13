@@ -22,6 +22,11 @@ namespace CnGalWebSite.DataModel.Model
         public string Name { get; set; }
 
         public string Url { get; set; }
+
+        /// <summary>
+        /// 是否启用，未启用的奖项不参与抽奖
+        /// </summary>
+        public bool IsEnabled { get; set; } = true;
     }
 
     public enum ExpoAwardType

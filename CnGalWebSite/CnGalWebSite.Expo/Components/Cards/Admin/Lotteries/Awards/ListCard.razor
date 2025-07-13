@@ -14,6 +14,17 @@
         {
             <span>@GetAwardTypeName(context.Item.Type)</span>
         }
+        else if (context.Header.Value == nameof(ExpoAwardOverviewModel.IsEnabled))
+        {
+            @if (context.Item.IsEnabled)
+            {
+                <MChip Color="success" Small>已启用</MChip>
+            }
+            else
+            {
+                <MChip Color="error" Small>已禁用</MChip>
+            }
+        }
         else if (context.Header.Value == nameof(ExpoAwardOverviewModel.Image))
         {
             @if (!string.IsNullOrEmpty(context.Item.Image))
@@ -49,6 +60,7 @@
         new (){ Text= "名称", Value= nameof(ExpoAwardOverviewModel.Name)},
         new (){ Text= "图片", Value= nameof(ExpoAwardOverviewModel.Image)},
         new (){ Text= "类型", Value= nameof(ExpoAwardOverviewModel.Type)},
+        new (){ Text= "启用状态", Value= nameof(ExpoAwardOverviewModel.IsEnabled), Sortable=false},
         new (){ Text= "数量", Value= nameof(ExpoAwardOverviewModel.Count), Sortable=false},
         new (){ Text= "已分配数", Value= nameof(ExpoAwardOverviewModel.PrizeCount), Sortable=false},
         new (){ Text= "操作", Value= "actions", Sortable=false }

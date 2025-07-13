@@ -21,6 +21,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
 
         public string Url { get; set; }
 
+        /// <summary>
+        /// 是否启用，未启用的奖项不参与抽奖
+        /// </summary>
+        public bool IsEnabled { get; set; } = true;
+
         public List<ExpoPrizeOverviewModel> Prizes { get; set; } = new List<ExpoPrizeOverviewModel>();
     }
 
