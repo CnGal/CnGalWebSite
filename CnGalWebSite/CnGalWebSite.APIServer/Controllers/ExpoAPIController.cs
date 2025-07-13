@@ -435,7 +435,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("找不到该用户");
             }
 
-           
+
             // 获取用户的所有任务
             var userTasks = await _expoTaskRepository.GetAll()
                 .Where(s => s.ApplicationUserId == user.Id)
@@ -493,6 +493,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsChangeSignature = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature),
                 IsSaveGGeneration = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration),
                 IsLotteryNumber = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber),
+                IsHasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38),
                 TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };
 

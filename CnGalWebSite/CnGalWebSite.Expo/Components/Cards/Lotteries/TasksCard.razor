@@ -511,8 +511,16 @@
             return;
         }
 
-        // 直接跳转到周年庆页面
-        Navigation.NavigateTo("/anniversary");
+        // 如果用户已经参与了抽奖，直接完成任务
+        if (Model.IsHasJoinedLottery)
+        {
+            await FinshTask(ExpoTaskType.LotteryNumber);
+        }
+        else
+        {
+            // 用户还没有参与抽奖，跳转到周年庆页面
+            Navigation.NavigateTo("/anniversary");
+        }
     }
 
     public async Task<int?> ParticipateInLottery()

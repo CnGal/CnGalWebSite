@@ -69,6 +69,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
         public bool IsLotteryNumber { get; set; }
 
         /// <summary>
+        /// 是否已经参与了抽奖
+        /// </summary>
+        public bool IsHasJoinedLottery { get; set; }
+
+        /// <summary>
         /// 总点数
         /// </summary>
         public int TotalPoints { get; set; }
