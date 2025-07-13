@@ -41,8 +41,8 @@ h1:focus {
 :root {
     --md-card-border-radius: 12px;
     --md-card-active-border-radius: 24px;
-    --background-image-primary: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-    --background-color-primary: #ff9a9e;
+    --background-image-primary: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    --background-color-primary: #e135b9;
 }
 /*覆盖默认值*/
 .m-menu__content, .m-card, .m-sheet.m-card, .m-slide-group__wrapper, .m-dialog {
@@ -64,6 +64,7 @@ h1:focus {
     font-size: small;
     padding: .5rem;
     background-image: var(--background-image-primary);
+    color: white !important;
 }
 
 .m-main {
@@ -84,7 +85,7 @@ h1:focus {
         display: flex;
         align-items: center;
         gap: 1rem;
-        color: var(--m-theme-primary) !important;
+        color: white !important;
         text-decoration: none !important;
     }
 
@@ -250,10 +251,25 @@ h1:focus {
 
     .home-head-card .image-card {
         display: flex;
+        position: relative;
     }
 
+        .home-head-card .image-card .img-btn {
+            background-image: url(https://res.cngal.org/images/expo/btn_1.png);
+            position: absolute;
+            left: 63%;
+            top: 80%;
+            width: 15%;
+            height: 7%;
+            background-size: contain;
+        }
+
+            .home-head-card .image-card .img-btn:hover {
+                background-image: url(https://res.cngal.org/images/expo/btn_2.png);
+            }
+
         .home-head-card .image-card img:first-child {
-            width: 60%;
+            width: 100%;
         }
 
         .home-head-card .image-card img:nth-child(2) {
@@ -283,6 +299,7 @@ h1:focus {
             padding: .3rem 3rem;
             cursor: pointer;
             transition: .5s;
+            border-radius: 15px;
         }
 
             .home-head-card .post-card .button-card:hover {
@@ -305,7 +322,7 @@ h1:focus {
         color: transparent;
         font-size: xxx-large;
         font-weight: bold;
-        padding-right: 42rem;
+        padding-right: 52rem;
     }
 
     .cngal-card span:nth-child(2) {
@@ -327,7 +344,7 @@ h1:focus {
         color: transparent;
         font-size: xxx-large;
         font-weight: bold;
-        padding-left: 42rem;
+        padding-left: 52rem;
     }
 /*简介*/
 .home-brief-card {
@@ -357,7 +374,13 @@ h1:focus {
 
     .home-brief-card .text-card {
         font-size: larger;
+        text-align: center;
     }
+
+        .home-brief-card .text-card a {
+            color: var(--m-theme-primary) !important;
+            text-decoration: auto;
+        }
 
     .home-brief-card .image-card {
         width: 70%;
@@ -505,11 +528,11 @@ h1:focus {
 }
 
     .lottery-page .cngal-card span:nth-child(1) {
-        padding-right: 55rem;
+        padding-right: 30rem;
     }
 
     .lottery-page .cngal-card span:nth-child(3) {
-        padding-left: 55rem;
+        padding-left: 30rem;
     }
 
     .lottery-page .title-card {
@@ -549,7 +572,7 @@ h1:focus {
                 display: flex;
                 justify-content: space-between;
                 padding: .5rem 1rem;
-                background: linear-gradient(45deg, #ff9a9e33 0%) no-repeat;
+                background: linear-gradient(45deg, #ff9aec33 0%) no-repeat;
                 background-size: calc(100% - 200px) 100%;
                 margin: 5px;
                 align-items: center;
@@ -668,7 +691,7 @@ h1:focus {
 
     .lottery-grid-card .prize-card {
         width: 33%;
-        background-color: #ff9a9e33;
+        background-color: rgb(255 154 228 / 20%);
         border-radius: 4px;
         padding: .5rem;
         aspect-ratio: 1;
@@ -677,7 +700,7 @@ h1:focus {
         .lottery-grid-card .prize-card > div {
             width: 100%;
             height: 100%;
-            border: 2px dashed #ff9a9e82;
+            border: 2px dashed #fe7fd982;
             border-radius: 4px;
             padding: .5rem;
             display: flex;
@@ -734,6 +757,7 @@ h1:focus {
             .lottery-grid-card .action-card > div div:nth-child(1) {
                 font-size: xxx-large;
             }
+
         .lottery-grid-card .action-card .points-text-card {
             font-size: small;
         }
@@ -744,13 +768,13 @@ h1:focus {
             cursor: not-allowed;
         }
 
-        .lottery-grid-card .action-card.disabled > div:hover {
-            background-image: linear-gradient(135deg, #999999, #666666);
-        }
+            .lottery-grid-card .action-card.disabled > div:hover {
+                background-image: linear-gradient(135deg, #999999, #666666);
+            }
 
-        .lottery-grid-card .prize-card .name-card {
-            text-align: center;
-        }
+    .lottery-grid-card .prize-card .name-card {
+        text-align: center;
+    }
 
     .lottery-grid-card .divid-card {
         background-image: var(--background-image-primary);
@@ -780,7 +804,7 @@ h1:focus {
 }
 
     .contact-card a {
-        color: #b5353a !important;
+        color: var(--m-theme-primary) !important;
     }
 
         .contact-card a:hover {
@@ -792,7 +816,7 @@ h1:focus {
 }
 
     .lottery-anniversary-card .brief-card a {
-        color: #b5353a !important;
+        color: var(--m-theme-primary) !important;
     }
 
         .lottery-anniversary-card .brief-card a:hover {
@@ -975,42 +999,42 @@ h1:focus {
     align-items: center;
 }
 
-    .questionnaire-header-card .questionnaire-hero .hero-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+.questionnaire-header-card .questionnaire-hero .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.questionnaire-header-card .questionnaire-hero .hero-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay {
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        backdrop-filter: blur(10px);
     }
 
-    .questionnaire-header-card .questionnaire-hero .hero-content {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay {
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
+        .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
 
-            .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-title {
-                font-size: 2rem;
-                font-weight: bold;
-                margin-bottom: 0.5rem;
-            }
-
-            .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-description {
-                font-size: 1.1rem;
-                opacity: 0.9;
-            }
+        .questionnaire-header-card .questionnaire-hero .hero-content .hero-overlay .questionnaire-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
 
 .questionnaire-meta {
     display: flex;
@@ -1273,12 +1297,13 @@ h1:focus {
 }
 
 .questionnaires-page .cngal-card span:nth-child(1) {
-    padding-right: 55rem;
+    padding-right: 45rem;
 }
 
 .questionnaires-page .cngal-card span:nth-child(3) {
-    padding-left: 55rem;
+    padding-left: 45rem;
 }
+
 .questionnaire-detail-page .title-card {
     display: flex;
     justify-content: center;
@@ -1286,15 +1311,18 @@ h1:focus {
     font-weight: bold;
     padding: 2rem;
 }
-.questionnaire-detail-page >div{
-    max-width:900px;
-    width:100%;
+
+.questionnaire-detail-page > div {
+    max-width: 900px;
+    width: 100%;
 }
+
 .questionnaire-hero p {
     justify-self: center;
 }
+
 .questionnaire-detail-page .navigation-card .m-btn__content {
-/*    padding-right: .5rem;*/
+    /*    padding-right: .5rem;*/
 }
 
 /* 多选排序题样式 */
@@ -1334,12 +1362,14 @@ h1:focus {
     }
 
 .ranking-list .ranking-item.selected {
-    background-color: rgba(25, 118, 210, 0.08);
-    border-color: rgba(25, 118, 210, 0.3);
+    background-color: rgb(210 25 189 / 8%);
+    border-color: rgb(210 25 175 / 30%);
 }
-.ranking-summary,.ranking-list {
+
+.ranking-summary, .ranking-list {
     margin-bottom: 1rem;
 }
+
 .ranking-summary-list {
     display: flex;
     gap: .5rem;
@@ -1364,9 +1394,56 @@ h1:focus {
 .lottery-page .lottery-tasks-card .task-card .name-card a {
     color: var(--m-theme-primary) !important;
 }
+
     .lottery-page .lottery-tasks-card .task-card .name-card a:hover {
-        text-decoration: underline!important;
+        text-decoration: underline !important;
     }
+/*导航栏*/
+.app-bar-card .m-menu__content, .app-bar-card .m-card, .app-bar-card .m-sheet.m-card, .app-bar-card .m-slide-group__wrapper, .app-bar-card .m-dialog {
+    border-radius: 0;
+}
+
+.app-bar-card .m-tab {
+    min-width: 0;
+    max-width: 16.67%;
+    padding: 0 16px;
+    color: white;
+    font-weight: bold;
+}
+
+.app-bar-card .m-slide-group__content {
+    width: 100%;
+}
+
+.app-bar-card .theme--dark.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) {
+    color: unset;
+}
+
+.app-bar-card .m-tabs-slider-wrapper {
+    display: none;
+}
+
+.app-bar-card .theme--dark.m-tabs .m-tab--active::before, .app-bar-card .theme--dark.m-tabs .m-tab--active:hover::before {
+    display: none;
+}
+
+.app-bar-card .m-ripple__container {
+    display: none;
+}
+
+.app-bar-card .m-tab--active::after {
+    content: '';
+    width: 80%;
+    height: 80%;
+    background: linear-gradient(158deg, #00A3FF 0%, #5DE2FF 100%) no-repeat;
+    border-radius: 10px;
+    display: flex;
+    opacity: 1 !important;
+    z-index: -1;
+    left: 10%;
+    top: 10%;
+    position: absolute;
+}
 
 .slotMachine-box {
     min-height: calc(100% - 341px);
@@ -1614,11 +1691,11 @@ div.prizeTips {
     }
 
     .lottery-page .cngal-card span:nth-child(1) {
-        padding: 0;
+        padding-right: 14rem;
     }
 
     .lottery-page .cngal-card span:nth-child(3) {
-        padding: 0;
+        padding-left: 14rem;
     }
 
     .lottery-grid-card .prize-card .name-card {
@@ -1664,8 +1741,8 @@ div.prizeTips {
         }
 
     .lottery-page .lottery-tasks-card .task-card .count-card {
-        width: 44px;
-        left: 2px;
+        width: 50px;
+        left: 0px;
         font-size: inherit;
     }
 
@@ -1794,21 +1871,33 @@ div.prizeTips {
             width: 20px;
             height: 20px;
         }
+
     .other-option-input {
         width: calc(100% - 1rem);
     }
+
     .ranking-list .ranking-item {
         padding: 0.5rem 1rem;
     }
+
     .lottery-grid-card .action-card .points-text-card {
         font-size: x-small;
         text-align: center;
         width: calc(100% - 5px);
     }
+
     .lottery-grid-card .action-card > div div:nth-child(1) {
         font-size: x-large;
     }
-}
-.lottery-page {
-    padding-bottom: 2rem;
+
+    .lottery-page {
+        padding-bottom: 2rem;
+    }
+
+    .home-head-card .image-card img {
+        content: url(https://res.cngal.org/images/expo/mobile_1.png);
+    }
+    .home-head-card .image-card .img-btn{
+        display:none;
+    }
 }

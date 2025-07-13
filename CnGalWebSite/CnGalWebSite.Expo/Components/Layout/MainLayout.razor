@@ -13,12 +13,12 @@
                 </div>
             </a>
             <div class="tabs-card">
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-home" Text="首页" Href="/" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-wallet-giftcard" Text="直播抽号" Href="/anniversary" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-clipboard-text" Text="问卷调查" Href="/questionnaires" />
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-home" Text="首页" Href="/" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-gamepad-variant" Text="游戏列表" Href="/games" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-gift" Text="预约抽奖" Href="/lottery" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-wallet-giftcard" Text="直播抽号" Href="/anniversary" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-clipboard-text" Text="问卷调查" Href="/questionnaires" />
+                <CnGalWebSite.Components.Buttons.MasaButton Color="white" TextStyle Icon="mdi-email" Text="联系我们" Href="/contact" />
                 <CnGalWebSite.Expo.Components.Cards.Users.LoginButton />
             </div>
         </MAppBar>
@@ -26,14 +26,14 @@
     else
     {
         <MAppBar App Class="app-bar-card">
-            <a class="logo-card" href="/" draggable="false">
-                <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" draggable="false" />
-                <div class="name-card">
-                    CNGAL周年庆展示会
-                </div>
-            </a>
-            <MSpacer></MSpacer>
-            <MAppBarNavIcon Color="primary" @onclick="() => _drawer = !(_drawer ?? false)"></MAppBarNavIcon>
+            <MTabs FixedTabs Dark Routable>
+                <MTab Href="/" >首页</MTab>
+                <MTab Href="/games">游戏列表</MTab>
+                <MTab Href="/lottery">预约抽奖</MTab>
+                <MTab Href="/anniversary">直播抽号</MTab>
+                <MTab Href="/questionnaires">问卷调查</MTab>
+                <MTab Href="/contact">联系我们</MTab>
+            </MTabs>
         </MAppBar>
         <MNavigationDrawer @bind-Value="_drawer" App Right Temporary>
             <div class="nav-drawer-card">
