@@ -1,4 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
@@ -28,10 +30,12 @@ namespace CnGalWebSite.APIServer.Controllers
         public readonly IRepository<PlayedGame, long> _playedGameRepository;
         public readonly IRepository<ApplicationUser, string> _userRepository;
         public readonly IRepository<LotteryUser, long> _lotteryUserRepository;
+        public readonly IRepository<Examine, long> _examineRepository;
         public readonly IAppHelper _appHelper;
         private readonly IQueryService _queryService;
+        private readonly IUserService _userService;
 
-        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository, IRepository<LotteryUser, long> lotteryUserRepository)
+        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<Examine, long> examineRepository, IUserService userService)
         {
             _appHelper = appHelper;
             _queryService = queryService;
@@ -45,6 +49,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameRepository = playedGameRepository;
             _userRepository = userRepository;
             _lotteryUserRepository = lotteryUserRepository;
+            _examineRepository = examineRepository;
+            _userService = userService;
         }
 
         #region 游戏
@@ -1364,11 +1370,25 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 // 检查用户是否设置了非默认头像（PhotoPath不为空且不为默认值）
                 var user = await _userRepository.GetAll()
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
-                // 头像路径不为空且不为默认头像文件名时表示已更换
-                return user != null && !string.IsNullOrWhiteSpace(user.PhotoPath);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                // 检查是否有待审核的用户信息修改
+                var examine = await _examineRepository.GetAll()
+                    .FirstOrDefaultAsync(s => s.ApplicationUserId == userId && s.Operation == Operation.EditUserMain && s.IsPassed == null);
+
+                if (examine != null)
+                {
+                    // 应用待审核的修改到用户对象上
+                    await _userService.UpdateUserData(user, examine);
+                }
+
+                // 头像路径不为空时表示已更换
+                return !string.IsNullOrWhiteSpace(user.PhotoPath);
             }
             catch (Exception)
             {
@@ -1388,11 +1408,27 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 // 检查用户是否设置了非默认签名（PersonalSignature不为空）
                 var user = await _userRepository.GetAll()
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
-                // 个人签名不为空时表示已更换
-                return user != null && !string.IsNullOrWhiteSpace(user.PersonalSignature) && user.PersonalSignature != "哇，这里什么都没有呢" && user.PersonalSignature != "这个人太懒了，什么也没写额(～￣▽￣)～";
+                if (user == null)
+                {
+                    return false;
+                }
+
+                // 检查是否有待审核的用户信息修改
+                var examine = await _examineRepository.GetAll()
+                    .FirstOrDefaultAsync(s => s.ApplicationUserId == userId && s.Operation == Operation.EditUserMain && s.IsPassed == null);
+
+                if (examine != null)
+                {
+                    // 应用待审核的修改到用户对象上
+                    await _userService.UpdateUserData(user, examine);
+                }
+
+                // 个人签名不为空且不为默认签名时表示已更换
+                return !string.IsNullOrWhiteSpace(user.PersonalSignature) &&
+                       user.PersonalSignature != "哇，这里什么都没有呢" &&
+                       user.PersonalSignature != "这个人太懒了，什么也没写额(～￣▽￣)～";
             }
             catch (Exception)
             {
