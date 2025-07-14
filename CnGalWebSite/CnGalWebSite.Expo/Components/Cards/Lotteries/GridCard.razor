@@ -324,6 +324,10 @@
                 _isAnimating = false;
                 _animationTimer.Dispose();
                 await InvokeAsync(StateHasChanged);
+                if (_items[_targetIndex].Type == ExpoAwardType.Key)
+                {
+                    await InvokeAsync(OnClickPrizes); // 仅激活码类型才弹窗
+                }
                 return;
             }
 
