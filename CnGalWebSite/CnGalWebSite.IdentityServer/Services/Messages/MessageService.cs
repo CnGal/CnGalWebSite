@@ -93,7 +93,7 @@ namespace CnGalWebSite.IdentityServer.Services.Messages
             {
 
                 PhoneNumbers = phoneNumber,
-                SignName = phoneNumber.StartsWith("86") ? "cngal":"CnGal资料站",
+                SignName = _configuration["SignName"],
                 TemplateCode = _configuration["SMS_"+(phoneNumber.StartsWith("86")?"": "Globe_") + type.ToString()] ?? throw new Exception("未找到匹配的SMS模板"),
                 TemplateParam = "{ 'code':'" + code + "'}",
             };
