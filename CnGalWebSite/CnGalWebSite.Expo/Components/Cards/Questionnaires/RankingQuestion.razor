@@ -74,35 +74,52 @@
     // 下一个排序号
     private int _nextRankNumber = 1;
 
+        private long? _lastQuestionId = null;
+    private string _lastAnswer = null;
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        InitializeSelectedOptions();
+
+        // 只有在问题或答案真正发生变化时才重新初始化
+        var currentQuestionId = Question?.Id;
+        if (_lastQuestionId != currentQuestionId || _lastAnswer != Answer)
+        {
+            InitializeSelectedOptions();
+            _lastQuestionId = currentQuestionId;
+            _lastAnswer = Answer;
+        }
     }
 
     private void InitializeSelectedOptions()
     {
         if (Question?.Options?.Any() != true) return;
 
-        // 重置
-        _selectedOptions.Clear();
-        _nextRankNumber = 1;
-
-        if (!string.IsNullOrEmpty(Answer))
+        // 只在以下情况下重置选择状态：
+        // 1. 有完整答案时（从外部恢复状态）
+        // 2. 当前没有任何选择时（全新开始）
+        if (!string.IsNullOrEmpty(Answer) || !_selectedOptions.Any())
         {
-            // 根据已有答案恢复选择状态
-            var sortedValues = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            // 重置
+            _selectedOptions.Clear();
+            _nextRankNumber = 1;
 
-            for (int i = 0; i < sortedValues.Length; i++)
+            if (!string.IsNullOrEmpty(Answer))
             {
-                var option = Question.Options.FirstOrDefault(o => o.Value == sortedValues[i]);
-                if (option != null)
-                {
-                    _selectedOptions[option.Id] = i + 1;
-                }
-            }
+                // 根据已有答案恢复选择状态
+                var sortedValues = Answer.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            _nextRankNumber = _selectedOptions.Count + 1;
+                for (int i = 0; i < sortedValues.Length; i++)
+                {
+                    var option = Question.Options.FirstOrDefault(o => o.Value == sortedValues[i]);
+                    if (option != null)
+                    {
+                        _selectedOptions[option.Id] = i + 1;
+                    }
+                }
+
+                _nextRankNumber = _selectedOptions.Count + 1;
+            }
         }
     }
 
@@ -153,10 +170,9 @@
 
     private async Task UpdateAnswer()
     {
-        // 只有当所有选项都被勾选时才提交答案
+        // 如果选择不完整，清空答案
         if (!IsAllOptionsSelected())
         {
-            // 如果之前有答案但现在不完整，清空答案
             if (!string.IsNullOrEmpty(Answer))
             {
                 await AnswerChanged.InvokeAsync("");
