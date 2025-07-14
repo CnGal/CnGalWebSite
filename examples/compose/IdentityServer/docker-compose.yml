@@ -55,6 +55,8 @@ services:
       - TokenAPISecret=${TokenAPISecret}
       # 白名单
       - IpWhitelist=${IpWhitelist}
+      # 签名
+      - SignName=${SignName}
     hostname: identityserver
     restart: always
     healthcheck:
