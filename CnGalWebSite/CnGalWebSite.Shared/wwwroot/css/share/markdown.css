@@ -54,3 +54,7 @@
     .markdown-body img {
         max-width: 100%;
     }
+    .markdown-body video {
+        max-width: 100%;
+        box-sizing: initial;
+    }
