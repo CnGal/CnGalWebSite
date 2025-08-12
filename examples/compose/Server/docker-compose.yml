@@ -1,18 +1,18 @@
 services:
   blazorserver:
-    image: littlefishtentears/cngalwebsiteserver:latest
+    image: littlefishtentears/cngalwebsiteserver:${IMAGE_TAG:-latest}
     container_name: blazorserver
     environment:
-      - TZ=${TZ}
-      - WebApiPath=${WebApiPath}
-      - Authority=${Authority}
+      - TZ=${TZ:-Asia/Shanghai}
+      - WebApiPath=${WebApiPath:-https://api.cngal.org/}
+      - Authority=${Authority:-https://oauth2.cngal.org}
       - ClientId=${ClientId}
       - ClientSecret=${ClientSecret}
       # 管理令牌储存
-      - TokenAPI=${TokenAPI}
+      - TokenAPI=${TokenAPI:-https://oauth2.cngal.org/api/tokens/}
       - TokenAPISecret=${TokenAPISecret}
       # 图床API
-      - ImageApiPath=${ImageApiPath}
+      - ImageApiPath=${ImageApiPath:-https://api.cngal.top/}
       # Live2D
       - Live2D_DataUrl=${Live2D_DataUrl}
       - Live2D_ResourcesPath=${Live2D_ResourcesPath}
@@ -29,9 +29,25 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-1.5G}
     ports:
-      - "3002:8081"
       - "2002:8080"
+      # - "3002:8081"
     volumes:
-      - ${MNT_DIR}/blazorserver/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - blazorserver-DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+    labels:
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
+    networks:
+      - web
+
+volumes:
+  blazorserver-DataProtection-Keys:
+
+networks:
+  web:
+    external: true

@@ -68,8 +68,12 @@ services:
     volumes:
       - apiserver-DataProtection-Keys:/root/.aspnet/DataProtection-Keys
     labels:
-      # watchtower
-      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true}
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
     networks:
       - web
 
