@@ -1,11 +1,11 @@
 services:
   drawingbed:
-    image: littlefishtentears/cngalwebsitedrawingbed:latest
+    image: littlefishtentears/cngalwebsitedrawingbed:${IMAGE_TAG:-latest}
     container_name: drawingbed
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       # Ids 地址
-      - Authority=${Authority}
+      - Authority=${Authority:-https://oauth2.cngal.org}
       # 阿里云OSS相关
       - OSSEndpoint=${OSSEndpoint}
       - OSSBucketName=${OSSBucketName}
@@ -20,12 +20,12 @@ services:
       - Tencent_BucketName=${Tencent_BucketName}
       # 图仓
       - TucangCCAPIToken=${TucangCCAPIToken}
-      - TucangCCAPIUrl=${TucangCCAPIUrl}
-      - CustomTucangCCUrl=${CustomTucangCCUrl}
+      - TucangCCAPIUrl=${TucangCCAPIUrl:-https://tucang.cc/api/v1/upload}
+      - CustomTucangCCUrl=${CustomTucangCCUrl:-https://tucang.cngal.top/api/image/show/}
       # 音频 baseUrl
-      - AudioUrl=${AudioUrl}
+      - AudioUrl=${AudioUrl:-https://res.cngal.org/}
       # 图片 baseUrl
-      - ImagesUrl=${ImagesUrl}
+      - ImagesUrl=${ImagesUrl:-https://image.cngal.org/}
     hostname: drawingbed
     restart: always
     healthcheck:
@@ -34,12 +34,30 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    ports:
+      - ${PORT:-2003}:8080
+    volumes:
+      - drawingbed-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - drawingbed-wwwroot:/app/wwwroot
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
-    ports:
-      - "2003:8080"
-    volumes:
-      - ${MNT_DIR}/drawingbed/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
-      - ${MNT_DIR}/drawingbed/wwwroot:/app/wwwroot
+          memory: ${RESOURCES_LIMITS_MEMORY:-500m}
+    labels:
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
+    networks:
+      - web
+
+
+volumes:
+  drawingbed-DataProtection-Keys:
+  drawingbed-wwwroot:
+
+networks:
+  web:
+    external: true

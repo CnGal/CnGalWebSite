@@ -1,10 +1,9 @@
-version: "3"
 services:
   apiserver:
-    image: littlefishtentears/cngalwebsiteidentityserver:latest
+    image: littlefishtentears/cngalwebsiteidentityserver:${IMAGE_TAG:-latest}
     container_name: identityserver
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       # 数据库连接字符串
       - DefaultDBConnection=${DefaultDBConnection}
       # 外部身份验证
@@ -21,11 +20,11 @@ services:
       - QQClientId=${QQClientId}
       - QQClientSecret=${QQClientSecret}
       # 发送验证邮件的电子邮箱
-      - Server=${Server}
-      - Port=${Port}
-      - SenderName=${SenderName}
-      - SenderEmail=${SenderEmail}
-      - Account=${Account}
+      - Server=${Server:-smtp.exmail.qq.com}
+      - Port=${Port:-465}
+      - SenderName=${SenderName:-CnGal资料站}
+      - SenderEmail=${SenderEmail:-kanban@cngal.org}
+      - Account=${Account:-kanban@cngal.org}
       - Password=${Password}
       # 短信模板
       - SMS_ResetPassword=${SMS_ResetPassword}
@@ -44,13 +43,13 @@ services:
       - GEETEST_KEY=${GEETEST_KEY}
       - GEETEST_ID=${GEETEST_ID}
       # 证书
-      - CertPath=${CertPath}
+      - CertPath=${CertPath:-cert/IS4.pfx}
       - CertPassword=${CertPassword}
       # 临时使用配置文件 后续持久化储存
-      - IdsSSR=${IdsSSR}
-      - IdsWASM=${IdsWASM}
-      - SSR=${SSR}
-      - WASM=${WASM}
+      - IdsSSR=${IdsSSR:-https://open.cngal.org}
+      - IdsWASM=${IdsWASM:-https://app.open.cngal.org}
+      - SSR=${SSR:-https://www.cngal.org}
+      - WASM=${WASM:-https://app.cngal.org}
       # SSR端储存令牌服务密匙
       - TokenAPISecret=${TokenAPISecret}
       # 白名单
@@ -68,9 +67,26 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${RESOURCES_LIMITS_MEMORY:-500m}
     ports:
-      - "5011:8080"
-      - "5001:8081"
+      - ${PORT:-5011}:8080
+      # - 5001:8081
     volumes:
-      - "${MNT_DIR}/IdentityServer:/app/cert"
+      - identityserver-DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+      - ${MNT_DIR:-/mnt/docker}/IdentityServer:/app/cert
+    labels:
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
+    networks:
+      - web
+
+volumes:
+  identityserver-DataProtection-Keys:
+
+networks:
+  web:
+    external: true
