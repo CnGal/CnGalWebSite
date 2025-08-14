@@ -34,7 +34,7 @@ services:
       - "2002:8080"
       # - "3002:8081"
     volumes:
-      - blazorserver-DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+      - blazorserver-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
     labels:
       - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
     logging:
