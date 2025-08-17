@@ -633,10 +633,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ArticleInforTipViewModel>>> GetWeeklyNewsOverviewAsync()
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).ToListAsync();
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).OrderByDescending(s => s.PublishTime).Take(8).ToListAsync();
 
             var model = new List<ArticleInforTipViewModel>();
-            foreach (var item in weeklyNews.OrderByDescending(s => s.PublishTime).Take(8))
+            foreach (var item in weeklyNews)
             {
                 var temp = _appHelper.GetArticleInforTipViewModel(item.Article);
                 temp.DisplayName = temp.DisplayName.Replace("CnGal每周速报（", "").Replace("）", "");

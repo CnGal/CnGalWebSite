@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 
 
 using System;
@@ -48,6 +49,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IHomeService _homeService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
+        private readonly IMemoryCache _memoryCache;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ILogger<HomeAPIController> _logger;
         private readonly IStoreInfoService _storeInfoService;
@@ -58,7 +60,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger, IRepository<StoreInfo, long> storeInfoRepository,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository, IStoreInfoService storeInfoService, IRepository<Tag, int> tagRepository, IRepository<Recommend, long> recommendRepository,
-        IRepository<Comment, long> commentRepository, IRepository<Carousel, int> carouselRepository, IQueryService queryService, IRepository<FriendLink, int> friendLinkRepository, IUserService userService)
+        IRepository<Comment, long> commentRepository, IRepository<Carousel, int> carouselRepository, IQueryService queryService, IRepository<FriendLink, int> friendLinkRepository, IUserService userService, IMemoryCache memoryCache)
         {
             _searchHelper = searchHelper;
             _entryRepository = entryRepository;
@@ -78,6 +80,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _queryService = queryService;
             _friendLinkRepository = friendLinkRepository;
             _userService = userService;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -123,7 +126,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取友情链接 
+        /// 获取友情链接
         /// </summary>
         /// <returns></returns>
         [AllowAnonymous]
@@ -257,7 +260,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Types"></param>
         /// <param name="Times">时间戳 格式 13位 xxx-xxx</param>
@@ -661,6 +664,15 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<HotTagItemModel>>> ListHotTags()
         {
+            const string cacheKey = "HotTags_List";
+
+            // 尝试从缓存中获取数据
+            if (_memoryCache.TryGetValue(cacheKey, out List<HotTagItemModel> cachedModel))
+            {
+                return cachedModel;
+            }
+
+            // 如果缓存中没有数据，则执行数据库查询
             var entries = await _tagRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entries)
                 .Where(s => s.Entries.Count >= 6)
@@ -680,6 +692,16 @@ namespace CnGalWebSite.APIServer.Controllers
                     Url = "tags/index/" + item.Id,
                 });
             }
+
+            // 将结果缓存，设置过期时间为30分钟
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(300),
+                SlidingExpiration = TimeSpan.FromMinutes(100), // 100分钟无访问则过期
+                Priority = CacheItemPriority.Normal
+            };
+
+            _memoryCache.Set(cacheKey, model, cacheOptions);
 
             return model;
         }
