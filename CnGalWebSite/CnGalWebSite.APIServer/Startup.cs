@@ -108,6 +108,8 @@ namespace CnGalWebSite.APIServer
             services.AddScoped<IFileUploadService, FileUploadService>();
             //添加Query
             services.AddScoped<IQueryService, QueryService>();
+            //添加内存缓存
+            services.AddMemoryCache();
 
             //注册Swagger生成器，定义一个或多个Swagger文件
             services.AddEndpointsApiExplorer();
@@ -171,7 +173,7 @@ namespace CnGalWebSite.APIServer
                     SenderName = Configuration["SenderName"],
                     SenderEmail = Configuration["SenderEmail"],
 
-                    // can be optional with no authentication 
+                    // can be optional with no authentication
                     Account = Configuration["Account"],
                     Password = Configuration["Password"],
                     // enable ssl or tls

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,13 +35,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ISteamInforService _steamInforService;
         private readonly IRankService _rankService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-
-        private static SteamGamesOverviewModel _overviewModel;
-        private static DateTime _overviewModelUpdateTime;
+        private readonly IMemoryCache _memoryCache;
 
         public SteamAPIController(IRepository<StoreInfo, long> storeInfoRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService,
-        IRepository<ApplicationUser, string> userRepository, IHttpService httpService)
+        IRepository<ApplicationUser, string> userRepository, IHttpService httpService, IMemoryCache memoryCache)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -51,6 +50,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _httpService = httpService;
             _playedGameRepository = playedGameRepository;
             _rankService = rankService;
+            _memoryCache = memoryCache;
         }
 
         [AllowAnonymous]
@@ -115,14 +115,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<SteamGamesOverviewModel>> GetSteamGamesOverview()
         {
-            var now = DateTime.Now.ToCstTime();
+            const string cacheKey = "SteamGamesOverview";
 
-            if (_overviewModel!=null&&(now - _overviewModelUpdateTime).TotalMinutes<60)
+            // 尝试从缓存中获取数据
+            if (_memoryCache.TryGetValue(cacheKey, out SteamGamesOverviewModel cachedModel))
             {
-                return _overviewModel;
+                return cachedModel;
             }
 
-            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).ThenInclude(s=>s.UserRanks).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new 
+            var now = DateTime.Now.ToCstTime();
+
+            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).ThenInclude(s=>s.UserRanks).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new
             {
                 Count = s.Count(),
                 s.First().ApplicationUser
@@ -169,15 +172,24 @@ namespace CnGalWebSite.APIServer.Controllers
                 highestGames.Add(entry);
             }
 
-            _overviewModel= new SteamGamesOverviewModel
+            var overviewModel = new SteamGamesOverviewModel
             {
                 Count = gameIds.Count,
                 HasMostGamesUsers = usersRe,
                 PossessionRateHighestGames = highestGames
             };
-            _overviewModelUpdateTime = now;
 
-            return _overviewModel;
+            // 将结果缓存，设置过期时间为60分钟
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60),
+                SlidingExpiration = TimeSpan.FromMinutes(30), // 30分钟无访问则过期
+                Priority = CacheItemPriority.Normal
+            };
+
+            _memoryCache.Set(cacheKey, overviewModel, cacheOptions);
+
+            return overviewModel;
         }
 
     }
