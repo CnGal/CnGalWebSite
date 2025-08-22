@@ -3,11 +3,11 @@ services:
     image: littlefishtentears/cngalwebsiteexamineservice:latest
     container_name: examineservice
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
       # 事件总线 主机名称
       - EventBus_HostName=${EventBus_HostName}
       # 事件总线 端口
-      - EventBus_Port=${EventBus_Port}
+      - EventBus_Port=${EventBus_Port:-5672}
       # 事件总线 用户名
       - EventBus_UserName=${EventBus_UserName}
       # 事件总线 密码
@@ -17,7 +17,23 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${resources_limits_memory}
+          memory: ${resources_limits_memory:-100m}
     volumes:
-      - ${MNT_DIR}/examineservice/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
-      - ${MNT_DIR}/examineservice/Data/SensitiveWords:/app/Data/SensitiveWords
+      - examineservice-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - ${DATA_DIR}/SensitiveWords:/app/Data/SensitiveWords
+    labels:
+      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
+    networks:
+      - web
+
+volumes:
+  examineservice-DataProtection-Keys:
+
+networks:
+  web:
+    external: true
