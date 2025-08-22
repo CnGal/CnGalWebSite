@@ -19,7 +19,6 @@ services:
         limits:
           memory: ${resources_limits_memory:-100m}
     volumes:
-      - examineservice-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
       - ${DATA_DIR}/SensitiveWords:/app/Data/SensitiveWords
     labels:
       - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
@@ -30,9 +29,6 @@ services:
         max-file: 10
     networks:
       - web
-
-volumes:
-  examineservice-DataProtection-Keys:
 
 networks:
   web:
