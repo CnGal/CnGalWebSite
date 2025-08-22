@@ -22,7 +22,7 @@ services:
       retries: 3
       start_period: 40s
     volumes:
-      - timedtask-DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+      - DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
     deploy:
       resources:
         limits:
@@ -40,9 +40,8 @@ services:
     networks:
       - web
 
-
 volumes:
-  timedtask-DataProtection-Keys:
+  DataProtection-Keys:
 
 networks:
   web:
