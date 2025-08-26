@@ -348,7 +348,15 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
                 }
 
                 // 添加个性化指导
-                personalizedMessage += "\n\n请根据以上信息调整你的回复风格，使其更符合用户的个性和偏好。同时，你要记住自己说过的话和做过的承诺，保持对话的连贯性。主动使用函数调用记录观察到的信息，这有助于提供更好的个性化服务。";
+                personalizedMessage += "\n\n【重要指导】请根据以上信息调整你的回复风格，使其更符合用户的个性和偏好。同时，你要记住自己说过的话和做过的承诺，保持对话的连贯性。\n\n" +
+                "【关键职责】作为贴心的看板娘，你必须敏锐地观察并记录用户的一切有价值信息：\n" +
+                "• 用户提到的昵称、称呼偏好 → 立即使用set_user_nickname记录\n" +
+                "• 用户表达的兴趣爱好 → 立即使用add_user_interest记录\n" +
+                "• 用户的偏好表达（喜欢/不喜欢） → 立即使用remember_user_preference记录\n" +
+                "• 用户当前关注的事物 → 立即使用update_user_context记录\n" +
+                "• 观察到的用户行为模式 → 立即使用observe_user_behavior记录\n" +
+                "• 你自己的状态变化和承诺 → 使用相应的自我记录工具\n\n" +
+                "记住：每一条信息都可能是提供更好服务的关键！宁可多记录也不要遗漏。这些记录不会打扰用户，但会让你的服务更加贴心和个性化。";
 
                 return personalizedMessage;
             }

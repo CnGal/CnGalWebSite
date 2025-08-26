@@ -11,12 +11,14 @@ using IdentityModel.Client;
 using CnGalWebSite.Core.Services;
 using System.Text.Json.Serialization;
 using CnGalWebSite.Kanban.ChatGPT.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Services
 {
     public class HttpService : IHttpService
     {
         private readonly HttpClient _client;
+        private readonly IConfiguration _configuration;
 
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -25,13 +27,21 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services
 
         public bool IsAuth { get; set; }
 
-        public HttpService(HttpClient client)
+        public HttpService(HttpClient client, IConfiguration configuration)
         {
             _client = client;
+            _configuration = configuration;
 
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             _jsonOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
             _jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+            // 设置 ChatGPT API 授权头
+            var apiKey = _configuration["ChatGPTApiKey"];
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
+            }
         }
         public async Task<TValue?> GetAsync<TValue>(string url)
         {

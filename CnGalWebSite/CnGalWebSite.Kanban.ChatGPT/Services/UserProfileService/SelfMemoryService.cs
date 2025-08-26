@@ -354,6 +354,229 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
             return parts.Any() ? string.Join("\n", parts) : "暂无记录的信息";
         }
 
+        public async Task<bool> RemoveSelfStateAsync(string state, string memoryId = "global")
+        {
+            try
+            {
+                var memory = await GetSelfMemoryAsync(memoryId);
+
+                var stateToRemove = memory.PersonalStates
+                    .FirstOrDefault(s => s.State.Contains(state, StringComparison.OrdinalIgnoreCase));
+
+                if (stateToRemove != null)
+                {
+                    memory.PersonalStates.Remove(stateToRemove);
+                    memory.UpdatedAt = DateTime.Now;
+                    await SaveMemoryAsync(memory);
+
+                    _logger.LogInformation("移除看板娘状态成功，状态：{state}", state);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "移除看板娘状态失败");
+                return false;
+            }
+        }
+
+        public async Task<bool> RemoveSelfTraitAsync(string trait, string memoryId = "global")
+        {
+            try
+            {
+                var memory = await GetSelfMemoryAsync(memoryId);
+
+                var traitToRemove = memory.PersonalTraits
+                    .FirstOrDefault(t => t.Trait.Contains(trait, StringComparison.OrdinalIgnoreCase));
+
+                if (traitToRemove != null)
+                {
+                    memory.PersonalTraits.Remove(traitToRemove);
+                    memory.UpdatedAt = DateTime.Now;
+                    await SaveMemoryAsync(memory);
+
+                    _logger.LogInformation("移除看板娘特征成功，特征：{trait}", trait);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "移除看板娘特征失败");
+                return false;
+            }
+        }
+
+        public async Task<bool> CleanupExpiredStatesAsync(string memoryId = "global")
+        {
+            try
+            {
+                var memory = await GetSelfMemoryAsync(memoryId);
+                var now = DateTime.Now;
+                var expiredStates = new List<SelfStateItem>();
+
+                foreach (var state in memory.PersonalStates.Where(s => s.IsActive && s.DurationMinutes > 0))
+                {
+                    var expiryTime = state.RecordedAt.AddMinutes(state.DurationMinutes);
+                    if (now > expiryTime)
+                    {
+                        state.IsActive = false;
+                        expiredStates.Add(state);
+                    }
+                }
+
+                if (expiredStates.Any())
+                {
+                    memory.UpdatedAt = DateTime.Now;
+                    await SaveMemoryAsync(memory);
+
+                    _logger.LogInformation("清理过期状态成功，共清理：{count}个状态", expiredStates.Count);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "清理过期状态失败");
+                return false;
+            }
+        }
+
+        public async Task<bool> CleanupCompletedCommitmentsAsync(string memoryId = "global")
+        {
+            try
+            {
+                var memory = await GetSelfMemoryAsync(memoryId);
+                var completedCommitments = memory.Commitments
+                    .Where(c => c.Status == "fulfilled" && c.RecordedAt < DateTime.Now.AddDays(-7))
+                    .ToList();
+
+                if (completedCommitments.Any())
+                {
+                    foreach (var commitment in completedCommitments)
+                    {
+                        memory.Commitments.Remove(commitment);
+                    }
+
+                    memory.UpdatedAt = DateTime.Now;
+                    await SaveMemoryAsync(memory);
+
+                    _logger.LogInformation("清理已完成承诺成功，共清理：{count}个承诺", completedCommitments.Count);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "清理已完成承诺失败");
+                return false;
+            }
+        }
+
+        public async Task<bool> PerformLifecycleManagementAsync(string memoryId = "global")
+        {
+            try
+            {
+                var memory = await GetSelfMemoryAsync(memoryId);
+                var now = DateTime.Now;
+                bool hasChanges = false;
+
+                // 1. 自动过期状态
+                var expiredCount = 0;
+                foreach (var state in memory.PersonalStates.Where(s => s.IsActive && s.DurationMinutes > 0))
+                {
+                    var expiryTime = state.RecordedAt.AddMinutes(state.DurationMinutes);
+                    if (now > expiryTime)
+                    {
+                        state.IsActive = false;
+                        expiredCount++;
+                        hasChanges = true;
+                    }
+                }
+
+                // 2. 清理长期非活跃状态（超过24小时的非活跃状态）
+                var oldInactiveStates = memory.PersonalStates
+                    .Where(s => !s.IsActive && s.RecordedAt < now.AddHours(-24))
+                    .ToList();
+                foreach (var oldState in oldInactiveStates)
+                {
+                    memory.PersonalStates.Remove(oldState);
+                    hasChanges = true;
+                }
+
+                // 3. 自动过期承诺（超过预期时间7天的待完成承诺）
+                var overdueCommitments = memory.Commitments
+                    .Where(c => c.Status == "pending" &&
+                           c.ExpectedTime.HasValue &&
+                           c.ExpectedTime.Value.AddDays(7) < now)
+                    .ToList();
+                foreach (var commitment in overdueCommitments)
+                {
+                    commitment.Status = "expired";
+                    hasChanges = true;
+                }
+
+                // 4. 清理旧的已完成承诺（7天前完成的）
+                var oldCompletedCommitments = memory.Commitments
+                    .Where(c => (c.Status == "fulfilled" || c.Status == "cancelled") &&
+                           c.RecordedAt < now.AddDays(-7))
+                    .ToList();
+                foreach (var commitment in oldCompletedCommitments)
+                {
+                    memory.Commitments.Remove(commitment);
+                    hasChanges = true;
+                }
+
+                // 5. 清理低重要度的旧对话记忆（保留高重要度的）
+                if (memory.ConversationMemories.Count > 100)
+                {
+                    var memoriesToKeep = memory.ConversationMemories
+                        .Where(m => m.Importance >= 4 || m.RecordedAt > now.AddDays(-3))
+                        .OrderByDescending(m => m.Importance)
+                        .ThenByDescending(m => m.RecordedAt)
+                        .Take(80)
+                        .ToList();
+
+                    if (memoriesToKeep.Count < memory.ConversationMemories.Count)
+                    {
+                        memory.ConversationMemories = memoriesToKeep;
+                        hasChanges = true;
+                    }
+                }
+
+                // 6. 特征强度衰减（长时间未更新的特征降低强度）
+                foreach (var trait in memory.PersonalTraits.Where(t => t.RecordedAt < now.AddDays(-30)))
+                {
+                    if (trait.Intensity > 1)
+                    {
+                        trait.Intensity = Math.Max(1, trait.Intensity - 1);
+                        hasChanges = true;
+                    }
+                }
+
+                if (hasChanges)
+                {
+                    memory.UpdatedAt = DateTime.Now;
+                    await SaveMemoryAsync(memory);
+
+                    _logger.LogInformation("数据生命周期管理完成，已过期状态：{expiredCount}个，清理旧数据，更新特征强度", expiredCount);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "数据生命周期管理失败");
+                return false;
+            }
+        }
+
         private async Task SaveMemoryAsync(KanbanSelfMemoryModel memory)
         {
             var cacheKey = SELF_MEMORY_CACHE_PREFIX + memory.MemoryId;

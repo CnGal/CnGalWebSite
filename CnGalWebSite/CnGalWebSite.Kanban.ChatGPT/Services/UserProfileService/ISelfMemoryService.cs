@@ -72,5 +72,42 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
         /// <param name="memoryId">记忆ID</param>
         /// <returns>格式化的记忆信息</returns>
         Task<string> GetFormattedMemoryAsync(string memoryType, string memoryId = "global");
+
+        /// <summary>
+        /// 移除自我状态
+        /// </summary>
+        /// <param name="state">状态描述</param>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>移除结果</returns>
+        Task<bool> RemoveSelfStateAsync(string state, string memoryId = "global");
+
+        /// <summary>
+        /// 移除自我特征
+        /// </summary>
+        /// <param name="trait">特征描述</param>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>移除结果</returns>
+        Task<bool> RemoveSelfTraitAsync(string trait, string memoryId = "global");
+
+        /// <summary>
+        /// 清理过期状态
+        /// </summary>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>清理结果</returns>
+        Task<bool> CleanupExpiredStatesAsync(string memoryId = "global");
+
+        /// <summary>
+        /// 清理已完成的承诺
+        /// </summary>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>清理结果</returns>
+        Task<bool> CleanupCompletedCommitmentsAsync(string memoryId = "global");
+
+        /// <summary>
+        /// 数据生命周期管理：自动清理和状态转换
+        /// </summary>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>管理结果</returns>
+        Task<bool> PerformLifecycleManagementAsync(string memoryId = "global");
     }
 }

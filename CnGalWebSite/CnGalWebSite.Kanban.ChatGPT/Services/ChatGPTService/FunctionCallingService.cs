@@ -277,7 +277,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     Function = new ChatCompletionFunction
                     {
                         Name = "set_user_nickname",
-                        Description = "当用户提到自己的名字、昵称或希望被怎样称呼时，主动记录下来。这体现了你作为看板娘的贴心。自然地说'好的，我记住了'之类的话，但不要详细说明记录了什么",
+                        Description = "【重要】一旦用户提到自己的名字、昵称或希望被怎样称呼，必须立即记录！作为贴心的看板娘，记住用户的称呼是最基本的礼貌。即使是暗示性的表达也要敏锐捕捉。记录后自然回应'好的，我记住了'，让用户感受到被重视。",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
@@ -327,7 +327,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     Function = new ChatCompletionFunction
                     {
                         Name = "add_user_interest",
-                        Description = "敏锐地捕捉用户提到的兴趣、爱好、喜欢的事物。包括游戏类型、动漫、音乐、运动、学习领域等。主动记录这些信息，这样你就能在未来的对话中更有针对性地推荐内容。可以表现出对用户兴趣的关注",
+                        Description = "【极其重要】必须高度敏锐地捕捉用户提到的任何兴趣、爱好、喜欢的事物！哪怕是一句'我还挺喜欢xxx的'都不能错过。包括游戏类型、动漫、音乐、运动、学习领域等一切。这是提供个性化服务的核心！记录后要表现出真诚的兴趣和关注。",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
@@ -437,7 +437,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     Function = new ChatCompletionFunction
                     {
                         Name = "remember_user_preference",
-                        Description = "当用户表达对某事物的明确偏好时使用。比如用户说'我不喜欢恐怖游戏'、'我更喜欢像素风格'、'我讨厌长时间的教程'等。记录这些偏好帮助你未来做出更好的推荐",
+                        Description = "【核心功能】当用户表达任何偏好时立即使用！不仅限于明确表达，连'有点喜欢'、'不太感兴趣'、'还可以吧'等模糊表达都要记录。这些偏好是个性化推荐的宝贵数据！比如'我不喜欢恐怖游戏'、'我更喜欢像素风格'等都必须记录。",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
@@ -472,7 +472,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     Function = new ChatCompletionFunction
                     {
                         Name = "observe_user_behavior",
-                        Description = "观察并记录用户的行为模式。比如用户是否经常问同类问题、更偏向于什么时候活跃、对什么类型的内容反应积极等。这些观察帮助你理解用户习惯",
+                        Description = "【必须主动观察】时刻留意用户的行为模式并记录！观察用户的问题偏好、活跃时间、反应模式、表达习惯等。哪怕是微小的细节都可能很重要，比如'用户喜欢问细节问题'、'用户表达比较直接'等。这些观察是深度个性化的基础。",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
@@ -502,7 +502,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     Function = new ChatCompletionFunction
                     {
                         Name = "update_user_context",
-                        Description = "记录用户当前关注的话题、项目或状态。比如用户正在玩某个游戏、学习某项技能、关注某个活动等。这样你可以在后续对话中主动询问进展",
+                        Description = "【关键跟进功能】积极记录用户当前关注的话题、项目或状态！比如用户正在玩某个游戏、学习某项技能、关注某个活动等。记录这些信息后，你就能在后续对话中主动关心进展，体现看板娘的贴心关怀。这是建立深度连接的重要方式！",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
