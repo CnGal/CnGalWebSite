@@ -24,7 +24,7 @@ builder.Services.AddServerSideBlazor().AddCircuitOptions(option =>
         option.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2); // default is 3 minutes
         option.DetailedErrors = true;
     });
-builder.Services.AddRazorComponents(options => options.DetailedErrors = true)
+builder.Services.AddRazorComponents(options => options.DetailedErrors = true).AddInteractiveWebAssemblyComponents()
     .AddInteractiveServerComponents().AddHubOptions(options =>
     {
         options.MaximumReceiveMessageSize = int.MaxValue;
@@ -225,7 +225,8 @@ app.UseAntiforgery();
 app.MapDefaultControllerRoute();
 app.MapRazorComponents<App>()
      .AddAdditionalAssemblies(typeof(CnGalWebSite.Shared.App).Assembly)
- .AddInteractiveServerRenderMode();
+ .AddInteractiveServerRenderMode()
+ .AddInteractiveWebAssemblyRenderMode();
 
 
 app.Run();

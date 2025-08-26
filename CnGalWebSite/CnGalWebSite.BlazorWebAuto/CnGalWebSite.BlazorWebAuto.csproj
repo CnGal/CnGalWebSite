@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9e33ae77-5421-4e6e-ae68-6d5d1f84aefb</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CnGalWebSite\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.BlazorWebAuto.Client\CnGalWebSite.BlazorWebAuto.Client.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.6" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
