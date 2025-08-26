@@ -633,7 +633,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ArticleInforTipViewModel>>> GetWeeklyNewsOverviewAsync()
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).OrderByDescending(s => s.PublishTime).Take(8).ToListAsync();
+            var weeklyNews = await _weeklyNewsRepository.GetAll().AsNoTracking().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).OrderByDescending(s => s.PublishTime).Take(8).ToListAsync();
 
             var model = new List<ArticleInforTipViewModel>();
             foreach (var item in weeklyNews)

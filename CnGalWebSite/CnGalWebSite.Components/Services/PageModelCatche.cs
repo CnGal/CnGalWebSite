@@ -27,7 +27,7 @@ namespace CnGalWebSite.Components.Service
 
         private PersistingComponentStateSubscription persistingSubscription;
 
-        public PageModelCatche(IServiceProvider serviceProvider, IHttpService httpService, IConfiguration configuration)
+        public PageModelCatche(IServiceProvider serviceProvider, IHttpService httpService, IConfiguration configuration, PersistentComponentState _applicationState)
         {
             _httpService = httpService;
             _serviceProvider = serviceProvider;
@@ -35,11 +35,10 @@ namespace CnGalWebSite.Components.Service
             _token = typeof(TModel).ToString();
             _baseUrl = configuration["WebApiPath"];
 
-            if (!OperatingSystem.IsBrowser())
-            {
-                ApplicationState = (PersistentComponentState)_serviceProvider.GetService(typeof(PersistentComponentState));
-                persistingSubscription = ApplicationState.RegisterOnPersisting(PersistData);
-            }
+
+            //ApplicationState = _applicationState;
+            //persistingSubscription = ApplicationState.RegisterOnPersisting(PersistData,);
+
         }
 
         public void Init(string name, string baseUrl)

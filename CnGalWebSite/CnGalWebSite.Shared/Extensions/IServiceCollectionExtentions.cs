@@ -74,7 +74,7 @@ namespace CnGalWebSite.Shared.Extentions
             //事件
             services.AddScoped<IEventService, EventService>();
             //结构化数据
-            _ = services.AddScoped<IStructuredDataService, StructuredDataService>();
+            services.AddScoped<IStructuredDataService, StructuredDataService>();
 
             // 看板娘Live2D
             services.AddKanbanLive2D();

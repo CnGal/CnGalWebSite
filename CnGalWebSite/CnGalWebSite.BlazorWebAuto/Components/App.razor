@@ -23,8 +23,8 @@
     <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
 
     <!--组件库-->
-    @* <link rel="stylesheet" href="_content/Masa.Blazor/css/masa-blazor.min.css" /> *@
-    <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" />
+    <link rel="stylesheet" href="@Assets["_content/Masa.Blazor/css/masa-blazor.min.css"]" />
+    @* <link rel="stylesheet" href="https://res.cngal.org/_content/Masa.Blazor/css/masa-blazor.min.css" /> *@
 
     <!--Markdown编辑器-->
     <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
@@ -42,10 +42,10 @@
     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
 
     <!--不同屏幕大小自适应样式-->
-   @*  <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
+    @*  <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
     <HeadOutlet @rendermode="@RenderMode.InteractiveAuto" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveAuto" />
+    @* <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveAuto" /> *@
 </head>
 
 <body>
@@ -103,8 +103,8 @@
     <script async src="https://umami.cngal.top/script.js" data-website-id="c190d5e2-f859-430c-8463-be388f6875b0"></script>
 
     <!--组件库-->
-    @* <script src="_content/Masa.Blazor/js/masa-blazor.js"></script> *@
-    <script src="https://res.cngal.org/_content/Masa.Blazor/js/masa-blazor.js"></script>
+    <script src="_content/Masa.Blazor/js/masa-blazor.js"></script>
+    @* <script src="https://res.cngal.org/_content/Masa.Blazor/js/masa-blazor.js"></script> *@
 
     @* <script src="_framework/blazor.web.js"></script> *@
     <script src="https://res.cngal.org/_framework/blazor.web.9.0.js" autostart="false"></script>
