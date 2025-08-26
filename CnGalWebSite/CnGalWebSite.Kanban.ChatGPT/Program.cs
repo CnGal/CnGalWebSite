@@ -1,11 +1,8 @@
-﻿
-
-using CnGalWebSite.Core.Services;
-using CnGalWebSite.EventBus.Extensions;
+﻿using CnGalWebSite.EventBus.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using NetCore.AutoRegisterDi;
 using System.Reflection;
+using CnGalWebSite.Kanban.ChatGPT.Extensions;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -20,6 +17,9 @@ builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 // 添加内存缓存
 builder.Services.AddMemoryCache();
+
+// 添加用户个性化服务
+builder.Services.AddUserProfileServices();
 
 //自动依赖注入
 builder.Services.RegisterAssemblyPublicNonGenericClasses()

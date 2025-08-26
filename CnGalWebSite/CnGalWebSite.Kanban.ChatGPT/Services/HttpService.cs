@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using IdentityModel.Client;
 using CnGalWebSite.Core.Services;
 using System.Text.Json.Serialization;
+using CnGalWebSite.Kanban.ChatGPT.Extensions;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Services
 {
