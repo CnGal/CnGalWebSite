@@ -38,6 +38,8 @@ services:
       - EnableFunctionCalling=${EnableFunctionCalling:-true}
     hostname: kanbangpt
     restart: always
+    volumes:
+      - ${MNT_DIR:-/mnt/docker}/kanbangpt:/app/storage
     deploy:
       resources:
         limits:
