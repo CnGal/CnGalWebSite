@@ -2,6 +2,9 @@
 using CnGalWebSite.Extensions;
 using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
 using CnGalWebSite.Kanban.ChatGPT.Services.SensitiveWords;
+using CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService;
+using CnGalWebSite.Kanban.ChatGPT.Services.UserAnalysisService;
+using CnGalWebSite.Kanban.ChatGPT.Services.SelfAnalysisService;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,6 +26,8 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         private readonly IMemoryCache _memoryCache;
         private readonly ISensitiveWordService _sensitiveWordService;
         private readonly IFunctionCallingService _functionCallingService;
+        private readonly ISelfAnalysisService _selfAnalysisService;
+        private readonly IUserAnalysisService _userAnalysisService;
 
         private static List<DateTime> _record = new List<DateTime>();
         private readonly HttpClient _httpClient;
@@ -36,7 +41,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         };
 
         public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger,
-            IMemoryCache memoryCache, ISensitiveWordService sensitiveWordService, IFunctionCallingService functionCallingService)
+            IMemoryCache memoryCache, ISensitiveWordService sensitiveWordService, IFunctionCallingService functionCallingService, ISelfAnalysisService selfAnalysisService, IUserAnalysisService userAnalysisService)
         {
             _httpService = httpService;
             _configuration = configuration;
@@ -44,9 +49,10 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             _memoryCache = memoryCache;
             _sensitiveWordService = sensitiveWordService;
             _functionCallingService = functionCallingService;
+            _selfAnalysisService = selfAnalysisService;
+            _userAnalysisService = userAnalysisService;
 
             _httpClient = _httpService.GetClientAsync().GetAwaiter().GetResult();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
             if (!int.TryParse(_configuration["MaxRecursionDepth"], out MaxRecursionDepth))
             {
                 MaxRecursionDepth = 10;
@@ -338,6 +344,16 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                         Message = "回复为空"
                     };
                 }
+                var enablePersonalizedSystem = _configuration["DisablePersonalizedSystem"];
+                if (enablePersonalizedSystem?.ToLower() != "true")
+                {
+                    // 【优化后】使用智能融合分析，减少数据冗余
+                    _ = Task.Run(async () => await _selfAnalysisService.AnalyzeAndFuseSelfInfoAsync(reply));
+
+                    // 【重要改进】使用新的智能融合方法而非增量记录
+                    _ = Task.Run(async () => await _userAnalysisService.AnalyzeAndFuseUserInfoAsync(messages));
+                }
+
 
                 // 检查敏感词
                 //words = await _sensitiveWordService.Check(reply);

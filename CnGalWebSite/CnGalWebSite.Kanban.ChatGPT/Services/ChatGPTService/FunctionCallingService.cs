@@ -7,6 +7,8 @@ using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.Kanban.ChatGPT.Models.Functions;
 using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
+using CnGalWebSite.Kanban.ChatGPT.Models.UserProfile;
+using CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
@@ -27,6 +29,8 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         private ILogger<FunctionCallingService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IHttpService _httpService;
+        private readonly IUserProfileService _userProfileService;
+        private readonly ISelfMemoryService _selfMemoryService;
 
         private static int ExtractIdFromUrl(string url)
         {
@@ -44,6 +48,42 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             return 0;
         }
 
+        /// <summary>
+        /// 从用户ID参数中提取实际的用户ID，处理群聊格式
+        /// </summary>
+        /// <param name="userIdParam">用户ID参数</param>
+        /// <returns>实际的用户ID</returns>
+        private static string ExtractActualUserId(string userIdParam)
+        {
+            if (string.IsNullOrWhiteSpace(userIdParam))
+            {
+                return "";
+            }
+
+            // 如果是数字，直接返回（群聊用户ID）
+            if (long.TryParse(userIdParam, out _))
+            {
+                return userIdParam;
+            }
+
+            // 如果包含[UserID:xxx]格式，提取数字部分
+            if (userIdParam.Contains("[UserID:") && userIdParam.Contains("]"))
+            {
+                var start = userIdParam.IndexOf("[UserID:") + 8;
+                var end = userIdParam.IndexOf("]", start);
+                if (end > start)
+                {
+                    var extractedId = userIdParam.Substring(start, end - start);
+                    if (long.TryParse(extractedId, out _))
+                    {
+                        return extractedId;
+                    }
+                }
+            }
+
+            return userIdParam;
+        }
+
         public static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -52,14 +92,18 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
         private readonly string _apiUrl;
 
-        public FunctionCallingService(ILogger<FunctionCallingService> logger, IConfiguration configuration, IHttpService httpService)
+        public FunctionCallingService(ILogger<FunctionCallingService> logger, IConfiguration configuration, IHttpService httpService,
+            IUserProfileService userProfileService, ISelfMemoryService selfMemoryService)
         {
             _logger = logger;
             _configuration = configuration;
             _httpService = httpService;
+            _userProfileService = userProfileService;
+            _selfMemoryService = selfMemoryService;
 
             _functionMap = new Dictionary<string, Func<string, Task<string>>>
             {
+                // 【优化后】仅保留查询类Function
                 { "search_cngal", SearchCnGal },
                 { "get_latest_games", GetLatestGames },
                 { "get_latest_demo_games", GetLatestDemoGames },
@@ -75,12 +119,13 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         {
             return
             [
+                // 【优化后】仅保留查询类Function Call，所有记录类功能由异步AI分析处理
                 new ChatCompletionTool
                 {
                     Function = new ChatCompletionFunction
                     {
                         Name = "search_cngal",
-                        Description = "如果遇到不懂的信息，优先在CnGal资料站中进行搜索。减少使用限定词，直接搜索条目名称。返回值中有条目的Id，通过Id可以获取条目详情，以及获取条目关联信息。",
+                        Description = "搜索CnGal资料站中的游戏、文章等内容",
                         Parameters = new ChatCompletionParameters
                         {
                             Properties = new Dictionary<string, ChatCompletionProperty>
@@ -191,8 +236,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                             Required = []
                         }
                     }
-                }
-                // 在这里可以添加更多工具
+                },
             ];
         }
 

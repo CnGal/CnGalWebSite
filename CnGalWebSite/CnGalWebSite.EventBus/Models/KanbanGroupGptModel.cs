@@ -15,6 +15,8 @@ namespace CnGalWebSite.EventBus.Models
     {
         public string Name { get; set; }
 
+        public long Id { get; set; }
+
         public string Text { get; set; }
 
         public bool IsAssistant { get; set; }

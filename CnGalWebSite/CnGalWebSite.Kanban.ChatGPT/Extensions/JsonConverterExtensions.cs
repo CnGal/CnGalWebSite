@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.Kanban.ChatGPT.Services
+namespace CnGalWebSite.Kanban.ChatGPT.Extensions
 {
     public class DateTimeConverterUsingDateTimeParse : JsonConverter<DateTime>
     {

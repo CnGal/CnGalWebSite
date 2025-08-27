@@ -64,7 +64,8 @@ namespace CnGalWebSite.RobotClientX.Services.GPT
                 {
                     IsAssistant = s.SenderId == qq,
                     Name = s.SenderName,
-                    Text = s.Content
+                    Text = s.Content,
+                    Id = s.SenderId
                 }).ToList()
             };
 

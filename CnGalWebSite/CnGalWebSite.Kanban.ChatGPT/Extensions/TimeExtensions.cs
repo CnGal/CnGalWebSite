@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CnGalWebSite.Kanban.ChatGPT.Services
+namespace CnGalWebSite.Kanban.ChatGPT.Extensions
 {
     public static class TimeExtensions
     {
@@ -45,7 +45,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services
             }
             else
             {
-                return (int)(timeSpan.TotalSeconds) + "秒前";
+                return (int)timeSpan.TotalSeconds + "秒前";
             }
         }
     }

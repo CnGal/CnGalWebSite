@@ -1,7 +1,9 @@
 ﻿using CnGalWebSite.Core.Services;
 using CnGalWebSite.EventBus.Models;
+using CnGalWebSite.Kanban.ChatGPT.Extensions;
 using CnGalWebSite.Kanban.ChatGPT.Models.GPT;
 using CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService;
+using CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,13 +16,14 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
 {
-    public class KanbanService(IMemoryCache memoryCache, ILogger<KanbanService> logger, IConfiguration configuration, IChatGPTService chatGPTService) : IKanbanService
+    public class KanbanService(IMemoryCache memoryCache, ILogger<KanbanService> logger, IConfiguration configuration, IChatGPTService chatGPTService, IUserProfileService userProfileService) : IKanbanService
     {
 
         private readonly IMemoryCache _memoryCache = memoryCache;
         private readonly IChatGPTService _chatGPTService = chatGPTService;
         private readonly ILogger<KanbanService> _logger = logger;
         private readonly IConfiguration _configuration = configuration;
+        private readonly IUserProfileService _userProfileService = userProfileService;
 
 
         public void SetCache(List<ChatCompletionMessage> messages, string userId)
@@ -214,6 +217,15 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
             sys = sys.Replace("{time}", datetime.ToString("HH:mm:ss"));
             sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
 
+            // 对于群聊，获取最后一个发言的用户ID来生成个性化系统消息
+            var enablePersonalizedSystem = _configuration["DisablePersonalizedSystem"];
+            if (enablePersonalizedSystem?.ToLower() != "true")
+            {
+                var lastUserMessage = messages.LastOrDefault(m => !m.IsAssistant);
+                var userIdForPersonalization = lastUserMessage?.Id.ToString() ?? "global";
+                sys = await _userProfileService.GetPersonalizedSystemMessageAsync(userIdForPersonalization, sys);
+            }
+
 
             messageList.Add(new ChatCompletionMessage
             {
@@ -224,7 +236,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
             // 拼接示例问答
             var user = _configuration["ChatGPT_Sample_User"];
             var kanban = _configuration["ChatGPT_Sample_Kanban"];
-            if (string.IsNullOrWhiteSpace(user) == false && string.IsNullOrWhiteSpace(kanban)==false)
+            if (string.IsNullOrWhiteSpace(user) == false && string.IsNullOrWhiteSpace(kanban) == false)
             {
                 messageList.Add(new ChatCompletionMessage
                 {
@@ -242,7 +254,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
             messageList.AddRange(messages.Select(s => new ChatCompletionMessage
             {
                 Role = s.IsAssistant ? "assistant" : "user",
-                Content = $"【{s.Name}】\n{s.Text}"
+                Content = s.IsAssistant ? s.Text : $"[UserID:{s.Id}]【{s.Name}】\n{s.Text}"
             }));
 
             var result = await _chatGPTService.SendMessages(messageList);
