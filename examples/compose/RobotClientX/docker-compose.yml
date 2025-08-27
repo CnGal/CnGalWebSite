@@ -35,6 +35,8 @@ services:
       - GroupHistoryMax=${GroupHistoryMax:-30}
       # 群聊历史记录达到最大条数后，保留最近N条消息
       - GroupHistoryMin=${GroupHistoryMin:-10}
+      # 禁用个性化系统
+      - DisablePersonalizedSystem=${DisablePersonalizedSystem:-false}
     hostname: robotclientx
     restart: always
     healthcheck:
