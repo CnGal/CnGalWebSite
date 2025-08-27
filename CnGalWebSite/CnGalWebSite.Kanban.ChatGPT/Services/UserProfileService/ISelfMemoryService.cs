@@ -109,5 +109,13 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
         /// <param name="memoryId">记忆ID</param>
         /// <returns>管理结果</returns>
         Task<bool> PerformLifecycleManagementAsync(string memoryId = "global");
+
+        /// <summary>
+        /// 完整替换看板娘记忆
+        /// </summary>
+        /// <param name="fusedMemory">融合后的完整记忆</param>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>替换结果</returns>
+        Task<bool> ReplaceCompleteMemoryAsync(KanbanSelfMemoryModel fusedMemory, string memoryId = "global");
     }
 }

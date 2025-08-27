@@ -344,12 +344,16 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                         Message = "回复为空"
                     };
                 }
+                var enablePersonalizedSystem = _configuration["DisablePersonalizedSystem"];
+                if (enablePersonalizedSystem?.ToLower() != "true")
+                {
+                    // 【优化后】使用智能融合分析，减少数据冗余
+                    _ = Task.Run(async () => await _selfAnalysisService.AnalyzeAndFuseSelfInfoAsync(reply));
 
-                // 分析回复内容并记录看板娘的自我信息
-                _ = Task.Run(async () => await _selfAnalysisService.AnalyzeAndRecordSelfInfoAsync(reply));
+                    // 【重要改进】使用新的智能融合方法而非增量记录
+                    _ = Task.Run(async () => await _userAnalysisService.AnalyzeAndFuseUserInfoAsync(messages));
+                }
 
-                // 分析用户消息并记录用户信息
-                _ = Task.Run(async () => await _userAnalysisService.AnalyzeAndRecordUserInfoAsync(messages));
 
                 // 检查敏感词
                 //words = await _sensitiveWordService.Check(reply);

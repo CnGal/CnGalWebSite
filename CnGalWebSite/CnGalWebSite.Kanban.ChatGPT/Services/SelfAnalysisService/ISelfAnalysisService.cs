@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Services.SelfAnalysisService
 {
@@ -8,22 +8,10 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.SelfAnalysisService
     public interface ISelfAnalysisService
     {
         /// <summary>
-        /// 使用AI分析看板娘的回复并自动记录相关信息
+        /// 【优化版】智能融合分析看板娘回复，减少冗余数据
         /// </summary>
         /// <param name="reply">看板娘的回复内容</param>
         /// <returns></returns>
-        Task AnalyzeAndRecordSelfInfoAsync(string reply);
-
-        /// <summary>
-        /// 执行定期数据生命周期管理
-        /// </summary>
-        /// <returns></returns>
-        Task PerformPeriodicLifecycleManagementAsync();
-
-        /// <summary>
-        /// 智能状态转换和清理
-        /// </summary>
-        /// <returns></returns>
-        Task PerformIntelligentStateManagementAsync();
+        Task AnalyzeAndFuseSelfInfoAsync(string reply);
     }
 }

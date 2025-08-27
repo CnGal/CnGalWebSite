@@ -1,4 +1,4 @@
-using CnGalWebSite.Kanban.ChatGPT.Models.UserProfile;
+﻿using CnGalWebSite.Kanban.ChatGPT.Models.UserProfile;
 using CnGalWebSite.Kanban.ChatGPT.Services.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -169,6 +169,40 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "反序列化用户上下文失败");
+                        }
+                        break;
+
+                    case "complete_profile_replace":
+                        // 【新增】支持完整档案替换，用于AI融合后的数据更新
+                        try
+                        {
+                            var newProfile = JsonSerializer.Deserialize<UserProfileModel>(request.Value);
+                            if (newProfile != null)
+                            {
+                                // 保留原有的创建时间和用户ID
+                                newProfile.UserId = profile.UserId;
+                                newProfile.CreatedAt = profile.CreatedAt;
+                                newProfile.UpdatedAt = DateTime.Now;
+
+                                // 完整替换档案内容
+                                profile.Nickname = newProfile.Nickname;
+                                profile.Personality = newProfile.Personality;
+                                profile.CommunicationStyle = newProfile.CommunicationStyle;
+                                profile.AgeGroup = newProfile.AgeGroup;
+                                profile.Interests = newProfile.Interests ?? new List<string>();
+                                profile.PreferredGameTypes = newProfile.PreferredGameTypes ?? new List<string>();
+                                profile.SpecialPreferences = newProfile.SpecialPreferences ?? new Dictionary<string, string>();
+                                profile.Preferences = newProfile.Preferences ?? new Dictionary<string, List<UserPreferenceItem>>();
+                                profile.BehaviorObservations = newProfile.BehaviorObservations ?? new List<BehaviorObservation>();
+                                profile.CurrentContexts = newProfile.CurrentContexts ?? new List<UserContextItem>();
+
+                                updated = true;
+                                _logger.LogInformation("AI融合档案替换成功，精简数据量：用户ID：{userId}", userId);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "完整档案替换失败");
                         }
                         break;
 
@@ -346,17 +380,6 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
                 {
                     personalizedMessage += "\n\n【看板娘记忆】\n" + selfMemory;
                 }
-
-                // 添加个性化指导
-                personalizedMessage += "\n\n【重要指导】请根据以上信息调整你的回复风格，使其更符合用户的个性和偏好。同时，你要记住自己说过的话和做过的承诺，保持对话的连贯性。\n\n" +
-                "【关键职责】作为贴心的看板娘，你必须敏锐地观察并记录用户的一切有价值信息：\n" +
-                "• 用户提到的昵称、称呼偏好 → 立即使用set_user_nickname记录\n" +
-                "• 用户表达的兴趣爱好 → 立即使用add_user_interest记录\n" +
-                "• 用户的偏好表达（喜欢/不喜欢） → 立即使用remember_user_preference记录\n" +
-                "• 用户当前关注的事物 → 立即使用update_user_context记录\n" +
-                "• 观察到的用户行为模式 → 立即使用observe_user_behavior记录\n" +
-                "• 你自己的状态变化和承诺 → 使用相应的自我记录工具\n\n" +
-                "记住：每一条信息都可能是提供更好服务的关键！宁可多记录也不要遗漏。这些记录不会打扰用户，但会让你的服务更加贴心和个性化。";
 
                 return personalizedMessage;
             }

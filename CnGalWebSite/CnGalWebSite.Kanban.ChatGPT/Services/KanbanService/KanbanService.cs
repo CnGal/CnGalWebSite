@@ -218,9 +218,14 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
             sys = sys.Replace("{date}", datetime.ToString("yyyy年MM月dd日"));
 
             // 对于群聊，获取最后一个发言的用户ID来生成个性化系统消息
-            var lastUserMessage = messages.LastOrDefault(m => !m.IsAssistant);
-            var userIdForPersonalization = lastUserMessage?.Id.ToString() ?? "global";
-            sys = await _userProfileService.GetPersonalizedSystemMessageAsync(userIdForPersonalization, sys);
+            var enablePersonalizedSystem = _configuration["DisablePersonalizedSystem"];
+            if (enablePersonalizedSystem?.ToLower() != "true")
+            {
+                var lastUserMessage = messages.LastOrDefault(m => !m.IsAssistant);
+                var userIdForPersonalization = lastUserMessage?.Id.ToString() ?? "global";
+                sys = await _userProfileService.GetPersonalizedSystemMessageAsync(userIdForPersonalization, sys);
+            }
+
 
             messageList.Add(new ChatCompletionMessage
             {
@@ -231,7 +236,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.KanbanService
             // 拼接示例问答
             var user = _configuration["ChatGPT_Sample_User"];
             var kanban = _configuration["ChatGPT_Sample_Kanban"];
-            if (string.IsNullOrWhiteSpace(user) == false && string.IsNullOrWhiteSpace(kanban)==false)
+            if (string.IsNullOrWhiteSpace(user) == false && string.IsNullOrWhiteSpace(kanban) == false)
             {
                 messageList.Add(new ChatCompletionMessage
                 {

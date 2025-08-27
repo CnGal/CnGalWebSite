@@ -1,4 +1,4 @@
-using CnGalWebSite.Kanban.ChatGPT.Models.UserProfile;
+﻿using CnGalWebSite.Kanban.ChatGPT.Models.UserProfile;
 using CnGalWebSite.Kanban.ChatGPT.Services.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -35,7 +35,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
             _configuration = configuration;
         }
 
-                public async Task<KanbanSelfMemoryModel> GetSelfMemoryAsync(string memoryId = "global")
+        public async Task<KanbanSelfMemoryModel> GetSelfMemoryAsync(string memoryId = "global")
         {
             var cacheKey = SELF_MEMORY_CACHE_PREFIX + memoryId;
 
@@ -575,6 +575,86 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserProfileService
                 _logger.LogError(ex, "数据生命周期管理失败");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 完整替换看板娘记忆
+        /// </summary>
+        /// <param name="fusedMemory">融合后的完整记忆</param>
+        /// <param name="memoryId">记忆ID</param>
+        /// <returns>替换结果</returns>
+        public async Task<bool> ReplaceCompleteMemoryAsync(KanbanSelfMemoryModel fusedMemory, string memoryId = "global")
+        {
+            try
+            {
+                // 确保记忆ID一致
+                fusedMemory.MemoryId = memoryId;
+                fusedMemory.UpdatedAt = DateTime.Now;
+
+                // 验证融合后的记忆数据
+                ValidateFusedMemory(fusedMemory);
+
+                // 直接替换完整记忆
+                await SaveMemoryAsync(fusedMemory);
+
+                _logger.LogInformation("成功完整替换看板娘记忆，记忆ID：{memoryId}。状态数：{states}，特征数：{traits}，承诺数：{commitments}，对话记忆数：{conversations}",
+                    memoryId,
+                    fusedMemory.PersonalStates?.Count ?? 0,
+                    fusedMemory.PersonalTraits?.Count ?? 0,
+                    fusedMemory.Commitments?.Count ?? 0,
+                    fusedMemory.ConversationMemories?.Count ?? 0);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "完整替换看板娘记忆失败，记忆ID：{memoryId}", memoryId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 验证融合后的记忆数据
+        /// </summary>
+        /// <param name="fusedMemory">融合后的记忆</param>
+        private void ValidateFusedMemory(KanbanSelfMemoryModel fusedMemory)
+        {
+            // 设置创建时间（如果尚未设置）
+            if (fusedMemory.CreatedAt == DateTime.MinValue)
+            {
+                fusedMemory.CreatedAt = DateTime.Now;
+            }
+
+            // 验证数据完整性
+            foreach (var state in fusedMemory.PersonalStates)
+            {
+                if (state.RecordedAt == DateTime.MinValue)
+                    state.RecordedAt = DateTime.Now;
+            }
+
+            foreach (var trait in fusedMemory.PersonalTraits)
+            {
+                if (trait.RecordedAt == DateTime.MinValue)
+                    trait.RecordedAt = DateTime.Now;
+                // 确保强度在合理范围内
+                trait.Intensity = Math.Max(1, Math.Min(5, trait.Intensity));
+            }
+
+            foreach (var commitment in fusedMemory.Commitments)
+            {
+                if (commitment.RecordedAt == DateTime.MinValue)
+                    commitment.RecordedAt = DateTime.Now;
+            }
+
+            foreach (var memory in fusedMemory.ConversationMemories)
+            {
+                if (memory.RecordedAt == DateTime.MinValue)
+                    memory.RecordedAt = DateTime.Now;
+                // 确保重要度在合理范围内
+                memory.Importance = Math.Max(1, Math.Min(5, memory.Importance));
+            }
+
+            _logger.LogDebug("融合记忆数据验证完成，记忆ID：{memoryId}", fusedMemory.MemoryId);
         }
 
         private async Task SaveMemoryAsync(KanbanSelfMemoryModel memory)

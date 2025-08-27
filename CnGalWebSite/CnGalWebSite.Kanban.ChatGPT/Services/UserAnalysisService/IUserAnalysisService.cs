@@ -10,11 +10,11 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserAnalysisService
     public interface IUserAnalysisService
     {
         /// <summary>
-        /// 自动分析用户消息并记录用户信息
+        /// 【优化版】智能融合分析用户信息，输出融合后的完整档案而非增量操作
         /// </summary>
         /// <param name="messages">对话消息列表</param>
         /// <returns></returns>
-        Task AnalyzeAndRecordUserInfoAsync(List<ChatCompletionMessage> messages);
+        Task AnalyzeAndFuseUserInfoAsync(List<ChatCompletionMessage> messages);
 
         /// <summary>
         /// 从消息中提取用户ID
@@ -36,11 +36,6 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserAnalysisService
         /// <returns></returns>
         Task PerformBatchUserLifecycleManagementAsync();
 
-        /// <summary>
-        /// 智能用户偏好和上下文管理
-        /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <returns></returns>
-        Task PerformIntelligentUserDataManagementAsync(string userId);
+        // 【已删除】PerformIntelligentUserDataManagementAsync方法 - 没有被引用
     }
 }
