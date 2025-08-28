@@ -191,7 +191,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             var words = new List<string>();
             if (_recursionCount <= 1)
             {
-                words = await _sensitiveWordService.Check(messages.Last().Content!);
+                //words = await _sensitiveWordService.Check(messages.Last().Content!);
             }
 
             if (words.Count != 0)
