@@ -19,12 +19,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddServerSideBlazor().AddCircuitOptions(option =>
-    {
-        option.DisconnectedCircuitMaxRetained = 30; // default is 100
-        option.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2); // default is 3 minutes
-        option.DetailedErrors = true;
-    });
-builder.Services.AddRazorComponents(options => options.DetailedErrors = true).AddInteractiveWebAssemblyComponents()
+{
+    option.DisconnectedCircuitMaxRetained = 30; // default is 100
+    option.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2); // default is 3 minutes
+    option.DetailedErrors = true;
+});
+builder.Services.AddRazorComponents(options => options.DetailedErrors = true)
     .AddInteractiveServerComponents().AddHubOptions(options =>
     {
         options.MaximumReceiveMessageSize = int.MaxValue;
@@ -225,8 +225,7 @@ app.UseAntiforgery();
 app.MapDefaultControllerRoute();
 app.MapRazorComponents<App>()
      .AddAdditionalAssemblies(typeof(CnGalWebSite.Shared.App).Assembly)
- .AddInteractiveServerRenderMode()
- .AddInteractiveWebAssemblyRenderMode();
+ .AddInteractiveServerRenderMode();
 
 
 app.Run();

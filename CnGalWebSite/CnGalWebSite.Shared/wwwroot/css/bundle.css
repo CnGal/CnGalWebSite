@@ -3745,6 +3745,13 @@ div.prizeTips {
     font-size: small;
     padding-bottom: .5rem;
 }
+/*chip换行*/
+.m-chip.m-chip--outlined.m-chip.m-chip {
+    height: auto;
+}
+.m-chip .m-chip__content {
+    white-space: break-spaces;
+}
 
 .markdown-body {
     display: flex;

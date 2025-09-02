@@ -15,6 +15,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CnGalWebSite.Kanban.ChatGPT.Models.DeepSeek;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 {
@@ -59,6 +60,28 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             }
         }
 
+        private async Task<double> CheckBalance()
+        {
+            // 使用 _httpService 调用 API
+            var response = await _httpService.GetAsync<DeepSeekBalanceResponse>("https://api.deepseek.com/user/balance");
+
+            if (response == null)
+            {
+                _logger.LogError("获取 DeepSeek 余额失败：API 返回空");
+                return 0.0;
+            }
+
+            var cnyBalance = response.Balance_infos?.FirstOrDefault(b => b.Currency == "CNY");
+            if (cnyBalance != null && double.TryParse(cnyBalance.Total_balance, out var totalBalance))
+            {
+                _logger.LogInformation("获取 DeepSeek 余额：{}", totalBalance);
+                return totalBalance;
+            }
+
+            _logger.LogError("获取 DeepSeek 余额失败：找不到人民币账单");
+
+            return 0.0;
+        }
 
         public string? TryGetCache(List<ChatCompletionMessage> messages)
         {
@@ -186,6 +209,16 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
             string? reply = null;
 
+            // 检查余额
+            var balance = await CheckBalance();
+            if (balance <= 1)
+            {
+                return new ChatGPTSendMessageResult
+                {
+                    Success = true,
+                    Message = "看板娘已进入冬眠模式"
+                };
+            }
 
             // 检查敏感词 如果属于递归调用，不对内部输入检查敏感词
             var words = new List<string>();
