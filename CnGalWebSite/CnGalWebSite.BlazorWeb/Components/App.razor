@@ -42,16 +42,16 @@
     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/bundle.min.css">
 
     <!--不同屏幕大小自适应样式-->
-   @*  <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
+    @*  <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/break-point.css"> *@
     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
-    <HeadOutlet @rendermode="@RenderMode.InteractiveAuto" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveAuto" />
+    <HeadOutlet @rendermode="@RenderMode.InteractiveServer" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveServer" />
 </head>
 
 <body>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @rendermode="@RenderMode.InteractiveAuto" Mobile="mobile" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @rendermode="@RenderMode.InteractiveServer" Mobile="mobile" />
 
-    <CnGalWebSite.Shared.App @rendermode="@RenderMode.InteractiveAuto" connectionInfo="connectionInfo" Mobile="mobile" />
+    <CnGalWebSite.Shared.App @rendermode="@RenderMode.InteractiveServer" connectionInfo="connectionInfo" Mobile="mobile" />
 
     <div id="blazor-error-ui" data-nosnippet>
         <div class="background-card">
