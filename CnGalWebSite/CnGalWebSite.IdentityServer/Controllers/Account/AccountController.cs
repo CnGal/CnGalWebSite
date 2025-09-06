@@ -129,7 +129,7 @@ namespace IdentityServerHost.Quickstart.UI
             {
                 if (context != null)
                 {
-                    // if the user cancels, send a result back into IdentityServer as if they 
+                    // if the user cancels, send a result back into IdentityServer as if they
                     // denied the consent (even if this client does not require consent).
                     // this will send back an access denied OIDC error response to the client.
                     await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
@@ -335,6 +335,12 @@ namespace IdentityServerHost.Quickstart.UI
             if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
+                return View(BuildRegisterViewModel(model));
+            }
+
+            //检查邮箱域名是否在黑名单中
+            if (!CheckEmailDomainBlacklistAsync(model.Email))
+            {
                 return View(BuildRegisterViewModel(model));
             }
 
@@ -1303,9 +1309,29 @@ namespace IdentityServerHost.Quickstart.UI
             return true;
         }
 
+        private bool CheckEmailDomainBlacklistAsync(string email)
+        {
+            var blacklistString = _configuration["EmailDomainBlacklist"];
+            if (string.IsNullOrWhiteSpace(blacklistString))
+            {
+                return true; // 没有配置黑名单，跳过检查
+            }
+
+            var blacklistedDomains = blacklistString.Split(',').Select(s => s.Trim()).ToList();
+            var emailDomain = email.Split('@').LastOrDefault();
+
+            if (emailDomain != null && blacklistedDomains.Contains(emailDomain, StringComparer.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError(string.Empty, "此邮箱域名已被禁止注册");
+                return false;
+            }
+
+            return true;
+        }
+
         private string GetCountryPhoneNumber(string phone, string country)
         {
-            return $"+{country}{phone}".Replace(" ","");
+            return $"+{country}{phone}".Replace(" ", "");
         }
         /// <summary>
         /// 检查用户实名验证

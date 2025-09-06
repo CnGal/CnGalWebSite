@@ -56,6 +56,8 @@ services:
       - IpWhitelist=${IpWhitelist}
       # 签名
       - SignName=${SignName}
+      # 邮箱域名黑名单
+      - EmailDomainBlacklist=${EmailDomainBlacklist}
     hostname: identityserver
     restart: always
     healthcheck:
