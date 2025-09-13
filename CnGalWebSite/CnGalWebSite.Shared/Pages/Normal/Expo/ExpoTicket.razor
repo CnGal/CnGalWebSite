@@ -1,0 +1,238 @@
+﻿@page "/ticket"
+@page "/ticket/{encryptedId}"
+
+@inject IHttpService _httpService
+@inject IPopupService _popupService
+@inject IPageModelCatche<ExpoTicketViewModel> _pageModelCatche
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="电子票根" Description="查看您的活动电子票根" />
+
+@if (_ticketInfo == null)
+{
+    <MDCard Class="pa-4 mb-4">
+        <div class="text-center">
+            <MIcon Size="64" Color="warning">mdi-ticket-outline</MIcon>
+            <h3 class="mt-2">票根不存在</h3>
+            <p class="text--secondary">请检查链接是否正确</p>
+            <MButton Color="primary" OnClick="GoHome">返回首页</MButton>
+        </div>
+    </MDCard>
+}
+else
+{
+    <div class="ticket-root">
+        <!-- 画布容器，宽高比与背景图一致 -->
+        <div class="artboard elevation-10"
+             @ref="_artboardRef"
+             style="--bg-url: url('@_ticketInfo.Activity.BackgroundImage');">
+
+            <!-- 背景层（使用背景图，不会被裁剪或拉伸） -->
+            <div class="bg-layer"></div>
+
+            <!-- 叠加内容层：在 artboard 内做百分比定位 -->
+            <div class="overlay">
+                <!-- 前景图片：在画布中上半区域 -->
+                <img class="fore-img"
+                     src="@_ticketInfo.Activity.ForegroundImage"
+                     alt="foreground"
+                     style="    top: 32%;left: 50%;transform: translate(-50%, -50%);width: 82%;">
+
+                <!-- 标题区：位于前景图下方 -->
+                <div class="title-card" style="    top: 75%;      left: 50%;     transform: translateX(-50%); width: 80%;">
+                    <div class="title-text">@_ticketInfo.Activity.Name</div>
+                    <div class="desc-text">@_ticketInfo.Activity.Description</div>
+                </div>
+
+                <!-- 底部号码区 -->
+                <div class="number-card" style="    bottom: 3%; left: 50%; transform: translateX(-50%); width: 70%;">
+                    <div class="name-text">@($"@{_ticketInfo.Nickname}")</div>
+                    <div class="number-text">@($"编号：{_ticketInfo.Number:D3}")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* 全屏根容器：增加可调边距变量 */
+    .ticket-root {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 5;
+        background: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+        display: grid;
+        place-items: center; /* 居中 artboard */
+        color: white;
+        overflow: hidden;
+        /* 这里定义画布与四周的留白 */
+        --page-pad: 48px;
+        padding: var(--page-pad);
+    }
+
+    /* 画布容器（保持与背景图同宽高比） */
+    .artboard {
+        position: relative;
+        --bg-ar: 16/9; /* JS 会用图片真实宽高比覆盖 */
+        /* 关键：在考虑四周边距后最大化地放进视口 */
+        width: min( calc(100vw - 2 * var(--page-pad)), calc((100vh - 2 * var(--page-pad)) * var(--bg-ar)) );
+        aspect-ratio: var(--bg-ar);
+        border-radius: 12px; /* 留白下更美观，可按需调整 */
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* 背景层保持等比铺满画布（容器与图等比，因此 100% 100% 不会失真） */
+    .bg-layer {
+        position: absolute;
+        inset: 0;
+        background-image: var(--bg-url);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100% 100%;
+        z-index: 0;
+    }
+
+    /* 叠加层 */
+    .overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+    }
+
+    /* 文本样式（保持与之前一致，可微调） */
+    .title-card {
+        position: absolute;
+    }
+
+    .title-text {
+        font-size: clamp(18px, 3.2vw, 32px);
+        font-weight: 800;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .desc-text {
+        margin-top: 4px;
+        font-size: clamp(12px, 1.8vw, 18px);
+        opacity: 0.9;
+    }
+
+    /* 前景图：百分比宽度与定位 */
+    .fore-img {
+        position: absolute;
+        display: block;
+        height: auto;
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+    }
+
+    /* 底部号码样式 */
+    .number-card {
+        position: absolute;
+        display: grid;
+        gap: 4px;
+        justify-items: center;
+        font-size: clamp(14px, 2vw, 18px);
+        text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    /* 颗粒叠加保持不变（可选） */
+    .ticket-root::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        /* 更新的 SVG 颗粒效果 */
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1.5" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="2" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.8" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="1.2" fill="white" opacity="0.1"/><circle cx="15" cy="80" r="2.2" fill="white" opacity="0.1"/><circle cx="85" cy="20" r="1.8" fill="white" opacity="0.1"/><circle cx="40" cy="60" r="0.9" fill="white" opacity="0.1"/><circle cx="60" cy="40" r="2.5" fill="white" opacity="0.1"/><circle cx="90" cy="50" r="1.0" fill="white" opacity="0.1"/><circle cx="30" cy="0" r="1.6" fill="white" opacity="0.1"/><circle cx="0" cy="30" r="0.7" fill="white" opacity="0.1"/><circle cx="70" cy="95" r="1.3" fill="white" opacity="0.1"/><circle cx="5" cy="5" r="1.9" fill="white" opacity="0.1"/><circle cx="95" cy="95" r="0.6" fill="white" opacity="0.1"/><circle cx="50" cy="85" r="2.1" fill="white" opacity="0.1"/><circle cx="20" cy="10" r="0.8" fill="white" opacity="0.1"/><circle cx="80" cy="65" r="1.4" fill="white" opacity="0.1"/><circle cx="35" cy="35" r="2.3" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+        z-index: 1;
+    }
+
+</style>
+
+@code {
+    [CascadingParameter] public ErrorHandler ErrorHandler { get; set; }
+    [SupplyParameterFromQuery, Parameter] public string? encryptedId { get; set; }
+    [SupplyParameterFromQuery, Parameter] public string? token { get; set; }
+
+    private ExpoTicketViewModel? _ticketInfo;
+    private ElementReference _artboardRef;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTicketInfo();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadTicketInfo();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_ticketInfo != null)
+        {
+            // 根据背景图的实际宽高比设置 --bg-ar
+            await EnsureBackgroundAspectRatio();
+        }
+    }
+
+    private async Task LoadTicketInfo()
+    {
+        try
+        {
+            var url = $"api/expo/GetTicketByEncryptedId?encryptedId={Uri.EscapeDataString(encryptedId)}";
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                url += $"&token={Uri.EscapeDataString(token)}";
+            }
+
+            _ticketInfo = await _pageModelCatche.GetCache(url);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取票根信息失败");
+        }
+    }
+
+    private void GoHome() => NavigationManager.NavigateTo("/");
+
+    private async Task ShareTicket()
+    {
+        try
+        {
+            var shareUrl = NavigationManager.Uri;
+            await _popupService.EnqueueSnackbarAsync("分享链接已复制到剪贴板", AlertTypes.Success);
+            // 可添加复制到剪贴板的 JS
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "分享失败");
+        }
+    }
+
+    private void PrintTicket()
+    {
+        _popupService.EnqueueSnackbarAsync("请使用浏览器的打印功能", AlertTypes.Info);
+    }
+
+    private async Task EnsureBackgroundAspectRatio()
+    {
+        if (_ticketInfo?.Activity?.BackgroundImage is null) return;
+
+        try
+        {
+            var ar = await JS.InvokeAsync<double>("TicketPage.getImageAspect", _ticketInfo.Activity.BackgroundImage);
+            if (ar > 0)
+            {
+                await JS.InvokeVoidAsync("TicketPage.setArtboardAspect", _artboardRef, ar);
+            }
+        }
+        catch
+        {
+            // 失败时保留默认 16/9，不影响显示，仅可能有轻微留白
+        }
+    }
+}

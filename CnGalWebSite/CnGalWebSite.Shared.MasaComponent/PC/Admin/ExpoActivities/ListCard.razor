@@ -1,0 +1,149 @@
+@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="ExpoActivityOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(ExpoActivityOverviewModel.Priority)" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 130px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,true)">@IconType.Up.ToIconString()</MIcon>
+                    <MIcon Color="info"
+                           Class="mr-2"
+                           OnClick="()=>EditItemPriority(context.Item,false)">@IconType.Down.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(ExpoActivityOverviewModel.ForegroundImage))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.ForegroundImage" />
+            }
+            else if (context.Header.Value == nameof(ExpoActivityOverviewModel.BackgroundImage))
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.BackgroundImage" />
+            }
+            else if (context.Header.Value == nameof(ExpoActivityOverviewModel.Hidden))
+            {
+                <MChip Color="@(context.Item.Hidden ? "error" : "success")" Text>
+                    @(context.Item.Hidden ? "隐藏" : "显示")
+                </MChip>
+            }
+            else if (context.Header.Value == nameof(ExpoActivityOverviewModel.TicketCount))
+            {
+                <MChip Color="primary" Text>
+                    @context.Item.TicketCount 张票
+                </MChip>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="1200">
+    <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+@code {
+    private string _baseUrl = "api/expo/ListActivity";
+    private string _name = "活动";
+
+    private List<DataTableHeader<ExpoActivityOverviewModel>> _headers = new List<DataTableHeader<ExpoActivityOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoActivityOverviewModel.Id)
+          },
+          new (){ Text= "活动名称", Value= nameof(ExpoActivityOverviewModel.Name)},
+          new (){ Text= "前景图片", Value= nameof(ExpoActivityOverviewModel.ForegroundImage)},
+          new (){ Text= "背景图片", Value= nameof(ExpoActivityOverviewModel.BackgroundImage)},
+          new (){ Text= "描述", Value= nameof(ExpoActivityOverviewModel.Description)},
+          new (){ Text= "优先级", Value= nameof(ExpoActivityOverviewModel.Priority)},
+          new (){ Text= "状态", Value= nameof(ExpoActivityOverviewModel.Hidden)},
+          new (){ Text= "票根数量", Value= nameof(ExpoActivityOverviewModel.TicketCount)},
+          new (){ Text= "创建时间", Value= nameof(ExpoActivityOverviewModel.CreateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<ExpoActivityOverviewModel> dataTableCard;
+
+    EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+    private bool _detailDialog;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void EditItem(ExpoActivityOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public async Task EditItemPriority(ExpoActivityOverviewModel model, bool up)
+    {
+        string operationName = up ? "增权重" : "降权重";
+        try
+        {
+            // 直接更新优先级
+            var editModel = new ExpoActivityEditModel
+            {
+                Id = model.Id,
+                Priority = model.Priority + (up ? 1 : -1)
+            };
+
+            var obj = await _httpService.PostAsync<ExpoActivityEditModel, Result>("api/expo/EditActivity", editModel);
+
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastAsync(operationName + "失败",  AlertTypes.Error);
+            }
+            else
+            {
+                await PopupService.ToastAsync(operationName + "成功", AlertTypes.Success);
+                dataTableCard.GetDataFromApi();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, operationName + "失败");
+        }
+    }
+}

@@ -1,0 +1,180 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+@if (Model == null)
+{
+    <MDCard>
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    </MDCard>
+}
+else
+{
+    <MDCard>
+        <MCardTitle>
+            @(Id == 0 ? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        @if (Model.Id > 0)
+        {
+            <MCardText>
+                加密ID：@EncryptedId
+            </MCardText>
+            <MCardText>
+                访问链接：  <a href="@ShareUrl" target="_blank">
+                    @ShareUrl
+                </a>
+            </MCardText>
+
+        }
+        <MCardText>
+            <MRow>
+                <MCol Cols="12">
+                    <MSelect @bind-Value="Model.ActivityId"
+                             Items="Activities"
+                             ItemText="x => x.Name"
+                             ItemValue="x => x.Id"
+                             Label="选择活动"
+                             Required />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.SeatInfo" Label="座位信息" Required />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Nickname" Label="昵称" Required />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Number" Label="编号" Type="number" Required />
+                </MCol>
+            </MRow>
+
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MDCard>
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    ExpoTicketEditModel Model;
+    List<ExpoActivityOverviewModel> Activities = new List<ExpoActivityOverviewModel>();
+
+    private string _baseUrl = "api/expo/EditTicket";
+    private string _name = "票根";
+    private string EncryptedId = "";
+    private string ShareUrl = "";
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadActivities();
+        await Refresh();
+    }
+
+    private async Task LoadActivities()
+    {
+        try
+        {
+            Activities = await _httpService.GetAsync<List<ExpoActivityOverviewModel>>("api/expo/GetAllActivities");
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取活动列表失败");
+        }
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new ExpoTicketEditModel() : await _httpService.GetAsync<ExpoTicketEditModel>($"{_baseUrl}?id={Id}");
+
+            // 生成加密ID
+            if (Model.Id > 0)
+            {
+                await GenerateEncryptedId(Model.Id);
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    private async Task GenerateEncryptedId(long ticketId)
+    {
+        try
+        {
+            var shareLink = await _httpService.GetAsync<ExpoTicketShareLinkModel>($"api/expo/GenerateTicketShareLink?ticketId={ticketId}");
+            EncryptedId = shareLink?.EncryptedId ?? "";
+            ShareUrl = shareLink?.ShareUrl ?? "";
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "生成加密ID失败");
+        }
+    }
+
+    private async Task CopyEncryptedId()
+    {
+        try
+        {
+            await PopupService.ToastAsync("加密ID已复制到剪贴板", AlertTypes.Success);
+            // 这里需要实现复制到剪贴板的功能
+            // 在实际项目中可以使用JavaScript interop
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "复制失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<ExpoTicketEditModel, Result>($"{_baseUrl}", Model);
+            if (result.Successful)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    await PopupService.ToastAsync(result.Error, AlertTypes.Success);
+                }
+                await OnEdited.InvokeAsync(Model);
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+    }
+}

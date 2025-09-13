@@ -117,6 +117,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<QuestionDisplayCondition> QuestionDisplayConditions { get; set; }
         public DbSet<QuestionnaireResponse> QuestionnaireResponses { get; set; }
         public DbSet<QuestionResponse> QuestionResponses { get; set; }
+        public DbSet<ExpoActivity> ExpoActivities { get; set; }
+        public DbSet<ExpoTicket> ExpoTickets { get; set; }
 
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -168,6 +170,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<EntryInformationType>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Commodity>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Questionnaire>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<ExpoActivity>().HasIndex(g => g.Name).IsUnique();
 
             //限定外键唯一
             modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();
@@ -451,6 +454,13 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<QuestionResponse>()
                 .HasIndex(r => new { r.QuestionnaireResponseId, r.QuestionId })
                 .IsUnique();
+
+            //配置活动与票根的关系
+            modelBuilder.Entity<ExpoTicket>()
+                .HasOne(t => t.Activity)
+                .WithMany(a => a.Tickets)
+                .HasForeignKey(t => t.ActivityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

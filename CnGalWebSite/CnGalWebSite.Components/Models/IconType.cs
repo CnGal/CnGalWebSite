@@ -217,6 +217,7 @@ namespace CnGalWebSite.Components.Models
         Send,
         Circuit,
         Bilibili,
+        Expo
     }
 
     public static class IconTypeHelper
@@ -225,6 +226,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Expo:
+                    return "mdi-shopping";
                 case IconType.Bilibili:
                     return "mdi-television-classic";
                 case IconType.Circuit:

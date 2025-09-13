@@ -1,0 +1,209 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+
+
+@if (Model == null)
+{
+    <MDCard>
+        <MCardText Class="pt-8 pb-8">
+            <CnGalWebSite.Components.Progressings.ProgressingCard />
+        </MCardText>
+    </MDCard>
+}
+else
+{
+    <MDCard>
+        <MCardTitle>
+            @(Id == 0 ? $"添加{_name}" : $"编辑{_name}")
+        </MCardTitle>
+        <MCardText>
+            Id：@Model.Id
+        </MCardText>
+        <MCardText>
+            <MRow>
+
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.ForegroundImage" Type="ImageAspectType.None" Text="上传前景图片" Class="mb-4" Gallery />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.BackgroundImage" Type="ImageAspectType.None" Text="上传背景图片" Class="mb-4" Gallery />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Name" Label="活动名称" Required />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MTextField @bind-Value="Model.Priority" Label="优先级" Type="number" />
+                </MCol>
+                <MCol Cols="12">
+                    <MTextarea @bind-Value="Model.Description" Label="描述" Rows="3" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <MSwitch @bind-Value="Model.Hidden" Label="隐藏" />
+                </MCol>
+            </MRow>
+
+            <!-- 票根信息显示 -->
+            <MDivider Class="my-4" />
+            <h3 class="mb-4">票根信息</h3>
+
+            @if (Model.Tickets != null && Model.Tickets.Any())
+            {
+                <MSimpleTable>
+                    <thead>
+                        <tr>
+                            <th class="text-left">座位信息</th>
+                            <th class="text-left">昵称</th>
+                            <th class="text-left">编号</th>
+                            <th class="text-left">状态</th>
+                            <th class="text-left">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model.Tickets)
+                        {
+                            <tr @key="ticket.Id">
+                                <td>@ticket.SeatInfo</td>
+                                <td>@ticket.Nickname</td>
+                                <td>@ticket.Number</td>
+                                <td>
+                                    <MChip Color="@(ticket.Hidden ? "error" : "success")" Text>
+                                        @(ticket.Hidden ? "隐藏" : "显示")
+                                    </MChip>
+                                </td>
+                                <td>
+                                    <CnGalWebSite.Components.Buttons.MasaButton Color="@(ticket.Hidden ? "success" : "error")"
+                                                                                Small
+                                                                                OnClick="() => ToggleTicketVisibility(ticket)"
+                                                                                Icon="@(ticket.Hidden ? "mdi-eye" : "mdi-eye-off")" Text="@(ticket.Hidden ? "显示" : "隐藏")" TextStyle />
+                                    <CnGalWebSite.Components.Buttons.MasaButton Color="info"
+                                                                                Small Class="ml-1"
+                                                                                OnClick="() => ShowEncryptedId(ticket.Id)"
+                                                                                Icon="mdi-key" Text="ID" TextStyle />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MSimpleTable>
+            }
+            else
+            {
+                <p class="text--secondary">暂无票根</p>
+            }
+
+        </MCardText>
+        <MCardActions Class="pb-6 ps-6 pe-6">
+            <MSpacer></MSpacer>
+            <MButton Color="primary"
+                     Text
+                     OnClick="SaveEdit">
+                <MIcon Left>mdi-check</MIcon>
+                保存
+            </MButton>
+        </MCardActions>
+    </MDCard>
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback OnEdited { get; set; }
+
+    ExpoActivityEditModel Model;
+
+    private string _baseUrl = "api/expo/EditActivity";
+    private string _name = "活动";
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = null;
+            StateHasChanged();
+            Model = Id == 0 ? new ExpoActivityEditModel() : await _httpService.GetAsync<ExpoActivityEditModel>($"{_baseUrl}?id={Id}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, $"获取{_name}信息失败");
+        }
+    }
+
+    public async Task SaveEdit()
+    {
+        try
+        {
+            var result = await _httpService.PostAsync<ExpoActivityEditModel, Result>($"{_baseUrl}", Model);
+            if (result.Successful)
+            {
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    await PopupService.ToastAsync(result.Error, AlertTypes.Success);
+                }
+                await OnEdited.InvokeAsync(Model);
+                StateHasChanged();
+            }
+            else
+            {
+                await PopupService.ToastAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, Model.Id == 0 ? $"添加{_name}失败" : $"编辑{_name}信息失败");
+        }
+    }
+
+    private async Task ToggleTicketVisibility(ExpoTicketEditModel ticket)
+    {
+        try
+        {
+            ticket.Hidden = !ticket.Hidden;
+            var result = await _httpService.PostAsync<ExpoTicketEditModel, Result>("api/expo/EditTicket", ticket);
+            if (result.Successful)
+            {
+                await PopupService.ToastAsync($"票根已{(ticket.Hidden ? "隐藏" : "显示")}", AlertTypes.Success);
+                StateHasChanged();
+            }
+            else
+            {
+                ticket.Hidden = !ticket.Hidden; // 回滚状态
+                await PopupService.ToastAsync(result.Error ?? "操作失败", AlertTypes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ticket.Hidden = !ticket.Hidden; // 回滚状态
+            await ErrorHandler.ProcessError(ex, "切换票根状态失败");
+        }
+    }
+
+    private async Task ShowEncryptedId(long ticketId)
+    {
+        try
+        {
+            var shareLink = await _httpService.GetAsync<ExpoTicketShareLinkModel>($"api/expo/GenerateTicketShareLink?ticketId={ticketId}");
+            if (shareLink != null)
+            {
+                await PopupService.ConfirmAsync($"加密ID", $"{shareLink.EncryptedId}", AlertTypes.Info);
+                // 这里可以显示一个对话框来展示完整的分享信息
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取加密ID失败");
+        }
+    }
+
+}

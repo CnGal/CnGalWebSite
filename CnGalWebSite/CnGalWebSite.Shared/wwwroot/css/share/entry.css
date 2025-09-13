@@ -193,5 +193,11 @@
     height: auto;
 }
 .m-chip .m-chip__content {
-    white-space: break-spaces;
+    white-space: normal;
+    text-align: center;
+}
+.m-chip.m-size--default {
+    height: fit-content;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }

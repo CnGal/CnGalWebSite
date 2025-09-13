@@ -3750,7 +3750,13 @@ div.prizeTips {
     height: auto;
 }
 .m-chip .m-chip__content {
-    white-space: break-spaces;
+    white-space: normal;
+    text-align: center;
+}
+.m-chip.m-size--default {
+    height: fit-content;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .markdown-body {
@@ -4528,6 +4534,56 @@ a.user-info-card {
     border-bottom: var(--md-sys-color-on-background) 1px solid;
     border-radius: var(--md-card-border-radius);
 }
+
+.expo-ticket-card {
+    height: calc(100vh);
+    width: 100vw;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    background: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+    .expo-ticket-card .back-img {
+        position: absolute;
+        height: calc(100vh - 200px);
+        z-index: -1;
+        height: 82%;
+    }
+    .expo-ticket-card .fore-img {
+        height: calc(100vh - 650px);
+        width: fit-content;
+        z-index: 0;
+        height: 48%;
+    }
+    .expo-ticket-card .title-card {
+        margin-top: 11%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+        .expo-ticket-card .title-card .title-text {
+            font-size: xx-large;
+            font-weight: bold;
+        }
+        .expo-ticket-card .title-card .desc-text {
+            font-size: large;
+        }
+    .expo-ticket-card .number-card {
+        font-size: large;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 5%;
+        gap: 8px;
+    }
 
 /*全局*/
 

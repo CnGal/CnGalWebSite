@@ -1,0 +1,39 @@
+@page "/admin/manageexpo"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IHttpService _httpService
+
+
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="展会管理"/>
+
+<div>
+    <MDCard Class="mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
+
+            <MTab Value="1">
+                活动管理<MIcon>mdi-calendar-star</MIcon>
+            </MTab>
+            <MTab Value="2">
+                票根管理<MIcon>mdi-ticket</MIcon>
+            </MTab>
+        </MTabs>
+
+    </MDCard>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.ExpoActivities.ListCard/>
+        </MTabItem>
+        <MTabItem Value="2">
+         <CnGalWebSite.Shared.MasaComponent.PC.Admin.ExpoTickets.ListCard/>
+        </MTabItem>
+    </MTabsItems>
+</div>
+
+@code {
+
+    public StringNumber TabIndex { get; set; } = 1;
+}

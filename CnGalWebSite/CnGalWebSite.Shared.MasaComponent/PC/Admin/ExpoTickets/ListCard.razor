@@ -1,0 +1,107 @@
+﻿@inject IHttpService _httpService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
+
+<MDCard>
+    <DataTableCard TModel="ExpoTicketOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(ExpoTicketOverviewModel.Number)" @ref="dataTableCard">
+        <ItemColContent>
+            @if (context.Header.Value == "actions")
+            {
+                <div style="width: 100px;">
+                    <MIcon Color="success"
+                           Class="mr-2"
+                           OnClick="()=>EditItem(context.Item)">@IconType.Edit.ToIconString()</MIcon>
+                </div>
+            }
+            else if (context.Header.Value == nameof(ExpoTicketOverviewModel.ActivityName))
+            {
+                <MChip Color="primary" Text>
+                    @context.Item.ActivityName
+                </MChip>
+            }
+            else if (context.Header.Value == nameof(ExpoTicketOverviewModel.SeatInfo))
+            {
+                <MChip Color="info" Text>
+                    @context.Item.SeatInfo
+                </MChip>
+            }
+            else if (context.Header.Value == nameof(ExpoTicketOverviewModel.Number))
+            {
+                <MChip Color="success" Text>
+                    #@context.Item.Number
+                </MChip>
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </DataTableCard>
+
+</MDCard>
+<MDialog @bind-Value="_editDialog"
+         MaxWidth="800">
+    <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
+</MDialog>
+@code {
+    private string _baseUrl = "api/expo/ListTicket";
+    private string _name = "票根";
+
+    private List<DataTableHeader<ExpoTicketOverviewModel>> _headers = new List<DataTableHeader<ExpoTicketOverviewModel>>
+{
+          new ()
+          {
+            Text= "Id",
+            Align= DataTableHeaderAlign.Start,
+            Value= nameof(ExpoTicketOverviewModel.Id)
+          },
+          new (){ Text= "活动", Value= nameof(ExpoTicketOverviewModel.ActivityName)},
+          new (){ Text= "座位信息", Value= nameof(ExpoTicketOverviewModel.SeatInfo)},
+          new (){ Text= "昵称", Value= nameof(ExpoTicketOverviewModel.Nickname)},
+          new (){ Text= "编号", Value= nameof(ExpoTicketOverviewModel.Number)},
+          new (){ Text= "创建时间", Value= nameof(ExpoTicketOverviewModel.CreateTime)},
+          new (){ Text= "操作", Value= "actions",Sortable=false }
+    };
+
+    DataTableCard<ExpoTicketOverviewModel> dataTableCard;
+
+    EditCard editCard;
+    private bool _editDialog;
+    private long _editedItemId;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void EditItem(ExpoTicketOverviewModel item)
+    {
+        _editedItemId = item.Id;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+
+    public void OnEdited()
+    {
+        _editDialog = false;
+        StateHasChanged();
+        if (dataTableCard != null)
+        {
+            dataTableCard.GetDataFromApi();
+        }
+    }
+
+    public async Task AddItem()
+    {
+        _editedItemId = 0;
+        _editDialog = true;
+        StateHasChanged();
+        if (editCard != null)
+        {
+            await editCard.Refresh();
+        }
+    }
+}
