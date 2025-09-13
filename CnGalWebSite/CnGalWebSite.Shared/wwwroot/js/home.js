@@ -79,7 +79,7 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
         if (copyToClipboard) {
             // 复制到剪贴板
             // 由于不能直接复制图片到剪贴板，我们需要先创建一个blob
-            canvas.toBlob(function(blob) {
+            canvas.toBlob(function (blob) {
                 try {
                     // 尝试使用新的Clipboard API (适用于较新的浏览器)
                     const clipboardItem = new ClipboardItem({ 'image/png': blob });
@@ -88,7 +88,7 @@ function saveDivAsImage(id, fileName, copyToClipboard) {
                         console.error('剪贴板复制失败:', err);
                         fallbackCopyToClipboard(imgURL, fileName);
                     });
-                } catch(e) {
+                } catch (e) {
                     // 回退方案
                     fallbackCopyToClipboard(imgURL, fileName);
                 }
@@ -151,7 +151,7 @@ function fallbackCopyToClipboard(imgURL, fileName) {
             document.body.removeChild(anchorElement);
             alert('无法复制到剪贴板，已改为下载图片');
         }
-    } catch(e) {
+    } catch (e) {
         console.error('回退复制失败:', e);
         // 如果出错，尝试下载
         const anchorElement = document.createElement('a');

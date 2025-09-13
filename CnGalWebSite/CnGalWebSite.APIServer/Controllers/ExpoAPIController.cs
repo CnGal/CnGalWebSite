@@ -4,6 +4,7 @@ using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.Core.Helpers;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
 using CnGalWebSite.DataModel.ViewModel.Expo;
@@ -31,11 +32,13 @@ namespace CnGalWebSite.APIServer.Controllers
         public readonly IRepository<ApplicationUser, string> _userRepository;
         public readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         public readonly IRepository<Examine, long> _examineRepository;
+        public readonly IRepository<ExpoActivity, long> _expoActivityRepository;
+        public readonly IRepository<ExpoTicket, long> _expoTicketRepository;
         public readonly IAppHelper _appHelper;
         private readonly IQueryService _queryService;
         private readonly IUserService _userService;
 
-        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<Examine, long> examineRepository, IUserService userService)
+        public ExpoAPIController(IQueryService queryService, IAppHelper appHelper, IRepository<ExpoGame, long> expoGameRepository, IRepository<ExpoTag, long> expoTagRepository, IRepository<Entry, int> entryRepository, IRepository<ExpoTask, long> expoTaskRepository, IRepository<ExpoAward, long> expoAwardRepository, IRepository<ExpoPrize, long> expoPrizeRepository, IRepository<QuestionnaireResponse, long> questionnaireResponseRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<ApplicationUser, string> userRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<Examine, long> examineRepository, IRepository<ExpoActivity, long> expoActivityRepository, IRepository<ExpoTicket, long> expoTicketRepository, IUserService userService)
         {
             _appHelper = appHelper;
             _queryService = queryService;
@@ -50,6 +53,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _userRepository = userRepository;
             _lotteryUserRepository = lotteryUserRepository;
             _examineRepository = examineRepository;
+            _expoActivityRepository = expoActivityRepository;
+            _expoTicketRepository = expoTicketRepository;
             _userService = userService;
         }
 
@@ -1310,7 +1315,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
 
-                /// <summary>
+        /// <summary>
         /// 检查用户是否有游戏评分记录
         /// </summary>
         /// <param name="userId">用户ID</param>
@@ -1459,6 +1464,499 @@ namespace CnGalWebSite.APIServer.Controllers
                 // 如果查询失败，返回false，确保安全
                 return false;
             }
+        }
+
+        #endregion
+
+        #region 活动
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<ExpoActivityViewModel>> GetActivityAsync([FromQuery] long id)
+        {
+            var item = await _expoActivityRepository.GetAll().AsNoTracking()
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (item == null)
+            {
+                return NotFound("无法找到该活动");
+            }
+
+            var model = new ExpoActivityViewModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                ForegroundImage = item.ForegroundImage,
+                BackgroundImage = item.BackgroundImage,
+                Description = item.Description,
+                Priority = item.Priority,
+                Hidden = item.Hidden,
+                CreateTime = item.CreateTime,
+                TicketCount = item.Tickets.Count,
+                Tickets = item.Tickets.Select(s => new ExpoTicketOverviewModel
+                {
+                    Id = s.Id,
+                    ActivityId = s.ActivityId,
+                    ActivityName = item.Name,
+                    SeatInfo = s.SeatInfo,
+                    Nickname = s.Nickname,
+                    Number = s.Number,
+                    CreateTime = s.CreateTime
+                }).ToList()
+            };
+
+            return model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IAsyncEnumerable<ExpoActivityOverviewModel> GetAllActivitiesAsync()
+        {
+            return _expoActivityRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Tickets)
+                 .Where(s => !s.Hidden)
+                 .Select(s => new ExpoActivityOverviewModel
+                 {
+                     Id = s.Id,
+                     Name = s.Name,
+                     ForegroundImage = s.ForegroundImage,
+                     BackgroundImage = s.BackgroundImage,
+                     Description = s.Description,
+                     Priority = s.Priority,
+                     Hidden = s.Hidden,
+                     CreateTime = s.CreateTime,
+                     TicketCount = s.Tickets.Count
+                 })
+                 .OrderBy(s => s.Priority)
+                 .AsAsyncEnumerable();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ExpoActivityEditModel>> EditActivityAsync([FromQuery] long id)
+        {
+            if (id == 0)
+            {
+                return new ExpoActivityEditModel
+                {
+                    CreateTime = DateTime.Now.ToCstTime()
+                };
+            }
+
+            var item = await _expoActivityRepository.GetAll()
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (item == null)
+            {
+                return NotFound("无法找到该活动");
+            }
+
+            var model = new ExpoActivityEditModel
+            {
+                Id = id,
+                Name = item.Name,
+                ForegroundImage = item.ForegroundImage,
+                BackgroundImage = item.BackgroundImage,
+                Description = item.Description,
+                Priority = item.Priority,
+                Hidden = item.Hidden,
+                CreateTime = item.CreateTime,
+                Tickets = item.Tickets.Select(s => new ExpoTicketEditModel
+                {
+                    Id = s.Id,
+                    ActivityId = s.ActivityId,
+                    ActivityName = item.Name,
+                    SeatInfo = s.SeatInfo,
+                    Nickname = s.Nickname,
+                    Number = s.Number,
+                    CreateTime = s.CreateTime
+                }).ToList()
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<Result> EditActivityAsync(ExpoActivityEditModel model)
+        {
+            var vail = model.Validate();
+            if (!vail.Successful)
+            {
+                return vail;
+            }
+
+            // 检查活动名称是否重复
+            if (await _expoActivityRepository.AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
+            {
+                return new Result { Successful = false, Error = "活动名称重复" };
+            }
+
+            ExpoActivity item = null;
+            if (model.Id == 0)
+            {
+                item = await _expoActivityRepository.InsertAsync(new ExpoActivity
+                {
+                    Priority = model.Priority,
+                    CreateTime = DateTime.Now.ToCstTime()
+                });
+                model.Id = item.Id;
+                _expoActivityRepository.Clear();
+            }
+
+            item = await _expoActivityRepository.GetAll()
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.Id == model.Id);
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "活动不存在" };
+            }
+
+            item.Name = model.Name;
+            item.ForegroundImage = model.ForegroundImage;
+            item.BackgroundImage = model.BackgroundImage;
+            item.Description = model.Description;
+            item.Priority = model.Priority;
+            item.Hidden = model.Hidden;
+
+            // 处理票根
+            var existingTicketIds = model.Tickets.Where(s => s.Id > 0).Select(s => s.Id).ToList();
+            var deleteTickets = item.Tickets.Where(s => !existingTicketIds.Contains(s.Id)).ToList();
+            foreach (var deleteTicket in deleteTickets)
+            {
+                item.Tickets.Remove(deleteTicket);
+                await _expoTicketRepository.DeleteAsync(deleteTicket);
+            }
+
+            // 更新已有票根
+            foreach (var ticket in model.Tickets.Where(s => s.Id > 0))
+            {
+                var existingTicket = item.Tickets.FirstOrDefault(s => s.Id == ticket.Id);
+                if (existingTicket != null)
+                {
+                    existingTicket.SeatInfo = ticket.SeatInfo;
+                    existingTicket.Nickname = ticket.Nickname;
+                    existingTicket.Number = ticket.Number;
+                }
+            }
+
+            // 添加新票根
+            var newTickets = model.Tickets.Where(s => s.Id == 0).Select(s => new ExpoTicket
+            {
+                ActivityId = item.Id,
+                SeatInfo = s.SeatInfo,
+                Nickname = s.Nickname,
+                Number = s.Number,
+                CreateTime = DateTime.Now.ToCstTime()
+            }).ToList();
+
+            item.Tickets.AddRange(newTickets);
+
+            await _expoActivityRepository.UpdateAsync(item);
+
+            return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<ExpoActivityOverviewModel>> ListActivity(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<ExpoActivity, long>(_expoActivityRepository.GetAll().AsSingleQuery().Include(s => s.Tickets), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name != null && s.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<ExpoActivityOverviewModel>
+            {
+                Items = await items.Select(s => new ExpoActivityOverviewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    ForegroundImage = s.ForegroundImage,
+                    BackgroundImage = s.BackgroundImage,
+                    Description = s.Description,
+                    Priority = s.Priority,
+                    Hidden = s.Hidden,
+                    CreateTime = s.CreateTime,
+                    TicketCount = s.Tickets.Count
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
+        }
+
+        #endregion
+
+        #region 票根
+
+        [HttpGet]
+        public async Task<ActionResult<ExpoTicketViewModel>> GetTicketAsync([FromQuery] long id)
+        {
+            var item = await _expoTicketRepository.GetAll().AsNoTracking()
+                .Include(s => s.Activity)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (item == null)
+            {
+                return NotFound("无法找到该票根");
+            }
+
+            var model = new ExpoTicketViewModel
+            {
+                Id = item.Id,
+                ActivityId = item.ActivityId,
+                ActivityName = item.Activity.Name,
+                SeatInfo = item.SeatInfo,
+                Nickname = item.Nickname,
+                Number = item.Number,
+                CreateTime = item.CreateTime,
+                Hidden = item.Hidden,
+                Activity = new ExpoActivityOverviewModel
+                {
+                    Id = item.Activity.Id,
+                    Name = item.Activity.Name,
+                    ForegroundImage = item.Activity.ForegroundImage,
+                    BackgroundImage = item.Activity.BackgroundImage,
+                    Description = item.Activity.Description,
+                    Priority = item.Activity.Priority,
+                    Hidden = item.Activity.Hidden,
+                    CreateTime = item.Activity.CreateTime
+                }
+            };
+
+            return model;
+        }
+
+        /// <summary>
+        /// 通过加密ID获取票根（公开访问，但需要验证）
+        /// </summary>
+        /// <param name="encryptedId">加密的票根ID</param>
+        /// <param name="token">访问令牌（可选）</param>
+        /// <returns>票根信息</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<ExpoTicketViewModel>> GetTicketByEncryptedIdAsync([FromQuery] string encryptedId, [FromQuery] string token = null)
+        {
+            // 解密票根ID
+            var ticketId = TicketIdEncryption.DecryptTicketId(encryptedId);
+            if (ticketId <= 0)
+            {
+                return BadRequest("无效的票根ID");
+            }
+
+            var item = await _expoTicketRepository.GetAll().AsNoTracking()
+                .Include(s => s.Activity)
+                .FirstOrDefaultAsync(s => s.Id == ticketId);
+
+            if (item == null)
+            {
+                return NotFound("无法找到该票根");
+            }
+
+            // 如果票根被隐藏，需要验证访问令牌
+            if (item.Hidden)
+            {
+                if (string.IsNullOrWhiteSpace(token) || !TicketIdEncryption.ValidateTicketToken(token, ticketId, item.ActivityId))
+                {
+                    return NotFound("票根不存在或已隐藏");
+                }
+            }
+
+            var model = new ExpoTicketViewModel
+            {
+                Id = item.Id,
+                ActivityId = item.ActivityId,
+                ActivityName = item.Activity.Name,
+                SeatInfo = item.SeatInfo,
+                Nickname = item.Nickname,
+                Number = item.Number,
+                CreateTime = item.CreateTime,
+                Hidden = item.Hidden,
+                Activity = new ExpoActivityOverviewModel
+                {
+                    Id = item.Activity.Id,
+                    Name = item.Activity.Name,
+                    ForegroundImage = _appHelper.GetImagePath(item.Activity.ForegroundImage, ""),
+                    BackgroundImage = _appHelper.GetImagePath(item.Activity.BackgroundImage, ""),
+                    Description = item.Activity.Description,
+                    Priority = item.Activity.Priority,
+                    Hidden = item.Activity.Hidden,
+                    CreateTime = item.Activity.CreateTime
+                }
+            };
+
+            return model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IAsyncEnumerable<ExpoTicketOverviewModel> GetTicketsByActivityAsync([FromQuery] long activityId)
+        {
+            return _expoTicketRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Activity)
+                 .Where(s => s.ActivityId == activityId && !s.Hidden) // 只返回未隐藏的票根
+                 .Select(s => new ExpoTicketOverviewModel
+                 {
+                     Id = s.Id,
+                     ActivityId = s.ActivityId,
+                     ActivityName = s.Activity.Name,
+                     SeatInfo = s.SeatInfo,
+                     Nickname = s.Nickname,
+                     Number = s.Number,
+                     CreateTime = s.CreateTime,
+                     Hidden = s.Hidden
+                 })
+                 .OrderBy(s => s.Number)
+                 .AsAsyncEnumerable();
+        }
+
+        /// <summary>
+        /// 生成票根分享链接
+        /// </summary>
+        /// <param name="ticketId">票根ID</param>
+        /// <returns>分享链接信息</returns>
+        [HttpGet]
+        public async Task<ActionResult<ExpoTicketShareLinkModel>> GenerateTicketShareLinkAsync([FromQuery] long ticketId)
+        {
+            var ticket = await _expoTicketRepository.GetAll().AsNoTracking()
+                .Include(s => s.Activity)
+                .FirstOrDefaultAsync(s => s.Id == ticketId);
+
+            if (ticket == null)
+            {
+                return NotFound("票根不存在");
+            }
+
+            var encryptedId = TicketIdEncryption.EncryptTicketId(ticketId);
+            var token = TicketIdEncryption.GenerateTicketToken(ticketId, ticket.ActivityId);
+
+            var shareLink = new ExpoTicketShareLinkModel
+            {
+                EncryptedId = encryptedId,
+                Token = token,
+                ShareUrl = $"/ticket/{Uri.EscapeDataString(encryptedId)}?token={Uri.EscapeDataString(token)}",
+                TicketInfo = new ExpoTicketShareInfo
+                {
+                    Id = ticketId,
+                    ActivityName = ticket.Activity.Name,
+                    SeatInfo = ticket.SeatInfo,
+                    Nickname = ticket.Nickname,
+                    Number = ticket.Number
+                }
+            };
+
+            return shareLink;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ExpoTicketEditModel>> EditTicketAsync([FromQuery] long id)
+        {
+            if (id == 0)
+            {
+                return new ExpoTicketEditModel
+                {
+                    CreateTime = DateTime.Now.ToCstTime()
+                };
+            }
+
+            var item = await _expoTicketRepository.GetAll()
+                .Include(s => s.Activity)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (item == null)
+            {
+                return NotFound("无法找到该票根");
+            }
+
+            var model = new ExpoTicketEditModel
+            {
+                Id = id,
+                ActivityId = item.ActivityId,
+                ActivityName = item.Activity.Name,
+                SeatInfo = item.SeatInfo,
+                Nickname = item.Nickname,
+                Number = item.Number,
+                CreateTime = item.CreateTime,
+                Hidden = item.Hidden
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<Result> EditTicketAsync(ExpoTicketEditModel model)
+        {
+            var vail = model.Validate();
+            if (!vail.Successful)
+            {
+                return vail;
+            }
+
+            // 检查活动是否存在
+            var activity = await _expoActivityRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ActivityId);
+            if (activity == null)
+            {
+                return new Result { Successful = false, Error = "活动不存在" };
+            }
+
+            // 检查编号是否重复（同一活动内）
+            if (await _expoTicketRepository.AnyAsync(s => s.ActivityId == model.ActivityId && s.Number == model.Number && s.Id != model.Id))
+            {
+                return new Result { Successful = false, Error = "该活动下编号重复" };
+            }
+
+            ExpoTicket item = null;
+            if (model.Id == 0)
+            {
+                item = await _expoTicketRepository.InsertAsync(new ExpoTicket
+                {
+                    ActivityId = model.ActivityId,
+                    CreateTime = DateTime.Now.ToCstTime()
+                });
+                model.Id = item.Id;
+                _expoTicketRepository.Clear();
+            }
+
+            item = await _expoTicketRepository.GetAll()
+                .FirstOrDefaultAsync(s => s.Id == model.Id);
+
+            if (item == null)
+            {
+                return new Result { Successful = false, Error = "票根不存在" };
+            }
+
+            item.SeatInfo = model.SeatInfo;
+            item.Nickname = model.Nickname;
+            item.Number = model.Number;
+            item.Hidden = model.Hidden;
+
+            await _expoTicketRepository.UpdateAsync(item);
+
+            return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        public async Task<QueryResultModel<ExpoTicketOverviewModel>> ListTicket(QueryParameterModel model)
+        {
+            var (items, total) = await _queryService.QueryAsync<ExpoTicket, long>(_expoTicketRepository.GetAll().AsSingleQuery().Include(s => s.Activity), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) ||
+                     (s.SeatInfo != null && s.SeatInfo.Contains(model.SearchText)) ||
+                     (s.Nickname != null && s.Nickname.Contains(model.SearchText)) ||
+                     (s.Activity != null && s.Activity.Name != null && s.Activity.Name.Contains(model.SearchText)));
+
+            return new QueryResultModel<ExpoTicketOverviewModel>
+            {
+                Items = await items.Select(s => new ExpoTicketOverviewModel
+                {
+                    Id = s.Id,
+                    ActivityId = s.ActivityId,
+                    ActivityName = s.Activity.Name,
+                    SeatInfo = s.SeatInfo,
+                    Nickname = s.Nickname,
+                    Number = s.Number,
+                    CreateTime = s.CreateTime
+                }).ToListAsync(),
+                Total = total,
+                Parameter = model
+            };
         }
 
         #endregion
