@@ -1502,7 +1502,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     SeatInfo = s.SeatInfo,
                     Nickname = s.Nickname,
                     Number = s.Number,
-                    CreateTime = s.CreateTime
+                    CreateTime = s.CreateTime,
+                    Hidden = s.Hidden,
+                    Image = s.Image
                 }).ToList()
             };
 
@@ -1570,7 +1572,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     SeatInfo = s.SeatInfo,
                     Nickname = s.Nickname,
                     Number = s.Number,
-                    CreateTime = s.CreateTime
+                    CreateTime = s.CreateTime,
+                    Hidden = s.Hidden,
+                    Image = s.Image
                 }).ToList()
             };
 
@@ -1638,6 +1642,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     existingTicket.SeatInfo = ticket.SeatInfo;
                     existingTicket.Nickname = ticket.Nickname;
                     existingTicket.Number = ticket.Number;
+                    existingTicket.Hidden = ticket.Hidden;
+                    existingTicket.Image = ticket.Image;
                 }
             }
 
@@ -1648,6 +1654,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 SeatInfo = s.SeatInfo,
                 Nickname = s.Nickname,
                 Number = s.Number,
+                Hidden = s.Hidden,
+                Image = s.Image,
                 CreateTime = DateTime.Now.ToCstTime()
             }).ToList();
 
@@ -1709,6 +1717,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Number = item.Number,
                 CreateTime = item.CreateTime,
                 Hidden = item.Hidden,
+                Image = item.Image,
                 Activity = new ExpoActivityOverviewModel
                 {
                     Id = item.Activity.Id,
@@ -1770,6 +1779,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Number = item.Number,
                 CreateTime = item.CreateTime,
                 Hidden = item.Hidden,
+                Image = _appHelper.GetImagePath(item.Image, ""),
                 Activity = new ExpoActivityOverviewModel
                 {
                     Id = item.Activity.Id,
@@ -1802,7 +1812,8 @@ namespace CnGalWebSite.APIServer.Controllers
                      Nickname = s.Nickname,
                      Number = s.Number,
                      CreateTime = s.CreateTime,
-                     Hidden = s.Hidden
+                     Hidden = s.Hidden,
+                     Image = s.Image
                  })
                  .OrderBy(s => s.Number)
                  .AsAsyncEnumerable();
@@ -1839,7 +1850,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     ActivityName = ticket.Activity.Name,
                     SeatInfo = ticket.SeatInfo,
                     Nickname = ticket.Nickname,
-                    Number = ticket.Number
+                    Number = ticket.Number,
+                    Image = ticket.Image
                 }
             };
 
@@ -1875,7 +1887,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 Nickname = item.Nickname,
                 Number = item.Number,
                 CreateTime = item.CreateTime,
-                Hidden = item.Hidden
+                Hidden = item.Hidden,
+                Image = item.Image
             };
 
             return model;
@@ -1927,6 +1940,7 @@ namespace CnGalWebSite.APIServer.Controllers
             item.Nickname = model.Nickname;
             item.Number = model.Number;
             item.Hidden = model.Hidden;
+            item.Image = model.Image;
 
             await _expoTicketRepository.UpdateAsync(item);
 
@@ -1952,7 +1966,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     SeatInfo = s.SeatInfo,
                     Nickname = s.Nickname,
                     Number = s.Number,
-                    CreateTime = s.CreateTime
+                    CreateTime = s.CreateTime,
+                    Hidden = s.Hidden,
+                    Image = s.Image
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model

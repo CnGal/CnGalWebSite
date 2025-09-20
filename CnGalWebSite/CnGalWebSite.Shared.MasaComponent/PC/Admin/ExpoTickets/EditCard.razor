@@ -33,6 +33,10 @@ else
         }
         <MCardText>
             <MRow>
+                <MCol Cols="12" Md="6">
+                    <CnGalWebSite.Components.Images.UploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" Text="票根图片" Class="mb-4" Gallery />
+                </MCol>
+
                 <MCol Cols="12">
                     <MSelect @bind-Value="Model.ActivityId"
                              Items="Activities"

@@ -44,5 +44,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 是否隐藏
         /// </summary>
         public bool Hidden { get; set; }
+
+        /// <summary>
+        /// 票根图片
+        /// </summary>
+        public string Image { get; set; }
     }
 }
