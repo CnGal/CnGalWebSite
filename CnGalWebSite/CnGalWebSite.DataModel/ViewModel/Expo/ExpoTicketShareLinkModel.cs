@@ -55,5 +55,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
         /// 编号
         /// </summary>
         public int Number { get; set; }
+
+        /// <summary>
+        /// 票根图片
+        /// </summary>
+        public string Image { get; set; }
     }
 }

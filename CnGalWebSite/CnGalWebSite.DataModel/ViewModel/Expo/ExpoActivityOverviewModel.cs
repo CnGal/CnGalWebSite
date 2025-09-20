@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,21 +39,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
 
         public Result Validate()
         {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                return new Result { Successful = false, Error = "活动名称不能为空" };
-            }
-
-            if (string.IsNullOrWhiteSpace(ForegroundImage))
-            {
-                return new Result { Successful = false, Error = "前景图片不能为空" };
-            }
-
-            if (string.IsNullOrWhiteSpace(BackgroundImage))
-            {
-                return new Result { Successful = false, Error = "背景图片不能为空" };
-            }
-
             return new Result { Successful = true };
         }
     }

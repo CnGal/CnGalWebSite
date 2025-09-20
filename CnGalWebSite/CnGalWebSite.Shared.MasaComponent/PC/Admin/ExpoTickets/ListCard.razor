@@ -21,15 +21,29 @@
             }
             else if (context.Header.Value == nameof(ExpoTicketOverviewModel.SeatInfo))
             {
-                <MChip Color="info" Text>
-                    @context.Item.SeatInfo
-                </MChip>
+                @if (string.IsNullOrWhiteSpace(context.Item.SeatInfo) == false)
+                {
+                    <MChip Color="info" Text>
+                        @context.Item.SeatInfo
+                    </MChip>
+                }
             }
             else if (context.Header.Value == nameof(ExpoTicketOverviewModel.Number))
             {
-                <MChip Color="success" Text>
-                    #@context.Item.Number
-                </MChip>
+                @if (context.Item.Number != 0)
+                {
+                    <MChip Color="success" Text>
+                        #@context.Item.Number
+                    </MChip>
+                }
+
+            }
+            else if (context.Header.Value == nameof(ExpoTicketOverviewModel.Image))
+            {
+                @if (!string.IsNullOrWhiteSpace(context.Item.Image))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Admin.Users.Ranks.ImageChip Image="@context.Item.Image" />
+                }
             }
             else
             {
@@ -55,7 +69,8 @@
             Align= DataTableHeaderAlign.Start,
             Value= nameof(ExpoTicketOverviewModel.Id)
           },
-          new (){ Text= "活动", Value= nameof(ExpoTicketOverviewModel.ActivityName)},
+          new (){ Text= "活动", Value= nameof(ExpoTicketOverviewModel.ActivityName),Sortable=false},
+          new (){ Text= "票根图片", Value= nameof(ExpoTicketOverviewModel.Image)},
           new (){ Text= "座位信息", Value= nameof(ExpoTicketOverviewModel.SeatInfo)},
           new (){ Text= "昵称", Value= nameof(ExpoTicketOverviewModel.Nickname)},
           new (){ Text= "编号", Value= nameof(ExpoTicketOverviewModel.Number)},

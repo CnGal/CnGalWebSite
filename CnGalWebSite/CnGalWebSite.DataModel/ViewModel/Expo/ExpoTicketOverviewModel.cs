@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +24,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
         public DateTime CreateTime { get; set; }
 
         public bool Hidden { get; set; }
+
+        public string Image { get; set; }
     }
 
     public class ExpoTicketViewModel : ExpoTicketOverviewModel
@@ -35,21 +37,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Expo
     {
         public Result Validate()
         {
-            if (string.IsNullOrWhiteSpace(SeatInfo))
-            {
-                return new Result { Successful = false, Error = "座位信息不能为空" };
-            }
-
-            if (string.IsNullOrWhiteSpace(Nickname))
-            {
-                return new Result { Successful = false, Error = "昵称不能为空" };
-            }
-
-            if (Number <= 0)
-            {
-                return new Result { Successful = false, Error = "编号必须大于0" };
-            }
-
             if (ActivityId <= 0)
             {
                 return new Result { Successful = false, Error = "活动ID无效" };

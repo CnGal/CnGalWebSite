@@ -26,13 +26,13 @@ else
         <!-- 画布容器，宽高比与背景图一致 -->
         <div class="artboard elevation-10"
              @ref="_artboardRef"
-             style="--bg-url: url('@_ticketInfo.Activity.BackgroundImage');">
+             style="--bg-url: url('@_ticketInfo.Image');">
 
             <!-- 背景层（使用背景图，不会被裁剪或拉伸） -->
             <div class="bg-layer"></div>
 
             <!-- 叠加内容层：在 artboard 内做百分比定位 -->
-            <div class="overlay">
+           @*  <div class="overlay">
                 <!-- 前景图片：在画布中上半区域 -->
                 <img class="fore-img"
                      src="@_ticketInfo.Activity.ForegroundImage"
@@ -46,11 +46,11 @@ else
                 </div>
 
                 <!-- 底部号码区 -->
-                <div class="number-card" style="    bottom: 3%; left: 50%; transform: translateX(-50%); width: 70%;">
+                <div class="number-card" style="bottom: 11.7%;left: 50%;transform: translateX(-50%);width: 56%;">
                     <div class="name-text">@($"@{_ticketInfo.Nickname}")</div>
                     <div class="number-text">@($"编号：{_ticketInfo.Number:D3}")</div>
                 </div>
-            </div>
+            </div> *@
         </div>
     </div>
 }
@@ -76,7 +76,7 @@ else
     /* 画布容器（保持与背景图同宽高比） */
     .artboard {
         position: relative;
-        --bg-ar: 16/9; /* JS 会用图片真实宽高比覆盖 */
+        --bg-ar: 1085 / 1947; /* JS 会用图片真实宽高比覆盖 */
         /* 关键：在考虑四周边距后最大化地放进视口 */
         width: min( calc(100vw - 2 * var(--page-pad)), calc((100vh - 2 * var(--page-pad)) * var(--bg-ar)) );
         aspect-ratio: var(--bg-ar);
@@ -133,9 +133,9 @@ else
         position: absolute;
         display: grid;
         gap: 4px;
-        justify-items: center;
+        justify-items: end;
         font-size: clamp(14px, 2vw, 18px);
-        text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        color: #FF3ABA;
     }
 
     /* 颗粒叠加保持不变（可选） */
