@@ -37,7 +37,7 @@ services:
       # 是否启用函数调用 启用后不能使用r1模型
       - EnableFunctionCalling=${EnableFunctionCalling:-true}
       # 是否禁用个性化系统提示词 
-      - DisablePersonalizedSystem=$"{DisablePersonalizedSystem}"
+      - DisablePersonalizedSystem=${DisablePersonalizedSystem:-true}
     hostname: kanbangpt
     restart: always
     volumes:
