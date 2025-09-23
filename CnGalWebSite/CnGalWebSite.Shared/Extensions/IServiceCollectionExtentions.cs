@@ -328,56 +328,6 @@ namespace CnGalWebSite.Shared.Extentions
                         custom.InverseOnSurface = "#201a18";
                     });
 
-                    // Blue Grey Light Theme
-                    theme.Themes.Add("blue-grey-light", false, custom =>
-                    {
-                        custom.Primary = "#006783";
-                        custom.OnPrimary = "#ffffff";
-                        custom.Secondary = "#4d616c";
-                        custom.OnSecondary = "#ffffff";
-                        custom.Accent = "#5d5b7d";
-                        custom.OnAccent = "#ffffff";
-                        custom.Error = "#ba1a1a";
-                        custom.OnError = "#ffffff";
-                        custom.Surface = "#fbfcfe";
-                        custom.OnSurface = "#191c1e";
-                        custom.SurfaceDim = "#e1e2e4";
-                        custom.SurfaceBright = "#fbfcfe";
-                        custom.SurfaceContainer = "#eff1f3";
-                        custom.SurfaceContainerLow = "#f8f9fb";
-                        custom.SurfaceContainerLowest = "#ffffff";
-                        custom.SurfaceContainerHigh = "#e1e2e4";
-                        custom.SurfaceContainerHighest = "#c5c7c8";
-                        custom.InversePrimary = "#65d3ff";
-                        custom.InverseSurface = "#2e3132";
-                        custom.InverseOnSurface = "#eff1f3";
-                    });
-
-                    // Blue Grey Dark Theme
-                    theme.Themes.Add("blue-grey-dark", true, custom =>
-                    {
-                        custom.Primary = "#65d3ff";
-                        custom.OnPrimary = "#003546";
-                        custom.Secondary = "#b4cad6";
-                        custom.OnSecondary = "#1f333c";
-                        custom.Accent = "#c6c2ea";
-                        custom.OnAccent = "#2e2d4d";
-                        custom.Error = "#ffb4ab";
-                        custom.OnError = "#690005";
-                        custom.Surface = "#191c1e";
-                        custom.OnSurface = "#e1e2e4";
-                        custom.SurfaceDim = "#191c1e";
-                        custom.SurfaceBright = "#444749";
-                        custom.SurfaceContainer = "#2e3132";
-                        custom.SurfaceContainerLow = "#191c1e";
-                        custom.SurfaceContainerLowest = "#000000";
-                        custom.SurfaceContainerHigh = "#444749";
-                        custom.SurfaceContainerHighest = "#505355";
-                        custom.InversePrimary = "#006783";
-                        custom.InverseSurface = "#e1e2e4";
-                        custom.InverseOnSurface = "#191c1e";
-                    });
-
                     // Brown Light Theme
                     theme.Themes.Add("brown-light", false, custom =>
                     {
