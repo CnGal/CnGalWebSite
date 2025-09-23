@@ -3411,7 +3411,7 @@ div.prizeTips {
     }
 
     .masa-calendar-card .day-card.active {
-        background-color: rgba(var(--m-theme-accent));
+        background-color: rgba(var(--m-theme-accent), 0.3);
     }
 /*图片列表查看*/
 .image-slide-group-card .m-slide-group__content {
