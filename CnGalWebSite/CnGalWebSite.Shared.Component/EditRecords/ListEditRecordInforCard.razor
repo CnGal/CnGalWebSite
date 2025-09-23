@@ -1,16 +1,16 @@
 ﻿
 <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()">
      <div class="overflow-y-auto overflow-x-hidden" style="max-height: 600px;padding: 3px;">
-         <div class="row">
+         <MRow Dense>
             @foreach (var item in Model.Examines.OrderByDescending(s => s.Id))
             {
-                <div class="col-12 col-md-6 col-lg-12 mb-3">
+                <MCol Cols="12" Md="6" Lg="12">
                     <MDCard ShowHoverStyle="true" OnClick="@(()=>OnSeletedItemChanged(item))" Color="@(item.IsSelected?"primary":"background")" Class="elevation-2">
                         <EditRecordInforCard Model="item" />
                     </MDCard>
-                </div>
+                </MCol>
             }
-        </div>
+        </MRow>
     </div>
 </CnGalWebSite.Components.Containers.MasaTitleContainer>
 

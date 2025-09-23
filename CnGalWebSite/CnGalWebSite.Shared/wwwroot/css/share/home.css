@@ -46,23 +46,6 @@
             aspect-ratio: 460/215;
         }
 
-        /*内部纸片*/
-        #home-page .item .m-chip {
-            /* transition: .3s; */
-        }
-
-        #home-page .item .m-chip {
-            background-color: var(--md-sys-color-primary) !important;
-            border-color: var(--md-sys-color-primary) !important;
-            color: var(--md-sys-color-on-primary) !important;
-        }
-
-        #home-page .item .m-chip--outlined {
-            background-color: transparent !important;
-            color: var(--md-sys-color-primary) !important;
-            caret-color: var(--md-sys-color-primary) !important;
-        }
-
         /*查看更多卡片*/
         #home-page .item.more-link {
             flex-direction: column !important;
@@ -74,7 +57,7 @@
         }
 
             #home-page .item.more-link i, #home-page .community-card .item i, #home-page .weekly-news-card .item i, #home-page .announcements-card .item i, #home-page .hot-tags-card .item i, #home-page .support-card .item i {
-                color: var(--md-sys-color-primary);
+                color: rgba(var(--m-theme-primary));
             }
 
         /*轮播图*/
@@ -171,16 +154,7 @@
         }
 
         #home-page .news-card .name {
-            color: var( --md-sys-color-on-surface) !important;
             font-weight: bold;
-        }
-
-        #home-page .news-card .time {
-            color: var( --md-sys-color-on-surface) !important;
-        }
-
-        #home-page .news-card .text {
-            color: var( --md-sys-color-on-surface) !important;
         }
 
         /*最新文章*/
@@ -577,8 +551,8 @@
     }
 
         #home-page .gallery-card button:hover {
-            background-color: var(--md-sys-color-primary) !important;
-            border-color: var(--md-sys-color-primary) !important;
+            background-color: rgba(var(--m-theme-primary)) !important;
+            border-color: rgba(var(--m-theme-primary)) !important;
             color: white !important;
         }
 

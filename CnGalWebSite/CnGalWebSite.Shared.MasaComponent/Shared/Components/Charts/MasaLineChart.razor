@@ -37,7 +37,7 @@
         <div class="d-flex align-center justify-center">
             @if (isReady)
             {
-                <MECharts Option="Model.Options" Width="@("100%")" Height="@("400px")" Dark="_dataCacheService.ThemeSetting.IsDark" @ref="echarts">
+                <MECharts Option="Model.Options" Width="@("100%")" Height="@("400px")" @ref="echarts">
                 </MECharts>
             }
 

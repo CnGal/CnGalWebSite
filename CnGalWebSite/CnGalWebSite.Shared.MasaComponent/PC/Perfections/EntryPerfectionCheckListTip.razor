@@ -11,7 +11,7 @@
         <MCardText>
             更新会有一天左右的延迟
         </MCardText>
-        <Scroll style="max-height:600px;" class="ps-6 pe-6">
+        <MCardText Style="max-height:600px;" Class="overflow-auto">
             @if (isReady)
             {
                 <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2" Multiple>
@@ -60,7 +60,7 @@
             }
 
 
-        </Scroll>
+        </MCardText>
        
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>

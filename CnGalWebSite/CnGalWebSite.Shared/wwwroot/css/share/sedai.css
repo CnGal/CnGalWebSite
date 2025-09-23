@@ -20,7 +20,7 @@
         display: flex;
         width: 100%;
         min-height: 4rem;
-        border-top: var(--md-sys-color-on-background) 1px solid;
+        border-top: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
     }
 
     .sedai-card .games-card {
@@ -46,7 +46,7 @@
     text-align: center;
     align-content: center;
     padding: 5px;
-    border-left: var(--md-sys-color-on-background) 1px solid;
+    border-left: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
     cursor: pointer;
 }
     .sedai-card .game-card.active {
@@ -60,7 +60,7 @@
         width: 7.69%;
         font-weight: bold;
         background-color: var(--m-theme-primary);
-        color: var(--md-sys-color-on-primary);
+        color: rgba(var(--m-theme-on-primary));
     }
 .sedai-page .about-card {
     padding: 1rem;
@@ -73,6 +73,6 @@
 }
 
 .sedai-card .table-card {
-    border-bottom: var(--md-sys-color-on-background) 1px solid;
+    border-bottom: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
     border-radius: var(--md-card-border-radius);
 }

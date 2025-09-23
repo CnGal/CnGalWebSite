@@ -17,10 +17,10 @@ namespace CnGalWebSite.GameSite.Shared.Extensions
                 //主题
                 options.ConfigureTheme(s =>
                 {
-                    s.Themes.Light.Primary = "var(--md-sys-color-primary)";
+                    s.Themes.Light.Primary = "rgba(var(--m-theme-primary))";
                     s.Themes.Light.Secondary = "var(--md-sys-color-secondary)";
                     s.Themes.Light.Error = "var(--md-sys-color-error)";
-                    s.Themes.Dark.Primary = "var(--md-sys-color-primary)";
+                    s.Themes.Dark.Primary = "rgba(var(--m-theme-primary))";
                     s.Themes.Dark.Secondary = "var(--md-sys-color-secondary)";
                     s.Themes.Dark.Error = "var(--md-sys-color-error)";
                 });

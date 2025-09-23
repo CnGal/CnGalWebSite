@@ -3,7 +3,7 @@
 @if (Model.Objects.Any())
 {
     <MDCard Class="mb-4">
-        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive>
+        <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive SliderColor="primary" ActiveClass="primary--text">
          @if (Model.Objects.Any(s => s.entry != null))
             {
                 <MTab Value="1">

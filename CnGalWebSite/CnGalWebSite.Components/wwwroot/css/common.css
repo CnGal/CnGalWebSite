@@ -4,21 +4,13 @@
     --md-card-active-border-radius: 24px;
 }
 
-:root {
-    --md-sys-color-surface-1: rgb(var(--md-sys-color-primary-rgb) / 0.05);
-    --md-sys-color-surface-2: rgb(var(--md-sys-color-primary-rgb) / 0.08);
-    --md-sys-color-surface-3: rgb(var(--md-sys-color-primary-rgb) / 0.11);
-    --md-sys-color-surface-4: rgb(var(--md-sys-color-primary-rgb) / 0.12);
-    --md-sys-color-surface-5: rgb(var(--md-sys-color-primary-rgb) / 0.14);
-}
-
 /*全局*/
 body {
     /*     font-family: 'Noto Sans SC', sans-serif;
  */
     font-family: "Google Sans Text",sans-serif;
-    background-color: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-surface));
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .w-100 {
@@ -164,11 +156,11 @@ ins {
 
 /*输入框*/
 input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 /*鼠标悬停样式*/
@@ -186,79 +178,10 @@ input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     max-width: 100%;
 }
 
-
-/*主题*/
-
-.m-application a {
-    color: var(--md-sys-color-primary);
+a:active {
+    color: rgba(var(--m-theme-primary));
 }
 
-.m-application .primary {
-    background-color: var(--md-sys-color-primary) !important;
-    border-color: var(--md-sys-color-primary) !important;
-}
-
-.m-application .primary--text {
-    color: var(--md-sys-color-primary) !important;
-    caret-color: var(--md-sys-color-primary) !important;
-}
-
-.m-application .secondary {
-    background-color: var(--md-sys-color-secondary) !important;
-    border-color: var(--md-sys-color-secondary) !important;
-}
-
-.m-application .secondary--text {
-    color: var(--md-sys-color-secondary) !important;
-    caret-color: var(--md-sys-color-secondary) !important;
-}
-
-.m-application .accent {
-    background-color: #82B1FF !important;
-    border-color: #82B1FF !important;
-}
-
-.m-application .accent--text {
-    color: #82B1FF !important;
-    caret-color: #82B1FF !important;
-}
-
-.m-application .error {
-    background-color: var(--md-sys-color-error) !important;
-    border-color: var(--md-sys-color-error) !important;
-}
-
-.m-application .error--text {
-    color: var(--md-sys-color-error) !important;
-    caret-color: var(--md-sys-color-error) !important;
-}
-
-.m-application .info {
-    background-color: #2196F3 !important;
-    border-color: #2196F3 !important;
-}
-
-.m-application .info--text {
-    color: #2196F3 !important;
-    caret-color: #2196F3 !important;
-}
-
-.m-application .success {
-    background-color: #4CAF50 !important;
-    border-color: #4CAF50 !important;
-}
-
-.m-application .success--text {
-    color: #4CAF50 !important;
-    caret-color: #4CAF50 !important;
-}
-
-.m-application .warning {
-    background-color: #FB8C00 !important;
-    border-color: #FB8C00 !important;
-}
-
-.m-application .warning--text {
-    color: #FB8C00 !important;
-    caret-color: #FB8C00 !important;
+a {
+    color: rgba(var(--m-theme-primary));
 }

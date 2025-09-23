@@ -1,46 +1,109 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
 @inject IHttpService _httpService
+@inject MasaBlazor MasaBlazor
+
+<style>
+    .theme-color-preview {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0;
+    }
+
+</style>
 
 <MDialog @bind-Value="Dialog"
-         MaxWidth="440">
+         MaxWidth="800">
     <MDCard>
         <MCardTitle>
             主题设置
         </MCardTitle>
         <MCardText>
-            <SectionTitleCard Title="主题颜色" Text="你可以从下方选择一个喜欢的颜色作为主题颜色" />
-            <MButtonGroup Borderless Value="@_dataCacheService.ThemeSetting.ThemeColor" ValueChanged="ColorValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; " Class="color-selector-card">
-                @foreach (var item in ThemeModel.AvailableColors)
+            <MRow>
+                <MCol Cols="12">
+                    <SectionTitleCard Title="主题" Text="选择您喜欢的颜色主题，每种颜色都有明亮和深色两种模式" />
+
+                    <!-- 主题网格 -->
+                    <MRow Class="mb-4 theme-preview-grid" Dense>
+                        @foreach (var colorGroup in GetFilteredThemeGroups())
+                        {
+                            <MCol Cols="6" Md="4" Lg="3">
+                                <MCard Class="theme-card" Outlined>
+                                    <MCardTitle Class="pa-3 pb-2">
+                                        <div class="d-flex align-center">
+                                            <div class="theme-color-preview me-2" style="background-color: @GetThemePreviewColor(colorGroup.ColorName)"></div>
+                                            <span class="text-capitalize">@GetColorDisplayName(colorGroup.ColorName)</span>
+                                        </div>
+                                    </MCardTitle>
+                                    <MCardText Class="pa-3 pt-0">
+                                        <MButtonGroup Value="@GetSelectedThemeForColor(colorGroup.ColorName)" Style="display: flex; flex-wrap: wrap;"
+                                                      ValueChanged="@ColorValueChanged"
+                                                      Mandatory
+                                                      Color="primary"
+                                                      Class="w-100">
+                                            @if (colorGroup.LightTheme != null)
+                                            {
+                                                <MButton Value="@colorGroup.LightTheme"
+                                                         Class="text-none flex-grow-1"
+                                                         Small>
+                                                    <MIcon Small>mdi-white-balance-sunny</MIcon>
+                                                    明亮
+                                                </MButton>
+                                            }
+                                            @if (colorGroup.DarkTheme != null)
+                                            {
+                                                <MButton Value="@colorGroup.DarkTheme"
+                                                         Class="text-none flex-grow-1"
+                                                         Small>
+                                                    <MIcon Small>mdi-weather-night</MIcon>
+                                                    深色
+                                                </MButton>
+                                            }
+                                        </MButtonGroup>
+                                    </MCardText>
+                                </MCard>
+                            </MCol>
+                        }
+                    </MRow>
+                </MCol>
+                @if (Kanban)
                 {
-                    <MButton Value="@item" Color="@item" Small Style="min-width: 28px;" />
+                    <MCol Cols="12" Md="6">
+                        <SectionTitleCard Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
+                        <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban ? "浮动按钮组" : "看板娘Live2D")" Class="m-0"></MSwitch>
+                    </MCol>
                 }
-            </MButtonGroup>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
+                    <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent ? "显示背景图" : "隐藏背景图")" Class="m-0"></MSwitch>
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="扩展显示范围" Text="选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小" />
+                    <MSwitch Value="_dataCacheService.ThemeSetting.IsExtendEntireScreen" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_dataCacheService.ThemeSetting.IsExtendEntireScreen ? "扩展显示范围" : "限制显示范围")" Class="m-0"></MSwitch>
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="词条样式模板" Text="选择词条页面的布局排版样式" />
+                    <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.EntryTemplate" ValueChanged="EntryTemplateValueChanged" TValue="EntryStyleTemplate" Label="词条样式模板" />
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="字体" Text=" 自定义渲染的字体，具体参见更新日志" />
+                    <MTextField Label="字体" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string"></MTextField>
 
-            <SectionTitleCard Title="主题模式" Text="可以选择深色或浅色模式，也可以跟随系统主题设置" />
-            <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.ThemeMode" ValueChanged="ThemeModeValueChanged" TValue="ThemeMode" Label="主题模式" />
-            @if (Kanban)
-            {
-                <SectionTitleCard Title="看板娘" Text="可以选择展示看板娘Live2D或旧版浮动按钮组" />
-                <MSwitch Value="_dataCacheService.ThemeSetting.HideKanban" TValue="bool" ValueChanged="HideKanbanValueChanged" Label="@(_dataCacheService.ThemeSetting.HideKanban?"浮动按钮组":"看板娘Live2D")" Class="m-0"></MSwitch>
-            }
-            <SectionTitleCard Title="背景图" Text="显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景，刷新页面后生效" />
-            <MSwitch Value="_dataCacheService.ThemeSetting.IsTransparent" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_dataCacheService.ThemeSetting.IsTransparent?"显示背景图":"隐藏背景图")" Class="m-0"></MSwitch>
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="自动保存编辑" Text="在编辑页面时间隔10秒自动保存一次数据" />
+                    <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave ? "自动保存" : "不自动保存")" Class="m-0"></MSwitch>
+                </MCol>
+                <MCol Cols="12" Md="6">
+                    <SectionTitleCard Title="显示错误详情" Text="展示网站发生错误时的详细信息" />
+                    <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor ? "显示" : "不显示")" Class="m-0"></MSwitch>
+                </MCol>
+            </MRow>
 
-            <SectionTitleCard Title="扩展显示范围" Text="选中后将把显示范围扩大到整个页面，也就是两边留白区域缩小" />
-            <MSwitch Value="_dataCacheService.ThemeSetting.IsExtendEntireScreen" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_dataCacheService.ThemeSetting.IsExtendEntireScreen?"扩展显示范围":"限制显示范围")" Class="m-0"></MSwitch>
 
-            <SectionTitleCard Title="词条样式模板" Text="选择词条页面的布局排版样式" />
-            <CnGalWebSite.Components.Inputs.MasaSelecte Value="@_dataCacheService.ThemeSetting.EntryTemplate" ValueChanged="EntryTemplateValueChanged" TValue="EntryStyleTemplate" Label="词条样式模板" />
-
-            <SectionTitleCard Title="字体" Text=" 自定义渲染的字体，具体参见更新日志" />
-            <MTextField Label="字体" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string"></MTextField>
-
-            <SectionTitleCard Title="自动保存编辑" Text="在编辑页面时间隔10秒自动保存一次数据" />
-            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Class="m-0"></MSwitch>
-
-            <SectionTitleCard Title="显示错误详情" Text="展示网站发生错误时的详细信息" />
-            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Class="m-0"></MSwitch>
 
         </MCardText>
     </MDCard>
@@ -49,9 +112,70 @@
 @code {
     bool Dialog { get; set; }
     bool Kanban { get; set; }
+    string searchText { get; set; } = "";
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    // 主题分组类
+    public class ThemeGroup
+    {
+        public string ColorName { get; set; }
+        public string LightTheme { get; set; }
+        public string DarkTheme { get; set; }
+    }
+
+    // 颜色到预览色的映射
+    private readonly Dictionary<string, string> _colorPreviewMap = new()
+    {
+        { "amber", "#FFC107" },
+        { "blue", "#2196F3" },
+        { "blue-grey", "#607D8B" },
+        { "brown", "#795548" },
+        { "cyan", "#00BCD4" },
+        { "deep-orange", "#FF5722" },
+        { "deep-purple", "#673AB7" },
+        { "green", "#4CAF50" },
+        { "grey", "#9E9E9E" },
+        { "indigo", "#3F51B5" },
+        { "light-blue", "#03A9F4" },
+        { "light-green", "#8BC34A" },
+        { "light-red", "#FF5252" },
+        { "lime", "#CDDC39" },
+        { "orange", "#FF9800" },
+        { "pink", "#E91E63" },
+        { "purple", "#9C27B0" },
+        { "red", "#F44336" },
+        { "teal", "#009688" },
+        { "yellow", "#FFEB3B" },
+        { "camel", "#D2691E" }
+    };
+
+    // 颜色显示名称映射
+    private readonly Dictionary<string, string> _colorDisplayNameMap = new()
+    {
+        { "amber", "琥珀" },
+        { "blue", "蓝色" },
+        { "blue-grey", "蓝灰" },
+        { "brown", "棕色" },
+        { "cyan", "青色" },
+        { "deep-orange", "深橙" },
+        { "deep-purple", "深紫" },
+        { "green", "绿色" },
+        { "grey", "灰色" },
+        { "indigo", "靛蓝" },
+        { "light-blue", "浅蓝" },
+        { "light-green", "浅绿" },
+        { "light-red", "浅红" },
+        { "lime", "酸橙" },
+        { "orange", "橙色" },
+        { "pink", "粉色" },
+        { "purple", "紫色" },
+        { "red", "红色" },
+        { "teal", "蓝绿" },
+        { "yellow", "黄色" },
+        { "camel", "骆驼" }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,13 +202,7 @@
 
     public void ColorValueChanged(StringNumber value)
     {
-        if (value == null)
-        {
-            return;
-        }
-
-        _dataCacheService.ThemeSetting.ThemeColor = value.ToString();
-
+        _dataCacheService.ThemeSetting.Theme = value.ToString();
         _eventService.OnSavaTheme();
     }
 
@@ -137,10 +255,88 @@
         _eventService.OnSavaTheme();
     }
 
-    public void ThemeModeValueChanged(ThemeMode temp)
+    // 获取主题分组
+    private List<ThemeGroup> GetThemeGroups()
     {
-        _dataCacheService.ThemeSetting.ThemeMode = temp;
+        var themes = MasaBlazor.Theme.Themes.GetAll().Select(t => t.Key).ToList();
+        var groups = new List<ThemeGroup>();
+
+        // 按颜色分组
+        var colorGroups = themes.GroupBy(GetColorName).Where(g => !string.IsNullOrEmpty(g.Key));
+
+        foreach (var colorGroup in colorGroups)
+        {
+            var group = new ThemeGroup
+            {
+                ColorName = colorGroup.Key,
+                LightTheme = colorGroup.FirstOrDefault(t => t.EndsWith("-light")),
+                DarkTheme = colorGroup.FirstOrDefault(t => t.EndsWith("-dark") || t == "camel")
+            };
+
+            // 特殊处理camel主题
+            if (colorGroup.Key == "camel")
+            {
+                group.DarkTheme = "camel";
+                group.LightTheme = null;
+            }
+
+            groups.Add(group);
+        }
+
+        return groups.OrderBy(g => g.ColorName).ToList();
+    }
+
+    // 获取过滤后的主题分组
+    private List<ThemeGroup> GetFilteredThemeGroups()
+    {
+        var groups = GetThemeGroups();
+        return groups;
+    }
+
+    // 从主题名称中提取颜色名称
+    private string GetColorName(string themeName)
+    {
+        if (themeName == "camel") return "camel";
+
+        if (themeName.EndsWith("-light"))
+            return themeName[..^6];
+
+        if (themeName.EndsWith("-dark"))
+            return themeName[..^5];
+
+        return "";
+    }
+
+    // 获取主题预览颜色
+    private string GetThemePreviewColor(string colorName)
+    {
+        return _colorPreviewMap.GetValueOrDefault(colorName, "#9E9E9E");
+    }
+
+    // 获取颜色显示名称
+    private string GetColorDisplayName(string colorName)
+    {
+        return _colorDisplayNameMap.GetValueOrDefault(colorName, colorName);
+    }
+
+    // 获取当前颜色选中的主题
+    private string GetSelectedThemeForColor(string colorName)
+    {
+        var currentTheme = _dataCacheService.ThemeSetting.Theme;
+        var currentColorName = GetColorName(currentTheme);
+
+        if (currentColorName == colorName)
+            return currentTheme;
+
+        return "";
+    }
+
+    // 重写ColorValueChanged方法以支持string参数
+    public void ColorValueChanged(string value)
+    {
+        _dataCacheService.ThemeSetting.Theme = value;
         _eventService.OnSavaTheme();
+        StateHasChanged();
     }
 }
 

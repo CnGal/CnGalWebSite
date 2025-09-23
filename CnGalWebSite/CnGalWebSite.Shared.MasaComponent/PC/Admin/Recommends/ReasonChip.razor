@@ -1,24 +1,11 @@
 ﻿
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined="Outlined" Color="@GetColor()" Icon="@GetIcon()" Text="@Reason.GetDisplayName()" />
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Outlined="Outlined" Color="primary" Icon="@GetIcon()" Text="@Reason.GetDisplayName()" />
 
  @code {
     [Parameter]
     public RecommendReason Reason { get; set; }
     [Parameter]
     public bool Outlined{ get; set; }
-
-    public string GetColor()
-    {
-        return Reason switch
-        {
-            RecommendReason.Classics => "red",
-            RecommendReason.NewHistoryLow => "orange",
-            RecommendReason.UnpopularMasterpiece => "green",
-            RecommendReason.HighPraiseRate => "info",
-            RecommendReason.Popular => "blue",
-            _ => "purple"
-        };
-    }
 
     public IconType GetIcon()
     {

@@ -1,4 +1,5 @@
 ﻿@using CnGalWebSite.Extensions
+@using Masa.Blazor
 
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -46,6 +47,7 @@
     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css">
     <HeadOutlet @rendermode="@RenderMode.InteractiveServer" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StructuredDataTip @rendermode="@RenderMode.InteractiveServer" />
+    <MAppThemeStylesheet />
 </head>
 
 <body>
@@ -81,7 +83,7 @@
     </div>
 
     <!--自定义脚本-->
-    @* <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script> *@
+   @*  <script src="_content/CnGalWebSite.Shared/js/bundle.js"></script> *@
     <script src="https://res.cngal.org/_content/CnGalWebSite.Shared/js/bundle.min.js"></script>
 
     <!--图片裁剪-->
@@ -103,7 +105,7 @@
     <script async src="https://umami.cngal.top/script.js" data-website-id="c190d5e2-f859-430c-8463-be388f6875b0"></script>
 
     <!--组件库-->
-    @* <script src="_content/Masa.Blazor/js/masa-blazor.js"></script> *@
+   @*  <script src="_content/Masa.Blazor/js/masa-blazor.js"></script> *@
     <script src="https://res.cngal.org/_content/Masa.Blazor/js/masa-blazor.js"></script>
 
     @* <script src="_framework/blazor.web.js"></script> *@

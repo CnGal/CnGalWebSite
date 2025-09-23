@@ -39,7 +39,8 @@
       "wwwroot/css/share/admin.css",
       "wwwroot/css/share/sedai.css",
       "wwwroot/css/share/expo.css",
-      "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css"
+      "../CnGalWebSite.Kanban/wwwroot/css/live2d-core.css",
+      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown.css"
     ]
   },
   {
@@ -52,18 +53,14 @@
   {
     "outputFileName": "wwwroot/css/light/bundle-light.css",
     "inputFiles": [
-      "wwwroot/css/light/common-light.css",
-      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.light.css",
-      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown.css"
+      "wwwroot/css/light/common-light.css"
     ]
   },
   {
     "outputFileName": "wwwroot/css/dark/bundle-dark.css",
     "inputFiles": [
       "wwwroot/css/dark/common-dark.css",
-      "wwwroot/css/dark/home.css",
-      "../CnGalWebSite.Components/wwwroot/css/material-theme/theme.dark.css",
-      "../CnGalWebSite.Components/wwwroot/css/markdown/github-markdown-dark.css"
+      "wwwroot/css/dark/home.css"
     ]
   },
   {

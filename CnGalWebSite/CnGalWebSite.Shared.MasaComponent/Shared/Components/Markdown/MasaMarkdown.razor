@@ -1,6 +1,7 @@
 ﻿@inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject IFileUploadService _fileUploadService
+@inject MasaBlazor MasaBlazor
 @implements IDisposable
 
 @if (isInjectFailed)
@@ -48,7 +49,7 @@
             _options.Add("height", 800);
         }
         _options.Add("mode", Mode.ToString());
-        if (_dataCacheService.ThemeSetting.IsDark)
+        if (MasaBlazor.Theme.CurrentTheme.IsDarkScheme)
         {
             _options.Add("theme", "dark");
         }
