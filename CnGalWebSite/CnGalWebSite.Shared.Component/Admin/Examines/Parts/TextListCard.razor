@@ -8,14 +8,14 @@
                 <div class="title-large mb-2">@item.Modifier</div>
             }
 
-            <div class="row">
+            <MRow Dense>
                 @foreach (var temp in item.Informations)
                 {
-                    <div class="col-12 col-lg-6 pb-1">
+                    <MCol Cols="12" Lg="6">
                         <TextPair Model="temp" />
-                    </div>
+                    </MCol>
                 }
-            </div>
+            </MRow>
 
         </MDCard>
     }
