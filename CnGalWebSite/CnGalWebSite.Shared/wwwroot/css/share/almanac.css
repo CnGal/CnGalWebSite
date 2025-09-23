@@ -6,7 +6,7 @@
     --almanac-background: rgba(204, 204, 204, 1);
     --almanac-on-background: rgba(0, 0, 0, 1);
     --almanac-card-on-background: rgba(0, 0, 0, .4);
-    --almanac-primary-color: var(--md-sys-color-primary);
+    --almanac-primary-color: rgba(var(--m-theme-primary));
     --almanac-secondary-color: var(--md-sys-color-secondary);
     --almanac-tertiary-color: var(--md-sys-color-tertiary);
 }

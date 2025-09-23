@@ -102,8 +102,8 @@
 }
 
 .revenues-page .index-card {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
+    background-color: rgba(var(--m-theme-primary));
+    color: rgba(var(--m-theme-on-primary));
     font-weight: bold;
     font-size: 1.3rem;
     padding: 0 .5rem;

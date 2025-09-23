@@ -11,7 +11,7 @@
                 <MDCard Class="item" Href="@item.Url">
                     @if (GetIcon(item) != null)
                     {
-                        <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
+                        <MIcon Color="primary">@GetIcon(item)</MIcon>
                     }
 
                     <div class="content">
@@ -57,21 +57,6 @@
         if (model == _items.FirstOrDefault(s => s.Priority == 0))
         {
             return IconType.New.ToIconString();
-        }
-
-        return null;
-    }
-
-    public string GetIconColor(AnnouncementItemModel model)
-    {
-        if (model.Priority != 0)
-        {
-            return "warning";
-        }
-
-        if (model == _items.FirstOrDefault(s => s.Priority == 0))
-        {
-            return "success";
         }
 
         return null;

@@ -2,11 +2,11 @@
 
 @if (Model.Time != null && Model.Time.Value.Date <= DateTime.Now.ToCstTime().Date)
 {
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="success" Icon="IconType.Published" Text="已发布" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="IconType.Published" Text="已发布" />
 }
 else
 {
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="error" Icon="IconType.UnPublished" Text="未发布" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="IconType.UnPublished" Text="未发布" />
 }
 
 @code {

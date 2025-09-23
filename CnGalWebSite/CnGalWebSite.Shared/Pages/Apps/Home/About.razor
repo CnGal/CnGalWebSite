@@ -8,7 +8,7 @@
 @if(isReady)
 {
     <MDCard Class="mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText GrowCenterActive>
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive SliderColor="primary" ActiveClass="primary--text">
          @foreach (var item in _dataCacheService.DocumentsCatche)
             {
                 <MTab Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">

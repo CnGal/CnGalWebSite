@@ -12,7 +12,7 @@
 
 <div>
     <MDCard Class="mb-4">
-        <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive>
+        <MTabs Value="@_dataCacheService.NewsSummaryCache.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow CenterActive SliderColor="primary" ActiveClass="primary--text">
              <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
                  本周<MIcon>mdi-av-timer </MIcon>
              </MTab>

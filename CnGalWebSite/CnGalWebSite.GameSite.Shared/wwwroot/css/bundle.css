@@ -1,33 +1,33 @@
-.primary {
-    background-color: var(--md-sys-color-primary);
+﻿.primary {
+    background-color: rgba(var(--m-theme-primary));
 }
 
 .primary-text {
-    color: var(--md-sys-color-primary);
+    color: rgba(var(--m-theme-primary));
 }
 
 .on-primary {
-    background-color: var(--md-sys-color-on-primary);
+    background-color: rgba(var(--m-theme-on-primary));
 }
 
 .on-primary-text {
-    color: var(--md-sys-color-on-primary);
+    color: rgba(var(--m-theme-on-primary));
 }
 
 .primary-container {
-    background-color: var(--md-sys-color-primary-container);
+    background-color: rgba(var(--m-theme-primary));
 }
 
 .primary-container-text {
-    color: var(--md-sys-color-primary-container);
+    color: rgba(var(--m-theme-primary));
 }
 
 .on-primary-container {
-    background-color: var(--md-sys-color-on-primary-container);
+    background-color: rgba(var(--m-theme-on-primary));
 }
 
 .on-primary-container-text {
-    color: var(--md-sys-color-on-primary-container);
+    color: rgba(var(--m-theme-on-primary));
 }
 
 .secondary {
@@ -79,19 +79,19 @@
 }
 
 .tertiary-container {
-    background-color: var(--md-sys-color-tertiary-container);
+    background-color: rgba(var(--m-theme-secondary));
 }
 
 .tertiary-container-text {
-    color: var(--md-sys-color-tertiary-container);
+    color: rgba(var(--m-theme-secondary));
 }
 
 .on-tertiary-container {
-    background-color: var(--md-sys-color-on-tertiary-container);
+    background-color: rgba(var(--m-theme-on-secondary));
 }
 
 .on-tertiary-container-text {
-    color: var(--md-sys-color-on-tertiary-container);
+    color: rgba(var(--m-theme-on-secondary));
 }
 
 .error {
@@ -127,27 +127,27 @@
 }
 
 .background {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 
 .background-text {
-    color: var(--md-sys-color-background);
+    color: rgba(var(--m-theme-surface-container-low));
 }
 
 .on-background {
-    background-color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .on-background-text {
-    color: var(--md-sys-color-on-background) !important;
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
 }
 
 .surface {
-    background-color: var(--md-sys-color-surface);
+    background-color: rgba(var(--m-theme-surface));
 }
 
 .surface-text {
-    color: var(--md-sys-color-surface);
+    color: rgba(var(--m-theme-surface));
 }
 
 .on-surface {
@@ -525,7 +525,7 @@
 .components-reconnect-show {
     height: 1rem;
     width: 1rem;
-    background-color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
     position: fixed;
     top: 0;
     z-index: 200;
@@ -664,8 +664,8 @@ body {
     /*     font-family: 'Noto Sans SC', sans-serif;
  */
     font-family: "Google Sans Text",sans-serif;
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .w-100 {
@@ -811,11 +811,11 @@ ins {
 
 /*输入框*/
 input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 /*鼠标悬停样式*/
@@ -847,8 +847,8 @@ html {
 }
 
 .theme--light.m-application {
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .row {
@@ -942,7 +942,7 @@ html {
 }
 /*下拉列表*/
 .m-sheet.theme--light.m-list.m-select-list {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 /*步骤条*/
 .m-stepper.theme--light.m-card, .m-stepper.theme--light.m-sheet {
@@ -950,11 +950,11 @@ html {
 }
 /*对话框*/
 .m-dialog, .m-snack__wrapper.m-sheet.theme--light {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 /*Markdown*/
 .markdown-body h1, .markdown-body h2 {
-    border-bottom: 2px solid var(--md-sys-color-primary) !important;
+    border-bottom: 2px solid rgba(var(--m-theme-primary)) !important;
 }
 
 .markdown-body blockquote {
@@ -966,7 +966,7 @@ html {
 
 .markdown-body hr {
     height: .1em !important;
-    background-color: var(--md-sys-color-primary) !important;
+    background-color: rgba(var(--m-theme-primary)) !important;
 }
 
 .markdown-body li > p {
@@ -1001,7 +1001,7 @@ html {
 }
 
 .theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
-    color: var(--md-sys-color-on-background) !important;
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
 }
 
 .theme--light.m-select .m-select__selections {
@@ -1009,7 +1009,7 @@ html {
 }
 
 .theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .theme--light.m-icon {
@@ -1017,11 +1017,11 @@ html {
 }
 
 .m-chip:not(.m-chip--outlined).primary {
-    color: var(--md-sys-color-on-primary)
+    color: rgba(var(--m-theme-on-primary))
 }
 
 .m-btn:not(.m-btn--outlined).primary {
-    color: var(--md-sys-color-on-primary)
+    color: rgba(var(--m-theme-on-primary))
 }
 /*边框颜色*/
 .theme--light.m-text-field > .m-input__control > .m-input__slot:before {
@@ -1059,8 +1059,8 @@ html {
 }
 
 .theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
+    background-color: rgba(var(--m-theme-primary));
+    color: rgba(var(--m-theme-on-primary));
 }
 /*步骤条*/
 .theme--light.m-stepper .m-stepper__label {
@@ -1068,11 +1068,11 @@ html {
 }
 
 .theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
-    background-color: var(--md-sys-color-surface-1);
+    background-color: rgba(var(--m-theme-accent));
 }
 /*底部导航栏激活样式*/
 .nav-bottom-tab-active {
-    color: var(--md-sys-color-primary) !important;
+    color: rgba(var(--m-theme-primary)) !important;
 }
 
 .theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
@@ -1080,8 +1080,8 @@ html {
 }
 
 .theme--light.m-bottom-navigation {
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-primary) !important;
+    background-color: rgba(var(--m-theme-surface-container-low));
+    color: rgba(var(--m-theme-primary)) !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -1095,7 +1095,7 @@ html {
 /*侧边导航栏*/
 
 .theme--light.m-navigation-drawer .m-navigation-drawer__content {
-    background-color: var(--md-sys-color-surface-1);
+    background-color: rgba(var(--m-theme-accent));
 }
 
 /*溢出的tab栏*/
@@ -1112,7 +1112,7 @@ html {
 }
 /*扩展卡片*/
 .theme--light.m-expansion-panels .m-expansion-panel {
-    background-color: var(--md-sys-color-surface-1);
+    background-color: rgba(var(--m-theme-accent));
     color: var(--md-sys-color-on-surface);
 }
 
@@ -1181,46 +1181,46 @@ html {
 }
     /*primary颜色*/
     .md-card.color-primary {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
 
     .md-card.show-hover-style.color-primary:hover {
-        background-color: var( --md-sys-color-tertiary-container);
-        color: var(--md-sys-color-on-tertiary-container) !important;
+        background-color: rgba(var(--m-theme-secondary));
+        color: rgba(var(--m-theme-on-secondary)) !important;
     }
 
     /*surface颜色*/
     .md-card.color-surface {
-        background-color: var(--md-sys-color-surface-1);
-        color: var( --md-sys-color-on-surface) !important;
+        background-color: rgba(var(--m-theme-accent));
+        color: rgba(var(--m-theme-on-surface)) !important;
     }
 
     .md-card.show-hover-style.color-surface:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
 
     /*tertiary颜色*/
     .md-card.color-tertiary {
-        background-color: var(--md-sys-color-tertiary-container);
-        color: var(--md-sys-color-on-tertiary-container) !important;
+        background-color: rgba(var(--m-theme-secondary));
+        color: rgba(var(--m-theme-on-secondary)) !important;
     }
 
     .md-card.show-hover-style.color-tertiary:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
     /*background颜色*/
     .md-card.color-background {
-        background-color: var(--md-sys-color-background);
-        color: var(--md-sys-color-on-background) !important;
+        background-color: rgba(var(--m-theme-surface-container-low));
+        color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12) !important;
     }
 
     .md-card.show-hover-style.color-background:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
 
     .md-card.show-hover-style:active {
@@ -1307,7 +1307,7 @@ html {
         }
 
         .title-container-card .title-card i {
-            color: var(--md-sys-color-primary);
+            color: rgba(var(--m-theme-primary));
         }
 
     .title-container-card .content-card {

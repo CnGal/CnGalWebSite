@@ -1,26 +1,25 @@
-﻿
-@inject IHttpService _httpService
+﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject IPageModelCatche<List<HomeNewsAloneViewModel>>  _pageModelCatche
+@inject IPageModelCatche<List<HomeNewsAloneViewModel>> _pageModelCatche
 
-    <CnGalWebSite.Components.Containers.MiniModeContainer>
+<CnGalWebSite.Components.Containers.MiniModeContainer>
     <section class="news-card">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新动态" Items="_items.Take(_dataCacheService.IsApp?4:6)" MoreLink="/articles/news" ForceShowMore>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="最新动态" Items="_items.Take(_dataCacheService.IsApp ? 4 : 6)" MoreLink="/articles/news" ForceShowMore>
             <div class="group">
                 @foreach (var item in context)
                 {
-                    <MDCard Class="item" ShowHoverStyle="true">
-                        <a href="@($"/entries/index/{item.GroupId}")" class="user-image">
+                    <MDCard Class="item" ShowHoverStyle="true" Href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" Target="@(string.IsNullOrWhiteSpace(item.Link) ? "" : "_blank")" OnClick="@(() => OnClickNews(item))">
+                        <div class="user-image">
                             <img src="@item.Image" alt="@item.Title" loading="lazy" />
-                        </a>
-                        <a class="content" @onclick="@(()=>OnClickNews(item))" href="@(string.IsNullOrWhiteSpace(item.Link) ? ("/articles/index/" + item.ArticleId) : item.Link)" target="@(string.IsNullOrWhiteSpace(item.Link)?"":"_blank")">
+                        </div>
+                        <div class="content">
                             <div class="head">
                                 <div class="name text-truncate-1">@item.Title</div>
                                 <div class="time  label-large">@item.Time.ToTimeFromNowString()</div>
                             </div>
                             <div class="text text-truncate-1 label-large">@item.Text</div>
-                        </a>
+                        </div>
                     </MDCard>
                 }
             </div>

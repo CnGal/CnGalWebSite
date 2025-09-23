@@ -43,7 +43,7 @@
 .components-reconnect-show {
     height: 1rem;
     width: 1rem;
-    background-color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
     position: fixed;
     top: 0;
     z-index: 200;

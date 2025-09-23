@@ -8,46 +8,46 @@
 }
     /*primary颜色*/
     .md-card.color-primary {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary),var(--m-medium-emphasis-opacity));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
 
     .md-card.show-hover-style.color-primary:hover {
-        background-color: var( --md-sys-color-tertiary-container);
-        color: var(--md-sys-color-on-tertiary-container) !important;
+        background-color: rgba(var(--m-theme-secondary),var(--m-medium-emphasis-opacity));
+        color: rgba(var(--m-theme-on-secondary)) !important;
     }
 
     /*surface颜色*/
     .md-card.color-surface {
-        background-color: var(--md-sys-color-surface-1);
-        color: var( --md-sys-color-on-surface) !important;
+        background-color: rgba(var(--m-theme-accent),var(--m-medium-emphasis-opacity));
+        color: rgba(var(--m-theme-on-accent)) !important;
     }
 
     .md-card.show-hover-style.color-surface:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary),var(--m-low-emphasis-opacity),var(--m-low-emphasis-opacity));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
 
     /*tertiary颜色*/
     .md-card.color-tertiary {
-        background-color: var(--md-sys-color-tertiary-container);
-        color: var(--md-sys-color-on-tertiary-container) !important;
+        background-color: rgba(var(--m-theme-secondary));
+        color: rgba(var(--m-theme-on-secondary)) !important;
     }
 
     .md-card.show-hover-style.color-tertiary:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-primary),var(--m-low-emphasis-opacity));
+        color: rgba(var(--m-theme-on-primary)) !important;
     }
     /*background颜色*/
     .md-card.color-background {
-        background-color: var(--md-sys-color-background);
-        color: var(--md-sys-color-on-background) !important;
+        background-color: rgba(var(--m-theme-surface-container-low));
+        color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12) !important;
     }
 
     .md-card.show-hover-style.color-background:hover {
-        background-color: var( --md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container) !important;
+        background-color: rgba(var(--m-theme-surface-container-high));
+        color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
     }
 
     .md-card.show-hover-style:active {
@@ -134,33 +134,37 @@
         }
 
         .title-container-card .title-card i {
-            color: var(--md-sys-color-primary);
+            color: rgba(var(--m-theme-primary));
         }
 
     .title-container-card .content-card {
         display: flex;
         flex-direction: column;
     }
+
     .title-container-card .button-card {
         display: flex;
         align-items: center;
     }
-    .title-container-card .title-card .title-large-card {
-        font-size:18px;
-        font-weight:bold;
-}
+
     .title-container-card .title-card .title-large-card {
         font-size: 18px;
         font-weight: bold;
     }
-    /*大图预览*/
-    .largeimage-bg {
-        width: 100%;
-        height: calc(100vh);
-        background-color: rgba(0,0,0,.7);
-        position: fixed;
-        z-index: 1050;
+
+    .title-container-card .title-card .title-large-card {
+        font-size: 18px;
+        font-weight: bold;
     }
+/*大图预览*/
+.largeimage-bg {
+    width: 100%;
+    height: calc(100vh);
+    background-color: rgba(0,0,0,.7);
+    position: fixed;
+    z-index: 1050;
+    top: 0;
+}
 
 
 

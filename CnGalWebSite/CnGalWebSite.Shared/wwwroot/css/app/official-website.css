@@ -55,7 +55,7 @@
     width: 100%;
     padding: 20px 0 0px;
     border-left: none;
-    border-top: 2px solid var(--md-sys-color-primary);
+    border-top: 2px solid rgba(var(--m-theme-primary));
     line-height: 1.25rem !important;
     font-size: .875rem !important;
 }

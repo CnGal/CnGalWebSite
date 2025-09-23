@@ -201,3 +201,6 @@
     padding-top: 5px;
     padding-bottom: 5px;
 }
+.m-chip.m-size--small {
+    height: fit-content;
+}

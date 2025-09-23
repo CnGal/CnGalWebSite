@@ -4,11 +4,11 @@
 @inject IJSRuntime JS
 @inject IPopupService PopupService
 
-<MAppBar App Class="elevation-2" Style="background-color: var(--md-sys-color-background)!important;">
+<MAppBar App Class="elevation-2" Style="background-color: rgba(var(--m-theme-surface-container-low))!important;">
     <div style=" word-break: keep-all;" class="ms-4 me-8">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
     </div>
-    <MTabs Class="cngal-main-tab-card" Routable>
+    <MTabs Class="cngal-main-tab-card" Routable SliderColor="primary" ActiveClass="primary--text">
         <MTab Href="/">首页</MTab>
         @* <MTab Href="/#evaluations-card">专题推荐</MTab> *@
         <MTab Href="/discount">游戏折扣</MTab>
@@ -17,12 +17,6 @@
         <MTab Href="/sharegames/new">分享游玩记录</MTab>
     </MTabs>
     <MSpacer></MSpacer>
-    <AuthorizeView>
-        <Authorized>
-            <CnGalWebSite.Components.Buttons.MasaButton Tooltip="任务" Icon="@IconType.Task.ToIconString()" Class="mr-2" Href="/tasks" />
-        </Authorized>
-    </AuthorizeView>
-    <CnGalWebSite.Shared.MasaComponent.PC.Layout.SwitchThemeModeButton Class="mr-2" />
     <CnGalWebSite.Components.Buttons.MasaButton Tooltip="搜索" Icon="@IconType.Search.ToIconString()" Class="mr-2" Href="/search" />
     <CnGalWebSite.Components.Containers.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />

@@ -12,7 +12,7 @@
                 <MDCard Class="item" Href="@($"articles/index/{item.Id}")">
                     @if (GetIcon(item) != null)
                     {
-                        <MIcon Color="@GetIconColor(item)">@GetIcon(item)</MIcon>
+                        <MIcon Color="primary">@GetIcon(item)</MIcon>
                     }
 
                     <div class="content">
@@ -51,16 +51,6 @@
         if (model == _items.OrderByDescending(s => s.LastEditTime).FirstOrDefault())
         {
             return IconType.New.ToIconString();
-        }
-
-        return null;
-    }
-
-    public string GetIconColor(ArticleInforTipViewModel model)
-    {
-        if (model == _items.OrderByDescending(s => s.LastEditTime).FirstOrDefault())
-        {
-            return "success";
         }
 
         return null;

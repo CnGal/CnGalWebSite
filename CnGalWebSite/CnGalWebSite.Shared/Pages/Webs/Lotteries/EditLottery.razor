@@ -26,7 +26,7 @@ else
 
         <CnGalWebSite.Components.Containers.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="@IconType.Lottery.ToIconString()" Outline>
          <MDCard Class="mb-4">
-             <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
+                <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive SliderColor="primary" ActiveClass="primary--text">
 
                  <MTab Value="1">
                      编辑<MIcon>mdi-pencil</MIcon>

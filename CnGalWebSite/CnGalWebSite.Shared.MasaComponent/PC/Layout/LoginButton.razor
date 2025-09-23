@@ -4,6 +4,8 @@
 <AuthorizeView>
     <Authorized>
         <CreateObjectButton Class="mr-2" />
+        <CnGalWebSite.Components.Buttons.MasaButton Tooltip="任务" Icon="@IconType.Task.ToIconString()" Class="mr-2" Href="/tasks" />
+        <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-cog" Class="me-2" Tooltip="设置" OnClick="OnOpenSetting" StopPropagation />
         <UserButton Class="me-4" OnClickSetting="OnOpenSetting" />
     </Authorized>
     <NotAuthorized>

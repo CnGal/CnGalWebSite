@@ -23,17 +23,6 @@ html {
 
 .theme--light.m-application {
     background-color: transparent;
-    color: var(--md-sys-color-on-background);
-}
-
-.row {
-    margin-bottom: 0px;
-    margin-top: 0;
-}
-
-.col-xl, .col-xl-auto, .col-xl-12, .col-xl-11, .col-xl-10, .col-xl-9, .col-xl-8, .col-xl-7, .col-xl-6, .col-xl-5, .col-xl-4, .col-xl-3, .col-xl-2, .col-xl-1, .col-lg, .col-lg-auto, .col-lg-12, .col-lg-11, .col-lg-10, .col-lg-9, .col-lg-8, .col-lg-7, .col-lg-6, .col-lg-5, .col-lg-4, .col-lg-3, .col-lg-2, .col-lg-1, .col-md, .col-md-auto, .col-md-12, .col-md-11, .col-md-10, .col-md-9, .col-md-8, .col-md-7, .col-md-6, .col-md-5, .col-md-4, .col-md-3, .col-md-2, .col-md-1, .col-sm, .col-sm-auto, .col-sm-12, .col-sm-11, .col-sm-10, .col-sm-9, .col-sm-8, .col-sm-7, .col-sm-6, .col-sm-5, .col-sm-4, .col-sm-3, .col-sm-2, .col-sm-1, .col, .col-auto, .col-12, .col-11, .col-10, .col-9, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3, .col-2, .col-1 {
-    padding-bottom: 0;
-    padding-top: 0;
 }
 
 .theme--light.m-application code {
@@ -66,13 +55,8 @@ html {
     background-color: transparent;
 }
 /*表格背景色*/
-.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.stripe):not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
-    background-color: transparent !important;
-}
 
-.m-data-table > .m-data-table__wrapper > table > tbody > tr:not(.stripe):not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper):not(.m-data-table__selected), .m-data-table > .m-data-table__wrapper > table > thead > tr {
-    background-color: transparent !important;
-}
+
 /*表格边框*/
 .m-sheet.m-toolbar.m-toolbar--flat {
     border-radius: var(--md-card-border-radius) !important;
@@ -122,7 +106,7 @@ html {
 }
 /*下拉列表*/
 .m-sheet.theme--light.m-list.m-select-list {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 /*步骤条*/
 .m-stepper.theme--light.m-card, .m-stepper.theme--light.m-sheet {
@@ -130,11 +114,11 @@ html {
 }
 /*对话框*/
 .m-dialog, .m-snack__wrapper.m-sheet.theme--light {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 /*Markdown*/
 .markdown-body h1, .markdown-body h2 {
-    border-bottom: 2px solid var(--md-sys-color-primary) !important;
+    border-bottom: 2px solid rgba(var(--m-theme-primary)) !important;
 }
 
 .markdown-body blockquote {
@@ -146,7 +130,7 @@ html {
 
 .markdown-body hr {
     height: .1em !important;
-    background-color: var(--md-sys-color-primary) !important;
+    background-color: rgba(var(--m-theme-primary)) !important;
 }
 
 .markdown-body li > p {
@@ -172,16 +156,12 @@ html {
     color: var(--md-sys-color-tertiary) !important;
 }
 /*默认字体颜色*/
-.theme--light.m-expansion-panels .m-expansion-panel-header .m-expansion-panel-header__icon .m-icon, .theme--light.m-tabs > .m-tabs-bar .m-tab--disabled, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active), .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-btn, .theme--light.m-tabs > .m-tabs-bar .m-tab:not(.m-tab--active) > .m-icon {
-    color: var(--md-sys-color-secondary);
-}
-
 .theme--light.m-label {
     color: inherit;
 }
 
 .theme--light.m-input, .theme--light.m-input input, .theme--light.m-input textarea {
-    color: var(--md-sys-color-on-background) !important;
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
 }
 
 .theme--light.m-select .m-select__selections {
@@ -189,7 +169,7 @@ html {
 }
 
 .theme--light.m-list-item:not(.m-list-item--active):not(.m-list-item--disabled) {
-    color: var(--md-sys-color-on-background);
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .theme--light.m-icon {
@@ -197,12 +177,9 @@ html {
 }
 
 .m-chip:not(.m-chip--outlined).primary {
-    color: var(--md-sys-color-on-primary)!important;
+    color: rgba(var(--m-theme-on-primary))!important;
 }
 
-.m-btn:not(.m-btn--outlined).primary {
-    color: var(--md-sys-color-on-primary) !important;
-}
 /*边框颜色*/
 .theme--light.m-text-field > .m-input__control > .m-input__slot:before {
     border-color: inherit;
@@ -238,21 +215,17 @@ html {
     color: inherit;
 }
 
-.theme--light.m-data-table > .m-data-table__wrapper > table > tbody > tr:hover:not(.m-data-table__expanded__content):not(.m-data-table__empty-wrapper) {
-    background-color: var(--md-sys-color-primary-container)!important;
-    color: var(--md-sys-color-on-primary-container)!important;
-}
 /*步骤条*/
 .theme--light.m-stepper .m-stepper__label {
     color: inherit;
 }
 
 .theme--light.m-stepper .m-stepper__step:not(.m-stepper__step--active):not(.m-stepper__step--complete):not(.m-stepper__step--error) .m-stepper__step__step {
-    background-color: var(--md-sys-color-surface-1);
+    background-color: rgba(var(--m-theme-accent));
 }
 /*底部导航栏激活样式*/
 .nav-bottom-tab-active {
-    color: var(--md-sys-color-primary) !important;
+    color: rgba(var(--m-theme-primary)) !important;
 }
 
 .theme--light.m-bottom-navigation .m-btn:not(.m-btn--active) {
@@ -260,8 +233,8 @@ html {
 }
 
 .theme--light.m-bottom-navigation {
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-primary) !important;
+    background-color: rgba(var(--m-theme-surface-container-low));
+    color: rgba(var(--m-theme-primary)) !important;
 }
 /*icon按钮*/
 .theme--light.m-btn.m-btn--icon {
@@ -275,7 +248,7 @@ html {
 /*侧边导航栏*/
 
 .theme--light.m-navigation-drawer .m-navigation-drawer__content {
-    background-color: var(--md-sys-color-surface-1);
+    background-color: rgba(var(--m-theme-accent));
 }
 
 /*溢出的tab栏*/
@@ -291,11 +264,6 @@ html {
     background-color: transparent;
 }
 /*扩展卡片*/
-.theme--light.m-expansion-panels .m-expansion-panel {
-    background-color: var(--md-sys-color-surface-1);
-    color: var(--md-sys-color-on-surface);
-}
-
 .m-expansion-panels:not(.m-expansion-panels--accordion):not(.m-expansion-panels--tile) > .m-expansion-panel--active {
     border-radius: var(--md-card-border-radius);
 }
@@ -339,17 +307,11 @@ html {
     justify-content: center;
 }
 /*tab栏*/
-.theme--light.m-sheet {
-    color: inherit;
-}
 
 .m-toolbar {
     transition: none;
 }
 
-.m-tab--active, .m-tab--active .m-btn.m-btn--flat, .m-tab--active .m-icon, .m-tab.m-tab {
-    color: inherit;
-}
 .m-tabs .m-slide-group__next--disabled, .m-tabs .m-slide-group__prev--disabled {
     display: none !important;
 }
@@ -363,17 +325,17 @@ html {
 }
 /*分页*/
 .theme--light.m-pagination .m-pagination__navigation {
-    background: var(--md-sys-color-background) !important;
+    background: rgba(var(--m-theme-surface-container-low)) !important;
 }
 
 .theme--light.m-pagination .m-pagination__item {
-    background: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
+    background: rgba(var(--m-theme-surface-container-low));
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .theme--light.m-pagination .m-pagination__item--active {
-    color: var(--md-sys-color-on-primary) !important;
-    background: var(--md-sys-color-primary) !important;
+    color: rgba(var(--m-theme-on-primary)) !important;
+    background: rgba(var(--m-theme-primary)) !important;
 }
 
 /*弹出菜单*/
@@ -384,7 +346,7 @@ html {
 .theme--light.m-dialog__content .m-dialog {
     background: none !important;
 }
-/*卡片*/
-.m-card__title {
-    font-size: 1rem;
+
+.m-tabs-items{
+    background-color:transparent;
 }

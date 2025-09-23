@@ -24,7 +24,7 @@
         .anniversary-page .user-steam-card .user-info .name {
             font-size: large;
             font-weight: bold;
-            color: var(--md-sys-color-primary);
+            color: rgba(var(--m-theme-primary));
         }
 
     .anniversary-page .user-steam-card .goal .key {
@@ -35,7 +35,7 @@
     .anniversary-page .user-steam-card .goal .value {
         font-size: 2.5rem;
         font-weight: bold;
-        color: var(--md-sys-color-primary);
+        color: rgba(var(--m-theme-primary));
     }
     /* 制作组列表*/
 .anniversaries-group-card .content-card {

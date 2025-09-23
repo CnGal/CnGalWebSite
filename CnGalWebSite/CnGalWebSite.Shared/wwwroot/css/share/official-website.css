@@ -89,7 +89,7 @@
         height: 2px;
         width: calc((100% - 1200px) / 2 - 20px);
         min-width: 20px;
-        background: var(--md-sys-color-primary);
+        background: rgba(var(--m-theme-primary));
         margin-right: 20px;
     }
 
@@ -99,7 +99,7 @@
         padding: 0 0 6rem;
         letter-spacing: 0.5rem;
         font-weight: bold;
-        color: var(--md-sys-color-primary);
+        color: rgba(var(--m-theme-primary));
     }
 
     .official-website section {
@@ -139,7 +139,7 @@
             flex-direction: column;
             -ms-flex-line-pack: center;
             align-content: center;
-            border-left: 2px solid var(--md-sys-color-primary);
+            border-left: 2px solid rgba(var(--m-theme-primary));
             padding-left: 20px;
             letter-spacing: 0.05rem !important;
             line-height: 1.8rem !important;
@@ -149,7 +149,7 @@
 
             .official-website .character-card .caption .name {
                 font-size: 2.5rem;
-                color: var(--md-sys-color-primary);
+                color: rgba(var(--m-theme-primary));
                 letter-spacing: 0.2rem;
                 line-height: 3rem;
                 font-weight: bold;
@@ -198,7 +198,7 @@
 
 
     .official-website .character-icon.active {
-        background-color: var(--md-sys-color-primary);
+        background-color: rgba(var(--m-theme-primary));
     }
 
     .official-website .m-slide-group__content {
@@ -218,7 +218,7 @@
         }
 
             .official-website .staff-card .group > .name {
-                background-color: var(--md-sys-color-primary);
+                background-color: rgba(var(--m-theme-primary));
                 color: white;
                 display: flex;
                 justify-content: center;
@@ -287,13 +287,13 @@
     flex-direction: column;
     gap: 0.6rem;
     margin-bottom: 0;
-    border-left: 2px solid var(--md-sys-color-primary);
+    border-left: 2px solid rgba(var(--m-theme-primary));
     font-size: 1rem;
 }
 
     .information .description .detail > div.title {
         margin-bottom: 20px;
-        color: var(--md-sys-color-primary);
+        color: rgba(var(--m-theme-primary));
     }
 
     .information .description .detail > div {

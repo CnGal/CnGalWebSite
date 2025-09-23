@@ -1,34 +1,34 @@
 ﻿@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
+@inject MasaBlazor MasaBlazor
 
 
 
+<div style="display: flex; justify-content: flex-end; ">
+    <div style="width:250px;">
+        <MMenu @bind-Value="_menu1"
+               CloseOnContentClick="false"
+               Transition="scale-transition"
+               OffsetY
+               MaxWidth="290"
+               MinWidth="@("auto")">
+            <ActivatorContent>
+                <MTextField Value="DateRangeText" Label="时间范围" PrependIcon="@IconType.Left.ToIconString()" OnPrependClick="OnPrependClick" AppendOuterIcon="@IconType.Right.ToIconString()" OnAppendOuterClick="OnAppendOuterClick" @attributes="context.Attrs" />
+            </ActivatorContent>
+            <ChildContent>
+                <MDatePicker Value="_dates" TValue="List<DateOnly>" Range ValueChanged="ValueChanged" NoTitle Locale="zh-CN" />
+            </ChildContent>
+        </MMenu>
 
-    <div style="display: flex; justify-content: flex-end; ">
-        <div style="width:250px;">
-            <MMenu @bind-Value="_menu1"
-                   CloseOnContentClick="false"
-                   Transition="scale-transition"
-                   OffsetY
-                   MaxWidth="290"
-                   MinWidth="@("auto")">
-                <ActivatorContent>
-                    <MTextField Value="DateRangeText" Label="时间范围" PrependIcon="@IconType.Left.ToIconString()" OnPrependClick="OnPrependClick" AppendOuterIcon="@IconType.Right.ToIconString()" OnAppendOuterClick="OnAppendOuterClick"  @attributes="context.Attrs"/>
-                </ActivatorContent>
-                <ChildContent>
-                    <MDatePicker Value="_dates" TValue="List<DateOnly>" Range ValueChanged="ValueChanged" NoTitle Locale="zh-CN"/>
-                </ChildContent>
-            </MMenu>
-
-        </div>
     </div>
-    <div class="d-flex align-center justify-center">
-        @if (isReady)
-        {
-        <MECharts Option="Model" InitOptions="@(opt => opt.Locale = "zh")" Width="@("100%")" Height="@(_dataCacheService.IsApp?(ShowScrollBar?"900px":"850px"):(ShowScrollBar?"250px":"200px"))" @ref="echarts" Dark="_dataCacheService.ThemeSetting.IsDark">
-            </MECharts>
-        }
-    </div>
+</div>
+<div class="d-flex align-center justify-center">
+    @if (isReady)
+    {
+        <MECharts Option="Model" InitOptions="@(opt => opt.Locale = "zh")" Width="@("100%")" Height="@(_dataCacheService.IsApp ? (ShowScrollBar ? "900px" : "850px") : (ShowScrollBar ? "250px" : "200px"))" @ref="echarts">
+        </MECharts>
+    }
+</div>
 
 
 @code {
@@ -69,7 +69,7 @@
     {
         _dates = dates;
 
-        if (dates.Count==1)
+        if (dates.Count == 1)
         {
             return;
         }
@@ -104,13 +104,13 @@
     {
         try
         {
-            if(_dates.Count!=2)
+            if (_dates.Count != 2)
             {
                 return;
             }
             Model = await _dataCacheService.HeatMapDataCatche.GetCache($"{ToolHelper.WebApiPath}api/space/GetUserHeatMap?Id={Id}&Type={Type}&AfterTime={_dates[0].ToUnixTimeMilliseconds()}&BeforeTime={_dates[1].ToUnixTimeMilliseconds()}");
 
-            Model.SetTheme(_dataCacheService.IsApp, _dataCacheService.ThemeSetting.IsDark, ShowScrollBar);
+            Model.SetTheme(_dataCacheService.IsApp, MasaBlazor.Theme.CurrentTheme.IsDarkScheme, ShowScrollBar);
             isReady = true;
             StateHasChanged();
         }

@@ -30,27 +30,27 @@
 
 /* 当元素总数为5-8个时，前4个元素有底部边框 */
 .sedai-card.mobile-card .games-card:has(:nth-child(5)):not(:has(:nth-child(9))) .game-card:nth-child(-n+4) {
-    border-bottom: var(--md-sys-color-on-background) 1px solid;
+    border-bottom: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }
 
 /* 当元素总数为9-12个时，前8个元素有底部边框 */
 .sedai-card.mobile-card .games-card:has(:nth-child(9)):not(:has(:nth-child(13))) .game-card:nth-child(-n+8) {
-    border-bottom: var(--md-sys-color-on-background) 1px solid;
+    border-bottom: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }
 
 /* 当元素总数小于4时，最后一个元素有右边框 */
 .sedai-card.mobile-card .games-card:not(:has(:nth-child(4))) .game-card:last-child {
-    border-right: var(--md-sys-color-on-background) 1px solid;
+    border-right: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }
 
 /* 当元素总数为5-7个时，最后一个元素有右边框 */
 .sedai-card.mobile-card .games-card:has(:nth-child(5)):not(:has(:nth-child(8))) .game-card:last-child {
-    border-right: var(--md-sys-color-on-background) 1px solid;
+    border-right: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }
 
 /* 当元素总数为9-11个时，最后一个元素有右边框 */
 .sedai-card.mobile-card .games-card:has(:nth-child(9)):not(:has(:nth-child(12))) .game-card:last-child {
-    border-right: var(--md-sys-color-on-background) 1px solid;
+    border-right: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }
 
 .sedai-card.mobile-card .year-card {

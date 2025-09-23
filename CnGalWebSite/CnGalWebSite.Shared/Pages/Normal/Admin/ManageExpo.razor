@@ -1,4 +1,4 @@
-@page "/admin/manageexpo"
+﻿@page "/admin/manageexpo"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -12,7 +12,7 @@
 
 <div>
     <MDCard Class="mb-4">
-        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive>
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow CenterActive SliderColor="primary" ActiveClass="primary--text">
 
             <MTab Value="1">
                 活动管理<MIcon>mdi-calendar-star</MIcon>

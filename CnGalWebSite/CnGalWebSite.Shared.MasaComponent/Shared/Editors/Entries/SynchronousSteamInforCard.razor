@@ -1,7 +1,7 @@
 ﻿@inject IHttpService _httpService
 @inject IFileUploadService _fileUploadService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="tertiary">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="secondary">
     游戏在Steam上发布？尝试 <a class="tertiary--text fw-bold" @onclick="OnClick">导入Steam信息</a>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 <MDialog @bind-Value="Dialog"

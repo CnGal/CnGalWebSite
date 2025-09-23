@@ -13,7 +13,7 @@
         }
     }
     <div class="row" itemscope itemtype="@(EntryView.Type== EntryType.Game?("http://schema.org/SoftwareApplication"):(EntryView.Type== EntryType.Role?("http://schema.org/Role"):(EntryView.Type== EntryType.ProductionGroup?("http://schema.org/Organization"):("http://schema.org/Person"))))">
-        <div class="col-12 mb-4">
+        <div class="col-12">
             @if (EntryView.IsHidden == true)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
@@ -37,7 +37,7 @@
         {
             <div class="col-12">
                 <MDCard Class="mb-4">
-                    <MTabs Value="EntryView.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow>
+                    <MTabs Value="EntryView.TabIndex" ValueChanged="ValueChanged" IconsAndText Grow SliderColor="primary" ActiveClass="primary--text">
 
                         <MTab Value="1">
                             首页<MIcon>@IconType.Home.ToIconString()</MIcon>

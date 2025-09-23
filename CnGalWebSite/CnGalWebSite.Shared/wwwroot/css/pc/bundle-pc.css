@@ -1,4 +1,4 @@
-tbody, td, tfoot, th, thead, tr {
+﻿tbody, td, tfoot, th, thead, tr {
     border-style: none;
 }
 /*平台判断*/
@@ -13,5 +13,5 @@ tbody, td, tfoot, th, thead, tr {
 
 /* 当元素总数为1-11个时，最后一个元素有右边框 */
 .sedai-card .games-card:has(:nth-child(1)):not(:has(:nth-child(12))) .game-card:last-child {
-    border-right: var(--md-sys-color-on-background) 1px solid;
+    border-right: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
 }

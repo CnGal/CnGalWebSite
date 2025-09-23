@@ -138,7 +138,7 @@
         }
 
 a.info-card-user {
-    color: var(--md-sys-color-on-background) !important;
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
 }
 /*编辑用户信息*/
 .edit-user-link-card .content-card {

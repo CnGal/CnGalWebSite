@@ -5,7 +5,7 @@
 <div style=" display: flex; flex-direction: column; align-items: flex-start;">
     @foreach (var item in Model)
     {
-        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="@($"{new String(' ', Level)}{item.Text}")" OnClick="()=>OnActiveUpdate(item)" Color="@(item.IsActive?_dataCacheService.ThemeSetting.ThemeColor:"grey")" />
+        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="@($"{new String(' ', Level)}{item.Text}")" OnClick="()=>OnActiveUpdate(item)"/>
         @if (item.Nodes != null && item.Nodes.Any())
         {
             <MasaCatalogItem Model="item.Nodes" Level="Level+1"  Url="@Url"/>

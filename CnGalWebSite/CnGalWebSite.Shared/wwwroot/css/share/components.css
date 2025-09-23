@@ -76,10 +76,10 @@
 }
 /*内置类型纸片*/
 .type-inline-chip {
-    background-color: var(--md-sys-color-primary);
+    background-color: rgba(var(--m-theme-primary));
     padding: 0 .3rem;
     border-radius: 5px;
-    color: var(--md-sys-color-on-primary);
+    color: rgba(var(--m-theme-on-primary));
     margin-right: 0.5rem;
     font-size: small;
 }
@@ -203,9 +203,9 @@
 }
 
 .masa-calendar-card .week-card {
-    border-top: thin solid var(--md-sys-color-surface-1);
+    border-top: thin solid rgba(var(--m-theme-accent));
     display: flex;
-    border-bottom: thin solid var(--md-sys-color-surface-1);
+    border-bottom: thin solid rgba(var(--m-theme-accent));
     min-height: 40px;
 }
 
@@ -218,21 +218,21 @@
 
 .masa-calendar-card .month-card {
     display: flex;
-    border-bottom: thin solid var(--md-sys-color-surface-1);
+    border-bottom: thin solid rgba(var(--m-theme-accent));
 }
 
 .masa-calendar-card .day-card {
     display: flex;
-    border-right: thin solid var(--md-sys-color-surface-1);
+    border-right: thin solid rgba(var(--m-theme-accent));
     width: 14.28%;
 }
 
     .masa-calendar-card .day-card.first {
-        border-left: thin solid var(--md-sys-color-surface-1);
+        border-left: thin solid rgba(var(--m-theme-accent));
     }
 
     .masa-calendar-card .day-card.active {
-        background-color: var(--md-sys-color-surface-1);
+        background-color: rgba(var(--m-theme-accent));
     }
 /*图片列表查看*/
 .image-slide-group-card .m-slide-group__content {

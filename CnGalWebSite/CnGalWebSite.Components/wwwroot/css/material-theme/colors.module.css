@@ -1,33 +1,33 @@
 ﻿.primary {
-    background-color: var(--md-sys-color-primary);
+    background-color: rgba(var(--m-theme-primary));
 }
 
 .primary-text {
-    color: var(--md-sys-color-primary);
+    color: rgba(var(--m-theme-primary));
 }
 
 .on-primary {
-    background-color: var(--md-sys-color-on-primary);
+    background-color: rgba(var(--m-theme-on-primary));
 }
 
 .on-primary-text {
-    color: var(--md-sys-color-on-primary);
+    color: rgba(var(--m-theme-on-primary));
 }
 
 .primary-container {
-    background-color: var(--md-sys-color-primary-container);
+    background-color: rgba(var(--m-theme-primary));
 }
 
 .primary-container-text {
-    color: var(--md-sys-color-primary-container);
+    color: rgba(var(--m-theme-primary));
 }
 
 .on-primary-container {
-    background-color: var(--md-sys-color-on-primary-container);
+    background-color: rgba(var(--m-theme-on-primary));
 }
 
 .on-primary-container-text {
-    color: var(--md-sys-color-on-primary-container);
+    color: rgba(var(--m-theme-on-primary));
 }
 
 .secondary {
@@ -79,19 +79,19 @@
 }
 
 .tertiary-container {
-    background-color: var(--md-sys-color-tertiary-container);
+    background-color: rgba(var(--m-theme-secondary));
 }
 
 .tertiary-container-text {
-    color: var(--md-sys-color-tertiary-container);
+    color: rgba(var(--m-theme-secondary));
 }
 
 .on-tertiary-container {
-    background-color: var(--md-sys-color-on-tertiary-container);
+    background-color: rgba(var(--m-theme-on-secondary));
 }
 
 .on-tertiary-container-text {
-    color: var(--md-sys-color-on-tertiary-container);
+    color: rgba(var(--m-theme-on-secondary));
 }
 
 .error {
@@ -127,27 +127,27 @@
 }
 
 .background {
-    background-color: var(--md-sys-color-background);
+    background-color: rgba(var(--m-theme-surface-container-low));
 }
 
 .background-text {
-    color: var(--md-sys-color-background);
+    color: rgba(var(--m-theme-surface-container-low));
 }
 
 .on-background {
-    background-color: var(--md-sys-color-on-background);
+    background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
 }
 
 .on-background-text {
-    color: var(--md-sys-color-on-background) !important;
+    color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
 }
 
 .surface {
-    background-color: var(--md-sys-color-surface);
+    background-color: rgba(var(--m-theme-surface));
 }
 
 .surface-text {
-    color: var(--md-sys-color-surface);
+    color: rgba(var(--m-theme-surface));
 }
 
 .on-surface {
