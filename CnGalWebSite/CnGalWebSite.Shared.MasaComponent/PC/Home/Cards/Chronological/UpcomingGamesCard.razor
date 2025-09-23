@@ -12,7 +12,7 @@
                 <div class="name text-truncate-1 title-large">@context.Name</div>
                 <div class="brief text-truncate-3 label-large">@context.BriefIntroduction</div>
                 <div class="tags">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="@GetPublishTimeChipColor(context)" Icon="@GetPublishTimeChipIcon(context)" Text="@GetPublishTimeChipText(context)" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.IconChip Color="primary" Icon="@GetPublishTimeChipIcon(context)" Text="@GetPublishTimeChipText(context)" />
                 </div>
             </div>
         </MDCard>
@@ -39,11 +39,6 @@
         {
             await ErrorHandler.ProcessError(ex, "获取主页即将发布游戏列表失败");
         }
-    }
-
-    string GetPublishTimeChipColor(UpcomingGameItemModel model)
-    {
-        return DateTime.TryParse(model.PublishTime, out DateTime time) ? "success" : "info";
     }
 
     IconType GetPublishTimeChipIcon(UpcomingGameItemModel model)
