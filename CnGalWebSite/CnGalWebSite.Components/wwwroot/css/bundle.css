@@ -861,14 +861,7 @@ html {
 /*修正Masa样式的影响*/
 .m-application {
     font-family: inherit !important;
-}
-
-.theme--light.m-application {
-    background-color: transparent;
-}
-
-.theme--light.m-application code {
-    background-color: transparent;
+    background-color: transparent!important;
 }
 
 .m-card__title {
