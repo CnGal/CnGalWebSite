@@ -8,45 +8,45 @@
                 <CnGalWebSite.Components.Images.UploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" Class="mb-4" />
             </MCol>
             <MCol Cols="12">
-                <MTextField @bind-Value="Model.Title" Label="标题" />
+                <MTextField @bind-Value="Model.Title" Label="标题" HideDetails="true"/>
             </MCol>
             <MCol Cols="12">
-                <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" />
+                <MTextarea Rows="5" @bind-Value="Model.BriefIntroduction" Label="简介" HideDetails="true" />
             </MCol>
             <MCol Cols="12">
-                <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" />
+                <MTextarea Rows="5" @bind-Value="Model.MainPage" Label="主页" HideDetails="true" />
             </MCol>
         </MRow>
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Infor.ToIconString()" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
-                <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" />
+                <CnGalWebSite.Components.Inputs.MasaSelecte @bind-Value="Model.Type" TValue="ArticleType" Label="类别" HideDetails="true" />
             </MCol>
             <MCol Cols="12" Md="6">
-                <MTextField @bind-Value="Model.NewsType" Label="动态类型" />
+                <MTextField @bind-Value="Model.NewsType" Label="动态类型" HideDetails="true" />
             </MCol>
             <MCol Cols="12" Md="6">
-                <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间" />
+                <CnGalWebSite.Components.Inputs.MasaDatePicker ShowDate ShowTime @bind-Value="Model.PublishTime" Label="原文发布时间"/>
             </MCol>
             <MCol Cols="6">
                 <RssTypeChip Type="Model.RssType"/>
             </MCol>
             <MCol Cols="12">
-                <MTextField @bind-Value="Model.Link" Label="原文链接" AppendIcon="mdi-open-in-app" OnAppendClick="OnAppendClick" />
+                <MTextField @bind-Value="Model.Link" Label="原文链接" AppendIcon="mdi-open-in-app" OnAppendClick="OnAppendClick" HideDetails="true" />
             </MCol>
         </MRow>
     </CnGalWebSite.Components.Containers.MasaTitleContainer>
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
         <MRow>
             <MCol Cols="12" Md="6">
-                <MTextField @bind-Value="Model.Author" Label="作者" />
+                <MTextField @bind-Value="Model.Author" Label="作者" HideDetails="true" />
             </MCol>
             <MCol Cols="12" Md="6">
-                <MTextField @bind-Value="Model.WeiboId" Label="微博Id" />
+                <MTextField @bind-Value="Model.WeiboId" Label="微博Id" HideDetails="true" />
             </MCol>
             <MCol Cols="12" Md="6">
-                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.AuthorEntryName" Label="关联词条名称" AutoCompleteItems="Items" />
+                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@Model.AuthorEntryName" Label="关联词条名称" AutoCompleteItems="Items" HideDetails="true" />
             </MCol>
         </MRow>
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="词条"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.Relevances.InputRelevancesListTip>

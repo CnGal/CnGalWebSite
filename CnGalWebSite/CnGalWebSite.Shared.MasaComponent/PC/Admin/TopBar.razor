@@ -2,13 +2,11 @@
 @inject NavigationManager NavigationManager
 
 
-<MDCard Class="pa-3 mb-4" Style="flex-direction: row;">
+<MDCard Class="pa-3 mb-4 admin-top-bar">
     <MSpacer></MSpacer>
     <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" Min />
      <MSpacer></MSpacer>
-     <CnGalWebSite.Shared.MasaComponent.PC.Layout.SwitchThemeModeButton Class="mr-6" />
-     <CnGalWebSite.Components.Buttons.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
-
+     <CnGalWebSite.Components.Buttons.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-2" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
      <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
 </MDCard>
 

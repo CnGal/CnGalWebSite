@@ -5,15 +5,18 @@
     {
         <SectionTitleCard Title="@Title" />
     }
-    <MRow>
-        @foreach(var item in Model)
-        {
-            <MCol Cols="12" Md="6" Lg="4">
-                <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@item.DisplayName" Label="唯一名称" AutoCompleteItems="AutoCompleteItems" />
-            </MCol>
-        }
-    </MRow>
-    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="OnAddinfor" Icon="mdi-plus"/>
+    @if (Model.Count != 0)
+    {
+        <MRow Class="mb-3">
+            @foreach (var item in Model)
+            {
+                <MCol Cols="12" Md="6" Lg="4">
+                    <CnGalWebSite.Components.Inputs.MasaAutoComplete @bind-Value="@item.DisplayName" Label="唯一名称" AutoCompleteItems="AutoCompleteItems" HideDetails="true"/>
+                </MCol>
+            }
+        </MRow>
+    }
+    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="添加" OnClick="OnAddinfor" Icon="mdi-plus" />
 </div>
 
 @code {
@@ -30,7 +33,7 @@
 
     private void OnAddinfor()
     {
-        Model.Add(new RelevancesModel());   
+        Model.Add(new RelevancesModel());
     }
 
 }
