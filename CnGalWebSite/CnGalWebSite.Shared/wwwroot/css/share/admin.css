@@ -4,12 +4,23 @@
     justify-content: space-around;
     gap: 1rem;
 }
+
     .admin-overview-card .item-card {
         display: flex;
         align-items: center;
-        gap:1rem;
+        gap: 1rem;
     }
+
     .admin-overview-card .name-card {
         font-size: large;
         font-weight: bold;
+    }
+
+.admin-top-bar {
+    flex-direction: row;
+}
+
+    .admin-top-bar .m-btn.m-btn--icon.m-size--default, .admin-top-bar .m-btn.m-btn--icon.m-size--default {
+        height: 48px;
+        width: 48px;
     }
