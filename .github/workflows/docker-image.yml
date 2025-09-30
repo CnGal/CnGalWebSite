@@ -21,6 +21,9 @@ jobs:
           with:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Generate timestamp tag
+          id: timestamp
+          run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
             
         # Server
         - name: build Blazor Server and push to Dockerhub
@@ -31,7 +34,8 @@ jobs:
             #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
             tags: |
-              littlefishtentears/cngalwebsiteserver
+              littlefishtentears/cngalwebsiteserver:latest
+              littlefishtentears/cngalwebsiteserver:${{ steps.timestamp.outputs.tag }}
               
          # API Server
         - name: build API Server and push to Dockerhub
@@ -42,7 +46,8 @@ jobs:
             #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
             tags: |
-              littlefishtentears/cngalwebsiteapiserver
+              littlefishtentears/cngalwebsiteapiserver:latest
+              littlefishtentears/cngalwebsiteapiserver:${{ steps.timestamp.outputs.tag }}
 
         # IdentityServer
         - name: build IdentityServer and push to Dockerhub
@@ -53,7 +58,8 @@ jobs:
             #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
             tags: |
-              littlefishtentears/cngalwebsiteidentityserver
+              littlefishtentears/cngalwebsiteidentityserver:latest
+              littlefishtentears/cngalwebsiteidentityserver:${{ steps.timestamp.outputs.tag }}
 
         # IdentityServer.Admin
         - name: build IdentityServer.Admin and push to Dockerhub
@@ -64,5 +70,6 @@ jobs:
             #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
             tags: |
-              littlefishtentears/cngalwebsiteidentityserveradmin
+              littlefishtentears/cngalwebsiteidentityserveradmin:latest
+              littlefishtentears/cngalwebsiteidentityserveradmin:${{ steps.timestamp.outputs.tag }}
         
