@@ -32,12 +32,12 @@ using Microsoft.Extensions.Logging;
 namespace CnGalWebSite.WebAssembly
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class Program
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -90,7 +90,7 @@ namespace CnGalWebSite.WebAssembly
                 options.ProviderOptions.ResponseType = "code";
             }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
             //添加Http服务
-            builder.Services.AddSingleton<IHttpService, HttpService>();
+            builder.Services.AddScoped<IHttpService, HttpService>();
             //注册身份验证的HttpClient
             builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
             builder.Services.AddHttpClient("AuthAPI")
