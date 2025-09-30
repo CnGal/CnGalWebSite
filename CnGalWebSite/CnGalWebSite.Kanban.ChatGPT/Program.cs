@@ -3,8 +3,20 @@ using Microsoft.Extensions.Configuration;
 using NetCore.AutoRegisterDi;
 using System.Reflection;
 using CnGalWebSite.Kanban.ChatGPT.Extensions;
+using NLog;
+using NLog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+// NLog: Setup NLog for Dependency injection
+builder.Logging.ClearProviders();
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.AddNLog();
+});
 
 // 添加后台任务
 builder.Services.AddHostedService<Worker>();
