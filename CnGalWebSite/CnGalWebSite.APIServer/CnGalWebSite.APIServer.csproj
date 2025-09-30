@@ -48,6 +48,8 @@
     <PackageReference Include="MimeKit" Version="4.10.0" />
     <PackageReference Include="NetCore.AutoRegisterDi" Version="2.2.1" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="6.0.4" />
+    <PackageReference Include="NLog" Version="6.0.4" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-preview.2.efcore.9.0.0" />
     <PackageReference Include="ReverseMarkdown" Version="4.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
