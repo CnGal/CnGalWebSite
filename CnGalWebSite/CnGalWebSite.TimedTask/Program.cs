@@ -11,8 +11,20 @@ using CnGalWebSite.TimedTask.Services;
 using System.Text.Json.Serialization;
 using CnGalWebSite.TimedTask.Extentions;
 using CnGalWebSite.HealthCheck.Models;
+using NLog;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+// Early init of NLog to allow startup and exception logging, before host is built
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("init main");
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    // NLog: Setup NLog for Dependency injection
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
 
 // Add services to the container.
 //添加数据库连接池
@@ -121,3 +133,15 @@ app.UseAuthorization();
 app.MapControllers().RequireAuthorization("ApiScope");
 
 app.Run();
+}
+catch (Exception exception)
+{
+    // NLog: catch setup errors
+    logger.Error(exception, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+    NLog.LogManager.Shutdown();
+}
