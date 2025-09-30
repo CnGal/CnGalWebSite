@@ -15,12 +15,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetCore.AutoRegisterDi;
+using NLog;
+using NLog.Web;
 
-MasudaBot asudaBot
-    = new(1, "", "");
+// Early init of NLog to allow startup and exception logging, before host is built
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("init main");
 
-//添加依赖注入
-using IHost host = Host.CreateDefaultBuilder(args)
+try
+{
+    MasudaBot asudaBot
+        = new(1, "", "");
+
+    //添加依赖注入
+    using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(builder =>
     {
         builder.AddCommandLine(args);//设置添加命令行
@@ -29,6 +37,12 @@ using IHost host = Host.CreateDefaultBuilder(args)
     {
         config.AddUserSecrets<Program>();
     })
+    .ConfigureLogging(logging =>
+    {
+        logging.ClearProviders();
+        logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+    })
+    .UseNLog()
     .ConfigureServices((builder, services) =>
     {
         //添加仓储
@@ -61,3 +75,15 @@ await _QQClientService.Init();
 
 
 await host.RunAsync();
+}
+catch (Exception exception)
+{
+    // NLog: catch setup errors
+    logger.Error(exception, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+    NLog.LogManager.Shutdown();
+}
