@@ -11,7 +11,7 @@
 @if (_currentThemeOptions?.IsDarkScheme ?? false)
 {
     <!--暗色模式-->
-     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/dark/bundle-dark.min.css" />
+    <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/dark/bundle-dark.min.css" />
     @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/dark/bundle-dark.css" /> *@
     <link rel="stylesheet" href="https://res.cngal.org/css/vs2015.min.css" />
 }
@@ -19,7 +19,7 @@ else
 {
 
     <!--亮色模式-->
-     <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/light/bundle-light.min.css" />
+    <link rel="stylesheet" href="https://res.cngal.org/_content/CnGalWebSite.Shared/css/light/bundle-light.min.css" />
     @* <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/light/bundle-light.css" /> *@
     <link rel="stylesheet" href="https://res.cngal.org/css/atom-one-light.min.css" />
 }
@@ -56,13 +56,13 @@ else
     [Parameter]
     public bool? Mobile { get; set; }
 
-    ThemeModel _themeSetting = new ThemeModel();
     private ThemeOptions? _currentThemeOptions;
 
     bool? _isDark;
     bool? _isTransparent;
     bool? _isFullScreen;
     string _themeColor;
+    bool _isReady;
 
 
     protected override void OnInitialized()
@@ -88,6 +88,10 @@ else
 
     public async void OnSavaTheme()
     {
+        if (_isReady == false)
+        {
+            return;
+        }
         await SaveTheme();
         await Refresh();
     }
@@ -108,6 +112,8 @@ else
             await LoadTheme();
             //刷新
             await Refresh();
+
+            _isReady = true;
         }
     }
 
