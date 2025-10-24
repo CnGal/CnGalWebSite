@@ -203,7 +203,8 @@ namespace CnGalWebSite.APIServer.Application.News
             var model = new List<OriginalRSS>();
 
             //获取最新B站数据
-            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "bilibili/user/dynamic/" + id);
+            // var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "bilibili/user/dynamic/" + id);
+            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "/bilibili/followings/dynamic/" + id);
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
