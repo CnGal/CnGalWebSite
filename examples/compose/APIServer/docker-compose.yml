@@ -50,6 +50,8 @@ services:
       - RSSBilibiliUserId=${RSSBilibiliUserId}
       # RSS
       - RSSUrl=${RSSUrl}
+      # B站专属RSS采集完整链接
+      - BilibiliRSSUrl=${BilibiliRSSUrl}
     hostname: apiserver
     restart: always
     healthcheck:

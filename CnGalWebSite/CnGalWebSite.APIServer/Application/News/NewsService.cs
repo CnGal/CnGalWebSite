@@ -116,7 +116,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
 
                 }
@@ -889,7 +889,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 BriefIntroduction = GetBilibiliBriefIntroduction(originalRSS.Description, authorString, 500),
                 Author = authorString,
                 MainPage = GetBilibiliMainPage(originalRSS.Description, authorString),
-                Link = GetBilibiliLink(originalRSS.Description),
+                Link = originalRSS.Link,
                 MainPicture = await GetBilibiliMainImage(GetBilibiliMainPage(originalRSS.Description, authorString)),
                 PublishTime = originalRSS.PublishTime,
                 State = GameNewsState.Edit
