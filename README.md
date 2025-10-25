@@ -297,7 +297,7 @@ QQ频道使用官方API，在 [.Net](https://github.com/microsoft/dotnet) 平台
 
 ## 社区交流
 
-CnGal 玩家交流群：[128446539](https://jq.qq.com/?_wv=1027&k=mG6qNvyg)
+CnGal 玩家交流群：[948774838](https://qm.qq.com/q/bgKC6yy5ri)
 
 CnGal 资料站编辑者交流&Bug 反馈群：[761794704](https://jq.qq.com/?_wv=1027&k=JzuI1IkF)
 

@@ -21,6 +21,9 @@ jobs:
           with:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Generate timestamp tag
+          id: timestamp
+          run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
                
         - name: build IdentityServer.Admin and push to Dockerhub
           uses: docker/build-push-action@v3
@@ -30,5 +33,6 @@ jobs:
             #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
             tags: |
-              littlefishtentears/cngalwebsiteidentityserveradmin
+              littlefishtentears/cngalwebsiteidentityserveradmin:latest
+              littlefishtentears/cngalwebsiteidentityserveradmin:${{ steps.timestamp.outputs.tag }}
         
