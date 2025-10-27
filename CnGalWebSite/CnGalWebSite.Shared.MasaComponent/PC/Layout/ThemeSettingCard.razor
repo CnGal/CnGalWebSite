@@ -339,5 +339,52 @@
         _eventService.OnSavaTheme();
         StateHasChanged();
     }
+
+    // 快速切换明暗主题
+    public void ToggleLightDarkTheme()
+    {
+        var currentTheme = _dataCacheService.ThemeSetting.Theme;
+        var colorName = GetColorName(currentTheme);
+        var themeGroups = GetThemeGroups();
+
+        if (string.IsNullOrEmpty(colorName))
+        {
+            return;
+        }
+
+        var currentGroup = themeGroups.FirstOrDefault(g => g.ColorName == colorName);
+        if (currentGroup == null)
+        {
+            return;
+        }
+
+        // 切换到对应的明暗主题
+        string newTheme;
+        if (currentTheme.EndsWith("-light") && currentGroup.DarkTheme != null)
+        {
+            newTheme = currentGroup.DarkTheme;
+        }
+        else if (currentTheme.EndsWith("-dark") && currentGroup.LightTheme != null)
+        {
+            newTheme = currentGroup.LightTheme;
+        }
+        else if (currentTheme == "camel")
+        {
+            // camel主题没有明暗切换，保持不变
+            return;
+        }
+        else if (currentGroup.LightTheme != null)
+        {
+            newTheme = currentGroup.LightTheme;
+        }
+        else
+        {
+            return;
+        }
+
+        _dataCacheService.ThemeSetting.Theme = newTheme;
+        _eventService.OnSavaTheme();
+        StateHasChanged();
+    }
 }
 

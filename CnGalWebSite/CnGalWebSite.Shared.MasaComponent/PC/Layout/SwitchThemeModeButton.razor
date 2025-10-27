@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IEventService _eventService
 
-<CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-cog" Tooltip="设置" OnClick="OnClick" Class="@Class" />
+<CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-theme-light-dark" Tooltip="切换主题" OnClick="OnSwitch" Class="@Class" />
 <CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard @ref="themeSettingCard" />
 
 @code {
@@ -18,5 +18,10 @@
         }
 
         _eventService.OnSavaTheme();
+    }
+
+    public void OnSwitch()
+    {
+        themeSettingCard.ToggleLightDarkTheme();
     }
 }
