@@ -49,7 +49,7 @@
                             <div class="user-info">
                                 @if (!string.IsNullOrWhiteSpace(Model?.BasicInfor?.PhotoPath))
                                 {
-                                    <img src="@Model.BasicInfor.PhotoPath.Split("?").Last()" alt="@Model.BasicInfor.Name" class="user-avatar" />
+                                    <img src="@ProcessImageUrl(Model.BasicInfor.PhotoPath)" alt="@Model.BasicInfor.Name" class="user-avatar" />
                                 }
                                 <div class="user-details">
                                     <div class="user-name">@Model?.BasicInfor?.Name 的游戏库</div>
@@ -66,7 +66,7 @@
                             @foreach (var game in DisplayGames)
                             {
                                 <a class="game-tile" style="@GetGameTileStyle(game)" title="@game.GameName - @FormatPlayTime(game.PlayDuration)" href="@($"/entries/index/{game.GameId}")">
-                                    <img src="@game.GameImage.Split("?").Last()" alt="@game.GameName" loading="lazy"/>
+                                    <img src="@ProcessImageUrl(game.GameImage)" alt="@game.GameName" loading="lazy"/>
                                 </a>
                             }
                         </div>
@@ -305,5 +305,29 @@
         {
             await ErrorHandler.ProcessError(ex, "复制图片失败");
         }
+    }
+
+    /// <summary>
+    /// 处理图片URL，移除查询参数
+    /// 只有当分割后的结果以http开头时才进行分割，否则返回原始URL
+    /// </summary>
+    private string ProcessImageUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return url;
+
+        // 如果URL不包含问号，直接返回原始URL
+        if (!url.Contains("?"))
+            return url;
+
+        // 分割URL并获取最后一部分
+        var result = url.Split("?").Last();
+
+        // 检查分割后的结果是否以http开头
+        if (result.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return result;
+
+        // 如果不是以http开头，返回原始URL
+        return url;
     }
 }
