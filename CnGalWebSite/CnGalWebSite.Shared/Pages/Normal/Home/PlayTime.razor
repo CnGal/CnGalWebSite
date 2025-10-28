@@ -1,0 +1,309 @@
+﻿@page "/playtime"
+
+@inject IHttpService _httpService
+@inject IJSRuntime JS
+@inject IPopupService _popupService
+@inject IDataCacheService _dataCacheService
+@inject IUserService _userService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="分享游戏库" Description="展示你的游戏收藏和游玩时长" />
+
+<div class="share-played-games-page">
+    <AuthorizeView>
+        <Authorized>
+            @if (isReady)
+            {
+                @if (string.IsNullOrWhiteSpace(Model?.SteamId))
+                {
+                    <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-6 mb-4">
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <MIcon Size="64" Color="primary">mdi-steam</MIcon>
+                            </div>
+                            <h3 class="mb-3">绑定Steam账号开始生成大图</h3>
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="绑定Steam账号" OnClick="OnEditSteam" Icon="@IconType.Steam.ToIconString()" />
+                        </div>
+                    </MDCard>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Outline Color="primary" Class="mb-4">
+                        Steam个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>哦，<a href="/articles/index/5" class="primary--text fw-bold">点击阅读教程</a>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                }
+                else if (GameRecords == null || GameRecords.Count == 0)
+                {
+                    <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-6 mb-4">
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <MIcon Size="64" Color="warning">mdi-alert-circle-outline</MIcon>
+                            </div>
+                            <h3 class="mb-3">未找到游戏记录</h3>
+                            <p class="mb-3">请先添加游戏记录或刷新Steam库存</p>
+                            <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
+                        </div>
+                    </MDCard>
+                }
+                else
+                {
+                    <MDCard Class="share-games-card mb-4 mobile-card" Id="share-games-content">
+                        <div class="title-section">
+                            <div class="user-info">
+                                @if (!string.IsNullOrWhiteSpace(Model?.BasicInfor?.PhotoPath))
+                                {
+                                    <img src="@Model.BasicInfor.PhotoPath.Split("?").Last()" alt="@Model.BasicInfor.Name" class="user-avatar" />
+                                }
+                                <div class="user-details">
+                                    <div class="user-name">@Model?.BasicInfor?.Name 的游戏库</div>
+                                    <div class="stats">
+                                        @($"共 {DisplayGames.Count} 款游戏 · 总游玩时长 {TotalPlayTime:F2} 小时")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="site-info">
+                                www.cngal.org/playtime
+                            </div>
+                        </div>
+                        <div class="games-mosaic">
+                            @foreach (var game in DisplayGames)
+                            {
+                                <a class="game-tile" style="@GetGameTileStyle(game)" title="@game.GameName - @FormatPlayTime(game.PlayDuration)" href="@($"/entries/index/{game.GameId}")">
+                                    <img src="@game.GameImage.Split("?").Last()" alt="@game.GameName" loading="lazy"/>
+                                </a>
+                            }
+                        </div>
+                        <div class="footer-section">
+                            <div class="footer-text">数据来自 CnGal资料站</div>
+                        </div>
+                    </MDCard>
+
+                    <MDCard Class="actions-card mb-4">
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="刷新数据" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" Small="_dataCacheService.IsApp" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="复制图片" Icon="mdi-content-copy" OnClick="OnClickCopy" Small="_dataCacheService.IsApp" />
+                        <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="下载图片" Icon="mdi-download" OnClick="OnClickDownload" Small="_dataCacheService.IsApp" />
+                    </MDCard>
+
+                    <MDCard Class="text-card mb-4">
+                        <div class="about-card">
+                            图片大小根据游玩时长自动调整，时长越长图片越大<br />
+                            支持一键复制分享到社交媒体，或下载保存到本地<br />
+                            数据来自你的Steam游戏库和CnGal资料站的游玩记录
+                        </div>
+                    </MDCard>
+                }
+            }
+            else
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+            }
+            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged" />
+
+        </Authorized>
+        <NotAuthorized>
+            <MDCard Style="display: flex; justify-content: center;align-items: center;" Class="pa-6 mb-4">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <MIcon Size="64" Color="primary">mdi-login</MIcon>
+                    </div>
+                    <h3 class="mb-3">登入后生成你的游戏库大图</h3>
+                    <CnGalWebSite.Components.Buttons.MasaButton Rounded Text="登入" OnClick="_userService.Login" Icon="@IconType.Login.ToIconString()" />
+                </div>
+            </MDCard>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public PersonalSpaceViewModel Model { get; set; }
+    public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
+    public List<GameRecordViewModel> DisplayGames = new List<GameRecordViewModel>();
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
+
+    bool isReady = false;
+    double TotalPlayTime => GameRecords.Sum(s => s.PlayDuration) / 60.0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                string userId = user.User.Claims.GetUserId();
+                Model = await _dataCacheService.PersonalSpaceDataCatche.GetCache(userId);
+                await LoadGameRecords(userId);
+                isReady = true;
+            }
+            catch (Exception ex)
+            {
+                await ErrorHandler.ProcessError(ex, "获取用户信息失败");
+            }
+        }
+        else
+        {
+            isReady = true;
+        }
+    }
+
+    private async Task LoadGameRecords(string userId)
+    {
+        try
+        {
+            GameRecords = await _dataCacheService.UserGameRecordDataCatche.GetCache(userId);
+            // 过滤出有效的游戏记录（有游玩时长且有图片）
+            var validGames = GameRecords
+                .Where(g => g.PlayDuration > 0 && !string.IsNullOrWhiteSpace(g.GameImage))
+                .OrderByDescending(g => g.PlayDuration)
+                .ToList();
+
+            // 限制最多显示 50 款游戏，避免图片过多
+            DisplayGames = validGames.Take(50).ToList();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取游戏记录失败");
+        }
+    }
+
+    private string GetGameTileStyle(GameRecordViewModel game)
+    {
+        if (DisplayGames.Count == 0) return "";
+
+        // 计算该游戏时长占总时长的比例
+        var totalDuration = DisplayGames.Sum(g => g.PlayDuration);
+        if (totalDuration == 0) return "grid-column: span 4; grid-row: span 2;";
+
+        var ratio = (double)game.PlayDuration / totalDuration;
+
+        // 根据占比和图片比例(460:215 ≈ 2.14:1)计算网格跨度
+        // 使用50px网格单元，保持宽高比接近2:1（接近实际的2.14:1）
+        int colSpan, rowSpan;
+
+        // 根据时长占比分配不同的网格大小，保持宽高比约为2:1
+        if (ratio >= 0.15) // 占比 >= 15%，超大游戏
+        {
+            colSpan = 12;
+            rowSpan = 6;
+        }
+        else if (ratio >= 0.10) // 占比 >= 10%，大游戏
+        {
+            colSpan = 10;
+            rowSpan = 5;
+        }
+        else if (ratio >= 0.06) // 占比 >= 6%，中大游戏
+        {
+            colSpan = 8;
+            rowSpan = 4;
+        }
+        else if (ratio >= 0.03) // 占比 >= 3%，中等游戏
+        {
+            colSpan = 6;
+            rowSpan = 3;
+        }
+        else if (ratio >= 0.015) // 占比 >= 1.5%，小游戏
+        {
+            colSpan = 4;
+            rowSpan = 2;
+        }
+        else if (ratio >= 0.008) // 占比 >= 0.8%，迷你游戏
+        {
+            colSpan = 4;
+            rowSpan = 2;
+        }
+        else // 占比 < 0.8%，微型游戏
+        {
+            colSpan = 2;
+            rowSpan = 1;
+        }
+
+        return $"grid-column: span {colSpan}; grid-row: span {rowSpan};";
+    }
+
+    private string FormatPlayTime(long minutes)
+    {
+        if (minutes < 60)
+            return $"{minutes}分钟";
+
+        var hours = minutes / 60.0;
+        if (hours < 100)
+            return $"{hours:F1}小时";
+
+        return $"{(int)hours}小时";
+    }
+
+    public void OnEditSteam()
+    {
+        if (editUserSteamInforTip != null)
+        {
+            editUserSteamInforTip.Refresh(true);
+        }
+    }
+
+    public async Task OnChanged(string steamId)
+    {
+        if (Model != null)
+        {
+            Model.SteamId = steamId;
+            await OnRefresh();
+        }
+    }
+
+    public async Task OnRefresh()
+    {
+        try
+        {
+            var user = await authenticationStateTask;
+            if (user.User.Identity.IsAuthenticated)
+            {
+                var result = await _httpService.GetAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor");
+                if (result.Successful)
+                {
+                    string userId = user.User.Claims.GetUserId();
+                    _dataCacheService.UserGameRecordDataCatche.Clean(userId);
+                    await LoadGameRecords(userId);
+                    await _popupService.ToastSuccessAsync("刷新成功", "已更新游戏库数据");
+                    StateHasChanged();
+                }
+                else
+                {
+                    await _popupService.ToastErrorAsync("刷新失败", result.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "刷新游戏库失败");
+        }
+    }
+
+    public async Task OnClickDownload()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("saveDivAsImage", "share-games-content", "我的游戏库", false);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "下载图片失败");
+        }
+    }
+
+    public async Task OnClickCopy()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("saveDivAsImage", "share-games-content", "我的游戏库", true);
+            await _popupService.EnqueueSnackbarAsync("复制图片成功", AlertTypes.Success);
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "复制图片失败");
+        }
+    }
+}

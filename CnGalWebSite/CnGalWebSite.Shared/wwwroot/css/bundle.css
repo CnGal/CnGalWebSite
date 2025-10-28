@@ -4378,18 +4378,18 @@ a.user-info-card {
     cursor: pointer;
 }
     .sedai-card .game-card.active {
-        background-color: var(--m-theme-secondary);
-        color: var(--md-sys-color-on-secondary);
+        background-color: rgba(var(--m-theme-secondary));
+        color: rgba(var(--m-theme-on-secondary));
     }
-    .sedai-card .year-card {
-        word-break: break-word;
-        text-align: center;
-        align-content: center;
-        width: 7.69%;
-        font-weight: bold;
-        background-color: var(--m-theme-primary);
-        color: rgba(var(--m-theme-on-primary));
-    }
+.sedai-card .year-card {
+    word-break: break-word;
+    text-align: center;
+    align-content: center;
+    width: 7.69%;
+    font-weight: bold;
+    background-color: rgba(var(--m-theme-primary));
+    color: rgba(var(--m-theme-on-primary));
+}
 .sedai-page .about-card {
     padding: 1rem;
     text-align: center;
@@ -4403,6 +4403,157 @@ a.user-info-card {
 .sedai-card .table-card {
     border-bottom: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) 1px solid;
     border-radius: var(--md-card-border-radius);
+}
+
+.share-played-games-page .share-played-games-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.share-played-games-page .share-games-card {
+    padding: 24px;
+    color: white;
+}
+
+.share-played-games-page .title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+}
+
+.share-played-games-page .user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.share-played-games-page .user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.share-played-games-page .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.share-played-games-page .user-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.share-played-games-page .stats {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.share-played-games-page .site-info {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.share-played-games-page .games-mosaic {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    grid-auto-rows: 50px;
+    grid-auto-flow: dense;
+    gap: 0;
+    min-height: 400px;
+}
+
+.share-played-games-page .game-tile {
+    position: relative;
+    overflow: hidden;
+    /* 网格跨度通过内联样式设置 */
+}
+
+    .share-played-games-page .game-tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 0;
+    }
+
+.share-played-games-page .footer-section {
+    padding-top: 16px;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.share-played-games-page .footer-text {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.share-played-games-page .actions-card {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.share-played-games-page .text-card {
+    padding: 16px;
+}
+
+.share-played-games-page .about-card {
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+    .share-played-games-page .about-card a {
+        color: var(--m-theme-primary);
+        text-decoration: underline;
+    }
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .share-played-games-page .share-games-card {
+        padding: 16px;
+    }
+
+    .share-played-games-page .title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .share-played-games-page .user-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .share-played-games-page .user-name {
+        font-size: 20px;
+    }
+
+    .share-played-games-page .stats {
+        font-size: 12px;
+    }
+
+    .share-played-games-page .games-mosaic {
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        grid-auto-rows: 40px;
+        grid-auto-flow: dense;
+        gap: 0;
+        min-height: 300px;
+    }
+
+    .share-played-games-page .share-games-card.mobile-card .games-mosaic {
+        grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+        grid-auto-rows: 20px;
+    }
+
+    .share-played-games-page .actions-card {
+        padding: 12px;
+        gap: 8px;
+    }
 }
 
 .expo-ticket-card {

@@ -5,12 +5,12 @@
     <Authorized>
         <CreateObjectButton Class="mr-2" />
         <CnGalWebSite.Components.Buttons.MasaButton Tooltip="任务" Icon="@IconType.Task.ToIconString()" Class="mr-2" Href="/tasks" />
-        <SwitchThemeModeButton />
+        <SwitchThemeModeButton Class="mr-2" />
         <UserButton Class="me-4" OnClickSetting="OnOpenSetting" />
     </Authorized>
     <NotAuthorized>
+        <SwitchThemeModeButton Class="mr-2" />
         <CnGalWebSite.Components.Buttons.MasaButton Icon="mdi-login" Class="mr-2" Tooltip="登入" OnClick="_userService.Login" />
-        <SwitchThemeModeButton/>
     </NotAuthorized>
 </AuthorizeView>
 @if (isOpen)
