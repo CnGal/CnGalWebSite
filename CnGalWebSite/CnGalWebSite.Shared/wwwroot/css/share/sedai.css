@@ -50,18 +50,18 @@
     cursor: pointer;
 }
     .sedai-card .game-card.active {
-        background-color: var(--m-theme-secondary);
-        color: var(--md-sys-color-on-secondary);
+        background-color: rgba(var(--m-theme-secondary));
+        color: rgba(var(--m-theme-on-secondary));
     }
-    .sedai-card .year-card {
-        word-break: break-word;
-        text-align: center;
-        align-content: center;
-        width: 7.69%;
-        font-weight: bold;
-        background-color: var(--m-theme-primary);
-        color: rgba(var(--m-theme-on-primary));
-    }
+.sedai-card .year-card {
+    word-break: break-word;
+    text-align: center;
+    align-content: center;
+    width: 7.69%;
+    font-weight: bold;
+    background-color: rgba(var(--m-theme-primary));
+    color: rgba(var(--m-theme-on-primary));
+}
 .sedai-page .about-card {
     padding: 1rem;
     text-align: center;

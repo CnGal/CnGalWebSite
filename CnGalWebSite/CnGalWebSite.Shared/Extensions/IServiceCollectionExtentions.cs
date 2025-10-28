@@ -27,7 +27,7 @@ namespace CnGalWebSite.Shared.Extentions
                 //主题
                 options.ConfigureTheme(theme =>
                 {
-                    theme.DefaultTheme = "pink-dark";
+                    theme.DefaultTheme = "pink-light";
                     // Amber Light Theme
                     theme.Themes.Add("amber-light", false, custom =>
                     {
