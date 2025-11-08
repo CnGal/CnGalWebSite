@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="LotteryUserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="LotteryUserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl + Id)" SortByItem="@nameof(LotteryUserOverviewModel.LotteryUserId)" SortDesc ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
