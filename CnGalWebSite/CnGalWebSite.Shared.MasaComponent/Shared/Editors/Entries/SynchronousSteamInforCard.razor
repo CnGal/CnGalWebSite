@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IFileUploadService _fileUploadService
+@using System.Text.Json
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="secondary">
     游戏在Steam上发布？尝试 <a class="tertiary--text fw-bold" @onclick="OnClick">导入Steam信息</a>
@@ -58,9 +59,8 @@
     {
         try
         {
-            // 调用 Steam API
-            var apiUrl = $"https://store.steampowered.com/api/appdetails?appids={SteamId}&l=schinese";
-            var jsonContent = await (await _httpService.GetClientAsync()).GetStringAsync(apiUrl);
+            // 通过后端 API 转发 Steam API
+            var jsonContent = await (await _httpService.GetClientAsync()).GetStringAsync($"{ToolHelper.WebApiPath}api/steam/GetSteamAppDetails/{SteamId}");
 
             using var document = JsonDocument.Parse(jsonContent);
             var root = document.RootElement;
