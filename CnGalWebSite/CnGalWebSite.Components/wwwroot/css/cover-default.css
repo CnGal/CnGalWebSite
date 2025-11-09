@@ -115,8 +115,8 @@ html {
 }
 
 .markdown-body blockquote {
-    color: var(--md-sys-color-secondary) !important;
-    border-left: .25em solid var(--md-sys-color-secondary) !important;
+    color: rgba(var(--m-theme-secondary)) !important;
+    border-left: .25em solid rgba(var(--m-theme-secondary)) !important;
     display: flex;
     flex-direction: column;
 }
