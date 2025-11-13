@@ -16,22 +16,24 @@
     }
 
     #blazor-error-ui .main-card {
-        background-color: var( --md-sys-color-error-container);
-        color: var(--md-sys-color-on-error-container) !important;
+        background-color: rgba(var(--m-theme-error));
+        color: rgba(var(--m-theme-on-error)) !important;
         position: fixed;
         top: 50%;
         bottom: 50%;
         left: 50%;
         right: 50%;
         transform: translate(-50%, -50%);
-        width: 400px;
-        height: 400px;
+        width: 460px;
+        height: 480px;
         border-radius: var( --md-card-border-radius);
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 1rem;
         justify-content: space-between;
+        text-align: center;
+        gap: 10px;
     }
 
     #blazor-error-ui .content-card {
@@ -39,15 +41,19 @@
         flex-direction: column;
         align-items: center;
     }
-/*重连*/
-.components-reconnect-show {
-    height: 1rem;
-    width: 1rem;
-    background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
-    position: fixed;
-    top: 0;
-    z-index: 200;
-}
+    #blazor-error-ui a {
+        color: rgba(var(--m-theme-on-error)) !important;
+        text-decoration-line: underline !important;
+    }
+    /*重连*/
+    .components-reconnect-show {
+        height: 1rem;
+        width: 1rem;
+        background-color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity));
+        position: fixed;
+        top: 0;
+        z-index: 200;
+    }
 /*错误提示*/
 #app-laoding {
     width: 100%;
