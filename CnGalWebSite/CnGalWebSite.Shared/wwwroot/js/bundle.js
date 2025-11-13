@@ -1093,6 +1093,7 @@ function browserVersion() {
     var isOpera = userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1; //Opera浏览器
     var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Chrome浏览器
     var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Safari浏览器
+    var isVivoBrowser = userAgent.indexOf("VivoBrowser") > -1; //VivoBrowser浏览器
     if (isIE) {
         return 1;
     } else if (isIE11) {
@@ -1132,6 +1133,8 @@ function browserVersion() {
         else {
             return 0;
         }
+    } else if (isVivoBrowser) {
+        return 1;
     } else {
         return -1;//不是ie浏览器
     }
