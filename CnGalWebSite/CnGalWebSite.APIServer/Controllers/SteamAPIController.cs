@@ -62,6 +62,14 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("{steamId}")]
+        public async Task<string> GetSteamAppDetails(int steamId)
+        {
+            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"https://store.steampowered.com/api/appdetails?appids={steamId}&l=schinese");
+            return content;
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<List<SteamUserInforModel>>> GetUserSteamInforAsync(string id)
         {

@@ -1,5 +1,6 @@
 ﻿@inject IHttpService _httpService
 @inject IFileUploadService _fileUploadService
+@using System.Text.Json
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3" Color="secondary">
     游戏在Steam上发布？尝试 <a class="tertiary--text fw-bold" @onclick="OnClick">导入Steam信息</a>
@@ -58,40 +59,110 @@
     {
         try
         {
-            var content = await (await _httpService.GetClientAsync()).GetStringAsync($"{ToolHelper.WebApiPath}api/steam/GetSteamHtml/{SteamId}");
+            // 通过后端 API 转发 Steam API
+            var jsonContent = await (await _httpService.GetClientAsync()).GetStringAsync($"{ToolHelper.WebApiPath}api/steam/GetSteamAppDetails/{SteamId}");
 
-            var document = new HtmlAgilityPack.HtmlDocument();
-            document.LoadHtml(content);
+            using var document = JsonDocument.Parse(jsonContent);
+            var root = document.RootElement;
+
+            // 获取应用数据
+            if (!root.TryGetProperty(SteamId, out var appElement))
+            {
+                throw new Exception("未找到 Steam 应用数据");
+            }
+
+            if (!appElement.TryGetProperty("success", out var successElement) || !successElement.GetBoolean())
+            {
+                throw new Exception("Steam API 返回失败");
+            }
+
+            if (!appElement.TryGetProperty("data", out var dataElement))
+            {
+                throw new Exception("Steam API 数据格式错误");
+            }
 
             //游戏名
-            var name = document.GetElementbyId("appHubAppName")?.InnerText;
-            //主图
-            var mainImage = document.GetElementbyId("gameHeaderImageCtn")?.ChildNodes.FirstOrDefault(s => s.HasClass("game_header_image_full"))?.GetAttributeValue("src", null);
-            var glance_ctn = document.GetElementbyId("game_highlights")?.ChildNodes.FirstOrDefault(s => s.HasClass("rightcol"))?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn"));
-            //简介
-            var briefIntroduction = ClearString(glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("game_description_snippet"))?.InnerText)?.Replace(" ", "");
-            //发行日期
-            var timeNote = glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn_responsive_left"))?.ChildNodes.FirstOrDefault(s => s.HasClass("release_date"))?.ChildNodes.FirstOrDefault(s => s.HasClass("date"))?.InnerText?.Replace(" ", "");
-            var time = timeNote.ToDate();
-            //开发商
-            var group = ClearString(document.GetElementbyId("developers_list")?.InnerText);
-            //发行商
-            var publisher = ClearString(glance_ctn?.ChildNodes.FirstOrDefault(s => s.HasClass("glance_ctn_responsive_left"))?.ChildNodes.FirstOrDefault(s => s.HasClass("dev_row") && s.ChildNodes.Any(s => s.HasClass("summary") && s.Id != "developers_list"))?.ChildNodes.FirstOrDefault(s => s.HasClass("summary"))?.InnerText);
-            //相册
-            var imagesNode = document.GetElementbyId("highlight_strip_scroll");
-            var images = imagesNode?.ChildNodes.Where(s => s.ChildNodes.Count == 3).Select(s =>
-            {
-                var image = s.ChildNodes.FirstOrDefault(s => s.Name == "img")?.GetAttributeValue("src", null)?.Split('?')?.First();
-                var temp = image?.Split('.');
-                return image.Replace("." + temp[^2], "");
-            });
+            var name = dataElement.TryGetProperty("name", out var nameElement) ? nameElement.GetString() : null;
 
-            var html = document.GetElementbyId("game_area_description")?.InnerHtml?.Replace("\t","");
+            //主图
+            var mainImage = dataElement.TryGetProperty("header_image", out var headerImageElement)
+                ? headerImageElement.GetString()
+                : null;
+
+            //简介
+            var briefIntroduction = dataElement.TryGetProperty("short_description", out var shortDescElement)
+                ? ClearString(shortDescElement.GetString())?.Replace(" ", "")
+                : null;
+
+            //发行日期
+            string timeNote = null;
+            DateTime? time = null;
+            if (dataElement.TryGetProperty("release_date", out var releaseDateElement))
+            {
+                if (releaseDateElement.TryGetProperty("date", out var dateElement))
+                {
+                    timeNote = dateElement.GetString();
+                    if (!string.IsNullOrWhiteSpace(timeNote))
+                    {
+                        time = timeNote.ToDate();
+                    }
+                }
+            }
+
+            //开发商
+            string group = null;
+            if (dataElement.TryGetProperty("developers", out var developersElement) && developersElement.ValueKind == JsonValueKind.Array)
+            {
+                var developers = developersElement.EnumerateArray()
+                    .Select(d => d.GetString())
+                    .Where(d => !string.IsNullOrWhiteSpace(d))
+                    .ToList();
+                if (developers.Any())
+                {
+                    group = string.Join(", ", developers);
+                }
+            }
+
+            //发行商
+            string publisher = null;
+            if (dataElement.TryGetProperty("publishers", out var publishersElement) && publishersElement.ValueKind == JsonValueKind.Array)
+            {
+                var publishers = publishersElement.EnumerateArray()
+                    .Select(p => p.GetString())
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .ToList();
+                if (publishers.Any())
+                {
+                    publisher = string.Join(", ", publishers);
+                }
+            }
+
+            //相册
+            var images = new List<string>();
+            if (dataElement.TryGetProperty("screenshots", out var screenshotsElement) && screenshotsElement.ValueKind == JsonValueKind.Array)
+            {
+                images = screenshotsElement.EnumerateArray()
+                    .Select(s => s.TryGetProperty("path_full", out var pathFullElement) ? pathFullElement.GetString() : null)
+                    .Where(img => !string.IsNullOrWhiteSpace(img))
+                    .ToList();
+            }
+
+            //主页内容
             var mainPage = "";
+            string html = null;
+            if (dataElement.TryGetProperty("detailed_description", out var detailedDescElement))
+            {
+                html = detailedDescElement.GetString();
+            }
+            else if (dataElement.TryGetProperty("about_the_game", out var aboutGameElement))
+            {
+                html = aboutGameElement.GetString();
+            }
+
             if (string.IsNullOrWhiteSpace(html) == false)
             {
                 var converter = new ReverseMarkdown.Converter();
-                mainPage = converter.Convert(html.Replace("<h2>关于这款游戏</h2>", ""));
+                mainPage = converter.Convert(html.Replace("<h2>关于这款游戏</h2>", "").Replace("<h2 class=\"bb_tag\">关于这款游戏</h2>", ""));
                 mainPage += $"\n > 以上介绍转载自Steam商店 https://store.steampowered.com/app/{SteamId}";
             }
 
