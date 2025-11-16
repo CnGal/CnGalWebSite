@@ -52,6 +52,8 @@ services:
       - RSSUrl=${RSSUrl}
       # B站专属RSS采集完整链接
       - BilibiliRSSUrl=${BilibiliRSSUrl}
+      # 小黑盒专属RSS采集完整链接
+      - HeyBoxRSSUrl=${HeyBoxRSSUrl}
     hostname: apiserver
     restart: always
     healthcheck:

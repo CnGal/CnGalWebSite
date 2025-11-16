@@ -6,7 +6,9 @@ using CnGalWebSite.DrawingBed.Helper.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
@@ -31,7 +33,7 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task<List<OriginalRSS>> GetOriginalWeibo(long id, DateTime fromTime)
         {
             var model = new List<OriginalRSS>();
-          
+
             //获取最新微博数据
             var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
             //反序列化数据
@@ -84,7 +86,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 WeiboId = id
             };
 
-     
+
 
             //获取最新微博数据
             var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id.ToString());
@@ -189,7 +191,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     //将图片上传到图床
 
                     weibo.Description = (await _fileUploadService.TransformImagesAsync(weibo.Description)).Text;
-                    
+
 
                     return weibo;
                 }
@@ -242,6 +244,122 @@ namespace CnGalWebSite.APIServer.Application.News
             foreach (var item in model)
             {
                 item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+            }
+
+            return model;
+        }
+
+        public async Task<List<OriginalRSS>> GetOriginalHeyBox(DateTime fromTime)
+        {
+            var model = new List<OriginalRSS>();
+
+            try
+            {
+                //获取最新小黑盒数据
+                var jsonStr = await _httpClient.GetStringAsync(_configuration["HeyBoxRSSUrl"]);
+
+                //反序列化数据
+                using var doc = JsonDocument.Parse(jsonStr);
+                var root = doc.RootElement;
+
+                if (!root.TryGetProperty("data", out var dataArray))
+                {
+                    return model;
+                }
+
+                foreach (var item in dataArray.EnumerateArray())
+                {
+                    var heyBoxPost = new OriginalRSS
+                    {
+                        Type = OriginalRSSType.HeyBox
+                    };
+
+                    // 解析发布时间
+                    if (item.TryGetProperty("create_at", out var createAt))
+                    {
+                        heyBoxPost.PublishTime = DateTime.Parse(createAt.GetString()).ToUniversalTime();
+                    }
+
+                    // 小黑盒时间是否早于起始时间
+                    if (heyBoxPost.PublishTime <= fromTime)
+                    {
+                        continue;
+                    }
+
+                    // 获取标题
+                    if (item.TryGetProperty("title", out var title))
+                    {
+                        heyBoxPost.Title = title.GetString();
+                    }
+
+                    // 获取作者
+                    if (item.TryGetProperty("username", out var username))
+                    {
+                        heyBoxPost.Author = username.GetString();
+                    }
+
+                    // 获取描述
+                    if (item.TryGetProperty("description", out var description))
+                    {
+                        heyBoxPost.Description = description.GetString();
+                    }
+
+                    // 获取分享链接
+                    if (item.TryGetProperty("share_url", out var shareUrl))
+                    {
+                        heyBoxPost.Link = shareUrl.GetString();
+                    }
+
+                    // 处理图片数组
+                    if (item.TryGetProperty("imgs", out var imgs))
+                    {
+                        var imgsStr = imgs.GetString();
+                        if (!string.IsNullOrWhiteSpace(imgsStr) && imgsStr != "[]")
+                        {
+                            try
+                            {
+                                using var imgDoc = JsonDocument.Parse(imgsStr);
+                                var imgArray = imgDoc.RootElement;
+                                var imageUrls = new List<string>();
+
+                                foreach (var imgUrl in imgArray.EnumerateArray())
+                                {
+                                    imageUrls.Add(imgUrl.GetString());
+                                }
+
+                                // 将图片添加到描述中
+                                if (imageUrls.Any())
+                                {
+                                    heyBoxPost.Description += "\n\n";
+                                    foreach (var imgUrl in imageUrls)
+                                    {
+                                        heyBoxPost.Description += $"<img src=\"{imgUrl}\" />\n";
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // 图片解析失败，忽略
+                            }
+                        }
+                    }
+
+                    model.Add(heyBoxPost);
+                }
+
+                // 将图片上传到图床
+                foreach (var item in model)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // 记录异常但不中断流程
+                // 可以考虑添加日志记录
             }
 
             return model;

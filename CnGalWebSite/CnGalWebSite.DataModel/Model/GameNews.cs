@@ -96,6 +96,8 @@ namespace CnGalWebSite.DataModel.Model
         Custom,
         [Display(Name = "B站")]
         Bilibili,
+        [Display(Name = "小黑盒")]
+        HeyBox,
     }
 
     public class WeeklyNews

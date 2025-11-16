@@ -217,7 +217,8 @@ namespace CnGalWebSite.Components.Models
         Send,
         Circuit,
         Bilibili,
-        Expo
+        Expo,
+        Heybox
     }
 
     public static class IconTypeHelper
@@ -226,6 +227,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.Heybox:
+                    return "mdi-package-variant";
                 case IconType.Expo:
                     return "mdi-shopping";
                 case IconType.Bilibili:
