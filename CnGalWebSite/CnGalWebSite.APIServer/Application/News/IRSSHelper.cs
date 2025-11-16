@@ -16,5 +16,7 @@ namespace CnGalWebSite.APIServer.Application.News
         Task<OriginalRSS> GetOriginalWeibo(long id, string keyWord);
 
         Task<List<OriginalRSS>> GetOriginalBilibili(long id, DateTime fromTime);
+
+        Task<List<OriginalRSS>> GetOriginalHeyBox(DateTime fromTime);
     }
 }

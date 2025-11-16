@@ -71,9 +71,13 @@ namespace CnGalWebSite.APIServer.Application.News
             var bilibiliTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Bilibili) ?
                 await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
+            var heyBoxTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.HeyBox) ?
+                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.HeyBox).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+
             // 获取rss源
             var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
             rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), bilibiliTime));
+            rss.AddRange(await _rssHelper.GetOriginalHeyBox(heyBoxTime));
 
             //var rss = await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time);
 
@@ -580,6 +584,7 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 OriginalRSSType.Weibo => await ProcessingMicroblog(originalRSS, entries, users),
                 OriginalRSSType.Bilibili => await ProcessingBilibili(originalRSS, entries, users),
+                OriginalRSSType.HeyBox => await ProcessingHeyBox(originalRSS, entries, users),
                 _ => null
             };
         }
@@ -806,7 +811,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
             var title = Markdown.ToPlainText(GetBilibiliMainPage(description, author), pipeline);
 
-           
+
             //去除 图片
             do
             {
@@ -930,6 +935,130 @@ namespace CnGalWebSite.APIServer.Application.News
 
             return model;
         }
+        #endregion
+
+        #region 小黑盒
+
+        public async Task<GameNews> ProcessingHeyBox(OriginalRSS originalRSS, List<string> entries, List<WeiboUserInfor> users)
+        {
+            var authorString = originalRSS.Author;
+            var model = new GameNews
+            {
+                Type = ArticleType.News,
+                RSS = originalRSS,
+                Title = GetHeyBoxTitle(originalRSS.Title, 30),
+                BriefIntroduction = GetHeyBoxBriefIntroduction(originalRSS.Description, 500),
+                Author = authorString,
+                MainPage = GetHeyBoxMainPage(originalRSS.Description),
+                Link = originalRSS.Link,
+                MainPicture = await GetHeyBoxMainImage(originalRSS.Description),
+                PublishTime = originalRSS.PublishTime,
+                State = GameNewsState.Edit,
+                IsOriginal = true
+            };
+
+            //检查是否重复
+            if (await _gameNewsRepository.GetAll().Include(s => s.RSS).AnyAsync(s => (s.RSS.Link == model.Link || s.Link == model.Link) && s.Title != "已删除"))
+            {
+                throw new Exception("该小黑盒动态已存在");
+            }
+
+            //查找关联词条
+            var relatedEntries = new List<string>();
+            foreach (var item in entries)
+            {
+                if (originalRSS.Title.Contains(item) || originalRSS.Description.Contains(item))
+                {
+                    relatedEntries.Add(item);
+                }
+            }
+
+            //过滤关联词条
+            relatedEntries = ScreenRelatedEntry(relatedEntries);
+
+            foreach (var item in relatedEntries)
+            {
+                model.Entries.Add(new GameNewsRelatedEntry
+                {
+                    EntryName = item
+                });
+            }
+
+            // 如果找到了关联词条且有主图，可以考虑自动发布
+            if (model.Entries.Count > 0 && !string.IsNullOrWhiteSpace(model.MainPicture))
+            {
+                model.State = GameNewsState.Publish;
+            }
+
+            return model;
+        }
+
+        public string GetHeyBoxTitle(string title, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                return "未命名";
+            }
+
+            // 清理标题中的特殊字符和表情
+            var cleanTitle = Regex.Replace(title, @"\[[\w_!]+\]", "");
+            cleanTitle = cleanTitle.Trim();
+
+            return _appHelper.GetStringAbbreviation(cleanTitle, maxLength);
+        }
+
+        public string GetHeyBoxBriefIntroduction(string description, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return "";
+            }
+
+            // 转换为纯文本
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            var plainText = Markdown.ToPlainText(GetHeyBoxMainPage(description), pipeline);
+
+            // 清理表情符号
+            plainText = Regex.Replace(plainText, @"\[[\w_!]+\]", "");
+
+            //去除图片
+            do
+            {
+                var midStr = ToolHelper.MidStrEx(plainText, "[", "]");
+                plainText = plainText.Replace($"[{midStr}]", "");
+            } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(plainText, "[", "]")) == false);
+
+            return _appHelper.GetStringAbbreviation(plainText.Trim(), maxLength);
+        }
+
+        public string GetHeyBoxMainPage(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return "";
+            }
+
+            // 清理小黑盒特有的表情标记
+            var text = description;
+
+            // 将HTML转换为Markdown
+            var converter = new ReverseMarkdown.Converter();
+            var markdown = converter.Convert(text).Replace("\\[\\]", "[]");
+
+            return markdown;
+        }
+
+        public async Task<string> GetHeyBoxMainImage(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return "";
+            }
+
+            var links = description.GetImageLinks();
+            return links.Any() ? await _fileUploadService.TransformImageAsync(links.First(), 460, 215) : "";
+        }
+
         #endregion
 
         public List<string> ScreenRelatedEntry(List<string> entries)
