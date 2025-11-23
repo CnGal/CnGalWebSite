@@ -15,20 +15,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using CnGalWebSite.IdentityServer.Admin.Shared.Extensions;
-using NLog;
-using NLog.Web;
 
-// Early init of NLog to allow startup and exception logging, before host is built
-var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
-logger.Debug("init main");
-
-try
-{
-    var builder = WebApplication.CreateBuilder(args);
-
-    // NLog: Setup NLog for Dependency injection
-    builder.Logging.ClearProviders();
-    builder.Host.UseNLog();
+var builder = WebApplication.CreateBuilder(args);
 //判断是否 SSR
 StaticOptions.IsSSR = StaticOptions.PreSetIsSSR == null ? true : StaticOptions.PreSetIsSSR.Value;
 //覆盖默认api地址
@@ -196,15 +184,3 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
-}
-catch (Exception exception)
-{
-    // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception");
-    throw;
-}
-finally
-{
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
-}

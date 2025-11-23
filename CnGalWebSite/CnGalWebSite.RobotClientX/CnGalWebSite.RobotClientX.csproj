@@ -24,10 +24,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
     <PackageReference Include="UnifyBot" Version="1.3.5" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.Components\CnGalWebSite.Components.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Core\CnGalWebSite.Core.csproj" />
@@ -35,7 +33,7 @@
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
     <ProjectReference Include="..\CnGalWebSite.RobotClientX.Models\CnGalWebSite.RobotClientX.Models.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Using Include="CnGalWebSite.Extensions" />
   </ItemGroup>
