@@ -12,20 +12,8 @@ using CnGalWebSite.GameSite.API.Services;
 using Microsoft.IdentityModel.Tokens;
 using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.GameSite.API.DataReositories;
-using NLog;
-using NLog.Web;
 
-// Early init of NLog to allow startup and exception logging, before host is built
-var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
-logger.Debug("init main");
-
-try
-{
-    var builder = WebApplication.CreateBuilder(args);
-
-    // NLog: Setup NLog for Dependency injection
-    builder.Logging.ClearProviders();
-    builder.Host.UseNLog();
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -159,15 +147,3 @@ app.UseAuthorization();
 app.MapControllers().RequireAuthorization("ApiScope");
 
 app.Run();
-}
-catch (Exception exception)
-{
-    // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception");
-    throw;
-}
-finally
-{
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
-}

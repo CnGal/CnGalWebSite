@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Linq;
-using NLog;
-using NLog.Web;
-using Microsoft.Extensions.Logging;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -19,27 +18,38 @@ namespace CnGalWebSite.IdentityServer
     {
         public static int Main(string[] args)
         {
-            // Early init of NLog to allow startup and exception logging, before host is built
-            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                // uncomment to write to Azure diagnostics stream
+                //.WriteTo.File(
+                //    @"D:\home\LogFiles\Application\identityserver.txt",
+                //    fileSizeLimitBytes: 1_000_000,
+                //    rollOnFileSizeLimit: true,
+                //    shared: true,
+                //    flushToDiskInterval: TimeSpan.FromSeconds(1))
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
+                .CreateLogger();
 
             try
             {
-                logger.Debug("init main");
                 var host = CreateHostBuilder(args).Build();
-                logger.Info("Starting host...");
+                Log.Information("Starting host...");
                 host.Run();
                 return 0;
             }
             catch (Exception ex)
             {
-                // NLog: catch setup errors
-                logger.Error(ex, "Host terminated unexpectedly.");
-                throw;
+                Log.Fatal(ex, "Host terminated unexpectedly.");
+                return 1;
             }
             finally
             {
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                NLog.LogManager.Shutdown();
+                Log.CloseAndFlush();
             }
         }
 
@@ -49,12 +59,7 @@ namespace CnGalWebSite.IdentityServer
                 {
                     builder.AddCommandLine(args);//设置添加命令行
                 })
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Trace);
-                })
-                .UseNLog()
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
