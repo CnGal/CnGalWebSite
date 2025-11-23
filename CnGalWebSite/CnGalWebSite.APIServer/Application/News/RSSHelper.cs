@@ -21,62 +21,73 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly IConfiguration _configuration;
         private readonly IFileService _fileService;
         private readonly IFileUploadService _fileUploadService;
+        private readonly ILogger<RSSHelper> _logger;
 
-        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService, IFileUploadService fileUploadService)
+        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService, IFileUploadService fileUploadService, ILogger<RSSHelper> logger)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _fileService = fileService;
             _fileUploadService = fileUploadService;
+            _logger = logger;
         }
 
         public async Task<List<OriginalRSS>> GetOriginalWeibo(long id, DateTime fromTime)
         {
-            var model = new List<OriginalRSS>();
-
-            //获取最新微博数据
-            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
-            //反序列化数据
-            var doc = new XmlDocument();
-            doc.LoadXml(xmlStr);
-
-            var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
-            foreach (XmlNode item in items)
+            try
             {
-                var weibo = new OriginalRSS
-                {
-                    Type = OriginalRSSType.Weibo
-                };
+                var model = new List<OriginalRSS>();
 
-                var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
-                weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
+                //获取最新微博数据
+                var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+                //反序列化数据
+                var doc = new XmlDocument();
+                doc.LoadXml(xmlStr);
 
-                //微博时间是否早于起始时间
-                if (weibo.PublishTime <= fromTime)
+                var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
+                foreach (XmlNode item in items)
                 {
-                    return model;
+                    var weibo = new OriginalRSS
+                    {
+                        Type = OriginalRSSType.Weibo
+                    };
+
+                    var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
+                    weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
+
+                    //微博时间是否早于起始时间
+                    if (weibo.PublishTime <= fromTime)
+                    {
+                        return model;
+                    }
+                    var title = (XmlElement)item.SelectSingleNode("title");
+                    weibo.Title = title.InnerText;
+
+                    var author = (XmlElement)item.SelectSingleNode("author");
+                    weibo.Author = author.InnerText;
+
+                    var description = (XmlElement)item.SelectSingleNode("description");
+                    weibo.Description = description.InnerText;
+                    var link = (XmlElement)item.SelectSingleNode("link");
+                    weibo.Link = link.InnerText;
+
+                    model.Add(weibo);
                 }
-                var title = (XmlElement)item.SelectSingleNode("title");
-                weibo.Title = title.InnerText;
 
-                var author = (XmlElement)item.SelectSingleNode("author");
-                weibo.Author = author.InnerText;
+                //将图片上传到图床
+                foreach (var item in model)
+                {
+                    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                }
 
-                var description = (XmlElement)item.SelectSingleNode("description");
-                weibo.Description = description.InnerText;
-                var link = (XmlElement)item.SelectSingleNode("link");
-                weibo.Link = link.InnerText;
-
-                model.Add(weibo);
+                return model;
             }
-
-            //将图片上传到图床
-            foreach (var item in model)
+            catch (Exception ex)
             {
-                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                _logger.LogError(ex, "获取微博动态失败");
+                return [];
             }
 
-            return model;
         }
 
         public async Task<WeiboUserInfor> GetWeiboUserInfor(long id)
@@ -202,59 +213,66 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task<List<OriginalRSS>> GetOriginalBilibili(long id, DateTime fromTime)
         {
-            var model = new List<OriginalRSS>();
-
-            //获取最新B站数据
-            var xmlStr = await _httpClient.GetStringAsync(_configuration["BilibiliRSSUrl"]);
-            //反序列化数据
-            var doc = new XmlDocument();
-            doc.LoadXml(xmlStr);
-
-            var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
-            foreach (XmlNode item in items)
+            try
             {
-                var weibo = new OriginalRSS
-                {
-                    Type = OriginalRSSType.Bilibili
-                };
+                var model = new List<OriginalRSS>();
 
-                var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
-                weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
+                //获取最新B站数据
+                var xmlStr = await _httpClient.GetStringAsync(_configuration["BilibiliRSSUrl"]);
+                //反序列化数据
+                var doc = new XmlDocument();
+                doc.LoadXml(xmlStr);
 
-                //微博时间是否早于起始时间
-                if (weibo.PublishTime <= fromTime)
+                var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
+                foreach (XmlNode item in items)
                 {
-                    return model;
+                    var weibo = new OriginalRSS
+                    {
+                        Type = OriginalRSSType.Bilibili
+                    };
+
+                    var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
+                    weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
+
+                    //微博时间是否早于起始时间
+                    if (weibo.PublishTime <= fromTime)
+                    {
+                        return model;
+                    }
+                    var title = (XmlElement)item.SelectSingleNode("title");
+                    weibo.Title = title.InnerText;
+
+                    var author = (XmlElement)item.SelectSingleNode("author");
+                    weibo.Author = author.InnerText;
+
+                    var description = (XmlElement)item.SelectSingleNode("description");
+                    weibo.Description = description.InnerText;
+                    var link = (XmlElement)item.SelectSingleNode("link");
+                    weibo.Link = link.InnerText;
+
+                    model.Add(weibo);
                 }
-                var title = (XmlElement)item.SelectSingleNode("title");
-                weibo.Title = title.InnerText;
 
-                var author = (XmlElement)item.SelectSingleNode("author");
-                weibo.Author = author.InnerText;
+                //将图片上传到图床
+                foreach (var item in model)
+                {
+                    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                }
 
-                var description = (XmlElement)item.SelectSingleNode("description");
-                weibo.Description = description.InnerText;
-                var link = (XmlElement)item.SelectSingleNode("link");
-                weibo.Link = link.InnerText;
-
-                model.Add(weibo);
+                return model;
             }
-
-            //将图片上传到图床
-            foreach (var item in model)
+            catch (Exception ex)
             {
-                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                _logger.LogError(ex, "获取Bilibili动态失败");
+                return [];
             }
-
-            return model;
         }
 
         public async Task<List<OriginalRSS>> GetOriginalHeyBox(DateTime fromTime)
         {
-            var model = new List<OriginalRSS>();
-
             try
             {
+                var model = new List<OriginalRSS>();
                 //获取最新小黑盒数据
                 var jsonStr = await _httpClient.GetStringAsync(_configuration["HeyBoxRSSUrl"]);
 
@@ -355,14 +373,15 @@ namespace CnGalWebSite.APIServer.Application.News
                         item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
                     }
                 }
+                return model;
             }
             catch (Exception ex)
             {
-                // 记录异常但不中断流程
-                // 可以考虑添加日志记录
+                _logger.LogError(ex, "获取小黑盒动态失败");
+                return [];
             }
 
-            return model;
+
         }
 
     }
