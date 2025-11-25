@@ -6,7 +6,7 @@ using CnGalWebSite.DrawingBed.Services;
 using CnGalWebSite.HealthCheck.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 
@@ -95,7 +95,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+});
 app.UseSwaggerUI();
 
 app.UseCors(options =>

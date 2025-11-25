@@ -6,7 +6,6 @@ using CnGalWebSite.RobotClientX.Services;
 using NetCore.AutoRegisterDi;
 using CnGalWebSite.RobotClientX.DataRepositories;
 using CnGalWebSite.Core.Services.Query;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 
@@ -15,6 +14,7 @@ using Masa.Blazor;
 using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.EventBus.Services;
 using CnGalWebSite.RobotClientX.Services.Messages;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 //自动重置配置
@@ -115,7 +115,10 @@ _ = app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseStaticFiles();
 //启用中间件Swagger
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+});
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");

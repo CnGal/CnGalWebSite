@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序" />
 
 <style>
     .row {
@@ -18,13 +18,13 @@
     else
     {
         <div>
-            <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ValueChanged="ValueChanged"/>
+            <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ValueChanged="ValueChanged" />
         </div>
         <div class="row">
             @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Skip((_dataCacheService.DiscountPageCatcheHelper.CurrentPage - 1) * _dataCacheService.DiscountPageCatcheHelper.MaxCount).Take(_dataCacheService.DiscountPageCatcheHelper.MaxCount))
             {
-                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-lg-4"))">
-                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s=>s==item.Id)"/>
+                <div class="@("mb-3 " + (_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType == SteamDisplayType.LongCard ? "col-12" : "col-12 col-md-6 col-lg-4"))">
+                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s => s == item.Id)" />
                 </div>
             }
 
@@ -36,7 +36,7 @@
         }
         @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count() == 0)
         {
-            <NotFoundCard  />
+            <NotFoundCard />
         }
     }
 </div>
@@ -50,7 +50,32 @@
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
+            {
+                _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<StoreInfoCardModel>>("api/storeinfo/GetAllGameStoreInfo"));
 
+                try
+                {
+                    _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await _httpService.GetAsync<List<int>>("api/playedgame/GetUserGameIds");
+                }
+                catch
+                {
+
+                }
+
+
+            }
+
+            isReady = true;
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
+        }
 
     }
 
@@ -58,45 +83,20 @@
     {
         if (firstRender)
         {
-            try
-            {
-                if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
-                {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await _httpService.GetAsync<List<StoreInfoCardModel>>("api/storeinfo/GetAllGameStoreInfo"));
-
-                    try
-                    {
-                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await _httpService.GetAsync<List<int>>("api/playedgame/GetUserGameIds");
-                    }
-                    catch
-                    {
-
-                    }
-
-
-                }
-
-                isReady = true;
-                StateHasChanged();
-
-            }
-            catch (Exception ex)
-            {
-                await ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
-            }
         }
+
     }
 
     public void ValueChanged()
     {
         StateHasChanged();
-        
+
     }
 
     private void OnPageClick(int pageIndex)
     {
         _dataCacheService.DiscountPageCatcheHelper.CurrentPage = pageIndex;
         StateHasChanged();
-        
+
     }
 }

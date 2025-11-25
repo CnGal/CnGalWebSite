@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
+﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.GameSite.API.DataReositories;
 using CnGalWebSite.GameSite.API.Infrastructure;
+using CnGalWebSite.GameSite.API.Services;
+using CnGalWebSite.HealthCheck.Models;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using NetCore.AutoRegisterDi;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
-using NetCore.AutoRegisterDi;
-using CnGalWebSite.Core.Services.Query;
-using CnGalWebSite.Core.Services;
-using CnGalWebSite.GameSite.API.Services;
-using Microsoft.IdentityModel.Tokens;
-using CnGalWebSite.HealthCheck.Models;
-using CnGalWebSite.GameSite.API.DataReositories;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,7 +118,10 @@ app.UseDeveloperExceptionPage();
 //添加真实IP中间件
 app.UseForwardedHeaders();
 
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+});
 app.UseSwaggerUI();
 
 //添加状态检查终结点

@@ -3,7 +3,6 @@ using CnGalWebSite.TimedTask.DataReositories;
 using CnGalWebSite.TimedTask.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using CnGalWebSite.EventBus.Extensions;
@@ -11,6 +10,7 @@ using CnGalWebSite.TimedTask.Services;
 using System.Text.Json.Serialization;
 using CnGalWebSite.TimedTask.Extentions;
 using CnGalWebSite.HealthCheck.Models;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,7 +99,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+});
 app.UseSwaggerUI();
 
 app.UseCors(options =>
