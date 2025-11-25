@@ -3,7 +3,6 @@ using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -14,6 +13,7 @@ using CnGalWebSite.ProjectSite.API.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.EventBus.Extensions;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,7 +121,10 @@ app.UseDeveloperExceptionPage();
 //添加真实IP中间件
 app.UseForwardedHeaders();
 
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+});
 app.UseSwaggerUI();
 
 //添加状态检查终结点

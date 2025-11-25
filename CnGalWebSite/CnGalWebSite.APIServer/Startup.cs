@@ -28,7 +28,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using NetCore.AutoRegisterDi;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
@@ -43,6 +42,7 @@ using System.Text.Json.Serialization;
 using Typesense.Setup;
 using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.APIServer.Application.Tasks;
+using Microsoft.OpenApi;
 
 namespace CnGalWebSite.APIServer
 {
@@ -100,7 +100,16 @@ namespace CnGalWebSite.APIServer
                 .AddTypesenseClient(config =>
                 {
                     config.ApiKey = Configuration["TypesenseAPIKey"];
-                    config.Nodes = new List<Node> { new Node(Configuration["TypesenseHost"], Configuration["TypesensePort"]) };
+                    config.Nodes = new List<Node>
+                    {
+                        new Node
+                        (
+                            Configuration["TypesenseHost"],
+                            Configuration["TypesensePort"],
+                            "http", // 或根据实际配置选择 "https"
+                            ""      // 如果没有额外路径则传递空字符串
+                        )
+                    };
                 });
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
@@ -210,7 +219,10 @@ namespace CnGalWebSite.APIServer
             //添加静态文件中间件
             app.UseStaticFiles();
             //启用中间件Swagger
-            app.UseSwagger();
+            app.UseSwagger(options =>
+            {
+                options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+            });
             app.UseSwaggerUI();
 
             //添加状态检查终结点

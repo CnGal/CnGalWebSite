@@ -21,7 +21,6 @@ using NewCngal.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using System;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.IO;
@@ -32,6 +31,7 @@ using IdentityServer4.EntityFramework.Mappers;
 using System.Linq;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Services;
+using Microsoft.OpenApi;
 
 namespace CnGalWebSite.IdentityServer
 {
@@ -259,7 +259,10 @@ namespace CnGalWebSite.IdentityServer
 
             app.UseStaticFiles();
             //启用中间件Swagger
-            app.UseSwagger();
+            app.UseSwagger(options =>
+            {
+                options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+            });
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "CnGal API V1");
