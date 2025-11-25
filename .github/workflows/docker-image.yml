@@ -3,73 +3,373 @@ name: Build and push all image
 on: workflow_dispatch # 手动触发
  
 jobs:
-  build-and-push:
-      if: ${{ github.ref == 'refs/heads/master' && github.repository == 'CnGal/CnGalWebSite' }}  # 检测master分支是否有更新
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@master
+  # 共享的初始化步骤
+  setup:
+    if: ${{ github.ref == 'refs/heads/master' && github.repository == 'CnGal/CnGalWebSite' }}
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.timestamp.outputs.tag }}
+    steps:
+      - name: Generate timestamp tag
+        id: timestamp
+        run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
 
-        - name: Set up QEMU
-          uses: docker/setup-qemu-action@v2
+  # Server
+  build-server:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
 
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-        - name: Login to DockerHub
-          uses: docker/login-action@v1
-          with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_TOKEN }}
-        - name: Generate timestamp tag
-          id: timestamp
-          run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
-            
-        # Server
-        - name: build Blazor Server and push to Dockerhub
-          uses: docker/build-push-action@v3
-          with:
-            context: .
-            file: ./CnGalWebSite/CnGalWebSite.Server/Dockerfile # Dockerfile 位置
-            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-            push: true
-            tags: |
-              littlefishtentears/cngalwebsiteserver:latest
-              littlefishtentears/cngalwebsiteserver:${{ steps.timestamp.outputs.tag }}
-              
-         # API Server
-        - name: build API Server and push to Dockerhub
-          uses: docker/build-push-action@v3
-          with:
-            context: .
-            file: ./CnGalWebSite/CnGalWebSite.APIServer/Dockerfile # Dockerfile 位置
-            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-            push: true
-            tags: |
-              littlefishtentears/cngalwebsiteapiserver:latest
-              littlefishtentears/cngalwebsiteapiserver:${{ steps.timestamp.outputs.tag }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-        # IdentityServer
-        - name: build IdentityServer and push to Dockerhub
-          uses: docker/build-push-action@v3
-          with:
-            context: .
-            file: ./CnGalWebSite/CnGalWebSite.IdentityServer/Dockerfile # Dockerfile 位置
-            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-            push: true
-            tags: |
-              littlefishtentears/cngalwebsiteidentityserver:latest
-              littlefishtentears/cngalwebsiteidentityserver:${{ steps.timestamp.outputs.tag }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        # IdentityServer.Admin
-        - name: build IdentityServer.Admin and push to Dockerhub
-          uses: docker/build-push-action@v3
-          with:
-            context: .
-            file: ./CnGalWebSite/CnGalWebSite.IdentityServer.Admin.SSR/Dockerfile # Dockerfile 位置
-            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
-            push: true
-            tags: |
-              littlefishtentears/cngalwebsiteidentityserveradmin:latest
-              littlefishtentears/cngalwebsiteidentityserveradmin:${{ steps.timestamp.outputs.tag }}
-        
+      - name: build Blazor Server and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.Server/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteserver:latest
+            littlefishtentears/cngalwebsiteserver:${{ needs.setup.outputs.tag }}
+
+  # API Server
+  build-apiserver:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build API Server and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.APIServer/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteapiserver:latest
+            littlefishtentears/cngalwebsiteapiserver:${{ needs.setup.outputs.tag }}
+
+  # IdentityServer
+  build-identityserver:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build IdentityServer and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.IdentityServer/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteidentityserver:latest
+            littlefishtentears/cngalwebsiteidentityserver:${{ needs.setup.outputs.tag }}
+
+  # IdentityServer.Admin
+  build-identityserver-admin:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build IdentityServer.Admin and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.IdentityServer.Admin.SSR/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteidentityserveradmin:latest
+            littlefishtentears/cngalwebsiteidentityserveradmin:${{ needs.setup.outputs.tag }}
+
+  # TimedTask
+  build-timedtask:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build TimedTask and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.TimedTask/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsitetimedtask:latest
+            littlefishtentears/cngalwebsitetimedtask:${{ needs.setup.outputs.tag }}
+
+  # RobotClientX
+  build-robotclientx:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build RobotClientX and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.RobotClientX/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiterobotclientx:latest
+            littlefishtentears/cngalwebsiterobotclientx:${{ needs.setup.outputs.tag }}
+
+  # Project SSR
+  build-project-ssr:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build Project SSR and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.ProjectSite.SSR/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsite-project-ssr:latest
+            littlefishtentears/cngalwebsite-project-ssr:${{ needs.setup.outputs.tag }}
+
+  # Project API
+  build-project-api:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build Project API and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.ProjectSite.API/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsite-project-api:latest
+            littlefishtentears/cngalwebsite-project-api:${{ needs.setup.outputs.tag }}
+
+  # Kanban GPT
+  build-kanbangpt:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build Kanban GPT and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.Kanban.ChatGPT/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsitekanbangpt:latest
+            littlefishtentears/cngalwebsitekanbangpt:${{ needs.setup.outputs.tag }}
+
+  # Expo
+  build-expo:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build Expo and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.Expo/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteexpo:latest
+            littlefishtentears/cngalwebsiteexpo:${{ needs.setup.outputs.tag }}
+
+  # Examine Service
+  build-examineservice:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build Examine Service and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.ExamineService/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsiteexamineservice:latest
+            littlefishtentears/cngalwebsiteexamineservice:${{ needs.setup.outputs.tag }}
+
+  # DrawingBed
+  build-drawingbed:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build DrawingBed and push to Dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./CnGalWebSite/CnGalWebSite.DrawingBed/Dockerfile
+          push: true
+          tags: |
+            littlefishtentears/cngalwebsitedrawingbed:latest
+            littlefishtentears/cngalwebsitedrawingbed:${{ needs.setup.outputs.tag }}
