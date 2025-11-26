@@ -985,10 +985,10 @@ namespace CnGalWebSite.APIServer.Application.News
             }
 
             // 如果找到了关联词条且有主图，可以考虑自动发布
-            if (model.Entries.Count > 0 && !string.IsNullOrWhiteSpace(model.MainPicture))
-            {
-                model.State = GameNewsState.Publish;
-            }
+            //if (model.Entries.Count > 0 && !string.IsNullOrWhiteSpace(model.MainPicture))
+            //{
+            //    model.State = GameNewsState.Publish;
+            //}
 
             return model;
         }
