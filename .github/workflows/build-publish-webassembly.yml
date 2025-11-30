@@ -1,0 +1,44 @@
+name: Build and Deploy WebAssembly to OSS
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT_PATH: 'CnGalWebSite/CnGalWebSite.WebAssembly'
+  PUBLISH_PATH: 'publish'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: Build project
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+    - name: Publish project
+      run: dotnet publish ${{ env.PROJECT_PATH }} -o ${{ env.PUBLISH_PATH }} -c Release --no-build
+
+    - name: Setup OSS Upload Tool
+      uses: manyuanrong/setup-ossutil@v2.0
+      with:
+        endpoint: ${{ secrets.ALIYUN_OSS_ENDPOINT }}
+        access-key-id: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        access-key-secret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+
+    - name: Upload to OSS
+      run: |
+        ossutil cp -rf ${{ env.PUBLISH_PATH }}/wwwroot/ oss://${{ secrets.ALIYUN_OSS_BUCKET }}/${{ secrets.ALIYUN_OSS_PATH }} \
+          --update \
+          --parallel 10
