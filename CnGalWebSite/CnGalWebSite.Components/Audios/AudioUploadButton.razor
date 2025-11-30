@@ -15,7 +15,7 @@
             }
             else
             {
-                <i class="@("m-icon m-icon--left theme--dark mdi  "+Icon)">
+                <i class="@("m-icon m-icon--left theme--dark mdi  " + Icon)">
                 </i>
             }
             @Text
@@ -23,7 +23,7 @@
     </label>
 </div>
 @code {
-    private int maxAllowedFiles = 10;
+    private int maxAllowedFiles = 100;
     bool IsInProc;
 
 
@@ -51,16 +51,17 @@
         IsInProc = true;
         StateHasChanged();
 
-        var files = args.GetMultipleFiles(maxAllowedFiles);
-        if(files.Count>maxAllowedFiles)
+        try
         {
-            await PopupService.ToastAsync($"单次最多上传{maxAllowedFiles}个文件哦~", AlertTypes.Info);
-        }
-
-        foreach (var item in files)
-        {
-            try
+            var files = args.GetMultipleFiles(maxAllowedFiles);
+            if (files.Count > maxAllowedFiles)
             {
+                await PopupService.ToastAsync($"单次最多上传{maxAllowedFiles}个文件哦~", AlertTypes.Info);
+            }
+
+            foreach (var item in files)
+            {
+
                 var obj = await _fileUploadService.UploadAudioAsync(item);
                 if (obj.Uploaded == true)
                 {
@@ -72,13 +73,16 @@
 
                 }
             }
-            catch (Exception ex)
-            {
-                await ErrorHandler.ProcessError(ex, "音频上传失败");
-            }
+            Text = text;
+            IsInProc = false;
+            StateHasChanged();
         }
-        Text = text;
-        IsInProc = false;
-        StateHasChanged();
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "音频上传失败");
+            IsInProc = false;
+            StateHasChanged();
+        }
+
     }
 }

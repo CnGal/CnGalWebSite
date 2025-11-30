@@ -35,7 +35,7 @@
                     <td>
                         <MasaAudio Src="@item.Url" Class="w-100" />
                     </td>
-                    <td>
+                    <td style="min-width: 110px;">
                         <CnGalWebSite.Components.Buttons.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="@IconType.Edit.ToIconString()" Color="success" />
                         <CnGalWebSite.Components.Buttons.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="@IconType.Delete.ToIconString()" Color="error" />
                     </td>
