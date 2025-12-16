@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Masa.Blazor
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Authentication
 @namespace CnGalWebSite.IdentityServer.Admin.Shared
@@ -44,6 +45,7 @@
     <link rel="stylesheet" href="_content/CnGalWebSite.IdentityServer.Admin.Shared/css/site.css">
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+    <component type="typeof(MAppThemeStylesheet)" render-mode="Static" />
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />

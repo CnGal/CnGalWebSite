@@ -341,9 +341,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         [HttpGet]
         public async Task<List<ProjectInfoViewModel>> GetAll()
         {
-            var now = DateTime.Now.ToCstTime();
             var projects = await _projectRepository.GetAll()
-                .Where(s => s.Priority > 0 && s.Hide == false && s.EndTime > now)
+                .Where(s => s.Priority > 0 && s.Hide == false)
                 .Include(s => s.Positions)
                 .Include(s => s.CreateUser)
                  .OrderByDescending(s => s.Priority)
@@ -356,10 +355,9 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         [HttpGet]
         public async Task<List<ProjectPositionInfoViewModel>> GetAllPositions()
         {
-            var now = DateTime.Now.ToCstTime();
             var projects = await _projectPositionRepository.GetAll()
                 .Include(s => s.Project).ThenInclude(s => s.CreateUser)
-                .Where(s => s.Priority > 0 && s.Hide == false && s.Project.Hide == false && s.DeadLine > now)
+                .Where(s => s.Priority > 0 && s.Hide == false && s.Project.Hide == false)
                 .OrderByDescending(s => s.Priority)
                 .ToListAsync();
 

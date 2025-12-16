@@ -74,6 +74,10 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Projects
         /// </summary>
         public string Tags { get; set; }
 
+        /// <summary>
+        /// 截稿日期
+        /// </summary>
+        public DateTime DeadLine { get; set; }
 
         /// <summary>
         /// 创建用户

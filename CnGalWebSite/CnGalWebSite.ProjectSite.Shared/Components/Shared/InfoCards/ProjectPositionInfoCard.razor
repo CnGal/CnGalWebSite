@@ -1,6 +1,10 @@
 ﻿<MDCard Class="info-card-project-position pa-4" Href="@($"/project/{Model.Id}")">
     <div class="title-large text-truncate-1">@Model.Description</div>
     <div class="tag-card">
+        @if (Model.DeadLine < DateTime.Now)
+        {
+            <MChip Small Color="error"> <MIcon Left XSmall>@IconType.OverTime.ToIconString() </MIcon>已过期</MChip>
+        }
         @if(string.IsNullOrWhiteSpace( Model.Tags)==false)
         {
             foreach(var item in Model.Tags.Split(','))

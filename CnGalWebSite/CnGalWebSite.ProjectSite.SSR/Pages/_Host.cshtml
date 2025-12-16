@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Masa.Blazor
 @using Microsoft.AspNetCore.Components.Web
 @using CnGalWebSite.ProjectSite.Shared
 @using CnGalWebSite.ProjectSite.Shared.Components.Themes
@@ -56,6 +57,7 @@
     @* <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/break-point.css"> *@
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <component type="typeof(MAppThemeStylesheet)" render-mode="Static" />
 </head>
 <body>
     <component type="typeof(StyleCard)" render-mode="ServerPrerendered"/>

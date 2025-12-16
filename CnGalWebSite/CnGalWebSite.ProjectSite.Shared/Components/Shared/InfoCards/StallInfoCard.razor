@@ -6,6 +6,10 @@
         <div class="name-card">
             <div class="title-medium">@Model.Name</div>
             <div class="tag-card">
+                @if (Model.EndTime < DateTime.Now)
+                {
+                    <IconChip Color="error" Text="已过期" Icon=" IconType.OverTime"></IconChip>
+                }
                 @if (Model.PositionType != ProjectPositionType.Other || string.IsNullOrWhiteSpace(Model.PositionTypeName) == false)
                 {
                     <IconChip Color="primary" Text="@(Model.PositionType == ProjectPositionType.Other ? Model.PositionTypeName : Model.PositionType.GetDisplayName())"></IconChip>

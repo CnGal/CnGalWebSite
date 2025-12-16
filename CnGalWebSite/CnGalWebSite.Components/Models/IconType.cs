@@ -218,7 +218,8 @@ namespace CnGalWebSite.Components.Models
         Circuit,
         Bilibili,
         Expo,
-        Heybox
+        Heybox,
+        OverTime
     }
 
     public static class IconTypeHelper
@@ -227,6 +228,8 @@ namespace CnGalWebSite.Components.Models
         {
             switch (type)
             {
+                case IconType.OverTime:
+                    return "mdi-clock-alert";
                 case IconType.Heybox:
                     return "mdi-package-variant";
                 case IconType.Expo:

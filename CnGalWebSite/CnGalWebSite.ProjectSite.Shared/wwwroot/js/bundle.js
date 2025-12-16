@@ -380,7 +380,7 @@ function initRecaptcha() {
 function initDebugTool() {
     // init vConsole
     eruda.init();
-   // var vConsole = new VConsole();
+    // var vConsole = new VConsole();
     console.log('成功启动调试工具');
 }
 function initMouseJs() {
@@ -393,9 +393,9 @@ function highlightAllCode() {
     hljs.highlightAll();
 }
 
-function trackEvent(event_name, type,objectName,objectId, userId,note) {
+function trackEvent(event_name, type, objectName, objectId, userId, note) {
     umami.track(event_name, {
-        type:type,
+        type: type,
         objectName: objectName,
         objectId: objectId,
         userId: userId,
@@ -433,7 +433,7 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
                 },
                 success: function (res) {
                     objRef.invokeMethodAsync('UpLoaded', res.image.url + '||' + f.size);
-                 //   document.getElementsByClassName("tui-editor-contents")[0].innerHTML='<a href="' + res.image.url + '"><img src="' + res.image.url + '" alt="' + res.image.title + '"></img></a>';
+                    //   document.getElementsByClassName("tui-editor-contents")[0].innerHTML='<a href="' + res.image.url + '"><img src="' + res.image.url + '" alt="' + res.image.title + '"></img></a>';
                     jQuery(up_img_label).html('<i class="fa fa-fw fa-check" aria-hidden="true"></i> 上传成功,继续上传');
                 },
                 error: function () {
@@ -446,7 +446,7 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
 
 function initTencentCAPTCHA(objRef) {
     var captcha1 = new TencentCaptcha('2049507573', function (res) {
-            //成功回调
+        //成功回调
         if (res.ret === 0) {
             // 上传票据 可根据errorCode和errorMessage做特殊处理或统计
             objRef.invokeMethodAsync('OnChecked', res.ticket, res.randstr);
@@ -454,8 +454,8 @@ function initTencentCAPTCHA(objRef) {
         else {
             objRef.invokeMethodAsync('OnCancel');
         }
-        });
-        captcha1.show(); // 显示验证码
+    });
+    captcha1.show(); // 显示验证码
 }
 function setCustomVar(name, value) {
     _czc.push(['_setCustomVar', name, value, 1]);
@@ -505,7 +505,7 @@ function initGeetestCAPTCHA(objRef, gt, challenge, success) {
         //成功回调
         captchaObj.onSuccess(function () {
             var result = captchaObj.getValidate();
-            objRef.invokeMethodAsync('OnSuccessed', result.geetest_challenge, result.geetest_validate,result.geetest_seccode);
+            objRef.invokeMethodAsync('OnSuccessed', result.geetest_challenge, result.geetest_validate, result.geetest_seccode);
         });
     });
 }
@@ -528,7 +528,7 @@ function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
         captchaObj.onReady(function () {
             captchaObj.verify();
         });
-       
+
         captchaObj.onSuccess(function () {
             var result = captchaObj.getValidate();
             objRef.invokeMethodAsync('OnChecked', result.geetest_challenge, result.geetest_validate, result.geetest_seccode);
@@ -543,20 +543,20 @@ function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
 }
 
 function showGeetestBindCAPTCHA(objRef) {
-        if (capObj == null) {
-            objRef.invokeMethodAsync('OnCancel');
-        }
-        else {
-            
-        }
+    if (capObj == null) {
+        objRef.invokeMethodAsync('OnCancel');
+    }
+    else {
+
+    }
 }
 function isMobile() {
     var ua = navigator.userAgent; /* navigator.userAgent 浏览器发送的用户代理标题 */
     if (ua.indexOf('Android') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPod') > -1 || ua.indexOf('Symbian') > -1) {
         return true;
     } else {
-　　　　return false;
-　　}
+        return false;
+    }
 };
 
 /*加载友盟js*/
@@ -592,14 +592,14 @@ window.downloadFileFromStream = async (fileName, contentStreamReference) => {
         anchorElement.download = '';
     }
     else {
-    anchorElement.download = fileName;
+        anchorElement.download = fileName;
     }
     anchorElement.click();
     anchorElement.remove();
     URL.revokeObjectURL(url);
 }
 
-function domToImageUrl(id,name) {
+function domToImageUrl(id, name) {
     domtoimage.toBlob(document.getElementById(id))
         .then(function (blob) {
             window.saveAs(blob, name);
@@ -651,25 +651,64 @@ function checkSystemThemeIsDark() {
     }
 }
 /*获取UA*/
-function getUserAgent()
-{
+function getUserAgent() {
     return navigator.userAgent;
 }
 
-/*以下为加载时自动执行的代码*/
-if (typeof Blazor != "undefined") {
-    Blazor.start({
-        reconnectionOptions: {
-            maxRetries: 3,
-            retryIntervalMilliseconds: 2000
+
+var int = self.setInterval("error_check()", 500);
+var counter = 0;
+function error_check() {
+    // 获取错误弹窗是否显示
+    var str = window.getComputedStyle(document.getElementById("blazor-error-ui")).display
+
+    // 没有错误则退出
+    if (str == "none") {
+
+        // 计数器
+        counter++;
+
+        // 如果正常浏览页面超过30s 清空错误计数
+        if (counter > 60) {
+            localStorage.setItem("error-counter", 0);
         }
-    });
+        return;
+    }
+
+    // 记录错误数量
+    var error = localStorage.getItem("error-counter");
+    error++;
+    localStorage.setItem("error-counter", error);
+
+    // 大于3次则不刷新页面
+    if (error > 3) {
+        return;
+    }
+
+
+    // 重新加载页面
+    onreload();
 }
+
+/*滚动到底部 */
+function scrollToBottom(css) {
+    var container = document.querySelector(css);
+    container.scrollTop = container.scrollHeight;
+}
+
+/*以下为加载时自动执行的代码*/
+//if (typeof Blazor != "undefined") {
+//    Blazor.start({
+//        reconnectionOptions: {
+//            maxRetries: 3,
+//            retryIntervalMilliseconds: 2000
+//        }
+//    });
+//}
 
 function onreload() {
     location.reload();
 }
-
 /*检测浏览器版本*/
 function browserVersion() {
     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
@@ -680,12 +719,13 @@ function browserVersion() {
     var isOpera = userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1; //Opera浏览器
     var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Chrome浏览器
     var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Safari浏览器
+    var isVivoBrowser = userAgent.indexOf("VivoBrowser") > -1; //VivoBrowser浏览器
     if (isIE) {
         return 1;
     } else if (isIE11) {
         return 1;
     } else if (isEdge) {
-        if (userAgent.split('Edge/')[1].split('.')[0] < 16) {
+        if (userAgent.split('Edge/')[1].split('.')[0] < 91) {
             return 1;
         }
         else {
@@ -699,35 +739,35 @@ function browserVersion() {
             return 0;
         }
     } else if (isOpera) {
-        if (userAgent.split('OPR/')[1].split('.')[0] < 44) {
+        if (userAgent.split('OPR/')[1].split('.')[0] < 70) {
             return 1;
         }
         else {
             return 0;
         }
     } else if (isChrome) {
-        if (userAgent.split('Chrome/')[1].split('.')[0] < 56) {
+        if (userAgent.split('Chrome/')[1].split('.')[0] < 91) {
             return 1;
         }
         else {
             return 0;
         }
     } else if (isSafari) {
-        if (userAgent.split('Safari/')[1].split('.')[0] < 11) {
+        if (userAgent.split('Version/')[1].split(' ')[0] < 16.4) {
             return 1;
         }
         else {
             return 0;
         }
+    } else if (isVivoBrowser) {
+        return 1;
     } else {
         return -1;//不是ie浏览器
     }
 }
 
-browserVersion();
-
 if (browserVersion() == 1) {
-    alert("貌似这个网站不支持你的浏览器哦\n你可以选择安装Edge，Chorme，Firefox或其他支持最新Web标准的浏览器，再重新进入\n如果使用的是QQ浏览器或360极速浏览器，请右击网页，选择极速模式，并重新打开标签页\n有任何疑问可以加群 761794704 进行反馈");
+    alert("浏览器版本过低，网页可能无法正确展示\n你可以尝试安装 Edge，Chorme，Firefox 的最新版本后重试\n有任何疑问可以加群 761794704 进行反馈");
 }
 
 

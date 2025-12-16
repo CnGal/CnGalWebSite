@@ -420,9 +420,8 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         [HttpGet]
         public async Task<List<StallInfoViewModel>> GetAll()
         {
-            var now = DateTime.Now.ToCstTime();
             var projects = await _stallRepository.GetAll()
-                .Where(s => s.Priority > 0 && s.Hide == false && s.EndTime > now)
+                .Where(s => s.Priority > 0 && s.Hide == false)
                 .Include(s => s.Images)
                 .Include(s => s.CreateUser)
                 .Include(s => s.Informations).ThenInclude(s => s.Type)

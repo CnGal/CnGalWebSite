@@ -1,5 +1,12 @@
 ﻿<MDCard Class="info-card-project pa-4" Href="@($"/project/{Model.Id}")">
     <div class="title-large">@Model.Name</div>
+    @if (Model.EndTime < DateTime.Now)
+    {
+        <div>
+            <MChip Small Color="error" Class="mb-2">  <MIcon Left XSmall>@IconType.OverTime.ToIconString() </MIcon>已过期</MChip>
+
+        </div>
+    }
     <div class="label-large text-truncate-3">@Model.Description</div>
     <div class="info-card">
 
@@ -23,7 +30,7 @@
 
         @if (Model.BudgetMax == 0 && Model.Percentage == 0)
         {
-            if(Model.PositionCount==0)
+            if (Model.PositionCount == 0)
             {
                 <div class="title-large primary-text">暂无约稿</div>
             }
@@ -31,7 +38,7 @@
             {
                 <div class="title-large primary-text">为爱发电</div>
             }
-            
+
         }
     </div>
 </MDCard>

@@ -54,6 +54,11 @@ namespace CnGalWebSite.ProjectSite.Models.ViewModels.Stalls
         public DateTime CreateTime { get; set; }
 
         /// <summary>
+        /// 截止日期
+        /// </summary>
+        public DateTime EndTime { get; set; }
+
+        /// <summary>
         /// 创建用户
         /// </summary>
         public UserInfoViewModel UserInfo { get; set; }=new UserInfoViewModel();
