@@ -9,7 +9,7 @@
                     <div class="name">@context.User.Identity.Name</div>
                     <div class="id">@context.User.Claims.GetUserId()</div>
                 </div>
-                <MButton Fab Dark Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsUrl+"Account/SelectModifyField"))">
+                <MButton Fab  Color="primary" OnClick="@(()=>NavigationManager.NavigateTo(StaticOptions.IdsUrl+"Account/SelectModifyField"))">
                     <MIcon>mdi-pencil</MIcon>
                 </MButton>
             </MCardText>

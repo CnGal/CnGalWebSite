@@ -1,7 +1,7 @@
 ﻿@inject ISettingService _settingService
 
 
-<MChip Outlined="Outlined" Dark="!Outlined" Small="!_settingService.IsApp" XSmall="_settingService.IsApp" Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href">
+<MChip Outlined="Outlined" Small="!_settingService.IsApp" XSmall="_settingService.IsApp" Color="@Color" Class=" ma-1" OnClick="OnClick" Href="@Href">
     @if (Icon != IconType.None)
     {
         <MIcon Left XSmall>@Icon.ToIconString() </MIcon>

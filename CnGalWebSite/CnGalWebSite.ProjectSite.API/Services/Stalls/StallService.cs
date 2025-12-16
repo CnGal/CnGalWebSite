@@ -20,6 +20,7 @@ namespace CnGalWebSite.ProjectSite.API.Services.Stalls
                 CreateTime = model.CreateTime,
                 Priority = model.Priority,
                 UpdateTime = model.UpdateTime,
+                EndTime = model.EndTime,
                 UserInfo=new Models.ViewModels.Users.UserInfoViewModel
                 {
                     Avatar=user?.Avatar??model.CreateUser?.Avatar,

@@ -1214,7 +1214,7 @@ html {
     }
 
     .md-card.show-hover-style.color-surface:hover {
-        background-color: rgba(var(--m-theme-primary),var(--m-low-emphasis-opacity),var(--m-low-emphasis-opacity));
+        background-color: rgba(var(--m-theme-primary),var(--m-low-emphasis-opacity));
         color: rgba(var(--m-theme-on-primary)) !important;
     }
 
@@ -1236,7 +1236,7 @@ html {
     }
 
     .md-card.show-hover-style.color-background:hover {
-        background-color: rgba(var(--m-theme-surface-container-high));
+        background-color: rgba(var(--m-theme-surface-container-high),var(--m-low-emphasis-opacity));
         color: rgba(var(--m-theme-on-surface),var(--m-high-emphasis-opacity)) !important;
     }
 
