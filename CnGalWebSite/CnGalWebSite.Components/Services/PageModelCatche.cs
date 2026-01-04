@@ -47,7 +47,7 @@ namespace CnGalWebSite.Components.Service
             _baseUrl = baseUrl ?? string.Empty;
         }
 
-        string GetUrl(string apiUrl) => apiUrl.Contains("://") ? apiUrl : _baseUrl + apiUrl;
+        string GetUrl(string apiUrl) => apiUrl.Contains("://") ? apiUrl : _baseUrl + apiUrl??"";
 
         private async Task<TModel> GetCacheFromMemory(string apiUrl)
         {

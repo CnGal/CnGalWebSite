@@ -1,0 +1,65 @@
+﻿@page "/home/explore"
+
+@inject IUserService _userService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject IStructuredDataService _structuredDataService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip/>
+
+<div class="pb-14" id="home-page">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.EvaluationsCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Recommends.MainCard />
+</div>
+
+<MFooter Fixed Padless>
+    <MBottomNavigation Value="1" Shift Grow ValueChanged="ValueChanged">
+        <MButton ActiveClass="nav-bottom-tab-active" Value="0">
+            <span>主页</span>
+            <MIcon>@IconType.Home.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="1">
+            <span>探索</span>
+            <MIcon>@IconType.Explore.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+            <span>分享游玩记录</span>
+            <MIcon>@IconType.GameRecord.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="3">
+            <span>广场</span>
+            <MIcon>@IconType.Shape.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="4">
+            <span>空间</span>
+            <MIcon>@IconType.User.ToIconString()</MIcon>
+        </MButton>
+    </MBottomNavigation>
+</MFooter>
+
+@code {
+    public void ValueChanged(StringNumber stringNumber)
+    {
+        var value = stringNumber.ToInt32();
+        switch (value)
+        {
+            case 0:
+                NavigationManager.NavigateTo("/");
+                break;
+            case 1:
+                NavigationManager.NavigateTo("/home/explore");
+                break;
+            case 2:
+                NavigationManager.NavigateTo("/home/sharegames");
+                break;
+            case 3:
+                NavigationManager.NavigateTo("/home/square");
+                break;
+            case 4:
+                NavigationManager.NavigateTo("/home/space");
+                break;
+        }
+    }
+}
+

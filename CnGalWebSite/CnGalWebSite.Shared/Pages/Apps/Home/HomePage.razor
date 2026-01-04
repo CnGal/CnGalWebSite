@@ -1,0 +1,93 @@
+﻿@inject IUserService _userService
+@inject IHttpService _httpService
+@inject IDataCacheService _dataCacheService
+@inject IStructuredDataService _structuredDataService
+@inject NavigationManager NavigationManager
+@inject IMauiService _mauiService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip />
+
+<div id="home-page" class="pb-14">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CarouselsCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.ButtonGroupCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.BirthdayCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecommendsCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.PublishedGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.RecentlyDemoGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.UpcomingGamesCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.ActivityGroupCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.SupportCard />
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.CommunityCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.FreeGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Thematic.DiscountGamesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestArticlesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.LatestVideoesCard />
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Chronological.FriendLinksCard />
+</div>
+
+<MFooter Fixed Padless>
+    <MBottomNavigation Value="0" Shift Grow ValueChanged="ValueChanged">
+        <MButton ActiveClass="nav-bottom-tab-active" Value="0">
+            <span>主页</span>
+            <MIcon>@IconType.Home.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="1">
+            <span>探索</span>
+            <MIcon>@IconType.Explore.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="2">
+            <span>分享游玩记录</span>
+            <MIcon>@IconType.GameRecord.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="3">
+            <span>广场</span>
+            <MIcon>@IconType.Shape.ToIconString()</MIcon>
+        </MButton>
+        <MButton ActiveClass="nav-bottom-tab-active" Value="4">
+            <span>空间</span>
+            <MIcon>@IconType.User.ToIconString()</MIcon>
+        </MButton>
+    </MBottomNavigation>
+</MFooter>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public void ValueChanged(StringNumber stringNumber)
+    {
+        var value = stringNumber.ToInt32();
+        switch (value)
+        {
+            case 0:
+                NavigationManager.NavigateTo("/");
+                break;
+            case 1:
+                NavigationManager.NavigateTo("/home/explore");
+                break;
+            case 2:
+                NavigationManager.NavigateTo("/home/sharegames");
+                break;
+            case 3:
+                NavigationManager.NavigateTo("/home/square");
+                break;
+            case 4:
+                NavigationManager.NavigateTo("/home/space");
+                break;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //通知MAUI
+            _mauiService.OnLoaded();
+        }
+    }
+}

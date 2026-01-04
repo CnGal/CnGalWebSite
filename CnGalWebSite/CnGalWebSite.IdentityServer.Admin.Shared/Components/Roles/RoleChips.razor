@@ -17,8 +17,10 @@
     {
         return role switch
         {
-            "User" => "green",
+            "User" => "blue",
+            "Tester" => "green",
             "Editor" => "orange",
+            "Moderator" => "amber",
             "Admin" => "red",
             "SuperAdmin" => "pink",
             _ => "purple"
@@ -30,7 +32,9 @@
         return role switch
         {
             "User" => "mdi-account",
+            "Tester" => "mdi-test-tube",
             "Editor" => "mdi-shield-edit",
+            "Moderator" => "mdi-shield-account",
             "Admin" => "mdi-shield-crown",
             "SuperAdmin" => "mdi-security",
             _ => "mdi-account-question"
