@@ -300,62 +300,55 @@ namespace CnGalWebSite.APIServer.Controllers
                 else
                 {
                     model.Number = award.Number;
-                    if (lottery.EndTime > DateTime.Now.ToCstTime())
+                    if (award.LotteryAward == null)
                     {
-                        model.State = UserLotteryState.WaitingDraw;
-                    }
-                    else
-                    {
-                        if (award.LotteryAward == null)
+                        if (lottery.IsEnd)
                         {
-                            if (lottery.IsEnd)
-                            {
-                                model.State = UserLotteryState.NotWin;
-                            }
-                            else
-                            {
-                                model.State = UserLotteryState.WaitingDraw;
-                            }
-
+                            model.State = UserLotteryState.NotWin;
                         }
                         else
                         {
-                            model.Award = new LotteryAwardViewModel
+                            model.State = UserLotteryState.WaitingDraw;
+                        }
+
+                    }
+                    else
+                    {
+                        model.Award = new LotteryAwardViewModel
+                        {
+                            Count = award.LotteryAward.Count,
+                            Id = award.LotteryAward.Id,
+                            Integral = award.LotteryAward.Integral,
+                            Name = award.LotteryAward.Name,
+                            Priority = award.LotteryAward.Priority,
+                            Type = award.LotteryAward.Type,
+                        };
+                        if (award.LotteryAward.Type == LotteryAwardType.RealThing)
+                        {
+
+
+                            if (user.UserAddress == null)
                             {
-                                Count = award.LotteryAward.Count,
-                                Id = award.LotteryAward.Id,
-                                Integral = award.LotteryAward.Integral,
-                                Name = award.LotteryAward.Name,
-                                Priority = award.LotteryAward.Priority,
-                                Type = award.LotteryAward.Type,
-                            };
-                            if (award.LotteryAward.Type == LotteryAwardType.RealThing)
-                            {
-
-
-                                if (user.UserAddress == null)
-                                {
-                                    model.State = UserLotteryState.WaitAddress;
-                                }
-                                else
-                                {
-                                    model.State = UserLotteryState.WaitShipments;
-                                }
-
-
-                                if (award.LotteryPrize != null && string.IsNullOrWhiteSpace(award.LotteryPrize.Context) == false)
-                                {
-                                    model.State = UserLotteryState.Shipped;
-                                }
+                                model.State = UserLotteryState.WaitAddress;
                             }
                             else
                             {
-                                model.State = UserLotteryState.Win;
-
+                                model.State = UserLotteryState.WaitShipments;
                             }
 
 
+                            if (award.LotteryPrize != null && string.IsNullOrWhiteSpace(award.LotteryPrize.Context) == false)
+                            {
+                                model.State = UserLotteryState.Shipped;
+                            }
                         }
+                        else
+                        {
+                            model.State = UserLotteryState.Win;
+
+                        }
+
+
                     }
 
                 }
