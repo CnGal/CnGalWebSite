@@ -133,23 +133,43 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var now = DateTime.Now.ToCstTime();
 
-            var users = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).ThenInclude(s=>s.UserRanks).Where(s => s.IsInSteam && s.ApplicationUser != null).GroupBy(s => s.ApplicationUserId).Where(s => s.Any()).Select(s => new
-            {
-                Count = s.Count(),
-                s.First().ApplicationUser
-            }).OrderByDescending(s => s.Count).Take(15).ToListAsync();
+            // 先聚合取Top15用户，再join用户表，只选择需要的字段
+            var topUsers = await _playedGameRepository.GetAll()
+                .AsNoTracking()
+                .Where(p => p.IsInSteam && p.ApplicationUserId != null)
+                .GroupBy(p => p.ApplicationUserId)
+                .Select(g => new
+                {
+                    UserId = g.Key!,
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(15)
+                .Join(_userRepository.GetAll().AsNoTracking(),
+                      x => x.UserId,
+                      u => u.Id,
+                      (x, u) => new
+                      {
+                          x.Count,
+                          u.Id,
+                          u.UserName,
+                          u.PhotoPath,
+                          u.PersonalSignature
+                      })
+                .OrderByDescending(x => x.Count)
+                .ToListAsync();
 
             var usersRe = new List<HasMostGamesUserModel>();
-            foreach (var item in users)
+            foreach (var item in topUsers)
             {
                 usersRe.Add(new HasMostGamesUserModel
                 {
-                    PersonalSignature = item.ApplicationUser.PersonalSignature,
+                    PersonalSignature = item.PersonalSignature,
                     Count = item.Count,
-                    Id = item.ApplicationUser.Id,
-                    Image = _appHelper.GetImagePath(item.ApplicationUser.PhotoPath, "user.png"),
-                    Name = item.ApplicationUser.UserName,
-                    Ranks=await _rankService.GetUserRanks(item.ApplicationUser)
+                    Id = item.Id,
+                    Image = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
+                    Name = item.UserName,
+                    Ranks = await _rankService.GetUserRanks(item.Id)
                 });
             }
 
