@@ -2,6 +2,7 @@
 @using CnGalWebSite.DataModel.ViewModel.Commodities;
 @using CnGalWebSite.DataModel.ViewModel.Others;
 @inject ISettingService _settingService
+@inject IUserService _userService
 @inject IUserDataService _userDataService
 @inject ILive2DService _live2DService
 @inject IJSRuntime JS
@@ -19,25 +20,32 @@
             <MRadioGroup Value=" _userDataService.UserData.Clothes.ClothesName" TValue="string" ValueChanged="ClothesChanged" Row Mandatory>
                 @foreach (var item in _clothesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s => s.Value == item.Name)?.IsOwned ?? false || (item.Name != null && item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="title-medium">丝袜</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.StockingsName" TValue="string" ValueChanged="StockingsChanged" Row Mandatory>
                 @foreach (var item in _stockingsRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s => s.Value == item.Name)?.IsOwned ?? false || (item.Name != null && item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="title-medium">鞋子</div>
             <MRadioGroup Value=" _userDataService.UserData.Clothes.ShoesName" TValue="string" ValueChanged="ShoesChanged" Row Mandatory>
                 @foreach (var item in _shoesRepository.GetAll())
                 {
-                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s=>s.Value==item.Name)?.IsOwned??false||(item.Name!=null&&item.Name.EndsWith('0'))))" />
+                    <MRadio Label="@item.DisplayName" TValue="string" Value="@item.Name" Disabled="@(!(Model?.FirstOrDefault(s => s.Value == item.Name)?.IsOwned ?? false || (item.Name != null && item.Name.EndsWith('0'))))" />
                 }
             </MRadioGroup>
             <div class="action-card">
-                <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="前往小卖铺解锁更多服装" Icon="@IconType.Buy.ToIconString()" Href="/commodities" />
+                <AuthorizeView>
+                    <Authorized>
+                        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="前往小卖铺解锁更多服装" Icon="@IconType.Buy.ToIconString()" Href="/commodities" />
+                    </Authorized>
+                    <NotAuthorized>
+                        <CnGalWebSite.Components.Buttons.MasaButton TextStyle Text="登录后解锁更多服装" Icon="@IconType.Buy.ToIconString()" OnClick="_userService.Login" />
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </MDCard>
     </MenuContent>
@@ -62,7 +70,7 @@
         }
         catch (Exception ex)
         {
-            await ErrorHandler.ProcessError(ex, "获取看板娘的小卖铺商品列表失败");
+            // await ErrorHandler.ProcessError(ex, "获取看板娘的小卖铺商品列表失败");
         }
     }
 

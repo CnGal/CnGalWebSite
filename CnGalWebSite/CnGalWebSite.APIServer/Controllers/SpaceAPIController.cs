@@ -1001,21 +1001,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<KanbanPermissionsModel>> GetKanbanPermissions()
         {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            if (user == null)
-            {
-                return new KanbanPermissionsModel { Permissions = false };
-            }
-
-            if (_userService.CheckCurrentUserRole("User"))
-            {
-                return new KanbanPermissionsModel { Permissions = true };
-            }
-
-            return new KanbanPermissionsModel { Permissions = false };
-
+            return new KanbanPermissionsModel { Permissions = true };
         }
     }
 }
