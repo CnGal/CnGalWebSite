@@ -3,6 +3,7 @@
 @inject IDialogBoxService _dialogBoxService
 @inject ILive2DService _live2DService
 @inject IEventService _eventService
+@inject IRemoteConfigService _remoteConfigService
 @implements IDisposable
 
 <div class="@($"kanban-live2d {(isReady?"":"d-none")}")" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
@@ -35,7 +36,7 @@
     {
         if (firstRender)
         {
-
+            await _remoteConfigService.InitializeAsync();
             await _live2DService.InitAsync();
             StateHasChanged();
 

@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Live2DTest.DataRepositories;
 using CnGalWebSite.Kanban.Services.Core;
+using CnGalWebSite.Kanban.Services.Configs;
 using CnGalWebSite.Kanban.Services.Dialogs;
 using CnGalWebSite.Kanban.Services.Events;
 using CnGalWebSite.Kanban.Services.Settings;
@@ -20,6 +21,7 @@ namespace CnGalWebSite.Kanban.Extensions
     {
         public static IServiceCollection AddKanbanLive2D(this IServiceCollection services)
         {
+            services.AddSingleton<IRemoteConfigService, RemoteConfigService>();
             services.AddScoped<ISettingService, SettingService>();
             services.AddScoped<IDialogBoxService, DialogBoxService>();
             services.AddScoped<ILive2DService, Live2DService>();
