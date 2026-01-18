@@ -1,8 +1,5 @@
-﻿using CnGalWebSite.DataModel.Helper;
-using Microsoft.Extensions.Configuration;
+﻿using CnGalWebSite.Kanban.Services.Configs;
 using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Net.Security;
 
 namespace Live2DTest.DataRepositories
 {
@@ -15,39 +12,18 @@ namespace Live2DTest.DataRepositories
     {
         private List<TEntity> _repository = new();
 
-        private readonly string _index = typeof(TEntity).ToString().Split('.').Last().Replace("Model","")+ ".json";
+        private readonly IRemoteConfigService _remoteConfigService;
 
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
-
-        public Repository(HttpClient httpClient, IConfiguration configuration)
+        public Repository(IRemoteConfigService remoteConfigService)
         {
-            if (ToolHelper.IsSSR)
-            {
-                var handler = new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
-                };
-                _httpClient = new HttpClient(handler);
-            }
-            else
-            {
-                _httpClient = httpClient;
-            }
-            _configuration = configuration;
+            _remoteConfigService = remoteConfigService;
         }
 
         public async Task LoadAsync()
         {
             try
             {
-                // 使用 HttpClient 获取响应
-                var response = await _httpClient.GetAsync(_configuration["Live2D_DataUrl"] + _index);
-                response.EnsureSuccessStatusCode();
-
-                // 使用 Stream 读取内容
-                using var stream = await response.Content.ReadAsStreamAsync();
-                var list = await System.Text.Json.JsonSerializer.DeserializeAsync<List<TEntity>>(stream, ToolHelper.options);
+                var list = await _remoteConfigService.GetRepositoryDataAsync<TEntity>();
 
                 _repository.Clear();
                 _repository.AddRange(list);

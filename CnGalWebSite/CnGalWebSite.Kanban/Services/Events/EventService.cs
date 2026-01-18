@@ -1,18 +1,15 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Kanban.Models;
+using CnGalWebSite.Kanban.Services.Configs;
 using CnGalWebSite.Kanban.Services.Core;
 using CnGalWebSite.Kanban.Services.Dialogs;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.Services.Events
@@ -20,8 +17,7 @@ namespace CnGalWebSite.Kanban.Services.Events
     public class EventService : IEventService, IDisposable
     {
         private readonly ILocalStorageService _localStorageService;
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
+        private readonly IRemoteConfigService _remoteConfigService;
         private readonly IDialogBoxService _dialogBoxService;
         private readonly ILogger<EventService> _logger;
         private readonly NavigationManager _navigationManager;
@@ -32,8 +28,6 @@ namespace CnGalWebSite.Kanban.Services.Events
         private EventGroupModel _eventGroupModel = new();
 
         private const string _localKey = "kanban_events";
-        private const string _remoteKey = "EventGroup.json";
-
         public EventGroupModel EventGroup
         {
             get
@@ -42,22 +36,10 @@ namespace CnGalWebSite.Kanban.Services.Events
             }
         }
 
-        public EventService(ILocalStorageService localStorageService, HttpClient httpClient, IConfiguration configuration, IDialogBoxService dialogBoxService, ILogger<EventService> logger, NavigationManager navigationManager, IJSRuntime jSRuntime)
+        public EventService(ILocalStorageService localStorageService, IRemoteConfigService remoteConfigService, IDialogBoxService dialogBoxService, ILogger<EventService> logger, NavigationManager navigationManager, IJSRuntime jSRuntime)
         {
             _localStorageService = localStorageService;
-            if (ToolHelper.IsSSR)
-            {
-                var handler = new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
-                };
-                _httpClient = new HttpClient(handler);
-            }
-            else
-            {
-                _httpClient = httpClient;
-            }
-            _configuration = configuration;
+            _remoteConfigService = remoteConfigService;
             _dialogBoxService = dialogBoxService;
             _logger = logger;
             _navigationManager = navigationManager;
@@ -75,13 +57,7 @@ namespace CnGalWebSite.Kanban.Services.Events
                     localData = new EventGroupModel();
                 }
 
-                // 使用 HttpClient 获取响应
-                var response = await _httpClient.GetAsync(_configuration["Live2D_DataUrl"] + _remoteKey);
-                response.EnsureSuccessStatusCode();
-
-                // 使用 Stream 读取内容
-                using var stream = await response.Content.ReadAsStreamAsync();
-                _eventGroupModel = await System.Text.Json.JsonSerializer.DeserializeAsync<EventGroupModel>(stream, ToolHelper.options);
+                _eventGroupModel = await _remoteConfigService.GetEventGroupAsync();
 
                 //复制最后执行时间
                 CopyData(localData.CustomEvents, _eventGroupModel.CustomEvents);
