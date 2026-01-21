@@ -424,7 +424,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<VginsightsDataModel>("https://vginsights.com/api/v1/game/" + storeInfo.Link);
+                var data = await _httpService.GetAsync<VginsightsDataModel>(_configuration["VginsightsApiUrl"] + storeInfo.Link);
 
                 //评测数
                 storeInfo.EvaluationCount ??= data.reviews;
