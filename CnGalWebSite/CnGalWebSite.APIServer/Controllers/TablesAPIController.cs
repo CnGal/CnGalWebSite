@@ -46,8 +46,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _groupInforTableModelRepository = groupInforTableModelRepository;
             _staffInforTableModelRepository = staffInforTableModelRepository;
             _roleInforTableModelRepository = roleInforTableModelRepository;
-           _storeInfoRepository= storeInfoRepository;
-            _makerInforTableModelRepository=makerInforTableModelRepository;
+            _storeInfoRepository = storeInfoRepository;
+            _makerInforTableModelRepository = makerInforTableModelRepository;
             _gameScoreTableRepository = gameScoreTableRepository;
             _tableService = tableService;
             _queryService = queryService;
@@ -124,7 +124,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Parameter = model
             };
         }
-      
+
 
         [HttpGet]
         public async Task<ActionResult<TableViewModel>> GetTableViewAsync()
@@ -182,9 +182,12 @@ namespace CnGalWebSite.APIServer.Controllers
             var (items, total) = await _queryService.QueryAsync<GameScoreTableModel, long>(_gameScoreTableRepository.GetAll().AsSingleQuery(), model,
               s => string.IsNullOrWhiteSpace(model.SearchText) || (s.GameName.Contains(model.SearchText)));
 
+
+            var ret = await items.ToListAsync();
+
             return new QueryResultModel<GameScoreTableModel>
             {
-                Items = await items.ToListAsync(),
+                Items = ret,
                 Total = total,
                 Parameter = model
             };
