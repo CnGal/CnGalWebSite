@@ -235,6 +235,13 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                         return "参加该抽奖需要至少有一条游玩记录创建时间大于抽奖开始时间";
                     }
                 }
+                else if (lottery.ConditionType == LotteryConditionType.SteamLibrary)
+                {
+                    if (await _steamInforService.CheckUserOwnedGame(user, lottery.GameSteamId) == false)
+                    {
+                        return "参加该抽奖需要将游戏加入Steam库";
+                    }
+                }
 
             }
             catch (Exception ex)

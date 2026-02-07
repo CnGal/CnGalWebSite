@@ -19,5 +19,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         Task BatchUpdateUserSteamInfo(int max);
 
         Task<bool> CheckUserWishlist(ApplicationUser user, string gameId);
+
+        Task<bool> CheckUserOwnedGame(ApplicationUser user, string gameId);
     }
 }
