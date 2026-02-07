@@ -245,10 +245,10 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 return false;
             }
-            var ids = user.SteamId.Split(',');
+            var ids = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',', StringSplitOptions.RemoveEmptyEntries);
             foreach (var id in ids)
             {
-                if (await CheckGameInWishlistSteam(id, gameId))
+                if (await CheckGameInWishlistSteam(id.Trim(), gameId))
                 {
                     return true;
                 }
@@ -281,6 +281,56 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             catch (Exception ex)
             {
                 throw new Exception("获取愿望单失败，请设置Steam个人资料公开", ex);
+            }
+        }
+
+        /// <summary>
+        /// 检查用户库存中是否包含目标游戏
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckUserOwnedGame(ApplicationUser user, string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(user.SteamId))
+            {
+                return false;
+            }
+            var ids = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var id in ids)
+            {
+                if (await CheckGameInOwnedGamesSteam(id.Trim(), gameId))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 检查单个用户库存中是否包含目标游戏
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckGameInOwnedGamesSteam(string userId, string gameId)
+        {
+            try
+            {
+                var url = _configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"]
+                    + "&steamid=" + userId + "&appids_filter[0]=" + gameId + "&skip_unvetted_apps=0";
+                var jsonContent = await _httpClient.GetStringAsync(url);
+                var obj = JObject.Parse(jsonContent);
+                var games = obj["response"]?["games"] as JArray;
+                if (games == null)
+                {
+                    return false;
+                }
+                return games.Any(s => s["appid"]?.ToString() == gameId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("获取Steam库存失败，请设置Steam个人资料公开", ex);
             }
         }
     }

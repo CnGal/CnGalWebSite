@@ -142,6 +142,8 @@ namespace CnGalWebSite.DataModel.Model
         Wishlist,
         [Display(Name = "抽奖开始后分享了游玩感想")]
         NewGameRecord,
+        [Display(Name = "将游戏加入Steam库")]
+        SteamLibrary,
     }
 
     public class LotteryUser

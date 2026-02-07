@@ -29,12 +29,18 @@
         <div class="content-card">
 
             <div class="condition-card">
-                @if (Model.ConditionType == LotteryConditionType.Wishlist)
+            @if (Model.ConditionType == LotteryConditionType.Wishlist)
                 {
                     <span>参与条件：把游戏 </span>
 
                     <a target="_blank" href="@($"https://store.steampowered.com/app/{Model.GameSteamId}")">加入Steam愿望单</a>
                 }
+            else if (Model.ConditionType == LotteryConditionType.SteamLibrary)
+            {
+                <span>参与条件：把游戏 </span>
+
+                <a target="_blank" href="@($"https://store.steampowered.com/app/{Model.GameSteamId}")">加入Steam库</a>
+            }
                 else
                 {
                     @($"参与条件：{Model.ConditionType.GetDisplayName()}")
