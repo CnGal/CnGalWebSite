@@ -93,7 +93,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item + "&skip_unvetted_apps=0");
+                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item + "&skip_unvetted_apps=0&include_played_free_games=1");
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
@@ -318,7 +318,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             try
             {
                 var url = _configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"]
-                    + "&steamid=" + userId + "&appids_filter[0]=" + gameId + "&skip_unvetted_apps=0";
+                    + "&steamid=" + userId + "&appids_filter[0]=" + gameId + "&skip_unvetted_apps=0&include_played_free_games=1";
                 var jsonContent = await _httpClient.GetStringAsync(url);
                 var obj = JObject.Parse(jsonContent);
                 var games = obj["response"]?["games"] as JArray;
