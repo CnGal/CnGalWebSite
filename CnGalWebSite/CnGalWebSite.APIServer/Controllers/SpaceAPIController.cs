@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Messages;
@@ -837,12 +837,26 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id)
+        public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id, [FromQuery] int currentPage = 1, [FromQuery] int maxResultCount = 10)
         {
-            var items = await _articleRepository.GetAll().Include(s => s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+            currentPage = Math.Max(1, currentPage);
+            maxResultCount = Math.Max(1, maxResultCount);
+            var query = _articleRepository.GetAll().Include(s => s.CreateUser).AsNoTracking()
+                .Where(s => s.CreateUserId == id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false);
 
-            var model = new UserArticleListModel();
-            foreach (var item in items.OrderByDescending(s => s.Id))
+            var totalCount = await query.CountAsync();
+            var items = await query.OrderByDescending(s => s.Id)
+                .Skip((currentPage - 1) * maxResultCount)
+                .Take(maxResultCount)
+                .ToListAsync();
+
+            var model = new UserArticleListModel
+            {
+                CurrentPage = currentPage,
+                MaxCount = maxResultCount,
+                TotalCount = totalCount
+            };
+            foreach (var item in items)
             {
                 model.Items.Add(_appHelper.GetArticleInforTipViewModel(item));
             }
