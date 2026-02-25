@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +11,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public int MaxCount { get; set; } = 10;
 
-        public int TotalPages => ((Items.Count - 1) / MaxCount) + 1;
+        public int TotalCount { get; set; }
+
+        public int TotalPages => MaxCount <= 0 ? 0 : (int)Math.Ceiling(decimal.Divide(TotalCount, MaxCount));
 
         public int CurrentPage { get; set; } = 1;
 

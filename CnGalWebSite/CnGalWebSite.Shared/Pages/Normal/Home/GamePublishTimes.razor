@@ -8,7 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche<List<EntryInforTipViewModel>> _pageModelCatche
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="游戏发售时间汇总" Description="可以查看每月发售游戏列表"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="@PageTitle" Description="@PageDescription"/>
 
 <style>
     .row {
@@ -24,9 +24,28 @@
     {
         <MDCard Class="ps-4 pe-4 mb-4">
             <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
-                <div class="title-large mb-3">游戏发售时间汇总</div>
-                <div>
-                    <CnGalWebSite.Components.Buttons.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
+                <div class="title-large mb-3">@PageTitle</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <MButtonGroup Tile Group Value="(int)Type" ValueChanged="OnDisplayTypeChanged"  Color="primary" Dense>
+                        <MButton  Value="@((int)PublishGamesDisplayType.CardList)">
+                            <MIcon Left>@IconType.Catalogs.ToIconString()</MIcon>
+                            卡片列表
+                        </MButton>
+                        <MButton  Value="@((int)PublishGamesDisplayType.Timeline)">
+                            <MIcon Left>@IconType.Timeline.ToIconString()</MIcon>
+                            时间线
+                        </MButton>
+                    </MButtonGroup>
+                    <MButtonGroup Tile Group Value="mode" ValueChanged="OnDataModeChanged" Color="primary" Dense>
+                        <MButton  Value="0">
+                            <MIcon Left>@IconType.Official.ToIconString()</MIcon>
+                            正式版
+                        </MButton>
+                        <MButton  Value="1">
+                            <MIcon Left>@IconType.Demo.ToIconString()</MIcon>
+                            试玩版
+                        </MButton>
+                    </MButtonGroup>
                 </div>
             </div>
             <div style="display: flex; align-items: center; justify-content: center;">
@@ -123,6 +142,10 @@
     [Parameter]
     public int type { get; set; }
 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int mode { get; set; }
+
     public PublishGamesDisplayType Type { get; set; }
 
     DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
@@ -138,6 +161,10 @@
 
     bool isReady = false;
 
+    string PageTitle => mode == 1 ? "游戏试玩时间汇总" : "游戏发布时间汇总";
+
+    string PageDescription => mode == 1 ? "可以查看每月游戏试玩日期列表" : "可以查看每月发售游戏列表";
+
     public string GetColor(int index)
     {
         return index switch { 0 => "red", 1 => "pink", 2 => "purple", 3 => "deep-purple", 4 => "indigo", 5 => "blue", 6 => "cyan", 7 => "teal", 8 => "green", 9 => "yellow", 10 => "orange", _ => "black" };
@@ -149,6 +176,7 @@
         try
         {
             isFirst = true;
+            mode = mode == 1 ? 1 : 0;
             Type = (PublishGamesDisplayType)type;
 
             if (Type == PublishGamesDisplayType.CardList)
@@ -162,7 +190,7 @@
                     Date = new DateOnly(Year, Month, 1);
                 }
 
-                CardModel = await _pageModelCatche.GetCache($"api/entries/GetPublishGamesByTime?year={Year}&month={Month}");
+                CardModel = await _pageModelCatche.GetCache($"api/entries/GetPublishGamesByTime?year={Year}&month={Month}&mode={mode}");
 
             }
             else
@@ -176,7 +204,7 @@
                     Before = BeforeTime.ToString().TransTime();
                 }
 
-                TimelineModel = await _dataCacheService.PublishGamesTimelineDataCatche.GetCache($"?beforeTime={BeforeTime}&aftertime={AfterTime}");
+                TimelineModel = await _dataCacheService.PublishGamesTimelineDataCatche.GetCache($"?beforeTime={BeforeTime}&aftertime={AfterTime}&mode={mode}");
             }
             isFirst = false;
             isReady = true;
@@ -190,18 +218,18 @@
     }
 
 
-   
+
 
     public void OnClickLeft()
     {
         DateChanged(Date.AddMonths(-1));
-        
+
     }
 
     public void OnClickRight()
     {
         DateChanged(Date.AddMonths(1));
-        
+
     }
 
     public void DateChanged(DateOnly date)
@@ -222,16 +250,25 @@
         Refresh();
     }
 
-    public void OnSwitch()
+    public void OnDisplayTypeChanged(StringNumber value)
     {
-        if (Type == PublishGamesDisplayType.CardList)
+        if (value == null)
         {
-            Type = PublishGamesDisplayType.Timeline;
+            value = (int)PublishGamesDisplayType.CardList;
         }
-        else
+        Type = (PublishGamesDisplayType)value.ToInt32();
+        type = value.ToInt32();
+        isFirst = false;
+        Refresh();
+    }
+
+    public void OnDataModeChanged(StringNumber value)
+    {
+        if (value == null)
         {
-            Type = PublishGamesDisplayType.CardList;
+            value = (int)0;
         }
+        mode = value.ToInt32();
         isFirst = false;
         Refresh();
     }
@@ -253,6 +290,7 @@
                     ["year"] = Date.Year,
                     ["month"] = Date.Month,
                     ["type"] = (int)Type,
+                    ["mode"] = mode,
                 }));
             }
             else
@@ -262,6 +300,7 @@
                     ["beforeTime"] = Before.ToUnixTimeMilliseconds(),
                     ["afterTime"] = After.ToUnixTimeMilliseconds(),
                     ["type"] = (int)Type,
+                    ["mode"] = mode,
                 }));
             }
 

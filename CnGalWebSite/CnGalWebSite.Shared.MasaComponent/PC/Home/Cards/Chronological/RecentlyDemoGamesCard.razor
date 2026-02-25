@@ -1,10 +1,10 @@
-﻿@inject IHttpService _httpService
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IPageModelCatche< List < RecentlyDemoGameItemModel> > _pageModelCatche
 
 <section class="published-games-card">
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="近期试玩" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times">
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Cards.Shared.SlideGroup Title="近期试玩" Items="_items.Take(_dataCacheService.IsApp?9:16)" MoreLink="/times?mode=1">
         <MDCard Class="item" Href="@context.Url">
             <img src="@context.Image" alt="@context.Name" loading="lazy" />
             <div class="content">

@@ -1,4 +1,4 @@
-﻿@inject IDataCacheService _dataCacheService
+@inject IDataCacheService _dataCacheService
 @inject IHttpService _httpService
 
 
@@ -8,7 +8,7 @@
 }
 else
 {
-    @foreach (var item in Model.Items.Skip((Model.CurrentPage - 1) * Model.MaxCount).Take(Model.MaxCount))
+    @foreach (var item in Model.Items)
     {
         <div class="mb-3">
             <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Search.ArticleInforViewTip Model="item" />
@@ -36,7 +36,7 @@ else
     {
         try
         {
-            Model = await _dataCacheService.UserArticleListDataCatche.GetCache(Id);
+            Model = await _dataCacheService.UserArticleListDataCatche.GetCache($"{Id}?currentPage={Model.CurrentPage}&maxResultCount={Model.MaxCount}");
             StateHasChanged();
         }
         catch (Exception ex)
@@ -45,10 +45,16 @@ else
         }
     }
 
-    private void OnPageClick(int pageIndex)
+    private async Task OnPageClick(int pageIndex)
     {
-        Model.CurrentPage = pageIndex;
-        StateHasChanged();
-        
+        try
+        {
+            Model = await _dataCacheService.UserArticleListDataCatche.GetCache($"{Id}?currentPage={pageIndex}&maxResultCount={Model.MaxCount}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.ProcessError(ex, "获取用户发表文章列表失败");
+        }
     }
 }
