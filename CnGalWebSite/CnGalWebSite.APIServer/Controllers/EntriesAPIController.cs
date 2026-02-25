@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -1537,7 +1537,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month)
+        public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month, [FromQuery] int mode = 0)
         {
             DateTime time = DateTime.Now.ToCstTime();
 
@@ -1549,6 +1549,36 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 year = time.Year;
             }
+
+            // mode=1：按游戏最新Demo/EA日期筛选
+            if (mode == 1)
+            {
+                var gamesByDemo = await _entryRepository.GetAll().AsNoTracking()
+                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                    .Where(s => s.Releases.Any(s => (s.Type == GameReleaseType.Demo || s.Type == GameReleaseType.EA) && s.Time != null))
+                    .Select(s => new
+                    {
+                        Entry = s,
+                        LatestDemoTime = s.Releases
+                            .Where(r => (r.Type == GameReleaseType.Demo || r.Type == GameReleaseType.EA) && r.Time != null)
+                            .OrderByDescending(r => r.Time)
+                            .Select(r => r.Time)
+                            .FirstOrDefault()
+                    })
+                    .Where(s => s.LatestDemoTime != null && s.LatestDemoTime.Value.Year == year && s.LatestDemoTime.Value.Month == month)
+                    .ToListAsync();
+
+                var demoModel = new List<EntryInforTipViewModel>();
+                foreach (var item in gamesByDemo)
+                {
+                    var entry = _appHelper.GetEntryInforTipViewModel(item.Entry);
+                    entry.PublishTime = item.LatestDemoTime;
+                    demoModel.Add(entry);
+                }
+
+                return demoModel;
+            }
+
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Year == year && s.PubulishTime.Value.Month == month)
@@ -1585,7 +1615,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<PublishGamesTimelineModel>>> GetPublishGamesTimeline([FromQuery] int groupId, [FromQuery] long afterTime, [FromQuery] long beforeTime)
+        public async Task<ActionResult<List<PublishGamesTimelineModel>>> GetPublishGamesTimeline([FromQuery] int groupId, [FromQuery] long afterTime, [FromQuery] long beforeTime, [FromQuery] int mode = 0)
         {
             DateTime after = DateTime.MinValue;
             DateTime before = DateTime.MaxValue;
@@ -1600,6 +1630,48 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             DateTime time = DateTime.Now.ToCstTime();
+
+            // mode=1：按游戏最新Demo/EA日期筛选
+            if (mode == 1)
+            {
+                var gamesByDemo = await _entryRepository.GetAll().AsNoTracking()
+                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                    .Where(s => groupId == 0 || s.EntryStaffFromEntryNavigation.Any(s => s.PositionGeneral == PositionGeneralType.ProductionGroup && s.ToEntry == groupId))
+                    .Where(s => s.Releases.Any(s => (s.Type == GameReleaseType.Demo || s.Type == GameReleaseType.EA) && s.Time != null))
+                    .Select(s => new
+                    {
+                        Entry = s,
+                        LatestDemoRelease = s.Releases
+                            .Where(r => (r.Type == GameReleaseType.Demo || r.Type == GameReleaseType.EA) && r.Time != null)
+                            .OrderByDescending(r => r.Time)
+                            .Select(r => new
+                            {
+                                r.Time,
+                                r.TimeNote
+                            })
+                            .FirstOrDefault()
+                    })
+                    .Where(s => s.LatestDemoRelease != null
+                        && s.LatestDemoRelease.Time != null
+                        && s.LatestDemoRelease.Time.Value.Date > after
+                        && s.LatestDemoRelease.Time.Value.Date < before)
+                    .OrderByDescending(s => s.LatestDemoRelease.Time)
+                    .ToListAsync();
+
+                var demoModel = new List<PublishGamesTimelineModel>();
+                foreach (var item in gamesByDemo)
+                {
+                    var entry = new PublishGamesTimelineModel();
+                    entry.SynchronizationProperties(_appHelper.GetEntryInforTipViewModel(item.Entry));
+                    entry.Thumbnail = item.Entry.Thumbnail;
+                    entry.PublishTime = item.LatestDemoRelease?.Time;
+                    entry.PublishTimeNote = item.LatestDemoRelease?.TimeNote;
+                    demoModel.Add(entry);
+                }
+
+                return demoModel;
+            }
+
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Releases)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
