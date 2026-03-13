@@ -1,4 +1,4 @@
-namespace CnGalWebSite.SDK.MainSite.Models;
+﻿namespace CnGalWebSite.SDK.MainSite.Models;
 
 public sealed class SdkResult<T>
 {

@@ -1,16 +1,17 @@
-using CnGalWebSite.DataModel.ViewModel.Home;
+﻿using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class HomeQueryService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    ILogger<HomeQueryService> logger) : IHomeQueryService
+    ILogger<HomeQueryService> logger) : QueryServiceBase(httpClient), IHomeQueryService
 {
     private static readonly TimeSpan HomeCacheDuration = TimeSpan.FromMinutes(2);
 
@@ -24,8 +25,8 @@ public sealed class HomeQueryService(
 
         var warnings = new List<SdkErrorModel>();
 
-        var carouselsResult = await GetListAsync<CarouselViewModel>(
-            "api/home/GetHomeCarouselsViewAsync",
+        var carouselsResult = await GetListAsync<HomeCarouselApiItem>(
+            "api/home/GetHomeCarouselsView",
             "HOME_CAROUSELS_FAILED",
             warnings,
             cancellationToken);
@@ -92,24 +93,58 @@ public sealed class HomeQueryService(
     {
         try
         {
-            var response = await httpClient.GetAsync(path, cancellationToken);
+            var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+
             if (!response.IsSuccessStatusCode)
             {
+                logger.LogError(
+                    "首页接口请求失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
+                    path,
+                    (int)response.StatusCode,
+                    HttpClient.BaseAddress,
+                    errorCode,
+                    TrimForLog(responseBody));
+
                 warnings.Add(new SdkErrorModel
                 {
                     Code = errorCode,
-                    Message = $"请求 {path} 失败",
+                    Message = $"请求 {path} 失败（HTTP {(int)response.StatusCode}）",
                     StatusCode = (int)response.StatusCode
                 });
                 return [];
             }
 
-            var data = await response.Content.ReadFromJsonAsync<List<TItem>>(cancellationToken: cancellationToken);
-            return data ?? [];
+            try
+            {
+                var data = Deserialize<List<TItem>>(responseBody);
+                return data ?? [];
+            }
+            catch (JsonException ex)
+            {
+                logger.LogError(
+                    ex,
+                    "首页接口反序列化失败。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
+                    path,
+                    HttpClient.BaseAddress,
+                    errorCode,
+                    TrimForLog(responseBody));
+                warnings.Add(new SdkErrorModel
+                {
+                    Code = errorCode,
+                    Message = $"请求 {path} 成功但数据格式不兼容",
+                    StatusCode = 200
+                });
+                return [];
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "请求接口 {Path} 时发生异常", path);
+            logger.LogError(
+                ex,
+                "首页接口请求异常。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}",
+                path,
+                HttpClient.BaseAddress,
+                errorCode);
             warnings.Add(new SdkErrorModel
             {
                 Code = errorCode,
@@ -155,5 +190,14 @@ public sealed class HomeQueryService(
         }
 
         return url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? url : $"/{url.TrimStart('/')}";
+    }
+
+    private sealed class HomeCarouselApiItem
+    {
+        public string? Image { get; set; }
+
+        public string? Link { get; set; }
+
+        public string? Note { get; set; }
     }
 }
