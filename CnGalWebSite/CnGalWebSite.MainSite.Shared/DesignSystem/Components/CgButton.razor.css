@@ -1,0 +1,29 @@
+.cg-btn {
+    border: 1px solid transparent;
+    border-radius: var(--cg-radius-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+
+.cg-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.cg-btn--primary {
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.cg-btn--primary:hover:not(:disabled) {
+    background: var(--cg-color-primary-hover);
+}
+
+.cg-btn--secondary {
+    background: var(--cg-color-surface);
+    border-color: var(--cg-color-border);
+    color: var(--cg-color-text);
+}

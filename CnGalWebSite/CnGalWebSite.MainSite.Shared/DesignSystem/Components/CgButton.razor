@@ -1,0 +1,22 @@
+<button class="@CssClass" type="@Type" disabled="@Disabled" @onclick="OnClick">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string Variant { get; set; } = "primary";
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private string CssClass => $"cg-btn cg-btn--{Variant}";
+}

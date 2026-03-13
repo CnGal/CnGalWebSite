@@ -1,0 +1,52 @@
+@page "/entries/{Id:int}"
+@inject IEntryQueryService EntryQueryService
+
+<PageTitle>条目详情</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <section class="entry-not-found">
+        <h1>条目加载失败</h1>
+        <p>@ErrorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (Model is not null)
+{
+    <article class="entry-detail">
+        <h1>@Model.Name</h1>
+        @if (string.IsNullOrWhiteSpace(Model.MainPicture) is false)
+        {
+            <img src="@Model.MainPicture" alt="@Model.Name" class="entry-cover" />
+        }
+        <p>@Model.Description</p>
+        <ul>
+            @foreach (var tag in Model.Tags)
+            {
+                <li>@tag</li>
+            }
+        </ul>
+    </article>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EntryDetailViewModel? Model;
+    private string? ErrorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await EntryQueryService.GetEntryDetailAsync(Id);
+        if (result.Success && result.Data is not null)
+        {
+            ErrorMessage = null;
+            Model = result.Data;
+            return;
+        }
+
+        Model = null;
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+}

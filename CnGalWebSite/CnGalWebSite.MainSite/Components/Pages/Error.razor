@@ -1,10 +1,10 @@
-﻿@page "/Error"
+@page "/Error"
 @using System.Diagnostics
 
 <PageTitle>Error</PageTitle>
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<h1 class="error-title">Error.</h1>
+<h2 class="error-subtitle">An error occurred while processing your request.</h2>
 
 @if (ShowRequestId)
 {
@@ -34,3 +34,10 @@
     protected override void OnInitialized() =>
         RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
 }
+
+<style>
+    .error-title,
+    .error-subtitle {
+        color: #b91c1c;
+    }
+</style>

@@ -1,0 +1,14 @@
+.cg-input {
+    width: 100%;
+    min-height: 2.4rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: 0.4rem 0.7rem;
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text);
+}
+
+.cg-input:focus {
+    outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    border-color: var(--cg-color-primary);
+}

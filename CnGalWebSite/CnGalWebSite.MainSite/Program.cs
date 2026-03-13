@@ -1,10 +1,14 @@
 using CnGalWebSite.MainSite.Components;
+using CnGalWebSite.MainSite.Shared;
+using CnGalWebSite.SDK.MainSite.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"] ?? "https://api.cngal.org/";
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddMainSiteSdk(apiBaseAddress);
 
 var app = builder.Build();
 
@@ -22,6 +26,7 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
+    .AddAdditionalAssemblies(typeof(AssemblyMarker).Assembly)
     .AddInteractiveServerRenderMode();
 
 app.Run();

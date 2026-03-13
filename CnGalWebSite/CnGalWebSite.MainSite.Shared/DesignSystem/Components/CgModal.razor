@@ -1,0 +1,38 @@
+@if (IsOpen)
+{
+    <div class="cg-modal-mask" @onclick="OnMaskClick">
+        <section class="cg-modal-panel" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
+            <header class="cg-modal-header">
+                <h3>@Title</h3>
+                <button class="cg-modal-close" type="button" @onclick="CloseAsync">x</button>
+            </header>
+            <div class="cg-modal-content">
+                @ChildContent
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private Task OnMaskClick()
+    {
+        return CloseAsync();
+    }
+
+    private Task CloseAsync()
+    {
+        return OnClose.InvokeAsync();
+    }
+}

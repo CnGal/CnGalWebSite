@@ -1,0 +1,113 @@
+@page "/"
+@inject IHomeQueryService HomeQueryService
+
+<PageTitle>CnGal 主站</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <section class="home-error">
+        <h1>首页加载失败</h1>
+        <p>@ErrorMessage</p>
+    </section>
+}
+else
+{
+    <section class="home-hero">
+        <h1>@Model.HeroTitle</h1>
+        <p>@Model.HeroSubtitle</p>
+    </section>
+
+    <section class="home-carousels">
+        <h2>轮播推荐</h2>
+        <ul>
+            @foreach (var carousel in Model.Carousels)
+            {
+                <li>
+                    <a href="@carousel.Link" target="_blank" rel="noopener noreferrer">
+                        @carousel.Note
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+
+    <section class="home-featured">
+        <h2>近期发售</h2>
+        <ul>
+            @foreach (var entry in Model.FeaturedEntries)
+            {
+                <li>
+                    <a href="/entries/@entry.Id">@entry.Name</a>
+                    <p>@entry.Tagline</p>
+                </li>
+            }
+        </ul>
+    </section>
+
+    <div class="home-columns">
+        <section class="home-announcements">
+            <h2>公告</h2>
+            <ul>
+                @foreach (var item in Model.Announcements)
+                {
+                    <li>
+                        <a href="@item.Url">@item.Name</a>
+                        <p>@item.BriefIntroduction</p>
+                    </li>
+                }
+            </ul>
+        </section>
+
+        <section class="home-articles">
+            <h2>最新文章</h2>
+            <ul>
+                @foreach (var item in Model.LatestArticles)
+                {
+                    <li>
+                        <a href="@item.Url">@item.Name</a>
+                        <p>@item.Author · @item.PublishTime</p>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+
+    @if (Model.Warnings.Count > 0)
+    {
+        <section class="home-warning">
+            <h2>部分模块加载异常</h2>
+            <ul>
+                @foreach (var warning in Model.Warnings)
+                {
+                    <li>@warning.Message</li>
+                }
+            </ul>
+        </section>
+    }
+}
+
+@code {
+    private HomeSummaryViewModel Model = new()
+    {
+        HeroTitle = string.Empty,
+        HeroSubtitle = string.Empty,
+        FeaturedEntries = [],
+        Carousels = [],
+        Announcements = [],
+        LatestArticles = [],
+        Warnings = []
+    };
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await HomeQueryService.GetHomeSummaryAsync();
+        if (result.Success && result.Data is not null)
+        {
+            Model = result.Data;
+            return;
+        }
+
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+}

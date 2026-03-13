@@ -1,0 +1,36 @@
+.entry-detail h1 {
+    margin: 0 0 0.6rem;
+}
+
+.entry-detail p {
+    margin: 0 0 1rem;
+    color: var(--cg-color-text-muted);
+}
+
+.entry-cover {
+    width: min(100%, 720px);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+    margin-bottom: 1rem;
+}
+
+.entry-detail ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.entry-detail li {
+    border: 1px solid var(--cg-color-border);
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.85rem;
+    background: color-mix(in oklab, var(--cg-color-surface) 80%, white);
+}
+
+.entry-not-found a {
+    color: var(--cg-color-link);
+}

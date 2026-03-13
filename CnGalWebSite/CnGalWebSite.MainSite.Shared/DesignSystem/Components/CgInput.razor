@@ -1,0 +1,24 @@
+<input class="cg-input"
+       type="@Type"
+       value="@Value"
+       placeholder="@Placeholder"
+       @onchange="OnChanged" />
+
+@code {
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    private Task OnChanged(ChangeEventArgs args)
+    {
+        return ValueChanged.InvokeAsync(args.Value?.ToString());
+    }
+}

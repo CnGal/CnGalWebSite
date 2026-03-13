@@ -1,0 +1,13 @@
+:root {
+    --cg-color-bg: #f4f6fb;
+    --cg-color-surface: #ffffff;
+    --cg-color-border: #d7ddeb;
+    --cg-color-text: #1a2440;
+    --cg-color-text-muted: #5a6687;
+    --cg-color-link: #214ed7;
+    --cg-color-primary: #2f63f0;
+    --cg-color-primary-hover: #234ec5;
+    --cg-radius-md: 0.55rem;
+    --cg-radius-lg: 0.8rem;
+    --cg-shadow-lg: 0 16px 32px rgba(18, 30, 61, 0.2);
+}

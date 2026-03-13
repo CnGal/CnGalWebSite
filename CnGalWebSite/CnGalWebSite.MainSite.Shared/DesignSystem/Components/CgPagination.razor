@@ -1,0 +1,36 @@
+<nav class="cg-pagination" aria-label="Pagination">
+    <CgButton Variant="secondary" Disabled="@(CurrentPage <= 1)" OnClick="GoPreviousAsync">上一页</CgButton>
+    <span class="cg-pagination-info">第 @CurrentPage 页 / 共 @TotalPages 页</span>
+    <CgButton Variant="secondary" Disabled="@(CurrentPage >= TotalPages)" OnClick="GoNextAsync">下一页</CgButton>
+</nav>
+
+@code {
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    [Parameter]
+    public int TotalPages { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback<int> CurrentPageChanged { get; set; }
+
+    private Task GoPreviousAsync(MouseEventArgs _)
+    {
+        if (CurrentPage <= 1)
+        {
+            return Task.CompletedTask;
+        }
+
+        return CurrentPageChanged.InvokeAsync(CurrentPage - 1);
+    }
+
+    private Task GoNextAsync(MouseEventArgs _)
+    {
+        if (CurrentPage >= TotalPages)
+        {
+            return Task.CompletedTask;
+        }
+
+        return CurrentPageChanged.InvokeAsync(CurrentPage + 1);
+    }
+}
