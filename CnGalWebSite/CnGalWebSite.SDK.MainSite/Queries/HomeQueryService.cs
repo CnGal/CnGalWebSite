@@ -25,7 +25,7 @@ public sealed class HomeQueryService(
 
         var warnings = new List<SdkErrorModel>();
 
-        var carouselsResult = await GetListAsync<HomeCarouselApiItem>(
+        var carouselsResult = await GetListAsync<CarouselViewModel>(
             "api/home/GetHomeCarouselsView",
             "HOME_CAROUSELS_FAILED",
             warnings,
@@ -190,14 +190,5 @@ public sealed class HomeQueryService(
         }
 
         return url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? url : $"/{url.TrimStart('/')}";
-    }
-
-    private sealed class HomeCarouselApiItem
-    {
-        public string? Image { get; set; }
-
-        public string? Link { get; set; }
-
-        public string? Note { get; set; }
     }
 }
