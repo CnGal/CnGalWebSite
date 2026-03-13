@@ -376,7 +376,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<GamalyticDataModel>("https://api.gamalytic.com/game/" + storeInfo.Link);
+                var data = await _httpService.GetAsync<GamalyticDataModel>(_configuration["GamalyticApiUrl"] + storeInfo.Link);
 
                 //评测数
                 storeInfo.EvaluationCount ??= data.ReviewsSteam;
