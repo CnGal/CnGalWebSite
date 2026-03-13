@@ -2,40 +2,41 @@ services:
   blazorserver:
     image: littlefishtentears/cngalwebsiteidentityserveradmin:${IMAGE_TAG:-latest}
     container_name: identityserveradmin
-    environment:
-      - TZ=${TZ:-Asia/Shanghai}
-      - Authority=${Authority:-https://oauth2.cngal.org}
-      - ClientId=${ClientId}
-      - ClientSecret=${ClientSecret}
-      - IdsApiUrl=${IdsApiUrl:-https://oauth2.cngal.org}
-      # 管理令牌储存
-      - TokenAPI=${TokenAPI:-https://oauth2.cngal.org/api/tokens/}
-      - TokenAPISecret=${TokenAPISecret}
     hostname: identityserveradmin
     restart: always
+
+    ports:
+      - ${PORT:-5100}:8080
+
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      Authority: ${Authority:-https://oauth2.cngal.org}
+      ClientId: ${ClientId}
+      ClientSecret: ${ClientSecret}
+      IdsApiUrl: ${IdsApiUrl:-https://oauth2.cngal.org}
+      TokenAPI: ${TokenAPI:-https://oauth2.cngal.org/api/tokens/}
+      TokenAPISecret: ${TokenAPISecret}
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+    volumes:
+      - DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+
+    labels:
+      com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
+
+    networks:
+      - web
+
     deploy:
       resources:
         limits:
           memory: ${RESOURCES_LIMITS_MEMORY:-500m}
-    ports:
-      - ${PORT:-5100}:8080
-    volumes:
-      - DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-    labels:
-      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: 10
-    networks:
-      - web
 
 volumes:
   DataProtection-Keys:

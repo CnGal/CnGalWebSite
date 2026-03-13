@@ -1,32 +1,32 @@
 services:
   apiserver:
-    image: littlefishtentears/cngalwebsiteexamineservice:latest
+    image: littlefishtentears/cngalwebsiteexamineservice:${IMAGE_TAG:-latest}
     container_name: examineservice
-    environment:
-      - TZ=${TZ:-Asia/Shanghai}
-      # 事件总线 主机名称
-      - EventBus_HostName=${EventBus_HostName}
-      # 事件总线 端口
-      - EventBus_Port=${EventBus_Port:-5672}
-      # 事件总线 用户名
-      - EventBus_UserName=${EventBus_UserName}
-      # 事件总线 密码
-      - EventBus_Password=${EventBus_Password}
     hostname: examineservice
-    restart: always
+    restart: unless-stopped
+
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      # 事件总线 主机名称
+      EventBus_HostName: ${EventBus_HostName}
+      # 事件总线 端口
+      EventBus_Port: ${EventBus_Port:-5672}
+      # 事件总线 用户名
+      EventBus_UserName: ${EventBus_UserName}
+      # 事件总线 密码
+      EventBus_Password: ${EventBus_Password}
+
+    labels:
+      com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
+
+    volumes:
+      - ${DATA_DIR}/SensitiveWords:/app/Data/SensitiveWords
+
     deploy:
       resources:
         limits:
           memory: ${resources_limits_memory:-100m}
-    volumes:
-      - ${DATA_DIR}/SensitiveWords:/app/Data/SensitiveWords
-    labels:
-      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: 10
+
     networks:
       - web
 
