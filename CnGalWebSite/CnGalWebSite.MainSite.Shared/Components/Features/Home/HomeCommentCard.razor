@@ -1,0 +1,16 @@
+<li class="home-card">
+    <a href="@Url">
+        <strong>@UserName</strong>
+        <div class="home-comment-content">
+            @((Microsoft.AspNetCore.Components.MarkupString)Content)
+        </div>
+        <small>@Time</small>
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string UserName { get; set; } = "";
+    [Parameter] public string Content { get; set; } = "";
+    [Parameter] public string Time { get; set; } = "";
+}

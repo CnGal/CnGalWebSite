@@ -1,0 +1,20 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Home
+<li class="home-card">
+    <a href="@Url">
+        <strong>@Name</strong>
+    </a>
+    <ul class="home-sub-list">
+        @foreach (var article in Articles)
+        {
+            <li>
+                <a href="/articles/index/@article.Id">@article.Name</a>
+            </li>
+        }
+    </ul>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public IEnumerable<EvaluationArticleItemModel> Articles { get; set; } = [];
+}

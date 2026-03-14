@@ -1,0 +1,16 @@
+<li class="home-card">
+    <a href="@Url" target="@Target" rel="noopener noreferrer">
+        <strong>@Title</strong>
+        @if (!string.IsNullOrWhiteSpace(Text))
+        {
+            <p>@Text</p>
+        }
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Target { get; set; }
+}

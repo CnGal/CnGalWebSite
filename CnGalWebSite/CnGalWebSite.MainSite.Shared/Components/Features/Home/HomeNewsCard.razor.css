@@ -1,0 +1,34 @@
+.home-card {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    padding: 0.7rem 0.9rem;
+}
+
+.home-card a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.home-card a:hover {
+    color: var(--cg-color-link);
+}
+
+.home-card strong {
+    display: block;
+}
+
+.home-card p,
+.home-card small {
+    color: var(--cg-color-text-muted);
+}
+
+.home-card p {
+    margin: 0.35rem 0 0;
+}
+
+.home-card small {
+    display: block;
+    margin-top: 0.35rem;
+}

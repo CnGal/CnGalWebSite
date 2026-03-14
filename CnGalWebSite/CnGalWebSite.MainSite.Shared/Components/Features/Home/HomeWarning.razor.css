@@ -1,0 +1,16 @@
+.home-warning {
+    margin-top: 1rem;
+}
+
+.home-warning h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    color: var(--cg-color-text-danger, #ef4444);
+}
+
+.home-warning ul {
+    list-style: disc;
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--cg-color-text-danger, #ef4444);
+}

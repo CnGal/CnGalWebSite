@@ -1,0 +1,21 @@
+<li class="home-card home-game-card">
+    <a href="@Url">
+        <img src="@Image" alt="@Name" loading="lazy" />
+        <div class="home-game-card-content">
+            <strong>@Name</strong>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p>@BriefIntroduction</p>
+            }
+            @ChildContent
+        </div>
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string Image { get; set; } = "";
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? BriefIntroduction { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,15 @@
+<section class="home-section">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <h2>@Title</h2>
+    }
+    @ChildContent
+</section>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

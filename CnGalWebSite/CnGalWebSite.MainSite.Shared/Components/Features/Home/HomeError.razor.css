@@ -1,0 +1,17 @@
+.home-error {
+    border: 1px solid #ef4444;
+    background: #fff1f2;
+    padding: 1rem;
+    border-radius: var(--cg-radius-md);
+}
+
+.home-error h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    color: #ef4444;
+}
+
+.home-error p {
+    margin: 0;
+    color: #7f1d1d;
+}

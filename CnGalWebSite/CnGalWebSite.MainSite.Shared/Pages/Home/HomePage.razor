@@ -1,0 +1,312 @@
+﻿@page "/"
+@inject IHomeQueryService HomeQueryService
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+<PageTitle>CnGal 主站</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <HomeError Message="@ErrorMessage" />
+}
+else
+{
+    <HomeHero Title="@Model.HeroTitle" Subtitle="@Model.HeroSubtitle" />
+
+    <HomeSection Title="轮播推荐">
+        <ul class="home-card-grid home-card-grid-3">
+            @foreach (var item in Model.Carousels.Take(6))
+            {
+                <HomeCarouselCard Link="@item.Link" Image="@item.Image" Note="@item.Note" />
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="随机推荐">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.HotRecommends.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="近期新作">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.PublishedGames.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="近期试玩">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.RecentlyDemoGames.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="即将发布">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.UpcomingGames.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
+                    <small>发售时间：@DisplayOrUnknown(item.PublishTime)</small>
+                </HomeGameCard>
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="活动">
+        <ul class="home-card-grid home-card-grid-3">
+            @foreach (var item in Model.ActivityCarousels.Take(3))
+            {
+                <HomeCarouselCard Link="@item.Link" Image="@item.Image" Note="@item.Note" />
+            }
+        </ul>
+    </HomeSection>
+
+    <div class="home-columns home-columns-news">
+        <HomeSection Title="最新动态">
+            <ul class="home-list">
+                @foreach (var item in Model.HomeNews.Take(12))
+                {
+                    <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@item.Time.ToString("yyyy-MM-dd HH:mm")" />
+                }
+            </ul>
+        </HomeSection>
+
+        <HomeSection Title="每周速报">
+            <ul class="home-list">
+                @foreach (var item in Model.WeeklyNews.Take(5))
+                {
+                    <HomeLinkCard Url="@($"/articles/index/{item.Id}")" Title="@TrimWeeklyNewsTitle(item.Name)" />
+                }
+            </ul>
+        </HomeSection>
+    </div>
+
+    <div class="home-columns">
+        <div class="home-column-left">
+            <HomeSection Title="最新文章">
+                <ul class="home-list">
+                    @foreach (var item in Model.LatestArticles.Take(12))
+                    {
+                        <HomeNewsCard Url="@item.Url" Title="@item.Name" Text="@item.BriefIntroduction" Time="@($"{(string.IsNullOrWhiteSpace(item.OriginalAuthor) ? item.UserName : item.OriginalAuthor)} · {item.PublishTime}")" />
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="最新视频">
+                <ul class="home-list">
+                    @foreach (var item in Model.LatestVideos.Take(12))
+                    {
+                        <HomeNewsCard Url="@item.Url" Title="@item.Name" Time="@($"{item.OriginalAuthor} · {item.PublishTime}")" />
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="友情链接">
+                <ul class="home-list">
+                    @foreach (var item in Model.FriendLinks.Take(20))
+                    {
+                        <HomeLinkCard Url="@item.Url" Title="@item.Name" Target="_blank" />
+                    }
+                </ul>
+            </HomeSection>
+        </div>
+
+        <div class="home-column-right">
+            <HomeSection Title="角色生日">
+                @if (Model.Birthdays.Count == 0)
+                {
+                    <div class="home-card">
+                        <p>好像今天没人过生日欸</p>
+                        <a href="/birthday">前往生日日历提前准备</a>
+                    </div>
+                }
+                else
+                {
+                    <ul class="home-list">
+                        @foreach (var item in Model.Birthdays.Take(4))
+                        {
+                            <HomeLinkCard Url="@($"/entries/index/{item.Id}")" Title="@item.Name" Text="@item.BriefIntroduction" />
+                        }
+                    </ul>
+                }
+            </HomeSection>
+
+            <HomeSection Title="公告">
+                <ul class="home-list">
+                    @foreach (var item in Model.Announcements.Take(12))
+                    {
+                        <HomeLinkCard Url="@item.Url" Title="@item.Name" Text="@item.BriefIntroduction" />
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="近期编辑">
+                <ul class="home-list">
+                    @foreach (var item in Model.RecentlyEditedGames.Take(8))
+                    {
+                        <HomeNewsCard Url="@item.Url" Title="@item.Name" Time="@item.PublishTime" />
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="社区交流">
+                <ul class="home-list">
+                    @foreach (var item in Model.CommunityLinks)
+                    {
+                        <HomeLinkCard Url="@item.Link" Title="@item.Title" Text="@item.Text" Target="_blank" />
+                    }
+                </ul>
+            </HomeSection>
+        </div>
+    </div>
+
+    <HomeAbout />
+
+    <div class="home-columns">
+        <div class="home-column-left">
+            <HomeSection Title="专题推荐">
+                <ul class="home-list">
+                    @foreach (var item in Model.Evaluations.Take(6))
+                    {
+                        <HomeEvaluationCard Url="@item.Url" Name="@item.Name" Articles="@item.Articles.Take(4)" />
+                    }
+                </ul>
+            </HomeSection>
+        </div>
+
+        <div class="home-column-right">
+            <HomeSection Title="支持我们">
+                <ul class="home-list">
+                    @foreach (var item in Model.SupportLinks)
+                    {
+                        <HomeLinkCard Url="@item.Link" Title="@item.Title" Text="@item.Text" Target="_blank" />
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="热门标签">
+                <ul class="home-list home-tag-list">
+                    @foreach (var item in Model.HotTags.Take(20))
+                    {
+                        <li><a href="@item.Url">@item.Name</a></li>
+                    }
+                </ul>
+            </HomeSection>
+
+            <HomeSection Title="近期留言">
+                <ul class="home-list">
+                    @foreach (var item in Model.LatestComments.Take(6))
+                    {
+                        <HomeCommentCard Url="@item.Url" UserName="@item.UserName" Content="@item.Content" Time="@item.Time" />
+                    }
+                </ul>
+            </HomeSection>
+        </div>
+    </div>
+
+    <HomeSection Title="免费游玩">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.FreeGames.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeSection Title="折扣中的游戏">
+        <ul class="home-card-grid home-card-grid-4">
+            @foreach (var item in Model.DiscountGames.Take(16))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
+                    <small>@($"{item.Cut}% OFF · ¥ {item.Price:0.00}")</small>
+                </HomeGameCard>
+            }
+        </ul>
+    </HomeSection>
+
+    <HomeKanban />
+
+    <HomeFooter />
+
+    @if (Model.Warnings.Count > 0)
+    {
+        <HomeWarning Warnings="@Model.Warnings" />
+    }
+}
+
+@code {
+    private HomeSummaryViewModel Model = new()
+    {
+        HeroTitle = "",
+        HeroSubtitle = "",
+        Carousels = [],
+        HotRecommends = [],
+        PublishedGames = [],
+        RecentlyDemoGames = [],
+        UpcomingGames = [],
+        ActivityCarousels = [],
+        HomeNews = [],
+        WeeklyNews = [],
+        LatestArticles = [],
+        LatestVideos = [],
+        FriendLinks = [],
+        Birthdays = [],
+        Announcements = [],
+        RecentlyEditedGames = [],
+        CommunityLinks = [],
+        Evaluations = [],
+        SupportLinks = [],
+        HotTags = [],
+        LatestComments = [],
+        FreeGames = [],
+        DiscountGames = [],
+        Warnings = []
+    };
+
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await HomeQueryService.GetHomeSummaryAsync();
+        if (result.Success && result.Data is not null)
+        {
+            Model = result.Data;
+            return;
+        }
+
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private static string DisplayOrUnknown(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "未知" : value;
+    }
+
+    private static string TrimWeeklyNewsTitle(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "CnGal每周速报";
+        }
+
+        return name.Replace("CnGal每周速报（", "").Replace("）", "");
+    }
+
+    private static string GetNewsLink(HomeNewsAloneViewModel model)
+    {
+        return string.IsNullOrWhiteSpace(model.Link) ? $"/articles/index/{model.ArticleId}" : model.Link;
+    }
+
+    private static string? GetNewsTarget(HomeNewsAloneViewModel model)
+    {
+        return string.IsNullOrWhiteSpace(model.Link) ? null : "_blank";
+    }
+}

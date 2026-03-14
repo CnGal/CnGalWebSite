@@ -1,0 +1,14 @@
+﻿<section class="home-warning">
+    <h2>部分模块加载异常</h2>
+    <ul>
+        @foreach (var warning in Warnings)
+        {
+            <li>@warning.Message</li>
+        }
+    </ul>
+</section>
+
+@code {
+    [Parameter]
+    public IEnumerable<SdkErrorModel> Warnings { get; set; } = [];
+}

@@ -1,0 +1,17 @@
+.home-hero {
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.2rem;
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-surface);
+}
+
+.home-hero h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.home-hero p {
+    margin: 0.5rem 0 0;
+    color: var(--cg-color-text-muted);
+}

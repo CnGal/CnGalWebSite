@@ -1,0 +1,15 @@
+<li class="home-card home-banner">
+    <a href="@Link" target="_blank" rel="noopener noreferrer">
+        <img src="@Image" alt="@Note" loading="lazy" />
+        @if (!string.IsNullOrWhiteSpace(Note))
+        {
+            <span>@Note</span>
+        }
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Link { get; set; } = "";
+    [Parameter] public string Image { get; set; } = "";
+    [Parameter] public string Note { get; set; } = "";
+}

@@ -1,0 +1,53 @@
+.home-card {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    padding: 0.7rem 0.9rem;
+}
+
+.home-card a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.home-card a:hover {
+    color: var(--cg-color-link);
+}
+
+.home-card strong {
+    display: block;
+}
+
+.home-card p,
+::deep .home-game-card-content small {
+    color: var(--cg-color-text-muted);
+}
+
+.home-card p {
+    margin: 0.35rem 0 0;
+}
+
+::deep .home-game-card-content small {
+    display: block;
+    margin-top: 0.35rem;
+}
+
+.home-game-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.home-game-card a {
+    display: block;
+}
+
+.home-game-card img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+.home-game-card-content {
+    padding: 0.65rem 0.75rem 0.8rem;
+}
