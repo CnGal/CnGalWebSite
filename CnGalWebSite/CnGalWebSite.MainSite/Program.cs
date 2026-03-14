@@ -8,6 +8,7 @@ var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"] ?? "https:
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress);
 
 var app = builder.Build();
@@ -21,10 +22,13 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapMainSiteAuthenticationEndpoints();
 app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(AssemblyMarker).Assembly)
     .AddInteractiveServerRenderMode();

@@ -1,8 +1,12 @@
-﻿<Router AppAssembly="typeof(Program).Assembly"
-        AdditionalAssemblies="new[] { typeof(CnGalWebSite.MainSite.Shared.AssemblyMarker).Assembly }"
-        NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(CnGalWebSite.MainSite.Shared.Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+@using Microsoft.AspNetCore.Components.Authorization
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly"
+            AdditionalAssemblies="new[] { typeof(CnGalWebSite.MainSite.Shared.AssemblyMarker).Assembly }"
+            NotFoundPage="typeof(Pages.NotFound)">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(CnGalWebSite.MainSite.Shared.Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+</CascadingAuthenticationState>

@@ -1,4 +1,6 @@
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
 
 <div class="cg-layout">
     <header class="cg-layout__header">
@@ -33,15 +35,24 @@
                     <button class="cg-action-btn" aria-label="通知">
                         <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
                     </button>
-                    <button class="cg-action-btn" aria-label="账户">
-                        <CgMdiIcon Name="mdiAccountCircle" aria-hidden="true" />
-                    </button>
-                </div>
-
-                <div class="cg-user-avatar">
-                    <div class="cg-user-avatar__inner">
-                        <img src="https://app.cngal.org/favicon.ico" alt="User Avatar" class="cg-user-avatar__img" />
-                    </div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="cg-authenticated">
+                                <span class="cg-user-name">@context.User.Identity?.Name</span>
+                                <form class="cg-auth-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
+                                    <button class="cg-action-btn" type="submit" aria-label="退出登录">
+                                        <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+                                    </button>
+                                </form>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="cg-auth-login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                                <CgMdiIcon Name="mdiAccountCircle" aria-hidden="true" />
+                                <span>登录</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </div>
             </div>
         </div>
@@ -129,3 +140,7 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+}

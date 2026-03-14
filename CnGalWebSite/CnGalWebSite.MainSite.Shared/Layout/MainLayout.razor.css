@@ -187,6 +187,7 @@
 .cg-topbar__actions {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
 }
 
 .cg-action-btn {
@@ -211,6 +212,48 @@
 .cg-action-btn ::deep .cg-mdi-icon {
     width: 24px;
     height: 24px;
+}
+
+.cg-authenticated {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cg-user-name {
+    max-width: 10rem;
+    font-size: 0.875rem;
+    color: var(--cg-color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cg-auth-form {
+    margin: 0;
+    display: flex;
+}
+
+.cg-auth-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.5rem;
+    border-radius: var(--cg-radius-xl, 1.5rem);
+    padding: 0 0.85rem;
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
+    transition: all var(--cg-transition-fast);
+}
+
+.cg-auth-login:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+}
+
+.cg-auth-login ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
 }
 
 .cg-user-avatar {
