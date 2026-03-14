@@ -1,0 +1,40 @@
+<input class="cg-input @ClassName"
+       type="text"
+       value="@Value"
+       placeholder="@Placeholder"
+       list="@_listId"
+       disabled="@Disabled"
+       @oninput="OnChanged" />
+<datalist id="@_listId">
+    @foreach (var item in Items)
+    {
+        <option value="@item"></option>
+    }
+</datalist>
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Items { get; set; } = [];
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string ClassName { get; set; } = string.Empty;
+
+    private readonly string _listId = $"cg-ac-{Guid.NewGuid():N}";
+
+    private Task OnChanged(ChangeEventArgs args)
+    {
+        return ValueChanged.InvokeAsync(args.Value?.ToString());
+    }
+}

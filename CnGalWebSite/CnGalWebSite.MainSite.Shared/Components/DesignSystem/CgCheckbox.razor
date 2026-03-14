@@ -1,0 +1,33 @@
+<label class="cg-checkbox @(Disabled ? "cg-checkbox--disabled" : string.Empty)">
+    <input class="cg-checkbox-input"
+           type="checkbox"
+           checked="@Value"
+           disabled="@Disabled"
+           @onchange="OnChanged" />
+    <span class="cg-checkbox-label">@Label</span>
+</label>
+
+@code {
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private Task OnChanged(ChangeEventArgs args)
+    {
+        if (args.Value is bool value)
+        {
+            return ValueChanged.InvokeAsync(value);
+        }
+
+        var text = args.Value?.ToString();
+        return ValueChanged.InvokeAsync(string.Equals(text, "true", StringComparison.OrdinalIgnoreCase));
+    }
+}

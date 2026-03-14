@@ -1,0 +1,23 @@
+.cg-select {
+    width: 100%;
+    padding: var(--cg-spacing-3);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-sm);
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text-primary);
+    font-family: inherit;
+    font-size: var(--cg-font-size-md);
+    transition: var(--cg-transition-fast);
+}
+
+.cg-select:focus {
+    border-color: var(--cg-color-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(57, 118, 239, 0.2);
+}
+
+.cg-select:disabled {
+    background-color: var(--cg-color-bg);
+    color: var(--cg-color-text-secondary);
+    cursor: not-allowed;
+}

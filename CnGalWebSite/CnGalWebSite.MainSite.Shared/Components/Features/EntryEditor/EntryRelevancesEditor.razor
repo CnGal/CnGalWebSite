@@ -1,31 +1,117 @@
+@using System.Web
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
-@using CnGalWebSite.DataModel.ViewModel.Entries
 @using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+@using CnGalWebSite.Extensions
 
 <section class="entry-editor-section">
     <h2>关联信息</h2>
-    <p>关联的相关词条、视频、文章及外部链接等。</p>
-    
+    <p>词条关联、动态/文章/视频、外部平台链接与自定义链接。</p>
+
     @if (Model != null)
     {
-        <div class="cg-form-group">
-            <label class="cg-form-label">相关游戏（一行一个名称）</label>
-            <textarea class="cg-textarea" @bind="GamesInput" placeholder="如：\n某个游戏\n另一个游戏"></textarea>
+        <div class="cg-form-section">
+            <div class="cg-section-header">
+                <h3>快速添加</h3>
+                <CgPopupMenu TriggerText="添加关联项"
+                             Items="@_quickAddMenuItems"
+                             ItemSelected="QuickAddAsync" />
+            </div>
         </div>
-        
-        <div class="cg-form-group">
-            <label class="cg-form-label">相关角色（一行一个名称）</label>
-            <textarea class="cg-textarea" @bind="RolesInput" placeholder="如：\n角色1\n角色2"></textarea>
+
+        <div class="cg-form-section mt-4">
+            <h3>词条关联（自动补全）</h3>
+            @RenderRelevanceList("角色", Model.Roles, MetaOptions.EntryRoleItems)
+            @if (Model.Type != EntryType.Game)
+            {
+                @RenderRelevanceList("STAFF", Model.staffs, MetaOptions.EntryStaffItems)
+            }
+            @RenderRelevanceList("组织", Model.Groups, MetaOptions.EntryGroupItems)
+            @RenderRelevanceList("游戏", Model.Games, MetaOptions.EntryGameItems)
+            @RenderRelevanceList("动态", Model.news, MetaOptions.ArticleItems)
+            @RenderRelevanceList("文章", Model.articles, MetaOptions.ArticleItems)
+            @RenderRelevanceList("视频", Model.videos, MetaOptions.VideoItems)
         </div>
-        
-        <div class="cg-form-group">
-            <label class="cg-form-label">相关文章（一行一个名称）</label>
-            <textarea class="cg-textarea" @bind="ArticlesInput" placeholder="如：\n文章标题1\n文章标题2"></textarea>
+
+        <div class="cg-form-section mt-4">
+            <h3>外部平台 Id/链接</h3>
+            <p class="cg-tip">支持直接粘贴完整链接，系统会自动截取平台 Id 并拼装标准链接。</p>
+            <div class="cg-grid-2">
+                @foreach (var item in _outlinkTypes)
+                {
+                    var current = item;
+                    <div class="cg-form-group">
+                        <label class="cg-form-label">@current.GetDisplayName()</label>
+                        <CgInput Value="@GetOutlinkValue(current)"
+                                 ValueChanged="(text) => OnOutlinkValueChanged(current, text)"
+                                 Placeholder="输入平台Id或完整链接" />
+                    </div>
+                }
+            </div>
         </div>
-        
-        <!-- 这里为了最小化迁移，直接用文本框代替自动补全，后续可引入 CgAutoComplete -->
+
+        <div class="cg-form-section mt-4">
+            <div class="cg-section-header">
+                <h3>自定义链接</h3>
+                <button class="cg-btn cg-btn--primary" type="button" @onclick="AddCustomLink">添加</button>
+            </div>
+
+            @if (GetCustomLinks().Any())
+            {
+                <table class="cg-table">
+                    <thead>
+                        <tr>
+                            <th>唯一名称</th>
+                            <th>链接</th>
+                            <th>简介</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var link in GetCustomLinks())
+                        {
+                            <tr>
+                                <td>@link.DisplayName</td>
+                                <td>@link.Link</td>
+                                <td>@link.DisPlayValue</td>
+                                <td class="cg-actions">
+                                    <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditCustomLink(link)">编辑</button>
+                                    <button class="cg-btn cg-btn--danger" type="button" @onclick="() => DeleteCustomLink(link)">删除</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
     }
 </section>
+
+<CgModal IsOpen="@_customLinkDialogOpen"
+         Title="编辑自定义链接"
+         OnClose="CloseCustomLinkDialogAsync">
+    @if (_customLinkEditing != null)
+    {
+        <div class="cg-grid-2">
+            <div class="cg-form-group">
+                <label class="cg-form-label">唯一名称</label>
+                <CgInput @bind-Value="_customLinkEditing.DisplayName" Placeholder="如：制作组博客" />
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">链接</label>
+                <CgInput @bind-Value="_customLinkEditing.Link" Placeholder="https://example.com" />
+            </div>
+        </div>
+        <div class="cg-form-group">
+            <label class="cg-form-label">简介</label>
+            <CgInput @bind-Value="_customLinkEditing.DisPlayValue" Placeholder="可选说明" />
+        </div>
+        <div class="cg-dialog-actions">
+            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseCustomLinkDialog">取消</button>
+            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveCustomLink">保存</button>
+        </div>
+    }
+</CgModal>
 
 @code {
     [Parameter]
@@ -34,45 +120,255 @@
     [Parameter]
     public EntryEditMetaOptions MetaOptions { get; set; } = default!;
 
-    private string GamesInput
+    private readonly List<KeyValuePair<string, string>> _quickAddMenuItems =
+    [
+        KeyValuePair.Create("roles", "添加角色"),
+        KeyValuePair.Create("staffs", "添加 STAFF"),
+        KeyValuePair.Create("groups", "添加组织"),
+        KeyValuePair.Create("games", "添加游戏"),
+        KeyValuePair.Create("news", "添加动态"),
+        KeyValuePair.Create("articles", "添加文章"),
+        KeyValuePair.Create("videos", "添加视频"),
+        KeyValuePair.Create("others", "添加自定义链接")
+    ];
+
+    private readonly List<OutlinkType> _outlinkTypes = Enum.GetValues<OutlinkType>().ToList();
+
+    private bool _customLinkDialogOpen;
+    private RelevancesModel? _customLinkEditing;
+    private RelevancesModel? _customLinkTarget;
+
+    private RenderFragment RenderRelevanceList(string title, List<RelevancesModel> list, List<string> options) => builder =>
     {
-        get => string.Join("\n", Model?.Games?.Select(g => g.DisplayName) ?? Array.Empty<string>());
-        set
+        var seq = 0;
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "cg-relevance-list");
+
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "cg-section-header");
+        builder.OpenElement(seq++, "h4");
+        builder.AddContent(seq++, title);
+        builder.CloseElement();
+        builder.OpenElement(seq++, "button");
+        builder.AddAttribute(seq++, "class", "cg-btn cg-btn--outline");
+        builder.AddAttribute(seq++, "type", "button");
+        builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => AddRelevanceItem(list)));
+        builder.AddContent(seq++, "添加");
+        builder.CloseElement();
+        builder.CloseElement();
+
+        foreach (var item in list)
         {
-            if (Model != null)
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "cg-relevance-row");
+
+            builder.OpenComponent<CgAutoComplete>(seq++);
+            builder.AddAttribute(seq++, "Value", item.DisplayName);
+            builder.AddAttribute(seq++, "ValueChanged", EventCallback.Factory.Create<string?>(this, (text) =>
             {
-                Model.Games = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
-                    .ToList() ?? new();
-            }
+                item.DisplayName = text ?? string.Empty;
+            }));
+            builder.AddAttribute(seq++, "Items", options);
+            builder.AddAttribute(seq++, "Placeholder", $"输入{title}唯一名称");
+            builder.CloseComponent();
+
+            builder.OpenElement(seq++, "button");
+            builder.AddAttribute(seq++, "class", "cg-btn cg-btn--danger");
+            builder.AddAttribute(seq++, "type", "button");
+            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => list.Remove(item)));
+            builder.AddContent(seq++, "删除");
+            builder.CloseElement();
+
+            builder.CloseElement();
         }
+
+        builder.CloseElement();
+    };
+
+    private Task QuickAddAsync(string key)
+    {
+        switch (key)
+        {
+            case "roles":
+                AddRelevanceItem(Model.Roles);
+                break;
+            case "staffs":
+                AddRelevanceItem(Model.staffs);
+                break;
+            case "groups":
+                AddRelevanceItem(Model.Groups);
+                break;
+            case "games":
+                AddRelevanceItem(Model.Games);
+                break;
+            case "news":
+                AddRelevanceItem(Model.news);
+                break;
+            case "articles":
+                AddRelevanceItem(Model.articles);
+                break;
+            case "videos":
+                AddRelevanceItem(Model.videos);
+                break;
+            case "others":
+                AddCustomLink();
+                break;
+        }
+
+        return Task.CompletedTask;
     }
 
-    private string RolesInput
+    private static void AddRelevanceItem(List<RelevancesModel> list)
     {
-        get => string.Join("\n", Model?.Roles?.Select(g => g.DisplayName) ?? Array.Empty<string>());
-        set
-        {
-            if (Model != null)
-            {
-                Model.Roles = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
-                    .ToList() ?? new();
-            }
-        }
+        list.Add(new RelevancesModel());
     }
 
-    private string ArticlesInput
+    private List<RelevancesModel> GetCustomLinks()
     {
-        get => string.Join("\n", Model?.articles?.Select(g => g.DisplayName) ?? Array.Empty<string>());
-        set
+        return Model.others.Where(s => IsCustomName(s.DisplayName)).ToList();
+    }
+
+    private void AddCustomLink()
+    {
+        _customLinkTarget = null;
+        _customLinkEditing = new RelevancesModel();
+        _customLinkDialogOpen = true;
+    }
+
+    private void EditCustomLink(RelevancesModel item)
+    {
+        _customLinkTarget = item;
+        _customLinkEditing = new RelevancesModel
         {
-            if (Model != null)
-            {
-                Model.articles = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
-                    .ToList() ?? new();
-            }
+            DisplayName = item.DisplayName,
+            DisPlayValue = item.DisPlayValue,
+            Link = item.Link
+        };
+        _customLinkDialogOpen = true;
+    }
+
+    private void DeleteCustomLink(RelevancesModel item)
+    {
+        Model.others.Remove(item);
+    }
+
+    private void SaveCustomLink()
+    {
+        if (_customLinkEditing == null || string.IsNullOrWhiteSpace(_customLinkEditing.DisplayName))
+        {
+            return;
         }
+
+        if (_customLinkTarget == null)
+        {
+            Model.others.Add(_customLinkEditing);
+        }
+        else
+        {
+            _customLinkTarget.DisplayName = _customLinkEditing.DisplayName;
+            _customLinkTarget.DisPlayValue = _customLinkEditing.DisPlayValue;
+            _customLinkTarget.Link = _customLinkEditing.Link;
+        }
+
+        CloseCustomLinkDialog();
+    }
+
+    private void CloseCustomLinkDialog()
+    {
+        _customLinkDialogOpen = false;
+        _customLinkEditing = null;
+        _customLinkTarget = null;
+    }
+
+    private Task CloseCustomLinkDialogAsync()
+    {
+        CloseCustomLinkDialog();
+        return Task.CompletedTask;
+    }
+
+    private string GetOutlinkValue(OutlinkType type)
+    {
+        var item = Model.others.FirstOrDefault(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+        if (item == null || string.IsNullOrWhiteSpace(item.Link))
+        {
+            return string.Empty;
+        }
+
+        var link = item.Link;
+        if (type == OutlinkType.Official)
+        {
+            return link;
+        }
+
+        var decoded = HttpUtility.UrlDecode(link);
+        var part = decoded.Split('?').FirstOrDefault() ?? decoded;
+        var segments = part.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        return segments.LastOrDefault()?.Replace("@", string.Empty).Replace(".html", string.Empty) ?? string.Empty;
+    }
+
+    private Task OnOutlinkValueChanged(OutlinkType type, string? text)
+    {
+        var value = text?.Trim() ?? string.Empty;
+        if (value.Contains("http", StringComparison.OrdinalIgnoreCase) && type != OutlinkType.Official)
+        {
+            var decoded = HttpUtility.UrlDecode(value);
+            var part = decoded.Split('?').FirstOrDefault() ?? decoded;
+            var segments = part.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            value = segments.LastOrDefault()?.Replace("@", string.Empty).Replace(".html", string.Empty) ?? string.Empty;
+        }
+
+        Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.CompletedTask;
+        }
+
+        Model.others.Add(new RelevancesModel
+        {
+            DisplayName = type.GetDisplayName(),
+            Link = BuildOutlink(type, value)
+        });
+
+        return Task.CompletedTask;
+    }
+
+    private string BuildOutlink(OutlinkType type, string value) => type switch
+    {
+        OutlinkType.Moegirl => "https://zh.moegirl.org.cn/" + value,
+        OutlinkType.VNDB => "https://vndb.org/" + value,
+        OutlinkType.YMGal => "https://www.ymgal.games/" + value,
+        OutlinkType.Bangumi => "https://bangumi.tv/" + (Model.Type switch
+        {
+            EntryType.Game => "subject/",
+            EntryType.Role => "character/",
+            EntryType.Staff => "person/",
+            EntryType.ProductionGroup => "person/",
+            _ => "subject/"
+        }) + value,
+        OutlinkType.WikiData => "https://www.wikidata.org/wiki/" + value,
+        OutlinkType.BaiDu => "https://baike.baidu.com/item/" + value,
+        OutlinkType.ZhWikiPedia => "https://zh.wikipedia.org/wiki/" + value,
+        OutlinkType._2DFan => "https://galge.fun/subjects/" + value,
+        OutlinkType.Weibo => "https://weibo.com/u/" + value,
+        OutlinkType.Bilibili => "https://space.bilibili.com/" + value,
+        OutlinkType.AcFun => "https://www.acfun.cn/u/" + value,
+        OutlinkType.Zhihu => "https://www.zhihu.com/people/" + value,
+        OutlinkType.Afdian => "https://afdian.com/@" + value,
+        OutlinkType.Pixiv => "https://www.pixiv.net/users/" + value,
+        OutlinkType.Twitter => "https://twitter.com/" + value,
+        OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
+        OutlinkType.Facebook => "https://www.facebook.com/" + value,
+        OutlinkType.Modian => $"https://zhongchou.modian.com/item/{value}.html",
+        _ => value
+    };
+
+    private bool IsCustomName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return true;
+        }
+
+        return !_outlinkTypes.Any(item => string.Equals(item.GetDisplayName(), name, StringComparison.OrdinalIgnoreCase));
     }
 }

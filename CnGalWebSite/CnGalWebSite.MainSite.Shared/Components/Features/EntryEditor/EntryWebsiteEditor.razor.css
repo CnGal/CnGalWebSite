@@ -80,3 +80,9 @@
 .mt-4 {
     margin-top: var(--cg-spacing-6);
 }
+
+.cg-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--cg-spacing-4);
+}

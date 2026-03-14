@@ -30,3 +30,31 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(57, 118, 239, 0.2);
 }
+
+.cg-form-section {
+    margin-bottom: var(--cg-spacing-6);
+    padding: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: #f8fafc;
+}
+
+.cg-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.cg-tag-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-2);
+}
+
+.cg-btn--danger {
+    background-color: var(--cg-color-error);
+    color: #fff;
+}

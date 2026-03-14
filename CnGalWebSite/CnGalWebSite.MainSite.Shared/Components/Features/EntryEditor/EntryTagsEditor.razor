@@ -4,13 +4,26 @@
 
 <section class="entry-editor-section">
     <h2>标签</h2>
-    <p>管理词条的标签信息。</p>
+    <p>通过自动补全管理标签（建议使用末级标签）。</p>
     
     @if (Model != null)
     {
-        <div class="cg-form-group">
-            <label class="cg-form-label">标签（一行一个标签）</label>
-            <textarea class="cg-textarea" @bind="TagsInput" placeholder="如：\n恋爱\n视觉小说"></textarea>
+        <div class="cg-form-section">
+            <div class="cg-section-header">
+                <h3>标签列表</h3>
+                <button class="cg-btn cg-btn--primary" type="button" @onclick="AddTag">添加标签</button>
+            </div>
+
+            @foreach (var item in Model.Tags)
+            {
+                <div class="cg-tag-row">
+                    <CgAutoComplete Value="@item.DisplayName"
+                                    ValueChanged="(text) => OnTagChanged(item, text)"
+                                    Items="@MetaOptions.TagItems"
+                                    Placeholder="输入标签名称" />
+                    <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveTag(item)">删除</button>
+                </div>
+            }
         </div>
     }
 </section>
@@ -22,17 +35,19 @@
     [Parameter]
     public EntryEditMetaOptions MetaOptions { get; set; } = default!;
 
-    private string TagsInput
+    private void AddTag()
     {
-        get => string.Join("\n", Model?.Tags?.Select(g => g.DisplayName) ?? Array.Empty<string>());
-        set
-        {
-            if (Model != null)
-            {
-                Model.Tags = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
-                    .ToList() ?? new();
-            }
-        }
+        Model.Tags.Add(new RelevancesModel());
+    }
+
+    private void RemoveTag(RelevancesModel tag)
+    {
+        Model.Tags.Remove(tag);
+    }
+
+    private Task OnTagChanged(RelevancesModel tag, string? value)
+    {
+        tag.DisplayName = value ?? string.Empty;
+        return Task.CompletedTask;
     }
 }
