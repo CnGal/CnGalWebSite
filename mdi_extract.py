@@ -80,7 +80,6 @@ def main() -> None:
         / "CnGalWebSite.MainSite.Shared"
         / "Components"
         / "DesignSystem"
-        / "Components"
         / "CgMdiIconMap.g.cs"
     )
 
