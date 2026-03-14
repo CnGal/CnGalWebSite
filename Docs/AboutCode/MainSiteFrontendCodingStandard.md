@@ -142,6 +142,16 @@
 - 对话框等复杂组件必须包含基本 ARIA（如 `role="dialog"`、`aria-modal="true"`）。
 - 链接按钮必须有可感知文本，禁用仅图标无可读描述的交互入口。
 
+## 5.5 图标生成与使用规范（MUST）
+
+- 主站图标统一使用 `DesignSystem/Components/CgMdiIcon.razor`，禁止在业务组件中直接内联 SVG 路径数据。
+- 图标名称必须使用 `@mdi/js` 导出的标准符号名（如 `mdiAccount`、`mdiControllerClassicOutline`），禁止自定义别名。
+- 图标映射文件 `CgMdiIconMap.g.cs` 属于自动生成文件，禁止手工编辑。
+- 当新增、删除或重命名任何 `mdi*` 图标引用后，必须在仓库根目录执行 `python mdi_extract.py` 重新生成映射文件。
+- `mdi_extract.py` 会扫描 `MainSite.Shared` 与 `MainSite` 中的 `.razor` 文件并按实际使用生成最小映射；若输出 `skipped non-icon or unresolved names`，必须修正对应名称后再提交。
+- 组件样式中若需从父组件调整 `CgMdiIcon` 尺寸/颜色，需遵循 CSS 隔离规则，使用 `::deep .cg-mdi-icon` 进行穿透，避免样式失效。
+- 图标默认应标记 `aria-hidden="true"`；若图标承担语义信息，必须提供等价可读文本（可见文本或 `aria-label`）。
+
 ---
 
 ## 6. 命名、目录与代码风格
@@ -214,4 +224,5 @@
 - 是否在 `MainSite.Shared` 出现了业务 API 直连？
 - 是否新增硬编码样式值而未进入 Tokens？
 - 是否覆盖了失败态与日志关键信息？
+- 若改动涉及图标：是否仅使用 `CgMdiIcon`，并在图标引用变更后执行了 `python mdi_extract.py`？
 

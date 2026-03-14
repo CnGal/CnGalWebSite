@@ -1,7 +1,10 @@
-﻿@page "/entries/{Id:int}"
+﻿@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Search
 
-<PageTitle>条目详情</PageTitle>
+<PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
 
 @if (ErrorMessage is not null)
 {
@@ -13,20 +16,495 @@
 }
 else if (Model is not null)
 {
-    <article class="entry-detail">
-        <h1>@Model.Name</h1>
-        @if (string.IsNullOrWhiteSpace(Model.MainPicture) is false)
+    <article class="entry-page">
+        @if (HasAtmosphere())
         {
-            <img src="@Model.MainPicture" alt="@Model.Name" class="entry-cover" loading="lazy" decoding="async" />
+            <div class="entry-atmosphere" aria-hidden="true">
+                @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false)
+                {
+                    <div class="entry-atmosphere-bg" style="@($"background-image:url('{Model.BackgroundPicture}')")"></div>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false)
+                {
+                    <div class="entry-atmosphere-bg entry-atmosphere-bg--small" style="@($"background-image:url('{Model.SmallBackgroundPicture}')")"></div>
+                }
+            </div>
         }
-        <p>@Model.Description</p>
-        <ul>
-            @foreach (var tag in Model.Tags)
-            {
-                <li>@tag</li>
-            }
-        </ul>
+
+        <header class="entry-hero">
+            <div class="entry-hero-main">
+                <div class="entry-hero-top">
+                    <span class="entry-type">@GetTypeText(Model.Type)</span>
+                    @if (Model.IsEdit)
+                    {
+                        <span class="entry-status entry-status--edit">可编辑状态</span>
+                    }
+                </div>
+                <h1>@Model.Name</h1>
+                @if (string.IsNullOrWhiteSpace(Model.AnotherName) is false)
+                {
+                    <p class="entry-another-name">别称：@Model.AnotherName</p>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) is false)
+                {
+                    <p class="entry-brief">@Model.BriefIntroduction</p>
+                }
+                @if (Model.ProductionGroups.Count > 0 || Model.Publishers.Count > 0)
+                {
+                    <div class="entry-people-chips">
+                        @if (Model.ProductionGroups.Count > 0)
+                        {
+                            @foreach (var item in Model.ProductionGroups)
+                            {
+                                <a href="@BuildEntryUrl(item.Id)" class="entry-chip">制作组：@item.DisplayName</a>
+                            }
+                        }
+                        @if (Model.Publishers.Count > 0)
+                        {
+                            @foreach (var item in Model.Publishers)
+                            {
+                                <a href="@BuildEntryUrl(item.Id)" class="entry-chip">发行商：@item.DisplayName</a>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+            <div class="entry-hero-side">
+                @if (string.IsNullOrWhiteSpace(GetHeroImageUrl()) is false)
+                {
+                    <img src="@GetHeroImageUrl()" alt="@Model.Name" class="entry-cover" loading="eager" decoding="async" />
+                }
+                else
+                {
+                    <div class="entry-cover entry-cover--empty" aria-label="暂无封面">NO IMAGE</div>
+                }
+                <div class="entry-actions">
+                    <a class="entry-action-btn" href="@BuildEntryUrl(Model.Id)">刷新页面</a>
+                    <a class="entry-action-btn entry-action-btn--ghost" href="@($"/entries/EditMain/{Model.Id}")">编辑词条</a>
+                </div>
+            </div>
+        </header>
+
+        @if (Model.IsHidden || Model.Type == EntryType.Staff)
+        {
+            <section class="entry-special-tips" aria-label="特殊提示">
+                @if (Model.IsHidden)
+                {
+                    <p class="entry-tip entry-tip--warning">当前词条处于隐藏状态，请谨慎传播并联系管理员确认。</p>
+                }
+                @if (Model.Type == EntryType.Staff)
+                {
+                    <p class="entry-tip entry-tip--danger">该词条可能涉及现实人物，请保持客观描述并谨慎编辑。</p>
+                }
+            </section>
+        }
+
+        <section class="entry-layout entry-layout--desktop" aria-label="桌面详情布局">
+            <main class="entry-main-col">
+                @if (Model.Audio.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>音频</h2>
+                        <ul class="entry-audio-list">
+                            @foreach (var item in Model.Audio.Take(6))
+                            {
+                                <li>
+                                    <div>
+                                        <h3>@item.Name</h3>
+                                        @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) is false)
+                                        {
+                                            <p>@item.BriefIntroduction</p>
+                                        }
+                                    </div>
+                                    <audio controls preload="none" src="@item.Url"></audio>
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                @if (Model.Pictures.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>图片</h2>
+                        <ul class="entry-image-grid">
+                            @foreach (var item in Model.Pictures.Take(12))
+                            {
+                                <li>
+                                    <a href="@item.Url" target="_blank" rel="noopener noreferrer">
+                                        <img src="@item.Url" alt="@DisplayTextOrFallback(item.Note, Model.Name)" loading="lazy" decoding="async" />
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
+                {
+                    <section class="entry-card">
+                        <h2>正文主页</h2>
+                        <div class="entry-markdown">
+                            @(new MarkupString(Model.MainPage))
+                        </div>
+                    </section>
+                }
+
+                @if (Model.NewsOfEntry.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>动态时间线</h2>
+                        <ul class="entry-news-list">
+                            @foreach (var item in Model.NewsOfEntry.Take(10))
+                            {
+                                <li>
+                                    <a href="@GetNewsLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer">@item.Title</a>
+                                    <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                @if (HasRelatedContent())
+                {
+                    <section class="entry-card">
+                        <h2>相关</h2>
+                        <div class="entry-related-grid">
+                            @if (Model.VideoRelevances.Count > 0)
+                            {
+                                <div>
+                                    <h3>相关视频</h3>
+                                    <ul class="entry-link-list">
+                                        @foreach (var item in Model.VideoRelevances.Take(8))
+                                        {
+                                            <li><a href="@($"/videos/index/{item.Id}")">@item.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            @if (Model.EntryRelevances.Count > 0 || Model.Roles.Count > 0 || Model.StaffGames.Count > 0)
+                            {
+                                <div>
+                                    <h3>相关词条</h3>
+                                    <ul class="entry-link-list">
+                                        @foreach (var item in Model.EntryRelevances.Take(8))
+                                        {
+                                            <li><a href="@BuildEntryUrl(item.Id)">@item.Name</a></li>
+                                        }
+                                        @foreach (var item in Model.Roles.Take(4))
+                                        {
+                                            <li><a href="@BuildEntryUrl(item.Id)">@item.Name</a></li>
+                                        }
+                                        @foreach (var item in Model.StaffGames.Take(4))
+                                        {
+                                            <li><a href="@BuildEntryUrl(item.Id)">@item.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            @if (Model.ArticleRelevances.Count > 0)
+                            {
+                                <div>
+                                    <h3>相关文章</h3>
+                                    <ul class="entry-link-list">
+                                        @foreach (var item in Model.ArticleRelevances.Take(8))
+                                        {
+                                            <li><a href="@GetArticleLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer">@item.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            @if (Model.IsHideOutlink is false && Model.OtherRelevances.Count > 0)
+                            {
+                                <div>
+                                    <h3>外部链接</h3>
+                                    <ul class="entry-link-list">
+                                        @foreach (var item in Model.OtherRelevances.Take(8))
+                                        {
+                                            <li><a href="@item.Link" target="_blank" rel="noopener noreferrer">@DisplayTextOrFallback(item.DisplayName, item.DisplayValue)</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+
+                @if (Model.CanComment)
+                {
+                    <section id="comments" class="entry-card entry-card--comment">
+                        <h2>评论入口</h2>
+                        <p>可前往评论区参与讨论，分享你的看法与补充信息。</p>
+                        <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
+                    </section>
+                }
+            </main>
+
+            <aside class="entry-side-col">
+                @if (Model.Booking is not null && Model.Booking.Goals.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>预约</h2>
+                        <p class="entry-booking-count">当前预约：@Model.Booking.BookingCount</p>
+                        <ul class="entry-goal-list">
+                            @foreach (var goal in Model.Booking.Goals.OrderBy(s => s.Target))
+                            {
+                                var reached = Model.Booking.BookingCount >= goal.Target;
+                                <li class="@(reached ? "entry-goal entry-goal--done" : "entry-goal")">
+                                    <span>@goal.Name</span>
+                                    <strong>@goal.Target</strong>
+                                </li>
+                            }
+                        </ul>
+                        <p class="entry-booking-status">@(Model.Booking.Open ? "预约开放中" : "预约未开放")</p>
+                    </section>
+                }
+
+                @if (Model.Information.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>基础信息</h2>
+                        <dl class="entry-info-list">
+                            @foreach (var item in Model.Information)
+                            {
+                                <div>
+                                    <dt>@item.Name</dt>
+                                    <dd>@item.Value</dd>
+                                </div>
+                            }
+                        </dl>
+                    </section>
+                }
+
+                @if (Model.Tags.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>标签</h2>
+                        <ul class="entry-tags">
+                            @foreach (var tag in Model.Tags.Take(24))
+                            {
+                                <li>@tag</li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                @if (Model.Releases.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>发行信息</h2>
+                        <ul class="entry-release-list">
+                            @foreach (var release in Model.Releases.Take(10))
+                            {
+                                <li>
+                                    <strong>@release.Name</strong>
+                                    <span>@(release.Time?.ToString("yyyy-MM-dd") ?? "时间待定")</span>
+                                    @if (string.IsNullOrWhiteSpace(release.Link) is false)
+                                    {
+                                        <a href="@release.GetLink()" target="_blank" rel="noopener noreferrer">查看平台</a>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                @if (Model.Staffs.Count > 0)
+                {
+                    <section class="entry-card">
+                        <h2>Staff</h2>
+                        <ul class="entry-staff-group-list">
+                            @foreach (var group in Model.Staffs.Take(8))
+                            {
+                                <li>
+                                    <h3>@DisplayTextOrFallback(group.Modifier, "Staff组")</h3>
+                                    @foreach (var position in group.StaffList.Take(5))
+                                    {
+                                        <p>
+                                            <strong>@position.Modifier：</strong>
+                                            @string.Join("、", position.Names.Select(s => s.DisplayName))
+                                        </p>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+            </aside>
+        </section>
+
+        <section class="entry-layout entry-layout--mobile" aria-label="移动端详情布局">
+            <div class="entry-mobile-tabs">
+                <input type="radio" id="entry-tab-home" name="entry-tab" checked>
+                <input type="radio" id="entry-tab-related" name="entry-tab">
+                @if (Model.Staffs.Count > 0)
+                {
+                    <input type="radio" id="entry-tab-staff" name="entry-tab">
+                }
+
+                <nav class="entry-mobile-tab-nav" role="tablist" aria-label="详情页标签">
+                    <label for="entry-tab-home" role="tab">首页</label>
+                    <label for="entry-tab-related" role="tab">相关</label>
+                    @if (Model.Staffs.Count > 0)
+                    {
+                        <label for="entry-tab-staff" role="tab">Staff</label>
+                    }
+                </nav>
+
+                <div class="entry-mobile-panels">
+                    <section class="entry-mobile-panel entry-mobile-panel--home">
+                        @if (Model.Booking is not null && Model.Booking.Goals.Count > 0)
+                        {
+                            <section class="entry-card">
+                                <h2>预约</h2>
+                                <p class="entry-booking-count">当前预约：@Model.Booking.BookingCount</p>
+                            </section>
+                        }
+                        @if (Model.Information.Count > 0)
+                        {
+                            <section class="entry-card">
+                                <h2>基础信息</h2>
+                                <dl class="entry-info-list">
+                                    @foreach (var item in Model.Information.Take(12))
+                                    {
+                                        <div>
+                                            <dt>@item.Name</dt>
+                                            <dd>@item.Value</dd>
+                                        </div>
+                                    }
+                                </dl>
+                            </section>
+                        }
+                        @if (Model.Tags.Count > 0)
+                        {
+                            <section class="entry-card">
+                                <h2>标签</h2>
+                                <ul class="entry-tags">
+                                    @foreach (var tag in Model.Tags.Take(24))
+                                    {
+                                        <li>@tag</li>
+                                    }
+                                </ul>
+                            </section>
+                        }
+                        @if (Model.Releases.Count > 0)
+                        {
+                            <section class="entry-card">
+                                <h2>发行信息</h2>
+                                <ul class="entry-release-list">
+                                    @foreach (var release in Model.Releases.Take(8))
+                                    {
+                                        <li>
+                                            <strong>@release.Name</strong>
+                                            <span>@(release.Time?.ToString("yyyy-MM-dd") ?? "时间待定")</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </section>
+                        }
+                        @if (Model.Audio.Count > 0 || Model.Pictures.Count > 0 || string.IsNullOrWhiteSpace(Model.MainPage) is false || Model.NewsOfEntry.Count > 0 || Model.CanComment)
+                        {
+                            <section class="entry-card">
+                                <h2>内容浏览</h2>
+                                <ul class="entry-link-list">
+                                    @if (Model.Audio.Count > 0)
+                                    {
+                                        <li>音频：@Model.Audio.Count</li>
+                                    }
+                                    @if (Model.Pictures.Count > 0)
+                                    {
+                                        <li>图片：@Model.Pictures.Count</li>
+                                    }
+                                    @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
+                                    {
+                                        <li>正文主页：可阅读</li>
+                                    }
+                                    @if (Model.NewsOfEntry.Count > 0)
+                                    {
+                                        <li>动态时间线：@Model.NewsOfEntry.Count</li>
+                                    }
+                                    @if (Model.CanComment)
+                                    {
+                                        <li><a href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a></li>
+                                    }
+                                </ul>
+                            </section>
+                        }
+                    </section>
+
+                    <section class="entry-mobile-panel entry-mobile-panel--related">
+                        @if (HasRelatedContent())
+                        {
+                            <section class="entry-card">
+                                <h2>相关内容</h2>
+                                <ul class="entry-link-list">
+                                    @foreach (var item in Model.VideoRelevances.Take(8))
+                                    {
+                                        <li><a href="@($"/videos/index/{item.Id}")">@item.Name</a></li>
+                                    }
+                                    @foreach (var item in Model.EntryRelevances.Take(8))
+                                    {
+                                        <li><a href="@BuildEntryUrl(item.Id)">@item.Name</a></li>
+                                    }
+                                    @foreach (var item in Model.ArticleRelevances.Take(8))
+                                    {
+                                        <li><a href="@GetArticleLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer">@item.Name</a></li>
+                                    }
+                                    @if (Model.IsHideOutlink is false)
+                                    {
+                                        @foreach (var item in Model.OtherRelevances.Take(8))
+                                        {
+                                            <li><a href="@item.Link" target="_blank" rel="noopener noreferrer">@DisplayTextOrFallback(item.DisplayName, item.DisplayValue)</a></li>
+                                        }
+                                    }
+                                </ul>
+                            </section>
+                        }
+                        else
+                        {
+                            <section class="entry-card entry-card--empty">
+                                <h2>相关内容</h2>
+                                <p>暂无相关视频、词条、文章或外部链接。</p>
+                            </section>
+                        }
+                    </section>
+
+                    @if (Model.Staffs.Count > 0)
+                    {
+                        <section class="entry-mobile-panel entry-mobile-panel--staff">
+                            <section class="entry-card">
+                                <h2>Staff</h2>
+                                <ul class="entry-staff-group-list">
+                                    @foreach (var group in Model.Staffs)
+                                    {
+                                        <li>
+                                            <h3>@DisplayTextOrFallback(group.Modifier, "Staff组")</h3>
+                                            @foreach (var position in group.StaffList)
+                                            {
+                                                <p>
+                                                    <strong>@position.Modifier：</strong>
+                                                    @string.Join("、", position.Names.Select(s => s.DisplayName))
+                                                </p>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </section>
+                        </section>
+                    }
+                </div>
+            </div>
+        </section>
     </article>
+}
+else
+{
+    <section class="entry-loading" aria-label="加载中">
+        <div class="entry-loading-block"></div>
+        <div class="entry-loading-block entry-loading-block--wide"></div>
+        <div class="entry-loading-block"></div>
+    </section>
 }
 
 @code {
@@ -48,5 +526,90 @@ else if (Model is not null)
 
         Model = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
+    }
+
+    private string GetHeroImageUrl()
+    {
+        if (Model is null)
+        {
+            return string.Empty;
+        }
+
+        if (Model.Type is EntryType.Role or EntryType.Staff)
+        {
+            return string.IsNullOrWhiteSpace(Model.Thumbnail) ? Model.MainPicture : Model.Thumbnail;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.MainPicture) ? Model.Thumbnail : Model.MainPicture;
+    }
+
+    private static string BuildEntryUrl(int id)
+    {
+        return $"/entries/index/{id}";
+    }
+
+    private static string DisplayTextOrFallback(string? value, string fallback)
+    {
+        return string.IsNullOrWhiteSpace(value) ? fallback : value;
+    }
+
+    private static string GetTypeText(EntryType type)
+    {
+        return type switch
+        {
+            EntryType.Game => "游戏",
+            EntryType.Role => "角色",
+            EntryType.ProductionGroup => "组织",
+            EntryType.Staff => "Staff",
+            _ => "词条"
+        };
+    }
+
+    private static bool IsExternalLink(string? link)
+    {
+        return string.IsNullOrWhiteSpace(link) is false
+               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string GetArticleLink(ArticleInforTipViewModel item)
+    {
+        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.Id}";
+    }
+
+    private static string GetNewsLink(NewsModel item)
+    {
+        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.ArticleId}";
+    }
+
+    private static string? GetTarget(string? link)
+    {
+        return IsExternalLink(link) ? "_blank" : null;
+    }
+
+    private bool HasRelatedContent()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return Model.VideoRelevances.Count > 0
+            || Model.EntryRelevances.Count > 0
+            || Model.ArticleRelevances.Count > 0
+            || (Model.IsHideOutlink is false && Model.OtherRelevances.Count > 0)
+            || Model.Roles.Count > 0
+            || Model.StaffGames.Count > 0;
     }
 }

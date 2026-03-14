@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -78,14 +78,52 @@ public sealed class EntryQueryService(
             {
                 Id = entry.Id,
                 Name = entry.Name ?? string.Empty,
-                Description = entry.BriefIntroduction ?? string.Empty,
-                MainPicture = entry.MainPicture,
-                Tags = entry.Tags
+                AnotherName = entry.AnotherName ?? string.Empty,
+                BriefIntroduction = entry.BriefIntroduction ?? string.Empty,
+                Type = entry.Type,
+                MainPicture = entry.MainPicture ?? string.Empty,
+                Thumbnail = entry.Thumbnail ?? string.Empty,
+                BackgroundPicture = entry.BackgroundPicture ?? string.Empty,
+                SmallBackgroundPicture = entry.SmallBackgroundPicture ?? string.Empty,
+                IsEdit = entry.IsEdit,
+                IsHidden = entry.IsHidden,
+                IsHideOutlink = entry.IsHideOutlink,
+                IsScored = entry.IsScored,
+                CanComment = entry.CanComment,
+                TabIndex = entry.TabIndex <= 0 ? 1 : entry.TabIndex,
+                MainPage = entry.MainPage ?? string.Empty,
+                Booking = entry.Booking,
+                Information = entry.Information?.ToList() ?? [],
+                Tags = entry.Tags?
                     .Select(s => s.Name)
                     .Where(s => string.IsNullOrWhiteSpace(s) is false)
                     .Distinct()
-                    .Take(16)
-                    .ToList()
+                    .Take(24)
+                    .ToList() ?? [],
+                Audio = entry.Audio?
+                    .Where(s => string.IsNullOrWhiteSpace(s.Url) is false)
+                    .OrderBy(s => s.Priority)
+                    .ToList() ?? [],
+                Pictures = entry.Pictures?
+                    .SelectMany(s => s.Pictures ?? [])
+                    .Where(s => string.IsNullOrWhiteSpace(s.Url) is false)
+                    .OrderBy(s => s.Priority)
+                    .ToList() ?? [],
+                NewsOfEntry = entry.NewsOfEntry?
+                    .OrderByDescending(s => s.HappenedTime)
+                    .ToList() ?? [],
+                EntryRelevances = entry.EntryRelevances?.ToList() ?? [],
+                ArticleRelevances = entry.ArticleRelevances?.ToList() ?? [],
+                VideoRelevances = entry.VideoRelevances?.ToList() ?? [],
+                OtherRelevances = entry.OtherRelevances?.ToList() ?? [],
+                Roles = entry.Roles?.ToList() ?? [],
+                StaffGames = entry.StaffGames?.ToList() ?? [],
+                Staffs = entry.Staffs?.ToList() ?? [],
+                ProductionGroups = entry.ProductionGroups?.ToList() ?? [],
+                Publishers = entry.Publishers?.ToList() ?? [],
+                Releases = entry.Releases?
+                    .OrderBy(s => s.Time ?? DateTime.MaxValue)
+                    .ToList() ?? []
             };
 
             memoryCache.Set(cacheKey, model, EntryCacheDuration);
