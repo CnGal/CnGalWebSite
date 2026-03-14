@@ -1,0 +1,22 @@
+﻿@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel
+<ul class="entry-audio-list">
+    @foreach (var item in Audio.Take(MaxCount))
+    {
+        <li>
+            <div>
+                <h3>@item.Name</h3>
+                @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) is false)
+                {
+                    <p>@item.BriefIntroduction</p>
+                }
+            </div>
+            <audio controls preload="none" src="@item.Url"></audio>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<EditAudioAloneModel> Audio { get; set; } = [];
+    [Parameter] public int MaxCount { get; set; } = 6;
+}

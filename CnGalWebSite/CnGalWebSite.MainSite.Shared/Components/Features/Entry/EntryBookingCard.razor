@@ -1,0 +1,28 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+@if (Booking is not null && Booking.Goals.Count > 0)
+{
+    <section class="entry-card">
+        <h2><CgMdiIcon Name="mdiGiftOutline" />预约</h2>
+        <p class="entry-booking-count">当前预约：@Booking.BookingCount</p>
+        @if (ShowGoals)
+        {
+            <ul class="entry-goal-list">
+                @foreach (var goal in Booking.Goals.OrderBy(s => s.Target))
+                {
+                    var reached = Booking.BookingCount >= goal.Target;
+                    <li class="@(reached ? "entry-goal entry-goal--done" : "entry-goal")">
+                        <span>@goal.Name</span>
+                        <strong>@goal.Target</strong>
+                    </li>
+                }
+            </ul>
+            <p class="entry-booking-status">@(Booking.Open ? "预约开放中" : "预约未开放")</p>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public BookingViewModel? Booking { get; set; }
+    [Parameter] public bool ShowGoals { get; set; } = true;
+}

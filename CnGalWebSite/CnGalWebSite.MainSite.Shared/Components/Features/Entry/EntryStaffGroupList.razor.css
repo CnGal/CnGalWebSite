@@ -1,0 +1,54 @@
+﻿.entry-staff-group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.entry-staff-group-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.entry-staff-group-list h3 {
+    font-size: 0.75rem;
+    color: var(--cg-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+}
+
+.entry-staff-position {
+    font-size: 0.85rem;
+    margin: 0;
+    display: flex;
+    color: var(--cg-color-text);
+}
+
+.entry-staff-position strong {
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.entry-staff-names {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.entry-staff-link {
+    color: var(--cg-color-primary);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.entry-staff-link:hover {
+    text-decoration: underline;
+}
+
+.entry-staff-separator {
+    color: var(--cg-color-text);
+}

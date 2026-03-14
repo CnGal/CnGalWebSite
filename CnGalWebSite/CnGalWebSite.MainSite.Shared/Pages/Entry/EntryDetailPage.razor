@@ -1,8 +1,10 @@
-﻿@page "/entries/index/{Id:int}"
+@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry
+@using CnGalWebSite.Extensions
 
 <PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
 
@@ -19,469 +21,117 @@ else if (Model is not null)
     <article class="entry-page">
         @if (HasAtmosphere())
         {
-            <div class="entry-atmosphere" aria-hidden="true">
-                @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false)
-                {
-                    <div class="entry-atmosphere-bg" style="@($"background-image:url('{Model.BackgroundPicture}')")"></div>
-                }
-                @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false)
-                {
-                    <div class="entry-atmosphere-bg entry-atmosphere-bg--small" style="@($"background-image:url('{Model.SmallBackgroundPicture}')")"></div>
-                }
-            </div>
+            <EntryAtmosphere BackgroundPicture="@Model.BackgroundPicture" SmallBackgroundPicture="@Model.SmallBackgroundPicture" />
         }
 
-        <header class="entry-hero @(IsSquareCover() ? "entry-hero--square" : "entry-hero--wide")">
-            <div class="entry-hero-side">
-                @if (string.IsNullOrWhiteSpace(GetHeroImageUrl()) is false)
-                {
-                    <img src="@GetHeroImageUrl()" alt="@Model.Name" class="entry-cover" loading="eager" decoding="async" />
-                }
-                else
-                {
-                    <div class="entry-cover entry-cover--empty" aria-label="暂无封面">NO IMAGE</div>
-                }
-            </div>
-            <div class="entry-hero-main">
-                <div class="entry-hero-top">
-                    <span class="entry-type">@GetTypeText(Model.Type)</span>
-                    @if (Model.IsEdit)
-                    {
-                        <span class="entry-status entry-status--edit">可编辑状态</span>
-                    }
-                </div>
-                <h1>@Model.Name</h1>
-                @if (string.IsNullOrWhiteSpace(Model.AnotherName) is false)
-                {
-                    <p class="entry-another-name">别称：@Model.AnotherName</p>
-                }
-                @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) is false)
-                {
-                    <p class="entry-brief">@Model.BriefIntroduction</p>
-                }
-                @if (Model.ProductionGroups.Count > 0 || Model.Publishers.Count > 0)
-                {
-                    <div class="entry-people-chips">
-                        @if (Model.ProductionGroups.Count > 0)
-                        {
-                            @foreach (var item in Model.ProductionGroups)
-                            {
-                                <a href="@BuildEntryUrl(item.Id)" class="entry-chip">制作组：@item.DisplayName</a>
-                            }
-                        }
-                        @if (Model.Publishers.Count > 0)
-                        {
-                            @foreach (var item in Model.Publishers)
-                            {
-                                <a href="@BuildEntryUrl(item.Id)" class="entry-chip">发行商：@item.DisplayName</a>
-                            }
-                        }
-                    </div>
-                }
-            </div>
-        </header>
+        <EntryHero Name="@Model.Name" AnotherName="@Model.AnotherName" BriefIntroduction="@Model.BriefIntroduction"
+                   TypeText="@GetTypeText(Model.Type)" IsEdit="Model.IsEdit" HeroImageUrl="@GetHeroImageUrl()"
+                   IsSquareCover="IsSquareCover()" ProductionGroups="Model.ProductionGroups" Publishers="Model.Publishers"
+                   BuildEntryUrl="BuildEntryUrl" />
 
-        @if (Model.IsHidden || Model.Type == EntryType.Staff)
-        {
-            <section class="entry-special-tips" aria-label="特殊提示">
-                @if (Model.IsHidden)
-                {
-                    <p class="entry-tip entry-tip--warning">当前词条处于隐藏状态，请谨慎传播并联系管理员确认。</p>
-                }
-                @if (Model.Type == EntryType.Staff)
-                {
-                    <p class="entry-tip entry-tip--danger">该词条可能涉及现实人物，请保持客观描述并谨慎编辑。</p>
-                }
-            </section>
-        }
+        <EntrySpecialTips IsHidden="Model.IsHidden" Type="Model.Type" />
 
         <section class="entry-layout entry-layout--desktop" aria-label="桌面详情布局">
             <main class="entry-main-col">
-                @if (Model.Audio.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiMusicCircleOutline" />音频</h2>
-                        <ul class="entry-audio-list">
-                            @foreach (var item in Model.Audio.Take(6))
-                            {
-                                <li>
-                                    <div>
-                                        <h3>@item.Name</h3>
-                                        @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) is false)
-                                        {
-                                            <p>@item.BriefIntroduction</p>
-                                        }
-                                    </div>
-                                    <audio controls preload="none" src="@item.Url"></audio>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntryCard Title="音频" Icon="mdiMusicCircleOutline" Show="Model.Audio.Count > 0">
+                    <EntryAudioList Audio="Model.Audio" MaxCount="6" />
+                </EntryCard>
 
-                @if (Model.Pictures.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiImageOutline" />图片</h2>
-                        <ul class="entry-image-grid">
-                            @foreach (var item in Model.Pictures.Take(12))
-                            {
-                                <li>
-                                    <a href="@item.Url" target="_blank" rel="noopener noreferrer">
-                                        <img src="@item.Url" alt="@DisplayTextOrFallback(item.Note, Model.Name)" loading="lazy" decoding="async" />
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
+                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="DisplayTextOrFallback" />
+                </EntrySection>
 
-                @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiTextBoxOutline" />正文主页</h2>
-                        <div class="entry-markdown">
-                            @(new MarkupString(Model.MainPage))
-                        </div>
-                    </section>
-                }
+                <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
+                    <div class="entry-markdown">
+                        @(new MarkupString(Model.MainPage))
+                    </div>
+                </EntryCard>
 
-                @if (Model.NewsOfEntry.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiTimelineTextOutline" />动态时间线</h2>
-                        <ul class="entry-news-list">
-                            @foreach (var item in Model.NewsOfEntry.Take(10))
-                            {
-                                <li>
-                                    <a href="@GetNewsLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer">@item.Title</a>
-                                    <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
+                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="GetTarget" />
+                </EntryCard>
 
-                @if (Model.VideoRelevances.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiAnimationPlayOutline" />相关视频</h2>
-                        <ul class="entry-card-list">
-                            @foreach (var item in Model.VideoRelevances.Take(8))
-                            {
-                                <li>
-                                    <a href="@($"/videos/index/{item.Id}")" class="entry-card-item">
-                                        <div class="entry-card-item-image">
-                                            <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div class="entry-card-item-content">
-                                            <span class="entry-card-item-title">@item.Name</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.VideoRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
                 
-                @if (Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiLinkVariant" />相关词条</h2>
-                        <ul class="entry-card-list">
-                            @foreach (var item in Model.EntryRelevances.Take(8))
-                            {
-                                <li>
-                                    <a href="@BuildEntryUrl(item.Id)" class="entry-card-item">
-                                        <div class="entry-card-item-image">
-                                            <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div class="entry-card-item-content">
-                                            <span class="entry-card-item-title">@item.Name</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            }
-                            @foreach (var item in Model.StaffGames.Take(4))
-                            {
-                                <li>
-                                    <a href="@BuildEntryUrl(item.Id)" class="entry-card-item">
-                                        <div class="entry-card-item-image">
-                                            <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div class="entry-card-item-content">
-                                            <span class="entry-card-item-title">@item.Name</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.EntryRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                        @foreach (var item in Model.StaffGames.Take(4))
+                        {
+                            <li>
+                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
                 
-                @if (Model.ArticleRelevances.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiTextBoxOutline" />相关文章</h2>
-                        <ul class="entry-card-list">
-                            @foreach (var item in Model.ArticleRelevances.Take(8))
-                            {
-                                <li>
-                                    <a href="@GetArticleLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer" class="entry-card-item">
-                                        <div class="entry-card-item-image">
-                                            <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div class="entry-card-item-content">
-                                            <span class="entry-card-item-title">@item.Name</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.ArticleRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
 
-                @if (Model.CanComment)
-                {
-                    <section id="comments" class="entry-card entry-card--comment">
-                        <h2><CgMdiIcon Name="mdiCommentTextOutline" />评论入口</h2>
-                        <p>可前往评论区参与讨论，分享你的看法与补充信息。</p>
-                        <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
-                    </section>
-                }
+                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="entry-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法与补充信息。">
+                    <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
+                </EntryCard>
             </main>
 
             <aside class="entry-side-col">
-                @if (Model.Booking is not null && Model.Booking.Goals.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiGiftOutline" />预约</h2>
-                        <p class="entry-booking-count">当前预约：@Model.Booking.BookingCount</p>
-                        <ul class="entry-goal-list">
-                            @foreach (var goal in Model.Booking.Goals.OrderBy(s => s.Target))
-                            {
-                                var reached = Model.Booking.BookingCount >= goal.Target;
-                                <li class="@(reached ? "entry-goal entry-goal--done" : "entry-goal")">
-                                    <span>@goal.Name</span>
-                                    <strong>@goal.Target</strong>
-                                </li>
-                            }
-                        </ul>
-                        <p class="entry-booking-status">@(Model.Booking.Open ? "预约开放中" : "预约未开放")</p>
-                    </section>
-                }
+                <EntryBookingCard Booking="Model.Booking" ShowGoals="true" />
 
-                @if (Model.Information.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiInformationOutline" />基础信息</h2>
-                        <dl class="entry-info-list">
-                            @foreach (var item in Model.Information)
-                            {
-                                <div>
-                                    <dt>@item.Name</dt>
-                                    <dd>@(new MarkupString(item.Value))</dd>
-                                </div>
-                            }
-                        </dl>
-                    </section>
-                }
+                <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
+                    <EntryInfoList Information="Model.Information" />
+                </EntryCard>
 
-                @if (Model.Tags.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiTagMultipleOutline" />标签</h2>
-                        <ul class="entry-tags">
-                            @foreach (var tag in Model.Tags.Take(24))
-                            {
-                                <li>@tag</li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
+                    <EntryTagList Tags="Model.Tags" MaxCount="24" />
+                </EntryCard>
 
-                @if (Model.Releases.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiCalendarClockOutline" />发行信息</h2>
-                        <div class="entry-release-cards">
-                            @foreach (var release in Model.Releases)
-                            {
-                                <div class="entry-release-card">
-                                    <div class="entry-release-header">
-                                        <div class="entry-release-header-left">
-                                            <CgMdiIcon Name="@GetPlatformIcon(release)" />
-                                            <strong>@GetPublishPlatformName(release)</strong>
-                                        </div>
-                                        <span class="entry-release-type">@GetReleaseTypeText(release.Type)</span>
-                                    </div>
-                                    <div class="entry-release-body">
-                                        @if (release.StoreInfor.State != StoreState.None && release.Time != null && release.Time.Value.Date <= DateTime.UtcNow.AddHours(8).Date)
-                                        {
-                                            <div class="entry-release-price-box">
-                                                @if (release.StoreInfor.State == StoreState.NotPublished && release.Type != GameReleaseType.Demo)
-                                                {
-                                                    <span class="entry-release-state"><CgMdiIcon Name="mdiInformationOutline" />未发售</span>
-                                                }
-                                                else if (release.StoreInfor.State == StoreState.Takedown)
-                                                {
-                                                    <span class="entry-release-state"><CgMdiIcon Name="mdiArchiveRemoveOutline" />已下架</span>
-                                                }
-                                                else if (release.StoreInfor.PriceNow == 0)
-                                                {
-                                                    <span class="entry-release-state entry-release-state--free"><CgMdiIcon Name="mdiGiftOutline" />免费 (Free)</span>
-                                                }
-                                                else if (release.StoreInfor.PriceNow > 0)
-                                                {
-                                                    <div class="entry-release-price-row">
-                                                        <CgMdiIcon Name="mdiCurrencyCny" />
-                                                        <span>当前价格：</span>
-                                                        @if (release.StoreInfor.CutNow > 0 && release.StoreInfor.OriginalPrice.HasValue)
-                                                        {
-                                                            <s class="entry-release-price-old">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.OriginalPrice.Value.ToString("0.00")</s>
-                                                        }
-                                                        <strong class="entry-release-price-now">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceNow.Value.ToString("0.00")</strong>
-                                                        @if (release.StoreInfor.CutNow > 0)
-                                                        {
-                                                            <span class="entry-release-discount">-@release.StoreInfor.CutNow%</span>
-                                                        }
-                                                    </div>
-                                                    @if (release.StoreInfor.CutLowest > 0 && release.StoreInfor.PriceLowest.HasValue)
-                                                    {
-                                                        <div class="entry-release-price-row entry-release-price-row--low">
-                                                            <CgMdiIcon Name="mdiChartLine" />
-                                                            <span>历史最低：</span>
-                                                            <strong>@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceLowest.Value.ToString("0.00")</strong>
-                                                        </div>
-                                                    }
-                                                }
-                                                else if (release.StoreInfor.PriceNow == null)
-                                                {
-                                                    <span class="entry-release-state"><CgMdiIcon Name="mdiHelpCircleOutline" />数据未更新</span>
-                                                }
-                                            </div>
-                                        }
+                <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
+                    <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
+                </EntryCard>
 
-                                        <ul class="entry-release-details">
-                                            @if (!string.IsNullOrWhiteSpace(release.Name))
-                                            {
-                                                <li>
-                                                    <CgMdiIcon Name="mdiSubtitlesOutline" />
-                                                    <span>@release.Name</span>
-                                                </li>
-                                            }
-                                            <li>
-                                                <CgMdiIcon Name="@(string.IsNullOrWhiteSpace(release.TimeNote) ? "mdiCalendarCheckOutline" : "mdiClockOutline")" />
-                                                <span>@(string.IsNullOrWhiteSpace(release.TimeNote) ? (release.Time?.ToString("yyyy年M月d日") ?? "时间待定") : release.TimeNote)</span>
-                                            </li>
-                                            @if (release.GamePlatformTypes?.Any() == true)
-                                            {
-                                                <li>
-                                                    <CgMdiIcon Name="mdiMonitorDashboard" />
-                                                    <span>@string.Join("、", release.GamePlatformTypes.Select(GetGamePlatformName))</span>
-                                                </li>
-                                            }
-                                            @if (!string.IsNullOrWhiteSpace(release.Engine))
-                                            {
-                                                <li>
-                                                    <CgMdiIcon Name="mdiEngineOutline" />
-                                                    <span>@release.Engine</span>
-                                                </li>
-                                            }
-                                            @if (release.StoreInfor.PlayTime > 0)
-                                            {
-                                                <li>
-                                                    <CgMdiIcon Name="mdiGamepadVariantOutline" />
-                                                    <span>平均游玩：@((release.StoreInfor.PlayTime / 60.0)?.ToString("0.0")) 小时</span>
-                                                </li>
-                                            }
-                                            @if (!string.IsNullOrWhiteSpace(release.Link))
-                                            {
-                                                <li>
-                                                    <CgMdiIcon Name="mdiLinkVariant" />
-                                                    <a href="@release.GetLink()" target="_blank" rel="noopener noreferrer">前往平台商店查看</a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </section>
-                }
+                <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
+                    <EntryReleaseCards Releases="Model.Releases"
+                                       GetPlatformIcon="GetPlatformIcon"
+                                       GetPlatformImage="GetPlatformImage"
+                                       GetPublishPlatformName="GetPublishPlatformName"
+                                       GetReleaseTypeText="GetReleaseTypeText"
+                                       GetCurrencyPrefix="GetCurrencyPrefix"
+                                       GetGamePlatformName="GetGamePlatformName" />
+                </EntrySection>
 
-                @if (Model.Roles.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiAccountStarOutline" />登场角色</h2>
-                        <ul class="entry-role-list">
-                            @foreach (var role in Model.Roles.Take(8))
-                            {
-                                <li>
-                                    <a href="@BuildEntryUrl(role.Id)" class="entry-role-item">
-                                        <div class="entry-role-avatar">
-                                            <img src="@role.MainImage" alt="@role.Name" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div class="entry-role-content">
-                                            <span class="entry-role-name">@role.Name</span>
-                                            @if (!string.IsNullOrWhiteSpace(role.CV))
-                                            {
-                                                <span class="entry-role-cv">CV: @role.CV</span>
-                                            }
-                                            @if (!string.IsNullOrWhiteSpace(role.BriefIntroduction))
-                                            {
-                                                <span class="entry-role-brief">@role.BriefIntroduction</span>
-                                            }
-                                        </div>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
+                    <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                </EntrySection>
 
-                @if (Model.IsHideOutlink is false && Model.OtherRelevances.Count > 0)
-                {
-                    <section class="entry-section">
-                        <h2><CgMdiIcon Name="mdiLinkVariant" />外部链接</h2>
-                        <ul class="entry-outlink-list">
-                            @foreach (var item in Model.OtherRelevances.Take(8))
-                            {
-                                <li>
-                                    <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="entry-outlink-item">
-                                        <CgMdiIcon Name="@GetExternalLinkIcon(item.DisplayName)" />
-                                        <span>@DisplayTextOrFallback(item.DisplayName, item.DisplayValue)</span>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
-
-                @if (Model.Staffs.Count > 0)
-                {
-                    <section class="entry-card">
-                        <h2><CgMdiIcon Name="mdiAccountGroupOutline" />Staff</h2>
-                        <ul class="entry-staff-group-list">
-                            @foreach (var group in Model.Staffs.Take(8))
-                            {
-                                <li>
-                                    @if (string.IsNullOrWhiteSpace(group.Modifier) is false)
-                                    {
-                                        <h3>@group.Modifier</h3>
-                                    }
-                                    @foreach (var position in group.StaffList.Take(5))
-                                    {
-                                        <p>
-                                            <strong>@position.Modifier：</strong>
-                                            @string.Join("、", position.Names.Select(s => s.DisplayName))
-                                        </p>
-                                    }
-                                </li>
-                            }
-                        </ul>
-                    </section>
-                }
+                <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
+                    <EntryOutlinkList Links="Model.OtherRelevances"
+                                      MaxCount="8"
+                                      GetExternalLinkIcon="GetExternalLinkIcon"
+                                      GetExternalLinkImage="GetExternalLinkImage"
+                                      GetExternalLinkDescription="GetExternalLinkDescription"
+                                      DisplayTextOrFallback="DisplayTextOrFallback" />
+                </EntrySection>
             </aside>
         </section>
 
@@ -505,340 +155,116 @@ else if (Model is not null)
 
                 <div class="entry-mobile-panels">
                     <section class="entry-mobile-panel entry-mobile-panel--home">
-                        @if (Model.Booking is not null && Model.Booking.Goals.Count > 0)
-                        {
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiGiftOutline" />预约</h2>
-                                <p class="entry-booking-count">当前预约：@Model.Booking.BookingCount</p>
-                            </section>
-                        }
-                        @if (Model.Information.Count > 0)
-                        {
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiInformationOutline" />基础信息</h2>
-                                <dl class="entry-info-list">
-                                    @foreach (var item in Model.Information.Take(12))
-                                    {
-                                        <div>
-                                            <dt>@item.Name</dt>
-                                            <dd>@item.Value</dd>
-                                        </div>
-                                    }
-                                </dl>
-                            </section>
-                        }
-                        @if (Model.Tags.Count > 0)
-                        {
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiTagMultipleOutline" />标签</h2>
-                                <ul class="entry-tags">
-                                    @foreach (var tag in Model.Tags.Take(24))
-                                    {
-                                        <li>@tag</li>
-                                    }
-                                </ul>
-                            </section>
-                        }
-                        @if (Model.Releases.Count > 0)
-                        {
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiCalendarClockOutline" />发行信息</h2>
-                                <div class="entry-release-cards">
-                                    @foreach (var release in Model.Releases)
-                                    {
-                                        <div class="entry-release-card">
-                                            <div class="entry-release-header">
-                                                <div class="entry-release-header-left">
-                                                    <CgMdiIcon Name="@GetPlatformIcon(release)" />
-                                                    <strong>@GetPublishPlatformName(release)</strong>
-                                                </div>
-                                                <span class="entry-release-type">@GetReleaseTypeText(release.Type)</span>
-                                            </div>
-                                            <div class="entry-release-body">
-                                                @if (release.StoreInfor.State != StoreState.None && release.Time != null && release.Time.Value.Date <= DateTime.UtcNow.AddHours(8).Date)
-                                                {
-                                                    <div class="entry-release-price-box">
-                                                        @if (release.StoreInfor.State == StoreState.NotPublished && release.Type != GameReleaseType.Demo)
-                                                        {
-                                                            <span class="entry-release-state"><CgMdiIcon Name="mdiInformationOutline" />未发售</span>
-                                                        }
-                                                        else if (release.StoreInfor.State == StoreState.Takedown)
-                                                        {
-                                                            <span class="entry-release-state"><CgMdiIcon Name="mdiArchiveRemoveOutline" />已下架</span>
-                                                        }
-                                                        else if (release.StoreInfor.PriceNow == 0)
-                                                        {
-                                                            <span class="entry-release-state entry-release-state--free"><CgMdiIcon Name="mdiGiftOutline" />免费 (Free)</span>
-                                                        }
-                                                        else if (release.StoreInfor.PriceNow > 0)
-                                                        {
-                                                            <div class="entry-release-price-row">
-                                                                <CgMdiIcon Name="mdiCurrencyCny" />
-                                                                <span>当前价格：</span>
-                                                                @if (release.StoreInfor.CutNow > 0 && release.StoreInfor.OriginalPrice.HasValue)
-                                                                {
-                                                                    <s class="entry-release-price-old">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.OriginalPrice.Value.ToString("0.00")</s>
-                                                                }
-                                                                <strong class="entry-release-price-now">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceNow.Value.ToString("0.00")</strong>
-                                                                @if (release.StoreInfor.CutNow > 0)
-                                                                {
-                                                                    <span class="entry-release-discount">-@release.StoreInfor.CutNow%</span>
-                                                                }
-                                                            </div>
-                                                            @if (release.StoreInfor.CutLowest > 0 && release.StoreInfor.PriceLowest.HasValue)
-                                                            {
-                                                                <div class="entry-release-price-row entry-release-price-row--low">
-                                                                    <CgMdiIcon Name="mdiChartLine" />
-                                                                    <span>历史最低：</span>
-                                                                    <strong>@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceLowest.Value.ToString("0.00")</strong>
-                                                                </div>
-                                                            }
-                                                        }
-                                                        else if (release.StoreInfor.PriceNow == null)
-                                                        {
-                                                            <span class="entry-release-state"><CgMdiIcon Name="mdiHelpCircleOutline" />数据未更新</span>
-                                                        }
-                                                    </div>
-                                                }
-
-                                                <ul class="entry-release-details">
-                                                    @if (!string.IsNullOrWhiteSpace(release.Name))
-                                                    {
-                                                        <li>
-                                                            <CgMdiIcon Name="mdiSubtitlesOutline" />
-                                                            <span>@release.Name</span>
-                                                        </li>
-                                                    }
-                                                    <li>
-                                                        <CgMdiIcon Name="@(string.IsNullOrWhiteSpace(release.TimeNote) ? "mdiCalendarCheckOutline" : "mdiClockOutline")" />
-                                                        <span>@(string.IsNullOrWhiteSpace(release.TimeNote) ? (release.Time?.ToString("yyyy年M月d日") ?? "时间待定") : release.TimeNote)</span>
-                                                    </li>
-                                                    @if (release.GamePlatformTypes?.Any() == true)
-                                                    {
-                                                        <li>
-                                                            <CgMdiIcon Name="mdiMonitorDashboard" />
-                                                            <span>@string.Join("、", release.GamePlatformTypes.Select(GetGamePlatformName))</span>
-                                                        </li>
-                                                    }
-                                                    @if (!string.IsNullOrWhiteSpace(release.Engine))
-                                                    {
-                                                        <li>
-                                                            <CgMdiIcon Name="mdiEngineOutline" />
-                                                            <span>@release.Engine</span>
-                                                        </li>
-                                                    }
-                                                    @if (release.StoreInfor.PlayTime > 0)
-                                                    {
-                                                        <li>
-                                                            <CgMdiIcon Name="mdiGamepadVariantOutline" />
-                                                            <span>平均游玩：@((release.StoreInfor.PlayTime / 60.0)?.ToString("0.0")) 小时</span>
-                                                        </li>
-                                                    }
-                                                    @if (!string.IsNullOrWhiteSpace(release.Link))
-                                                    {
-                                                        <li>
-                                                            <CgMdiIcon Name="mdiLinkVariant" />
-                                                            <a href="@release.GetLink()" target="_blank" rel="noopener noreferrer">前往平台商店查看</a>
-                                                        </li>
-                                                    }
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </section>
-                        }
-                        @if (Model.Audio.Count > 0 || Model.Pictures.Count > 0 || string.IsNullOrWhiteSpace(Model.MainPage) is false || Model.NewsOfEntry.Count > 0 || Model.CanComment)
-                        {
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiViewGridOutline" />内容浏览</h2>
-                                <ul class="entry-link-list">
-                                    @if (Model.Audio.Count > 0)
-                                    {
-                                        <li>音频：@Model.Audio.Count</li>
-                                    }
-                                    @if (Model.Pictures.Count > 0)
-                                    {
-                                        <li>图片：@Model.Pictures.Count</li>
-                                    }
-                                    @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
-                                    {
-                                        <li>正文主页：可阅读</li>
-                                    }
-                                    @if (Model.NewsOfEntry.Count > 0)
-                                    {
-                                        <li>动态时间线：@Model.NewsOfEntry.Count</li>
-                                    }
-                                    @if (Model.CanComment)
-                                    {
-                                        <li><a href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a></li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntryBookingCard Booking="Model.Booking" ShowGoals="false" />
+                        
+                        <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
+                            <EntryInfoList Information="Model.Information" MaxCount="12" />
+                        </EntryCard>
+                        
+                        <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
+                            <EntryTagList Tags="Model.Tags" MaxCount="24" />
+                        </EntryCard>
+                        
+                        <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
+                            <EntryReleaseCards Releases="Model.Releases"
+                                               GetPlatformIcon="GetPlatformIcon"
+                                               GetPlatformImage="GetPlatformImage"
+                                               GetPublishPlatformName="GetPublishPlatformName"
+                                               GetReleaseTypeText="GetReleaseTypeText"
+                                               GetCurrencyPrefix="GetCurrencyPrefix"
+                                               GetGamePlatformName="GetGamePlatformName" />
+                        </EntrySection>
+                        
+                        <EntryCard Title="内容浏览" Icon="mdiViewGridOutline" Show="Model.Audio.Count > 0 || Model.Pictures.Count > 0 || !string.IsNullOrWhiteSpace(Model.MainPage) || Model.NewsOfEntry.Count > 0 || Model.CanComment">
+                            <EntryLinkList>
+                                @if (Model.Audio.Count > 0)
+                                {
+                                    <li>音频：@Model.Audio.Count</li>
+                                }
+                                @if (Model.Pictures.Count > 0)
+                                {
+                                    <li>图片：@Model.Pictures.Count</li>
+                                }
+                                @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
+                                {
+                                    <li>正文主页：可阅读</li>
+                                }
+                                @if (Model.NewsOfEntry.Count > 0)
+                                {
+                                    <li>动态时间线：@Model.NewsOfEntry.Count</li>
+                                }
+                                @if (Model.CanComment)
+                                {
+                                    <li><a href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a></li>
+                                }
+                            </EntryLinkList>
+                        </EntryCard>
                     </section>
 
                     <section class="entry-mobile-panel entry-mobile-panel--related">
-                        @if (Model.VideoRelevances.Count > 0)
-                        {
-                            <section class="entry-section">
-                                <h2><CgMdiIcon Name="mdiAnimationPlayOutline" />相关视频</h2>
-                                <ul class="entry-card-list">
-                                    @foreach (var item in Model.VideoRelevances.Take(8))
-                                    {
-                                        <li>
-                                            <a href="@($"/videos/index/{item.Id}")" class="entry-card-item">
-                                                <div class="entry-card-item-image">
-                                                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                                </div>
-                                                <div class="entry-card-item-content">
-                                                    <span class="entry-card-item-title">@item.Name</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.VideoRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
 
-                        @if (Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0)
-                        {
-                            <section class="entry-section">
-                                <h2><CgMdiIcon Name="mdiLinkVariant" />相关词条</h2>
-                                <ul class="entry-card-list">
-                                    @foreach (var item in Model.EntryRelevances.Take(8))
-                                    {
-                                        <li>
-                                            <a href="@BuildEntryUrl(item.Id)" class="entry-card-item">
-                                                <div class="entry-card-item-image">
-                                                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                                </div>
-                                                <div class="entry-card-item-content">
-                                                    <span class="entry-card-item-title">@item.Name</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    }
-                                    @foreach (var item in Model.StaffGames.Take(4))
-                                    {
-                                        <li>
-                                            <a href="@BuildEntryUrl(item.Id)" class="entry-card-item">
-                                                <div class="entry-card-item-image">
-                                                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                                </div>
-                                                <div class="entry-card-item-content">
-                                                    <span class="entry-card-item-title">@item.Name</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.EntryRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                                @foreach (var item in Model.StaffGames.Take(4))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
 
-                        @if (Model.ArticleRelevances.Count > 0)
-                        {
-                            <section class="entry-section">
-                                <h2><CgMdiIcon Name="mdiTextBoxOutline" />相关文章</h2>
-                                <ul class="entry-card-list">
-                                    @foreach (var item in Model.ArticleRelevances.Take(8))
-                                    {
-                                        <li>
-                                            <a href="@GetArticleLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer" class="entry-card-item">
-                                                <div class="entry-card-item-image">
-                                                    <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
-                                                </div>
-                                                <div class="entry-card-item-content">
-                                                    <span class="entry-card-item-title">@item.Name</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.ArticleRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
 
-                        @if (HasRelatedContent() == false && Model.Roles.Count == 0 && (Model.IsHideOutlink || Model.OtherRelevances.Count == 0))
-                        {
-                            <section class="entry-card entry-card--empty">
-                                <h2><CgMdiIcon Name="mdiLinkVariant" />相关内容</h2>
-                                <p>暂无相关内容。</p>
-                            </section>
-                        }
+                        <EntryCard Title="相关内容" Icon="mdiLinkVariant" Class="entry-card--empty" Show="!HasRelatedContent() && Model.Roles.Count == 0 && (Model.IsHideOutlink || Model.OtherRelevances.Count == 0)">
+                            <p>暂无相关内容。</p>
+                        </EntryCard>
 
-                        @if (Model.Roles.Count > 0)
-                        {
-                            <section class="entry-section">
-                                <h2><CgMdiIcon Name="mdiAccountStarOutline" />登场角色</h2>
-                                <ul class="entry-role-list">
-                                    @foreach (var role in Model.Roles.Take(8))
-                                    {
-                                        <li>
-                                            <a href="@BuildEntryUrl(role.Id)" class="entry-role-item">
-                                                <div class="entry-role-avatar">
-                                                    <img src="@role.MainImage" alt="@role.Name" loading="lazy" decoding="async" />
-                                                </div>
-                                                <div class="entry-role-content">
-                                                    <span class="entry-role-name">@role.Name</span>
-                                                    @if (!string.IsNullOrWhiteSpace(role.CV))
-                                                    {
-                                                        <span class="entry-role-cv">CV: @role.CV</span>
-                                                    }
-                                                    @if (!string.IsNullOrWhiteSpace(role.BriefIntroduction))
-                                                    {
-                                                        <span class="entry-role-brief">@role.BriefIntroduction</span>
-                                                    }
-                                                </div>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
+                            <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                        </EntrySection>
 
-                        @if (Model.IsHideOutlink is false && Model.OtherRelevances.Count > 0)
-                        {
-                            <section class="entry-section">
-                                <h2><CgMdiIcon Name="mdiLinkVariant" />外部链接</h2>
-                                <ul class="entry-outlink-list">
-                                    @foreach (var item in Model.OtherRelevances.Take(8))
-                                    {
-                                        <li>
-                                            <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="entry-outlink-item">
-                                                <CgMdiIcon Name="@GetExternalLinkIcon(item.DisplayName)" />
-                                                <span>@DisplayTextOrFallback(item.DisplayName, item.DisplayValue)</span>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
-                        }
+                        <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
+                            <EntryOutlinkList Links="Model.OtherRelevances"
+                                              MaxCount="8"
+                                              GetExternalLinkIcon="GetExternalLinkIcon"
+                                              GetExternalLinkImage="GetExternalLinkImage"
+                                              GetExternalLinkDescription="GetExternalLinkDescription"
+                                              DisplayTextOrFallback="DisplayTextOrFallback" />
+                        </EntrySection>
                     </section>
 
                     @if (Model.Staffs.Count > 0)
                     {
                         <section class="entry-mobile-panel entry-mobile-panel--staff">
-                            <section class="entry-card">
-                                <h2><CgMdiIcon Name="mdiAccountGroupOutline" />Staff</h2>
-                                <ul class="entry-staff-group-list">
-                                    @foreach (var group in Model.Staffs)
-                                    {
-                                        <li>
-                                            @if (string.IsNullOrWhiteSpace(group.Modifier) is false)
-                                            {
-                                                <h3>@group.Modifier</h3>
-                                            }
-                                            @foreach (var position in group.StaffList)
-                                            {
-                                                <p>
-                                                    <strong>@position.Modifier：</strong>
-                                                    @string.Join("、", position.Names.Select(s => s.DisplayName))
-                                                </p>
-                                            }
-                                        </li>
-                                    }
-                                </ul>
-                            </section>
+                            <EntryCard Title="Staff" Icon="mdiAccountGroupOutline">
+                                <EntryStaffGroupList Staffs="Model.Staffs" />
+                            </EntryCard>
                         </section>
                     }
                 </div>
@@ -924,14 +350,7 @@ else
 
     private static string GetTypeText(EntryType type)
     {
-        return type switch
-        {
-            EntryType.Game => "游戏",
-            EntryType.Role => "角色",
-            EntryType.ProductionGroup => "组织",
-            EntryType.Staff => "Staff",
-            _ => "词条"
-        };
+        return type.GetDisplayName();
     }
 
     private static bool IsExternalLink(string? link)
@@ -970,6 +389,50 @@ else
         return "mdiEarth";
     }
 
+    private string? GetExternalLinkImage(string displayName)
+    {
+        var image = displayName switch
+        {
+            "萌娘百科" => "Moegirl.png",
+            "Bangumi" => "Bangumi.png",
+            "百度百科" => "BaiDuWiki.png",
+            "2DFan" => "2DFan.png",
+            "中文维基百科" => "Wiki.png",
+            "月幕Galgame" => "YMGal.png",
+            "Bilibili" => "bilibili.png",
+            "bilibili" => "bilibili.png",
+            "WikiData" => "Wikidata.png",
+            "微博" => "weibo.png",
+            "AcFun" => "AcFun.png",
+            "知乎" => "zhihu.png",
+            "爱发电" => "Afdian.png",
+            "Pixiv" => "pixiv.png",
+            "Twitter" => "twitter.png",
+            "YouTube" => "Youtube.png",
+            "Facebook" => "Facebook.png",
+            "官网" => "SmartHome.png",
+            "摩点" => "modian.png",
+            "小黑盒" => "xiaoheihe.jpg",
+            _ => null
+        };
+
+        if (string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
+    private string? GetExternalLinkDescription(RelevancesKeyValueModel item)
+    {
+        return item.DisplayName switch
+        {
+            "VNDB" => item.DisplayValue + (string.IsNullOrWhiteSpace(item.DisplayValue) ? "" : " - ") + "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
+            _ => item.DisplayValue
+        };
+    }
+
     private bool HasRelatedContent()
     {
         if (Model is null)
@@ -989,17 +452,7 @@ else
         {
             return release.PublishPlatformName;
         }
-        return release.PublishPlatformType switch
-        {
-            PublishPlatformType.Steam => "Steam",
-            PublishPlatformType.TapTap => "TapTap",
-            PublishPlatformType.Epic => "Epic",
-            PublishPlatformType.AppStore => "App Store",
-            PublishPlatformType.GooglePlay => "Google Play",
-            PublishPlatformType.NS => "Nintendo Switch",
-            PublishPlatformType.DLsite => "DLsite",
-            _ => "其他"
-        };
+        return release.PublishPlatformType.GetDisplayName();
     }
 
     private string GetPlatformIcon(GameReleaseViewModel release)
@@ -1021,33 +474,57 @@ else
         };
     }
 
+    private string? GetPlatformImage(GameReleaseViewModel release)
+    {
+        var image = release.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "Steam.png",
+            PublishPlatformType.AppStore => "AppStore.png",
+            PublishPlatformType.GooglePlay => "GooglePlay.png",
+            PublishPlatformType.DLsite => "DLsite.png",
+            PublishPlatformType.NS => "Nintendo_Switch.png",
+            PublishPlatformType.TapTap => "TapTap.png",
+            PublishPlatformType.Epic => "Epic.png",
+            _ => null
+        };
+
+        if (image == null && string.IsNullOrWhiteSpace(release.PublishPlatformName) == false)
+        {
+            var lowerName = release.PublishPlatformName.ToLower();
+            if (lowerName.Contains("b站") || lowerName.Contains("bilibili"))
+            {
+                image = "bilibili.png";
+            }
+            else if (lowerName.Contains("微博"))
+            {
+                image = "weibo.png";
+            }
+            else if (lowerName.Contains("贴吧") || lowerName.Contains("百度"))
+            {
+                image = "BaiDuWiki.png";
+            }
+            else if (lowerName.Contains("方块游戏"))
+            {
+                image = "CraftGame.png";
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
     private string GetGamePlatformName(GamePlatformType type)
     {
-        return type switch
-        {
-            GamePlatformType.Windows => "Windows",
-            GamePlatformType.Linux => "Linux",
-            GamePlatformType.Mac => "macOS",
-            GamePlatformType.IOS => "iOS",
-            GamePlatformType.Android => "Android",
-            GamePlatformType.PS => "PlayStation",
-            GamePlatformType.NS => "Nintendo Switch",
-            GamePlatformType.DOS => "DOS",
-            GamePlatformType.HarmonyOS => "HarmonyOS",
-            GamePlatformType.H5 => "H5",
-            _ => type.ToString()
-        };
+        return type.GetDisplayName();
     }
 
     private string GetReleaseTypeText(GameReleaseType type)
     {
-        return type switch
-        {
-            GameReleaseType.Official => "正式版",
-            GameReleaseType.Demo => "Demo",
-            GameReleaseType.EA => "抢先体验",
-            _ => "未知"
-        };
+        return type.GetDisplayName();
     }
 
     private string GetCurrencyPrefix(CurrencyCode code)

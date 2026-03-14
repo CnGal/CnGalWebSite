@@ -1,0 +1,29 @@
+﻿.entry-card {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    padding: 1.5rem;
+}
+
+.entry-card > h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--cg-color-text);
+}
+
+.entry-card > h2 ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cg-color-primary);
+}
+
+.entry-card > p {
+    margin: 0 0 1rem 0;
+    color: var(--cg-color-text-muted);
+    line-height: 1.7;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,21 @@
+﻿.entry-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.entry-section > h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--cg-color-text);
+}
+
+.entry-section > h2 ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cg-color-primary);
+}

@@ -1,0 +1,31 @@
+.entry-link-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.entry-link-list li {
+    display: inline-flex;
+}
+
+.entry-link-list a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.85rem;
+    background: color-mix(in oklab, var(--cg-color-bg) 80%, white);
+    border-radius: var(--cg-radius-md);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--cg-color-text);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.entry-link-list a:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, white);
+    color: var(--cg-color-primary);
+}

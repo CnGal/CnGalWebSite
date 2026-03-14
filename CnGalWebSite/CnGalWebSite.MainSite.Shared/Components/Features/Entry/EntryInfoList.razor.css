@@ -1,0 +1,34 @@
+﻿.entry-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+}
+
+.entry-info-list div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    gap: 1rem;
+}
+
+.entry-info-list div:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.entry-info-list dt {
+    font-size: 0.8rem;
+    word-break: keep-all;
+    color: var(--cg-color-text-muted);
+}
+
+.entry-info-list dd {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cg-color-text);
+    text-align: right;
+}

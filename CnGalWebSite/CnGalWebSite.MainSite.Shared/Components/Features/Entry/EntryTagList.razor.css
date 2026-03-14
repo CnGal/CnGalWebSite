@@ -1,0 +1,18 @@
+.entry-tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.entry-tags li {
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    border-radius: var(--cg-radius-md);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: color-mix(in oklab, var(--cg-color-bg) 60%, white);
+    color: var(--cg-color-text-muted);
+}

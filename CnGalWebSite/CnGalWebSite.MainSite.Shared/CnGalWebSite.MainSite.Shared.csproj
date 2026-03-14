@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
     <ProjectReference Include="..\CnGalWebSite.SDK.MainSite\CnGalWebSite.SDK.MainSite.csproj" />
   </ItemGroup>
 

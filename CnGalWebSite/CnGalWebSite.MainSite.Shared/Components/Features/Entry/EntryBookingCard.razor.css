@@ -1,0 +1,64 @@
+.entry-card {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    padding: 1.5rem;
+}
+
+.entry-card > h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cg-color-text);
+}
+
+.entry-card > h2 ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cg-color-primary);
+}
+
+.entry-booking-count {
+    margin-bottom: 1rem !important;
+    font-weight: 600;
+    color: var(--cg-color-text) !important;
+}
+
+.entry-goal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.entry-goal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    background: color-mix(in oklab, var(--cg-color-bg) 50%, transparent);
+}
+
+.entry-goal--done {
+    border-color: #86efac;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.entry-goal--done strong {
+    color: #166534;
+}
+
+.entry-booking-status {
+    margin-top: 1rem !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+}

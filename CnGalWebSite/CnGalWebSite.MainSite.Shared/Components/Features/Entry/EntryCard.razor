@@ -1,0 +1,20 @@
+@if (Show)
+{
+    <section class="entry-card @Class">
+        <h2><CgMdiIcon Name="@Icon" />@Title</h2>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <p>@Description</p>
+        }
+        @ChildContent
+    </section>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; } = true;
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

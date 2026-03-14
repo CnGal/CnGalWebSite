@@ -1,0 +1,169 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<div class="entry-release-cards">
+    @for (int i = 0; i < SortedReleases.Count; i++)
+    {
+        var release = SortedReleases[i];
+        <details class="entry-release-card" open="@(i == 0)">
+            <summary class="entry-release-header">
+                <div class="entry-release-header-left">
+                    @if (string.IsNullOrWhiteSpace(GetPlatformImage(release)) == false)
+                    {
+                        <img src="@GetPlatformImage(release)" class="entry-release-platform-image" alt="@GetPublishPlatformName(release)" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <CgMdiIcon Name="@GetPlatformIcon(release)" />
+                    }
+                    <strong>@GetPublishPlatformName(release)</strong>
+                </div>
+                <div class="entry-release-header-right">
+                    <span class="entry-release-type">@GetReleaseTypeText(release.Type)</span>
+                    <CgMdiIcon Name="mdiChevronDown" Class="entry-release-chevron" />
+                </div>
+            </summary>
+            <div class="entry-release-body">
+                @if (release.StoreInfor.State != StoreState.None && release.Time != null && release.Time.Value.Date <= DateTime.UtcNow.AddHours(8).Date)
+                {
+                    <div class="entry-release-price-box">
+                        @if (release.StoreInfor.State == StoreState.NotPublished && release.Type != GameReleaseType.Demo)
+                        {
+                            <span class="entry-release-state"><CgMdiIcon Name="mdiInformationOutline" />未发售</span>
+                        }
+                        else if (release.StoreInfor.State == StoreState.Takedown)
+                        {
+                            <span class="entry-release-state"><CgMdiIcon Name="mdiArchiveRemoveOutline" />已下架</span>
+                        }
+                        else if (release.StoreInfor.PriceNow == 0)
+                        {
+                            <span class="entry-release-state entry-release-state--free"><CgMdiIcon Name="mdiGiftOutline" />免费 (Free)</span>
+                        }
+                        else if (release.StoreInfor.PriceNow > 0)
+                        {
+                            <div class="entry-release-price-row">
+                                <CgMdiIcon Name="mdiCurrencyCny" />
+                                <span>当前价格：</span>
+                                @if (release.StoreInfor.CutNow > 0 && release.StoreInfor.OriginalPrice.HasValue)
+                                {
+                                    <s class="entry-release-price-old">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.OriginalPrice.Value.ToString("0.00")</s>
+                                }
+                                <strong class="entry-release-price-now">@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceNow.Value.ToString("0.00")</strong>
+                                @if (release.StoreInfor.CutNow > 0)
+                                {
+                                    <span class="entry-release-discount">-@release.StoreInfor.CutNow%</span>
+                                }
+                            </div>
+                            @if (release.StoreInfor.CutLowest > 0 && release.StoreInfor.PriceLowest.HasValue)
+                            {
+                                <div class="entry-release-price-row entry-release-price-row--low">
+                                    <CgMdiIcon Name="mdiChartLine" />
+                                    <span>历史最低：</span>
+                                    <strong>@GetCurrencyPrefix(release.StoreInfor.CurrencyCode)@release.StoreInfor.PriceLowest.Value.ToString("0.00")</strong>
+                                </div>
+                            }
+                        }
+                        else if (release.StoreInfor.PriceNow == null)
+                        {
+                            <span class="entry-release-state"><CgMdiIcon Name="mdiHelpCircleOutline" />数据未更新</span>
+                        }
+                    </div>
+                }
+
+                <ul class="entry-release-details">
+                    @if (!string.IsNullOrWhiteSpace(release.Name))
+                    {
+                        <li>
+                            <CgMdiIcon Name="mdiSubtitlesOutline" />
+                            <span>@release.Name</span>
+                        </li>
+                    }
+                    <li>
+                        <CgMdiIcon Name="@(string.IsNullOrWhiteSpace(release.TimeNote) ? "mdiCalendarCheckOutline" : "mdiClockOutline")" />
+                        <span>@(string.IsNullOrWhiteSpace(release.TimeNote) ? (release.Time?.ToString("yyyy年M月d日") ?? "时间待定") : release.TimeNote)</span>
+                    </li>
+                    @if (release.GamePlatformTypes?.Any() == true)
+                    {
+                        <li>
+                            <CgMdiIcon Name="mdiMonitorDashboard" />
+                            <span>@string.Join("、", release.GamePlatformTypes.Select(GetGamePlatformName))</span>
+                        </li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(release.Engine))
+                    {
+                        <li>
+                            <CgMdiIcon Name="mdiEngineOutline" />
+                            <span>@release.Engine</span>
+                        </li>
+                    }
+                    @if (release.StoreInfor.PlayTime > 0)
+                    {
+                        <li>
+                            <CgMdiIcon Name="mdiGamepadVariantOutline" />
+                            <span>平均游玩：@((release.StoreInfor.PlayTime / 60.0)?.ToString("0.0")) 小时</span>
+                        </li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(release.Link))
+                    {
+                        <li>
+                            <CgMdiIcon Name="mdiLinkVariant" />
+                            <a href="@release.GetLink()" target="_blank" rel="noopener noreferrer">前往平台商店查看</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </details>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<GameReleaseViewModel> Releases { get; set; } = [];
+
+    private IReadOnlyList<GameReleaseViewModel> SortedReleases = [];
+
+    protected override void OnParametersSet()
+    {
+        var items = new List<(int, GameReleaseViewModel)>();
+        foreach (var item in Releases)
+        {
+            var pro = 0;
+            if (item.PublishPlatformType == PublishPlatformType.Steam)
+            {
+                pro += 10;
+            }
+            if (item.Time != null && item.Time.Value <= DateTime.UtcNow.AddHours(8))
+            {
+                pro += 10;
+            }
+            if (item.Type == GameReleaseType.Official)
+            {
+                pro += 10;
+            }
+            else
+            {
+                pro += 5;
+            }
+            items.Add((pro, item));
+        }
+        SortedReleases = items.OrderByDescending(s => s.Item1).ThenByDescending(s => s.Item2.Time).Select(s => s.Item2).ToList();
+    }
+
+    [Parameter]
+    public Func<GameReleaseViewModel, string> GetPublishPlatformName { get; set; } = _ => "其他";
+
+    [Parameter]
+    public Func<GameReleaseViewModel, string> GetPlatformIcon { get; set; } = _ => "mdiGamepadVariantOutline";
+
+    [Parameter]
+    public Func<GameReleaseViewModel, string?> GetPlatformImage { get; set; } = _ => null;
+
+    [Parameter]
+    public Func<GameReleaseType, string> GetReleaseTypeText { get; set; } = _ => "未知";
+
+    [Parameter]
+    public Func<CurrencyCode, string> GetCurrencyPrefix { get; set; } = _ => "";
+
+    [Parameter]
+    public Func<GamePlatformType, string> GetGamePlatformName { get; set; } = t => t.ToString();
+}

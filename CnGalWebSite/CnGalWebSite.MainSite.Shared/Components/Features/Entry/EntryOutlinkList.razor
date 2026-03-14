@@ -1,0 +1,52 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<ul class="entry-outlink-list">
+    @foreach (var item in Links.Take(MaxCount))
+    {
+        var title = DisplayTextOrFallback(item.DisplayName, item.DisplayValue);
+        var desc = GetExternalLinkDescription(item);
+        
+        <li>
+            <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="entry-outlink-item">
+                <div class="entry-outlink-item-icon">
+                    @if (string.IsNullOrWhiteSpace(GetExternalLinkImage(item.DisplayName)) == false)
+                    {
+                        <img src="@GetExternalLinkImage(item.DisplayName)" class="entry-outlink-item-image" alt="@item.DisplayName" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <CgMdiIcon Name="@GetExternalLinkIcon(item.DisplayName)" />
+                    }
+                </div>
+                <div class="entry-outlink-item-content">
+                    <span class="entry-outlink-item-title">@title</span>
+                    @if (string.IsNullOrWhiteSpace(desc) == false && desc != title)
+                    {
+                        <span class="entry-outlink-item-desc">@desc</span>
+                    }
+                </div>
+            </a>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<RelevancesKeyValueModel> Links { get; set; } = [];
+
+    [Parameter]
+    public int MaxCount { get; set; } = 8;
+
+    [Parameter]
+    public Func<string, string> GetExternalLinkIcon { get; set; } = _ => "mdiEarth";
+
+    [Parameter]
+    public Func<string, string?> GetExternalLinkImage { get; set; } = _ => null;
+
+    [Parameter]
+    public Func<RelevancesKeyValueModel, string?> GetExternalLinkDescription { get; set; } = item => item.DisplayValue;
+
+    [Parameter]
+    public Func<string?, string, string> DisplayTextOrFallback { get; set; } = (value, fallback) => string.IsNullOrWhiteSpace(value) ? fallback : value;
+}

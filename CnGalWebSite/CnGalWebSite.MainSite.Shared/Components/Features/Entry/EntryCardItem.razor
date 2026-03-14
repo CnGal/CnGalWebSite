@@ -1,0 +1,15 @@
+<a href="@Url" class="entry-card-item" target="@Target" rel="@(Target == "_blank" ? "noopener noreferrer" : null)">
+    <div class="entry-card-item-image">
+        <img src="@Image" alt="@Title" loading="lazy" decoding="async" />
+    </div>
+    <div class="entry-card-item-content">
+        <span class="entry-card-item-title">@Title</span>
+    </div>
+</a>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string Image { get; set; } = "";
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Target { get; set; }
+}

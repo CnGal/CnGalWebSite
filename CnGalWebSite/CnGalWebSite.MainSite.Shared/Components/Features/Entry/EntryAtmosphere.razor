@@ -1,0 +1,15 @@
+<div class="entry-atmosphere" aria-hidden="true">
+    @if (string.IsNullOrWhiteSpace(BackgroundPicture) is false)
+    {
+        <div class="entry-atmosphere-bg" style="@($"background-image:url('{BackgroundPicture}')")"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(SmallBackgroundPicture) is false)
+    {
+        <div class="entry-atmosphere-bg entry-atmosphere-bg--small" style="@($"background-image:url('{SmallBackgroundPicture}')")"></div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? BackgroundPicture { get; set; }
+    [Parameter] public string? SmallBackgroundPicture { get; set; }
+}
