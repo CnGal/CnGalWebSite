@@ -1,0 +1,56 @@
+.cg-space-card {
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+    margin-bottom: var(--cg-spacing-4);
+    overflow: hidden;
+}
+
+.cg-space-card-header {
+    display: flex;
+    align-items: center;
+    padding: var(--cg-spacing-4) var(--cg-spacing-4) 0;
+}
+
+.cg-space-card-icon {
+    margin-right: var(--cg-spacing-2);
+}
+
+.cg-space-card-header ::deep .cg-space-card-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+}
+
+.cg-space-card-title {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    margin: 0;
+    color: var(--cg-color-text-primary);
+}
+
+.cg-space-card-body {
+    padding: var(--cg-spacing-4);
+}
+
+.cg-markdown-body {
+    font-size: var(--cg-font-size-md);
+    line-height: 1.6;
+    color: var(--cg-color-text-primary);
+    word-wrap: break-word;
+}
+
+.cg-markdown-body ::deep img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--cg-radius-md);
+}
+
+.cg-markdown-body ::deep a {
+    color: var(--cg-color-primary);
+    text-decoration: none;
+}
+
+.cg-markdown-body ::deep a:hover {
+    text-decoration: underline;
+}

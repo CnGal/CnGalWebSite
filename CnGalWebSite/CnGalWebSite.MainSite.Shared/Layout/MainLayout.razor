@@ -32,19 +32,9 @@
                 </label>
 
                 <div class="cg-topbar__actions">
-                    <button class="cg-action-btn" aria-label="通知">
-                        <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
-                    </button>
                     <AuthorizeView>
                         <Authorized>
-                            <div class="cg-authenticated">
-                                <span class="cg-user-name">@context.User.Identity?.Name</span>
-                                <form class="cg-auth-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
-                                    <button class="cg-action-btn" type="submit" aria-label="退出登录">
-                                        <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
-                                    </button>
-                                </form>
-                            </div>
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.UserMenu UserName="@context.User.Identity?.Name" UserId="@context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value" CurrentReturnUrl="@CurrentReturnUrl" />
                         </Authorized>
                         <NotAuthorized>
                             <a class="cg-auth-login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">

@@ -138,6 +138,11 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
         })
         .AddHttpMessageHandler<AccessTokenHandler>();
+        services.AddHttpClient<ISpaceQueryService, SpaceQueryService>(client =>
+        {
+            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
+        })
+        .AddHttpMessageHandler<AccessTokenHandler>();
         return services;
     }
 

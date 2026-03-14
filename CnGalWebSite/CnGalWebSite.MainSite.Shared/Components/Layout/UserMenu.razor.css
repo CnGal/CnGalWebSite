@@ -1,0 +1,141 @@
+.cg-user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.cg-action-btn {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--cg-radius-xl);
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
+    color: var(--cg-color-text-muted);
+    border: none;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.cg-action-btn:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+}
+
+.cg-action-btn:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 45%, transparent);
+    outline-offset: 2px;
+}
+
+.cg-action-btn ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.cg-user-menu-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--cg-radius-full);
+}
+
+.cg-user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + var(--cg-spacing-2));
+    right: 0;
+    width: 200px;
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-md);
+    box-shadow: var(--cg-shadow-lg);
+    border: 1px solid var(--cg-color-border);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.cg-user-menu-header {
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+    background-color: color-mix(in oklab, var(--cg-color-surface) 95%, var(--cg-color-primary));
+}
+
+.cg-user-menu-name {
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+    font-size: var(--cg-font-size-md);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cg-user-menu-list {
+    padding: var(--cg-spacing-1) 0;
+}
+
+.cg-user-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--cg-spacing-2) var(--cg-spacing-4);
+    color: var(--cg-color-text-primary);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.cg-user-menu-item:hover {
+    background-color: color-mix(in oklab, var(--cg-color-surface) 90%, var(--cg-color-primary));
+    color: var(--cg-color-primary);
+}
+
+.cg-user-menu-item:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 45%, transparent);
+    outline-offset: -2px;
+}
+
+.cg-user-menu-item ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: var(--cg-spacing-3);
+    color: var(--cg-color-text-secondary);
+}
+
+.cg-user-menu-item:hover ::deep .cg-mdi-icon {
+    color: var(--cg-color-primary);
+}
+
+.cg-user-menu-item--danger {
+    color: var(--cg-color-error);
+}
+
+.cg-user-menu-item--danger ::deep .cg-mdi-icon {
+    color: var(--cg-color-error);
+}
+
+.cg-user-menu-item--danger:hover {
+    background-color: color-mix(in oklab, var(--cg-color-surface) 90%, var(--cg-color-error));
+    color: var(--cg-color-error);
+}
+
+.cg-user-menu-item--danger:hover ::deep .cg-mdi-icon {
+    color: var(--cg-color-error);
+}
+
+.cg-user-menu-form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.cg-user-menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+}
