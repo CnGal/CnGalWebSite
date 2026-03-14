@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -14,20 +14,32 @@ else
     <div class="home-page">
         <HomeHero Carousels="@Model.Carousels" />
 
-        <HomeSection Title="社区交流" Icon="mdiForum" IconColor="var(--cg-color-primary)">
-            <ul class="home-community-grid">
-                @foreach (var item in Model.CommunityLinks.Take(3).Select((value, index) => new { value, index }))
-                {
-                    <HomeLinkCard Url="@item.value.Link"
-                                  Title="@item.value.Title"
-                                  Text="@item.value.Text"
-                                  Target="_blank"
-                                  CommunityStyle="true"
-                                  Icon="@GetCommunityIcon(item.index)"
-                                  IconTone="@GetCommunityTone(item.index)" />
-                }
-            </ul>
-        </HomeSection>
+        <div class="home-community-action-section">
+            <div class="home-community-left">
+                <ul class="home-community-grid">
+                    @foreach (var item in Model.CommunityLinks.Take(6).Select((value, index) => new { value, index }))
+                    {
+                        <HomeLinkCard Url="@item.value.Link"
+                                      Title="@item.value.Title"
+                                      Text="@item.value.Text"
+                                      Target="_blank"
+                                      CommunityStyle="true"
+                                      Icon="@GetCommunityIcon(item.index)"
+                                      IconTone="@GetCommunityTone(item.index)" />
+                    }
+                </ul>
+            </div>
+            <div class="home-community-right">
+                <a href="/entries/create" class="home-action-btn home-action-btn--primary">
+                    <CgMdiIcon Name="mdiPencilPlus" aria-hidden="true" />
+                    <span>贡献词条</span>
+                </a>
+                <a href="/articles/create" class="home-action-btn home-action-btn--secondary">
+                    <CgMdiIcon Name="mdiNotePlus" aria-hidden="true" />
+                    <span>发布文章</span>
+                </a>
+            </div>
+        </div>
 
         <div class="home-games-section">
                     <HomeRandomRecommend HotRecommends="@Model.HotRecommends" />
@@ -221,7 +233,7 @@ else
         </div>
 
         <HomeKanban />
-        
+
         <HomeSection Title="免费游玩" Icon="mdiGiftOutline" IconColor="#10b981">
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.FreeGames.Take(5))
@@ -344,9 +356,12 @@ else
     {
         return index switch
         {
-            1 => "mdiNoteEditOutline",
+            1 => "mdiBug",
             2 => "mdiHub",
-            _ => "mdiForum"
+            3 => "mdiTelevisionClassic",
+            4 => "mdiSinaWeibo",
+            5 => "mdiCube",
+            _ => "mdiQqchat"
         };
     }
 
@@ -356,7 +371,10 @@ else
         {
             1 => "secondary",
             2 => "purple",
-            _ => "primary"
+            3 => "primary",
+            4 => "red",
+            5 => "dark",
+            _ => "pink"
         };
     }
 }

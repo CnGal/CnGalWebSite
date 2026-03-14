@@ -1,0 +1,72 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+
+<section class="entry-editor-section">
+    <h2>附加信息</h2>
+    <p>基础信息、发行时间、相关Staff、预约信息等。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-section">
+            <h3>基础信息项</h3>
+            @if (Model.Informations != null)
+            {
+                @foreach (var info in Model.Informations)
+                {
+                    <div class="cg-form-group">
+                        <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : "")</label>
+                        <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
+                    </div>
+                }
+            }
+        </div>
+        
+        <div class="cg-form-section mt-4">
+            <h3>Staff 数据图表（格式同旧站）</h3>
+            <div class="cg-form-group">
+                <textarea class="cg-textarea" @bind="StaffsInput" placeholder="Staff 列表，例如：\n原画：张三\n剧本：李四" rows="6"></textarea>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditAddInforViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private string StaffsInput
+    {
+        get
+        {
+            if (Model?.Staffs == null || !Model.Staffs.Any()) return "";
+            var sb = new System.Text.StringBuilder();
+            var groups = Model.Staffs.GroupBy(s => s.Modifier ?? "");
+            foreach (var g in groups)
+            {
+                if (!string.IsNullOrWhiteSpace(g.Key))
+                {
+                    sb.AppendLine(g.Key);
+                }
+                var posGroups = g.GroupBy(s => s.PositionOfficial ?? "");
+                foreach (var pg in posGroups)
+                {
+                    if (string.IsNullOrWhiteSpace(pg.Key)) continue;
+                    var names = string.Join("，", pg.Select(s => $"{s.Name}{(string.IsNullOrWhiteSpace(s.SubordinateOrganization) ? "" : $"（{s.SubordinateOrganization}）")}"));
+                    sb.AppendLine($"{pg.Key}：{names}");
+                }
+            }
+            return sb.ToString();
+        }
+        set
+        {
+            if (Model != null)
+            {
+                Model.Staffs = CnGalWebSite.DataModel.Helper.ToolHelper.GetStaffsFromString(value ?? "");
+            }
+        }
+    }
+}

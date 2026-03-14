@@ -1,0 +1,68 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+
+<section class="entry-editor-section">
+    <h2>主要信息</h2>
+    <p>编辑入口类型、名称、简介、主图等主要信息。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-group">
+            <label class="cg-form-label">类别</label>
+            <select class="cg-select" value="@Model.Type" @onchange="OnTypeChanged">
+                <option value="Game">游戏</option>
+                <option value="Role">角色</option>
+                <option value="Staff">STAFF</option>
+                <option value="ProductionGroup">制作组</option>
+            </select>
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">唯一名称</label>
+            <CgInput @bind-Value="Model.Name" Placeholder="如：游戏名称" />
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">显示名称</label>
+            <CgInput @bind-Value="Model.DisplayName" Placeholder="显示在页面上的名称" />
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">简介</label>
+            <textarea class="cg-textarea" @bind="Model.BriefIntroduction" placeholder="简短的一句话介绍" rows="3"></textarea>
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">主图</label>
+            <CgInput @bind-Value="Model.MainPicture" Placeholder="主图链接" />
+        </div>
+        
+        <div class="cg-form-group">
+            <label class="cg-form-label">缩略图</label>
+            <CgInput @bind-Value="Model.Thumbnail" Placeholder="缩略图链接" />
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">背景图</label>
+            <CgInput @bind-Value="Model.BackgroundPicture" Placeholder="大背景图链接" />
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditMainViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<CnGalWebSite.DataModel.Model.EntryType> TypeChanged { get; set; }
+
+    private async Task OnTypeChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<CnGalWebSite.DataModel.Model.EntryType>(args.Value?.ToString(), out var newType))
+        {
+            Model.Type = newType;
+            await TypeChanged.InvokeAsync(newType);
+        }
+    }
+}

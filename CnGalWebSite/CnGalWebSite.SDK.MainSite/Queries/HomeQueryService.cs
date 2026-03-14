@@ -209,6 +209,24 @@ public sealed class HomeQueryService(
                 Title = "QQ频道",
                 Text = "CnGal资料站官方QQ频道",
                 Link = "https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=onAQQ&from=246610&biz=ka"
+            },
+            new()
+            {
+                Title = "Bilibili",
+                Text = "B站官方账号",
+                Link = "https://space.bilibili.com/145239325"
+            },
+            new()
+            {
+                Title = "微博",
+                Text = "微博官方账号",
+                Link = "https://weibo.com/cngalorg"
+            },
+            new()
+            {
+                Title = "小黑盒",
+                Text = "小黑盒官方账号",
+                Link = "https://www.xiaoheihe.cn/app/user/profile/30519991"
             }
         ];
     }

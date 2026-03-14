@@ -1,0 +1,51 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.Core.Models
+
+<section class="entry-editor-section">
+    <h2>音频</h2>
+    <p>管理词条的关联音频和音乐。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-section">
+            <button class="cg-btn cg-btn--primary" @onclick="AddAudio">添加音频</button>
+            <div class="audio-list mt-4">
+                @foreach (var audio in Model.Audio)
+                {
+                    <div class="audio-item">
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">音频名称</label>
+                            <CgInput @bind-Value="audio.Name" Placeholder="如：OP、ED、BGM" />
+                        </div>
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">音频描述</label>
+                            <CgInput @bind-Value="audio.BriefIntroduction" Placeholder="描述" />
+                        </div>
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">音频链接</label>
+                            <CgInput @bind-Value="audio.Url" Placeholder="外链音频URL" />
+                        </div>
+                        <button class="cg-btn cg-btn--danger" @onclick="@(() => RemoveAudio(audio))">删除</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditAudioViewModel Model { get; set; } = default!;
+
+    private void AddAudio()
+    {
+        Model.Audio ??= new();
+        Model.Audio.Add(new EditAudioAloneModel());
+    }
+
+    private void RemoveAudio(EditAudioAloneModel audio)
+    {
+        Model.Audio?.Remove(audio);
+    }
+}

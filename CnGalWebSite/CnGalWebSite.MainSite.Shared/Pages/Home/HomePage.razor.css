@@ -7,6 +7,79 @@
     margin: 0 auto;
 }
 
+.home-community-action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .home-community-action-section {
+        flex-direction: row;
+        align-items: stretch;
+    }
+}
+
+.home-community-left {
+    flex: 1;
+}
+
+.home-community-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .home-community-right {
+        width: 240px;
+    }
+}
+
+.home-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--cg-radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--cg-transition-fast);
+    flex: 1;
+}
+
+.home-action-btn ::deep .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.home-action-btn--primary {
+    background: var(--cg-color-primary);
+    color: white;
+}
+
+.home-action-btn--primary:hover {
+    background: var(--cg-color-primary-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.home-action-btn--secondary {
+    background: var(--cg-color-secondary);
+    color: white;
+}
+
+.home-action-btn--secondary:hover {
+    background: color-mix(in oklab, var(--cg-color-secondary) 85%, black);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--cg-shadow-md);
+}
+
 .home-games-section {
     display: flex;
     flex-direction: column;

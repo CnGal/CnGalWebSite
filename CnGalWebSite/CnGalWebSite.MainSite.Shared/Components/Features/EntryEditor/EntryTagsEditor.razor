@@ -1,0 +1,38 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+
+<section class="entry-editor-section">
+    <h2>标签</h2>
+    <p>管理词条的标签信息。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-group">
+            <label class="cg-form-label">标签（一行一个标签）</label>
+            <textarea class="cg-textarea" @bind="TagsInput" placeholder="如：\n恋爱\n视觉小说"></textarea>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditEntryTagViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private string TagsInput
+    {
+        get => string.Join("\n", Model?.Tags?.Select(g => g.DisplayName) ?? Array.Empty<string>());
+        set
+        {
+            if (Model != null)
+            {
+                Model.Tags = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
+                    .ToList() ?? new();
+            }
+        }
+    }
+}

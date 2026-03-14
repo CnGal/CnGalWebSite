@@ -1,0 +1,58 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+
+<section class="entry-editor-section">
+    <h2>专题页设置</h2>
+    <p>专属样式和背景图设置。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-group">
+            <label class="cg-form-label">自定义 HTML 代码</label>
+            <textarea class="cg-textarea" @bind="Model.Html" placeholder="在此输入自定义的网页 HTML 代码" rows="6"></textarea>
+        </div>
+
+        <div class="cg-form-section mt-4">
+            <button class="cg-btn cg-btn--primary" @onclick="AddImage">添加专题图片</button>
+            <div class="image-list mt-4">
+                @foreach (var img in Model.Images)
+                {
+                    <div class="image-item">
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">图片位置（Type）</label>
+                            <select class="cg-select" @bind="img.Type">
+                                <option value="@CnGalWebSite.DataModel.Model.EntryWebsiteImageType.Carousel">轮播图</option>
+                                <option value="@CnGalWebSite.DataModel.Model.EntryWebsiteImageType.Background">背景图</option>
+                            </select>
+                        </div>
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">图片链接</label>
+                            <CgInput @bind-Value="img.Image" Placeholder="如：https://..." />
+                        </div>
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">备注说明</label>
+                            <CgInput @bind-Value="img.Note" Placeholder="图片描述" />
+                        </div>
+                        <button class="cg-btn cg-btn--danger" @onclick="@(() => RemoveImage(img))">删除</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditEntryWebsiteViewModel Model { get; set; } = default!;
+
+    private void AddImage()
+    {
+        Model.Images ??= new();
+        Model.Images.Add(new EditWebsiteImageModel());
+    }
+
+    private void RemoveImage(EditWebsiteImageModel img)
+    {
+        Model.Images?.Remove(img);
+    }
+}

@@ -1,0 +1,272 @@
+﻿@page "/entries/establish"
+@page "/entries/create"
+@page "/entries/edit/{Id:int}"
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using System.Text.Json
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+@using CnGalWebSite.DataModel.ViewModel
+@using Microsoft.JSInterop
+@using CnGalWebSite.MainSite.Shared.Components.Features.EntryEditor
+@inject IEntryCommandService EntryCommandService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IDisposable
+
+<PageTitle>@(IsCreate ? "创建词条" : $"编辑词条")</PageTitle>
+
+@if (IsLoading)
+{
+    <section class="entry-edit-loading" aria-label="加载中">
+        <div class="entry-edit-loading-spinner"></div>
+        <p>正在获取数据...</p>
+    </section>
+}
+else if (LoadErrorMessage != null)
+{
+    <section class="entry-edit-error">
+        <h1>加载失败</h1>
+        <p>@LoadErrorMessage</p>
+        <button class="cg-btn cg-btn--primary" @onclick="LoadDataAsync">重试</button>
+    </section>
+}
+else if (Model != null)
+{
+    <article class="entry-edit-page">
+        <header class="entry-edit-header">
+            <h1>@(IsCreate ? "创建词条" : "编辑词条")</h1>
+            <div class="entry-edit-actions">
+                <button class="cg-btn cg-btn--outline" disabled="@IsSubmitting" @onclick="Cancel">取消</button>
+                <button class="cg-btn cg-btn--primary" disabled="@IsSubmitting" @onclick="SubmitAsync">
+                    @if (IsSubmitting)
+                    {
+                        <span class="cg-spinner"></span>
+                        <span>提交中...</span>
+                    }
+                    else
+                    {
+                        <span>提交审核</span>
+                    }
+                </button>
+            </div>
+        </header>
+
+        @if (SubmitErrorMessage != null)
+        {
+            <div class="entry-edit-alert entry-edit-alert--error">
+                @SubmitErrorMessage
+            </div>
+        }
+
+        @if (HasDraftRecovered)
+        {
+            <div class="entry-edit-alert entry-edit-alert--info">
+                <span>发现您上次编辑的未保存草稿，已自动为您恢复。</span>
+                <button class="cg-btn cg-btn--outline" @onclick="DiscardDraft">丢弃草稿</button>
+            </div>
+        }
+
+        <main class="entry-edit-content">
+            <EntryMainEditor Model="Model.Data.Main" TypeChanged="OnTypeChanged" />
+            <EntryAddInforEditor Model="Model.Data.AddInfor" MetaOptions="Model.MetaOptions" />
+            <EntryImagesEditor Model="Model.Data.Images" />
+            <EntryMainPageEditor Model="Model.Data.MainPage" />
+            <EntryRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
+            <EntryTagsEditor Model="Model.Data.Tags" MetaOptions="Model.MetaOptions" />
+            <EntryAudioEditor Model="Model.Data.Audio" />
+            <EntryWebsiteEditor Model="Model.Data.Website" />
+        </main>
+    </article>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Type { get; set; }
+
+    private bool IsCreate => Id is null || Id <= 0;
+
+    private bool IsLoading = true;
+    private string? LoadErrorMessage;
+
+    private bool IsSubmitting = false;
+    private string? SubmitErrorMessage;
+
+    private EntryEditViewModel? Model;
+
+    private System.Threading.Timer? _autoSaveTimer;
+    private string DraftKey => IsCreate ? "EntryDraft_Create" : $"EntryDraft_Edit_{Id}";
+
+    private bool HasDraftRecovered = false;
+    private EstablishEntryViewModel? OriginalData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+        _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private void AutoSaveCallback(object? state)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            if (Model != null && !IsSubmitting && !IsLoading)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(Model.Data);
+                    await JS.InvokeVoidAsync("localStorage.setItem", DraftKey, json);
+                }
+                catch { /* Ignore local storage errors */ }
+            }
+        });
+    }
+
+    public void Dispose()
+    {
+        _autoSaveTimer?.Dispose();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        IsLoading = true;
+        LoadErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            SdkResult<EntryEditViewModel> result;
+            if (IsCreate)
+            {
+                var entryType = Enum.TryParse<EntryType>(Type, true, out var t) ? t : EntryType.Game;
+                result = await EntryCommandService.GetEntryCreateTemplateAsync(entryType);
+            }
+            else
+            {
+                result = await EntryCommandService.GetEntryEditAsync(Id!.Value);
+            }
+
+            if (result.Success && result.Data != null)
+            {
+                Model = result.Data;
+                OriginalData = JsonSerializer.Deserialize<EstablishEntryViewModel>(JsonSerializer.Serialize(result.Data.Data));
+
+                try
+                {
+                    var draftStr = await JS.InvokeAsync<string>("localStorage.getItem", DraftKey);
+                    if (!string.IsNullOrWhiteSpace(draftStr))
+                    {
+                        var draft = JsonSerializer.Deserialize<EstablishEntryViewModel>(draftStr);
+                        if (draft != null)
+                        {
+                            Model.Data = draft;
+                            HasDraftRecovered = true;
+                        }
+                    }
+                }
+                catch { }
+
+                var metaResult = await EntryCommandService.GetEntryEditMetaOptionsAsync();
+                if (metaResult.Success && metaResult.Data != null)
+                {
+                    Model.MetaOptions = metaResult.Data;
+                }
+            }
+            else
+            {
+                LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
+            }
+        }
+        catch (Exception ex)
+        {
+            LoadErrorMessage = "发生未知错误：" + ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DiscardDraft()
+    {
+        if (OriginalData != null && Model != null)
+        {
+            Model.Data = JsonSerializer.Deserialize<EstablishEntryViewModel>(JsonSerializer.Serialize(OriginalData))!;
+            HasDraftRecovered = false;
+            await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (Model == null || IsSubmitting) return;
+
+        var validationResult = Model.Data.Validate();
+        if (!validationResult.Successful)
+        {
+            SubmitErrorMessage = validationResult.Error ?? "请检查表单是否填写正确";
+            return;
+        }
+
+        IsSubmitting = true;
+        SubmitErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var request = new EntryEditRequest
+            {
+                IsCreate = IsCreate,
+                Data = Model.Data
+            };
+
+            var result = await EntryCommandService.SubmitEditAsync(request);
+            if (result.Success)
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                NavigationManager.NavigateTo($"/entries/index/{result.Data}");
+            }
+            else
+            {
+                SubmitErrorMessage = result.Error?.Message ?? "提交失败";
+            }
+        }
+        catch (Exception ex)
+        {
+            SubmitErrorMessage = "发生未知错误：" + ex.Message;
+        }
+        finally
+        {
+            IsSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel()
+    {
+        if (IsCreate)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/entries/index/{Id}");
+        }
+    }
+
+    private void OnTypeChanged(EntryType newType)
+    {
+        if (Model != null)
+        {
+            Model.Data.Type = newType;
+            Model.Data.Main.Type = newType;
+            Model.Data.AddInfor.Type = newType;
+            Model.Data.Relevances.Type = newType;
+        }
+    }
+}

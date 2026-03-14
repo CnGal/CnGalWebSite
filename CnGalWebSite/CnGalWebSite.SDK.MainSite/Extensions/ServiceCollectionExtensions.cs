@@ -1,5 +1,6 @@
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Auth;
+using CnGalWebSite.SDK.MainSite.Commands;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Queries;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -139,6 +140,11 @@ public static class ServiceCollectionExtensions
         })
         .AddHttpMessageHandler<AccessTokenHandler>();
         services.AddHttpClient<ISpaceQueryService, SpaceQueryService>(client =>
+        {
+            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
+        })
+        .AddHttpMessageHandler<AccessTokenHandler>();
+        services.AddHttpClient<IEntryCommandService, EntryCommandService>(client =>
         {
             client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
         })

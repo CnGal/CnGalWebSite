@@ -1,0 +1,46 @@
+﻿@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+
+<section class="entry-editor-section">
+    <h2>相册</h2>
+    <p>编辑词条相册图片。</p>
+
+    @if (Model != null)
+    {
+        <div class="cg-form-section">
+            <button class="cg-btn cg-btn--primary" @onclick="AddImage">添加图片</button>
+            <div class="image-list mt-4">
+                @foreach (var img in Model.Images)
+                {
+                    <div class="image-item">
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">图片链接</label>
+                            <CgInput @bind-Value="img.Image" Placeholder="如：https://..." />
+                        </div>
+                        <div class="cg-form-group flex-1">
+                            <label class="cg-form-label">备注说明</label>
+                            <CgInput @bind-Value="img.Note" Placeholder="图片描述" />
+                        </div>
+                        <button class="cg-btn cg-btn--danger" @onclick="@(() => RemoveImage(img))">删除</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditImagesViewModel Model { get; set; } = default!;
+
+    private void AddImage()
+    {
+        Model.Images ??= new();
+        Model.Images.Add(new EditImageAloneModel());
+    }
+
+    private void RemoveImage(EditImageAloneModel img)
+    {
+        Model.Images?.Remove(img);
+    }
+}

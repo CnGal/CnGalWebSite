@@ -1,0 +1,78 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+
+<section class="entry-editor-section">
+    <h2>关联信息</h2>
+    <p>关联的相关词条、视频、文章及外部链接等。</p>
+    
+    @if (Model != null)
+    {
+        <div class="cg-form-group">
+            <label class="cg-form-label">相关游戏（一行一个名称）</label>
+            <textarea class="cg-textarea" @bind="GamesInput" placeholder="如：\n某个游戏\n另一个游戏"></textarea>
+        </div>
+        
+        <div class="cg-form-group">
+            <label class="cg-form-label">相关角色（一行一个名称）</label>
+            <textarea class="cg-textarea" @bind="RolesInput" placeholder="如：\n角色1\n角色2"></textarea>
+        </div>
+        
+        <div class="cg-form-group">
+            <label class="cg-form-label">相关文章（一行一个名称）</label>
+            <textarea class="cg-textarea" @bind="ArticlesInput" placeholder="如：\n文章标题1\n文章标题2"></textarea>
+        </div>
+        
+        <!-- 这里为了最小化迁移，直接用文本框代替自动补全，后续可引入 CgAutoComplete -->
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditRelevancesViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private string GamesInput
+    {
+        get => string.Join("\n", Model?.Games?.Select(g => g.DisplayName) ?? Array.Empty<string>());
+        set
+        {
+            if (Model != null)
+            {
+                Model.Games = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
+                    .ToList() ?? new();
+            }
+        }
+    }
+
+    private string RolesInput
+    {
+        get => string.Join("\n", Model?.Roles?.Select(g => g.DisplayName) ?? Array.Empty<string>());
+        set
+        {
+            if (Model != null)
+            {
+                Model.Roles = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
+                    .ToList() ?? new();
+            }
+        }
+    }
+
+    private string ArticlesInput
+    {
+        get => string.Join("\n", Model?.articles?.Select(g => g.DisplayName) ?? Array.Empty<string>());
+        set
+        {
+            if (Model != null)
+            {
+                Model.articles = value?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(n => new RelevancesModel { DisplayName = n.Trim() })
+                    .ToList() ?? new();
+            }
+        }
+    }
+}
