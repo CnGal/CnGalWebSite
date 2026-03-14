@@ -1,0 +1,14 @@
+using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.Files;
+
+namespace CnGalWebSite.SDK.MainSite.Abstractions;
+
+public interface IFileCommandService
+{
+    Task<SdkResult<string>> UploadImageAsync(
+        Stream fileStream,
+        string fileName,
+        ImageAspectType aspectType = ImageAspectType.None,
+        bool gallery = false,
+        CancellationToken cancellationToken = default);
+}

@@ -3,7 +3,7 @@
        value="@Value"
        placeholder="@Placeholder"
        disabled="@Disabled"
-       @onchange="OnChanged" />
+       @oninput="OnInput" />
 
 @code {
     [Parameter]
@@ -21,7 +21,7 @@
     [Parameter]
     public bool Disabled { get; set; }
 
-    private Task OnChanged(ChangeEventArgs args)
+    private Task OnInput(ChangeEventArgs args)
     {
         return ValueChanged.InvokeAsync(args.Value?.ToString());
     }

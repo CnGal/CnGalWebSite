@@ -12,3 +12,15 @@
     outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
     border-color: var(--cg-color-primary);
 }
+
+.cg-input:disabled {
+    background-color: var(--cg-color-surface-2, color-mix(in oklab, var(--cg-color-surface) 92%, black));
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+    border-color: var(--cg-color-border-muted, color-mix(in oklab, var(--cg-color-border) 75%, transparent));
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.cg-input:disabled::placeholder {
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 55%, transparent));
+}

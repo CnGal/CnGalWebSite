@@ -1,0 +1,122 @@
+.cg-image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.cg-image-upload__preview-wrap {
+    width: 100%;
+    min-height: 10rem;
+    border: 1px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cg-image-upload__preview {
+    width: 100%;
+    max-height: 18rem;
+    object-fit: contain;
+    background: color-mix(in oklab, var(--cg-color-surface) 90%, black);
+}
+
+.cg-image-upload__placeholder {
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+    font-size: 0.92rem;
+}
+
+.cg-image-upload__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.cg-image-upload__file-input {
+    display: none;
+}
+
+.cg-image-upload__label--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.cg-image-upload__label--rounded {
+    border-radius: 999px;
+}
+
+.cg-image-upload__message {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.cg-image-upload__message--error {
+    color: var(--cg-color-danger, #d14343);
+}
+
+.cg-image-upload__cropper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.cg-image-upload__crop-preview {
+    width: auto;
+    max-width: 100%;
+    max-height: 28rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-surface) 88%, black);
+    display: block;
+}
+
+.cg-image-upload__hint {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+}
+
+.cg-image-upload__crop-stage {
+    position: relative;
+    user-select: none;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 0;
+}
+
+.cg-image-upload__crop-overlay {
+    position: absolute;
+    border: 2px solid var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    cursor: move;
+    box-sizing: border-box;
+}
+
+.cg-image-upload__crop-handle {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #fff;
+    background: var(--cg-color-primary);
+    cursor: nwse-resize;
+    padding: 0;
+}
+
+.cg-image-upload__shade {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+.cg-image-upload__crop-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}

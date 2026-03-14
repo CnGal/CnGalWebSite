@@ -1,4 +1,4 @@
-using CnGalWebSite.SDK.MainSite.Abstractions;
+﻿using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Auth;
 using CnGalWebSite.SDK.MainSite.Commands;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -124,7 +124,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress)
+    public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress)
     {
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
@@ -149,16 +149,15 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
         })
         .AddHttpMessageHandler<AccessTokenHandler>();
+        services.AddHttpClient<IFileCommandService, FileCommandService>(client =>
+        {
+            client.BaseAddress = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
+        });
         return services;
     }
 
-    private static string EnsureTrailingSlash(string apiBaseAddress)
+    private static string EnsureTrailingSlash(string address)
     {
-        if (string.IsNullOrWhiteSpace(apiBaseAddress))
-        {
-            return "https://api.cngal.org/";
-        }
-
-        return apiBaseAddress.EndsWith('/') ? apiBaseAddress : $"{apiBaseAddress}/";
+        return address.EndsWith('/') ? address : $"{address}/";
     }
 }

@@ -1,0 +1,558 @@
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models.Files
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IFileCommandService FileCommandService
+@inject IJSRuntime JSRuntime
+
+<div class="cg-image-upload @Class">
+    @if (ShowPreview)
+    {
+        <div class="cg-image-upload__preview-wrap">
+            @if (string.IsNullOrWhiteSpace(CurrentImagePath))
+            {
+                <div class="cg-image-upload__placeholder">暂无图片</div>
+            }
+            else
+            {
+                <img class="cg-image-upload__preview" src="@CurrentImagePath" alt="图片预览" />
+            }
+        </div>
+    }
+
+    <div class="cg-image-upload__actions">
+        <label class="cg-btn cg-btn--primary @(Rounded ? "cg-image-upload__label--rounded" : string.Empty) @(Disabled || _isUploading ? "cg-image-upload__label--disabled" : string.Empty)"
+               for="@_inputId">
+            @(_isUploading ? "上传中..." : Text)
+        </label>
+        <InputFile id="@_inputId"
+                   class="cg-image-upload__file-input"
+                   accept="image/*"
+                   multiple="@Multiple"
+                   disabled="@(Disabled || _isUploading)"
+                   OnChange="OnFileChanged" />
+
+        @if (string.IsNullOrWhiteSpace(CurrentImagePath) is false)
+        {
+            <CgButton Variant="secondary" Disabled="@Disabled" OnClick="OnCleanAsync">清空</CgButton>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="cg-image-upload__message cg-image-upload__message--error">@_errorMessage</div>
+    }
+</div>
+
+<CgModal IsOpen="@_cropDialogOpen" Title="裁剪图片" OnClose="CloseCropDialogAsync">
+    <div class="cg-image-upload__cropper">
+        @if (string.IsNullOrWhiteSpace(_pendingPreviewDataUrl) is false)
+        {
+            <div class="cg-image-upload__crop-stage"
+                 @ref="_cropStageRef"
+                 @onmousemove="OnCropStageMouseMoveAsync"
+                 @onmouseup="OnCropStageMouseUp"
+                 @onmouseleave="OnCropStageMouseUp">
+                <img class="cg-image-upload__crop-preview"
+                     src="@_pendingPreviewDataUrl"
+                     alt="裁剪预览"
+                     @onload="OnCropPreviewLoadedAsync" />
+                <div class="cg-image-upload__shade" style="@ShadeTopStyle"></div>
+                <div class="cg-image-upload__shade" style="@ShadeLeftStyle"></div>
+                <div class="cg-image-upload__shade" style="@ShadeRightStyle"></div>
+                <div class="cg-image-upload__shade" style="@ShadeBottomStyle"></div>
+                <div class="cg-image-upload__crop-overlay"
+                     style="@CropRectStyle"
+                     @onmousedown="OnCropRectMouseDownAsync">
+                    <button class="cg-image-upload__crop-handle"
+                            type="button"
+                            aria-label="拖动缩放裁剪区域"
+                            @onmousedown:stopPropagation="true"
+                            @onmousedown="OnCropHandleMouseDownAsync"></button>
+                </div>
+            </div>
+        }
+        <p class="cg-image-upload__hint">直接上传可以更加快捷地裁剪图片</p>
+        <div class="cg-image-upload__crop-actions">
+            <CgButton Variant="secondary" Disabled="@_isUploading" OnClick="OnDirectUploadFromDialogAsync">直接上传</CgButton>
+            <CgButton Disabled="@_isUploading" OnClick="OnCropUploadAsync">裁剪并上传</CgButton>
+        </div>
+    </div>
+</CgModal>
+
+@code {
+    private const long MaxUploadBytes = 10 * 1024 * 1024;
+    private readonly string _inputId = $"cg-image-upload-{Guid.NewGuid():N}";
+    private bool _isUploading;
+    private string? _errorMessage;
+    private string? _localImagePath;
+    private bool _cropDialogOpen;
+    private IBrowserFile? _pendingFile;
+    private string? _pendingPreviewDataUrl;
+    private ElementReference _cropStageRef;
+    private CropRect _cropRect = new(0.1d, 0.1d, 0.8d, 0.8d);
+    private CropRect _cropStartRect = new(0.1d, 0.1d, 0.8d, 0.8d);
+    private bool _isDraggingRect;
+    private bool _isResizingRect;
+    private double _dragStartClientX;
+    private double _dragStartClientY;
+    private double _cropStageWidth;
+    private double _cropStageHeight;
+    private double _cropStageLeft;
+    private double _cropStageTop;
+    private IJSObjectReference? _jsModule;
+    private string? _lastExternalImagePath;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? ImagePath { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ImagePathChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnImageUploaded { get; set; }
+
+    [Parameter]
+    public ImageAspectType Type { get; set; } = ImageAspectType.None;
+
+    [Parameter]
+    public bool ShowCropper { get; set; }
+
+    [Parameter]
+    public bool ShowPreview { get; set; } = true;
+
+    [Parameter]
+    public bool Multiple { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "上传图片";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool Gallery { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Rounded { get; set; } = true;
+
+    private string? CurrentImagePath => Value ?? ImagePath ?? _localImagePath;
+    private string CropRectStyle =>
+        $"left:{_cropRect.X * 100:0.###}%;top:{_cropRect.Y * 100:0.###}%;width:{_cropRect.Width * 100:0.###}%;height:{_cropRect.Height * 100:0.###}%;";
+    private string ShadeTopStyle => $"left:0;top:0;width:100%;height:{_cropRect.Y * 100:0.###}%;";
+    private string ShadeLeftStyle =>
+        $"left:0;top:{_cropRect.Y * 100:0.###}%;width:{_cropRect.X * 100:0.###}%;height:{_cropRect.Height * 100:0.###}%;";
+    private string ShadeRightStyle =>
+        $"left:{(_cropRect.X + _cropRect.Width) * 100:0.###}%;top:{_cropRect.Y * 100:0.###}%;width:{(1d - _cropRect.X - _cropRect.Width) * 100:0.###}%;height:{_cropRect.Height * 100:0.###}%;";
+    private string ShadeBottomStyle =>
+        $"left:0;top:{(_cropRect.Y + _cropRect.Height) * 100:0.###}%;width:100%;height:{(1d - _cropRect.Y - _cropRect.Height) * 100:0.###}%;";
+
+    protected override void OnParametersSet()
+    {
+        var externalValue = Value ?? ImagePath;
+        if (!string.Equals(externalValue, _lastExternalImagePath, StringComparison.Ordinal))
+        {
+            _localImagePath = externalValue;
+            _lastExternalImagePath = externalValue;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(externalValue) is false || string.IsNullOrWhiteSpace(_localImagePath))
+        {
+            _localImagePath = externalValue;
+        }
+    }
+
+    private async Task OnFileChanged(InputFileChangeEventArgs args)
+    {
+        if (Disabled || _isUploading || args.FileCount == 0)
+        {
+            return;
+        }
+
+        _errorMessage = null;
+        if (Multiple)
+        {
+            foreach (var file in args.GetMultipleFiles())
+            {
+                await UploadSingleFileAsync(file, cropped: false);
+            }
+
+            return;
+        }
+
+        var selected = args.File;
+        if (ShowCropper)
+        {
+            _pendingFile = selected;
+            _pendingPreviewDataUrl = await ReadPreviewDataUrlAsync(selected);
+            _cropRect = new CropRect(0.1d, 0.1d, 0.8d, 0.8d);
+            _cropDialogOpen = true;
+            return;
+        }
+
+        await UploadSingleFileAsync(selected, cropped: false);
+    }
+
+    private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped)
+    {
+        _isUploading = true;
+        try
+        {
+            IBrowserFile targetFile = file;
+            var aspectType = Type;
+            if (cropped)
+            {
+                aspectType = ImageAspectType.None;
+            }
+
+            await using var stream = targetFile.OpenReadStream(MaxUploadBytes);
+            var uploadResult = await FileCommandService.UploadImageAsync(stream, targetFile.Name, aspectType, Gallery);
+            if (!uploadResult.Success || string.IsNullOrWhiteSpace(uploadResult.Data))
+            {
+                _errorMessage = uploadResult.Error?.Message ?? "上传失败";
+                return;
+            }
+
+            await ChangeImageUrlAsync(uploadResult.Data);
+            _errorMessage = null;
+        }
+        catch (IOException)
+        {
+            _errorMessage = "上传失败：图片过大（最大 10MB）";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"上传失败：{ex.Message}";
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+
+    private async Task OnCropUploadAsync(MouseEventArgs _)
+    {
+        if (_pendingFile is null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_pendingPreviewDataUrl))
+        {
+            _errorMessage = "裁剪失败：未读取到图片数据";
+            return;
+        }
+
+        _isUploading = true;
+        try
+        {
+            var jsModule = await GetJsModuleAsync();
+            var cropped = await jsModule.InvokeAsync<CroppedImageResult>("cropDataUrlByRect",
+                _pendingPreviewDataUrl,
+                _cropRect.X,
+                _cropRect.Y,
+                _cropRect.Width,
+                _cropRect.Height);
+
+            if (cropped is null || string.IsNullOrWhiteSpace(cropped.Base64))
+            {
+                _errorMessage = "裁剪失败：无法生成裁剪结果";
+                return;
+            }
+
+            var bytes = Convert.FromBase64String(cropped.Base64);
+            await using var stream = new MemoryStream(bytes);
+            var extension = GetExtensionByMime(cropped.MimeType);
+            var fileName = BuildCroppedFileName(_pendingFile.Name, extension);
+            var uploadResult = await FileCommandService.UploadImageAsync(stream, fileName, ImageAspectType.None, Gallery);
+            if (!uploadResult.Success || string.IsNullOrWhiteSpace(uploadResult.Data))
+            {
+                _errorMessage = uploadResult.Error?.Message ?? "上传失败";
+                return;
+            }
+
+            await ChangeImageUrlAsync(uploadResult.Data);
+            _errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"裁剪失败：{ex.Message}";
+            return;
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+
+        _cropDialogOpen = false;
+    }
+
+    private async Task OnDirectUploadFromDialogAsync(MouseEventArgs _)
+    {
+        if (_pendingFile is null)
+        {
+            return;
+        }
+
+        await UploadSingleFileAsync(_pendingFile, cropped: false);
+        _cropDialogOpen = false;
+    }
+
+    private Task CloseCropDialogAsync()
+    {
+        _cropDialogOpen = false;
+        _pendingFile = null;
+        _pendingPreviewDataUrl = null;
+        _isDraggingRect = false;
+        _isResizingRect = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnCleanAsync(MouseEventArgs _)
+    {
+        _errorMessage = null;
+        await ChangeImageUrlAsync(null);
+    }
+
+    private async Task ChangeImageUrlAsync(string? url)
+    {
+        _localImagePath = url;
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(url);
+        }
+
+        if (ImagePathChanged.HasDelegate)
+        {
+            await ImagePathChanged.InvokeAsync(url);
+        }
+
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            await OnImageUploaded.InvokeAsync(url);
+        }
+    }
+
+    private async Task OnCropPreviewLoadedAsync()
+    {
+        await RefreshCropStageMetricsAsync();
+        if (_cropStageWidth <= 0 || _cropStageHeight <= 0)
+        {
+            return;
+        }
+
+        _cropRect = BuildInitialCropRect(Type, _cropStageWidth / _cropStageHeight);
+        StateHasChanged();
+    }
+
+    private async Task OnCropRectMouseDownAsync(MouseEventArgs args)
+    {
+        await RefreshCropStageMetricsAsync();
+        _isDraggingRect = true;
+        _isResizingRect = false;
+        _dragStartClientX = args.ClientX;
+        _dragStartClientY = args.ClientY;
+        _cropStartRect = _cropRect;
+    }
+
+    private async Task OnCropHandleMouseDownAsync(MouseEventArgs args)
+    {
+        await RefreshCropStageMetricsAsync();
+        _isResizingRect = true;
+        _isDraggingRect = false;
+        _dragStartClientX = args.ClientX;
+        _dragStartClientY = args.ClientY;
+        _cropStartRect = _cropRect;
+    }
+
+    private async Task OnCropStageMouseMoveAsync(MouseEventArgs args)
+    {
+        if (!_isDraggingRect && !_isResizingRect)
+        {
+            return;
+        }
+
+        if (_cropStageWidth <= 0 || _cropStageHeight <= 0)
+        {
+            await RefreshCropStageMetricsAsync();
+            if (_cropStageWidth <= 0 || _cropStageHeight <= 0)
+            {
+                return;
+            }
+        }
+
+        var deltaX = (args.ClientX - _dragStartClientX) / _cropStageWidth;
+        var deltaY = (args.ClientY - _dragStartClientY) / _cropStageHeight;
+
+        if (_isDraggingRect)
+        {
+            var x = Math.Clamp(_cropStartRect.X + deltaX, 0d, 1d - _cropStartRect.Width);
+            var y = Math.Clamp(_cropStartRect.Y + deltaY, 0d, 1d - _cropStartRect.Height);
+            _cropRect = new CropRect(x, y, _cropStartRect.Width, _cropStartRect.Height);
+        }
+        else if (_isResizingRect)
+        {
+            const double minSize = 0.08d;
+            var ratio = GetTargetRatio(Type);
+            if (ratio is null)
+            {
+                var width = Math.Clamp(_cropStartRect.Width + deltaX, minSize, 1d - _cropStartRect.X);
+                var height = Math.Clamp(_cropStartRect.Height + deltaY, minSize, 1d - _cropStartRect.Y);
+                _cropRect = new CropRect(_cropStartRect.X, _cropStartRect.Y, width, height);
+                return;
+            }
+
+            var stageRatio = _cropStageWidth / _cropStageHeight;
+            var widthByDeltaX = _cropStartRect.Width + deltaX;
+            var widthByDeltaY = _cropStartRect.Width + deltaY * ratio.Value / stageRatio;
+            var widthCandidate = Math.Abs(deltaX) >= Math.Abs(deltaY) ? widthByDeltaX : widthByDeltaY;
+
+            var maxWidthByX = 1d - _cropStartRect.X;
+            var maxWidthByY = (1d - _cropStartRect.Y) * ratio.Value / stageRatio;
+            var maxWidth = Math.Max(0.01d, Math.Min(maxWidthByX, maxWidthByY));
+
+            var minWidthByX = minSize;
+            var minWidthByY = minSize * ratio.Value / stageRatio;
+            var minWidth = Math.Min(maxWidth, Math.Max(minWidthByX, minWidthByY));
+
+            var widthLocked = Math.Clamp(widthCandidate, minWidth, maxWidth);
+            var heightLocked = widthLocked * stageRatio / ratio.Value;
+
+            _cropRect = new CropRect(_cropStartRect.X, _cropStartRect.Y, widthLocked, heightLocked);
+        }
+    }
+
+    private void OnCropStageMouseUp()
+    {
+        _isDraggingRect = false;
+        _isResizingRect = false;
+    }
+
+    private async Task RefreshCropStageMetricsAsync()
+    {
+        var jsModule = await GetJsModuleAsync();
+        var metrics = await jsModule.InvokeAsync<ElementMetrics>("getElementMetrics", _cropStageRef);
+        _cropStageWidth = Math.Max(metrics.Width, 0);
+        _cropStageHeight = Math.Max(metrics.Height, 0);
+        _cropStageLeft = metrics.Left;
+        _cropStageTop = metrics.Top;
+    }
+
+    private async ValueTask<IJSObjectReference> GetJsModuleAsync()
+    {
+        _jsModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-image-upload.js");
+        return _jsModule;
+    }
+
+    private static CropRect BuildInitialCropRect(ImageAspectType type, double stageRatio)
+    {
+        const double maxRatioSize = 0.8d;
+        var targetRatio = GetTargetRatio(type);
+        if (targetRatio is null)
+        {
+            return new CropRect(0.1d, 0.1d, 0.8d, 0.8d);
+        }
+
+        double widthRatio;
+        double heightRatio;
+        if (stageRatio > targetRatio.Value)
+        {
+            heightRatio = maxRatioSize;
+            widthRatio = heightRatio * targetRatio.Value / stageRatio;
+        }
+        else
+        {
+            widthRatio = maxRatioSize;
+            heightRatio = widthRatio * stageRatio / targetRatio.Value;
+        }
+
+        var x = (1d - widthRatio) / 2d;
+        var y = (1d - heightRatio) / 2d;
+        return new CropRect(x, y, widthRatio, heightRatio);
+    }
+
+    private static double? GetTargetRatio(ImageAspectType type)
+    {
+        return type switch
+        {
+            ImageAspectType._1_1 => 1d,
+            ImageAspectType._16_9 => 460d / 215d,
+            ImageAspectType._9_16 => 9d / 16d,
+            ImageAspectType._4_1A2 => 4d / 1.2d,
+            _ => null
+        };
+    }
+
+    private static string BuildCroppedFileName(string fileName, string extension)
+    {
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        if (string.IsNullOrWhiteSpace(nameWithoutExtension))
+        {
+            nameWithoutExtension = $"crop-{Guid.NewGuid():N}";
+        }
+
+        return $"{nameWithoutExtension}-crop.{extension}";
+    }
+
+    private static string GetExtensionByMime(string? mimeType)
+    {
+        return mimeType?.ToLowerInvariant() switch
+        {
+            "image/png" => "png",
+            "image/webp" => "webp",
+            _ => "jpg"
+        };
+    }
+
+    private static async Task<string?> ReadPreviewDataUrlAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(MaxUploadBytes);
+        using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory);
+        var base64 = Convert.ToBase64String(memory.ToArray());
+        return $"data:{file.ContentType};base64,{base64}";
+    }
+
+    private readonly record struct CropRect(double X, double Y, double Width, double Height);
+
+    private sealed class ElementMetrics
+    {
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public double Left { get; set; }
+        public double Top { get; set; }
+    }
+
+    private sealed class CroppedImageResult
+    {
+        public string? Base64 { get; set; }
+        public string? MimeType { get; set; }
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

@@ -1,15 +1,16 @@
-using CnGalWebSite.MainSite.Components;
+﻿using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"] ?? "https://api.cngal.org/";
+var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"];
+var imageApiBaseAddress = builder.Configuration["MainSiteApi:ImageApiPath"];
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
-builder.Services.AddMainSiteSdk(apiBaseAddress);
+builder.Services.AddMainSiteSdk(apiBaseAddress, imageApiBaseAddress);
 
 var app = builder.Build();
 
