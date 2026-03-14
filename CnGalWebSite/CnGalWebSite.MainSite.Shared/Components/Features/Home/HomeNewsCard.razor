@@ -3,7 +3,7 @@
         @if (!string.IsNullOrWhiteSpace(Image))
         {
             <div class="home-news-card-image">
-                <img src="@Image" alt="@Title" loading="lazy" />
+                <img src="@Image" alt="@Title" loading="lazy" decoding="async" />
             </div>
         }
         <div class="home-news-card-content">

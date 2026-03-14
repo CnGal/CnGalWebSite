@@ -255,7 +255,7 @@ else
                         <a href="@item.Url" target="_blank" rel="noopener noreferrer" class="home-friend-link-card" style="width: 100%;">
                             @if (!string.IsNullOrWhiteSpace(item.Image))
                             {
-                                <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                                <img Src="@item.Image" alt="@item.Name" loading="lazy" decoding="async"/>
                             }
                             <span>@item.Name</span>
                         </a>

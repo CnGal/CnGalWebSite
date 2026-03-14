@@ -1,7 +1,7 @@
 <li class="home-game-card @(Horizontal ? "home-game-card--horizontal" : string.Empty)">
     <a href="@Url" class="home-game-card-link">
         <figure class="home-game-card-image-wrapper">
-            <img class="home-game-card-image" src="@Image" alt="@Name" loading="lazy" />
+            <img class="home-game-card-image" src="@Image" alt="@Name" loading="lazy" decoding="async" />
         </figure>
 
         <div class="home-game-card-body">

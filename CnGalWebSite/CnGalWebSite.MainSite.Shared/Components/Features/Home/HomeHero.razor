@@ -6,7 +6,14 @@
         {
             var first = Carousels.First();
             <a class="home-hero-carousel-link" href="@first.Link" aria-label="查看轮播详情">
-                <img class="home-hero-carousel-image" src="@first.Image" alt="@first.Note" loading="lazy" />
+                <img class="home-hero-carousel-image"
+                     src="@first.Image"
+                     alt="@first.Note"
+                     loading="eager"
+                     fetchpriority="high"
+                     decoding="async"
+                     width="2048"
+                     height="400" />
             </a>
         }
     </div>

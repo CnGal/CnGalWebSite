@@ -3,7 +3,7 @@
         @if (!string.IsNullOrWhiteSpace(Image))
         {
             <div class="home-role-card-avatar">
-                <img src="@Image" alt="@Name" loading="lazy" />
+                <img src="@Image" alt="@Name" loading="lazy" decoding="async" />
             </div>
         }
         else

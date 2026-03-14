@@ -1,7 +1,7 @@
 <li class="home-comment-card">
     <a href="@Url" class="home-comment-link">
         <div class="home-comment-header">
-            <img src="@(string.IsNullOrWhiteSpace(UserImage) ? "/_content/CnGalWebSite.MainSite.Shared/images/default/user.png" : UserImage)" alt="@UserName" class="home-comment-avatar" loading="lazy" />
+            <img src="@(string.IsNullOrWhiteSpace(UserImage) ? "/_content/CnGalWebSite.MainSite.Shared/images/default/user.png" : UserImage)" alt="@UserName" class="home-comment-avatar" loading="lazy" decoding="async" />
             <div class="home-comment-meta">
                 <strong>@UserName</strong>
                 <small>@Time</small>

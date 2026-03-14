@@ -1,4 +1,4 @@
-@page "/entries/{Id:int}"
+﻿@page "/entries/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 
 <PageTitle>条目详情</PageTitle>
@@ -17,7 +17,7 @@ else if (Model is not null)
         <h1>@Model.Name</h1>
         @if (string.IsNullOrWhiteSpace(Model.MainPicture) is false)
         {
-            <img src="@Model.MainPicture" alt="@Model.Name" class="entry-cover" />
+            <img src="@Model.MainPicture" alt="@Model.Name" class="entry-cover" loading="lazy" decoding="async" />
         }
         <p>@Model.Description</p>
         <ul>

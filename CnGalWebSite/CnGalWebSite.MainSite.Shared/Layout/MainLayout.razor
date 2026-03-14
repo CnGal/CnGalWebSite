@@ -2,30 +2,47 @@
 
 <div class="cg-layout">
     <header class="cg-layout__header">
-        <div class="cg-layout__container cg-topbar">
+        <div class="cg-topbar">
             <div class="cg-topbar__left">
                 <a class="cg-brand" href="/">
-                    <span class="material-symbols-outlined" aria-hidden="true">auto_stories</span>
-                    <span class="cg-brand__text">CnGal</span>
+                    <div class="cg-brand__icon">
+                        <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+                    </div>
+                    <h2 class="cg-brand__text">CnGal资料站</h2>
                 </a>
 
                 <nav class="cg-topbar__nav" aria-label="主导航">
-                    <a href="#">游戏</a>
-                    <a href="#">角色</a>
-                    <a href="#">文章</a>
-                    <a href="#">动态</a>
-                    <a href="#" class="is-highlight">社区</a>
+                    <a href="#">词条</a>
+                    <a href="#">社区</a>
+                    <a href="#">周报</a>
+                    <a href="#">制作组</a>
                 </nav>
             </div>
 
-            <div class="cg-topbar__search">
-                <span class="material-symbols-outlined" aria-hidden="true">search</span>
-                <input type="text" placeholder="搜索游戏、制作组或标签..." aria-label="搜索内容" />
-            </div>
+            <div class="cg-topbar__right">
+                <label class="cg-topbar__search">
+                    <div class="cg-topbar__search-inner">
+                        <div class="cg-topbar__search-icon">
+                            <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                        </div>
+                        <input type="text" placeholder="搜索词条、制作组..." aria-label="搜索内容" />
+                    </div>
+                </label>
 
-            <div class="cg-topbar__actions">
-                <a class="cg-btn cg-btn--primary" href="#">登录</a>
-                <a class="cg-btn cg-btn--secondary" href="#">注册</a>
+                <div class="cg-topbar__actions">
+                    <button class="cg-action-btn" aria-label="通知">
+                        <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+                    </button>
+                    <button class="cg-action-btn" aria-label="账户">
+                        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+                    </button>
+                </div>
+
+                <div class="cg-user-avatar">
+                    <div class="cg-user-avatar__inner">
+                        <img src="https://app.cngal.org/favicon.ico" alt="User Avatar" class="cg-user-avatar__img" />
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -39,64 +56,69 @@
     </main>
 
     <footer class="cg-layout__footer">
-        <div class="cg-layout__container">
-            <div class="cg-footer-main">
-                <div class="cg-footer-intro">
-                    <div class="cg-brand">
+        <div class="cg-footer-main">
+            <div class="cg-footer-intro">
+                <div class="cg-brand">
                         <span class="material-symbols-outlined" aria-hidden="true">auto_stories</span>
-                        <span class="cg-brand__text">CnGal</span>
-                    </div>
+                    <h2 class="cg-brand__text">CnGal资料站</h2>
+                </div>
                     <p>CnGal是一个非营利性的，立志于收集整理国内制作组创作及中文化的中文Galgame/AVG的介绍、攻略、评测、感想等内容的资料性质的网站。 此外，CnGal官方还会与圈内中文AVG制作组进行友好合作，如免费提供Banner广告位，网站服务器资源等。</p>
                     <p>不良信息举报邮箱：help@cngal.org</p>
-                    <div class="cg-footer-socials" aria-label="社交链接">
-                        <a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="新浪微博"><span class="material-symbols-outlined" aria-hidden="true">language</span></a>
-                        <a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer" aria-label="Bilibili"><span class="material-symbols-outlined" aria-hidden="true">smart_display</span></a>
-                        <a href="https://www.zhihu.com/people/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="知乎"><span class="material-symbols-outlined" aria-hidden="true">chat</span></a>
-                    </div>
+                <div class="cg-footer-socials" aria-label="社交链接">
+                    <a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="新浪微博">
+                        <span class="material-symbols-outlined" aria-hidden="true">alternate_email</span>
+                    </a>
+                    <a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer" aria-label="Bilibili">
+                        <span class="material-symbols-outlined" aria-hidden="true">public</span>
+                    </a>
+                    <a href="https://www.zhihu.com/people/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="知乎">
+                        <span class="material-symbols-outlined" aria-hidden="true">rss_feed</span>
+                    </a>
                 </div>
+            </div>
 
-                <div class="cg-footer-links">
-                    <section>
+            <div class="cg-footer-links">
+                <section>
                         <h4>社交平台</h4>
-                        <ul>
+                    <ul>
                             <li><a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer">新浪微博</a></li>
                             <li><a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer">Bilibili</a></li>
                             <li><a href="https://www.zhihu.com/people/cngalorg" target="_blank" rel="noopener noreferrer">知乎</a></li>
-                        </ul>
-                    </section>
+                    </ul>
+                </section>
 
-                    <section>
+                <section>
                         <h4>关于我们</h4>
-                        <ul>
+                    <ul>
                             <li><a href="/about">概述</a></li>
                             <li><a href="/structure">组织架构</a></li>
                             <li><a href="/privacy">隐私协议</a></li>
                             <li><a href="/document?id=766">更新日志</a></li>
-                        </ul>
-                    </section>
+                    </ul>
+                </section>
 
-                    <section>
+                <section>
                         <h4>其他</h4>
-                        <ul>
+                    <ul>
                             <li><a href="https://open.cngal.org/" target="_blank" rel="noopener noreferrer">开放平台</a></li>
                             <li><a href="https://app.cngal.org/" target="_blank" rel="noopener noreferrer">PWA 应用</a></li>
                             <li><a href="/data">数据汇总</a></li>
                             <li><a href="https://github.com/CnGal/CnGalWebSite" target="_blank" rel="noopener noreferrer">源代码仓库</a></li>
-                        </ul>
-                    </section>
-                </div>
+                    </ul>
+                </section>
             </div>
+        </div>
 
-            <div class="cg-footer-bottom">
+        <div class="cg-footer-bottom">
                 <p>© 2025 - CnGal资料站</p>
-                <div class="cg-footer-meta">
+            <div class="cg-footer-meta">
                     <span>
                         <a href="http://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer">粤ICP备15055899号</a>
                     </span>
                     <span>
                         <a href="https://icp.gov.moe/?keyword=20225899" target="_blank" rel="noopener noreferrer">萌ICP备20225899号</a>
                     </span>
-                </div>
+          
             </div>
         </div>
     </footer>
