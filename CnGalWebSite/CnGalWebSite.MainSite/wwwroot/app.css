@@ -2,7 +2,7 @@ html,
 body {
     margin: 0;
     padding: 0;
-    font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+    font-family: var(--cg-font-family);
     color: var(--cg-color-text);
     background: var(--cg-color-bg);
 }
@@ -15,10 +15,6 @@ body {
 
 a {
     color: var(--cg-color-link);
-}
-
-article.content {
-    max-width: 1080px;
 }
 
 h1:focus,

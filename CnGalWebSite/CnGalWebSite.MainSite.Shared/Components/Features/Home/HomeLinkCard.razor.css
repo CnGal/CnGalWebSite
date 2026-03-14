@@ -2,24 +2,118 @@
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
     background: var(--cg-color-surface);
-    padding: 0.7rem 0.9rem;
+    padding: 0.75rem 1rem;
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.home-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: var(--cg-color-primary-hover);
 }
 
 .home-card a {
     color: inherit;
     text-decoration: none;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .home-card a:hover {
-    color: var(--cg-color-link);
+    color: var(--cg-color-primary);
 }
 
 .home-card strong {
     display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
 }
 
 .home-card p {
     color: var(--cg-color-text-muted);
-    margin: 0.35rem 0 0;
+    margin: 0;
+    font-size: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.home-card--community {
+    border-color: color-mix(in oklab, var(--cg-color-border) 60%, white);
+    padding: 1rem;
+}
+
+.home-card--community a {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    color: inherit;
+}
+
+.home-card--community a:hover {
+    color: inherit;
+}
+
+.home-card-community-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--cg-radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.home-card-community-icon .material-symbols-outlined {
+    font-size: 1.4rem;
+}
+
+.home-card-community-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.home-card--community strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-card--community p {
+    -webkit-line-clamp: 1;
+    font-size: 0.6875rem;
+}
+
+.home-card-community-icon.is-primary {
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, white);
+    color: var(--cg-color-primary);
+}
+
+.home-card-community-icon.is-secondary {
+    background: color-mix(in oklab, var(--cg-color-secondary) 14%, white);
+    color: var(--cg-color-secondary);
+}
+
+.home-card-community-icon.is-purple {
+    background: color-mix(in oklab, #8b5cf6 15%, white);
+    color: #8b5cf6;
+}
+
+.home-card--community:hover .home-card-community-icon.is-primary {
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.home-card--community:hover .home-card-community-icon.is-secondary {
+    background: var(--cg-color-secondary);
+    color: #fff;
+}
+
+.home-card--community:hover .home-card-community-icon.is-purple {
+    background: #8b5cf6;
+    color: #fff;
 }

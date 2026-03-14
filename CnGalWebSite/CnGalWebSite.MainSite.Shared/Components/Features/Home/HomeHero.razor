@@ -1,12 +1,18 @@
-<section class="home-hero">
-    <h1>@Title</h1>
-    <p>@Subtitle</p>
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+<section class="home-hero-section">
+    <div class="home-hero-carousel">
+        @if (Carousels != null && Carousels.Any())
+        {
+            var first = Carousels.First();
+            <a class="home-hero-carousel-link" href="@first.Link" aria-label="查看轮播详情">
+                <img class="home-hero-carousel-image" src="@first.Image" alt="@first.Note" loading="lazy" />
+            </a>
+        }
+    </div>
 </section>
 
 @code {
     [Parameter]
-    public string Title { get; set; } = "";
-
-    [Parameter]
-    public string Subtitle { get; set; } = "";
+    public IEnumerable<CarouselViewModel> Carousels { get; set; } = [];
 }

@@ -1,37 +1,77 @@
-.home-section {
-    margin-bottom: 1.1rem;
-}
-
-.home-section h2 {
-    margin: 0 0 0.7rem;
-    font-size: 1.2rem;
-}
-
 .home-kanban-content {
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
-    background: var(--cg-color-surface);
-    display: grid;
-    gap: 0.8rem;
+    display: flex;
     align-items: center;
-    grid-template-columns: 1fr auto 1fr;
-    padding: 0.7rem;
-}
-
-.home-kanban-content img {
-    width: 100%;
-    max-height: 180px;
-    object-fit: contain;
-}
-
-.home-kanban-content p {
-    margin: 0;
-    font-weight: 600;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 3rem;
+    padding: 2rem;
+    background-color: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
     text-align: center;
 }
 
-@media (max-width: 760px) {
+.home-kanban-content img {
+    height: 12rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.home-kanban-img-flipped {
+    transform: rotateY(180deg);
+}
+
+.home-kanban-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 70rem;
+    flex: 1;
+}
+
+.home-kanban-quote-content {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 0.1rem;
+    color: var(--cg-color-text);
+}
+
+.home-kanban-quote-by {
+    font-size: 0.875rem;
+    letter-spacing: 0.05rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    color: var(--cg-color-text-muted);
+}
+
+.home-kanban-quote-by a {
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: color var(--cg-transition-fast);
+}
+
+.home-kanban-quote-by a:hover {
+    color: var(--cg-color-primary);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
     .home-kanban-content {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .home-kanban-content img {
+        height: 8rem;
+    }
+
+    .home-kanban-img-flipped {
+        display: none;
+    }
+    
+    .home-kanban-quote-content {
+        font-size: 1.25rem;
     }
 }

@@ -1,13 +1,21 @@
-<li class="home-card home-game-card">
-    <a href="@Url">
-        <img src="@Image" alt="@Name" loading="lazy" />
-        <div class="home-game-card-content">
-            <strong>@Name</strong>
+<li class="home-game-card @(Horizontal ? "home-game-card--horizontal" : string.Empty)">
+    <a href="@Url" class="home-game-card-link">
+        <figure class="home-game-card-image-wrapper">
+            <img class="home-game-card-image" src="@Image" alt="@Name" loading="lazy" />
+        </figure>
+
+        <div class="home-game-card-body">
+            <h4 class="home-game-card-title">@Name</h4>
             @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
             {
-                <p>@BriefIntroduction</p>
+                <p class="home-game-card-desc">@BriefIntroduction</p>
             }
-            @ChildContent
+            @if (ChildContent is not null)
+            {
+                <div class="home-game-card-extra">
+                    @ChildContent
+                </div>
+            }
         </div>
     </a>
 </li>
@@ -18,4 +26,5 @@
     [Parameter] public string Name { get; set; } = "";
     [Parameter] public string? BriefIntroduction { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Horizontal { get; set; }
 }

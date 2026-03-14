@@ -1,0 +1,539 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3976ef",
+                        "secondary": "#f472b6", /* Soft Pink for ACG theme */
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>CnGal资料站 - 极致版</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 md:px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">CnGal资料站</h2>
+</div>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">词条</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">社区</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">周报</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">制作组</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-slate-100 dark:bg-slate-800 border border-transparent focus-within:border-primary/50 transition-all">
+<div class="text-slate-500 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400" placeholder="搜索词条、制作组..." value=""/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+</button>
+</div>
+<div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-secondary p-0.5">
+<div class="w-full h-full rounded-full bg-white dark:bg-slate-900 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Anime style user avatar illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMQN1PxMV3CPjtxIsfyh6_HpSlmUv4Q1fmy11QfRv83bSOufdlJFpE6P3BGSL-Dz8leSqf8-BRGLKd1if6P2-0I6-wVbUYc5BIKhZoPAw8uQo5Jv8SyymjbrtFhCLGEKeYlTT69EYiwu2rsrSps5An0cs44f_K1xfoNI3F99SzkwOcslgKDrNshFo4UkhIOWcg2EodX1P5Mq-UpIC13_QN8chTPMID2x6TSvHDH1IPjDVDv_HP5Mf8UpQlDMwfsem_JRM6L5CUt9ON"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto w-full px-4 md:px-10 py-6 space-y-8">
+<!-- Hero Section & Knowledge Board -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Carousel / News -->
+<div class="lg:col-span-8 space-y-6">
+<div class="relative aspect-[21/9] rounded-xl overflow-hidden shadow-xl group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Vibrant anime game landscape illustration banner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbn02tm-LnKNnx-qjZFYLDEazGAey8cbgQqgjhRx6rgpfV6mTmtxg5ryG9j5JfP1u7i-NXg8e4w8RiSCCpIvPKr1BlJtUpC2yyOyRXp_W74pGuTgnwtE9YIvBxe3HABsLG-K30mNgTL3NBVnnBpxML4AY68h14slXcavKcqLv0nVG5FtpCp7D-HKCo0_K78Q4h17-qPplfyqufLeU2DCB78JXw-JttVSALXar_M9KeoapWi8btt9fJKFSJifU5bwGu_6RsqOHW0_G1"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
+<span class="bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full w-fit mb-3">限时专题</span>
+<h1 class="text-white text-3xl font-bold mb-2">2024 夏季国产原创游戏大赏</h1>
+<p class="text-white/80 text-lg">支持你的本命作品，赢取限定周边与徽章</p>
+</div>
+</div><!-- Community Communication Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+<!-- Player Group Card -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all group cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<div class="min-w-0">
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">CnGal 玩家交流群</h4>
+<p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">本群无资源请支持正版，调戏看板娘要注意节度哦</p>
+</div>
+</div>
+</div>
+<!-- Editor Group Card -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all group cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary shrink-0 group-hover:bg-secondary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">edit_note</span>
+</div>
+<div class="min-w-0">
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">CnGal 编辑者交流与 Bug 反馈群</h4>
+<p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">群主很懒, 什么都没有留下</p>
+</div>
+</div>
+</div>
+<!-- QQ Channel Card -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all group cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">hub</span>
+</div>
+<div class="min-w-0">
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">QQ 频道</h4>
+<p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">CnGal 资料站官方 QQ 频道</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Today's Board -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-8xl text-primary">lightbulb</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary font-bold">auto_stories</span>
+<h2 class="text-lg font-bold">今日看板</h2>
+<span class="text-slate-400 text-xs ml-auto">最后更新: 10:00 AM</span>
+</div>
+<div class="flex flex-col md:flex-row gap-6">
+<div class="flex-1 space-y-3">
+<h3 class="text-primary font-bold">冷知识：你知道吗？</h3>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed italic">
+                                    “《三色绘恋》的初版剧本曾长达100万字，后期为了节奏优化删减了近30%的日常内容，但保留了所有的核心分支。”
+                                </p>
+<div class="flex gap-2">
+<button class="bg-primary/10 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">casino</span> 随机看一个
+                                    </button>
+<button class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-bold transition-all">
+                                        查看详细词条
+                                    </button>
+</div>
+</div>
+<div class="w-full md:w-48 aspect-video rounded-lg overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800">
+<img class="w-full h-full object-cover" data-alt="Game development character design sketches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8B5xW1SIGtcxT6E44ajRsSWeM3MOjAkJlJ3LjuP30ev0NnVH1OjGUQRHLETc0pGtKi00I7OKoRiamglTkK2tEbJutH-Z8pVvJAJmfAPIFiK7y6d1tvnX_YR1iy8aDpjfGPqUlDZ54flUmcOyIQ44Txpldah1iLzuHqIVZomzqwJGoIJumJ5YXCz5XJhtXk09NDxPum1euhQw2sGcROjxPHlfhUo3qLIXMmwqeIKg9Bdj3nTVNkALlZ_z5PCk0Xv56M0ZjOhjxSeTY"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Stats & Hot List -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Real-time Stats -->
+<div class="grid grid-cols-3 gap-3">
+<div class="bg-primary/5 dark:bg-primary/10 p-4 rounded-xl border border-primary/10 text-center">
+<p class="text-xs text-primary/70 font-bold mb-1">词条数</p>
+<p class="text-xl font-bold text-primary">24,582</p>
+</div>
+<div class="bg-secondary/5 dark:bg-secondary/10 p-4 rounded-xl border border-secondary/10 text-center">
+<p class="text-xs text-secondary/70 font-bold mb-1">图片数</p>
+<p class="text-xl font-bold text-secondary">158k+</p>
+</div>
+<div class="bg-blue-500/5 dark:bg-blue-500/10 p-4 rounded-xl border border-blue-500/10 text-center">
+<p class="text-xs text-blue-500/70 font-bold mb-1">贡献者</p>
+<p class="text-xl font-bold text-blue-500">8,210</p>
+</div>
+</div>
+<!-- Hot Entries Rank -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+<h2 class="text-lg font-bold">热门词条排行榜</h2>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 group cursor-pointer">
+<span class="text-2xl font-black text-slate-200 group-hover:text-primary transition-colors italic w-8">01</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">夏日溯汐</h4>
+<p class="text-xs text-slate-400">热度 12,840</p>
+</div>
+<span class="material-symbols-outlined text-green-500 text-sm">stat_3</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<span class="text-2xl font-black text-slate-200 group-hover:text-primary transition-colors italic w-8">02</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">九霄工作室</h4>
+<p class="text-xs text-slate-400">热度 9,210</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">remove</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<span class="text-2xl font-black text-slate-200 group-hover:text-primary transition-colors italic w-8">03</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">雨夜霓虹：序章</h4>
+<p class="text-xs text-slate-400">热度 7,450</p>
+</div>
+<span class="material-symbols-outlined text-green-500 text-sm">stat_1</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-slate-500 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            查看完整榜单
+                        </button>
+</div>
+<!-- Weekly Digest -->
+<div class="bg-gradient-to-br from-primary to-blue-600 rounded-xl p-6 shadow-lg text-white">
+<h3 class="font-bold mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined">newspaper</span> CnGal 周报
+                        </h3>
+<p class="text-sm text-white/80 mb-4 leading-relaxed">第 156 期：七月暑期档爆发，国产Gal迎来黄金期？</p>
+<button class="w-full bg-white text-primary font-bold py-2 rounded-lg text-sm hover:shadow-lg transition-all">立即阅读</button>
+</div>
+</div>
+</div>
+<!-- Games Showcase -->
+<div class="space-y-6">
+<div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+<div class="flex gap-8">
+<a class="pb-2 border-b-2 border-primary text-primary font-bold" href="#">已发售</a>
+<a class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600" href="#">试玩 Demo</a>
+<a class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600" href="#">即将发售</a>
+</div>
+<a class="text-primary text-sm flex items-center gap-1 font-semibold" href="#">
+                        更多 <span class="material-symbols-outlined text-sm">chevron_right</span>
+</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Game Card 1 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-slate-100 dark:border-slate-800">
+<div class="relative aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Anime character portrait on game cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7MTi9oA9f-gtVbijEX0t_PeI0Hvjd9vieHEaKhp4ZGuwXCKNz129FlmQb6WSTp1N7xpXTOd24p96MiZf0kjHMEk24Eu620trTu0c1W5GItCiKyQjG918PqiwpE-3CpsS6QlnIFTJZYStRN53CepyxCo9eG23DPedy7hkAsy4AZRHwwGpHqSvjI43kmF9KOAgLgME2N91_ZhDJBiqQsX0syltbxqvBes0vX6lRK5QyPRwBQx3ODYoPqoWvhP5tWM51oMtWGz2W-ZvM"/>
+<div class="absolute top-2 left-2 flex flex-wrap gap-1">
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">科幻</span>
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">多结局</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                                好评率 96%
+                            </div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-slate-800 dark:text-slate-200 mb-1 truncate">时间旅行者的倒数</h3>
+<p class="text-xs text-slate-500 mb-3 truncate">制作组：梦之庭院工作室</p>
+<div class="flex items-center justify-between">
+<span class="text-secondary font-bold">￥38.00</span>
+<button class="size-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Game Card 2 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-slate-100 dark:border-slate-800">
+<div class="relative aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Vibrant cityscape anime background image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiedoSVECPYfefSe6sheOr1uRfU_pg9wrNcbjLMRDxJrfcTbcc7__VGnaQEyNE3l3kcrA7RvE3EtDgVmMPdAhHFKsc-1P_9ASpz03E20i3RDQLv9sHMqJ8v4E9H9IqBsMvskpLk3sPu9hvzo9giSHhTD8xJWCXEWDhPhxSdf-pWx9J_k9HMFLO8hQH0spzkDyqqgmTiTp6iTs25qUZcDhPldA2IIIn_L8ucwrkanPDEUyHrJRv56MCWijSq165j5KQT2EhzUxQr6ep"/>
+<div class="absolute top-2 left-2 flex flex-wrap gap-1">
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">恋爱</span>
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">校园</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                                好评率 89%
+                            </div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-slate-800 dark:text-slate-200 mb-1 truncate">樱花落下的瞬间</h3>
+<p class="text-xs text-slate-500 mb-3 truncate">制作组：Sakura Soft</p>
+<div class="flex items-center justify-between">
+<span class="text-secondary font-bold">￥25.00</span>
+<button class="size-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Game Card 3 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-slate-100 dark:border-slate-800">
+<div class="relative aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Abstract purple and blue gradient artwork" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEZMvDt0iRHvLlfu2AjHo4iBlixY1-KedvOdbF-YuL72Xj5NQiOdEZEmHL1HPWqkAuxjoKo9uyWJenrVK-quifxxbMlLGASc81tjAuJpEQ913WzT2_UykOyC-zQlNBVriD1ySQ0iTSJBj8-8iDckwpptnkKIxoYN-Ihem2DGkXdJ8xS0y1izkUF-7tYKmNu7_l-9WsP9GL7fjal1cISq2LL3ipcQLxEj-3pkJNGXwmMU3JDKCHuu7RWFKJQytd3mfN4JyMGTeV48wF"/>
+<div class="absolute top-2 left-2 flex flex-wrap gap-1">
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">悬疑</span>
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">解谜</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                                好评率 92%
+                            </div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-slate-800 dark:text-slate-200 mb-1 truncate">第十三位访客</h3>
+<p class="text-xs text-slate-500 mb-3 truncate">制作组：黑盒工作室</p>
+<div class="flex items-center justify-between">
+<span class="text-secondary font-bold">￥42.00</span>
+<button class="size-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Game Card 4 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group border border-slate-100 dark:border-slate-800">
+<div class="relative aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Cosmic space theme anime background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz2MxBVlgTE4LJlNWEHFe3Pu4G1PH3yp4B-9FBxN9aznkJocmLhTfKb1qHyOlMluSXvc9nuq320Mq8D89KdHQEtpw9lqK44PZ9_E8tSYYdKvWgdLmmsQOMZRLxtokFzQeh667QgRnaU8IPWlpeygYyLnHQDhDvFsGbQEygwN7S6auxNd6l_-wanpg3Rz4r6tMOf85b7oDKUrKPuTxPjV5B4U7V7fyvigR691qP6bPTbj0RUlEk8Cumg130D5Lac8QldroBWkJ8YfXo"/>
+<div class="absolute top-2 left-2 flex flex-wrap gap-1">
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">催泪</span>
+<span class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded">剧情向</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                                好评率 98%
+                            </div>
+</div>
+<div class="p-4">
+<h3 class="font-bold text-slate-800 dark:text-slate-200 mb-1 truncate">星之梦：重制版</h3>
+<p class="text-xs text-slate-500 mb-3 truncate">制作组：Key / Visual Arts</p>
+<div class="flex items-center justify-between">
+<span class="text-secondary font-bold">￥68.00</span>
+<button class="size-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Community & Dev Feed -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Selected Short Reviews -->
+<div class="xl:col-span-2 space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+<h2 class="text-xl font-bold">精选短评</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3 relative">
+<div class="flex items-center gap-3">
+<img class="size-8 rounded-full bg-primary/10" data-alt="Pixel art user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4YIuYLQR2NWoXeWA_ZygnKkTUkby55i1138Mj7GqTZp5oGBPjnvRPcX4-txG6pm2TYOsSfrVSX2wuYcH5SUpqM_ZlukzPtd8VM5w-xYCQJdmvQFU3Ft4mjjIuDs958_qhD5naujMkS1fVL76UgE41_I2shqGFtpiJ4b_rLDhIWnFMKD-qdtapLxXQhhlmd8jOETapJUWgiKfNnBi4ZulU7ZkVKq7sIgCbzR4y3_iO_bd3jjtpIaNQ4sWHqL9Pc9Lzbv0vmGlKFDof"/>
+<div>
+<h4 class="text-sm font-bold">一只草泥马</h4>
+<p class="text-[10px] text-slate-400">评价了《夏日溯汐》</p>
+</div>
+<div class="ml-auto flex text-yellow-400 text-xs">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 italic">“美术和配乐真的绝了，那种海风扑面而来的感觉还原得很好，结局哭爆。”</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3 relative">
+<div class="flex items-center gap-3">
+<img class="size-8 rounded-full bg-primary/10" data-alt="Pixel art user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDokrxC5LNLRiUFaNQ15Xu3xcxkCJ8S0pvasj2XFAxCkweF5ABrVNSK1g-F8zYMOETxlRDHoilKRVIrYG4GuMvsiMWRDRU92BgNpt01__XFNFdj3WT4bRof4jQWM48VoaZJEDJNSq5cNo68Wa5neCh10h9DNH4g0cV-QuM4JoMBCQAmGJfSgzk_Axk5_OYub_KF6mmq8GUJHikc0h6n1yDRgib5BAWPp5oREswboRlqS1s5AlcyFzGO80G7hPaHJP7Skmj_cpQax8hr"/>
+<div>
+<h4 class="text-sm font-bold">游戏评测猿</h4>
+<p class="text-[10px] text-slate-400">评价了《第十三位访客》</p>
+</div>
+<div class="ml-auto flex text-yellow-400 text-xs">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 italic">“解谜难度适中，气氛渲染很到位，这种中式悬疑的内核非常耐人寻味。”</p>
+</div>
+</div>
+</div>
+<!-- Dev Group Dynamics -->
+<div class="space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">groups</span>
+<h2 class="text-xl font-bold">制作组动态</h2>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800">
+<div class="divide-y divide-slate-100 dark:divide-slate-800">
+<div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="flex gap-3">
+<div class="size-10 rounded-lg bg-slate-200 shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Studio logo placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClpe5FjSZ4pJPsUIUdrFWvzCgFM1s7s4bp2GjI5037xKIARW5wmX2j4HvMsbDQjTtEkcOqwG0BfkGvkX720sw_jOuXLFJDF_WdDVhLYFF6GQ7Tqc5Lamo1xRh_yvBhLvy23IN6R6qwe6KOX9PNGuWC6RVxiCtlBiWJlDLJWL1-KeuPXZLIvm86rL73FnyO2YSWF723RPe7F0CWLa4TMhDdFVupeANSouMtsC_bn0rmOOR2YfVRx0dZRThO0mZ3vhSwBzHpL2ttuYpi"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-sm font-bold truncate">九霄工作室</h4>
+<p class="text-xs text-slate-500 mt-1 line-clamp-2">“《九霄：序章》现已上线Steam试玩，欢迎大家反馈Bug...”</p>
+<p class="text-[10px] text-primary mt-2">2小时前</p>
+</div>
+</div>
+</div>
+<div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="flex gap-3">
+<div class="size-10 rounded-lg bg-slate-200 shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Developer group profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVTHYQn0NLT8qYaWeXWZzxhp9EetQjaIeggnqNcwE_dkyvaoKLlEn8QdwRJrrVISoR9S9uu033pECVrcvqOTxNydzAurd0xzWkStHbmj96BAc1yrOm1TmkFsee2wwkpKS4XhFw2d3--j_mfDMn8WWH-Hl5Ns221pIURkr-raMsZVP46i3OtWFlcIhxiths1hmDwQpf2wpnAJFobeq6oVOlpvweanFloMg72Wx1Q41SC4ibuPcBLW6zvaUmjuxWvr97MEnXv8LBekLo"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-sm font-bold truncate">漫天花雨企划</h4>
+<p class="text-xs text-slate-500 mt-1 line-clamp-2">“关于新款周边的设计投票已经开启，请前往官博参与...”</p>
+<p class="text-[10px] text-primary mt-2">昨天 18:45</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Series Featured Sections -->
+<div class="space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">explore</span>
+<h2 class="text-xl font-bold">专题导视</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="relative group h-48 rounded-2xl overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Ethereal abstract series banner design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHi72JWAPN46Cjp9OHV5Dynd2c2gWqfGO4Vd-rdltF901Nl_TNktFHcW0Lq50xOdoCbxn--g2N1Q2ipe1L5Vs8LWvW0CoRen9oaUozZ0OahRBAY4V5Jrnio4Ug-kzdC8P7rLVLTeirasQe76npxpq4qquizXEMSPsYlDKsToOusuVX4FD1lWR9pmnAh_LRxkmsPd24GI6Qh_dsb6eMZVi5_ngEJx0fGxDirfc2F4vLfawEQEmaE2IXZtcc_uV0fue4nIzTUcGVnCno"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary/90 to-transparent flex flex-col justify-center p-8">
+<h3 class="text-white text-2xl font-black mb-2 italic">经典重现</h3>
+<p class="text-white/80 text-sm max-w-[240px]">重温那些年带给我们感动的时代之作，收录 50+ 部早期经典 Galgame。</p>
+</div>
+</div>
+<div class="relative group h-48 rounded-2xl overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Modern stylish game series banner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA23_xy96XWFftxCsWorv_O8HpT5DeEsasFz8hjeSXAyBH6IFeke2q1xbd9GhVJJkgCvCW4BTcJXnlXyWyNNuCDxwS71ifxlLtOyrrD_TE18q7MZd7ErZhL3WDTq1SpQDkDU_dVreJD_cCMHuPST0AY7bpByXUmQobLS0R41kkXS4GlOeCkKVIjFWBoySOncwEsqrDtYHmH9TT3rSGTAkDIu8OmiYoFyUAPnABPju7heiGqVOAleoLBtOl9ofr08NK05Ou1lwqqsKL"/>
+<div class="absolute inset-0 bg-gradient-to-r from-secondary/90 to-transparent flex flex-col justify-center p-8">
+<h3 class="text-white text-2xl font-black mb-2 italic">Key社专题</h3>
+<p class="text-white/80 text-sm max-w-[240px]">从《Kanon》到《Summer Pockets》，探索 Key 氏物语的催泪魔法。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Contributor Wall -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-8 border border-slate-100 dark:border-slate-800 text-center space-y-6">
+<div class="space-y-2">
+<h2 class="text-2xl font-bold">特别感谢：活跃贡献者</h2>
+<p class="text-slate-500 text-sm">感谢以下用户近期在词条建立、资料纠错和图片上传中的辛勤付出</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary">
+<img class="size-full rounded-full bg-white object-cover" data-alt="Active contributor avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTiTnaWUAZD4hVKr_kMY2MLPJ2i98-Q51CdpT4LJZTGb4E9xV-dZ8A2l-MaO9kFusWiDhxxz7xo8RjDBJSqDZCXI4Ey8ZbK4Hn6_HtKRQXXOv4STUrNXi300RUBAha5NwrGNN6mt1vxVsaI_En6417b4RlQmqJAz9Aslm46d2rCQDMcxXuG5QAjOWBBFjL3VuPPTGA3PHW1tlrWyY28uJBGUFFOTfnnDMs3WFZjemz4lE5y9d7o4QHAlHRUqby3AlLaKn7OE_k3LkO"/>
+</div>
+<span class="text-xs font-bold">喵羽</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary">
+<img class="size-full rounded-full bg-white object-cover" data-alt="Active contributor avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADASiS1Nkr6kFhf_4WPNi82TEfkbYvzIf3jPr-iVnxJ9IbiI1qbF_QKiOukQI8aPOUxS-xuuGZPWPHAuJxZ0OmQZpxcQQE8wf8-ZZ5mplhDS26oaVuIxKDginFCMA6u2tFe-JZNpwfEKB4lzv627FjkpTr6ByXTZC2-v0GOHM5BrqavTp9IUc-Aszb8Ql8pmULhl_1lC6pVLbVldZ1rc5Dz9_j4nDylq8Ol0pQoP9I12QjDMk2pKYJlUEtyv8VNbsiw0xFUhmDWmRI"/>
+</div>
+<span class="text-xs font-bold">深蓝幻象</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary">
+<img class="size-full rounded-full bg-white object-cover" data-alt="Active contributor avatar 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqhMPoH8HQ2L-kGR5AXQmoXuN-VTof8od3iK-aVLS8zAsGJrM_G7v9DyGOeGU2Gc5i-x4yXmWuc_iRWOnF5h3gsK0ifZj1LV0z9M7x3lO4YEWMlLyrgkLd30R-DONQeP4Idewazu8B6Us8WX90ec6_3Vqohj8eSUt7_kYpjKLo9DSJvMnhruIeJNXf8QmGCedF4ED285uUnjG0nytshG-PXkxM_IkR_lwWlVJ5GJgpeXw2rk6aGbYRTjio08-EpnX3QIZRgbgum0Dh"/>
+</div>
+<span class="text-xs font-bold">Kuroko</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary">
+<img class="size-full rounded-full bg-white object-cover" data-alt="Active contributor avatar 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFQxKLklZYzwZ4PE9jOmt6l2_OGW7VNrYPjk7gSfUTS2z4UUHj1N0qNVjtd__NyDrPA7l7X57BcgvI3GeIKW-xLqzabQNuOsAHNlkiQPIitF6wSD3QhTr6wC8ayQ7OoxysgzG3ikCMkhoCM2n_7E3ps3w1Q6YU9zIr8gIErL19KYUSwrjeeDwjdJscXQaqs76fkZkH8a13kLXFC2WYIhwk07oawjSUFQwx2x0HhzDtCbgVo77_ip1FWaxrjV6jHvYDam-lG0YgHp0u"/>
+</div>
+<span class="text-xs font-bold">雨宫萤</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary">
+<img class="size-full rounded-full bg-white object-cover" data-alt="Active contributor avatar 5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwx4Hvan1vFUDROkvEu71_OSyRyJ8TkbZGagbyo1xrtQLS0ZlrLxgTKhhpUgXu-e6p3UkpywH5veo56rjsjCqYa6SgnU7e2_Y0Ahn05CKos1t1bjjyZ3kHGdBlVXV9uLPronorQ4_t1W6bQCRq81gEJ_MYXq9Jsy6Ml7pQc-hZgaY24fyclSgqT0H4yPfPEMOf-wnGLQvsaiYfd3YT-SgnegHN-VyqaItIlzgN1UiBvKxiAQWgF8zVf0VRv6wgEkXOaxF98dxhK9Bl"/>
+</div>
+<span class="text-xs font-bold">Sakura_10</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full p-1 bg-slate-200">
+<div class="size-full rounded-full bg-white flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">add</span>
+</div>
+</div>
+<span class="text-xs font-bold text-slate-400">加入贡献</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-12 pt-16 pb-8">
+<div class="max-w-[1440px] mx-auto px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+<div class="space-y-6">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">auto_awesome</span>
+<h2 class="text-xl font-bold">CnGal资料站</h2>
+</div>
+<p class="text-slate-500 text-sm leading-relaxed">
+                        CnGal是一个由爱好者建立的国产Galgame资料站，致力于收集和整理国产Galgame相关信息，为玩家和开发者提供交流平台。
+                    </p>
+<div class="flex gap-4">
+<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">alternate_email</span>
+</a>
+<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">public</span>
+</a>
+<a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">rss_feed</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-bold mb-6">站点导航</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary" href="#">所有词条</a></li>
+<li><a class="hover:text-primary" href="#">制作组列表</a></li>
+<li><a class="hover:text-primary" href="#">近期发售</a></li>
+<li><a class="hover:text-primary" href="#">众筹广场</a></li>
+<li><a class="hover:text-primary" href="#">周边商店</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6">开发与维护</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary" href="#">加入编辑</a></li>
+<li><a class="hover:text-primary" href="#">API 文档</a></li>
+<li><a class="hover:text-primary" href="#">GitHub 开源</a></li>
+<li><a class="hover:text-primary" href="#">Bug 反馈</a></li>
+<li><a class="hover:text-primary" href="#">捐赠支持</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6">友情链接</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary" href="#">Bangumi 番组计划</a></li>
+<li><a class="hover:text-primary" href="#">VNDB</a></li>
+<li><a class="hover:text-primary" href="#">KeyFansClub</a></li>
+<li><a class="hover:text-primary" href="#">萌娘百科</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-[1440px] mx-auto px-10 border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-slate-400">© 2024 CnGal资料站. All Rights Reserved. 浙ICP备xxxxxxxx号</p>
+<div class="flex gap-6 text-xs text-slate-400">
+<a class="hover:text-primary" href="#">隐私政策</a>
+<a class="hover:text-primary" href="#">使用条款</a>
+<a class="hover:text-primary" href="#">联系我们</a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

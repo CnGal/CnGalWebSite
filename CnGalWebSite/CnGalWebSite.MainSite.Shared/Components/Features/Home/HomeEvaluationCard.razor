@@ -1,13 +1,17 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Home
-<li class="home-card">
-    <a href="@Url">
+@using CnGalWebSite.DataModel.ViewModel.Home
+<li class="home-evaluation-card">
+    <a href="@Url" class="home-evaluation-card-header">
+        <img src="@Image" alt="@Name" class="home-evaluation-card-image" />
         <strong>@Name</strong>
     </a>
-    <ul class="home-sub-list">
+    <ul class="home-evaluation-sub-list">
         @foreach (var article in Articles)
         {
             <li>
-                <a href="/articles/index/@article.Id">@article.Name</a>
+                <a href="/articles/index/@article.Id">
+                    <span class="material-symbols-outlined">article</span>
+                    <span>@article.Name</span>
+                </a>
             </li>
         }
     </ul>
@@ -16,5 +20,6 @@
 @code {
     [Parameter] public string Url { get; set; } = "";
     [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string Image { get; set; } = "";
     [Parameter] public IEnumerable<EvaluationArticleItemModel> Articles { get; set; } = [];
 }

@@ -1,35 +1,95 @@
-.home-card {
+.home-evaluation-card {
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
     background: var(--cg-color-surface);
-    padding: 0.7rem 0.9rem;
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast), transform var(--cg-transition-fast);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
-.home-card a {
-    color: inherit;
+.home-evaluation-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: var(--cg-color-primary);
+    transform: translateY(-2px);
+}
+
+.home-evaluation-card-header {
+    display: flex;
+    flex-direction: column;
+    color: var(--cg-color-text);
     text-decoration: none;
-    display: block;
+    border-bottom: 1px dashed var(--cg-color-border);
 }
 
-.home-card a:hover {
-    color: var(--cg-color-link);
+.home-evaluation-card-header:hover {
+    color: var(--cg-color-primary);
 }
 
-.home-card strong {
-    display: block;
+.home-evaluation-card-image {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    object-fit: cover;
+    background-color: var(--cg-color-bg);
 }
 
-.home-sub-list {
+.home-evaluation-card-header strong {
+    font-size: 1rem;
+    font-weight: 700;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    padding: 0.75rem 1rem;
+}
+
+.home-evaluation-sub-list {
     list-style: none;
-    margin: 0.5rem 0 0 0;
-    padding-left: 0.75rem;
+    margin: 0;
+    padding: 0.75rem 1rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
 }
 
-.home-sub-list li {
-    margin-bottom: 0.3rem;
+.home-evaluation-sub-list li {
+    display: flex;
 }
 
-.home-sub-list a {
-    color: var(--cg-color-link);
-    display: inline;
+.home-evaluation-sub-list a {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color var(--cg-transition-fast);
+    line-height: 1.4;
+    width: 100%;
+}
+
+.home-evaluation-sub-list a .material-symbols-outlined {
+    font-size: 1rem;
+    color: var(--cg-color-text-muted);
+    margin-top: 0.125rem;
+    transition: color var(--cg-transition-fast);
+    flex-shrink: 0;
+}
+
+.home-evaluation-sub-list a span:last-child {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.home-evaluation-sub-list a:hover {
+    color: var(--cg-color-primary);
+}
+
+.home-evaluation-sub-list a:hover .material-symbols-outlined {
+    color: var(--cg-color-primary);
 }

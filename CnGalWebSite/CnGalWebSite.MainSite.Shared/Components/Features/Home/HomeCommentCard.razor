@@ -1,16 +1,22 @@
-<li class="home-card">
-    <a href="@Url">
-        <strong>@UserName</strong>
+<li class="home-comment-card">
+    <a href="@Url" class="home-comment-link">
+        <div class="home-comment-header">
+            <img src="@(string.IsNullOrWhiteSpace(UserImage) ? "/_content/CnGalWebSite.MainSite.Shared/images/default/user.png" : UserImage)" alt="@UserName" class="home-comment-avatar" loading="lazy" />
+            <div class="home-comment-meta">
+                <strong>@UserName</strong>
+                <small>@Time</small>
+            </div>
+        </div>
         <div class="home-comment-content">
             @((Microsoft.AspNetCore.Components.MarkupString)Content)
         </div>
-        <small>@Time</small>
     </a>
 </li>
 
 @code {
     [Parameter] public string Url { get; set; } = "";
     [Parameter] public string UserName { get; set; } = "";
+    [Parameter] public string UserImage { get; set; } = "";
     [Parameter] public string Content { get; set; } = "";
     [Parameter] public string Time { get; set; } = "";
 }

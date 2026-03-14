@@ -1,16 +1,25 @@
 .home-warning {
     margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fef2f2;
+    border-radius: var(--cg-radius-md);
+    border: 1px solid #fecaca;
 }
 
 .home-warning h2 {
     margin: 0 0 0.5rem;
-    font-size: 1.2rem;
-    color: var(--cg-color-text-danger, #ef4444);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #b91c1c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .home-warning ul {
     list-style: disc;
     margin: 0;
     padding-left: 1.2rem;
-    color: var(--cg-color-text-danger, #ef4444);
+    color: #b91c1c;
+    font-size: 0.875rem;
 }
