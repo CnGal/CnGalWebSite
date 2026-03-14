@@ -302,6 +302,11 @@
     font-weight: 700;
 }
 
+.home-weekly-digest-card h3 ::deep .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
 .home-weekly-digest-card p {
     margin: 0 0 1rem;
     font-size: 0.875rem;

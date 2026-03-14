@@ -3,7 +3,7 @@
         @if (CommunityStyle)
         {
             <span class="home-card-community-icon @(GetToneClass())">
-                <span class="material-symbols-outlined">@Icon</span>
+                <CgMdiIcon Name="@Icon" aria-hidden="true" />
             </span>
             <span class="home-card-community-content">
                 <strong>@Title</strong>
@@ -30,7 +30,7 @@
     [Parameter] public string? Text { get; set; }
     [Parameter] public string? Target { get; set; }
     [Parameter] public bool CommunityStyle { get; set; }
-    [Parameter] public string Icon { get; set; } = "forum";
+    [Parameter] public string Icon { get; set; } = "mdiForum";
     [Parameter] public string IconTone { get; set; } = "primary";
 
     private string GetToneClass()

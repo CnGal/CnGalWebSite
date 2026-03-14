@@ -66,8 +66,9 @@
     transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
 }
 
-.home-card-community-icon .material-symbols-outlined {
-    font-size: 1.4rem;
+.home-card-community-icon ::deep .cg-mdi-icon {
+    width: 1.55rem;
+    height: 1.55rem;
 }
 
 .home-card-community-content {

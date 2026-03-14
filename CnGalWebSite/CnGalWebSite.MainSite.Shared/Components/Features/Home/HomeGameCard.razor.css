@@ -130,6 +130,7 @@
     margin-top: 0;
 }
 
-.home-game-card--horizontal ::deep .home-game-card-extra .material-symbols-outlined {
-    font-size: 0.875rem;
+.home-game-card--horizontal ::deep .home-game-card-extra .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
 }

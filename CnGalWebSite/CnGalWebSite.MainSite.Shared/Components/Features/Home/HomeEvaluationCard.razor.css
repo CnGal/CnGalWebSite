@@ -71,8 +71,9 @@
     width: 100%;
 }
 
-.home-evaluation-sub-list a .material-symbols-outlined {
-    font-size: 1rem;
+.home-evaluation-sub-list a ::deep .cg-mdi-icon {
+    width: 1.1rem;
+    height: 1.1rem;
     color: var(--cg-color-text-muted);
     margin-top: 0.125rem;
     transition: color var(--cg-transition-fast);
@@ -90,6 +91,6 @@
     color: var(--cg-color-primary);
 }
 
-.home-evaluation-sub-list a:hover .material-symbols-outlined {
+.home-evaluation-sub-list a:hover ::deep .cg-mdi-icon {
     color: var(--cg-color-primary);
 }

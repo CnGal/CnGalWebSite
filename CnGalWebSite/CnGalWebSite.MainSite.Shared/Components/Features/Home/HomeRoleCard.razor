@@ -9,7 +9,7 @@
         else
         {
             <div class="home-role-card-avatar home-role-card-avatar--fallback">
-                <span class="material-symbols-outlined">person</span>
+                <CgMdiIcon Name="mdiAccount" aria-hidden="true" />
             </div>
         }
         
@@ -19,7 +19,7 @@
                 @if (!string.IsNullOrWhiteSpace(GameName))
                 {
                     <span class="home-role-card-game" title="@GameName">
-                        <span class="material-symbols-outlined">sports_esports</span>
+                        <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
                         @GameName
                     </span>
                 }

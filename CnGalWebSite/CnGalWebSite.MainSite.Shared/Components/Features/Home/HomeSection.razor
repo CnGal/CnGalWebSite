@@ -5,7 +5,7 @@
             <h2 class="home-section-title">
                 @if (!string.IsNullOrWhiteSpace(Icon))
                 {
-                    <span class="material-symbols-outlined home-section-icon" style="@(!string.IsNullOrWhiteSpace(IconColor) ? $"color: {IconColor}" : "")">@Icon</span>
+                    <CgMdiIcon Name="@Icon" Class="home-section-icon" Style="@(!string.IsNullOrWhiteSpace(IconColor) ? $"color: {IconColor}" : null)" aria-hidden="true" />
                 }
                 @Title
             </h2>

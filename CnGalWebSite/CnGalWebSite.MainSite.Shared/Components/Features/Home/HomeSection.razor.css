@@ -22,6 +22,8 @@
 
 .home-section-icon {
     color: var(--cg-color-primary);
+    width: 1.4rem;
+    height: 1.4rem;
 }
 
 .home-section-header-append {

@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -14,7 +14,7 @@ else
     <div class="home-page">
         <HomeHero Carousels="@Model.Carousels" />
 
-        <HomeSection Title="社区交流" Icon="forum" IconColor="var(--cg-color-primary)">
+        <HomeSection Title="社区交流" Icon="mdiForum" IconColor="var(--cg-color-primary)">
             <ul class="home-community-grid">
                 @foreach (var item in Model.CommunityLinks.Take(3).Select((value, index) => new { value, index }))
                 {
@@ -32,7 +32,7 @@ else
         <div class="home-games-section">
                     <HomeRandomRecommend HotRecommends="@Model.HotRecommends" />
 
-            <HomeSection Title="近期新作" Icon="rocket_launch" IconColor="var(--cg-color-primary)">
+            <HomeSection Title="近期新作" Icon="mdiRocketLaunch" IconColor="var(--cg-color-primary)">
                 <ul class="home-game-grid">
                     @foreach (var item in Model.PublishedGames.Take(8))
                     {
@@ -41,7 +41,7 @@ else
                 </ul>
             </HomeSection>
 
-            <HomeSection Title="近期试玩" Icon="stadia_controller" IconColor="var(--cg-color-primary)">
+            <HomeSection Title="近期试玩" Icon="mdiGamepadVariantOutline" IconColor="var(--cg-color-primary)">
                 <ul class="home-game-grid">
                     @foreach (var item in Model.RecentlyDemoGames.Take(8))
                     {
@@ -53,7 +53,7 @@ else
 
             @if (Model.ActivityCarousels.Any())
             {
-                <HomeSection Title="活动" Icon="celebration" IconColor="var(--cg-color-secondary)">
+                <HomeSection Title="活动" Icon="mdiPartyPopper" IconColor="var(--cg-color-secondary)">
                     <ul class="home-carousel-grid">
                         @foreach (var item in Model.ActivityCarousels.Take(3))
                         {
@@ -63,7 +63,7 @@ else
                 </HomeSection>
             }
 
-            <HomeSection Title="即将发布" Icon="event_upcoming" IconColor="var(--cg-color-primary)">
+            <HomeSection Title="即将发布" Icon="mdiCalendarClock" IconColor="var(--cg-color-primary)">
                 <ul class="home-game-grid">
                     @foreach (var item in Model.UpcomingGames.Take(8))
                     {
@@ -77,7 +77,7 @@ else
 
         <div class="home-grid-layout">
             <div class="home-grid-main">
-                <HomeSection Title="最新文章" Icon="edit_note" IconColor="var(--cg-color-secondary)">
+                <HomeSection Title="最新文章" Icon="mdiNoteEditOutline" IconColor="var(--cg-color-secondary)">
                     <ul class="home-articles-grid">
                         @foreach (var item in Model.LatestArticles.Take(8))
                         {
@@ -86,7 +86,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="最新视频" Icon="play_circle" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="最新视频" Icon="mdiPlayCircle" IconColor="var(--cg-color-primary)">
                     <ul class="home-articles-grid">
                         @foreach (var item in Model.LatestVideos.Take(6))
                         {
@@ -95,7 +95,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="专题推荐" Icon="topic" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
                     <ul class="home-articles-grid">
                         @foreach (var item in Model.Evaluations.Take(6))
                         {
@@ -106,7 +106,7 @@ else
             </div>
 
             <div class="home-grid-sidebar">
-                <HomeSection Title="每周速报" Icon="summarize" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="每周速报" Icon="mdiTextLong" IconColor="var(--cg-color-primary)">
                     @{
                         var latestWeekly = Model.WeeklyNews.FirstOrDefault();
                     }
@@ -114,7 +114,7 @@ else
                     {
                         <a href="@($"/articles/index/{latestWeekly.Id}")" class="home-weekly-digest-card">
                             <h3>
-                                <span class="material-symbols-outlined">newspaper</span>
+                                <CgMdiIcon Name="mdiNewspaper" aria-hidden="true" />
                                 CnGal 周报
                             </h3>
                             <p>第 @TrimWeeklyNewsTitle(latestWeekly.Name) 期</p>
@@ -125,7 +125,7 @@ else
                     {
                         <div class="home-weekly-digest-card">
                             <h3>
-                                <span class="material-symbols-outlined">newspaper</span>
+                                <CgMdiIcon Name="mdiNewspaper" aria-hidden="true" />
                                 CnGal 周报
                             </h3>
                             <p>暂无最新周报内容</p>
@@ -134,7 +134,7 @@ else
                     }
                 </HomeSection>
 
-                <HomeSection Title="制作组动态" Icon="groups" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="制作组动态" Icon="mdiAccountGroupOutline" IconColor="var(--cg-color-primary)">
                     <ul class="home-list home-dev-news-list-connected">
                         @foreach (var item in Model.HomeNews.Take(6))
                         {
@@ -143,7 +143,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="角色生日" Icon="cake" IconColor="var(--cg-color-secondary)">
+                <HomeSection Title="角色生日" Icon="mdiCake" IconColor="var(--cg-color-secondary)">
                     @if (Model.Birthdays.Count == 0)
                     {
                         <div class="home-card">
@@ -168,7 +168,7 @@ else
                     }
                 </HomeSection>
 
-                <HomeSection Title="公告" Icon="campaign" IconColor="#f59e0b">
+                <HomeSection Title="公告" Icon="mdiBullhornOutline" IconColor="#f59e0b">
                     <ul class="home-list">
                         @foreach (var item in Model.Announcements.Take(12))
                         {
@@ -177,13 +177,13 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="近期编辑" Icon="history" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="近期编辑" Icon="mdiHistory" IconColor="var(--cg-color-primary)">
                     <ul class="home-list">
                         @foreach (var item in Model.RecentlyEditedGames.Take(8))
                         {
                             <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" Horizontal="true">
                                 <small>
-                                    <span class="material-symbols-outlined">schedule</span>
+                                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                                     @item.PublishTime
                                 </small>
                             </HomeGameCard>
@@ -191,7 +191,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="近期留言" Icon="chat" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="近期留言" Icon="mdiChat" IconColor="var(--cg-color-primary)">
                     <ul class="home-list">
                         @foreach (var item in Model.LatestComments.Take(6))
                         {
@@ -200,7 +200,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="支持我们" Icon="volunteer_activism" IconColor="var(--cg-color-primary)">
+                <HomeSection Title="支持我们" Icon="mdiHandHeartOutline" IconColor="var(--cg-color-primary)">
                     <ul class="home-list">
                         @foreach (var item in Model.SupportLinks)
                         {
@@ -209,7 +209,7 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="热门标签" Icon="local_offer" IconColor="var(--cg-color-secondary)">
+                <HomeSection Title="热门标签" Icon="mdiTagOutline" IconColor="var(--cg-color-secondary)">
                     <ul class="home-tag-list">
                         @foreach (var item in Model.HotTags.Take(20))
                         {
@@ -222,7 +222,7 @@ else
 
         <HomeKanban />
         
-        <HomeSection Title="免费游玩" Icon="redeem" IconColor="#10b981">
+        <HomeSection Title="免费游玩" Icon="mdiGiftOutline" IconColor="#10b981">
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.FreeGames.Take(5))
                 {
@@ -233,7 +233,7 @@ else
             </ul>
         </HomeSection>
 
-        <HomeSection Title="折扣中" Icon="sell" IconColor="#f59e0b">
+        <HomeSection Title="折扣中" Icon="mdiSale" IconColor="#f59e0b">
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.DiscountGames.Take(5))
                 {
@@ -247,7 +247,7 @@ else
             </ul>
         </HomeSection>
 
-        <HomeSection Title="友情链接" Icon="link" IconColor="var(--cg-color-text-muted)">
+        <HomeSection Title="友情链接" Icon="mdiLink" IconColor="var(--cg-color-text-muted)">
             <ul class="home-friend-link-grid">
                 @foreach (var item in Model.FriendLinks.Take(20))
                 {
@@ -344,9 +344,9 @@ else
     {
         return index switch
         {
-            1 => "edit_note",
-            2 => "hub",
-            _ => "forum"
+            1 => "mdiNoteEditOutline",
+            2 => "mdiHub",
+            _ => "mdiForum"
         };
     }
 

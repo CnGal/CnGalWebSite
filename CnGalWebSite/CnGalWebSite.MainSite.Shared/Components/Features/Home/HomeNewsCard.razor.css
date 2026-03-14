@@ -105,8 +105,9 @@
     color: var(--cg-color-text-muted);
 }
 
-.home-news-card-time .material-symbols-outlined {
-    font-size: 0.875rem;
+.home-news-card-time ::deep .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
 }
 
 .home-news-card--dev {

@@ -44,8 +44,9 @@
     color: var(--cg-color-text-muted);
 }
 
-.home-role-card-avatar--fallback .material-symbols-outlined {
-    font-size: 1.5rem;
+.home-role-card-avatar--fallback ::deep .cg-mdi-icon {
+    width: 1.65rem;
+    height: 1.65rem;
 }
 
 .home-role-card-content {
@@ -94,8 +95,9 @@
     max-width: 50%;
 }
 
-.home-role-card-game .material-symbols-outlined {
-    font-size: 0.75rem;
+.home-role-card-game ::deep .cg-mdi-icon {
+    width: 0.85rem;
+    height: 0.85rem;
 }
 
 .home-role-card-desc {
