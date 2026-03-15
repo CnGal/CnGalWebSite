@@ -285,7 +285,7 @@
 
 .home-card {
     border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     padding: 1rem;
 }

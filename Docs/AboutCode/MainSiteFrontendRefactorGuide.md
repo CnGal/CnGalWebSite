@@ -16,7 +16,7 @@
 ### `CnGalWebSite.MainSite`
 
 - Blazor 启动项目（Host），SDK 为 `Microsoft.NET.Sdk.Web`。
-- 负责程序入口（`Program.cs`）、渲染模式注册（`AddInteractiveServerRenderMode`）、静态资源映射（`MapStaticAssets`）、全局中间件（认证/授权/防伪/HTTPS）。
+- 负责程序入口（`Program.cs`）、渲染模式注册（`AddInteractiveServerRenderMode`）、静态资源映射（`MapStaticAssets`）、全局中间件（认证/授权/防伪/HTTPS）、注册 `MainSite.Shared` 服务（`AddMainSiteSharedServices()`）。
 - 包含根组件 `App.razor`、`Routes.razor`（使用 `AuthorizeRouteView`）、`Error.razor`、`NotFound.razor`。
 - 不承载具体业务页面实现（页面在 `MainSite.Shared` 中）。
 - 依赖 `MainSite.Shared` 和 `SDK.MainSite`。
@@ -24,7 +24,7 @@
 ### `CnGalWebSite.MainSite.Shared`
 
 - 页面与组件层（Razor Class Library，SDK 为 `Microsoft.NET.Sdk.Razor`）。
-- 包含布局、页面、组件、前端状态（仅 UI 相关）。
+- 包含布局、页面、组件、前端状态（仅 UI 相关）和前端服务（如 Toast 通知）。
 - 不直接依赖 APIServer 接口实现，不直接写 HTTP 请求。
 - 依赖 `SDK.MainSite`、`CnGalWebSite.Extensions`、`CnGalWebSite.Helper`。
 
@@ -92,7 +92,7 @@
 
 ### 4.3 当前基础组件清单（Design System）
 
-以下组件已实现，均位于 `Components/DesignSystem/` 目录：
+以下组件已实现（共 23 个），均位于 `Components/DesignSystem/` 目录：
 
 | 组件 | 说明 |
 |---|---|
@@ -103,6 +103,7 @@
 | `CgEnumSelect` | 枚举专用下拉选择 |
 | `CgCheckbox` | 复选框 |
 | `CgDateInput` | 日期输入 |
+| `CgDateInputMode` | `CgDateInput` 辅助枚举类型 |
 | `CgAutoComplete` | 自动补全输入 |
 | `CgModal` | 模态对话框 |
 | `CgPopupMenu` | 弹出菜单 |
@@ -117,6 +118,8 @@
 | `CgAudioUpload` | 音频上传 |
 | `CgProgressRing` | 圆环进度指示器（确定进度/无限进度） |
 | `CgHtmlContent` | HTML 内容显示（渲染 markdown 解析生成的 HTML，统一排版样式） |
+| `CgMarkdownEditor` | Markdown 编辑器（含 JS Interop，支持工具栏与图片直传） |
+| `CgTreeView` | 树视图组件（用于标签树等层级数据展示） |
 | `CgMdiIcon` | MDI 图标（配合 `CgMdiIconMap.g.cs` 自动生成映射） |
 
 ---
@@ -128,7 +131,7 @@
 1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`。
 2. **交互动作接口（Commands）**
    - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
@@ -138,17 +141,19 @@
 
 ```text
 CnGalWebSite.SDK.MainSite
-├─ Abstractions/          # 6 个接口
+├─ Abstractions/          # 7 个接口
 │  ├─ IHomeQueryService
 │  ├─ IEntryQueryService
 │  ├─ ISpaceQueryService
+│  ├─ ITagQueryService
 │  ├─ IEntryCommandService
 │  ├─ IFileCommandService
 │  └─ IMainSiteAuthRequestService
 ├─ Queries/               # 只读查询服务
 │  ├─ HomeQueryService
 │  ├─ EntryQueryService
-│  └─ SpaceQueryService
+│  ├─ SpaceQueryService
+│  └─ TagQueryService
 ├─ Commands/              # 写操作命令服务
 │  ├─ EntryCommandService
 │  └─ FileCommandService
@@ -163,10 +168,12 @@ CnGalWebSite.SDK.MainSite
 │  ├─ SpaceDetailViewModel.cs
 │  ├─ MainSiteOidcOptions.cs
 │  ├─ EntryEdit/          # 词条编辑相关模型
-│  └─ Files/              # 文件上传相关模型
+│  └─ Files/              # 文件上传相关模型（ImageAspectType、ImageCropRect、AudioUploadResult）
 ├─ Infrastructure/        # 基础设施
 │  ├─ QueryServiceBase    # 查询服务基类（HttpClient 封装、反序列化、日志截断）
-│  └─ SdkJsonSerializerOptions  # 全局统一 JSON 序列化配置
+│  ├─ CommandServiceBase  # 命令服务基类（POST/GET + JSON 序列化辅助）
+│  ├─ SdkJsonSerializerOptions  # 全局统一 JSON 序列化配置
+│  └─ StaffBatchParser    # Staff 批量文本解析工具
 └─ Extensions/            # DI 注册扩展
    ├─ ServiceCollectionExtensions  # AddMainSiteSdk / AddMainSiteOidcAuthentication
    └─ EndpointRouteBuilderExtensions  # MapMainSiteAuthenticationEndpoints
@@ -175,7 +182,9 @@ CnGalWebSite.SDK.MainSite
 ### 5.2 关键基础设施
 
 - **`SdkResult<T>`**：统一结果模型（`Success` + `Data` / `Error(Code, Message, StatusCode)`）。
-- **`QueryServiceBase`**：查询服务基类，封装 `GetAsyncWithBody`、`Deserialize<T>`（使用全局统一配置）、`TrimForLog`。
+- **`QueryServiceBase`**：查询服务基类，封装底层辅助方法（`GetAsyncWithBody`、`Deserialize<T>`、`TrimForLog`）及模板方法（`GetSingleAsync<TDto,TResult>`、`GetListSafeAsync<TItem>`、`GetAsync<T>`）。
+- **`CommandServiceBase`**：命令服务基类，封装 `GetFromJsonAsync`、`PostAsJsonAsync`、`PostAsJsonRawAsync`、`ReadResponseAsync`，统一使用 `SdkJsonSerializerOptions.Default`。
+- **`StaffBatchParser`**：Staff 批量文本解析工具（从文本批量导入 Staff 信息，移植自 `ToolHelper`）。
 - **`SdkJsonSerializerOptions`**：全局统一 `JsonSerializerOptions`，开启 `PropertyNameCaseInsensitive` 和 `JsonStringEnumConverter`。
 - **`AccessTokenHandler`**：`DelegatingHandler`，为 HttpClient 请求自动附加访问令牌。
 - **DI 注册**：每个服务通过 `AddHttpClient<TInterface, TImpl>` 注册为类型化 HttpClient，并附加 `AccessTokenHandler`。
@@ -188,7 +197,7 @@ CnGalWebSite.SDK.MainSite
 
 - [x] 建立目录规范（`Pages/` / `Components/Features/` / `Components/DesignSystem/` / `Components/Layout/` / `Layout/`）。
 - [x] 建立样式变量体系（`design-tokens.css`，包含颜色、间距、圆角、字号、字重、阴影、过渡等 `--cg-*` 变量）。
-- [x] 建立基础组件（21 个 DesignSystem 组件）。
+- [x] 建立基础组件（23 个 DesignSystem 组件）。
 - [x] 确立页面渲染模式策略（静态默认、按页交互）。
 
 ### 阶段 B：核心页面迁移 ✅ 已完成
@@ -197,7 +206,7 @@ CnGalWebSite.SDK.MainSite
 - [x] 条目详情页（`EntryDetailPage`）— 纯静态 SSR。
 - [x] 条目编辑页（`EntryEditPage`）— InteractiveServer（含草稿恢复、自动保存、客户端校验）。
 - [x] 个人空间页（`SpaceIndexPage`）— 纯静态 SSR。
-- [x] 封装 SDK Query 服务（Home、Entry、Space）与 Command 服务（Entry、File）。
+- [x] 封装 SDK Query 服务（Home、Entry、Space、Tag）与 Command 服务（Entry、File）。
 - [x] 数据读取全部改为 SDK 服务。
 
 ### 阶段 C：交互页面精细化 🔄 进行中
@@ -221,7 +230,7 @@ CnGalWebSite.SDK.MainSite
 ```text
 CnGalWebSite.MainSite
 ├─ Components/
-│  ├─ App.razor              # 根组件（HTML shell，引用 design-tokens.css）
+│  ├─ App.razor              # 根组件（HTML shell，引用 design-tokens.css，含 circuit-dead 检测脚本与 reconnect modal 逻辑）
 │  ├─ Routes.razor            # 路由组件（CascadingAuthenticationState + AuthorizeRouteView）
 │  ├─ _Imports.razor
 │  ├─ Pages/
@@ -236,13 +245,14 @@ CnGalWebSite.MainSite
 ```text
 CnGalWebSite.MainSite.Shared
 ├─ Components/
-│  ├─ DesignSystem/           # 21 个基础 UI 组件
+│  ├─ DesignSystem/           # 23 个基础 UI 组件
 │  │  ├─ CgButton.razor / .razor.css
 │  │  ├─ CgInput.razor / .razor.css
 │  │  ├─ CgSelect.razor / .razor.css
 │  │  ├─ CgEnumSelect.razor
 │  │  ├─ CgCheckbox.razor / .razor.css
 │  │  ├─ CgDateInput.razor / .razor.css
+│  │  ├─ CgDateInputMode.cs   # CgDateInput 辅助枚举
 │  │  ├─ CgAutoComplete.razor / .razor.css
 │  │  ├─ CgTextarea.razor / .razor.css
 │  │  ├─ CgModal.razor / .razor.css
@@ -257,11 +267,15 @@ CnGalWebSite.MainSite.Shared
 │  │  ├─ CgImageUpload.razor / .razor.css
 │  │  ├─ CgAudioUpload.razor / .razor.css
 │  │  ├─ CgProgressRing.razor / .razor.css
+│  │  ├─ CgHtmlContent.razor / .razor.css
+│  │  ├─ CgMarkdownEditor.razor / .razor.css
+│  │  ├─ CgTreeView.razor / .razor.css
 │  │  ├─ CgMdiIcon.razor / .razor.css
 │  │  └─ CgMdiIconMap.g.cs   # 自动生成的图标映射
 │  ├─ Features/               # 业务组件
-│  │  ├─ Entry/               # 词条详情（18 个组件）
-│  │  ├─ EntryEditor/         # 词条编辑（14 个组件）
+│  │  ├─ Entry/
+│  │  │  ├─ Detail/           # 词条详情（18 个组件）
+│  │  │  └─ Editor/           # 词条编辑（16 个组件）
 │  │  ├─ Home/                # 首页（14 个组件）
 │  │  └─ Space/               # 个人空间（4 个组件）
 │  └─ Layout/
@@ -280,7 +294,14 @@ CnGalWebSite.MainSite.Shared
 │  ├─ styles/
 │  │  └─ design-tokens.css    # 全局设计变量
 │  └─ scripts/
-│     └─ cg-image-upload.js   # 图片上传 JS Interop
+│     ├─ cg-image-upload.js   # 图片上传 JS Interop
+│     ├─ cg-markdown-editor.js # Markdown 编辑器 JS Interop（工具栏、图片直传）
+│     └─ cg-edit-nav.js       # 编辑页导航辅助 JS
+├─ Services/
+│  ├─ ICgToastService.cs      # Toast 通知服务接口
+│  └─ CgToastService.cs       # Toast 通知服务实现
+├─ Extensions/
+│  └─ ServiceCollectionExtensions.cs  # AddMainSiteSharedServices
 ├─ _Imports.razor
 └─ AssemblyMarker.cs
 ```
