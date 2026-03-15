@@ -71,7 +71,7 @@
     flex-shrink: 0;
 }
 
-::deep .entry-editor-section > p {
+::deep .entry-editor-section>p {
     color: var(--cg-color-text-muted);
     margin-bottom: var(--cg-spacing-4);
     font-size: var(--cg-font-size-sm);
@@ -118,7 +118,9 @@
 }
 
 @keyframes cg-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ── 响应式 ── */

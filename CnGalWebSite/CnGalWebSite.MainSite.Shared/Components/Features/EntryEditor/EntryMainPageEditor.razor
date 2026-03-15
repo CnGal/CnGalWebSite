@@ -7,10 +7,8 @@
 
     @if (Model != null)
     {
-        <CgTextarea @bind-Value="Model.Context"
-                    Placeholder="支持 Markdown 语法..."
-                    Rows="20"
-                    Monospace />
+        <CgMarkdownEditor @bind-Value="Model.Context"
+                           Placeholder="支持 Markdown 语法..." />
     }
 </section>
 

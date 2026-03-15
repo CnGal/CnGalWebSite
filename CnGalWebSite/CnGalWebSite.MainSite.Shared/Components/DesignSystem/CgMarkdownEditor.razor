@@ -1,0 +1,125 @@
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models.Files
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IFileCommandService FileCommandService
+@inject IJSRuntime JSRuntime
+
+<div class="cg-markdown-editor">
+    <div @ref="_containerRef"></div>
+
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="cg-markdown-editor__error">@_errorMessage</div>
+    }
+</div>
+
+@code {
+    private const long MaxUploadBytes = 10 * 1024 * 1024;
+
+    private ElementReference _containerRef;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<CgMarkdownEditor>? _dotNetRef;
+    private bool _initialized;
+    private string? _lastKnownValue;
+    private string? _errorMessage;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-markdown-editor.js");
+
+            _lastKnownValue = Value;
+            await _jsModule.InvokeVoidAsync("initEditor", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty);
+            _initialized = true;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!_initialized || _jsModule is null)
+        {
+            return;
+        }
+
+        // 当外部参数变更时，同步到 JS 编辑器
+        if (!string.Equals(Value, _lastKnownValue, StringComparison.Ordinal))
+        {
+            _lastKnownValue = Value;
+            await _jsModule.InvokeVoidAsync("setValue", Value ?? string.Empty);
+        }
+    }
+
+    /// <summary>
+    /// 由 JS 调用：编辑器内容变更时通知 .NET
+    /// </summary>
+    [JSInvokable]
+    public async Task OnEditorValueChanged(string value)
+    {
+        _lastKnownValue = value;
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+
+    /// <summary>
+    /// 由 JS 调用：Vditor 图片上传回调
+    /// </summary>
+    [JSInvokable]
+    public async Task<string?> OnImageUploadFromJs(string base64Data, string fileName)
+    {
+        _errorMessage = null;
+        try
+        {
+            var bytes = Convert.FromBase64String(base64Data);
+            using var stream = new MemoryStream(bytes);
+            var result = await FileCommandService.UploadImageAsync(stream, fileName, ImageAspectType.None);
+            if (result.Success && !string.IsNullOrWhiteSpace(result.Data))
+            {
+                return result.Data;
+            }
+
+            _errorMessage = result.Error?.Message ?? "图片上传失败";
+            StateHasChanged();
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"图片上传异常：{ex.Message}";
+            StateHasChanged();
+            return null;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("disposeEditor");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        _dotNetRef?.Dispose();
+    }
+}
