@@ -51,12 +51,6 @@ public static class ServiceCollectionExtensions
         .AddOpenIdConnect(MainSiteOidcOptions.OidcScheme, options =>
         {
             options.Authority = oidcOptions.Authority;
-
-            if (string.IsNullOrWhiteSpace(oidcOptions.MetadataAddress) is false)
-            {
-                options.MetadataAddress = oidcOptions.MetadataAddress;
-            }
-
             options.ClientId = oidcOptions.ClientId;
             options.ClientSecret = oidcOptions.ClientSecret;
             options.RequireHttpsMetadata = oidcOptions.RequireHttpsMetadata;

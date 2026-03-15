@@ -7,8 +7,6 @@ public sealed class MainSiteOidcOptions
 
     public string Authority { get; init; } = "https://localhost:5001";
 
-    public string? MetadataAddress { get; init; }
-
     public string ClientId { get; init; } = string.Empty;
 
     public string ClientSecret { get; init; } = string.Empty;
