@@ -20,7 +20,7 @@
                                OnAudioUploaded="OnAudioUploaded" />
             </HeaderActions>
             <ChildContent>
-                <CgTable HasData="@Model.Audio.Any()">
+                <CgTable HasData="@Model.Audio.Any()" MaxHeight="400px">
                     <Empty>
                         <p>暂无音频，请点击"上传音频"添加。</p>
                     </Empty>

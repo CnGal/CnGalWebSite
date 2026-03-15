@@ -25,6 +25,14 @@
                         @foreach (var item in Model.Images.OrderByDescending(s => s.Priority))
                         {
                             <div class="cg-image-card">
+                                <div class="cg-image-card__actions">
+                                    <CgButton Variant="ghost" OnClick="() => EditImage(item)" aria-label="编辑">
+                                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    </CgButton>
+                                    <CgButton Variant="ghost-danger" OnClick="() => DeleteImage(item)" aria-label="删除">
+                                        <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                    </CgButton>
+                                </div>
                                 <div class="cg-image-card__preview">
                                     <img src="@item.Image" alt="@item.Note"/>
                                 </div>
@@ -32,10 +40,6 @@
                                 {
                                     <div class="cg-image-card__note">@item.Note</div>
                                 }
-                                <div class="cg-image-card__actions">
-                                    <CgButton Variant="outline" Size="sm" OnClick="() => EditImage(item)">编辑</CgButton>
-                                    <CgButton Variant="danger" Size="sm" OnClick="() => DeleteImage(item)">删除</CgButton>
-                                </div>
                             </div>
                         }
                     </div>
@@ -56,16 +60,8 @@
     <ChildContent>
         @if (_editingItem != null)
         {
-            <div class="cg-edit-image-preview">
-                @if (!string.IsNullOrWhiteSpace(_editingItem.Image))
-                {
-                    <img src="@_editingItem.Image" alt="预览"/>
-                }
-            </div>
-
-            <CgFormGroup Label="替换图片">
+            <CgFormGroup Label="图片">
                 <CgImageUpload @bind-Value="_editingItem.Image"
-                               ShowPreview="false"
                                Text="上传替换图片"/>
             </CgFormGroup>
             <CgGrid>

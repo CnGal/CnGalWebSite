@@ -47,7 +47,7 @@
                 <CgButton Variant="primary" OnClick="AddCustomLink">添加</CgButton>
             </HeaderActions>
             <ChildContent>
-                <CgTable HasData="@GetCustomLinks().Any()">
+                <CgTable HasData="@GetCustomLinks().Any()" MaxHeight="400px">
                     <Empty>
                         <p>暂无自定义链接，请点击"添加"。</p>
                     </Empty>
@@ -68,8 +68,12 @@
                                 <td>@link.Link</td>
                                 <td>@link.DisPlayValue</td>
                                 <td class="cg-actions">
-                                    <CgButton Variant="outline" OnClick="() => EditCustomLink(link)">编辑</CgButton>
-                                    <CgButton Variant="danger" OnClick="() => DeleteCustomLink(link)">删除</CgButton>
+                                    <CgButton Variant="ghost" OnClick="() => EditCustomLink(link)" aria-label="编辑">
+                                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    </CgButton>
+                                    <CgButton Variant="ghost-danger" OnClick="() => DeleteCustomLink(link)" aria-label="删除">
+                                        <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                    </CgButton>
                                 </td>
                             </tr>
                         }

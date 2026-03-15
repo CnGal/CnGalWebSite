@@ -1,6 +1,6 @@
 @if (HasData)
 {
-    <div class="cg-table-wrap">
+    <div class="cg-table-wrap" style="@WrapStyle">
         <table class="cg-table">
             @ChildContent
         </table>
@@ -28,4 +28,14 @@ else if (Empty != null)
     /// </summary>
     [Parameter]
     public bool HasData { get; set; } = true;
+
+    /// <summary>
+    /// 可选最大高度（如 "400px"），设置后表格区域可滚动，表头保持固定。
+    /// </summary>
+    [Parameter]
+    public string? MaxHeight { get; set; }
+
+    private string? WrapStyle => string.IsNullOrWhiteSpace(MaxHeight)
+        ? null
+        : $"max-height:{MaxHeight};overflow-y:auto";
 }
