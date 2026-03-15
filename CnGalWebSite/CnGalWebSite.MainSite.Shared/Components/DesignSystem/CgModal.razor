@@ -9,6 +9,12 @@
             <div class="cg-modal-content">
                 @ChildContent
             </div>
+            @if (Footer != null)
+            {
+                <footer class="cg-modal-footer">
+                    @Footer
+                </footer>
+            }
         </section>
     </div>
 }
@@ -22,6 +28,12 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 弹窗底部操作栏（如取消/保存按钮），若不提供则不渲染
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }

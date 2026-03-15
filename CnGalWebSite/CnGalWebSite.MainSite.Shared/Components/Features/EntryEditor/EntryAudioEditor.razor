@@ -13,17 +13,17 @@
             音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
         </CgAlert>
 
-        <div class="cg-form-section">
-            <div class="cg-section-header">
-                <h3>音频试听</h3>
+        <CgFormSection Title="音频试听">
+            <HeaderActions>
                 <CgAudioUpload Multiple
                                OnAudioUploaded="OnAudioUploaded" />
-            </div>
-
-            @if (Model.Audio.Any())
-            {
-                <div class="cg-audio-table-wrap">
-                    <table class="cg-audio-table">
+            </HeaderActions>
+            <ChildContent>
+                <CgTable HasData="@Model.Audio.Any()">
+                    <Empty>
+                        <p class="cg-audio-empty">暂无音频，请点击"上传音频"添加。</p>
+                    </Empty>
+                    <ChildContent>
                         <thead>
                             <tr>
                                 <th>缩略图</th>
@@ -37,35 +37,29 @@
                             @foreach (var item in Model.Audio.OrderByDescending(s => s.Priority))
                             {
                                 <tr>
-                                    <td class="cg-audio-table__thumb-cell">
+                                    <td class="cg-audio-thumb-cell">
                                         <img src="@GetThumbnailUrl(item)"
-                                             class="cg-audio-table__thumb"
+                                             class="cg-audio-thumb"
                                              alt="@item.Name" />
                                     </td>
-                                    <td class="cg-audio-table__name-cell">@item.Name</td>
-                                    <td class="cg-audio-table__desc-cell">@item.BriefIntroduction</td>
-                                    <td class="cg-audio-table__preview-cell">
+                                    <td class="cg-audio-name-cell">@item.Name</td>
+                                    <td class="cg-audio-desc-cell">@item.BriefIntroduction</td>
+                                    <td class="cg-audio-preview-cell">
                                         <audio controls preload="none" class="cg-audio-player">
                                             <source src="@item.Url" />
                                         </audio>
                                     </td>
-                                    <td class="cg-audio-table__actions-cell">
-                                        <button class="cg-btn cg-btn--outline cg-btn--sm" type="button"
-                                                @onclick="() => EditAudio(item)">编辑</button>
-                                        <button class="cg-btn cg-btn--danger cg-btn--sm" type="button"
-                                                @onclick="() => DeleteAudio(item)">删除</button>
+                                    <td class="cg-actions">
+                                        <CgButton Variant="outline" Size="sm" OnClick="() => EditAudio(item)">编辑</CgButton>
+                                        <CgButton Variant="danger" Size="sm" OnClick="() => DeleteAudio(item)">删除</CgButton>
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <p class="cg-empty-tip">暂无音频，请点击"上传音频"添加。</p>
-            }
-        </div>
+                    </ChildContent>
+                </CgTable>
+            </ChildContent>
+        </CgFormSection>
     }
 </section>
 
@@ -73,23 +67,19 @@
 <CgModal IsOpen="@_editDialogOpen"
          Title="编辑音频"
          OnClose="CloseEditDialogAsync">
-    @if (_editingItem != null)
-    {
-        <p class="cg-edit-hint">音频的名称和简介会在词条页面展示，优先级会影响展示顺序</p>
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <p class="cg-edit-hint">音频的名称和简介会在词条页面展示，优先级会影响展示顺序</p>
 
-        <div class="cg-edit-audio-section">
-            <div class="cg-form-group">
-                <label class="cg-form-label">缩略图</label>
+            <CgFormGroup Label="缩略图">
                 <CgImageUpload @bind-Value="_editingItem.Thumbnail"
                                ShowCropper
                                Type="ImageAspectType._1_1"
                                Text="上传缩略图" />
-            </div>
-        </div>
+            </CgFormGroup>
 
-        <div class="cg-edit-audio-section">
-            <div class="cg-form-group">
-                <label class="cg-form-label">音频预览</label>
+            <CgFormGroup Label="音频预览">
                 <div class="cg-edit-audio-preview">
                     <audio controls preload="none" class="cg-audio-player cg-audio-player--full">
                         <source src="@_editingItem.Url" />
@@ -98,34 +88,28 @@
                                    OnAudioUploaded="OnReUpload"
                                    Text="重新上传" />
                 </div>
-            </div>
-        </div>
+            </CgFormGroup>
 
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">名称</label>
-                <CgInput @bind-Value="_editingItem.Name" Placeholder="如：OP、ED、BGM" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">优先级</label>
-                <input class="cg-input" type="number"
-                       value="@_editingItem.Priority"
-                       @onchange="OnPriorityChanged" />
-            </div>
-        </div>
+            <CgGrid>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editingItem.Name" Placeholder="如：OP、ED、BGM" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingItem.Priority" />
+                </CgFormGroup>
+            </CgGrid>
 
-        <div class="cg-form-group">
-            <label class="cg-form-label">简介</label>
-            <textarea class="cg-input cg-textarea" rows="3"
-                      @bind="_editingItem.BriefIntroduction"
-                      placeholder="音频描述"></textarea>
-        </div>
-
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseEditDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveEdit">保存</button>
-        </div>
-    }
+            <CgFormGroup Label="简介">
+                <CgTextarea @bind-Value="_editingItem.BriefIntroduction"
+                            Rows="3"
+                            Placeholder="音频描述" />
+            </CgFormGroup>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveEdit">保存</CgButton>
+    </Footer>
 </CgModal>
 
 <CgToast @ref="_toast" />
@@ -207,15 +191,6 @@
     private void DeleteAudio(EditAudioAloneModel item)
     {
         Model.Audio?.Remove(item);
-    }
-
-    // ── 优先级输入 ──
-    private void OnPriorityChanged(ChangeEventArgs args)
-    {
-        if (_editingItem != null && int.TryParse(args.Value?.ToString(), out var val))
-        {
-            _editingItem.Priority = val;
-        }
     }
 
     // ── 关闭弹窗 ──

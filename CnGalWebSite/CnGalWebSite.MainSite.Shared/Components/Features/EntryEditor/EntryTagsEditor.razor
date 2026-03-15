@@ -5,26 +5,26 @@
 <section class="entry-editor-section">
     <h2>标签</h2>
     <p>通过自动补全管理标签（建议使用末级标签）。</p>
-    
+
     @if (Model != null)
     {
-        <div class="cg-form-section">
-            <div class="cg-section-header">
-                <h3>标签列表</h3>
-                <button class="cg-btn cg-btn--primary" type="button" @onclick="AddTag">添加标签</button>
-            </div>
-
-            @foreach (var item in Model.Tags)
-            {
-                <div class="cg-tag-row">
-                    <CgAutoComplete Value="@item.DisplayName"
-                                    ValueChanged="(text) => OnTagChanged(item, text)"
-                                    Items="@MetaOptions.TagItems"
-                                    Placeholder="输入标签名称" />
-                    <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveTag(item)">删除</button>
-                </div>
-            }
-        </div>
+        <CgFormSection Title="标签列表">
+            <HeaderActions>
+                <CgButton Variant="primary" OnClick="AddTag">添加标签</CgButton>
+            </HeaderActions>
+            <ChildContent>
+                @foreach (var item in Model.Tags)
+                {
+                    <div class="cg-tag-row">
+                        <CgAutoComplete Value="@item.DisplayName"
+                                        ValueChanged="(text) => OnTagChanged(item, text)"
+                                        Items="@MetaOptions.TagItems"
+                                        Placeholder="输入标签名称" />
+                        <CgButton Variant="danger" OnClick="() => RemoveTag(item)">删除</CgButton>
+                    </div>
+                }
+            </ChildContent>
+        </CgFormSection>
     }
 </section>
 

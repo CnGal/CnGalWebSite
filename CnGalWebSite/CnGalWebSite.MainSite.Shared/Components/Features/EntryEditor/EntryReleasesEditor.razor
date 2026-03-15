@@ -2,116 +2,105 @@
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
-<div class="cg-form-section">
-    <div class="cg-section-header">
-        <h3>发行列表</h3>
-        <button class="cg-btn cg-btn--primary" type="button" @onclick="AddRelease">添加发行版本</button>
-    </div>
-
-    @if (Releases.Any())
-    {
-        <table class="cg-table">
-            <thead>
-                <tr>
-                    <th>类型</th>
-                    <th>名称</th>
-                    <th>发行平台</th>
-                    <th>游戏平台</th>
-                    <th>发行时间</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Releases.OrderBy(s => s.Time))
-                {
+<CgFormSection Title="发行列表">
+    <HeaderActions>
+        <CgButton Variant="primary" OnClick="AddRelease">添加发行版本</CgButton>
+    </HeaderActions>
+    <ChildContent>
+        <CgTable HasData="@Releases.Any()">
+            <ChildContent>
+                <thead>
                     <tr>
-                        <td>@item.Type.GetDisplayName()</td>
-                        <td>@item.Name</td>
-                        <td>@GetPublishPlatformText(item)</td>
-                        <td>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</td>
-                        <td>@GetReleaseTimeText(item)</td>
-                        <td class="cg-actions">
-                            <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditRelease(item)">编辑</button>
-                            <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveRelease(item)">删除</button>
-                        </td>
+                        <th>类型</th>
+                        <th>名称</th>
+                        <th>发行平台</th>
+                        <th>游戏平台</th>
+                        <th>发行时间</th>
+                        <th>操作</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
-</div>
+                </thead>
+                <tbody>
+                    @foreach (var item in Releases.OrderBy(s => s.Time))
+                    {
+                        <tr>
+                            <td>@item.Type.GetDisplayName()</td>
+                            <td>@item.Name</td>
+                            <td>@GetPublishPlatformText(item)</td>
+                            <td>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</td>
+                            <td>@GetReleaseTimeText(item)</td>
+                            <td class="cg-actions">
+                                <CgButton Variant="outline" OnClick="() => EditRelease(item)">编辑</CgButton>
+                                <CgButton Variant="danger" OnClick="() => RemoveRelease(item)">删除</CgButton>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </ChildContent>
+        </CgTable>
+    </ChildContent>
+</CgFormSection>
 
 <CgModal IsOpen="@_releaseDialogOpen"
          Title="编辑发行版本"
          OnClose="CloseReleaseDialogAsync">
-    @if (_releaseEditing != null)
-    {
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">类型</label>
-                <CgEnumSelect TEnum="GameReleaseType"
-                              Value="@_releaseEditing.Type"
-                              ValueChanged="OnReleaseTypeChanged" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">名称</label>
-                <CgInput @bind-Value="_releaseEditing.Name" Placeholder="游戏发行名称" />
-            </div>
+    <ChildContent>
+        @if (_releaseEditing != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="GameReleaseType"
+                                  Value="@_releaseEditing.Type"
+                                  ValueChanged="OnReleaseTypeChanged" />
+                </CgFormGroup>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_releaseEditing.Name" Placeholder="游戏发行名称" />
+                </CgFormGroup>
 
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行平台类型</label>
-                <CgEnumSelect TEnum="PublishPlatformType"
-                              Value="@_releaseEditing.PublishPlatformType"
-                              ValueChanged="OnPublishPlatformChanged" />
-            </div>
-            @if (_releaseEditing.PublishPlatformType == PublishPlatformType.Other)
-            {
-                <div class="cg-form-group">
-                    <label class="cg-form-label">发行平台名称</label>
-                    <CgInput @bind-Value="_releaseEditing.PublishPlatformName" Placeholder="如：官网商城" />
-                </div>
-            }
-
-            <div class="cg-form-group">
-                <label class="cg-form-label">@(_releaseEditing.PublishPlatformType == PublishPlatformType.Other ? "链接" : "平台Id")</label>
-                <CgInput @bind-Value="_releaseEditing.Link" Placeholder="平台链接或平台 Id" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">引擎</label>
-                <CgInput @bind-Value="_releaseEditing.Engine" Placeholder="如：Unity / Ren'Py" />
-            </div>
-
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行时间</label>
-                <input class="cg-input"
-                       type="date"
-                       value="@ToDateInput(_releaseEditing.Time)"
-                       @onchange="OnReleaseDateChanged" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行时间备注</label>
-                <CgInput @bind-Value="_releaseEditing.TimeNote" Placeholder="如：2026 年 Q3" />
-            </div>
-        </div>
-
-        <div class="cg-form-group">
-            <label class="cg-form-label">游戏平台</label>
-            <div class="cg-checkbox-group">
-                @foreach (var platform in _gamePlatformValues)
+                <CgFormGroup Label="发行平台类型">
+                    <CgEnumSelect TEnum="PublishPlatformType"
+                                  Value="@_releaseEditing.PublishPlatformType"
+                                  ValueChanged="OnPublishPlatformChanged" />
+                </CgFormGroup>
+                @if (_releaseEditing.PublishPlatformType == PublishPlatformType.Other)
                 {
-                    var current = platform;
-                    <CgCheckbox Value="@_releaseEditing.GamePlatformTypes.Contains(current)"
-                                ValueChanged="(selected) => OnPlatformChanged(current, selected)"
-                                Label="@platform.GetDisplayName()" />
+                    <CgFormGroup Label="发行平台名称">
+                        <CgInput @bind-Value="_releaseEditing.PublishPlatformName" Placeholder="如：官网商城" />
+                    </CgFormGroup>
                 }
-            </div>
-        </div>
 
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseReleaseDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveRelease">保存</button>
-        </div>
-    }
+                <CgFormGroup Label="@(_releaseEditing.PublishPlatformType == PublishPlatformType.Other ? "链接" : "平台Id")">
+                    <CgInput @bind-Value="_releaseEditing.Link" Placeholder="平台链接或平台 Id" />
+                </CgFormGroup>
+                <CgFormGroup Label="引擎">
+                    <CgInput @bind-Value="_releaseEditing.Engine" Placeholder="如：Unity / Ren'Py" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="发行时间">
+                    <CgDateInput Value="@_releaseEditing.Time"
+                                 ValueChanged="OnReleaseDateChanged" />
+                </CgFormGroup>
+                <CgFormGroup Label="发行时间备注">
+                    <CgInput @bind-Value="_releaseEditing.TimeNote" Placeholder="如：2026 年 Q3" />
+                </CgFormGroup>
+            </CgGrid>
+
+            <CgFormGroup Label="游戏平台">
+                <div class="cg-checkbox-group">
+                    @foreach (var platform in _gamePlatformValues)
+                    {
+                        var current = platform;
+                        <CgCheckbox Value="@_releaseEditing.GamePlatformTypes.Contains(current)"
+                                    ValueChanged="(selected) => OnPlatformChanged(current, selected)"
+                                    Label="@platform.GetDisplayName()" />
+                    }
+                </div>
+            </CgFormGroup>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseReleaseDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveRelease">保存</CgButton>
+    </Footer>
 </CgModal>
 
 @code {
@@ -212,19 +201,13 @@
         }
     }
 
-    private void OnReleaseDateChanged(ChangeEventArgs args)
+    private void OnReleaseDateChanged(DateTime? date)
     {
-        if (_releaseEditing == null)
+        if (_releaseEditing != null)
         {
-            return;
+            _releaseEditing.Time = date;
         }
-
-        var text = args.Value?.ToString();
-        _releaseEditing.Time = DateTime.TryParse(text, out var date) ? date : null;
     }
-
-    private static string ToDateInput(DateTime? time)
-        => time?.ToString("yyyy-MM-dd") ?? string.Empty;
 
     private void SaveRelease()
     {

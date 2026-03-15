@@ -11,41 +11,41 @@
             可以在这里上传游戏的宣传图，不涉及<strong>剧透、侵权、违法</strong>的游戏 CG 和角色立绘等图片
         </CgAlert>
 
-        <div class="cg-form-section">
-            <div class="cg-section-header">
-                <h3>图片列表</h3>
+        <CgFormSection Title="图片列表">
+            <HeaderActions>
                 <CgImageUpload Multiple
                                ShowPreview="false"
                                Text="上传图片到图床"
                                OnImageUploaded="OnImageUploaded"/>
-            </div>
-
-            @if (Model.Images.Any())
-            {
-                <div class="cg-image-grid">
-                    @foreach (var item in Model.Images.OrderByDescending(s => s.Priority))
-                    {
-                        <div class="cg-image-card">
-                            <div class="cg-image-card__preview">
-                                <img src="@item.Image" alt="@item.Note"/>
+            </HeaderActions>
+            <ChildContent>
+                @if (Model.Images.Any())
+                {
+                    <div class="cg-image-grid">
+                        @foreach (var item in Model.Images.OrderByDescending(s => s.Priority))
+                        {
+                            <div class="cg-image-card">
+                                <div class="cg-image-card__preview">
+                                    <img src="@item.Image" alt="@item.Note"/>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(item.Note))
+                                {
+                                    <div class="cg-image-card__note">@item.Note</div>
+                                }
+                                <div class="cg-image-card__actions">
+                                    <CgButton Variant="outline" Size="sm" OnClick="() => EditImage(item)">编辑</CgButton>
+                                    <CgButton Variant="danger" Size="sm" OnClick="() => DeleteImage(item)">删除</CgButton>
+                                </div>
                             </div>
-                            @if (!string.IsNullOrWhiteSpace(item.Note))
-                            {
-                                <div class="cg-image-card__note">@item.Note</div>
-                            }
-                            <div class="cg-image-card__actions">
-                                <button class="cg-btn cg-btn--outline cg-btn--sm" type="button" @onclick="() => EditImage(item)">编辑</button>
-                                <button class="cg-btn cg-btn--danger cg-btn--sm" type="button" @onclick="() => DeleteImage(item)">删除</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <p class="cg-empty-tip">暂无图片，请点击"上传图片到图床"添加。</p>
-            }
-        </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="cg-image-empty">暂无图片，请点击"上传图片到图床"添加。</p>
+                }
+            </ChildContent>
+        </CgFormSection>
     }
 </section>
 
@@ -53,39 +53,35 @@
 <CgModal IsOpen="@_editDialogOpen"
          Title="编辑图片"
          OnClose="CloseEditDialogAsync">
-    @if (_editingItem != null)
-    {
-        <div class="cg-edit-image-preview">
-            @if (!string.IsNullOrWhiteSpace(_editingItem.Image))
-            {
-                <img src="@_editingItem.Image" alt="预览"/>
-            }
-        </div>
-
-        <div class="cg-form-group">
-            <label class="cg-form-label">替换图片</label>
-            <CgImageUpload @bind-Value="_editingItem.Image"
-                           ShowPreview="false"
-                           Text="上传替换图片"/>
-        </div>
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">备注</label>
-                <CgInput @bind-Value="_editingItem.Note" Placeholder="图片描述"/>
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <div class="cg-edit-image-preview">
+                @if (!string.IsNullOrWhiteSpace(_editingItem.Image))
+                {
+                    <img src="@_editingItem.Image" alt="预览"/>
+                }
             </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">优先级</label>
-                <input class="cg-input" type="number"
-                       value="@_editingItem.Priority"
-                       @onchange="OnPriorityChanged"/>
-            </div>
-        </div>
 
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseEditDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveEdit">保存</button>
-        </div>
-    }
+            <CgFormGroup Label="替换图片">
+                <CgImageUpload @bind-Value="_editingItem.Image"
+                               ShowPreview="false"
+                               Text="上传替换图片"/>
+            </CgFormGroup>
+            <CgGrid>
+                <CgFormGroup Label="备注">
+                    <CgInput @bind-Value="_editingItem.Note" Placeholder="图片描述"/>
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingItem.Priority" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveEdit">保存</CgButton>
+    </Footer>
 </CgModal>
 
 @code {
@@ -139,14 +135,6 @@
         CloseEditDialog();
     }
 
-    private void OnPriorityChanged(ChangeEventArgs args)
-    {
-        if (_editingItem != null && int.TryParse(args.Value?.ToString(), out var val))
-        {
-            _editingItem.Priority = val;
-        }
-    }
-
     private void CloseEditDialog()
     {
         _editingItem = null;
@@ -159,5 +147,4 @@
         CloseEditDialog();
         return Task.CompletedTask;
     }
-
 }

@@ -1,84 +1,78 @@
 @using CnGalWebSite.DataModel.ViewModel
 
-<div class="cg-form-section">
-    <div class="cg-section-header">
-        <h3>预约</h3>
-    </div>
-    <div class="cg-grid-2">
-        <CgCheckbox @bind-Value="Booking.Open" Label="开启预约" />
+<CgFormSection Title="预约">
+    <ChildContent>
+        <CgGrid>
+            <CgCheckbox @bind-Value="Booking.Open" Label="开启预约" />
+            @if (Booking.Open)
+            {
+                <CgCheckbox @bind-Value="Booking.IsNeedNotification" Label="上线后通知预约用户" />
+            }
+        </CgGrid>
+
         @if (Booking.Open)
         {
-            <CgCheckbox @bind-Value="Booking.IsNeedNotification" Label="上线后通知预约用户" />
+            <CgFormGroup Label="关联抽奖">
+                <CgAutoComplete @bind-Value="Booking.LotteryName"
+                                Items="@LotteryItems"
+                                Placeholder="输入或选择抽奖名称" />
+            </CgFormGroup>
+
+            <CgFormSection Title="预约目标">
+                <HeaderActions>
+                    <CgButton Variant="primary" OnClick="AddBookingGoal">添加目标</CgButton>
+                </HeaderActions>
+                <ChildContent>
+                    <CgTable HasData="@Booking.Goals.Any()">
+                        <ChildContent>
+                            <thead>
+                                <tr>
+                                    <th>目标人数</th>
+                                    <th>名称</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var goal in Booking.Goals.OrderBy(s => s.Target))
+                                {
+                                    <tr>
+                                        <td>@goal.Target</td>
+                                        <td>@goal.Name</td>
+                                        <td class="cg-actions">
+                                            <CgButton Variant="outline" OnClick="() => EditBookingGoal(goal)">编辑</CgButton>
+                                            <CgButton Variant="danger" OnClick="() => RemoveBookingGoal(goal)">删除</CgButton>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </ChildContent>
+                    </CgTable>
+                </ChildContent>
+            </CgFormSection>
         }
-    </div>
-
-    @if (Booking.Open)
-    {
-        <div class="cg-form-group">
-            <label class="cg-form-label">关联抽奖</label>
-            <CgAutoComplete @bind-Value="Booking.LotteryName"
-                            Items="@LotteryItems"
-                            Placeholder="输入或选择抽奖名称" />
-        </div>
-
-        <div class="cg-section-header mt-4">
-            <h3>预约目标</h3>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="AddBookingGoal">添加目标</button>
-        </div>
-
-        @if (Booking.Goals.Any())
-        {
-            <table class="cg-table">
-                <thead>
-                    <tr>
-                        <th>目标人数</th>
-                        <th>名称</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var goal in Booking.Goals.OrderBy(s => s.Target))
-                    {
-                        <tr>
-                            <td>@goal.Target</td>
-                            <td>@goal.Name</td>
-                            <td class="cg-actions">
-                                <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditBookingGoal(goal)">编辑</button>
-                                <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveBookingGoal(goal)">删除</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    }
-</div>
+    </ChildContent>
+</CgFormSection>
 
 <CgModal IsOpen="@_bookingGoalDialogOpen"
          Title="编辑预约目标"
          OnClose="CloseBookingGoalDialogAsync">
-    @if (_bookingGoalEditing != null)
-    {
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">目标人数</label>
-                <input class="cg-input"
-                       type="number"
-                       min="1"
-                       value="@_bookingGoalEditing.Target"
-                       @onchange="OnBookingTargetChanged" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">名称</label>
-                <CgInput @bind-Value="_bookingGoalEditing.Name" Placeholder="如：公开试玩 DEMO" />
-            </div>
-        </div>
-
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseBookingGoalDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveBookingGoal">保存</button>
-        </div>
-    }
+    <ChildContent>
+        @if (_bookingGoalEditing != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="目标人数">
+                    <CgInput @bind-Value="_bookingGoalEditing.Target" Placeholder="如：1000" />
+                </CgFormGroup>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_bookingGoalEditing.Name" Placeholder="如：公开试玩 DEMO" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseBookingGoalDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveBookingGoal">保存</CgButton>
+    </Footer>
 </CgModal>
 
 @code {
@@ -113,17 +107,6 @@
     private void RemoveBookingGoal(EditBookingGoalModel model)
     {
         Booking.Goals.Remove(model);
-    }
-
-    private void OnBookingTargetChanged(ChangeEventArgs args)
-    {
-        if (_bookingGoalEditing == null)
-        {
-            return;
-        }
-
-        var text = args.Value?.ToString();
-        _bookingGoalEditing.Target = int.TryParse(text, out var value) ? value : 0;
     }
 
     private void SaveBookingGoal()

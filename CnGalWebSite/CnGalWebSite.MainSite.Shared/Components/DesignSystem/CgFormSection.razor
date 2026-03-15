@@ -1,0 +1,32 @@
+<div class="cg-form-section">
+    @if (!string.IsNullOrWhiteSpace(Title) || HeaderActions != null)
+    {
+        <div class="cg-form-section__header">
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <h3 class="cg-form-section__title">@Title</h3>
+            }
+            @if (HeaderActions != null)
+            {
+                <div class="cg-form-section__actions">
+                    @HeaderActions
+                </div>
+            }
+        </div>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 标题右侧操作区（按钮等）
+    /// </summary>
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+}

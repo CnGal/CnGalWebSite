@@ -1,9 +1,9 @@
 @using CnGalWebSite.DataModel.ViewModel
 
 <div class="cg-relevance-list">
-    <div class="cg-section-header">
+    <div class="cg-relevance-list__header">
         <h4>@Title</h4>
-        <button class="cg-btn cg-btn--outline" type="button" @onclick="AddItem">添加</button>
+        <CgButton Variant="outline" OnClick="AddItem">添加</CgButton>
     </div>
 
     @if (Items.Any())
@@ -16,8 +16,8 @@
                     <CgAutoComplete Value="@current.DisplayName"
                                     ValueChanged="(text) => current.DisplayName = text ?? string.Empty"
                                     Items="@AutoCompleteItems"
-                                    Placeholder="@($"输入{Title}唯一名称")"/>
-                    <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveItem(current)">删除</button>
+                                    Placeholder="@($"输入{Title}唯一名称")" />
+                    <CgButton Variant="danger" OnClick="() => RemoveItem(current)">删除</CgButton>
                 </div>
             }
         </div>
@@ -40,5 +40,4 @@
     {
         Items.Remove(item);
     }
-
 }

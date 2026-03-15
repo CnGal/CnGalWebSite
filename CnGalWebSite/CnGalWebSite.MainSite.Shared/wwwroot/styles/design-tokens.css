@@ -40,4 +40,8 @@
     --cg-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --cg-transition-fast: 0.15s ease-in-out;
     --cg-transition-normal: 0.3s ease-in-out;
+    --cg-color-section-bg: #f8fafc;
+    --cg-color-on-primary: #ffffff;
+    --cg-color-focus-ring: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+    --cg-color-hover-overlay: rgba(0, 0, 0, 0.04);
 }

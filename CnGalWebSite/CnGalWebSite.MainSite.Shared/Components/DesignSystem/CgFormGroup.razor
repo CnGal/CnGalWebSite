@@ -1,0 +1,15 @@
+<div class="cg-form-group">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="cg-form-group__label">@Label</label>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

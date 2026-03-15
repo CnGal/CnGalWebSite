@@ -4,70 +4,59 @@
 @using CnGalWebSite.Extensions
 @using System.Globalization
 
-<div class="cg-form-section">
-    <h3>基础信息项</h3>
+<CgFormSection Title="基础信息项">
     @foreach (var info in Informations)
     {
         @if (info.Name == "生日")
         {
-            <div class="cg-form-group">
-                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
-                <input class="cg-input"
-                       type="date"
-                       value="@ToBirthdayDateInput(info.Value)"
-                       @onchange="(e) => OnBirthdayChanged(e, info)" />
-            </div>
+            <CgFormGroup Label="@FormatLabel(info)">
+                <CgDateInput Value="@ParseBirthday(info.Value)"
+                             ValueChanged="(date) => OnBirthdayChanged(date, info)" />
+            </CgFormGroup>
         }
         else if (info.Name == "性别")
         {
-            <div class="cg-form-group">
-                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
+            <CgFormGroup Label="@FormatLabel(info)">
                 <CgEnumSelect TEnum="GenderType"
                               Value="@GetGenderValue(info.Value)"
                               ValueChanged="(v) => OnGenderChanged(v, info)" />
-            </div>
+            </CgFormGroup>
         }
         else
         {
-            <div class="cg-form-group">
-                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
+            <CgFormGroup Label="@FormatLabel(info)">
                 <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
-            </div>
+            </CgFormGroup>
         }
     }
-</div>
+</CgFormSection>
 
 @code {
     [Parameter]
     public List<EditInformationModel> Informations { get; set; } = default!;
 
-    private static string ToBirthdayDateInput(string? value)
+    private static string FormatLabel(EditInformationModel info)
+    {
+        return !string.IsNullOrWhiteSpace(info.Description)
+            ? $"{info.Name} ({info.Description})"
+            : info.Name;
+    }
+
+    private static DateTime? ParseBirthday(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return string.Empty;
+            return null;
         }
 
-        // 旧站格式为 "M月d日"，需转换为 date input 的 "yyyy-MM-dd" 格式
-        if (DateTime.TryParseExact(value, "M月d日", null, DateTimeStyles.None, out var date))
-        {
-            return date.ToString("yyyy-MM-dd");
-        }
-
-        return string.Empty;
+        return DateTime.TryParseExact(value, "M月d日", null, DateTimeStyles.None, out var date)
+            ? date
+            : null;
     }
 
-    private static void OnBirthdayChanged(ChangeEventArgs args, EditInformationModel info)
+    private static void OnBirthdayChanged(DateTime? date, EditInformationModel info)
     {
-        var text = args.Value?.ToString();
-        if (DateTime.TryParse(text, out var date))
-        {
-            info.Value = date.ToString("M月d日");
-        }
-        else
-        {
-            info.Value = null;
-        }
+        info.Value = date?.ToString("M月d日");
     }
 
     private static GenderType GetGenderValue(string? value)

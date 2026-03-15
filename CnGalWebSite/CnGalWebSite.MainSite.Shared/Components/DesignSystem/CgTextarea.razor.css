@@ -1,0 +1,24 @@
+.cg-textarea {
+    padding: var(--cg-spacing-3);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-sm);
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text-primary);
+    font-family: inherit;
+    font-size: var(--cg-font-size-md);
+    transition: border-color var(--cg-transition-fast);
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 72px;
+    line-height: 1.6;
+}
+
+.cg-textarea:focus {
+    border-color: var(--cg-color-primary);
+    outline: 2px solid var(--cg-color-focus-ring);
+}
+
+.cg-textarea--mono {
+    font-family: monospace;
+}

@@ -9,6 +9,8 @@
 
 .cg-modal-panel {
     width: min(640px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     box-shadow: var(--cg-shadow-lg);
@@ -37,4 +39,11 @@
 
 .cg-modal-content {
     padding: 1rem;
+}
+
+.cg-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+    padding: 0 1rem 1rem;
 }

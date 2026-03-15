@@ -2,7 +2,7 @@
     margin-bottom: var(--cg-spacing-4);
 }
 
-.cg-section-header {
+.cg-relevance-list__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,7 +10,7 @@
     margin-bottom: var(--cg-spacing-3);
 }
 
-.cg-section-header h4 {
+.cg-relevance-list__header h4 {
     margin: 0;
     font-size: var(--cg-font-size-md);
     color: var(--cg-color-text-primary);

@@ -2,127 +2,118 @@
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
-<div class="cg-form-section">
-    <div class="cg-section-header">
-        <h3>Staff 列表</h3>
-        <div class="cg-header-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="OpenBatchDialog">批量导入</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="AddStaff">添加 Staff</button>
-        </div>
-    </div>
+<CgFormSection Title="Staff 列表">
+    <HeaderActions>
+        <CgButton Variant="outline" OnClick="OpenBatchDialog">批量导入</CgButton>
+        <CgButton Variant="primary" OnClick="AddStaff">添加 Staff</CgButton>
+    </HeaderActions>
+    <ChildContent>
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <CgAlert Variant="error">@_errorMessage</CgAlert>
+        }
 
-    @if (!string.IsNullOrEmpty(_errorMessage))
-    {
-        <CgAlert Variant="error">@_errorMessage</CgAlert>
-    }
-
-    @if (Staffs.Any())
-    {
-        <table class="cg-table">
-            <thead>
-            <tr>
-                <th>分组</th>
-                <th>★官方职位</th>
-                <th>★唯一名称</th>
-                <th>通用职位</th>
-                <th>隶属组织</th>
-                <th>自定义名称</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var item in Staffs)
-            {
+        <CgTable HasData="@Staffs.Any()">
+            <Empty>
+                <p class="cg-staff-empty">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
+            </Empty>
+            <ChildContent>
+                <thead>
                 <tr>
-                    <td>@item.Modifier</td>
-                    <td>@item.PositionOfficial</td>
-                    <td>@item.Name</td>
-                    <td>@item.PositionGeneral.GetDisplayName()</td>
-                    <td>@item.SubordinateOrganization</td>
-                    <td>@item.CustomName</td>
-                    <td class="cg-actions">
-                        <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditStaff(item)">编辑</button>
-                        <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveStaff(item)">删除</button>
-                    </td>
+                    <th>分组</th>
+                    <th>★官方职位</th>
+                    <th>★唯一名称</th>
+                    <th>通用职位</th>
+                    <th>隶属组织</th>
+                    <th>自定义名称</th>
+                    <th>操作</th>
                 </tr>
-            }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p class="cg-empty-tip">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
-    }
-</div>
+                </thead>
+                <tbody>
+                @foreach (var item in Staffs)
+                {
+                    <tr>
+                        <td>@item.Modifier</td>
+                        <td>@item.PositionOfficial</td>
+                        <td>@item.Name</td>
+                        <td>@item.PositionGeneral.GetDisplayName()</td>
+                        <td>@item.SubordinateOrganization</td>
+                        <td>@item.CustomName</td>
+                        <td class="cg-actions">
+                            <CgButton Variant="outline" OnClick="() => EditStaff(item)">编辑</CgButton>
+                            <CgButton Variant="danger" OnClick="() => RemoveStaff(item)">删除</CgButton>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </ChildContent>
+        </CgTable>
+    </ChildContent>
+</CgFormSection>
 
 @* ── 编辑 / 新增弹窗 ── *@
 <CgModal IsOpen="@_editDialogOpen"
          Title="@(_editTarget == null ? "添加 Staff" : "编辑 Staff")"
          OnClose="CloseEditDialogAsync">
-    @if (_editingItem != null)
-    {
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">分组</label>
-                <CgInput @bind-Value="_editingItem.Modifier" Placeholder="如：主题曲"/>
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">★官方职位</label>
-                <CgInput @bind-Value="_editingItem.PositionOfficial" Placeholder="如：主催、作曲"/>
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">★唯一名称</label>
-                <CgInput @bind-Value="_editingItem.Name" Placeholder="Staff 唯一名称"/>
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">通用职位</label>
-                <CgEnumSelect TEnum="PositionGeneralType"
-                              Value="@_editingItem.PositionGeneral"
-                              ValueChanged="OnPositionGeneralChanged"/>
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">隶属组织</label>
-                <CgInput @bind-Value="_editingItem.SubordinateOrganization" Placeholder="如：工作室A"/>
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">自定义名称</label>
-                <CgInput @bind-Value="_editingItem.CustomName" Placeholder="自定义显示名称"/>
-            </div>
-        </div>
-
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseEditDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveStaff">保存</button>
-        </div>
-    }
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="分组">
+                    <CgInput @bind-Value="_editingItem.Modifier" Placeholder="如：主题曲"/>
+                </CgFormGroup>
+                <CgFormGroup Label="★官方职位">
+                    <CgInput @bind-Value="_editingItem.PositionOfficial" Placeholder="如：主催、作曲"/>
+                </CgFormGroup>
+                <CgFormGroup Label="★唯一名称">
+                    <CgInput @bind-Value="_editingItem.Name" Placeholder="Staff 唯一名称"/>
+                </CgFormGroup>
+                <CgFormGroup Label="通用职位">
+                    <CgEnumSelect TEnum="PositionGeneralType"
+                                  Value="@_editingItem.PositionGeneral"
+                                  ValueChanged="OnPositionGeneralChanged"/>
+                </CgFormGroup>
+                <CgFormGroup Label="隶属组织">
+                    <CgInput @bind-Value="_editingItem.SubordinateOrganization" Placeholder="如：工作室A"/>
+                </CgFormGroup>
+                <CgFormGroup Label="自定义名称">
+                    <CgInput @bind-Value="_editingItem.CustomName" Placeholder="自定义显示名称"/>
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveStaff">保存</CgButton>
+    </Footer>
 </CgModal>
 
 @* ── 批量导入弹窗 ── *@
 <CgModal IsOpen="@_batchDialogOpen"
          Title="批量导入 Staff"
          OnClose="CloseBatchDialogAsync">
-    <div class="cg-batch-tip">
-        <p>按照下方例子整理 Staff 文本后输入可以批量导入 Staff 信息</p>
-        <p>括号中的内容分别是通用职位、配音角色、隶属组织</p>
-        <p>同类项将会自动合并</p>
-        <p>其中"、""，""，"和":""："和"（）""()"都可作分隔符，如果 Staff 名称中包含分隔符，请单独录入</p>
-        <p>请把有分类的 Staff 放到最后</p>
-        <br/>
-        <p class="cg-batch-example">
-            主催：小明<br/>
-            CV（配音）：小红、小亮（工作室A）、小李<br/>
-            主题曲：<br/>
-            作词：小红（工作室B）<br/>
-            作曲：小刚
-        </p>
-    </div>
-    <div class="cg-form-group">
-        <textarea class="cg-textarea" @bind="_batchText" rows="7" placeholder="请输入 Staff 文本"></textarea>
-    </div>
-    <div class="cg-dialog-actions">
-        <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseBatchDialog">取消</button>
-        <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveBatch">保存</button>
-    </div>
+    <ChildContent>
+        <div class="cg-batch-tip">
+            <p>按照下方例子整理 Staff 文本后输入可以批量导入 Staff 信息</p>
+            <p>括号中的内容分别是通用职位、配音角色、隶属组织</p>
+            <p>同类项将会自动合并</p>
+            <p>其中"、""，""，"和"："":"和"（）""()"都可作分隔符，如果 Staff 名称中包含分隔符，请单独录入</p>
+            <p>请把有分类的 Staff 放到最后</p>
+            <br/>
+            <p class="cg-batch-example">
+                主催：小明<br/>
+                CV（配音）：小红、小亮（工作室A）、小李<br/>
+                主题曲：<br/>
+                作词：小红（工作室B）<br/>
+                作曲：小刚
+            </p>
+        </div>
+        <CgTextarea @bind-Value="_batchText" Rows="7" Placeholder="请输入 Staff 文本" />
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseBatchDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveBatch">保存</CgButton>
+    </Footer>
 </CgModal>
 
 @code {
@@ -286,5 +277,4 @@
         CloseBatchDialog();
         return Task.CompletedTask;
     }
-
 }

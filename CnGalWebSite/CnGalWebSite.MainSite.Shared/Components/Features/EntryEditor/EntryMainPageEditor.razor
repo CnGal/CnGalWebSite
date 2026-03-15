@@ -4,12 +4,13 @@
 <section class="entry-editor-section">
     <h2>正文主页</h2>
     <p>使用 Markdown 编辑词条详情内容。</p>
-    
+
     @if (Model != null)
     {
-        <div class="cg-form-group">
-            <textarea class="cg-textarea markdown-editor" @bind="Model.Context" placeholder="支持 Markdown 语法..." rows="20"></textarea>
-        </div>
+        <CgTextarea @bind-Value="Model.Context"
+                    Placeholder="支持 Markdown 语法..."
+                    Rows="20"
+                    Monospace />
     }
 </section>
 

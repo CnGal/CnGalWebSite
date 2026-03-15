@@ -1,0 +1,27 @@
+.cg-form-section {
+    margin-bottom: var(--cg-spacing-6);
+    padding: var(--cg-spacing-4);
+    background-color: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+}
+
+.cg-form-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-4);
+    flex-wrap: wrap;
+}
+
+.cg-form-section__title {
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-form-section__actions {
+    display: flex;
+    gap: var(--cg-spacing-2);
+}

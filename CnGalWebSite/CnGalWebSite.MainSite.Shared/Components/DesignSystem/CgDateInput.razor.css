@@ -1,0 +1,18 @@
+.cg-date-input {
+    width: 100%;
+    min-height: 2.4rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    font-family: inherit;
+    font-size: var(--cg-font-size-md);
+    box-sizing: border-box;
+    transition: border-color var(--cg-transition-fast);
+}
+
+.cg-date-input:focus {
+    outline: 2px solid var(--cg-color-focus-ring);
+    border-color: var(--cg-color-primary);
+}

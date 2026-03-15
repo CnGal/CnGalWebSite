@@ -1,23 +1,22 @@
+@typeparam TValue
+
 <input @key="_inputKey"
        class="cg-input"
-       type="@Type"
-       value="@Value"
+       type="@InputType"
+       value="@StringValue"
        placeholder="@Placeholder"
        disabled="@Disabled"
        @oninput="OnInput" />
 
 @code {
     [Parameter]
-    public string Type { get; set; } = "text";
+    public TValue? Value { get; set; }
 
     [Parameter]
-    public string? Value { get; set; }
+    public EventCallback<TValue?> ValueChanged { get; set; }
 
     [Parameter]
     public string? Placeholder { get; set; }
-
-    [Parameter]
-    public EventCallback<string?> ValueChanged { get; set; }
 
     [Parameter]
     public bool Disabled { get; set; }
@@ -25,11 +24,28 @@
     private int _inputKey;
     private string? _lastUserInput;
 
+    private string InputType
+    {
+        get
+        {
+            var type = typeof(TValue);
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (type == typeof(int) || type == typeof(long) || type == typeof(double) || type == typeof(float) || type == typeof(decimal))
+            {
+                return "number";
+            }
+
+            return "text";
+        }
+    }
+
+    private string? StringValue => Value?.ToString();
+
     protected override void OnParametersSet()
     {
-        // 父组件传入的 Value 与用户实际输入不同时，
-        // 递增 key 强制重建 <input> 元素，确保 DOM 值与 Value 同步
-        if (_lastUserInput != null && Value != _lastUserInput)
+        var currentStr = Value?.ToString();
+        if (_lastUserInput != null && currentStr != _lastUserInput)
         {
             _inputKey++;
             _lastUserInput = null;
@@ -39,6 +55,32 @@
     private Task OnInput(ChangeEventArgs args)
     {
         _lastUserInput = args.Value?.ToString();
-        return ValueChanged.InvokeAsync(_lastUserInput);
+        var converted = ConvertValue(_lastUserInput);
+        return ValueChanged.InvokeAsync(converted);
+    }
+
+    private static TValue? ConvertValue(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return default;
+        }
+
+        var targetType = typeof(TValue);
+        targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+        if (targetType == typeof(string))
+        {
+            return (TValue?)(object?)text;
+        }
+
+        try
+        {
+            return (TValue?)Convert.ChangeType(text, targetType);
+        }
+        catch
+        {
+            return default;
+        }
     }
 }

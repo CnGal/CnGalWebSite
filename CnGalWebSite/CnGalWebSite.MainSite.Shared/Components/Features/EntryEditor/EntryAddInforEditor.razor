@@ -12,24 +12,16 @@
     {
         <EntryTypeFieldsEditor Model="Model" />
 
-        <div class="mt-4">
-            <EntryInformationsEditor Informations="Model.Informations" />
-        </div>
+        <EntryInformationsEditor Informations="Model.Informations" />
 
         @if (Model.Type == EntryType.Game)
         {
-            <div class="mt-4">
-                <EntryReleasesEditor Releases="Model.Releases" />
-            </div>
+            <EntryReleasesEditor Releases="Model.Releases" />
 
-            <div class="mt-4">
-                <EntryBookingEditor Booking="Model.Booking" LotteryItems="MetaOptions.LotteryItems" />
-            </div>
+            <EntryBookingEditor Booking="Model.Booking" LotteryItems="MetaOptions.LotteryItems" />
         }
 
-        <div class="mt-4">
-            <EntryStaffsEditor Staffs="Model.Staffs" />
-        </div>
+        <EntryStaffsEditor Staffs="Model.Staffs" />
     }
 </section>
 

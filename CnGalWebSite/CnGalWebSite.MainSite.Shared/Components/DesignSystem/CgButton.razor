@@ -15,8 +15,25 @@
     [Parameter]
     public string Variant { get; set; } = "primary";
 
+    /// <summary>
+    /// 尺寸："default" | "sm"
+    /// </summary>
+    [Parameter]
+    public string Size { get; set; } = "default";
+
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    private string CssClass => $"cg-btn cg-btn--{Variant}";
+    private string CssClass
+    {
+        get
+        {
+            var cls = $"cg-btn cg-btn--{Variant}";
+            if (Size == "sm")
+            {
+                cls += " cg-btn--sm";
+            }
+            return cls;
+        }
+    }
 }

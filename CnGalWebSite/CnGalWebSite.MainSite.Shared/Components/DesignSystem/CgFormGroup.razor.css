@@ -1,0 +1,12 @@
+.cg-form-group {
+    margin-bottom: var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+}
+
+.cg-form-group__label {
+    margin-bottom: var(--cg-spacing-2);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-primary);
+    font-size: var(--cg-font-size-sm);
+}
