@@ -11,25 +11,29 @@
 
 ---
 
-## 2. 当前职责边界（重构后继续保持）
+## 2. 当前职责边界
 
 ### `CnGalWebSite.MainSite`
 
-- Blazor 启动项目（Host）。
-- 负责程序入口、渲染模式注册、静态资源映射、全局中间件。
-- 不承载具体业务页面实现（页面在共享项目中）。
+- Blazor 启动项目（Host），SDK 为 `Microsoft.NET.Sdk.Web`。
+- 负责程序入口（`Program.cs`）、渲染模式注册（`AddInteractiveServerRenderMode`）、静态资源映射（`MapStaticAssets`）、全局中间件（认证/授权/防伪/HTTPS）。
+- 包含根组件 `App.razor`、`Routes.razor`（使用 `AuthorizeRouteView`）、`Error.razor`、`NotFound.razor`。
+- 不承载具体业务页面实现（页面在 `MainSite.Shared` 中）。
+- 依赖 `MainSite.Shared` 和 `SDK.MainSite`。
 
 ### `CnGalWebSite.MainSite.Shared`
 
-- 页面与组件层（Razor Class Library）。
+- 页面与组件层（Razor Class Library，SDK 为 `Microsoft.NET.Sdk.Razor`）。
 - 包含布局、页面、组件、前端状态（仅 UI 相关）。
 - 不直接依赖 APIServer 接口实现，不直接写 HTTP 请求。
+- 依赖 `SDK.MainSite`、`CnGalWebSite.Extensions`、`CnGalWebSite.Helper`。
 
 ### `CnGalWebSite.SDK.MainSite`
 
-- 前后端通信封装层。
-- 包含 API Client、缓存策略、登录态/令牌管理、异常标准化、重试等。
+- 前后端通信封装层（SDK 为 `Microsoft.NET.Sdk`），引用 `Microsoft.AspNetCore.App` 框架。
+- 包含 API Client、OIDC 认证/令牌管理、异常标准化。
 - 对 `MainSite.Shared` 暴露面向业务的服务接口（而非原始 API 细节）。
+- 依赖 `CnGalWebSite.DataModel`、`Microsoft.AspNetCore.Authentication.OpenIdConnect`。
 
 ### `CnGalWebSite.APIServer`
 
@@ -40,155 +44,242 @@
 
 ## 3. 目标架构与渲染策略
 
-## 3.1 页面分级策略（强制）
+### 3.1 页面分级策略（强制）
 
 将页面分为两类，并在评审时明确标注：
 
 1. **静态页（默认）**
    - 使用纯 SSR，不启用交互式渲染。
-   - 适合：主页展示、词条详情、公告/文章、榜单浏览等读多写少页面。
+   - 当前已实现的静态页：`HomePage`、`EntryDetailPage`、`SpaceIndexPage`。
 2. **交互页（按页启用）**
    - 仅当页面存在明显交互需求时启用交互式组件。
-   - 适合：登录注册、复杂筛选、实时编辑、需要客户端状态同步的页面。
+   - 当前已实现的交互页：`EntryEditPage`（`@rendermode InteractiveServer`）。
 
 > 约束：默认新页面必须是静态页；如需交互，必须在 PR 说明中写明原因。
 
-## 3.2 Blazor 渲染模式建议
+### 3.2 Blazor 渲染模式配置
 
-- 全站保持 `AddRazorComponents()` + 交互能力注册（Host 层）。
-- 路由和组件默认不写 `@rendermode`，即静态 SSR。
+- `Program.cs` 注册 `AddRazorComponents()` + `AddInteractiveServerComponents()`。
+- `MapRazorComponents<App>()` 注册 `AddInteractiveServerRenderMode()` 并添加 `MainSite.Shared` 程序集。
+- `App.razor` 和 `Routes.razor` **不写** `@rendermode`，保持全局静态 SSR。
+- `Routes.razor` 使用 `CascadingAuthenticationState` + `AuthorizeRouteView`，默认布局为 `MainLayout`。
 - 仅在具体页面根组件声明交互渲染（如 `@rendermode InteractiveServer`）。
-- 避免在布局级（Layout）或全局根组件上启用交互，防止“全站被动交互化”。
+- 禁止在布局级（Layout）或全局根组件上启用交互，防止"全站被动交互化"。
 
-## 3.3 组件设计原则
+### 3.3 组件设计原则
 
-- 页面组件：负责页面结构与数据编排。
-- 业务组件：封装某一块业务视图（如评分面板、评论区）。
-- 基础组件（Design System）：按钮、输入框、弹窗、分页、Tag、卡片等。
+- 页面组件：负责页面结构与数据编排（位于 `Pages/` 目录）。
+- 业务组件：封装某一块业务视图（位于 `Components/Features/` 目录）。
+- 基础组件（Design System）：按钮、输入框、弹窗、分页、Tag、表格等（位于 `Components/DesignSystem/` 目录）。
+- 布局组件：全局壳与导航（位于 `Components/Layout/` 和 `Layout/` 目录）。
 - 所有组件优先支持 SSR 输出；需要事件回调时再切入交互模式。
 
 ---
 
 ## 4. 去第三方组件库方案
 
-## 4.1 目标
+### 4.1 目标
 
-- 不再依赖第三方“组件库级别”包（如大型 UI 套件）。
+- 不再依赖第三方"组件库级别"包（如大型 UI 套件）。
 - 样式与组件行为可控、可维护、可按需裁剪。
 
-## 4.2 迁移方式
+### 4.2 迁移方式
 
 1. 先建立 `Design Tokens`（颜色、字号、圆角、间距、阴影、层级、动效时长）。
-2. 用 CSS Variables + BEM/语义化类名构建自研基础组件。
+2. 用 CSS Variables + 语义化类名构建自研基础组件。
 3. 按页面迁移：先替换通用组件，再替换业务页面。
 4. 每迁移一个页面，删除对应第三方依赖调用点，最后清理包引用与静态资源。
 
-## 4.3 最低基础组件清单
+### 4.3 当前基础组件清单（Design System）
 
-- `CgButton`
-- `CgInput` / `CgTextarea` / `CgSelect`
-- `CgModal`
-- `CgTabs`
-- `CgPagination`
-- `CgTag` / `CgBadge`
-- `CgToast`（可选）
+以下组件已实现，均位于 `Components/DesignSystem/` 目录：
+
+| 组件 | 说明 |
+|---|---|
+| `CgButton` | 通用按钮（支持 Variant） |
+| `CgInput` | 单行文本输入 |
+| `CgTextarea` | 多行文本输入 |
+| `CgSelect` | 通用下拉选择 |
+| `CgEnumSelect` | 枚举专用下拉选择 |
+| `CgCheckbox` | 复选框 |
+| `CgDateInput` | 日期输入 |
+| `CgAutoComplete` | 自动补全输入 |
+| `CgModal` | 模态对话框 |
+| `CgPopupMenu` | 弹出菜单 |
+| `CgPagination` | 分页 |
+| `CgTable` | 表格 |
+| `CgGrid` | 网格布局 |
+| `CgToast` | 轻量提示（Toast） |
+| `CgAlert` | 提示信息（Alert） |
+| `CgFormSection` | 表单区块 |
+| `CgFormGroup` | 表单分组 |
+| `CgImageUpload` | 图片上传（含 JS Interop） |
+| `CgAudioUpload` | 音频上传 |
+| `CgMdiIcon` | MDI 图标（配合 `CgMdiIconMap.g.cs` 自动生成映射） |
 
 ---
 
-## 5. SDK 层重构要求（支撑静态优先）
+## 5. SDK 层设计（支撑静态优先）
 
-为支持“静态页优先”，`SDK.MainSite` 需提供两类能力：
+为支持"静态页优先"，`SDK.MainSite` 提供两类能力：
 
-1. **SSR 友好查询接口**
+1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-2. **交互动作接口**
-   - 点赞、收藏、提交评论、编辑资料等操作型命令。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`。
+2. **交互动作接口（Commands）**
+   - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
+   - 当前已实现：`EntryCommandService`、`FileCommandService`。
 
-并要求：
-
-- 明确缓存层级（内存缓存/分布式缓存/ETag）。
-- 登录态获取与刷新逻辑统一封装，页面层不直接处理令牌细节。
-- 所有对 APIServer 的调用统一走 SDK，不允许在 `MainSite.Shared` 直接 `HttpClient` 请求业务接口。
-
----
-
-## 6. 分阶段实施计划
-
-## 阶段 A：基础设施与规范（1~2 周）
-
-- 建立目录规范（`Pages` / `Features` / `SharedComponents` / `DesignSystem`）。
-- 建立样式变量体系与全局样式重置。
-- 建立基础组件第一版（按钮、输入、弹窗、分页）。
-- 补充页面渲染模式检查清单（静态默认、按页交互）。
-
-交付物：
-
-- 可复用基础组件集。
-- 前端重构规范文档（本文件 + 代码约束）。
-
-## 阶段 B：核心页面迁移（2~4 周）
-
-- 选择访问量最高的静态型页面优先迁移（首页、条目详情、列表页）。
-- 把旧组件库调用替换为自研组件。
-- 数据读取全部改为 SDK Query 服务。
-- 页面级性能对比（TTFB、HTML 大小、交互脚本体积）。
-
-交付物：
-
-- 核心页面完成静态 SSR。
-- 旧组件库依赖减少 60% 以上（以组件调用点计）。
-
-## 阶段 C：交互页面精细化（2~3 周）
-
-- 对必须交互页面按页启用 `@rendermode`。
-- 将交互逻辑聚焦到页面根组件和局部业务组件，避免全局交互化。
-- 接入统一异常提示、登录态处理、操作反馈机制。
-
-交付物：
-
-- 交互页全部可用且可回归。
-- 页面交互边界清晰（静态页不携带不必要交互脚本）。
-
-## 阶段 D：收尾与治理（1~2 周）
-
-- 删除已不使用的第三方组件库包与静态资源。
-- 统一 UI 一致性检查（间距、字号、颜色、交互反馈）。
-- 完成 E2E 冒烟与关键路径压测。
-
-交付物：
-
-- 干净依赖图。
-- 重构验收报告与后续维护清单。
-
----
-
-## 7. 目录建议（示例）
-
-```text
-CnGalWebSite.MainSite.Shared
-├─ DesignSystem/
-│  ├─ Tokens/
-│  ├─ Components/
-│  └─ Styles/
-├─ Features/
-│  ├─ Home/
-│  ├─ Entries/
-│  ├─ Articles/
-│  └─ Account/
-├─ Pages/
-└─ SharedComponents/
-```
+### 5.1 当前 SDK 目录结构
 
 ```text
 CnGalWebSite.SDK.MainSite
-├─ Abstractions/
-├─ Queries/
-├─ Commands/
-├─ Auth/
-├─ Caching/
-└─ Infrastructure/
+├─ Abstractions/          # 6 个接口
+│  ├─ IHomeQueryService
+│  ├─ IEntryQueryService
+│  ├─ ISpaceQueryService
+│  ├─ IEntryCommandService
+│  ├─ IFileCommandService
+│  └─ IMainSiteAuthRequestService
+├─ Queries/               # 只读查询服务
+│  ├─ HomeQueryService
+│  ├─ EntryQueryService
+│  └─ SpaceQueryService
+├─ Commands/              # 写操作命令服务
+│  ├─ EntryCommandService
+│  └─ FileCommandService
+├─ Auth/                  # OIDC 认证与令牌管理
+│  ├─ MainSiteAuthRequestService
+│  ├─ AccessTokenHandler
+│  └─ CookieOidcRefresher
+├─ Models/                # ViewModel、结果模型、配置
+│  ├─ SdkResult.cs
+│  ├─ HomeSummaryViewModel.cs
+│  ├─ EntryDetailViewModel.cs
+│  ├─ SpaceDetailViewModel.cs
+│  ├─ MainSiteOidcOptions.cs
+│  ├─ EntryEdit/          # 词条编辑相关模型
+│  └─ Files/              # 文件上传相关模型
+├─ Infrastructure/        # 基础设施
+│  ├─ QueryServiceBase    # 查询服务基类（HttpClient 封装、反序列化、日志截断）
+│  └─ SdkJsonSerializerOptions  # 全局统一 JSON 序列化配置
+└─ Extensions/            # DI 注册扩展
+   ├─ ServiceCollectionExtensions  # AddMainSiteSdk / AddMainSiteOidcAuthentication
+   └─ EndpointRouteBuilderExtensions  # MapMainSiteAuthenticationEndpoints
+```
+
+### 5.2 关键基础设施
+
+- **`SdkResult<T>`**：统一结果模型（`Success` + `Data` / `Error(Code, Message, StatusCode)`）。
+- **`QueryServiceBase`**：查询服务基类，封装 `GetAsyncWithBody`、`Deserialize<T>`（使用全局统一配置）、`TrimForLog`。
+- **`SdkJsonSerializerOptions`**：全局统一 `JsonSerializerOptions`，开启 `PropertyNameCaseInsensitive` 和 `JsonStringEnumConverter`。
+- **`AccessTokenHandler`**：`DelegatingHandler`，为 HttpClient 请求自动附加访问令牌。
+- **DI 注册**：每个服务通过 `AddHttpClient<TInterface, TImpl>` 注册为类型化 HttpClient，并附加 `AccessTokenHandler`。
+
+---
+
+## 6. 分阶段实施进展
+
+### 阶段 A：基础设施与规范 ✅ 已完成
+
+- [x] 建立目录规范（`Pages/` / `Components/Features/` / `Components/DesignSystem/` / `Components/Layout/` / `Layout/`）。
+- [x] 建立样式变量体系（`design-tokens.css`，包含颜色、间距、圆角、字号、字重、阴影、过渡等 `--cg-*` 变量）。
+- [x] 建立基础组件（20 个 DesignSystem 组件）。
+- [x] 确立页面渲染模式策略（静态默认、按页交互）。
+
+### 阶段 B：核心页面迁移 ✅ 已完成
+
+- [x] 首页（`HomePage`）— 纯静态 SSR。
+- [x] 条目详情页（`EntryDetailPage`）— 纯静态 SSR。
+- [x] 条目编辑页（`EntryEditPage`）— InteractiveServer（含草稿恢复、自动保存、客户端校验）。
+- [x] 个人空间页（`SpaceIndexPage`）— 纯静态 SSR。
+- [x] 封装 SDK Query 服务（Home、Entry、Space）与 Command 服务（Entry、File）。
+- [x] 数据读取全部改为 SDK 服务。
+
+### 阶段 C：交互页面精细化 🔄 进行中
+
+- [x] 条目编辑页已按页启用 `@rendermode InteractiveServer`。
+- [x] 编辑页包含完整交互功能（自动保存草稿、丢弃草稿、类型联动、表单校验、提交审核）。
+- [ ] 其他需交互页面（如登录、个人中心编辑）待按需增加。
+- [ ] 统一异常提示机制进一步完善。
+
+### 阶段 D：收尾与治理
+
+- [ ] 删除已不使用的第三方组件库包与静态资源。
+- [ ] 统一 UI 一致性检查（间距、字号、颜色、交互反馈）。
+- [ ] 补充更多页面（文章详情、搜索列表等）。
+- [ ] 完成 E2E 冒烟与关键路径压测。
+
+---
+
+## 7. 当前目录结构
+
+```text
+CnGalWebSite.MainSite
+├─ Components/
+│  ├─ App.razor              # 根组件（HTML shell，引用 design-tokens.css）
+│  ├─ Routes.razor            # 路由组件（CascadingAuthenticationState + AuthorizeRouteView）
+│  ├─ _Imports.razor
+│  ├─ Pages/
+│  │  ├─ Error.razor
+│  │  └─ NotFound.razor
+│  └─ Layout/                 # （当前为空）
+├─ Program.cs
+├─ appsettings.json
+└─ wwwroot/
+```
+
+```text
+CnGalWebSite.MainSite.Shared
+├─ Components/
+│  ├─ DesignSystem/           # 20 个基础 UI 组件
+│  │  ├─ CgButton.razor / .razor.css
+│  │  ├─ CgInput.razor / .razor.css
+│  │  ├─ CgSelect.razor / .razor.css
+│  │  ├─ CgEnumSelect.razor
+│  │  ├─ CgCheckbox.razor / .razor.css
+│  │  ├─ CgDateInput.razor / .razor.css
+│  │  ├─ CgAutoComplete.razor / .razor.css
+│  │  ├─ CgTextarea.razor / .razor.css
+│  │  ├─ CgModal.razor / .razor.css
+│  │  ├─ CgPopupMenu.razor / .razor.css
+│  │  ├─ CgPagination.razor / .razor.css
+│  │  ├─ CgTable.razor / .razor.css
+│  │  ├─ CgGrid.razor / .razor.css
+│  │  ├─ CgToast.razor / .razor.css
+│  │  ├─ CgAlert.razor / .razor.css
+│  │  ├─ CgFormSection.razor / .razor.css
+│  │  ├─ CgFormGroup.razor / .razor.css
+│  │  ├─ CgImageUpload.razor / .razor.css
+│  │  ├─ CgAudioUpload.razor / .razor.css
+│  │  ├─ CgMdiIcon.razor / .razor.css
+│  │  └─ CgMdiIconMap.g.cs   # 自动生成的图标映射
+│  ├─ Features/               # 业务组件
+│  │  ├─ Entry/               # 词条详情（18 个组件）
+│  │  ├─ EntryEditor/         # 词条编辑（14 个组件）
+│  │  ├─ Home/                # 首页（14 个组件）
+│  │  └─ Space/               # 个人空间（4 个组件）
+│  └─ Layout/
+│     └─ UserMenu.razor / .razor.css
+├─ Layout/
+│  └─ MainLayout.razor / .razor.css
+├─ Pages/
+│  ├─ Home/
+│  │  └─ HomePage.razor / .razor.css
+│  ├─ Entry/
+│  │  ├─ EntryDetailPage.razor / .razor.css
+│  │  └─ EntryEditPage.razor / .razor.css
+│  └─ Space/
+│     └─ SpaceIndexPage.razor / .razor.css
+├─ wwwroot/
+│  ├─ styles/
+│  │  └─ design-tokens.css    # 全局设计变量
+│  └─ scripts/
+│     └─ cg-image-upload.js   # 图片上传 JS Interop
+├─ _Imports.razor
+└─ AssemblyMarker.cs
 ```
 
 ---
@@ -196,16 +287,16 @@ CnGalWebSite.SDK.MainSite
 ## 8. 工程约束（建议写入 CI 检查）
 
 - 禁止在 `MainSite.Shared` 中出现业务 API 直连逻辑。
-- 新增页面若含 `@rendermode`，必须附带“交互必要性”说明。
+- 新增页面若含 `@rendermode`，必须附带"交互必要性"说明。
 - 静态页禁止引入无必要 JS 互操作。
-- 页面 PR 必须包含“替换了哪些第三方组件调用点”的说明。
+- 页面 PR 必须包含"替换了哪些第三方组件调用点"的说明。
 - 组件必须提供基础可访问性（键盘焦点、语义标签、ARIA 基本属性）。
 
 ---
 
 ## 9. 验收标准（Definition of Done）
 
-- 大多数页面以静态 SSR 渲染（建议目标：`>= 80%` 页面）。
+- 大多数页面以静态 SSR 渲染（当前目标：`>= 80%` 页面）。
 - 交互能力仅在必要页面启用，且未出现全局交互化回退。
 - 第三方组件库依赖移除完成（包、样式、脚本、组件调用点）。
 - `MainSite.Shared` 不直接依赖 APIServer，全部通过 `SDK.MainSite`。
@@ -226,12 +317,10 @@ CnGalWebSite.SDK.MainSite
 
 ---
 
-## 11. 推荐落地顺序（首批）
+## 11. 下一步工作
 
-1. 完成 `DesignSystem` 基础组件（Button/Input/Modal/Pagination）。
-2. 迁移首页与详情页为静态 SSR 模式。
-3. 封装 `SDK.MainSite` 的首页、详情 Query 服务。
-4. 迁移登录和个人中心（按页交互）。
-5. 清理并移除不再使用的第三方组件库依赖。
-
-该顺序可在最短周期内体现“静态优先 + 按页交互 + 去三方依赖”的重构价值。
+1. 继续补充更多页面（文章详情、搜索列表、登录/注册等）。
+2. 清理并移除不再使用的第三方组件库依赖。
+3. 完善 SDK 缓存策略（当前尚未建立独立 `Caching/` 模块）。
+4. 统一 UI 一致性检查与可访问性审计。
+5. 补充关键路径 E2E 测试。

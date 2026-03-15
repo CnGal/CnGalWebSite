@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

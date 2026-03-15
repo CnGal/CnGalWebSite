@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.Helper
+@using CnGalWebSite.SDK.MainSite.Infrastructure
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
@@ -247,7 +247,7 @@
             return;
         }
 
-        var items = ToolHelper.GetStaffsFromString(_batchText);
+        var items = StaffBatchParser.GetStaffsFromString(_batchText);
 
         foreach (var item in items)
         {
