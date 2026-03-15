@@ -40,6 +40,8 @@ services:
       - SteamAPIUrl=${SteamAPIUrl}
       - BackUpArchiveUrl=${BackUpArchiveUrl}
       - HeyboxGetGameDetailUrl=${HeyboxGetGameDetailUrl}
+      - VginsightsApiUrl=${VginsightsApiUrl}
+      - GamalyticApiUrl=${GamalyticApiUrl}
       # GPT一分钟请求次数上限 单用户
       - ChatGPTLimit_1_Minute=${ChatGPTLimit_1_Minute}
       # GPT一天请求次数上限 单用户

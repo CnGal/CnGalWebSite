@@ -2,93 +2,84 @@ services:
   apiserver:
     image: littlefishtentears/cngalwebsiteidentityserver:${IMAGE_TAG:-latest}
     container_name: identityserver
-    environment:
-      - TZ=${TZ:-Asia/Shanghai}
-      # 数据库连接字符串
-      - DefaultDBConnection=${DefaultDBConnection}
-      # 外部身份验证
-      # 谷歌
-      - GoogleClientId=${GoogleClientId}
-      - GoogleClientSecret=${GoogleClientSecret}
-      # Github
-      - GitHubClientId=${GitHubClientId}
-      - GitHubClientSecret=${GitHubClientSecret}
-      # Gitee
-      - GiteeClientId=${GiteeClientId}
-      - GiteeClientSecret=${GiteeClientSecret}
-      # QQ
-      - QQClientId=${QQClientId}
-      - QQClientSecret=${QQClientSecret}
-      # 发送验证邮件的电子邮箱
-      - Server=${Server:-smtp.exmail.qq.com}
-      - Port=${Port:-465}
-      - SenderName=${SenderName:-CnGal资料站}
-      - SenderEmail=${SenderEmail:-kanban@cngal.org}
-      - Account=${Account:-kanban@cngal.org}
-      - Password=${Password}
-      # 短信模板
-      - SMS_ResetPassword=${SMS_ResetPassword}
-      - SMS_AddPhoneNumber=${SMS_AddPhoneNumber}
-      - SMS_ChangePhoneNumber=${SMS_ChangePhoneNumber}
-      # 海外短信模板
-      - SMS_Globe_ResetPassword=${SMS_Globe_ResetPassword}
-      - SMS_Globe_AddPhoneNumber=${SMS_Globe_AddPhoneNumber}
-      - SMS_Globe_ChangePhoneNumber=${SMS_Globe_ChangePhoneNumber}
-      # 阿里云
-      - AliyunAccessKeySecret=${AliyunAccessKeySecret}
-      - AliyunAccessKeyId=${AliyunAccessKeyId}
-      # 信任的第三方登录
-      - TrustedExternalAuthProviders=${TrustedExternalAuthProviders}
-      # 极验
-      - GEETEST_KEY=${GEETEST_KEY}
-      - GEETEST_ID=${GEETEST_ID}
-      # 证书
-      - CertPath=${CertPath:-cert/IS4.pfx}
-      - CertPassword=${CertPassword}
-      # 临时使用配置文件 后续持久化储存
-      - IdsSSR=${IdsSSR:-https://open.cngal.org}
-      - IdsWASM=${IdsWASM:-https://app.open.cngal.org}
-      - SSR=${SSR:-https://www.cngal.org}
-      - WASM=${WASM:-https://app.cngal.org}
-      # SSR端储存令牌服务密匙
-      - TokenAPISecret=${TokenAPISecret}
-      # 白名单
-      - IpWhitelist=${IpWhitelist}
-      # 签名
-      - SignName=${SignName}
-      # 邮箱域名黑名单
-      - EmailDomainBlacklist=${EmailDomainBlacklist}
     hostname: identityserver
-    restart: always
+    restart: unless-stopped
+
+    networks:
+      - web
+
+    ports:
+      - ${PORT:-5011}:8080
+      # - 5001:8081
+
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      DefaultDBConnection: ${DefaultDBConnection}
+      TokenAPISecret: ${TokenAPISecret}
+      IpWhitelist: ${IpWhitelist}
+      IdsSSR: ${IdsSSR:-https://open.cngal.org}
+      IdsWASM: ${IdsWASM:-https://app.open.cngal.org}
+      SSR: ${SSR:-https://www.cngal.org}
+      WASM: ${WASM:-https://app.cngal.org}
+      # 证书
+      CertPath: ${CertPath:-cert/IS4.pfx}
+      CertPassword: ${CertPassword}
+      # 邮箱域名黑名单
+      EmailDomainBlacklist: ${EmailDomainBlacklist}
+      # SMTP
+      Server: ${Server:-smtp.exmail.qq.com}
+      Port: ${Port:-465}
+      SenderName: ${SenderName:-CnGal资料站}
+      SenderEmail: ${SenderEmail:-kanban@cngal.org}
+      Account: ${Account:-kanban@cngal.org}
+      Password: ${Password}
+      # 短信
+      AliyunAccessKeySecret: ${AliyunAccessKeySecret}
+      AliyunAccessKeyId: ${AliyunAccessKeyId}
+      SMS_AddPhoneNumber: ${SMS_AddPhoneNumber}
+      SMS_ChangePhoneNumber: ${SMS_ChangePhoneNumber}
+      SMS_ResetPassword: ${SMS_ResetPassword}
+      SMS_Globe_ResetPassword: ${SMS_Globe_ResetPassword}
+      SMS_Globe_AddPhoneNumber: ${SMS_Globe_AddPhoneNumber}
+      SMS_Globe_ChangePhoneNumber: ${SMS_Globe_ChangePhoneNumber}
+      SignName: ${SignName}
+      # 信任的第三方登录
+      TrustedExternalAuthProviders: ${TrustedExternalAuthProviders}
+      # 极验验证码
+      GEETEST_KEY: ${GEETEST_KEY}
+      GEETEST_ID: ${GEETEST_ID}
+      # 外部身份验证
+      GoogleClientId: ${GoogleClientId}
+      GoogleClientSecret: ${GoogleClientSecret}
+      GitHubClientId: ${GitHubClientId}
+      GitHubClientSecret: ${GitHubClientSecret}
+      GiteeClientId: ${GiteeClientId}
+      GiteeClientSecret: ${GiteeClientSecret}
+      QQClientId: ${QQClientId}
+      QQClientSecret: ${QQClientSecret}
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 1m30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+    volumes:
+      - DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+      - ${MNT_DIR:-/mnt/docker}/IdentityServer:/app/cert
+
+    labels:
+      com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
+
     deploy:
       resources:
         limits:
           memory: ${RESOURCES_LIMITS_MEMORY:-500m}
-    ports:
-      - ${PORT:-5011}:8080
-      # - 5001:8081
-    volumes:
-      - DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-      - ${MNT_DIR:-/mnt/docker}/IdentityServer:/app/cert
-    labels:
-      - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-true} # watchtower
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: 10
-    networks:
-      - web
-
-volumes:
-  DataProtection-Keys:
 
 networks:
   web:
     external: true
+
+volumes:
+  DataProtection-Keys:
