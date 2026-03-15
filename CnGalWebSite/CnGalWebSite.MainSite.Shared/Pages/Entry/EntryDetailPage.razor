@@ -1,9 +1,9 @@
-@page "/entries/index/{Id:int}"
+﻿@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Search
-@using CnGalWebSite.MainSite.Shared.Components.Features.Entry
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.Extensions
 
 <PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>

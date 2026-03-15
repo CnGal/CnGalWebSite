@@ -1,16 +1,17 @@
-@page "/entries/establish"
+﻿@page "/entries/establish"
 @page "/entries/create"
 @page "/entries/edit/{Id:int}"
 
 @rendermode InteractiveServer
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
+@using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models
 @using System.Text.Json
 @using CnGalWebSite.SDK.MainSite.Models.EntryEdit
 @using CnGalWebSite.DataModel.ViewModel
 @using Microsoft.JSInterop
-@using CnGalWebSite.MainSite.Shared.Components.Features.EntryEditor
 @inject IEntryCommandService EntryCommandService
 @inject ITagQueryService TagQueryService
 @inject NavigationManager NavigationManager
