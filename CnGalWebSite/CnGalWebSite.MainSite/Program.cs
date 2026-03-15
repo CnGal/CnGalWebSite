@@ -14,7 +14,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
-
+//添加状态检查
+builder.Services.AddHealthChecks();
 var app = builder.Build();
 //设置请求来源
 if (!app.Environment.IsDevelopment())
