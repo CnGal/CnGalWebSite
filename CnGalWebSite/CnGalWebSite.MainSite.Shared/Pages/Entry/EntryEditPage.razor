@@ -1,4 +1,4 @@
-﻿@page "/entries/establish"
+@page "/entries/establish"
 @page "/entries/create"
 @page "/entries/edit/{Id:int}"
 
@@ -71,7 +71,7 @@ else if (Model != null)
 
         <main class="entry-edit-content">
             <EntryMainEditor Model="Model.Data.Main" TypeChanged="OnTypeChanged" />
-            <EntryAddInforEditor Model="Model.Data.AddInfor" MetaOptions="Model.MetaOptions" />
+            <EntryAddInforEditor @ref="_addInforEditorRef" Model="Model.Data.AddInfor" MetaOptions="Model.MetaOptions" />
             <EntryImagesEditor Model="Model.Data.Images" />
             <EntryMainPageEditor Model="Model.Data.MainPage" />
             <EntryRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
@@ -98,6 +98,7 @@ else if (Model != null)
     private string? SubmitErrorMessage;
 
     private EntryEditViewModel? Model;
+    private EntryAddInforEditor? _addInforEditorRef;
 
     private System.Threading.Timer? _autoSaveTimer;
     private string DraftKey => IsCreate ? "EntryDraft_Create" : $"EntryDraft_Edit_{Id}";
@@ -261,7 +262,7 @@ else if (Model != null)
         }
     }
 
-    private void OnTypeChanged(EntryType newType)
+    private async Task OnTypeChanged(EntryType newType)
     {
         if (Model != null)
         {
@@ -269,6 +270,11 @@ else if (Model != null)
             Model.Data.Main.Type = newType;
             Model.Data.AddInfor.Type = newType;
             Model.Data.Relevances.Type = newType;
+
+            if (_addInforEditorRef != null)
+            {
+                await _addInforEditorRef.RefreshInformationsAsync(newType);
+            }
         }
     }
 }

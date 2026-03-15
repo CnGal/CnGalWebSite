@@ -1,0 +1,60 @@
+@using CnGalWebSite.DataModel.Helper
+@using CnGalWebSite.DataModel.ViewModel
+
+<div class="cg-form-section">
+    <h3>Staff 数据图表（兼容旧站格式）</h3>
+    <div class="cg-form-group">
+        <textarea class="cg-textarea"
+                  @bind="StaffsInput"
+                  placeholder="示例：&#10;原画：张三&#10;剧本：李四"
+                  rows="8"></textarea>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EditAddInforViewModel Model { get; set; } = default!;
+
+    private string StaffsInput
+    {
+        get
+        {
+            if (Model?.Staffs == null || !Model.Staffs.Any())
+            {
+                return string.Empty;
+            }
+
+            var sb = new System.Text.StringBuilder();
+            var groups = Model.Staffs.GroupBy(s => s.Modifier ?? string.Empty);
+            foreach (var g in groups)
+            {
+                if (!string.IsNullOrWhiteSpace(g.Key))
+                {
+                    sb.AppendLine(g.Key);
+                }
+
+                var posGroups = g.GroupBy(s => s.PositionOfficial ?? string.Empty);
+                foreach (var pg in posGroups)
+                {
+                    if (string.IsNullOrWhiteSpace(pg.Key))
+                    {
+                        continue;
+                    }
+
+                    var names = string.Join("，", pg.Select(s =>
+                        $"{s.Name}{(string.IsNullOrWhiteSpace(s.SubordinateOrganization) ? string.Empty : $"（{s.SubordinateOrganization}）")}"));
+                    sb.AppendLine($"{pg.Key}：{names}");
+                }
+            }
+
+            return sb.ToString();
+        }
+        set
+        {
+            if (Model != null)
+            {
+                Model.Staffs = ToolHelper.GetStaffsFromString(value ?? string.Empty);
+            }
+        }
+    }
+}

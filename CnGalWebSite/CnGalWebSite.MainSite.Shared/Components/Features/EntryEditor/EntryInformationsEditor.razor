@@ -1,0 +1,87 @@
+@using CnGalWebSite.DataModel.Helper
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.Extensions
+@using System.Globalization
+
+<div class="cg-form-section">
+    <h3>基础信息项</h3>
+    @foreach (var info in Informations)
+    {
+        @if (info.Name == "生日")
+        {
+            <div class="cg-form-group">
+                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
+                <input class="cg-input"
+                       type="date"
+                       value="@ToBirthdayDateInput(info.Value)"
+                       @onchange="(e) => OnBirthdayChanged(e, info)" />
+            </div>
+        }
+        else if (info.Name == "性别")
+        {
+            <div class="cg-form-group">
+                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
+                <CgEnumSelect TEnum="GenderType"
+                              Value="@GetGenderValue(info.Value)"
+                              ValueChanged="(v) => OnGenderChanged(v, info)" />
+            </div>
+        }
+        else
+        {
+            <div class="cg-form-group">
+                <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
+                <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<EditInformationModel> Informations { get; set; } = default!;
+
+    private static string ToBirthdayDateInput(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        // 旧站格式为 "M月d日"，需转换为 date input 的 "yyyy-MM-dd" 格式
+        if (DateTime.TryParseExact(value, "M月d日", null, DateTimeStyles.None, out var date))
+        {
+            return date.ToString("yyyy-MM-dd");
+        }
+
+        return string.Empty;
+    }
+
+    private static void OnBirthdayChanged(ChangeEventArgs args, EditInformationModel info)
+    {
+        var text = args.Value?.ToString();
+        if (DateTime.TryParse(text, out var date))
+        {
+            info.Value = date.ToString("M月d日");
+        }
+        else
+        {
+            info.Value = null;
+        }
+    }
+
+    private static GenderType GetGenderValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return GenderType.None;
+        }
+
+        return value.ToEnumValue<GenderType>();
+    }
+
+    private static void OnGenderChanged(GenderType gender, EditInformationModel info)
+    {
+        info.Value = gender.GetDisplayName();
+    }
+}

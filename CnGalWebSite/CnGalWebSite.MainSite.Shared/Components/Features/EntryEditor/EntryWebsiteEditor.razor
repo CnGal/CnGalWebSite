@@ -51,15 +51,15 @@
                     <div class="image-item">
                         <div class="cg-form-group flex-1">
                             <label class="cg-form-label">图片位置（Type）</label>
-                            <CgSelect Value="@img.Type.ToString()"
-                                      ValueChanged="(text) => OnImageTypeChanged(img, text)"
-                                      Options="@_imageTypeOptions" />
+                            <CgEnumSelect TEnum="EntryWebsiteImageType"
+                                          Value="@img.Type"
+                                          ValueChanged="(type) => { img.Type = type; }" />
                         </div>
                         <div class="cg-form-group flex-1">
                             <label class="cg-form-label">图片尺寸（Size）</label>
-                            <CgSelect Value="@img.Size.ToString()"
-                                      ValueChanged="(text) => OnImageSizeChanged(img, text)"
-                                      Options="@_imageSizeOptions" />
+                            <CgEnumSelect TEnum="EntryWebsiteImageSize"
+                                          Value="@img.Size"
+                                          ValueChanged="(size) => { img.Size = size; }" />
                         </div>
                         <div class="cg-form-group flex-1">
                             <label class="cg-form-label">图片链接</label>
@@ -81,14 +81,6 @@
     [Parameter]
     public EditEntryWebsiteViewModel Model { get; set; } = default!;
 
-    private readonly List<KeyValuePair<string, string>> _imageTypeOptions = Enum.GetValues<EntryWebsiteImageType>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
-
-    private readonly List<KeyValuePair<string, string>> _imageSizeOptions = Enum.GetValues<EntryWebsiteImageSize>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
-
     private void AddImage()
     {
         Model.Images ??= new();
@@ -98,25 +90,5 @@
     private void RemoveImage(EditWebsiteImageModel img)
     {
         Model.Images?.Remove(img);
-    }
-
-    private Task OnImageTypeChanged(EditWebsiteImageModel model, string? value)
-    {
-        if (Enum.TryParse<EntryWebsiteImageType>(value, out var type))
-        {
-            model.Type = type;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private Task OnImageSizeChanged(EditWebsiteImageModel model, string? value)
-    {
-        if (Enum.TryParse<EntryWebsiteImageSize>(value, out var size))
-        {
-            model.Size = size;
-        }
-
-        return Task.CompletedTask;
     }
 }

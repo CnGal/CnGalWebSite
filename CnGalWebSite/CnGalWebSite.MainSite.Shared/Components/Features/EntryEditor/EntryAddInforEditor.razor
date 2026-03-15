@@ -1,8 +1,8 @@
-@using CnGalWebSite.DataModel.Helper
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models.EntryEdit
-@using CnGalWebSite.Extensions
+@inject IEntryCommandService EntryCommandService
 
 <section class="entry-editor-section">
     <h2>附加信息</h2>
@@ -10,251 +10,28 @@
 
     @if (Model != null)
     {
-        @if (Model.Type == EntryType.Game || Model.Type == EntryType.Role)
-        {
-            <div class="cg-form-section">
-                <h3>类型补充字段</h3>
-                @if (Model.Type == EntryType.Game)
-                {
-                    <div class="cg-grid-2">
-                        <div class="cg-form-group">
-                            <label class="cg-form-label">制作组</label>
-                            <CgInput @bind-Value="Model.ProductionGroup" Placeholder="制作组唯一名称或名称" />
-                        </div>
-                        <div class="cg-form-group">
-                            <label class="cg-form-label">发行商</label>
-                            <CgInput @bind-Value="Model.Publisher" Placeholder="发行商唯一名称或名称" />
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="cg-form-group">
-                        <label class="cg-form-label">声优</label>
-                        <CgInput @bind-Value="Model.CV" Placeholder="角色声优信息" />
-                    </div>
-                }
-            </div>
-        }
+        <EntryTypeFieldsEditor Model="Model" />
 
-        <div class="cg-form-section mt-4">
-            <h3>基础信息项</h3>
-            @foreach (var info in Model.Informations)
-            {
-                <div class="cg-form-group">
-                    <label class="cg-form-label">@info.Name @(!string.IsNullOrWhiteSpace(info.Description) ? $"({info.Description})" : string.Empty)</label>
-                    <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
-                </div>
-            }
+        <div class="mt-4">
+            <EntryInformationsEditor Informations="Model.Informations" />
         </div>
 
         @if (Model.Type == EntryType.Game)
         {
-            <div class="cg-form-section mt-4">
-                <div class="cg-section-header">
-                    <h3>发行列表</h3>
-                    <button class="cg-btn cg-btn--primary" type="button" @onclick="AddRelease">添加发行版本</button>
-                </div>
-
-                @if (Model.Releases.Any())
-                {
-                    <table class="cg-table">
-                        <thead>
-                            <tr>
-                                <th>类型</th>
-                                <th>名称</th>
-                                <th>发行平台</th>
-                                <th>游戏平台</th>
-                                <th>发行时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Releases.OrderBy(s => s.Time))
-                            {
-                                <tr>
-                                    <td>@item.Type.GetDisplayName()</td>
-                                    <td>@item.Name</td>
-                                    <td>@GetPublishPlatformText(item)</td>
-                                    <td>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</td>
-                                    <td>@GetReleaseTimeText(item)</td>
-                                    <td class="cg-actions">
-                                        <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditRelease(item)">编辑</button>
-                                        <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveRelease(item)">删除</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
+            <div class="mt-4">
+                <EntryReleasesEditor Releases="Model.Releases" />
             </div>
 
-            <div class="cg-form-section mt-4">
-                <div class="cg-section-header">
-                    <h3>预约</h3>
-                </div>
-                <div class="cg-grid-2">
-                    <CgCheckbox @bind-Value="Model.Booking.Open" Label="开启预约" />
-                    @if (Model.Booking.Open)
-                    {
-                        <CgCheckbox @bind-Value="Model.Booking.IsNeedNotification" Label="上线后通知预约用户" />
-                    }
-                </div>
-
-                @if (Model.Booking.Open)
-                {
-                    <div class="cg-form-group">
-                        <label class="cg-form-label">关联抽奖</label>
-                        <CgAutoComplete @bind-Value="Model.Booking.LotteryName"
-                                        Items="@MetaOptions.LotteryItems"
-                                        Placeholder="输入或选择抽奖名称" />
-                    </div>
-
-                    <div class="cg-section-header mt-4">
-                        <h3>预约目标</h3>
-                        <button class="cg-btn cg-btn--primary" type="button" @onclick="AddBookingGoal">添加目标</button>
-                    </div>
-
-                    @if (Model.Booking.Goals.Any())
-                    {
-                        <table class="cg-table">
-                            <thead>
-                                <tr>
-                                    <th>目标人数</th>
-                                    <th>名称</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var goal in Model.Booking.Goals.OrderBy(s => s.Target))
-                                {
-                                    <tr>
-                                        <td>@goal.Target</td>
-                                        <td>@goal.Name</td>
-                                        <td class="cg-actions">
-                                            <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditBookingGoal(goal)">编辑</button>
-                                            <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveBookingGoal(goal)">删除</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                }
+            <div class="mt-4">
+                <EntryBookingEditor Booking="Model.Booking" LotteryItems="MetaOptions.LotteryItems" />
             </div>
         }
 
-        <div class="cg-form-section mt-4">
-            <h3>Staff 数据图表（兼容旧站格式）</h3>
-            <div class="cg-form-group">
-                <textarea class="cg-textarea"
-                          @bind="StaffsInput"
-                          placeholder="示例：&#10;原画：张三&#10;剧本：李四"
-                          rows="8"></textarea>
-            </div>
+        <div class="mt-4">
+            <EntryStaffsEditor Model="Model" />
         </div>
     }
 </section>
-
-<CgModal IsOpen="@_releaseDialogOpen"
-         Title="编辑发行版本"
-         OnClose="CloseReleaseDialogAsync">
-    @if (_releaseEditing != null)
-    {
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">类型</label>
-                <CgSelect Value="@_releaseEditing.Type.ToString()"
-                          ValueChanged="OnReleaseTypeChanged"
-                          Options="@_releaseTypeOptions" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">名称</label>
-                <CgInput @bind-Value="_releaseEditing.Name" Placeholder="游戏发行名称" />
-            </div>
-
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行平台类型</label>
-                <CgSelect Value="@_releaseEditing.PublishPlatformType.ToString()"
-                          ValueChanged="OnPublishPlatformChanged"
-                          Options="@_publishPlatformOptions" />
-            </div>
-            @if (_releaseEditing.PublishPlatformType == PublishPlatformType.Other)
-            {
-                <div class="cg-form-group">
-                    <label class="cg-form-label">发行平台名称</label>
-                    <CgInput @bind-Value="_releaseEditing.PublishPlatformName" Placeholder="如：官网商城" />
-                </div>
-            }
-
-            <div class="cg-form-group">
-                <label class="cg-form-label">@(_releaseEditing.PublishPlatformType == PublishPlatformType.Other ? "链接" : "平台Id")</label>
-                <CgInput @bind-Value="_releaseEditing.Link" Placeholder="平台链接或平台 Id" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">引擎</label>
-                <CgInput @bind-Value="_releaseEditing.Engine" Placeholder="如：Unity / Ren'Py" />
-            </div>
-
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行时间</label>
-                <input class="cg-input"
-                       type="date"
-                       value="@ToDateInput(_releaseEditing.Time)"
-                       @onchange="OnReleaseDateChanged" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">发行时间备注</label>
-                <CgInput @bind-Value="_releaseEditing.TimeNote" Placeholder="如：2026 年 Q3" />
-            </div>
-        </div>
-
-        <div class="cg-form-group">
-            <label class="cg-form-label">游戏平台</label>
-            <div class="cg-checkbox-group">
-                @foreach (var platform in _gamePlatformValues)
-                {
-                    var current = platform;
-                    <CgCheckbox Value="@_releaseEditing.GamePlatformTypes.Contains(current)"
-                                ValueChanged="(selected) => OnPlatformChanged(current, selected)"
-                                Label="@platform.GetDisplayName()" />
-                }
-            </div>
-        </div>
-
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseReleaseDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveRelease">保存</button>
-        </div>
-    }
-</CgModal>
-
-<CgModal IsOpen="@_bookingGoalDialogOpen"
-         Title="编辑预约目标"
-         OnClose="CloseBookingGoalDialogAsync">
-    @if (_bookingGoalEditing != null)
-    {
-        <div class="cg-grid-2">
-            <div class="cg-form-group">
-                <label class="cg-form-label">目标人数</label>
-                <input class="cg-input"
-                       type="number"
-                       min="1"
-                       value="@_bookingGoalEditing.Target"
-                       @onchange="OnBookingTargetChanged" />
-            </div>
-            <div class="cg-form-group">
-                <label class="cg-form-label">名称</label>
-                <CgInput @bind-Value="_bookingGoalEditing.Name" Placeholder="如：公开试玩 DEMO" />
-            </div>
-        </div>
-
-        <div class="cg-dialog-actions">
-            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseBookingGoalDialog">取消</button>
-            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveBookingGoal">保存</button>
-        </div>
-    }
-</CgModal>
 
 @code {
     [Parameter]
@@ -263,277 +40,29 @@
     [Parameter]
     public EntryEditMetaOptions MetaOptions { get; set; } = default!;
 
-    private readonly List<KeyValuePair<string, string>> _releaseTypeOptions = Enum.GetValues<GameReleaseType>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
-
-    private readonly List<KeyValuePair<string, string>> _publishPlatformOptions = Enum.GetValues<PublishPlatformType>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
-
-    private readonly List<GamePlatformType> _gamePlatformValues = Enum.GetValues<GamePlatformType>().ToList();
-
-    private bool _releaseDialogOpen;
-    private EditReleaseModel? _releaseEditing;
-    private EditReleaseModel? _releaseTarget;
-
-    private bool _bookingGoalDialogOpen;
-    private EditBookingGoalModel? _bookingGoalEditing;
-    private EditBookingGoalModel? _bookingGoalTarget;
-
-    private string StaffsInput
+    /// <summary>
+    /// 按类型重新获取远端配置的基础信息字段列表，保留用户已填写的值
+    /// </summary>
+    public async Task RefreshInformationsAsync(EntryType type)
     {
-        get
+        var result = await EntryCommandService.GetInformationFieldsAsync(type);
+        if (result.Success && result.Data != null)
         {
-            if (Model?.Staffs == null || !Model.Staffs.Any())
+            // 保留用户已填写的值
+            var existingValues = Model.Informations
+                .Where(i => !string.IsNullOrWhiteSpace(i.Value))
+                .ToDictionary(i => i.Name, i => i.Value);
+
+            Model.Informations = result.Data;
+            foreach (var info in Model.Informations)
             {
-                return string.Empty;
-            }
-
-            var sb = new System.Text.StringBuilder();
-            var groups = Model.Staffs.GroupBy(s => s.Modifier ?? string.Empty);
-            foreach (var g in groups)
-            {
-                if (!string.IsNullOrWhiteSpace(g.Key))
+                if (existingValues.TryGetValue(info.Name, out var value))
                 {
-                    sb.AppendLine(g.Key);
-                }
-
-                var posGroups = g.GroupBy(s => s.PositionOfficial ?? string.Empty);
-                foreach (var pg in posGroups)
-                {
-                    if (string.IsNullOrWhiteSpace(pg.Key))
-                    {
-                        continue;
-                    }
-
-                    var names = string.Join("，", pg.Select(s =>
-                        $"{s.Name}{(string.IsNullOrWhiteSpace(s.SubordinateOrganization) ? string.Empty : $"（{s.SubordinateOrganization}）")}"));
-                    sb.AppendLine($"{pg.Key}：{names}");
+                    info.Value = value;
                 }
             }
 
-            return sb.ToString();
+            StateHasChanged();
         }
-        set
-        {
-            if (Model != null)
-            {
-                Model.Staffs = ToolHelper.GetStaffsFromString(value ?? string.Empty);
-            }
-        }
-    }
-
-    private string GetPublishPlatformText(EditReleaseModel model)
-        => model.PublishPlatformType == PublishPlatformType.Other && !string.IsNullOrWhiteSpace(model.PublishPlatformName)
-            ? model.PublishPlatformName
-            : model.PublishPlatformType.GetDisplayName();
-
-    private static string GetReleaseTimeText(EditReleaseModel model)
-    {
-        if (!string.IsNullOrWhiteSpace(model.TimeNote))
-        {
-            if (model.Time.HasValue)
-            {
-                return $"{model.TimeNote} ({model.Time.Value:yyyy-MM-dd})";
-            }
-
-            return model.TimeNote;
-        }
-
-        return model.Time.HasValue ? model.Time.Value.ToString("yyyy-MM-dd") : string.Empty;
-    }
-
-    private void AddRelease()
-    {
-        _releaseTarget = null;
-        _releaseEditing = new EditReleaseModel
-        {
-            Type = GameReleaseType.Official,
-            PublishPlatformType = PublishPlatformType.Steam,
-            GamePlatformTypes = []
-        };
-        _releaseDialogOpen = true;
-    }
-
-    private void EditRelease(EditReleaseModel model)
-    {
-        _releaseTarget = model;
-        _releaseEditing = new EditReleaseModel
-        {
-            Name = model.Name,
-            PublishPlatformType = model.PublishPlatformType,
-            PublishPlatformName = model.PublishPlatformName,
-            Type = model.Type,
-            GamePlatformTypes = [.. model.GamePlatformTypes],
-            Time = model.Time,
-            TimeNote = model.TimeNote,
-            Engine = model.Engine,
-            Link = model.Link
-        };
-        _releaseDialogOpen = true;
-    }
-
-    private void RemoveRelease(EditReleaseModel model)
-    {
-        Model.Releases.Remove(model);
-    }
-
-    private void OnPlatformChanged(GamePlatformType type, bool selected)
-    {
-        if (_releaseEditing == null)
-        {
-            return;
-        }
-
-        if (selected && !_releaseEditing.GamePlatformTypes.Contains(type))
-        {
-            _releaseEditing.GamePlatformTypes.Add(type);
-        }
-        else if (!selected)
-        {
-            _releaseEditing.GamePlatformTypes.Remove(type);
-        }
-    }
-
-    private Task OnReleaseTypeChanged(string? value)
-    {
-        if (_releaseEditing != null && Enum.TryParse<GameReleaseType>(value, out var parsed))
-        {
-            _releaseEditing.Type = parsed;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private Task OnPublishPlatformChanged(string? value)
-    {
-        if (_releaseEditing != null && Enum.TryParse<PublishPlatformType>(value, out var parsed))
-        {
-            _releaseEditing.PublishPlatformType = parsed;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private void OnReleaseDateChanged(ChangeEventArgs args)
-    {
-        if (_releaseEditing == null)
-        {
-            return;
-        }
-
-        var text = args.Value?.ToString();
-        _releaseEditing.Time = DateTime.TryParse(text, out var date) ? date : null;
-    }
-
-    private static string ToDateInput(DateTime? time)
-        => time?.ToString("yyyy-MM-dd") ?? string.Empty;
-
-    private void SaveRelease()
-    {
-        if (_releaseEditing == null || string.IsNullOrWhiteSpace(_releaseEditing.Name))
-        {
-            return;
-        }
-
-        if (_releaseTarget == null)
-        {
-            Model.Releases.Add(_releaseEditing);
-        }
-        else
-        {
-            _releaseTarget.Name = _releaseEditing.Name;
-            _releaseTarget.PublishPlatformType = _releaseEditing.PublishPlatformType;
-            _releaseTarget.PublishPlatformName = _releaseEditing.PublishPlatformName;
-            _releaseTarget.Type = _releaseEditing.Type;
-            _releaseTarget.GamePlatformTypes = [.. _releaseEditing.GamePlatformTypes];
-            _releaseTarget.Time = _releaseEditing.Time;
-            _releaseTarget.TimeNote = _releaseEditing.TimeNote;
-            _releaseTarget.Engine = _releaseEditing.Engine;
-            _releaseTarget.Link = _releaseEditing.Link;
-        }
-
-        CloseReleaseDialog();
-    }
-
-    private void CloseReleaseDialog()
-    {
-        _releaseEditing = null;
-        _releaseTarget = null;
-        _releaseDialogOpen = false;
-    }
-
-    private Task CloseReleaseDialogAsync()
-    {
-        CloseReleaseDialog();
-        return Task.CompletedTask;
-    }
-
-    private void AddBookingGoal()
-    {
-        _bookingGoalTarget = null;
-        _bookingGoalEditing = new EditBookingGoalModel();
-        _bookingGoalDialogOpen = true;
-    }
-
-    private void EditBookingGoal(EditBookingGoalModel model)
-    {
-        _bookingGoalTarget = model;
-        _bookingGoalEditing = new EditBookingGoalModel
-        {
-            Name = model.Name,
-            Target = model.Target
-        };
-        _bookingGoalDialogOpen = true;
-    }
-
-    private void RemoveBookingGoal(EditBookingGoalModel model)
-    {
-        Model.Booking.Goals.Remove(model);
-    }
-
-    private void OnBookingTargetChanged(ChangeEventArgs args)
-    {
-        if (_bookingGoalEditing == null)
-        {
-            return;
-        }
-
-        var text = args.Value?.ToString();
-        _bookingGoalEditing.Target = int.TryParse(text, out var value) ? value : 0;
-    }
-
-    private void SaveBookingGoal()
-    {
-        if (_bookingGoalEditing == null || string.IsNullOrWhiteSpace(_bookingGoalEditing.Name))
-        {
-            return;
-        }
-
-        if (_bookingGoalTarget == null)
-        {
-            Model.Booking.Goals.Add(_bookingGoalEditing);
-        }
-        else
-        {
-            _bookingGoalTarget.Name = _bookingGoalEditing.Name;
-            _bookingGoalTarget.Target = _bookingGoalEditing.Target;
-        }
-
-        CloseBookingGoalDialog();
-    }
-
-    private void CloseBookingGoalDialog()
-    {
-        _bookingGoalEditing = null;
-        _bookingGoalTarget = null;
-        _bookingGoalDialogOpen = false;
-    }
-
-    private Task CloseBookingGoalDialogAsync()
-    {
-        CloseBookingGoalDialog();
-        return Task.CompletedTask;
     }
 }

@@ -1,0 +1,268 @@
+@using CnGalWebSite.DataModel.Helper
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<div class="cg-form-section">
+    <div class="cg-section-header">
+        <h3>发行列表</h3>
+        <button class="cg-btn cg-btn--primary" type="button" @onclick="AddRelease">添加发行版本</button>
+    </div>
+
+    @if (Releases.Any())
+    {
+        <table class="cg-table">
+            <thead>
+                <tr>
+                    <th>类型</th>
+                    <th>名称</th>
+                    <th>发行平台</th>
+                    <th>游戏平台</th>
+                    <th>发行时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Releases.OrderBy(s => s.Time))
+                {
+                    <tr>
+                        <td>@item.Type.GetDisplayName()</td>
+                        <td>@item.Name</td>
+                        <td>@GetPublishPlatformText(item)</td>
+                        <td>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</td>
+                        <td>@GetReleaseTimeText(item)</td>
+                        <td class="cg-actions">
+                            <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditRelease(item)">编辑</button>
+                            <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveRelease(item)">删除</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<CgModal IsOpen="@_releaseDialogOpen"
+         Title="编辑发行版本"
+         OnClose="CloseReleaseDialogAsync">
+    @if (_releaseEditing != null)
+    {
+        <div class="cg-grid-2">
+            <div class="cg-form-group">
+                <label class="cg-form-label">类型</label>
+                <CgEnumSelect TEnum="GameReleaseType"
+                              Value="@_releaseEditing.Type"
+                              ValueChanged="OnReleaseTypeChanged" />
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">名称</label>
+                <CgInput @bind-Value="_releaseEditing.Name" Placeholder="游戏发行名称" />
+            </div>
+
+            <div class="cg-form-group">
+                <label class="cg-form-label">发行平台类型</label>
+                <CgEnumSelect TEnum="PublishPlatformType"
+                              Value="@_releaseEditing.PublishPlatformType"
+                              ValueChanged="OnPublishPlatformChanged" />
+            </div>
+            @if (_releaseEditing.PublishPlatformType == PublishPlatformType.Other)
+            {
+                <div class="cg-form-group">
+                    <label class="cg-form-label">发行平台名称</label>
+                    <CgInput @bind-Value="_releaseEditing.PublishPlatformName" Placeholder="如：官网商城" />
+                </div>
+            }
+
+            <div class="cg-form-group">
+                <label class="cg-form-label">@(_releaseEditing.PublishPlatformType == PublishPlatformType.Other ? "链接" : "平台Id")</label>
+                <CgInput @bind-Value="_releaseEditing.Link" Placeholder="平台链接或平台 Id" />
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">引擎</label>
+                <CgInput @bind-Value="_releaseEditing.Engine" Placeholder="如：Unity / Ren'Py" />
+            </div>
+
+            <div class="cg-form-group">
+                <label class="cg-form-label">发行时间</label>
+                <input class="cg-input"
+                       type="date"
+                       value="@ToDateInput(_releaseEditing.Time)"
+                       @onchange="OnReleaseDateChanged" />
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">发行时间备注</label>
+                <CgInput @bind-Value="_releaseEditing.TimeNote" Placeholder="如：2026 年 Q3" />
+            </div>
+        </div>
+
+        <div class="cg-form-group">
+            <label class="cg-form-label">游戏平台</label>
+            <div class="cg-checkbox-group">
+                @foreach (var platform in _gamePlatformValues)
+                {
+                    var current = platform;
+                    <CgCheckbox Value="@_releaseEditing.GamePlatformTypes.Contains(current)"
+                                ValueChanged="(selected) => OnPlatformChanged(current, selected)"
+                                Label="@platform.GetDisplayName()" />
+                }
+            </div>
+        </div>
+
+        <div class="cg-dialog-actions">
+            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseReleaseDialog">取消</button>
+            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveRelease">保存</button>
+        </div>
+    }
+</CgModal>
+
+@code {
+    [Parameter]
+    public List<EditReleaseModel> Releases { get; set; } = default!;
+
+    private readonly List<GamePlatformType> _gamePlatformValues = Enum.GetValues<GamePlatformType>().ToList();
+
+    private bool _releaseDialogOpen;
+    private EditReleaseModel? _releaseEditing;
+    private EditReleaseModel? _releaseTarget;
+
+    private string GetPublishPlatformText(EditReleaseModel model)
+        => model.PublishPlatformType == PublishPlatformType.Other && !string.IsNullOrWhiteSpace(model.PublishPlatformName)
+            ? model.PublishPlatformName
+            : model.PublishPlatformType.GetDisplayName();
+
+    private static string GetReleaseTimeText(EditReleaseModel model)
+    {
+        if (!string.IsNullOrWhiteSpace(model.TimeNote))
+        {
+            if (model.Time.HasValue)
+            {
+                return $"{model.TimeNote} ({model.Time.Value:yyyy-MM-dd})";
+            }
+
+            return model.TimeNote;
+        }
+
+        return model.Time.HasValue ? model.Time.Value.ToString("yyyy-MM-dd") : string.Empty;
+    }
+
+    private void AddRelease()
+    {
+        _releaseTarget = null;
+        _releaseEditing = new EditReleaseModel
+        {
+            Type = GameReleaseType.Official,
+            PublishPlatformType = PublishPlatformType.Steam,
+            GamePlatformTypes = []
+        };
+        _releaseDialogOpen = true;
+    }
+
+    private void EditRelease(EditReleaseModel model)
+    {
+        _releaseTarget = model;
+        _releaseEditing = new EditReleaseModel
+        {
+            Name = model.Name,
+            PublishPlatformType = model.PublishPlatformType,
+            PublishPlatformName = model.PublishPlatformName,
+            Type = model.Type,
+            GamePlatformTypes = [.. model.GamePlatformTypes],
+            Time = model.Time,
+            TimeNote = model.TimeNote,
+            Engine = model.Engine,
+            Link = model.Link
+        };
+        _releaseDialogOpen = true;
+    }
+
+    private void RemoveRelease(EditReleaseModel model)
+    {
+        Releases.Remove(model);
+    }
+
+    private void OnPlatformChanged(GamePlatformType type, bool selected)
+    {
+        if (_releaseEditing == null)
+        {
+            return;
+        }
+
+        if (selected && !_releaseEditing.GamePlatformTypes.Contains(type))
+        {
+            _releaseEditing.GamePlatformTypes.Add(type);
+        }
+        else if (!selected)
+        {
+            _releaseEditing.GamePlatformTypes.Remove(type);
+        }
+    }
+
+    private void OnReleaseTypeChanged(GameReleaseType type)
+    {
+        if (_releaseEditing != null)
+        {
+            _releaseEditing.Type = type;
+        }
+    }
+
+    private void OnPublishPlatformChanged(PublishPlatformType platform)
+    {
+        if (_releaseEditing != null)
+        {
+            _releaseEditing.PublishPlatformType = platform;
+        }
+    }
+
+    private void OnReleaseDateChanged(ChangeEventArgs args)
+    {
+        if (_releaseEditing == null)
+        {
+            return;
+        }
+
+        var text = args.Value?.ToString();
+        _releaseEditing.Time = DateTime.TryParse(text, out var date) ? date : null;
+    }
+
+    private static string ToDateInput(DateTime? time)
+        => time?.ToString("yyyy-MM-dd") ?? string.Empty;
+
+    private void SaveRelease()
+    {
+        if (_releaseEditing == null || string.IsNullOrWhiteSpace(_releaseEditing.Name))
+        {
+            return;
+        }
+
+        if (_releaseTarget == null)
+        {
+            Releases.Add(_releaseEditing);
+        }
+        else
+        {
+            _releaseTarget.Name = _releaseEditing.Name;
+            _releaseTarget.PublishPlatformType = _releaseEditing.PublishPlatformType;
+            _releaseTarget.PublishPlatformName = _releaseEditing.PublishPlatformName;
+            _releaseTarget.Type = _releaseEditing.Type;
+            _releaseTarget.GamePlatformTypes = [.. _releaseEditing.GamePlatformTypes];
+            _releaseTarget.Time = _releaseEditing.Time;
+            _releaseTarget.TimeNote = _releaseEditing.TimeNote;
+            _releaseTarget.Engine = _releaseEditing.Engine;
+            _releaseTarget.Link = _releaseEditing.Link;
+        }
+
+        CloseReleaseDialog();
+    }
+
+    private void CloseReleaseDialog()
+    {
+        _releaseEditing = null;
+        _releaseTarget = null;
+        _releaseDialogOpen = false;
+    }
+
+    private Task CloseReleaseDialogAsync()
+    {
+        CloseReleaseDialog();
+        return Task.CompletedTask;
+    }
+}

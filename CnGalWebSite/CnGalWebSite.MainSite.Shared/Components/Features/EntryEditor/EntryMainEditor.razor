@@ -12,15 +12,15 @@
         <div class="cg-grid-2">
             <div class="cg-form-group">
                 <label class="cg-form-label">类型</label>
-                <CgSelect Value="@Model.Type.ToString()"
-                          ValueChanged="OnTypeChanged"
-                          Options="@_entryTypeOptions" />
+                <CgEnumSelect TEnum="EntryType"
+                              Value="@Model.Type"
+                              ValueChanged="OnTypeChanged" />
             </div>
             <div class="cg-form-group">
                 <label class="cg-form-label">样式模板</label>
-                <CgSelect Value="@Model.Template.ToString()"
-                          ValueChanged="OnTemplateChanged"
-                          Options="@_templateOptions" />
+                <CgEnumSelect TEnum="EntryStyleTemplate"
+                              Value="@Model.Template"
+                              ValueChanged="OnTemplateChanged" />
             </div>
         </div>
 
@@ -103,13 +103,6 @@
     private bool _syncDisplayName;
     private bool _syncInitialized;
 
-    private readonly List<KeyValuePair<string, string>> _entryTypeOptions = Enum.GetValues<EntryType>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
-
-    private readonly List<KeyValuePair<string, string>> _templateOptions = Enum.GetValues<EntryStyleTemplate>()
-        .Select(type => KeyValuePair.Create(type.ToString(), type.GetDisplayName()))
-        .ToList();
 
     protected override void OnParametersSet()
     {
@@ -122,25 +115,15 @@
         _syncInitialized = true;
     }
 
-    private async Task OnTypeChanged(string? value)
+    private async Task OnTypeChanged(EntryType newType)
     {
-        if (!Enum.TryParse<EntryType>(value, out var newType))
-        {
-            return;
-        }
-
         Model.Type = newType;
         await TypeChanged.InvokeAsync(newType);
     }
 
-    private Task OnTemplateChanged(string? value)
+    private void OnTemplateChanged(EntryStyleTemplate template)
     {
-        if (Enum.TryParse<EntryStyleTemplate>(value, out var template))
-        {
-            Model.Template = template;
-        }
-
-        return Task.CompletedTask;
+        Model.Template = template;
     }
 
     private Task OnNameChanged(string? value)
