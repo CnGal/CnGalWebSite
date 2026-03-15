@@ -1,0 +1,93 @@
+/* ── CgTreeView ── */
+
+.cg-tree,
+.cg-tree__children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── 单行 ── */
+.cg-tree__row {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: var(--cg-spacing-2);
+    border-radius: var(--cg-radius-sm);
+    cursor: default;
+    transition: background var(--cg-transition-fast);
+    user-select: none;
+}
+
+.cg-tree__row:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.cg-tree__row--selected {
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+}
+
+/* ── 展开/折叠 ── */
+.cg-tree__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: var(--cg-radius-sm);
+    background: transparent;
+    color: var(--cg-color-text-muted);
+    cursor: pointer;
+    padding: 0;
+    transition: transform var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.cg-tree__toggle:hover {
+    color: var(--cg-color-text);
+    background: var(--cg-color-hover-overlay);
+}
+
+.cg-tree__toggle--open {
+    transform: rotate(90deg);
+}
+
+::deep .cg-tree__toggle .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.cg-tree__toggle-placeholder {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+}
+
+/* ── 图标 ── */
+::deep .cg-tree__icon {
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+/* ── 文本 ── */
+.cg-tree__text {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── checkbox 对齐 ── */
+::deep .cg-tree__row .cg-checkbox {
+    flex-shrink: 0;
+}

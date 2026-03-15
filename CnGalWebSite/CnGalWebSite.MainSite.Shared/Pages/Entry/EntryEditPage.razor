@@ -12,6 +12,7 @@
 @using Microsoft.JSInterop
 @using CnGalWebSite.MainSite.Shared.Components.Features.EntryEditor
 @inject IEntryCommandService EntryCommandService
+@inject ITagQueryService TagQueryService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject ICgToastService ToastService
@@ -149,10 +150,20 @@ else if (Model != null)
                 }
                 catch { }
 
-                var metaResult = await EntryCommandService.GetEntryEditMetaOptionsAsync();
+                var metaTask = EntryCommandService.GetEntryEditMetaOptionsAsync();
+                var tagTreeTask = TagQueryService.GetTagTreeAsync();
+                await Task.WhenAll(metaTask, tagTreeTask);
+
+                var metaResult = metaTask.Result;
                 if (metaResult.Success && metaResult.Data != null)
                 {
                     Model.MetaOptions = metaResult.Data;
+                }
+
+                var tagTreeResult = tagTreeTask.Result;
+                if (tagTreeResult.Success && tagTreeResult.Data != null)
+                {
+                    Model.MetaOptions.TagTreeItems = tagTreeResult.Data;
                 }
             }
             else

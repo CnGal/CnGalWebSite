@@ -1,12 +1,19 @@
-@using CnGalWebSite.SDK.MainSite.Abstractions
-@using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.JSInterop
+@using Microsoft.Extensions.Configuration
 @implements IAsyncDisposable
-@inject IFileCommandService FileCommandService
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
 
 <div class="cg-markdown-editor">
-    <div @ref="_containerRef"></div>
+    @if (_loading)
+    {
+        <div class="cg-markdown-editor__loading">
+            <CgProgressRing Size="lg" />
+            <span class="cg-markdown-editor__loading-text">正在加载编辑器…</span>
+        </div>
+    }
+
+    <div @ref="_containerRef" style="@(_loading ? "display:none" : null)"></div>
 
     @if (!string.IsNullOrWhiteSpace(_errorMessage))
     {
@@ -15,12 +22,12 @@
 </div>
 
 @code {
-    private const long MaxUploadBytes = 10 * 1024 * 1024;
 
     private ElementReference _containerRef;
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<CgMarkdownEditor>? _dotNetRef;
     private bool _initialized;
+    private bool _loading;
     private string? _lastKnownValue;
     private string? _errorMessage;
 
@@ -41,13 +48,20 @@
         if (firstRender)
         {
             _dotNetRef = DotNetObjectReference.Create(this);
+            _loading = true;
+            StateHasChanged();
+
             _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
                 "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-markdown-editor.js");
 
+            var imageApiBaseUrl = Configuration["MainSiteApi:ImageApiPath"] ?? string.Empty;
+
             _lastKnownValue = Value;
-            await _jsModule.InvokeVoidAsync("initEditor", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty);
+            await _jsModule.InvokeVoidAsync("initEditor", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty, imageApiBaseUrl);
             _initialized = true;
+            _loading = false;
+            StateHasChanged();
         }
     }
 
@@ -75,35 +89,6 @@
         _lastKnownValue = value;
         Value = value;
         await ValueChanged.InvokeAsync(value);
-    }
-
-    /// <summary>
-    /// 由 JS 调用：Vditor 图片上传回调
-    /// </summary>
-    [JSInvokable]
-    public async Task<string?> OnImageUploadFromJs(string base64Data, string fileName)
-    {
-        _errorMessage = null;
-        try
-        {
-            var bytes = Convert.FromBase64String(base64Data);
-            using var stream = new MemoryStream(bytes);
-            var result = await FileCommandService.UploadImageAsync(stream, fileName, ImageAspectType.None);
-            if (result.Success && !string.IsNullOrWhiteSpace(result.Data))
-            {
-                return result.Data;
-            }
-
-            _errorMessage = result.Error?.Message ?? "图片上传失败";
-            StateHasChanged();
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"图片上传异常：{ex.Message}";
-            StateHasChanged();
-            return null;
-        }
     }
 
     public async ValueTask DisposeAsync()

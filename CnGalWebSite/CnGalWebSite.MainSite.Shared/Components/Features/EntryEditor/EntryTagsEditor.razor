@@ -43,6 +43,10 @@
                 <p class="tag-editor__empty">暂无标签，点击 <strong>+</strong> 按钮添加。</p>
             }
         </div>
+
+        <EntryTagTreeCard TreeItems="@MetaOptions.TagTreeItems"
+                          Tags="@Model.Tags"
+                          OnTagsChanged="StateHasChanged" />
     }
 </section>
 

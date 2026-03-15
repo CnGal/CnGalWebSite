@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.ViewModel.Tags;
+
 namespace CnGalWebSite.SDK.MainSite.Models.EntryEdit;
 
 public sealed class EntryEditMetaOptions
@@ -10,4 +12,5 @@ public sealed class EntryEditMetaOptions
     public List<string> TagItems { get; set; } = [];
     public List<string> VideoItems { get; set; } = [];
     public List<string> LotteryItems { get; set; } = [];
+    public List<TagTreeModel> TagTreeItems { get; set; } = [];
 }

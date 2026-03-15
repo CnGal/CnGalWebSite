@@ -51,8 +51,12 @@
                                         </audio>
                                     </td>
                                     <td class="cg-actions">
-                                        <CgButton Variant="outline" Size="sm" OnClick="() => EditAudio(item)">编辑</CgButton>
-                                        <CgButton Variant="danger" Size="sm" OnClick="() => DeleteAudio(item)">删除</CgButton>
+                                        <CgButton Variant="ghost" OnClick="() => EditAudio(item)" aria-label="编辑">
+                                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                        </CgButton>
+                                        <CgButton Variant="ghost-danger" OnClick="() => DeleteAudio(item)" aria-label="删除">
+                                            <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                        </CgButton>
                                     </td>
                                 </tr>
                             }

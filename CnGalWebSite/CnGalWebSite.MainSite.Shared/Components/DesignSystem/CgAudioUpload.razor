@@ -4,16 +4,27 @@
 @inject IFileCommandService FileCommandService
 
 <div class="cg-audio-upload @Class">
-    <label class="cg-btn cg-btn--primary @(Disabled || _isUploading ? "cg-audio-upload__label--disabled" : string.Empty)"
-           for="@_inputId">
-        @(_isUploading ? "上传中..." : Text)
-    </label>
-    <InputFile id="@_inputId"
-               class="cg-audio-upload__file-input"
-               accept="audio/*"
-               multiple="@Multiple"
-               disabled="@(Disabled || _isUploading)"
-               OnChange="OnFileChanged" />
+    <div class="cg-audio-upload__actions">
+        <label class="cg-audio-upload__upload-btn @(Disabled || _isUploading ? "cg-audio-upload__upload-btn--disabled" : string.Empty)"
+               for="@_inputId">
+            @if (_isUploading)
+            {
+                <CgProgressRing Size="sm" />
+                <span>上传中...</span>
+            }
+            else
+            {
+                @Text
+            }
+        </label>
+        <InputFile id="@_inputId"
+                   class="cg-audio-upload__file-input"
+                   style="display:none"
+                   accept="audio/*"
+                   multiple="@Multiple"
+                   disabled="@(Disabled || _isUploading)"
+                   OnChange="OnFileChanged" />
+    </div>
 
     @if (!string.IsNullOrWhiteSpace(_errorMessage))
     {

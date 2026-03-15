@@ -2,6 +2,24 @@
     width: 100%;
 }
 
+/* ── 加载态 ── */
+.cg-markdown-editor__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 200px;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+}
+
+.cg-markdown-editor__loading-text {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
 /* ── Vditor 容器适配设计系统 ── */
 .cg-markdown-editor ::deep .vditor {
     font-family: var(--cg-font-family), sans-serif;

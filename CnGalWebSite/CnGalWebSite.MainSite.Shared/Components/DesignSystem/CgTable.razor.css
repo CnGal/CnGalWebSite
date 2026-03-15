@@ -64,6 +64,7 @@
     display: flex;
     gap: var(--cg-spacing-1);
     align-items: center;
+    height: 100%;
 }
 
 /* ── 空状态 ── */

@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Auth;
 using CnGalWebSite.SDK.MainSite.Commands;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -153,6 +153,11 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
         });
+        services.AddHttpClient<ITagQueryService, TagQueryService>(client =>
+        {
+            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
+        })
+        .AddHttpMessageHandler<AccessTokenHandler>();
         return services;
     }
 
