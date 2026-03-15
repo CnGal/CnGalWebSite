@@ -1,40 +1,109 @@
-<input class="cg-input @ClassName"
-       type="text"
-       value="@Value"
-       placeholder="@Placeholder"
-       list="@_listId"
-       disabled="@Disabled"
-       @oninput="OnChanged" />
-<datalist id="@_listId">
-    @foreach (var item in Items)
+@* CgAutoComplete — 自定义下拉自动补全（类 CgSelect 风格） *@
+<div class="cg-autocomplete @ClassName">
+    <input @key="_inputKey"
+           class="cg-autocomplete__input"
+           type="text"
+           value="@Value"
+           placeholder="@Placeholder"
+           disabled="@Disabled"
+           @oninput="OnInput"
+           @onfocus="OpenDropdown"
+           autocomplete="off"/>
+
+    @if (_isOpen && _filtered.Any())
     {
-        <option value="@item"></option>
+        <button type="button"
+                class="cg-autocomplete__backdrop"
+                aria-label="关闭下拉框"
+                @onclick="CloseDropdown"></button>
+
+        <ul class="cg-autocomplete__menu" role="listbox">
+            @foreach (var item in _filtered)
+            {
+                <li role="option">
+                    <button type="button"
+                            class="cg-autocomplete__option"
+                            @onclick="() => SelectOption(item)">
+                        @item
+                    </button>
+                </li>
+            }
+        </ul>
     }
-</datalist>
+</div>
 
 @code {
-    [Parameter]
-    public string? Value { get; set; }
+    private const int MaxResults = 20;
+    private bool _isOpen;
+    private List<string> _filtered = [];
+    private int _inputKey;
+    private string? _lastUserInput;
 
-    [Parameter]
-    public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Value { get; set; }
 
-    [Parameter]
-    public IEnumerable<string> Items { get; set; } = [];
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
 
-    [Parameter]
-    public string? Placeholder { get; set; }
+    [Parameter] public IEnumerable<string> Items { get; set; } = [];
 
-    [Parameter]
-    public bool Disabled { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
 
-    [Parameter]
-    public string ClassName { get; set; } = string.Empty;
+    [Parameter] public bool Disabled { get; set; }
 
-    private readonly string _listId = $"cg-ac-{Guid.NewGuid():N}";
+    [Parameter] public string ClassName { get; set; } = string.Empty;
 
-    private Task OnChanged(ChangeEventArgs args)
+    protected override void OnParametersSet()
     {
-        return ValueChanged.InvokeAsync(args.Value?.ToString());
+        if (_lastUserInput != null && Value != _lastUserInput)
+        {
+            _inputKey++;
+            _lastUserInput = null;
+        }
     }
+
+    private void UpdateFiltered(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            _filtered = Items.Take(MaxResults).ToList();
+        }
+        else
+        {
+            _filtered = Items
+                .Where(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
+                .Take(MaxResults)
+                .ToList();
+        }
+    }
+
+    private async Task OnInput(ChangeEventArgs args)
+    {
+        var text = args.Value?.ToString();
+        _lastUserInput = text;
+        await ValueChanged.InvokeAsync(text);
+        UpdateFiltered(text);
+        _isOpen = _filtered.Any();
+    }
+
+    private void OpenDropdown()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        UpdateFiltered(Value);
+        _isOpen = _filtered.Any();
+    }
+
+    private void CloseDropdown()
+    {
+        _isOpen = false;
+    }
+
+    private async Task SelectOption(string item)
+    {
+        _isOpen = false;
+        await ValueChanged.InvokeAsync(item);
+    }
+
 }

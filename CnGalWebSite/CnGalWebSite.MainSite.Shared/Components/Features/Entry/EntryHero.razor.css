@@ -127,6 +127,46 @@
     background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
 }
 
+.entry-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.entry-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-primary);
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.entry-edit-btn:hover {
+    opacity: 0.9;
+}
+
+.entry-edit-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.entry-edit-btn--login {
+    background: transparent;
+    color: var(--cg-color-primary);
+}
+
+.entry-edit-btn--login:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    opacity: 1;
+}
+
 @media (min-width: 768px) {
     .entry-hero {
         gap: 2.5rem;

@@ -1,0 +1,23 @@
+.cg-audio-upload {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-audio-upload__file-input {
+    display: none;
+}
+
+.cg-audio-upload__label--disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.cg-audio-upload__message {
+    font-size: var(--cg-font-size-sm);
+    padding: var(--cg-spacing-1) 0;
+}
+
+.cg-audio-upload__message--error {
+    color: var(--cg-color-error);
+}

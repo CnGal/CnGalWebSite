@@ -11,4 +11,9 @@ public interface IFileCommandService
         ImageAspectType aspectType = ImageAspectType.None,
         bool gallery = false,
         CancellationToken cancellationToken = default);
+
+    Task<SdkResult<AudioUploadResult>> UploadAudioAsync(
+        Stream fileStream,
+        string fileName,
+        CancellationToken cancellationToken = default);
 }

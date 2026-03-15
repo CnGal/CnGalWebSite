@@ -32,7 +32,7 @@ public sealed class EntryCommandService(
             };
             
             // 获取并初始化各个类型的基础信息模板
-            var informations = await httpClient.GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", cancellationToken);
+            var informations = await httpClient.GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", SdkJsonSerializerOptions.Default, cancellationToken);
             if (informations != null)
             {
                 foreach (var item in informations)
@@ -56,14 +56,14 @@ public sealed class EntryCommandService(
         try
         {
             // 并发获取所有编辑部分的当前数据
-            var mainTask = httpClient.GetFromJsonAsync<EditMainViewModel>($"api/entries/EditMain/{id}", cancellationToken);
-            var addInforTask = httpClient.GetFromJsonAsync<EditAddInforViewModel>($"api/entries/EditAddInfor/{id}", cancellationToken);
-            var mainPageTask = httpClient.GetFromJsonAsync<EditMainPageViewModel>($"api/entries/EditMainPage/{id}", cancellationToken);
-            var imagesTask = httpClient.GetFromJsonAsync<EditImagesViewModel>($"api/entries/EditImages/{id}", cancellationToken);
-            var relevancesTask = httpClient.GetFromJsonAsync<EditRelevancesViewModel>($"api/entries/EditRelevances/{id}", cancellationToken);
-            var tagsTask = httpClient.GetFromJsonAsync<EditEntryTagViewModel>($"api/entries/EditTags/{id}", cancellationToken);
-            var audioTask = httpClient.GetFromJsonAsync<EditAudioViewModel>($"api/entries/EditAudio/{id}", cancellationToken);
-            var websiteTask = httpClient.GetFromJsonAsync<EditEntryWebsiteViewModel>($"api/entries/EditWebsite/{id}", cancellationToken);
+            var mainTask = httpClient.GetFromJsonAsync<EditMainViewModel>($"api/entries/EditMain/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var addInforTask = httpClient.GetFromJsonAsync<EditAddInforViewModel>($"api/entries/EditAddInfor/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var mainPageTask = httpClient.GetFromJsonAsync<EditMainPageViewModel>($"api/entries/EditMainPage/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var imagesTask = httpClient.GetFromJsonAsync<EditImagesViewModel>($"api/entries/EditImages/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var relevancesTask = httpClient.GetFromJsonAsync<EditRelevancesViewModel>($"api/entries/EditRelevances/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var tagsTask = httpClient.GetFromJsonAsync<EditEntryTagViewModel>($"api/entries/EditTags/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var audioTask = httpClient.GetFromJsonAsync<EditAudioViewModel>($"api/entries/EditAudio/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
+            var websiteTask = httpClient.GetFromJsonAsync<EditEntryWebsiteViewModel>($"api/entries/EditWebsite/{id}", SdkJsonSerializerOptions.Default, cancellationToken);
 
             await Task.WhenAll(mainTask, addInforTask, mainPageTask, imagesTask, relevancesTask, tagsTask, audioTask, websiteTask);
 
@@ -101,14 +101,14 @@ public sealed class EntryCommandService(
         {
             var model = new EntryEditMetaOptions();
             
-            var gamesTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
-            var rolesTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/1", cancellationToken);
-            var groupsTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/2", cancellationToken);
-            var staffsTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/3", cancellationToken);
-            var articlesTask = httpClient.GetFromJsonAsync<List<string>>("api/articles/GetAllArticles", cancellationToken);
-            var tagsTask = httpClient.GetFromJsonAsync<List<string>>("api/tags/GetAllTags", cancellationToken);
-            var videosTask = httpClient.GetFromJsonAsync<List<string>>("api/videos/GetNames", cancellationToken);
-            var lotteriesTask = httpClient.GetFromJsonAsync<List<string>>("api/lotteries/GetNames", cancellationToken);
+            var gamesTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", SdkJsonSerializerOptions.Default, cancellationToken);
+            var rolesTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/1", SdkJsonSerializerOptions.Default, cancellationToken);
+            var groupsTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/2", SdkJsonSerializerOptions.Default, cancellationToken);
+            var staffsTask = httpClient.GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/3", SdkJsonSerializerOptions.Default, cancellationToken);
+            var articlesTask = httpClient.GetFromJsonAsync<List<string>>("api/articles/GetAllArticles", SdkJsonSerializerOptions.Default, cancellationToken);
+            var tagsTask = httpClient.GetFromJsonAsync<List<string>>("api/tags/GetAllTags", SdkJsonSerializerOptions.Default, cancellationToken);
+            var videosTask = httpClient.GetFromJsonAsync<List<string>>("api/videos/GetNames", SdkJsonSerializerOptions.Default, cancellationToken);
+            var lotteriesTask = httpClient.GetFromJsonAsync<List<string>>("api/lotteries/GetNames", SdkJsonSerializerOptions.Default, cancellationToken);
 
             await Task.WhenAll(gamesTask, rolesTask, groupsTask, staffsTask, articlesTask, tagsTask, videosTask, lotteriesTask);
 
@@ -136,8 +136,8 @@ public sealed class EntryCommandService(
         {
             if (request.IsCreate)
             {
-                var response = await httpClient.PostAsJsonAsync("api/entries/EstablishEntry", request.Data, cancellationToken);
-                var result = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken);
+                var response = await httpClient.PostAsJsonAsync("api/entries/EstablishEntry", request.Data, SdkJsonSerializerOptions.Default, cancellationToken);
+                var result = await response.Content.ReadFromJsonAsync<Result>(SdkJsonSerializerOptions.Default, cancellationToken);
                 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
@@ -189,7 +189,7 @@ public sealed class EntryCommandService(
     {
         try
         {
-            var informations = await httpClient.GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", cancellationToken);
+            var informations = await httpClient.GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", SdkJsonSerializerOptions.Default, cancellationToken);
             return SdkResult<List<EditInformationModel>>.Ok(informations ?? []);
         }
         catch (Exception ex)
@@ -201,7 +201,7 @@ public sealed class EntryCommandService(
 
     private async Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
-        var response = await httpClient.PostAsJsonAsync(path, model, cancellationToken);
-        return await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken);
+        var response = await httpClient.PostAsJsonAsync(path, model, SdkJsonSerializerOptions.Default, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<Result>(SdkJsonSerializerOptions.Default, cancellationToken);
     }
 }

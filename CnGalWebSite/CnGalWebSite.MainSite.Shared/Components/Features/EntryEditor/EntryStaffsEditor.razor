@@ -1,60 +1,290 @@
 @using CnGalWebSite.DataModel.Helper
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
 <div class="cg-form-section">
-    <h3>Staff 数据图表（兼容旧站格式）</h3>
-    <div class="cg-form-group">
-        <textarea class="cg-textarea"
-                  @bind="StaffsInput"
-                  placeholder="示例：&#10;原画：张三&#10;剧本：李四"
-                  rows="8"></textarea>
+    <div class="cg-section-header">
+        <h3>Staff 列表</h3>
+        <div class="cg-header-actions">
+            <button class="cg-btn cg-btn--outline" type="button" @onclick="OpenBatchDialog">批量导入</button>
+            <button class="cg-btn cg-btn--primary" type="button" @onclick="AddStaff">添加 Staff</button>
+        </div>
     </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <CgAlert Variant="error">@_errorMessage</CgAlert>
+    }
+
+    @if (Staffs.Any())
+    {
+        <table class="cg-table">
+            <thead>
+            <tr>
+                <th>分组</th>
+                <th>★官方职位</th>
+                <th>★唯一名称</th>
+                <th>通用职位</th>
+                <th>隶属组织</th>
+                <th>自定义名称</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Staffs)
+            {
+                <tr>
+                    <td>@item.Modifier</td>
+                    <td>@item.PositionOfficial</td>
+                    <td>@item.Name</td>
+                    <td>@item.PositionGeneral.GetDisplayName()</td>
+                    <td>@item.SubordinateOrganization</td>
+                    <td>@item.CustomName</td>
+                    <td class="cg-actions">
+                        <button class="cg-btn cg-btn--outline" type="button" @onclick="() => EditStaff(item)">编辑</button>
+                        <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveStaff(item)">删除</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="cg-empty-tip">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
+    }
 </div>
 
-@code {
-    [Parameter]
-    public EditAddInforViewModel Model { get; set; } = default!;
-
-    private string StaffsInput
+@* ── 编辑 / 新增弹窗 ── *@
+<CgModal IsOpen="@_editDialogOpen"
+         Title="@(_editTarget == null ? "添加 Staff" : "编辑 Staff")"
+         OnClose="CloseEditDialogAsync">
+    @if (_editingItem != null)
     {
-        get
+        <div class="cg-grid-2">
+            <div class="cg-form-group">
+                <label class="cg-form-label">分组</label>
+                <CgInput @bind-Value="_editingItem.Modifier" Placeholder="如：主题曲"/>
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">★官方职位</label>
+                <CgInput @bind-Value="_editingItem.PositionOfficial" Placeholder="如：主催、作曲"/>
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">★唯一名称</label>
+                <CgInput @bind-Value="_editingItem.Name" Placeholder="Staff 唯一名称"/>
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">通用职位</label>
+                <CgEnumSelect TEnum="PositionGeneralType"
+                              Value="@_editingItem.PositionGeneral"
+                              ValueChanged="OnPositionGeneralChanged"/>
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">隶属组织</label>
+                <CgInput @bind-Value="_editingItem.SubordinateOrganization" Placeholder="如：工作室A"/>
+            </div>
+            <div class="cg-form-group">
+                <label class="cg-form-label">自定义名称</label>
+                <CgInput @bind-Value="_editingItem.CustomName" Placeholder="自定义显示名称"/>
+            </div>
+        </div>
+
+        <div class="cg-dialog-actions">
+            <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseEditDialog">取消</button>
+            <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveStaff">保存</button>
+        </div>
+    }
+</CgModal>
+
+@* ── 批量导入弹窗 ── *@
+<CgModal IsOpen="@_batchDialogOpen"
+         Title="批量导入 Staff"
+         OnClose="CloseBatchDialogAsync">
+    <div class="cg-batch-tip">
+        <p>按照下方例子整理 Staff 文本后输入可以批量导入 Staff 信息</p>
+        <p>括号中的内容分别是通用职位、配音角色、隶属组织</p>
+        <p>同类项将会自动合并</p>
+        <p>其中"、""，""，"和":""："和"（）""()"都可作分隔符，如果 Staff 名称中包含分隔符，请单独录入</p>
+        <p>请把有分类的 Staff 放到最后</p>
+        <br/>
+        <p class="cg-batch-example">
+            主催：小明<br/>
+            CV（配音）：小红、小亮（工作室A）、小李<br/>
+            主题曲：<br/>
+            作词：小红（工作室B）<br/>
+            作曲：小刚
+        </p>
+    </div>
+    <div class="cg-form-group">
+        <textarea class="cg-textarea" @bind="_batchText" rows="7" placeholder="请输入 Staff 文本"></textarea>
+    </div>
+    <div class="cg-dialog-actions">
+        <button class="cg-btn cg-btn--outline" type="button" @onclick="CloseBatchDialog">取消</button>
+        <button class="cg-btn cg-btn--primary" type="button" @onclick="SaveBatch">保存</button>
+    </div>
+</CgModal>
+
+@code {
+    [Parameter] public List<StaffModel> Staffs { get; set; } = default!;
+
+    // ── 错误提示 ──
+    private string? _errorMessage;
+    private Timer? _errorTimer;
+
+    // ── 编辑弹窗状态 ──
+    private bool _editDialogOpen;
+    private StaffModel? _editingItem;
+    private StaffModel? _editTarget; // null = 新增, 非null = 编辑
+
+    // ── 批量导入弹窗状态 ──
+    private bool _batchDialogOpen;
+    private string? _batchText;
+
+    // ── 错误提示辅助 ──
+    private void ShowError(string message)
+    {
+        _errorMessage = message;
+        _errorTimer?.Dispose();
+        _errorTimer = new Timer(_ =>
         {
-            if (Model?.Staffs == null || !Model.Staffs.Any())
-            {
-                return string.Empty;
-            }
+            _errorMessage = null;
+            InvokeAsync(StateHasChanged);
+        }, null, 4000, Timeout.Infinite);
+    }
 
-            var sb = new System.Text.StringBuilder();
-            var groups = Model.Staffs.GroupBy(s => s.Modifier ?? string.Empty);
-            foreach (var g in groups)
-            {
-                if (!string.IsNullOrWhiteSpace(g.Key))
-                {
-                    sb.AppendLine(g.Key);
-                }
+    // ── 添加 ──
+    private void AddStaff()
+    {
+        _editTarget = null;
+        _editingItem = new StaffModel();
+        _editDialogOpen = true;
+    }
 
-                var posGroups = g.GroupBy(s => s.PositionOfficial ?? string.Empty);
-                foreach (var pg in posGroups)
-                {
-                    if (string.IsNullOrWhiteSpace(pg.Key))
-                    {
-                        continue;
-                    }
+    // ── 编辑 ──
+    private void EditStaff(StaffModel model)
+    {
+        _editTarget = model;
+        _editingItem = new StaffModel
+        {
+            Id = model.Id,
+            Modifier = model.Modifier,
+            PositionOfficial = model.PositionOfficial,
+            Name = model.Name,
+            PositionGeneral = model.PositionGeneral,
+            SubordinateOrganization = model.SubordinateOrganization,
+            CustomName = model.CustomName
+        };
+        _editDialogOpen = true;
+    }
 
-                    var names = string.Join("，", pg.Select(s =>
-                        $"{s.Name}{(string.IsNullOrWhiteSpace(s.SubordinateOrganization) ? string.Empty : $"（{s.SubordinateOrganization}）")}"));
-                    sb.AppendLine($"{pg.Key}：{names}");
-                }
-            }
+    // ── 删除 ──
+    private void RemoveStaff(StaffModel model)
+    {
+        Staffs.Remove(model);
+    }
 
-            return sb.ToString();
+    // ── 保存编辑 ──
+    private void SaveStaff()
+    {
+        if (_editingItem == null)
+        {
+            return;
         }
-        set
+
+        // 验证
+        var result = _editingItem.Validate(Staffs);
+        if (!result.Successful)
         {
-            if (Model != null)
-            {
-                Model.Staffs = ToolHelper.GetStaffsFromString(value ?? string.Empty);
-            }
+            ShowError(result.Error);
+            return;
+        }
+
+        if (_editTarget == null)
+        {
+            // 新增：分配 Id
+            _editingItem.Id = Staffs.Count == 0 ? 1 : Staffs.Max(s => s.Id) + 1;
+            Staffs.Add(_editingItem);
+        }
+        else
+        {
+            // 编辑：回写到原对象
+            _editTarget.Modifier = _editingItem.Modifier;
+            _editTarget.PositionOfficial = _editingItem.PositionOfficial;
+            _editTarget.Name = _editingItem.Name;
+            _editTarget.PositionGeneral = _editingItem.PositionGeneral;
+            _editTarget.SubordinateOrganization = _editingItem.SubordinateOrganization;
+            _editTarget.CustomName = _editingItem.CustomName;
+        }
+
+        CloseEditDialog();
+    }
+
+    private void OnPositionGeneralChanged(PositionGeneralType value)
+    {
+        if (_editingItem != null)
+        {
+            _editingItem.PositionGeneral = value;
         }
     }
+
+    private void CloseEditDialog()
+    {
+        _editingItem = null;
+        _editTarget = null;
+        _editDialogOpen = false;
+    }
+
+    private Task CloseEditDialogAsync()
+    {
+        CloseEditDialog();
+        return Task.CompletedTask;
+    }
+
+    // ── 批量导入 ──
+    private void OpenBatchDialog()
+    {
+        _batchText = null;
+        _batchDialogOpen = true;
+    }
+
+    private void SaveBatch()
+    {
+        if (string.IsNullOrWhiteSpace(_batchText))
+        {
+            ShowError("请输入 Staff 文本");
+            return;
+        }
+
+        var items = ToolHelper.GetStaffsFromString(_batchText);
+
+        foreach (var item in items)
+        {
+            var result = item.Validate(Staffs);
+            if (!result.Successful)
+            {
+                ShowError(result.Error);
+                // 跳过重复项，继续导入其他项
+                continue;
+            }
+
+            item.Id = Staffs.Any() ? Staffs.Max(s => s.Id) + 1 : 0;
+            Staffs.Add(item);
+        }
+
+        CloseBatchDialog();
+    }
+
+    private void CloseBatchDialog()
+    {
+        _batchText = null;
+        _batchDialogOpen = false;
+    }
+
+    private Task CloseBatchDialogAsync()
+    {
+        CloseBatchDialog();
+        return Task.CompletedTask;
+    }
+
 }

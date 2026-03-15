@@ -1,4 +1,5 @@
-<input class="cg-input"
+<input @key="_inputKey"
+       class="cg-input"
        type="@Type"
        value="@Value"
        placeholder="@Placeholder"
@@ -21,8 +22,23 @@
     [Parameter]
     public bool Disabled { get; set; }
 
+    private int _inputKey;
+    private string? _lastUserInput;
+
+    protected override void OnParametersSet()
+    {
+        // 父组件传入的 Value 与用户实际输入不同时，
+        // 递增 key 强制重建 <input> 元素，确保 DOM 值与 Value 同步
+        if (_lastUserInput != null && Value != _lastUserInput)
+        {
+            _inputKey++;
+            _lastUserInput = null;
+        }
+    }
+
     private Task OnInput(ChangeEventArgs args)
     {
-        return ValueChanged.InvokeAsync(args.Value?.ToString());
+        _lastUserInput = args.Value?.ToString();
+        return ValueChanged.InvokeAsync(_lastUserInput);
     }
 }

@@ -27,7 +27,7 @@ else if (Model is not null)
         <EntryHero Name="@Model.Name" AnotherName="@Model.AnotherName" BriefIntroduction="@Model.BriefIntroduction"
                    TypeText="@GetTypeText(Model.Type)" IsEdit="Model.IsEdit" HeroImageUrl="@GetHeroImageUrl()"
                    IsSquareCover="IsSquareCover()" ProductionGroups="Model.ProductionGroups" Publishers="Model.Publishers"
-                   BuildEntryUrl="BuildEntryUrl" />
+                   BuildEntryUrl="BuildEntryUrl" EntryId="Id" />
 
         <EntrySpecialTips IsHidden="Model.IsHidden" Type="Model.Type" />
 

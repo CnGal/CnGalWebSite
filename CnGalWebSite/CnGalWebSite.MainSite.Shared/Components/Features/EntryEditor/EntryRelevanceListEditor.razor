@@ -1,0 +1,44 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+<div class="cg-relevance-list">
+    <div class="cg-section-header">
+        <h4>@Title</h4>
+        <button class="cg-btn cg-btn--outline" type="button" @onclick="AddItem">添加</button>
+    </div>
+
+    @if (Items.Any())
+    {
+        <div class="cg-relevance-grid">
+            @foreach (var item in Items)
+            {
+                var current = item;
+                <div class="cg-relevance-row">
+                    <CgAutoComplete Value="@current.DisplayName"
+                                    ValueChanged="(text) => current.DisplayName = text ?? string.Empty"
+                                    Items="@AutoCompleteItems"
+                                    Placeholder="@($"输入{Title}唯一名称")"/>
+                    <button class="cg-btn cg-btn--danger" type="button" @onclick="() => RemoveItem(current)">删除</button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public List<RelevancesModel> Items { get; set; } = default!;
+
+    [Parameter] public IEnumerable<string> AutoCompleteItems { get; set; } = [];
+
+    private void AddItem()
+    {
+        Items.Add(new RelevancesModel());
+    }
+
+    private void RemoveItem(RelevancesModel item)
+    {
+        Items.Remove(item);
+    }
+
+}

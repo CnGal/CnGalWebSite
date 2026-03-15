@@ -66,10 +66,66 @@ public sealed class FileCommandService(
         };
     }
 
+    public async Task<SdkResult<AudioUploadResult>> UploadAudioAsync(
+        Stream fileStream,
+        string fileName,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var streamContent = new StreamContent(fileStream);
+            using var form = new MultipartFormDataContent();
+            form.Add(streamContent, "\"files\"", fileName);
+
+            // type=1 corresponds to UploadFileType.Audio
+            var requestUri = "api/files/Upload?type=1";
+            var response = await httpClient.PostAsync(requestUri, form, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("音频上传失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
+                    (int)response.StatusCode, requestUri, httpClient.BaseAddress);
+                return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_HTTP_ERROR", $"上传失败（HTTP {(int)response.StatusCode}）");
+            }
+
+            var results = await response.Content.ReadFromJsonAsync<List<AudioUploadResponseDto>>(cancellationToken: cancellationToken);
+            var first = results?.FirstOrDefault();
+            if (first is null)
+            {
+                return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_EMPTY_RESPONSE", "上传失败，服务未返回结果");
+            }
+
+            if (!first.Uploaded || string.IsNullOrWhiteSpace(first.Url))
+            {
+                return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_FAILED", first.Error ?? "上传失败");
+            }
+
+            return SdkResult<AudioUploadResult>.Ok(new AudioUploadResult
+            {
+                Url = first.Url,
+                FileName = first.FileName,
+                Duration = first.Duration ?? TimeSpan.Zero
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "音频上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, httpClient.BaseAddress);
+            return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_EXCEPTION", "上传音频时发生异常");
+        }
+    }
+
     private sealed class UploadResultDto
     {
         public bool Uploaded { get; set; }
         public string? Url { get; set; }
+        public string? Error { get; set; }
+    }
+
+    private sealed class AudioUploadResponseDto
+    {
+        public bool Uploaded { get; set; }
+        public string? Url { get; set; }
+        public string? FileName { get; set; }
+        public TimeSpan? Duration { get; set; }
         public string? Error { get; set; }
     }
 }

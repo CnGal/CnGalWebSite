@@ -1,3 +1,78 @@
-.cg-input {
+.cg-autocomplete {
+    position: relative;
     width: 100%;
+}
+
+.cg-autocomplete__input {
+    width: 100%;
+    min-height: 2.4rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: 0.4rem 0.7rem;
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    font-family: inherit;
+    font-size: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    box-sizing: border-box;
+}
+
+.cg-autocomplete__input:focus {
+    outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    border-color: var(--cg-color-primary);
+}
+
+.cg-autocomplete__input:disabled {
+    background-color: var(--cg-color-surface-2, color-mix(in oklab, var(--cg-color-surface) 92%, black));
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.cg-autocomplete__input::placeholder {
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+}
+
+.cg-autocomplete__backdrop {
+    position: fixed;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    z-index: 9;
+}
+
+.cg-autocomplete__menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+    box-shadow: 0 10px 30px color-mix(in oklab, var(--cg-color-text) 12%, transparent);
+    max-height: 16rem;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.cg-autocomplete__option {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--cg-color-text);
+    text-align: left;
+    padding: 0.45rem 0.5rem;
+    border-radius: var(--cg-radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.cg-autocomplete__option:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
 }

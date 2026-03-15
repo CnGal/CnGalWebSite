@@ -1,0 +1,34 @@
+.cg-relevance-list {
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.cg-section-header h4 {
+    margin: 0;
+    font-size: var(--cg-font-size-md);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-relevance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--cg-spacing-3);
+}
+
+.cg-relevance-row {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    align-items: center;
+}
+
+.cg-relevance-row > :first-child {
+    flex: 1;
+    min-width: 0;
+}

@@ -1,5 +1,6 @@
-﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
+@inject IMainSiteAuthRequestService AuthRequestService
 
 <header class="entry-hero @(IsSquareCover ? "entry-hero--square" : "entry-hero--wide")">
     <div class="entry-hero-side">
@@ -42,6 +43,25 @@
                 }
             </div>
         }
+        @if (EntryId > 0)
+        {
+            <div class="entry-hero-actions">
+                <AuthorizeView>
+                    <Authorized>
+                        <a class="entry-edit-btn" href="/entries/edit/@EntryId">
+                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            <span>编辑词条</span>
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="entry-edit-btn entry-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/entries/edit/{EntryId}")">
+                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            <span>登录后编辑</span>
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        }
     </div>
 </header>
 
@@ -51,6 +71,7 @@
     [Parameter] public string? BriefIntroduction { get; set; }
     [Parameter] public string TypeText { get; set; } = "";
     [Parameter] public bool IsEdit { get; set; }
+    [Parameter] public int EntryId { get; set; }
     [Parameter] public string? HeroImageUrl { get; set; }
     [Parameter] public bool IsSquareCover { get; set; }
     [Parameter] public IReadOnlyList<StaffNameModel> ProductionGroups { get; set; } = [];

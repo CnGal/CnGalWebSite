@@ -1,0 +1,86 @@
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models.Files
+@using Microsoft.AspNetCore.Components.Forms
+@inject IFileCommandService FileCommandService
+
+<div class="cg-audio-upload @Class">
+    <label class="cg-btn cg-btn--primary @(Disabled || _isUploading ? "cg-audio-upload__label--disabled" : string.Empty)"
+           for="@_inputId">
+        @(_isUploading ? "上传中..." : Text)
+    </label>
+    <InputFile id="@_inputId"
+               class="cg-audio-upload__file-input"
+               accept="audio/*"
+               multiple="@Multiple"
+               disabled="@(Disabled || _isUploading)"
+               OnChange="OnFileChanged" />
+
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="cg-audio-upload__message cg-audio-upload__message--error">@_errorMessage</div>
+    }
+</div>
+
+@code {
+    private const long MaxUploadBytes = 50 * 1024 * 1024; // 50MB for audio files
+    private readonly string _inputId = $"cg-audio-upload-{Guid.NewGuid():N}";
+    private bool _isUploading;
+    private string? _errorMessage;
+
+    [Parameter] public EventCallback<AudioUploadResult> OnAudioUploaded { get; set; }
+    [Parameter] public bool Multiple { get; set; } = true;
+    [Parameter] public string Text { get; set; } = "上传音频";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private async Task OnFileChanged(InputFileChangeEventArgs args)
+    {
+        if (Disabled || _isUploading || args.FileCount == 0)
+        {
+            return;
+        }
+
+        _errorMessage = null;
+        _isUploading = true;
+        StateHasChanged();
+
+        try
+        {
+            var files = Multiple ? args.GetMultipleFiles(100) : [args.File];
+            foreach (var file in files)
+            {
+                await UploadSingleFileAsync(file);
+            }
+        }
+        finally
+        {
+            _isUploading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task UploadSingleFileAsync(IBrowserFile file)
+    {
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxUploadBytes);
+            var result = await FileCommandService.UploadAudioAsync(stream, file.Name);
+            if (!result.Success || result.Data is null)
+            {
+                _errorMessage = result.Error?.Message ?? "上传失败";
+                return;
+            }
+
+            _errorMessage = null;
+            await OnAudioUploaded.InvokeAsync(result.Data);
+        }
+        catch (IOException)
+        {
+            _errorMessage = "上传失败：音频过大（最大 50MB）";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"上传失败：{ex.Message}";
+        }
+    }
+}

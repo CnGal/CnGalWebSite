@@ -1,4 +1,5 @@
 @using System.Web
+@using System.Text.RegularExpressions
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.SDK.MainSite.Models.EntryEdit
@@ -10,27 +11,18 @@
 
     @if (Model != null)
     {
-        <div class="cg-form-section">
-            <div class="cg-section-header">
-                <h3>快速添加</h3>
-                <CgPopupMenu TriggerText="添加关联项"
-                             Items="@_quickAddMenuItems"
-                             ItemSelected="QuickAddAsync" />
-            </div>
-        </div>
-
         <div class="cg-form-section mt-4">
             <h3>词条关联（自动补全）</h3>
-            @RenderRelevanceList("角色", Model.Roles, MetaOptions.EntryRoleItems)
+            <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
             @if (Model.Type != EntryType.Game)
             {
-                @RenderRelevanceList("STAFF", Model.staffs, MetaOptions.EntryStaffItems)
+                <EntryRelevanceListEditor Title="STAFF" Items="Model.staffs" AutoCompleteItems="MetaOptions.EntryStaffItems"/>
             }
-            @RenderRelevanceList("组织", Model.Groups, MetaOptions.EntryGroupItems)
-            @RenderRelevanceList("游戏", Model.Games, MetaOptions.EntryGameItems)
-            @RenderRelevanceList("动态", Model.news, MetaOptions.ArticleItems)
-            @RenderRelevanceList("文章", Model.articles, MetaOptions.ArticleItems)
-            @RenderRelevanceList("视频", Model.videos, MetaOptions.VideoItems)
+            <EntryRelevanceListEditor Title="组织" Items="Model.Groups" AutoCompleteItems="MetaOptions.EntryGroupItems"/>
+            <EntryRelevanceListEditor Title="游戏" Items="Model.Games" AutoCompleteItems="MetaOptions.EntryGameItems"/>
+            <EntryRelevanceListEditor Title="动态" Items="Model.news" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="文章" Items="Model.articles" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="视频" Items="Model.videos" AutoCompleteItems="MetaOptions.VideoItems"/>
         </div>
 
         <div class="cg-form-section mt-4">
@@ -113,6 +105,8 @@
     }
 </CgModal>
 
+<CgToast @ref="_toast" />
+
 @code {
     [Parameter]
     public EditRelevancesViewModel Model { get; set; } = default!;
@@ -120,108 +114,38 @@
     [Parameter]
     public EntryEditMetaOptions MetaOptions { get; set; } = default!;
 
-    private readonly List<KeyValuePair<string, string>> _quickAddMenuItems =
-    [
-        KeyValuePair.Create("roles", "添加角色"),
-        KeyValuePair.Create("staffs", "添加 STAFF"),
-        KeyValuePair.Create("groups", "添加组织"),
-        KeyValuePair.Create("games", "添加游戏"),
-        KeyValuePair.Create("news", "添加动态"),
-        KeyValuePair.Create("articles", "添加文章"),
-        KeyValuePair.Create("videos", "添加视频"),
-        KeyValuePair.Create("others", "添加自定义链接")
-    ];
-
     private readonly List<OutlinkType> _outlinkTypes = Enum.GetValues<OutlinkType>().ToList();
 
+    /// <summary>
+    /// 每种外部平台类型对应的链接正则，用于从粘贴的完整链接中提取 value。
+    /// 模式与 BuildOutlink 中的拼接规则一一对应。
+    /// </summary>
+    private static readonly Dictionary<OutlinkType, Regex> _outlinkUrlPatterns = new()
+    {
+        [OutlinkType.Moegirl]      = new(@"^https?://zh\.moegirl\.org\.cn/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.VNDB]         = new(@"^https?://vndb\.org/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YMGal]        = new(@"^https?://(?:www\.)?ymgal\.games/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bangumi]      = new(@"^https?://bangumi\.tv/(?:subject|character|person)/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.WikiData]     = new(@"^https?://(?:www\.)?wikidata\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.BaiDu]        = new(@"^https?://baike\.baidu\.com/item/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.ZhWikiPedia]  = new(@"^https?://zh\.wikipedia\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType._2DFan]       = new(@"^https?://galge\.fun/subjects/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Weibo]        = new(@"^https?://weibo\.com/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bilibili]     = new(@"^https?://space\.bilibili\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.AcFun]        = new(@"^https?://(?:www\.)?acfun\.cn/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Zhihu]        = new(@"^https?://(?:www\.)?zhihu\.com/people/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Afdian]       = new(@"^https?://afdian\.com/@([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Pixiv]        = new(@"^https?://(?:www\.)?pixiv\.net/users/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Twitter]      = new(@"^https?://(?:www\.)?(?:twitter|x)\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YouTube]      = new(@"^https?://(?:www\.)?youtube\.com/channel/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Facebook]     = new(@"^https?://(?:www\.)?facebook\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Modian]       = new(@"^https?://zhongchou\.modian\.com/item/([^?#/]+?)\.html", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+    };
+
+    private CgToast _toast = default!;
     private bool _customLinkDialogOpen;
     private RelevancesModel? _customLinkEditing;
     private RelevancesModel? _customLinkTarget;
-
-    private RenderFragment RenderRelevanceList(string title, List<RelevancesModel> list, List<string> options) => builder =>
-    {
-        var seq = 0;
-        builder.OpenElement(seq++, "div");
-        builder.AddAttribute(seq++, "class", "cg-relevance-list");
-
-        builder.OpenElement(seq++, "div");
-        builder.AddAttribute(seq++, "class", "cg-section-header");
-        builder.OpenElement(seq++, "h4");
-        builder.AddContent(seq++, title);
-        builder.CloseElement();
-        builder.OpenElement(seq++, "button");
-        builder.AddAttribute(seq++, "class", "cg-btn cg-btn--outline");
-        builder.AddAttribute(seq++, "type", "button");
-        builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => AddRelevanceItem(list)));
-        builder.AddContent(seq++, "添加");
-        builder.CloseElement();
-        builder.CloseElement();
-
-        foreach (var item in list)
-        {
-            builder.OpenElement(seq++, "div");
-            builder.AddAttribute(seq++, "class", "cg-relevance-row");
-
-            builder.OpenComponent<CgAutoComplete>(seq++);
-            builder.AddAttribute(seq++, "Value", item.DisplayName);
-            builder.AddAttribute(seq++, "ValueChanged", EventCallback.Factory.Create<string?>(this, (text) =>
-            {
-                item.DisplayName = text ?? string.Empty;
-            }));
-            builder.AddAttribute(seq++, "Items", options);
-            builder.AddAttribute(seq++, "Placeholder", $"输入{title}唯一名称");
-            builder.CloseComponent();
-
-            builder.OpenElement(seq++, "button");
-            builder.AddAttribute(seq++, "class", "cg-btn cg-btn--danger");
-            builder.AddAttribute(seq++, "type", "button");
-            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => list.Remove(item)));
-            builder.AddContent(seq++, "删除");
-            builder.CloseElement();
-
-            builder.CloseElement();
-        }
-
-        builder.CloseElement();
-    };
-
-    private Task QuickAddAsync(string key)
-    {
-        switch (key)
-        {
-            case "roles":
-                AddRelevanceItem(Model.Roles);
-                break;
-            case "staffs":
-                AddRelevanceItem(Model.staffs);
-                break;
-            case "groups":
-                AddRelevanceItem(Model.Groups);
-                break;
-            case "games":
-                AddRelevanceItem(Model.Games);
-                break;
-            case "news":
-                AddRelevanceItem(Model.news);
-                break;
-            case "articles":
-                AddRelevanceItem(Model.articles);
-                break;
-            case "videos":
-                AddRelevanceItem(Model.videos);
-                break;
-            case "others":
-                AddCustomLink();
-                break;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static void AddRelevanceItem(List<RelevancesModel> list)
-    {
-        list.Add(new RelevancesModel());
-    }
 
     private List<RelevancesModel> GetCustomLinks()
     {
@@ -300,27 +224,69 @@
             return link;
         }
 
+        // 使用正则从已存储的链接中提取 value
         var decoded = HttpUtility.UrlDecode(link);
-        var part = decoded.Split('?').FirstOrDefault() ?? decoded;
-        var segments = part.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        return segments.LastOrDefault()?.Replace("@", string.Empty).Replace(".html", string.Empty) ?? string.Empty;
+        if (_outlinkUrlPatterns.TryGetValue(type, out var pattern))
+        {
+            var match = pattern.Match(decoded);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+        }
+
+        return string.Empty;
     }
 
-    private Task OnOutlinkValueChanged(OutlinkType type, string? text)
+    private async Task OnOutlinkValueChanged(OutlinkType type, string? text)
     {
         var value = text?.Trim() ?? string.Empty;
-        if (value.Contains("http", StringComparison.OrdinalIgnoreCase) && type != OutlinkType.Official)
+
+        // Official 类型直接存储完整值，不做解析
+        if (type == OutlinkType.Official)
+        {
+            Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                Model.others.Add(new RelevancesModel
+                {
+                    DisplayName = type.GetDisplayName(),
+                    Link = value
+                });
+            }
+            return;
+        }
+
+        // 输入包含链接时，使用正则匹配对应平台 URL 并提取 value
+        if (value.Contains("http", StringComparison.OrdinalIgnoreCase))
         {
             var decoded = HttpUtility.UrlDecode(value);
-            var part = decoded.Split('?').FirstOrDefault() ?? decoded;
-            var segments = part.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            value = segments.LastOrDefault()?.Replace("@", string.Empty).Replace(".html", string.Empty) ?? string.Empty;
+            if (_outlinkUrlPatterns.TryGetValue(type, out var pattern))
+            {
+                var match = pattern.Match(decoded);
+                if (match.Success)
+                {
+                    value = match.Groups[1].Value;
+                }
+                else
+                {
+                    Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+                    await _toast.ShowAsync($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                    return;
+                }
+            }
+            else
+            {
+                Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+                await _toast.ShowAsync($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                return;
+            }
         }
 
         Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Task.CompletedTask;
+            return;
         }
 
         Model.others.Add(new RelevancesModel
@@ -328,8 +294,6 @@
             DisplayName = type.GetDisplayName(),
             Link = BuildOutlink(type, value)
         });
-
-        return Task.CompletedTask;
     }
 
     private string BuildOutlink(OutlinkType type, string value) => type switch

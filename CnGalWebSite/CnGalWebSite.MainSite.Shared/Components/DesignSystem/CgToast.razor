@@ -1,0 +1,53 @@
+@* CgToast — 轻量级 Toast 提示，自动消失 *@
+@if (_visible)
+{
+    <div class="cg-toast cg-toast--@Variant" role="alert">
+        <span class="cg-toast-message">@Message</span>
+    </div>
+}
+
+@code {
+    private bool _visible;
+    private CancellationTokenSource? _cts;
+
+    /// <summary>
+    /// 类型：info / success / warning / error
+    /// </summary>
+    [Parameter] public string Variant { get; set; } = "info";
+
+    /// <summary>
+    /// 提示文字
+    /// </summary>
+    [Parameter] public string Message { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 持续时间（毫秒），默认 3000
+    /// </summary>
+    [Parameter] public int Duration { get; set; } = 3000;
+
+    /// <summary>
+    /// 显示 Toast
+    /// </summary>
+    public async Task ShowAsync(string message, string variant = "info")
+    {
+        // 若已有定时器则取消
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
+        Message = message;
+        Variant = variant;
+        _visible = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(Duration, _cts.Token);
+            _visible = false;
+            StateHasChanged();
+        }
+        catch (TaskCanceledException)
+        {
+            // 被新一次 ShowAsync 取消，忽略
+        }
+    }
+}
