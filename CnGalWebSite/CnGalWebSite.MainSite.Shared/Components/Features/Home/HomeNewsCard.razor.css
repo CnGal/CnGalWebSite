@@ -34,6 +34,11 @@
     height: 100%;
     display: block;
     object-fit: cover;
+    transition: transform 0.5s ease-in-out;
+}
+
+.home-news-card-link:hover .home-news-card-image img {
+    transform: scale(1.1);
 }
 
 .home-news-card-content {

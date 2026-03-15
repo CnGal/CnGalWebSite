@@ -1,7 +1,8 @@
-using CnGalWebSite.DataModel.ViewModel;
+﻿using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -28,7 +29,9 @@ public sealed class HomeQueryService(
         }
 
         var warnings = new List<SdkErrorModel>();
-        const int totalRequests = 19;
+        const int totalRequests = 20;
+
+        var tableResult = await GetResultSafeAsync<TableViewModel>("api/tables/GetTableView", "HOME_TABLE_FAILED", warnings, cancellationToken);
 
         var carouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView", "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
         var hotRecommendsResult = await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
@@ -79,11 +82,12 @@ public sealed class HomeQueryService(
             RecentlyEditedGames = NormalizeHomeItemUrls(recentlyEditedGamesResult),
             CommunityLinks = CreateCommunityLinks(),
             Evaluations = NormalizeHomeItemUrls(evaluationsResult),
-            SupportLinks = CreateSupportLinks(),
+            SupportLink = CreateSupportLink(),
             HotTags = NormalizeHomeItemUrls(hotTagsResult),
             LatestComments = NormalizeHomeItemUrls(latestCommentsResult),
             FreeGames = NormalizeHomeItemUrls(freeGamesResult),
             DiscountGames = NormalizeHomeItemUrls(discountGamesResult),
+            CommunityStats = tableResult ?? new TableViewModel(),
             Warnings = warnings
         };
 
@@ -162,17 +166,14 @@ public sealed class HomeQueryService(
         ];
     }
 
-    private static IReadOnlyList<HomeSupportLinkViewModel> CreateSupportLinks()
+    private static HomeSupportLinkViewModel CreateSupportLink()
     {
-        return
-        [
-            new()
-            {
-                Title = "为TA充电",
-                Text = "CnGal 中文GalGame资料站 的日常运营",
-                Link = "https://space.bilibili.com/145239325"
-            }
-        ];
+        return new HomeSupportLinkViewModel
+        {
+            Title = "为TA充电",
+            Text = "CnGal 中文GalGame资料站 的日常运营",
+            Link = "https://space.bilibili.com/145239325"
+        };
     }
 
     private static string NormalizePath(string? url)

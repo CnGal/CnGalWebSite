@@ -206,6 +206,79 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         }
     }
 
+    /// <summary>
+    /// 通用 GET 单个请求，失败时降级为 null 并将错误追加到 warnings。
+    /// 用于 Home 等聚合页面的"部分可用"策略。
+    /// </summary>
+    protected async Task<TItem?> GetResultSafeAsync<TItem>(
+        string path,
+        string errorCode,
+        ICollection<SdkErrorModel> warnings,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.LogError(
+                    "聚合单个接口请求失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
+                    path,
+                    (int)response.StatusCode,
+                    HttpClient.BaseAddress,
+                    errorCode,
+                    TrimForLog(responseBody));
+
+                warnings.Add(new SdkErrorModel
+                {
+                    Code = errorCode,
+                    Message = $"请求 {path} 失败（HTTP {(int)response.StatusCode}）",
+                    StatusCode = (int)response.StatusCode
+                });
+                return default;
+            }
+
+            try
+            {
+                return Deserialize<TItem>(responseBody);
+            }
+            catch (JsonException ex)
+            {
+                Logger.LogError(
+                    ex,
+                    "聚合单个接口反序列化失败。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
+                    path,
+                    HttpClient.BaseAddress,
+                    errorCode,
+                    TrimForLog(responseBody));
+                warnings.Add(new SdkErrorModel
+                {
+                    Code = errorCode,
+                    Message = $"请求 {path} 成功但数据格式不兼容",
+                    StatusCode = 200
+                });
+                return default;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(
+                ex,
+                "聚合单个接口请求异常。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}",
+                path,
+                HttpClient.BaseAddress,
+                errorCode);
+            warnings.Add(new SdkErrorModel
+            {
+                Code = errorCode,
+                Message = $"请求 {path} 时发生异常",
+                StatusCode = null
+            });
+            return default;
+        }
+    }
+
     // ──────── 模板方法：简单 GET → SdkResult<T> ────────
 
     /// <summary>

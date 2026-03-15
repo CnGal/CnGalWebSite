@@ -29,8 +29,13 @@
 .home-banner img {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 7;
+    aspect-ratio: 1200 / 675;
     object-fit: cover;
+    transition: transform 0.5s ease-in-out;
+}
+
+.home-banner a:hover img {
+    transform: scale(1.1);
 }
 
 .home-banner span {

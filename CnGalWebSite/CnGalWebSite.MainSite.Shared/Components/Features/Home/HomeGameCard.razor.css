@@ -79,6 +79,36 @@
     overflow: hidden;
 }
 
+.home-game-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: auto;
+}
+
+.home-game-card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 18%, transparent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-game-card-tag ::deep .cg-mdi-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+}
+
 .home-game-card-extra {
     margin-top: auto;
 }
@@ -128,6 +158,10 @@
     line-clamp: 1;
     -webkit-line-clamp: 1;
     margin-top: 0;
+}
+
+.home-game-card--horizontal .home-game-card-tags {
+    display: none;
 }
 
 .home-game-card--horizontal ::deep .home-game-card-extra .cg-mdi-icon {

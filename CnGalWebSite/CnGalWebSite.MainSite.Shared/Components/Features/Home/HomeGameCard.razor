@@ -10,6 +10,18 @@
             {
                 <p class="home-game-card-desc">@BriefIntroduction</p>
             }
+            @if (Tags is not null && Tags.Any())
+            {
+                <div class="home-game-card-tags">
+                    @foreach (var tag in Tags.Take(2))
+                    {
+                        <span class="home-game-card-tag">
+                            <CgMdiIcon Name="mdiTag" aria-hidden="true" />
+                            @tag
+                        </span>
+                    }
+                </div>
+            }
             @if (ChildContent is not null)
             {
                 <div class="home-game-card-extra">
@@ -25,6 +37,7 @@
     [Parameter] public string Image { get; set; } = "";
     [Parameter] public string Name { get; set; } = "";
     [Parameter] public string? BriefIntroduction { get; set; }
+    [Parameter] public IEnumerable<string>? Tags { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool Horizontal { get; set; }
 }
