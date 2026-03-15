@@ -7,7 +7,6 @@ using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
@@ -17,6 +16,8 @@ public sealed class HomeQueryService(
     ILogger<HomeQueryService> logger) : QueryServiceBase(httpClient), IHomeQueryService
 {
     private static readonly TimeSpan HomeCacheDuration = TimeSpan.FromMinutes(2);
+
+    protected override ILogger Logger => logger;
 
     public async Task<SdkResult<HomeSummaryViewModel>> GetHomeSummaryAsync(CancellationToken cancellationToken = default)
     {
@@ -29,29 +30,29 @@ public sealed class HomeQueryService(
         var warnings = new List<SdkErrorModel>();
         const int totalRequests = 19;
 
-        var carouselsResult = await GetListAsync<CarouselViewModel>("api/home/GetHomeCarouselsView", "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
-        var hotRecommendsResult = await GetListAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
-        var publishedGamesResult = await GetListAsync<PublishedGameItemModel>("api/home/ListPublishedGames", "HOME_PUBLISHED_GAMES_FAILED", warnings, cancellationToken);
-        var recentlyDemoGamesResult = await GetListAsync<RecentlyDemoGameItemModel>("api/home/ListRecentlyDemoGames", "HOME_RECENTLY_DEMO_GAMES_FAILED", warnings, cancellationToken);
-        var upcomingGamesResult = await GetListAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames", "HOME_UPCOMING_GAMES_FAILED", warnings, cancellationToken);
-        var activityCarouselsResult = await GetListAsync<CarouselViewModel>("api/home/GetActivityCarouselsView", "HOME_ACTIVITY_CAROUSELS_FAILED", warnings, cancellationToken);
-        var homeNewsResult = await GetListAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView", "HOME_NEWS_FAILED", warnings, cancellationToken);
-        var weeklyNewsResult = await GetListAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview", "HOME_WEEKLY_NEWS_FAILED", warnings, cancellationToken);
-        var latestArticlesResult = await GetListAsync<LatestArticleItemModel>("api/home/ListLatestArticles", "HOME_LATEST_ARTICLES_FAILED", warnings, cancellationToken);
-        var latestVideosResult = await GetListAsync<LatestVideoItemModel>("api/home/ListLatestVideos", "HOME_LATEST_VIDEOS_FAILED", warnings, cancellationToken);
-        var friendLinksResult = await GetListAsync<FriendLinkItemModel>("api/home/ListFriendLinks", "HOME_FRIEND_LINKS_FAILED", warnings, cancellationToken);
-        var birthdaysResult = await GetListAsync<RoleBrithdayViewModel>(
+        var carouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView", "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
+        var hotRecommendsResult = await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
+        var publishedGamesResult = await GetListSafeAsync<PublishedGameItemModel>("api/home/ListPublishedGames", "HOME_PUBLISHED_GAMES_FAILED", warnings, cancellationToken);
+        var recentlyDemoGamesResult = await GetListSafeAsync<RecentlyDemoGameItemModel>("api/home/ListRecentlyDemoGames", "HOME_RECENTLY_DEMO_GAMES_FAILED", warnings, cancellationToken);
+        var upcomingGamesResult = await GetListSafeAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames", "HOME_UPCOMING_GAMES_FAILED", warnings, cancellationToken);
+        var activityCarouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetActivityCarouselsView", "HOME_ACTIVITY_CAROUSELS_FAILED", warnings, cancellationToken);
+        var homeNewsResult = await GetListSafeAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView", "HOME_NEWS_FAILED", warnings, cancellationToken);
+        var weeklyNewsResult = await GetListSafeAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview", "HOME_WEEKLY_NEWS_FAILED", warnings, cancellationToken);
+        var latestArticlesResult = await GetListSafeAsync<LatestArticleItemModel>("api/home/ListLatestArticles", "HOME_LATEST_ARTICLES_FAILED", warnings, cancellationToken);
+        var latestVideosResult = await GetListSafeAsync<LatestVideoItemModel>("api/home/ListLatestVideos", "HOME_LATEST_VIDEOS_FAILED", warnings, cancellationToken);
+        var friendLinksResult = await GetListSafeAsync<FriendLinkItemModel>("api/home/ListFriendLinks", "HOME_FRIEND_LINKS_FAILED", warnings, cancellationToken);
+        var birthdaysResult = await GetListSafeAsync<RoleBrithdayViewModel>(
             $"api/entries/GetRoleBirthdaysByTime?month={DateTime.Now.Month}&day={DateTime.Now.Day}",
             "HOME_BIRTHDAYS_FAILED",
             warnings,
             cancellationToken);
-        var announcementsResult = await GetListAsync<AnnouncementItemModel>("api/home/ListAnnouncements", "HOME_ANNOUNCEMENTS_FAILED", warnings, cancellationToken);
-        var recentlyEditedGamesResult = await GetListAsync<RecentlyEditedGameItemModel>("api/home/ListRecentlyEditedGames", "HOME_RECENTLY_EDITED_GAMES_FAILED", warnings, cancellationToken);
-        var evaluationsResult = await GetListAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", warnings, cancellationToken);
-        var hotTagsResult = await GetListAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED", warnings, cancellationToken);
-        var latestCommentsResult = await GetListAsync<LatestCommentItemModel>("api/home/ListLatestComments?renderMarkdown=true", "HOME_LATEST_COMMENTS_FAILED", warnings, cancellationToken);
-        var freeGamesResult = await GetListAsync<FreeGameItemModel>("api/home/ListFreeGames", "HOME_FREE_GAMES_FAILED", warnings, cancellationToken);
-        var discountGamesResult = await GetListAsync<DiscountGameItemModel>("api/home/ListDiscountGames", "HOME_DISCOUNT_GAMES_FAILED", warnings, cancellationToken);
+        var announcementsResult = await GetListSafeAsync<AnnouncementItemModel>("api/home/ListAnnouncements", "HOME_ANNOUNCEMENTS_FAILED", warnings, cancellationToken);
+        var recentlyEditedGamesResult = await GetListSafeAsync<RecentlyEditedGameItemModel>("api/home/ListRecentlyEditedGames", "HOME_RECENTLY_EDITED_GAMES_FAILED", warnings, cancellationToken);
+        var evaluationsResult = await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", warnings, cancellationToken);
+        var hotTagsResult = await GetListSafeAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED", warnings, cancellationToken);
+        var latestCommentsResult = await GetListSafeAsync<LatestCommentItemModel>("api/home/ListLatestComments?renderMarkdown=true", "HOME_LATEST_COMMENTS_FAILED", warnings, cancellationToken);
+        var freeGamesResult = await GetListSafeAsync<FreeGameItemModel>("api/home/ListFreeGames", "HOME_FREE_GAMES_FAILED", warnings, cancellationToken);
+        var discountGamesResult = await GetListSafeAsync<DiscountGameItemModel>("api/home/ListDiscountGames", "HOME_DISCOUNT_GAMES_FAILED", warnings, cancellationToken);
 
         if (warnings.Count == totalRequests)
         {
@@ -88,76 +89,6 @@ public sealed class HomeQueryService(
 
         memoryCache.Set(cacheKey, model, HomeCacheDuration);
         return SdkResult<HomeSummaryViewModel>.Ok(model);
-    }
-
-    private async Task<IReadOnlyList<TItem>> GetListAsync<TItem>(
-        string path,
-        string errorCode,
-        ICollection<SdkErrorModel> warnings,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                logger.LogError(
-                    "首页接口请求失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
-                    path,
-                    (int)response.StatusCode,
-                    HttpClient.BaseAddress,
-                    errorCode,
-                    TrimForLog(responseBody));
-
-                warnings.Add(new SdkErrorModel
-                {
-                    Code = errorCode,
-                    Message = $"请求 {path} 失败（HTTP {(int)response.StatusCode}）",
-                    StatusCode = (int)response.StatusCode
-                });
-                return [];
-            }
-
-            try
-            {
-                var data = Deserialize<List<TItem>>(responseBody);
-                return data ?? [];
-            }
-            catch (JsonException ex)
-            {
-                logger.LogError(
-                    ex,
-                    "首页接口反序列化失败。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}; ResponseBody={ResponseBody}",
-                    path,
-                    HttpClient.BaseAddress,
-                    errorCode,
-                    TrimForLog(responseBody));
-                warnings.Add(new SdkErrorModel
-                {
-                    Code = errorCode,
-                    Message = $"请求 {path} 成功但数据格式不兼容",
-                    StatusCode = 200
-                });
-                return [];
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(
-                ex,
-                "首页接口请求异常。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}",
-                path,
-                HttpClient.BaseAddress,
-                errorCode);
-            warnings.Add(new SdkErrorModel
-            {
-                Code = errorCode,
-                Message = $"请求 {path} 时发生异常",
-                StatusCode = null
-            });
-            return [];
-        }
     }
 
     private static IReadOnlyList<TItem> NormalizeHomeItemUrls<TItem>(IReadOnlyList<TItem> source)

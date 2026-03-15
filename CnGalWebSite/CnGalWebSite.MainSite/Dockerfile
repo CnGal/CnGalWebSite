@@ -30,10 +30,6 @@ RUN dotnet publish "./CnGalWebSite.MainSite.csproj" -c $BUILD_CONFIGURATION -o /
 
 # 此阶段在生产中使用，或在常规模式下从 VS 运行时使用(在不使用调试配置时为默认值)
 FROM base AS final
-USER root
-RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
-    && chown -R $APP_UID:$APP_UID /home/app/.aspnet
-USER $APP_UID
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CnGalWebSite.MainSite.dll"]

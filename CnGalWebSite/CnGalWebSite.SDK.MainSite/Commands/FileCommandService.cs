@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.Files;
 using Microsoft.Extensions.Logging;
@@ -8,8 +9,10 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class FileCommandService(
     HttpClient httpClient,
-    ILogger<FileCommandService> logger) : IFileCommandService
+    ILogger<FileCommandService> logger) : CommandServiceBase(httpClient), IFileCommandService
 {
+    protected override ILogger Logger => logger;
+
     public async Task<SdkResult<string>> UploadImageAsync(
         Stream fileStream,
         string fileName,
@@ -30,11 +33,11 @@ public sealed class FileCommandService(
             {
                 requestUri += $"&cropX={cropRect.X}&cropY={cropRect.Y}&cropW={cropRect.Width}&cropH={cropRect.Height}";
             }
-            var response = await httpClient.PostAsync(requestUri, form, cancellationToken);
+            var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("图片上传失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
-                    (int)response.StatusCode, requestUri, httpClient.BaseAddress);
+                    (int)response.StatusCode, requestUri, HttpClient.BaseAddress);
                 return SdkResult<string>.Fail("FILE_UPLOAD_HTTP_ERROR", $"上传失败（HTTP {(int)response.StatusCode}）");
             }
 
@@ -54,7 +57,7 @@ public sealed class FileCommandService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "图片上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, httpClient.BaseAddress);
+            logger.LogError(ex, "图片上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, HttpClient.BaseAddress);
             return SdkResult<string>.Fail("FILE_UPLOAD_EXCEPTION", "上传图片时发生异常");
         }
     }
@@ -84,11 +87,11 @@ public sealed class FileCommandService(
 
             // type=1 corresponds to UploadFileType.Audio
             var requestUri = "api/files/Upload?type=1";
-            var response = await httpClient.PostAsync(requestUri, form, cancellationToken);
+            var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("音频上传失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
-                    (int)response.StatusCode, requestUri, httpClient.BaseAddress);
+                    (int)response.StatusCode, requestUri, HttpClient.BaseAddress);
                 return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_HTTP_ERROR", $"上传失败（HTTP {(int)response.StatusCode}）");
             }
 
@@ -113,7 +116,7 @@ public sealed class FileCommandService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "音频上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, httpClient.BaseAddress);
+            logger.LogError(ex, "音频上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, HttpClient.BaseAddress);
             return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_EXCEPTION", "上传音频时发生异常");
         }
     }
