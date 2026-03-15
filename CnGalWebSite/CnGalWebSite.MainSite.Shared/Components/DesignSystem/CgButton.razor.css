@@ -61,3 +61,12 @@
     padding: var(--cg-spacing-1) var(--cg-spacing-3);
     font-size: var(--cg-font-size-sm);
 }
+
+/* ── loading ── */
+.cg-btn--loading {
+    gap: var(--cg-spacing-2);
+}
+
+.cg-btn--loading ::deep .cg-progress-ring {
+    color: inherit;
+}

@@ -15,6 +15,7 @@ public sealed class FileCommandService(
         string fileName,
         ImageAspectType aspectType = ImageAspectType.None,
         bool gallery = false,
+        ImageCropRect? cropRect = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -25,6 +26,10 @@ public sealed class FileCommandService(
 
             var (x, y) = GetAspectRatio(aspectType);
             var requestUri = $"api/files/Upload?x={x}&y={y}&type=0&gallery={gallery.ToString().ToLowerInvariant()}";
+            if (cropRect is not null)
+            {
+                requestUri += $"&cropX={cropRect.X}&cropY={cropRect.Y}&cropW={cropRect.Width}&cropH={cropRect.Height}";
+            }
             var response = await httpClient.PostAsync(requestUri, form, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {

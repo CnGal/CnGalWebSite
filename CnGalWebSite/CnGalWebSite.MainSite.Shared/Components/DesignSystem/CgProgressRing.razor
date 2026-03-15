@@ -1,0 +1,77 @@
+@* CgProgressRing — 圆环进度指示器，支持确定进度（0~100）与无限进度 *@
+<div class="cg-progress-ring @SizeClass @IndeterminateClass"
+     role="progressbar"
+     aria-valuenow="@(Value.HasValue ? (int)Value.Value : null)"
+     aria-valuemin="@(Value.HasValue ? 0 : null)"
+     aria-valuemax="@(Value.HasValue ? 100 : null)"
+     style="@RootStyle">
+    <svg class="cg-progress-ring__svg" viewBox="0 0 @ViewBoxSize @ViewBoxSize">
+        <circle class="cg-progress-ring__track"
+                cx="@Center" cy="@Center" r="@Radius"
+                fill="none"
+                stroke-width="@StrokeWidth" />
+        <circle class="cg-progress-ring__indicator"
+                cx="@Center" cy="@Center" r="@Radius"
+                fill="none"
+                stroke-width="@StrokeWidth"
+                stroke-dasharray="@Circumference"
+                stroke-dashoffset="@DashOffset"
+                stroke-linecap="round" />
+    </svg>
+</div>
+
+@code {
+    /// <summary>
+    /// 进度值（0~100）。为 null 时使用无限旋转动画。
+    /// </summary>
+    [Parameter]
+    public double? Value { get; set; }
+
+    /// <summary>
+    /// 尺寸："default"（24px）| "sm"（16px）| "lg"（32px）
+    /// </summary>
+    [Parameter]
+    public string Size { get; set; } = "default";
+
+    /// <summary>
+    /// 圆环线宽
+    /// </summary>
+    [Parameter]
+    public double StrokeWidth { get; set; } = 3;
+
+    /// <summary>
+    /// 颜色覆盖，默认 currentColor（继承父元素文字色）
+    /// </summary>
+    [Parameter]
+    public string? Color { get; set; }
+
+    private const double ViewBoxSize = 48;
+    private double Center => ViewBoxSize / 2;
+    private double Radius => (ViewBoxSize - StrokeWidth) / 2;
+    private double Circumference => 2 * Math.PI * Radius;
+
+    private double DashOffset
+    {
+        get
+        {
+            if (Value is null)
+            {
+                // 无限模式：显示约 25% 的弧长
+                return Circumference * 0.75;
+            }
+            var clamped = Math.Clamp(Value.Value, 0, 100);
+            return Circumference * (1 - clamped / 100);
+        }
+    }
+
+    private string SizeClass => Size switch
+    {
+        "sm" => "cg-progress-ring--sm",
+        "lg" => "cg-progress-ring--lg",
+        _ => string.Empty
+    };
+
+    private string IndeterminateClass => Value.HasValue ? string.Empty : "cg-progress-ring--indeterminate";
+
+    private string? RootStyle => string.IsNullOrWhiteSpace(Color) ? null : $"--cg-progress-ring-color: {Color};";
+}

@@ -19,7 +19,15 @@
                         <circle cx="8.5" cy="8.5" r="1.5" />
                         <path d="m21 15-5-5L5 21" />
                     </svg>
-                    <span>@(_isUploading ? "上传中..." : "点击上传图片")</span>
+                    @if (_isUploading)
+                    {
+                        <CgProgressRing Size="sm" />
+                        <span>上传中...</span>
+                    }
+                    else
+                    {
+                        <span>点击上传图片</span>
+                    }
                 </div>
             }
             else
@@ -51,7 +59,15 @@
         <div class="cg-image-upload__actions">
             <label class="cg-image-upload__upload-btn @(Disabled || _isUploading ? "cg-image-upload__upload-btn--disabled" : string.Empty)"
                    for="@_inputId">
-                @(_isUploading ? "上传中..." : Text)
+                @if (_isUploading)
+                {
+                    <CgProgressRing Size="sm" />
+                    <span>上传中...</span>
+                }
+                else
+                {
+                    @Text
+                }
             </label>
             <InputFile id="@_inputId"
                        class="cg-image-upload__file-input"
@@ -99,8 +115,8 @@
         }
         <p class="cg-image-upload__hint">直接上传可以更加快捷地裁剪图片</p>
         <div class="cg-image-upload__crop-actions">
-            <CgButton Variant="secondary" Disabled="@_isUploading" OnClick="OnDirectUploadFromDialogAsync">直接上传</CgButton>
-            <CgButton Disabled="@_isUploading" OnClick="OnCropUploadAsync">裁剪并上传</CgButton>
+            <CgButton Variant="secondary" Async Disabled="@_isUploading" OnClick="OnDirectUploadFromDialogAsync">直接上传</CgButton>
+            <CgButton Async Disabled="@_isUploading" OnClick="OnCropUploadAsync">裁剪并上传</CgButton>
         </div>
     </div>
 </CgModal>
@@ -226,7 +242,7 @@
         await UploadSingleFileAsync(selected, cropped: false);
     }
 
-    private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped)
+    private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)
     {
         _isUploading = true;
         try
@@ -239,7 +255,7 @@
             }
 
             await using var stream = targetFile.OpenReadStream(MaxUploadBytes);
-            var uploadResult = await FileCommandService.UploadImageAsync(stream, targetFile.Name, aspectType, Gallery);
+            var uploadResult = await FileCommandService.UploadImageAsync(stream, targetFile.Name, aspectType, Gallery, cropRect);
             if (!uploadResult.Success || string.IsNullOrWhiteSpace(uploadResult.Data))
             {
                 _errorMessage = uploadResult.Error?.Message ?? "上传失败";
@@ -270,46 +286,15 @@
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_pendingPreviewDataUrl))
-        {
-            _errorMessage = "裁剪失败：未读取到图片数据";
-            return;
-        }
-
         _isUploading = true;
         try
         {
-            var jsModule = await GetJsModuleAsync();
-            var cropped = await jsModule.InvokeAsync<CroppedImageResult>("cropDataUrlByRect",
-                _pendingPreviewDataUrl,
-                _cropRect.X,
-                _cropRect.Y,
-                _cropRect.Width,
-                _cropRect.Height);
-
-            if (cropped is null || string.IsNullOrWhiteSpace(cropped.Base64))
-            {
-                _errorMessage = "裁剪失败：无法生成裁剪结果";
-                return;
-            }
-
-            var bytes = Convert.FromBase64String(cropped.Base64);
-            await using var stream = new MemoryStream(bytes);
-            var extension = GetExtensionByMime(cropped.MimeType);
-            var fileName = BuildCroppedFileName(_pendingFile.Name, extension);
-            var uploadResult = await FileCommandService.UploadImageAsync(stream, fileName, ImageAspectType.None, Gallery);
-            if (!uploadResult.Success || string.IsNullOrWhiteSpace(uploadResult.Data))
-            {
-                _errorMessage = uploadResult.Error?.Message ?? "上传失败";
-                return;
-            }
-
-            await ChangeImageUrlAsync(uploadResult.Data);
-            _errorMessage = null;
+            var cropRect = new ImageCropRect(_cropRect.X, _cropRect.Y, _cropRect.Width, _cropRect.Height);
+            await UploadSingleFileAsync(_pendingFile, cropped: true, cropRect: cropRect);
         }
         catch (Exception ex)
         {
-            _errorMessage = $"裁剪失败：{ex.Message}";
+            _errorMessage = $"裁剪上传失败：{ex.Message}";
             return;
         }
         finally
@@ -518,27 +503,6 @@
         };
     }
 
-    private static string BuildCroppedFileName(string fileName, string extension)
-    {
-        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-        if (string.IsNullOrWhiteSpace(nameWithoutExtension))
-        {
-            nameWithoutExtension = $"crop-{Guid.NewGuid():N}";
-        }
-
-        return $"{nameWithoutExtension}-crop.{extension}";
-    }
-
-    private static string GetExtensionByMime(string? mimeType)
-    {
-        return mimeType?.ToLowerInvariant() switch
-        {
-            "image/png" => "png",
-            "image/webp" => "webp",
-            _ => "jpg"
-        };
-    }
-
     private static async Task<string?> ReadPreviewDataUrlAsync(IBrowserFile file)
     {
         await using var stream = file.OpenReadStream(MaxUploadBytes);
@@ -556,12 +520,6 @@
         public double Height { get; set; }
         public double Left { get; set; }
         public double Top { get; set; }
-    }
-
-    private sealed class CroppedImageResult
-    {
-        public string? Base64 { get; set; }
-        public string? MimeType { get; set; }
     }
     
     public async ValueTask DisposeAsync()

@@ -1,4 +1,8 @@
-<button class="@CssClass" type="@Type" disabled="@Disabled" @onclick="OnClick">
+<button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync">
+    @if (_isLoading)
+    {
+        <CgProgressRing Size="sm" />
+    }
     @ChildContent
 </button>
 
@@ -21,8 +25,42 @@
     [Parameter]
     public string Size { get; set; } = "default";
 
+    /// <summary>
+    /// 开启后，按钮在执行异步回调期间自动禁用并显示进度环。
+    /// </summary>
+    [Parameter]
+    public bool Async { get; set; }
+
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private bool _isLoading;
+
+    private bool IsDisabled => Disabled || _isLoading;
+
+    private async Task HandleClickAsync(MouseEventArgs args)
+    {
+        if (!Async)
+        {
+            await OnClick.InvokeAsync(args);
+            return;
+        }
+
+        if (_isLoading)
+        {
+            return;
+        }
+
+        _isLoading = true;
+        try
+        {
+            await OnClick.InvokeAsync(args);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
     private string CssClass
     {
@@ -32,6 +70,10 @@
             if (Size == "sm")
             {
                 cls += " cg-btn--sm";
+            }
+            if (_isLoading)
+            {
+                cls += " cg-btn--loading";
             }
             return cls;
         }

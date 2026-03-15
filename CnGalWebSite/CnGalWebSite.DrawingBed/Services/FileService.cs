@@ -1,4 +1,4 @@
-﻿using Aliyun.OSS;
+using Aliyun.OSS;
 using CnGalWebSite.DrawingBed.Models.DataModels;
 using CnGalWebSite.DrawingBed.Models.ViewModels;
 using COSXML;
@@ -45,7 +45,7 @@ namespace CnGalWebSite.DrawingBed.Services
             Directory.CreateDirectory(_audioTempPath);
         }
 
-        public async Task<UploadResult> TransferDepositFile(string url, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
+        public async Task<UploadResult> TransferDepositFile(string url, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0)
         {
             string pathSaveFile = null;
             string pathCutFile = null;
@@ -57,7 +57,12 @@ namespace CnGalWebSite.DrawingBed.Services
                 pathSaveFile = await SaveFileFromUrl(url, type);
                 if (type == UploadFileType.Image)
                 {
-                    pathCutFile = CutLocalImage(pathSaveFile, x, y);
+                    var pathAfterRectCrop = CropImageByRect(pathSaveFile, cropX, cropY, cropW, cropH);
+                    pathCutFile = CutLocalImage(pathAfterRectCrop, x, y);
+                    if (pathAfterRectCrop != pathSaveFile && pathAfterRectCrop != pathCutFile)
+                    {
+                        DeleteFile(pathAfterRectCrop);
+                    }
                     pathCompressFile = CompressImage(pathCutFile);
                     result.FileSize = (new FileInfo(pathCompressFile)).Length;
                 }
@@ -110,7 +115,7 @@ namespace CnGalWebSite.DrawingBed.Services
             }
         }
 
-        public async Task<UploadResult> UploadFormFile(IFormFile file, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image)
+        public async Task<UploadResult> UploadFormFile(IFormFile file, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0)
         {
             string pathSaveFile = null;
             string pathCompressFile = null;
@@ -123,7 +128,12 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 if (type == UploadFileType.Image)
                 {
-                    pathCutFile = CutLocalImage(pathSaveFile, x, y);
+                    var pathAfterRectCrop = CropImageByRect(pathSaveFile, cropX, cropY, cropW, cropH);
+                    pathCutFile = CutLocalImage(pathAfterRectCrop, x, y);
+                    if (pathAfterRectCrop != pathSaveFile && pathAfterRectCrop != pathCutFile)
+                    {
+                        DeleteFile(pathAfterRectCrop);
+                    }
                     pathCompressFile = CompressImage(pathCutFile);
                 }
                 else
@@ -314,6 +324,28 @@ namespace CnGalWebSite.DrawingBed.Services
         public string CutLocalImage(string path, double x = 0, double y = 0)
         {
             return x == 0 && y == 0 ? path : CutImage(path, x, y);
+        }
+
+        /// <summary>
+        /// 按归一化矩形坐标裁剪图片（坐标范围 0~1）
+        /// </summary>
+        private string CropImageByRect(string path, double cropX, double cropY, double cropW, double cropH)
+        {
+            if (cropW <= 0 || cropH <= 0)
+            {
+                return path;
+            }
+
+            var newPath = Path.Combine(_imageTempPath, Guid.NewGuid() + "." + GetFileSuffixName(path, UploadFileType.Image));
+            using var image = Image.Load(path);
+            var sx = Math.Max(0, (int)(cropX * image.Width));
+            var sy = Math.Max(0, (int)(cropY * image.Height));
+            var sw = Math.Max(1, Math.Min((int)(cropW * image.Width), image.Width - sx));
+            var sh = Math.Max(1, Math.Min((int)(cropH * image.Height), image.Height - sy));
+
+            image.Mutate(ctx => ctx.Crop(new Rectangle(sx, sy, sw, sh)));
+            image.Save(newPath);
+            return newPath;
         }
 
         public string CompressImage(string path)

@@ -10,6 +10,7 @@ public interface IFileCommandService
         string fileName,
         ImageAspectType aspectType = ImageAspectType.None,
         bool gallery = false,
+        ImageCropRect? cropRect = null,
         CancellationToken cancellationToken = default);
 
     Task<SdkResult<AudioUploadResult>> UploadAudioAsync(

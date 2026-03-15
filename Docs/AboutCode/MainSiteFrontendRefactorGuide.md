@@ -96,7 +96,7 @@
 
 | 组件 | 说明 |
 |---|---|
-| `CgButton` | 通用按钮（支持 Variant） |
+| `CgButton` | 通用按钮（支持 Variant、Async 加载态） |
 | `CgInput` | 单行文本输入 |
 | `CgTextarea` | 多行文本输入 |
 | `CgSelect` | 通用下拉选择 |
@@ -115,6 +115,7 @@
 | `CgFormGroup` | 表单分组 |
 | `CgImageUpload` | 图片上传（含 JS Interop） |
 | `CgAudioUpload` | 音频上传 |
+| `CgProgressRing` | 圆环进度指示器（确定进度/无限进度） |
 | `CgMdiIcon` | MDI 图标（配合 `CgMdiIconMap.g.cs` 自动生成映射） |
 
 ---
@@ -186,7 +187,7 @@ CnGalWebSite.SDK.MainSite
 
 - [x] 建立目录规范（`Pages/` / `Components/Features/` / `Components/DesignSystem/` / `Components/Layout/` / `Layout/`）。
 - [x] 建立样式变量体系（`design-tokens.css`，包含颜色、间距、圆角、字号、字重、阴影、过渡等 `--cg-*` 变量）。
-- [x] 建立基础组件（20 个 DesignSystem 组件）。
+- [x] 建立基础组件（21 个 DesignSystem 组件）。
 - [x] 确立页面渲染模式策略（静态默认、按页交互）。
 
 ### 阶段 B：核心页面迁移 ✅ 已完成
@@ -234,7 +235,7 @@ CnGalWebSite.MainSite
 ```text
 CnGalWebSite.MainSite.Shared
 ├─ Components/
-│  ├─ DesignSystem/           # 20 个基础 UI 组件
+│  ├─ DesignSystem/           # 21 个基础 UI 组件
 │  │  ├─ CgButton.razor / .razor.css
 │  │  ├─ CgInput.razor / .razor.css
 │  │  ├─ CgSelect.razor / .razor.css
@@ -254,6 +255,7 @@ CnGalWebSite.MainSite.Shared
 │  │  ├─ CgFormGroup.razor / .razor.css
 │  │  ├─ CgImageUpload.razor / .razor.css
 │  │  ├─ CgAudioUpload.razor / .razor.css
+│  │  ├─ CgProgressRing.razor / .razor.css
 │  │  ├─ CgMdiIcon.razor / .razor.css
 │  │  └─ CgMdiIconMap.g.cs   # 自动生成的图标映射
 │  ├─ Features/               # 业务组件
