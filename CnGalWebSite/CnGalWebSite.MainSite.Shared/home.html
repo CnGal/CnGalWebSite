@@ -1,12 +1,10 @@
 ﻿<!DOCTYPE html>
-
-<html lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ACG Database - Game Entry Detail</title>
+<title>ACG Portal - Multi-Tabbed Content Hub</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -15,7 +13,7 @@
                 extend: {
                     colors: {
                         "primary": "#66ccff",
-                        "accent-pink": "#ff66cc",
+                        "accent-pink": "#ff85c0",
                         "background-light": "#f5f7f8",
                         "background-dark": "#0f1c23",
                     },
@@ -27,434 +25,207 @@
             },
         }
     </script>
-<style>
+<style type="text/tailwindcss">
         body { font-family: 'Space Grotesk', sans-serif; }
-        .glass-effect { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .skeleton {
+            background: linear-gradient(90deg, #e6f0f4 25%, #f8fbfc 50%, #e6f0f4 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #66ccff33;
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<!-- Top Navigation Bar -->
-<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 lg:px-20 py-3">
-<div class="max-w-7xl mx-auto flex items-center justify-between gap-8">
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden">
+<div class="flex h-full w-full flex-col">
+<header class="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 bg-white dark:bg-slate-900 z-10">
 <div class="flex items-center gap-8">
-<div class="flex items-center gap-2 text-primary">
-<span class="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
-<h2 class="text-xl font-bold tracking-tight">ACG<span class="text-accent-pink">DB</span></h2>
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">star_half</span>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold">ACG Portal</h2>
 </div>
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Games</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Anime</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Comics</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Community</a>
-</nav>
 </div>
-<div class="flex flex-1 justify-end items-center gap-4">
-<div class="relative w-full max-w-xs hidden sm:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary">search</span>
-<input class="w-full bg-primary/5 border-none rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search titles..." type="text"/>
+<div class="flex items-center gap-4">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg pl-9 pr-4 py-1.5 text-xs focus:ring-2 focus:ring-primary" placeholder="Search entries..."/>
 </div>
-<div class="flex gap-2">
-<button class="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all">
-<span class="material-symbols-outlined">share</span>
-</button>
-<button class="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all">
-<span class="material-symbols-outlined">bookmark</span>
-</button>
-<div class="w-10 h-10 rounded-full bg-cover border-2 border-accent-pink" data-alt="User profile avatar with circular border" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArWJVmQrGgB1vUduIrxJTV-lpQKcOaCFyKn1z_ntOUwaqy09zP-hAe_ILzCQ9G0LlxEEHHQsTwFrFEBgEo7zXiXRf27a-OD2L8-ycmDsrux3A1DFz0g9BoOKxeV5bH32mZ9mRvPbkgMr2sgzgZKMT5pmNiJ0cPsKQhQkcDepO4Pn27oyY9-LkJCCOfPRsJudgP0MnFiZ0DO5PHLFXEwz7yYSkQOuWZsPO4X5Q2eo3izgxQvXssx7ZklQt-CqOYTUhg5WNctIo-4w0S')"></div>
-</div>
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary overflow-hidden">
+<img alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY1ydiuh2E2jKk3FeC8hd23uHWOsBtAtvi4XB33PgfR5ZVhF6xOvkniGAUQi_8Hh1Jy04mTXKJ3SGnxuUABkGp6qj4S09a1B3gRMGLXl23rNK9BjuGrdRDZdLT4_ET1nVWn5bDpeljFbRndp4Y52ujlDbNA6I7Kg5lZWz8j9VcbM45CghcVX20xQqTlbBngoLSWei8TbumdUWL1O4Zto5RPxycvsMsOZDNvh3WxZPhLa3uXek0v6UMVe7LZmK7MmQ3GNIKkIU6QE_S"/>
 </div>
 </div>
 </header>
-<main class="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-<!-- Breadcrumbs -->
-<nav class="flex gap-2 text-xs font-medium text-slate-500 mb-6 items-center">
-<a class="hover:text-primary" href="#">Home</a>
-<span class="material-symbols-outlined text-xs">chevron_right</span>
-<a class="hover:text-primary" href="#">Games</a>
-<span class="material-symbols-outlined text-xs">chevron_right</span>
-<span class="text-slate-900 dark:text-slate-100">Zenless Zone Zero</span>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col p-4 overflow-y-auto custom-scrollbar">
+<div class="mb-6 p-4 bg-primary/5 rounded-xl border border-primary/20">
+<div class="flex items-center gap-2 text-primary mb-1">
+<span class="material-symbols-outlined text-lg">edit</span>
+<h3 class="text-xs font-bold uppercase tracking-widest">Edit Mode Active</h3>
+</div>
+<p class="text-[10px] text-slate-500">Unsaved changes will be lost</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-semibold transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm">Core Details</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">gallery_thumbnail</span>
+<span class="text-sm">Visual Assets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">library_music</span>
+<span class="text-sm">Media &amp; Audio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-sm">Staff &amp; Connections</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="text-sm">Booking &amp; Activity</span>
+</a>
 </nav>
-<!-- Hero Section: Large PV Banner -->
-<!-- Main Content Grid -->
-<section class="bg-white dark:bg-slate-800/50 p-6 lg:p-8 rounded-xl border border-primary/10 mb-8">
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-<!-- Main Visual Image -->
-<div class="lg:col-span-5">
-<div class="aspect-[460/215] rounded-xl overflow-hidden shadow-sm">
-<img alt="Zenless Zone Zero Main Visual" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP7n179fb78kixq0q4Uw_KGKr-Iq6zcPAxjnt4h-tDaCI2FpAVp31qawg40lB1g6YMC32qmskjO4t0YQQ7xWTeU5TvNuffFzgfWYNYbtUFPoqiIkNdhNSHSNQ06xjJhr68YWERSfx1xaqT2nrEaNihAkCnbPDjrW-CriwnFi1HJOms3QWFPANX4F44FjndRv5vv5Qz2o9NYGKVdf7KLiCmHjGA2m-x3LwQS4f3OHGXQQ7B6Lcprmy2Li2lTMGew9_ovT8EERZ_HDhA"/>
+<div class="mt-6 flex flex-col gap-2">
+<button class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 hover:brightness-105 transition-all text-sm">
+                    Save Changes
+                </button>
+<button class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold py-3 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm">
+                    Cancel
+                </button>
 </div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-slate-950 p-8 custom-scrollbar">
+<div class="max-w-5xl mx-auto space-y-8">
+<div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">
+<a class="hover:text-primary transition-colors" href="#">Database</a>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-100">Core Details Editor</span>
 </div>
-<!-- Game Info & Actions -->
-<div class="lg:col-span-7 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-<div>
-<div class="flex gap-2 mb-3">
-<span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wider">Action RPG</span>
-<span class="px-2.5 py-0.5 bg-accent-pink/10 text-accent-pink text-[10px] font-bold rounded uppercase tracking-wider">Anime-Style</span>
+<section class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">id_card</span> Primary Identity
+                                </h3>
+<div class="grid grid-cols-1 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Entry Title</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-lg font-bold" placeholder="e.g. Neon Genesis Evangelion" type="text"/>
 </div>
-<h1 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-3">Zenless Zone Zero</h1>
-<div class="flex flex-wrap items-center gap-4 text-slate-500 dark:text-slate-400">
-<div class="flex items-center gap-1.5">
-<span class="material-symbols-outlined text-primary fill-1 text-xl">star</span>
-<span class="font-bold text-slate-900 dark:text-white text-lg">4.9</span>
-<span class="text-sm">(24k reviews)</span>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aliases / Other Names</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="Separated by semicolon (;)" type="text"/>
 </div>
-<span class="hidden sm:block w-1 h-1 rounded-full bg-slate-300"></span>
-<div class="flex items-center gap-1.5">
-<span class="material-symbols-outlined text-sm">calendar_month</span>
-<span class="text-sm">Released: July 4, 2024</span>
-</div>
-</div>
-</div>
-<div class="flex flex-wrap gap-3 w-full md:w-auto">
-<button class="flex-1 md:flex-none px-6 py-3 bg-primary hover:bg-primary/90 text-slate-900 font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition-all">
-<span class="material-symbols-outlined text-xl">shopping_cart</span>
-            Pre-register Now
-        </button>
-<button class="flex-1 md:flex-none px-6 py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all">
-<span class="material-symbols-outlined text-xl">add</span>
-            Add to Wishlist
-        </button>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Synopsis / Introduction</label>
+<textarea class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="Provide a compelling overview of this entry..." rows="6"></textarea>
 </div>
 </div>
 </div>
-</section><div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-<!-- Left Column: Details -->
-<div class="lg:col-span-8 flex flex-col gap-8"><section class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h3 class="text-xl font-bold flex items-center gap-2 mb-4">
-<span class="material-symbols-outlined text-primary">description</span>
-        About the Game
-    </h3>
-<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        Zenless Zone Zero is a brand-new urban fantasy action RPG from HoYoverse. Set in a post-apocalyptic world where mysterious disasters known as 'Hollows' have wiped out most of civilization, New Eridu stands as the last bastion of humanity. Players take on the role of a 'Proxy', a specialized guide who helps others navigate the dangerous Hollows, uncovering secrets and battling ethereal monsters in high-octane, stylish combat.
-    </p>
-</section>
-<!-- About Section -->
-<!-- Media Gallery -->
-<div class="flex flex-col gap-4">
-<div class="flex justify-between items-center">
-<h3 class="text-xl font-bold flex items-center gap-2">
-<span class="material-symbols-outlined text-accent-pink">imagesmode</span>
-                            Media Gallery
-                        </h3>
-<button class="text-sm text-primary font-bold">View All 42 Items</button>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">category</span> Categorization &amp; Release
+                                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</label>
+<select class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm">
+<option>Select Category</option>
+<option>Anime</option>
+<option>Manga</option>
+<option>Game</option>
+<option>Light Novel</option>
+</select>
 </div>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-<div class="aspect-video rounded-xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-primary">
-<img class="w-full h-full object-cover" data-alt="Screenshot of neon city street at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcyeWZOyPxmU3RsKa1nDEtCgF9Z77a7fDZJrMubD-61cEajuSSPrje5UgL9iZ5H8CgEZMJjEDvX2H9rqcOJQzlhExu-pooB4UP7LP8x6YvCzq5BxCQc1u-uZMZpzH-WoZQDCl6XN0jAerf-jVKHTKSs81edy2Mh0yWQAya_a_cANkAKh_sJJZUBp659j51Ufu1TTBDbouoCziVi8AXN8JJh8U907YV2rprLVJltmwMypf5N5Zd8UibpW3KItAirKVwq0Lbm4MJ9owq"/>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Release Info</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="YYYY-MM-DD" type="date"/>
 </div>
-<div class="aspect-video rounded-xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-primary">
-<img class="w-full h-full object-cover" data-alt="Interior of futuristic gaming lab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ6Dc-9A2-JgIjTlpgCDpC93Zraztruh8uwrohvDJ2fPymLqa3lTjx_Utan9tCCDShUPIpt2loCe4PtM-zayAy7PpZzU_W6VKQ9bKx2WX5_eTmu3qrWMkFMPptnT9paLKofrgHKVUjlZ3h75irnUV4kui-ZovTWGBhriPtpAhCGPe7pgWnYrUICUmnQVu7zOgfd8XoQnSYbg6iQk-2kUaCNl26IaJ3f2Wf9NFreTh-ZlwBSlxe7t8BBtuAuZtk0ns-o4khh8xcoc7t"/>
-</div>
-<div class="aspect-video rounded-xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-primary">
-<img class="w-full h-full object-cover" data-alt="Abstract digital glitch pattern background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKFeKgI0It_fru_Eafy6G6aMCWW75NeRRIoS1Lvw8912NJXf8nMUXnAjGSaX1aeNdC7L7icjnK_sWPWzcpWDD8LLEJoj-ZxK1-P5HvbYEObDb_Vp8PkYMGT3V6KVjcGLlJt8xfGbK4ZZKs1riXiXubtgvWLk2zZcfmTdBI3n9nWqACz1L6voQus75zes5mIAMn_9PVy67xH8EwNNo9gyCESLcJWP8TqKcWDpZo6d-O_15Jl9-EpkhBAwInYwLpLmy93F3wk6rwUCKm"/>
-</div>
-<div class="hidden md:block aspect-video rounded-xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-primary">
-<img class="w-full h-full object-cover" data-alt="Cinematic lighting on a mecha character" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF248Sfkv-IvVIHNlLXh6CzloS24LMMTogO7mdHPM7ox3JmuXLIPThScEDcieXoONZjxpo2ajJVGc61wRG9vQkw7u_4u5TV6094h0oi8MMjYeB43I1WZOzOTcnL-WctehEJcM9eoBNmRRhThxoDGWHvw4t8dV6Ghq1QU424eUjZwI41394AE835UPL2DPBQxJq-G2aJBIKFyGLR2-65INkjUNJFlPuHY2N4qFgOdaLZH1ZCjz-VcaY8EXX0hA6W6u5Jo_2M5PivuAB"/>
-</div>
-<div class="hidden md:block aspect-video rounded-xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-primary">
-<img class="w-full h-full object-cover" data-alt="Stylish character in urban fashion" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP7n179fb78kixq0q4Uw_KGKr-Iq6zcPAxjnt4h-tDaCI2FpAVp31qawg40lB1g6YMC32qmskjO4t0YQQ7xWTeU5TvNuffFzgfWYNYbtUFPoqiIkNdhNSHSNQ06xjJhr68YWERSfx1xaqT2nrEaNihAkCnbPDjrW-CriwnFi1HJOms3QWFPANX4F44FjndRv5vv5Qz2o9NYGKVdf7KLiCmHjGA2m-x3LwQS4f3OHGXQQ7B6Lcprmy2Li2lTMGew9_ovT8EERZ_HDhA"/>
-</div>
-<div class="hidden md:block aspect-video rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center relative">
-<img class="w-full h-full object-cover opacity-50" data-alt="Dark abstract room with neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ715ujStHOXufHxF2mZtksvmMBYbnndCU2rOH4IRWyfKoaGMl46JmE5uhSl9o0E7oz0I0b2Ribw9hec43YXpiWjxjRwYI7k4d6JxAxDGB7kOSBDaMHMMr4075pytOLhCG-Bs_gTFxWVDgAfi9mz_FN53k4yCadyt1zssI9yb3N5-eBHb8rfGdNbYolEAhQB10iQvThoajbtoJUyOFNg1jKQDdUeDJIs0T_Ue0TQoD5DRYhBPQfRUvTSdVVJHQoZAGJ9WTHsuGurRZ"/>
-<div class="absolute inset-0 flex flex-col items-center justify-center text-white">
-<span class="text-2xl font-black">+37</span>
-<span class="text-xs uppercase">More Photos</span>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tags / Genres</label>
+<div class="flex flex-wrap gap-2 p-3 border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl min-h-[60px]">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 uppercase">Sci-Fi <span class="material-symbols-outlined text-[10px] cursor-pointer">close</span></span>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 uppercase">Mecha <span class="material-symbols-outlined text-[10px] cursor-pointer">close</span></span>
+<button class="text-[10px] font-bold text-primary/60 hover:text-primary transition-colors px-2 py-1">+ Add Tag</button>
 </div>
 </div>
 </div>
 </div>
-<section class="flex flex-col gap-6">
-<div class="flex justify-between items-center">
-<h3 class="text-xl font-bold flex items-center gap-2">
-<span class="material-symbols-outlined text-accent-pink">forum</span>
-            User Reviews
-        </h3>
-<button class="text-sm text-primary font-bold hover:underline">Write a Review</button>
 </div>
-<div class="space-y-4">
-<!-- Review Card 1 -->
-<div class="bg-white dark:bg-slate-800/50 p-5 rounded-xl border border-primary/10">
-<div class="flex justify-between items-start mb-3">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArWJVmQrGgB1vUduIrxJTV-lpQKcOaCFyKn1z_ntOUwaqy09zP-hAe_ILzCQ9G0LlxEEHHQsTwFrFEBgEo7zXiXRf27a-OD2L8-ycmDsrux3A1DFz0g9BoOKxeV5bH32mZ9mRvPbkgMr2sgzgZKMT5pmNiJ0cPsKQhQkcDepO4Pn27oyY9-LkJCCOfPRsJudgP0MnFiZ0DO5PHLFXEwz7yYSkQOuWZsPO4X5Q2eo3izgxQvXssx7ZklQt-CqOYTUhg5WNctIo-4w0S')"></div>
-<div>
-<p class="text-sm font-bold">Alex Rivers</p>
-<div class="flex text-primary">
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-</div>
-</div>
-</div>
-<span class="text-[10px] text-slate-400">2 days ago</span>
-</div>
-<p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                The combat system is incredibly fluid. Switching between characters for chain attacks feels rewarding and the visual effects are top-tier. The 'Hollow' exploration adds a nice roguelike element to the typical ARPG loop.
-            </p>
-</div>
-<!-- Review Card 2 -->
-<div class="bg-white dark:bg-slate-800/50 p-5 rounded-xl border border-primary/10">
-<div class="flex justify-between items-start mb-3">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ715ujStHOXufHxF2mZtksvmMBYbnndCU2rOH4IRWyfKoaGMl46JmE5uhSl9o0E7oz0I0b2Ribw9hec43YXpiWjxjRwYI7k4d6JxAxDGB7kOSBDaMHMMr4075pytOLhCG-Bs_gTFxWVDgAfi9mz_FN53k4yCadyt1zssI9yb3N5-eBHb8rfGdNbYolEAhQB10iQvThoajbtoJUyOFNg1jKQDdUeDJIs0T_Ue0TQoD5DRYhBPQfRUvTSdVVJHQoZAGJ9WTHsuGurRZ')"></div>
-<div>
-<p class="text-sm font-bold">Sarah Miller</p>
-<div class="flex text-primary">
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs">star</span>
-</div>
-</div>
-</div>
-<span class="text-[10px] text-slate-400">1 week ago</span>
-</div>
-<p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                I love the urban vibe and the character designs. Each character has so much personality in their animations. The story starts a bit slow but picks up once you get to the first major boss. The Bangboo are adorable!
-            </p>
-</div>
-<!-- Review Card 3 -->
-<div class="bg-white dark:bg-slate-800/50 p-5 rounded-xl border border-primary/10">
-<div class="flex justify-between items-start mb-3">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCP7n179fb78kixq0q4Uw_KGKr-Iq6zcPAxjnt4h-tDaCI2FpAVp31qawg40lB1g6YMC32qmskjO4t0YQQ7xWTeU5TvNuffFzgfWYNYbtUFPoqiIkNdhNSHSNQ06xjJhr68YWERSfx1xaqT2nrEaNihAkCnbPDjrW-CriwnFi1HJOms3QWFPANX4F44FjndRv5vv5Qz2o9NYGKVdf7KLiCmHjGA2m-x3LwQS4f3OHGXQQ7B6Lcprmy2Li2lTMGew9_ovT8EERZ_HDhA')"></div>
-<div>
-<p class="text-sm font-bold">Kai Chen</p>
-<div class="flex text-primary">
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-<span class="material-symbols-outlined text-xs fill-1">star</span>
-</div>
-</div>
-</div>
-<span class="text-[10px] text-slate-400">Jan 12, 2024</span>
-</div>
-<p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                As a long-time fan of HoYoverse games, this is a fresh change of pace. The parry mechanic is satisfying and the TV-grid exploration is more strategic than it looks. Definitely the most stylish game of the year.
-            </p>
-</div>
-</div>
-<button class="w-full py-3 border border-dashed border-primary/30 rounded-xl text-sm font-medium text-slate-500 hover:bg-primary/5 transition-colors">Load More Reviews</button>
-</section><!-- Comments Section -->
-<section class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h3 class="text-xl font-bold flex items-center gap-2 mb-6">
-<span class="material-symbols-outlined text-primary">comment</span>
-        Comments
-    </h3>
-<!-- Comment Input -->
-<div class="flex gap-4 mb-8">
-<div class="w-10 h-10 rounded-full bg-cover flex-shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArWJVmQrGgB1vUduIrxJTV-lpQKcOaCFyKn1z_ntOUwaqy09zP-hAe_ILzCQ9G0LlxEEHHQsTwFrFEBgEo7zXiXRf27a-OD2L8-ycmDsrux3A1DFz0g9BoOKxeV5bH32mZ9mRvPbkgMr2sgzgZKMT5pmNiJ0cPsKQhQkcDepO4Pn27oyY9-LkJCCOfPRsJudgP0MnFiZ0DO5PHLFXEwz7yYSkQOuWZsPO4X5Q2eo3izgxQvXssx7ZklQt-CqOYTUhg5WNctIo-4w0S')"></div>
-<div class="flex-1">
-<textarea class="w-full bg-primary/5 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/50 resize-none" placeholder="Share your thoughts..." rows="3"></textarea>
-<div class="flex justify-end mt-2">
-<button class="px-6 py-2 bg-primary hover:bg-primary/90 text-slate-900 text-sm font-bold rounded-lg transition-all shadow-sm">Post Comment</button>
-</div>
-</div>
-</div>
-<!-- Comments List -->
 <div class="space-y-6">
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover flex-shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ715ujStHOXufHxF2mZtksvmMBYbnndCU2rOH4IRWyfKoaGMl46JmE5uhSl9o0E7oz0I0b2Ribw9hec43YXpiWjxjRwYI7k4d6JxAxDGB7kOSBDaMHMMr4075pytOLhCG-Bs_gTFxWVDgAfi9mz_FN53k4yCadyt1zssI9yb3N5-eBHb8rfGdNbYolEAhQB10iQvThoajbtoJUyOFNg1jKQDdUeDJIs0T_Ue0TQoD5DRYhBPQfRUvTSdVVJHQoZAGJ9WTHsuGurRZ')"></div>
-<div class="flex-1">
-<div class="flex items-center gap-2 mb-1">
-<span class="text-sm font-bold">EriduExplorer</span>
-<span class="text-[10px] text-slate-400">5 hours ago</span>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span> Basic Info
+                                </h3>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs">
+<option>Airing / Ongoing</option>
+<option>Completed</option>
+<option>Upcoming</option>
+</select>
 </div>
-<p class="text-sm text-slate-600 dark:text-slate-400">The soundtrack in the main menu is absolutely fire. Can't wait for the official release!</p>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Episodes / Chapters</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs" type="number" value="26"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Source Material</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs" placeholder="Original" type="text"/>
 </div>
 </div>
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover flex-shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCF248Sfkv-IvVIHNlLXh6CzloS24LMMTogO7mdHPM7ox3JmuXLIPThScEDcieXoONZjxpo2ajJVGc61wRG9vQkw7u_4u5TV6094h0oi8MMjYeB43I1WZOzOTcnL-WctehEJcM9eoBNmRRhThxoDGWHvw4t8dV6Ghq1QU424eUjZwI41394AE835UPL2DPBQxJq-G2aJBIKFyGLR2-65INkjUNJFlPuHY2N4qFgOdaLZH1ZCjz-VcaY8EXX0hA6W6u5Jo_2M5PivuAB')"></div>
-<div class="flex-1">
-<div class="flex items-center gap-2 mb-1">
-<span class="text-sm font-bold">ProxyHype</span>
-<span class="text-[10px] text-slate-400">12 hours ago</span>
 </div>
-<p class="text-sm text-slate-600 dark:text-slate-400">I'm really looking forward to the mobile performance. If it's as smooth as Genshin, I'm sold.</p>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calendar_month</span> Booking Schedule
+                                </h3>
+<div class="space-y-3">
+<div class="h-8 w-full skeleton rounded-lg"></div>
+<div class="h-8 w-full skeleton rounded-lg"></div>
+<div class="h-8 w-full skeleton rounded-lg"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-40 grayscale pointer-events-none">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center gap-4">
+<div class="size-20 rounded-full bg-accent-pink/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-accent-pink">image_not_supported</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Visual Assets Preview</h3>
+<p class="text-slate-500 text-[10px] mt-1">Main Image, Backgrounds, and Photo Album data</p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center gap-4">
+<div class="size-20 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary">volume_off</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Audio &amp; OSTs</h3>
+<p class="text-slate-500 text-[10px] mt-1">No audio files or playlists linked to this entry</p>
 </div>
 </div>
 </div>
 </section>
-<!-- Related Entries Section -->
-<section class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10 mt-8">
-<h3 class="text-xl font-bold flex items-center gap-2 mb-6">
-<span class="material-symbols-outlined text-accent-pink">grid_view</span>
-        Related Entries
-    </h3>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<!-- Related Card 1 -->
-<div class="group cursor-pointer">
-<div class="aspect-video rounded-xl overflow-hidden mb-2 border border-primary/5">
-<img alt="Zenless Zone Zero Soundtrack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKFeKgI0It_fru_Eafy6G6aMCWW75NeRRIoS1Lvw8912NJXf8nMUXnAjGSaX1aeNdC7L7icjnK_sWPWzcpWDD8LLEJoj-ZxK1-P5HvbYEObDb_Vp8PkYMGT3V6KVjcGLlJt8xfGbK4ZZKs1riXiXubtgvWLk2zZcfmTdBI3n9nWqACz1L6voQus75zes5mIAMn_9PVy67xH8EwNNo9gyCESLcJWP8TqKcWDpZo6d-O_15Jl9-EpkhBAwInYwLpLmy93F3wk6rwUCKm"/>
 </div>
-<div class="px-1">
-<span class="text-[9px] font-bold text-accent-pink uppercase tracking-widest">Music</span>
-<h4 class="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">Zenless Zone Zero (Soundtrack)</h4>
-</div>
-</div>
-<!-- Related Card 2 -->
-<div class="group cursor-pointer">
-<div class="aspect-video rounded-xl overflow-hidden mb-2 border border-primary/5">
-<img alt="Honkai: Star Rail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcyeWZOyPxmU3RsKa1nDEtCgF9Z77a7fDZJrMubD-61cEajuSSPrje5UgL9iZ5H8CgEZMJjEDvX2H9rqcOJQzlhExu-pooB4UP7LP8x6YvCzq5BxCQc1u-uZMZpzH-WoZQDCl6XN0jAerf-jVKHTKSs81edy2Mh0yWQAya_a_cANkAKh_sJJZUBp659j51Ufu1TTBDbouoCziVi8AXN8JJh8U907YV2rprLVJltmwMypf5N5Zd8UibpW3KItAirKVwq0Lbm4MJ9owq"/>
-</div>
-<div class="px-1">
-<span class="text-[9px] font-bold text-primary uppercase tracking-widest">Game</span>
-<h4 class="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">Honkai: Star Rail</h4>
-</div>
-</div>
-<!-- Related Card 3 -->
-<div class="group cursor-pointer">
-<div class="aspect-video rounded-xl overflow-hidden mb-2 border border-primary/5">
-<img alt="Genshin Impact" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ6Dc-9A2-JgIjTlpgCDpC93Zraztruh8uwrohvDJ2fPymLqa3lTjx_Utan9tCCDShUPIpt2loCe4PtM-zayAy7PpZzU_W6VKQ9bKx2WX5_eTmu3qrWMkFMPptnT9paLKofrgHKVUjlZ3h75irnUV4kui-ZovTWGBhriPtpAhCGPe7pgWnYrUICUmnQVu7zOgfd8XoQnSYbg6iQk-2kUaCNl26IaJ3f2Wf9NFreTh-ZlwBSlxe7t8BBtuAuZtk0ns-o4khh8xcoc7t"/>
-</div>
-<div class="px-1">
-<span class="text-[9px] font-bold text-primary uppercase tracking-widest">Game</span>
-<h4 class="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">Genshin Impact</h4>
-</div>
-</div>
-</div>
-</section></div>
-<!-- Right Column: Sidebar -->
-<aside class="lg:col-span-4 flex flex-col gap-6">
-<!-- Platforms Card -->
-<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h4 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Available Platforms</h4>
-<div class="flex flex-wrap gap-2">
-<div class="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-<span class="material-symbols-outlined text-primary">computer</span>
-<span class="text-sm font-medium">Windows PC</span>
-</div>
-<div class="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-<span class="material-symbols-outlined text-primary">sports_esports</span>
-<span class="text-sm font-medium">PlayStation 5</span>
-</div>
-<div class="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-<span class="material-symbols-outlined text-primary">smartphone</span>
-<span class="text-sm font-medium">iOS / Android</span>
-</div>
-</div>
-</div><div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h4 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Detailed Information</h4>
-<div class="space-y-3">
-<div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-700/50">
-<span class="text-xs text-slate-500">Developer</span>
-<span class="text-xs font-bold">HoYoverse</span>
-</div>
-<div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-700/50">
-<span class="text-xs text-slate-500">Publisher</span>
-<span class="text-xs font-bold">Cognosphere</span>
-</div>
-<div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-700/50">
-<span class="text-xs text-slate-500">Rating</span>
-<span class="text-xs font-bold">ESRB Teen</span>
-</div>
-<div class="flex justify-between items-center py-1">
-<span class="text-xs text-slate-500">Players</span>
-<span class="text-xs font-bold">Single / Online</span>
-</div>
-</div>
-</div><div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h4 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Releases</h4>
-<div class="space-y-3">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-lg">language</span>
-<div>
-<p class="text-[10px] text-slate-500 uppercase font-bold">Global</p>
-<p class="text-xs font-bold">July 4, 2024</p>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-lg">flag</span>
-<div>
-<p class="text-[10px] text-slate-500 uppercase font-bold">China</p>
-<p class="text-xs font-bold">July 4, 2024</p>
-</div>
-</div>
-</div>
-</div><div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<div class="flex justify-between items-center mb-4">
-<h4 class="font-bold uppercase text-xs tracking-widest text-slate-500">Main Characters</h4>
-<button class="text-[10px] text-primary font-bold hover:underline">View All</button>
-</div>
-<div class="space-y-4">
-<div class="flex gap-3">
-<div class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden border border-primary/10">
-<img alt="Wise" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP7n179fb78kixq0q4Uw_KGKr-Iq6zcPAxjnt4h-tDaCI2FpAVp31qawg40lB1g6YMC32qmskjO4t0YQQ7xWTeU5TvNuffFzgfWYNYbtUFPoqiIkNdhNSHSNQ06xjJhr68YWERSfx1xaqT2nrEaNihAkCnbPDjrW-CriwnFi1HJOms3QWFPANX4F44FjndRv5vv5Qz2o9NYGKVdf7KLiCmHjGA2m-x3LwQS4f3OHGXQQ7B6Lcprmy2Li2lTMGew9_ovT8EERZ_HDhA"/>
-</div>
-<div class="flex-1">
-<h5 class="text-sm font-bold">Wise</h5>
-<p class="text-[10px] text-slate-500 line-clamp-2">The calm and dependable Proxy who manages Random Play.</p>
-</div>
-</div>
-</div>
-</div><div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h4 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Staff List</h4>
-<div class="grid grid-cols-2 gap-x-4 gap-y-4">
-<div>
-<p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest">Director</p>
-<p class="text-xs font-bold">Zhenyu Li</p>
-</div>
-<div>
-<p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest">Producer</p>
-<p class="text-xs font-bold">Cai Haoyu</p>
-</div>
-<div>
-<p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest">Art</p>
-<p class="text-xs font-bold">Qi Daonan</p>
-</div>
-<div>
-<p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest">Design</p>
-<p class="text-xs font-bold">Xiao Wu</p>
-</div>
-</div>
-</div>
-<!-- Rating Breakdown -->
-<!-- Features Card -->
-<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10">
-<h4 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">External Links</h4>
-<div class="grid grid-cols-2 gap-2">
-<a class="flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-slate-700 rounded-lg text-[10px] font-bold hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-sm">link</span>
-            Official
-        </a>
-<a class="flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-slate-700 rounded-lg text-[10px] font-bold hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-sm">brand_awareness</span>
-            X / Twitter
-        </a>
-<a class="flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-slate-700 rounded-lg text-[10px] font-bold hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-sm">play_circle</span>
-            YouTube
-        </a>
-<a class="flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-slate-700 rounded-lg text-[10px] font-bold hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-sm">group</span>
-            Discord
-        </a>
-</div>
-</div></aside>
-</div>
-<!-- Bottom CTA for Booking/Buy -->
 </main>
-<footer class="mt-20 border-t border-primary/10 bg-white dark:bg-slate-900/50 py-12 px-4 lg:px-20">
-<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-<div class="flex items-center gap-2 text-primary grayscale opacity-70">
-<span class="material-symbols-outlined text-2xl font-bold">rocket_launch</span>
-<h2 class="text-lg font-bold tracking-tight">ACG DB</h2>
-</div>
-<p class="text-slate-500 text-sm">© 2024 ACG Database. All rights reserved. Not affiliated with HoYoverse.</p>
-<div class="flex gap-6">
-<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">public</span></a>
-<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">mail</span></a>
-<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">policy</span></a>
 </div>
 </div>
-</footer>
-<!-- Style for filled icons -->
-<style>
-        .fill-1 { font-variation-settings: 'FILL' 1; }
-    </style>
+
 </body></html>

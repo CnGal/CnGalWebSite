@@ -1,0 +1,121 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<aside class="entry-edit-sidebar">
+    <div class="entry-edit-sidebar__status">
+        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+        <div>
+            <h3>@(IsCreate ? "创建模式" : "编辑模式")</h3>
+            <p>未保存的更改将会丢失</p>
+        </div>
+    </div>
+
+    <nav class="entry-edit-sidebar__nav">
+        @foreach (var item in _navItems)
+        {
+            <a class="entry-edit-nav-item @(item.Id == _activeSectionId ? "entry-edit-nav-item--active" : "")"
+               href="javascript:void(0)"
+               @onclick="() => ScrollToSection(item.Id)"
+               @onclick:preventDefault>
+                <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                <span>@item.Label</span>
+            </a>
+        }
+    </nav>
+
+    <div class="entry-edit-sidebar__actions">
+        <button class="cg-btn cg-btn--primary cg-btn--block" disabled="@IsSubmitting" @onclick="OnSubmit">
+            @if (IsSubmitting)
+            {
+                <span class="cg-spinner"></span>
+                <span>提交中...</span>
+            }
+            else
+            {
+                <span>提交审核</span>
+            }
+        </button>
+        <button class="cg-btn cg-btn--outline cg-btn--block" disabled="@IsSubmitting" @onclick="OnCancel">取消</button>
+    </div>
+</aside>
+
+@code {
+    [Parameter]
+    public bool IsCreate { get; set; }
+
+    [Parameter]
+    public bool IsSubmitting { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    // ── 导航项定义 ──
+    private static readonly NavItem[] _navItems =
+    [
+        new("section-main", "主要信息", "mdiFileDocumentOutline"),
+        new("section-addinfo", "附加信息", "mdiInformationOutline"),
+        new("section-images", "相册", "mdiImageOutline"),
+        new("section-mainpage", "正文主页", "mdiBookOpenVariant"),
+        new("section-relevances", "关联信息", "mdiHub"),
+        new("section-tags", "标签", "mdiTagOutline"),
+        new("section-audio", "音频", "mdiMusicNoteOutline"),
+        new("section-website", "专题页设置", "mdiEarth"),
+    ];
+
+    private record NavItem(string Id, string Label, string Icon);
+
+    // ── JS 隔离 ──
+    private string _activeSectionId = "section-main";
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<EntryEditorSidebar>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-edit-nav.js");
+
+            _dotNetRef = DotNetObjectReference.Create(this);
+            var sectionIds = _navItems.Select(n => n.Id).ToArray();
+            await _jsModule.InvokeVoidAsync("initSectionObserver", _dotNetRef, sectionIds);
+        }
+    }
+
+    [JSInvokable]
+    public void OnSectionVisible(string sectionId)
+    {
+        if (_activeSectionId != sectionId)
+        {
+            _activeSectionId = sectionId;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ScrollToSection(string sectionId)
+    {
+        _activeSectionId = sectionId;
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("scrollToSection", sectionId);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule != null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("disposeSectionObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

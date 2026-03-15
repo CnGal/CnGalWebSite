@@ -1,0 +1,228 @@
+
+/* ── 侧边栏容器 ── */
+.entry-edit-sidebar {
+    width: 280px;
+    min-width: 280px;
+    border-right: 1px solid var(--cg-color-border);
+    background-color: var(--cg-color-surface);
+    display: flex;
+    flex-direction: column;
+    padding: var(--cg-spacing-4);
+    position: sticky;
+    top: calc(var(--cg-header-height) + 30px);
+    max-height: calc(100vh - var(--cg-header-height) - 60px);
+    align-self: flex-start;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+/* 自定义滚动条 */
+.entry-edit-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.entry-edit-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.entry-edit-sidebar::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+    border-radius: 10px;
+}
+
+/* ── 编辑模式状态提示 ── */
+.entry-edit-sidebar__status {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+    margin-bottom: var(--cg-spacing-6);
+}
+
+.entry-edit-sidebar__status ::deep .cg-mdi-icon {
+    color: var(--cg-color-primary);
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.entry-edit-sidebar__status h3 {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--cg-color-primary);
+    margin: 0;
+}
+
+.entry-edit-sidebar__status p {
+    font-size: 0.625rem;
+    color: var(--cg-color-text-muted);
+    margin: 0;
+}
+
+/* ── 导航列表 ── */
+.entry-edit-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.entry-edit-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    cursor: pointer;
+    user-select: none;
+}
+
+.entry-edit-nav-item:hover {
+    background-color: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+.entry-edit-nav-item--active {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    font-weight: var(--cg-font-weight-semibold);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+}
+
+.entry-edit-nav-item--active:hover {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+}
+
+.entry-edit-nav-item ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.entry-edit-nav-item--active ::deep .cg-mdi-icon {
+    color: var(--cg-color-on-primary);
+}
+
+/* ── 底部操作按钮 ── */
+.entry-edit-sidebar__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-6);
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px solid var(--cg-color-border);
+}
+
+/* ── 按钮样式 ── */
+.cg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-6);
+    border-radius: var(--cg-radius-md);
+    font-weight: var(--cg-font-weight-medium);
+    cursor: pointer;
+    transition: var(--cg-transition-fast);
+    border: 1px solid transparent;
+    font-size: var(--cg-font-size-sm);
+}
+
+.cg-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cg-btn--primary {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+}
+
+.cg-btn--primary:hover:not(:disabled) {
+    background-color: var(--cg-color-primary-hover);
+}
+
+.cg-btn--outline {
+    background-color: transparent;
+    border-color: var(--cg-color-border);
+    color: var(--cg-color-text);
+}
+
+.cg-btn--outline:hover:not(:disabled) {
+    background-color: var(--cg-color-hover-overlay);
+}
+
+.cg-btn--block {
+    width: 100%;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-lg);
+    font-weight: var(--cg-font-weight-bold);
+}
+
+.cg-btn--primary.cg-btn--block {
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+}
+
+.cg-btn--primary.cg-btn--block:hover:not(:disabled) {
+    filter: brightness(1.05);
+}
+
+.cg-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: cg-spin 1s linear infinite;
+}
+
+@keyframes cg-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── 响应式：窄屏折叠 ── */
+@media (max-width: 1024px) {
+    .entry-edit-sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--cg-color-border);
+        padding: var(--cg-spacing-3);
+    }
+
+    .entry-edit-sidebar__status {
+        margin-bottom: var(--cg-spacing-3);
+    }
+
+    .entry-edit-sidebar__nav {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: var(--cg-spacing-1);
+        padding-bottom: var(--cg-spacing-2);
+    }
+
+    .entry-edit-nav-item {
+        white-space: nowrap;
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+        font-size: var(--cg-font-size-xs);
+        border-radius: var(--cg-radius-md);
+    }
+
+    .entry-edit-sidebar__actions {
+        flex-direction: row;
+        margin-top: var(--cg-spacing-3);
+        padding-top: var(--cg-spacing-3);
+    }
+}

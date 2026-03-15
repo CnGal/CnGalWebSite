@@ -36,24 +36,6 @@ else if (LoadErrorMessage != null)
 else if (Model != null)
 {
     <article class="entry-edit-page">
-        <header class="entry-edit-header">
-            <h1>@(IsCreate ? "创建词条" : "编辑词条")</h1>
-            <div class="entry-edit-actions">
-                <button class="cg-btn cg-btn--outline" disabled="@IsSubmitting" @onclick="Cancel">取消</button>
-                <button class="cg-btn cg-btn--primary" disabled="@IsSubmitting" @onclick="SubmitAsync">
-                    @if (IsSubmitting)
-                    {
-                        <span class="cg-spinner"></span>
-                        <span>提交中...</span>
-                    }
-                    else
-                    {
-                        <span>提交审核</span>
-                    }
-                </button>
-            </div>
-        </header>
-
         @if (SubmitErrorMessage != null)
         {
             <div class="entry-edit-alert entry-edit-alert--error">
@@ -69,16 +51,23 @@ else if (Model != null)
             </div>
         }
 
-        <main class="entry-edit-content">
-            <EntryMainEditor Model="Model.Data.Main" TypeChanged="OnTypeChanged" />
-            <EntryAddInforEditor @ref="_addInforEditorRef" Model="Model.Data.AddInfor" MetaOptions="Model.MetaOptions" />
-            <EntryImagesEditor Model="Model.Data.Images" />
-            <EntryMainPageEditor Model="Model.Data.MainPage" />
-            <EntryRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
-            <EntryTagsEditor Model="Model.Data.Tags" MetaOptions="Model.MetaOptions" />
-            <EntryAudioEditor Model="Model.Data.Audio" />
-            <EntryWebsiteEditor Model="Model.Data.Website" />
-        </main>
+        <div class="entry-edit-layout">
+            <EntryEditorSidebar IsCreate="IsCreate"
+                                IsSubmitting="IsSubmitting"
+                                OnSubmit="SubmitAsync"
+                                OnCancel="Cancel" />
+
+            <main class="entry-edit-main">
+                <EntryMainEditor Model="Model.Data.Main" TypeChanged="OnTypeChanged" />
+                <EntryAddInforEditor @ref="_addInforEditorRef" Model="Model.Data.AddInfor" MetaOptions="Model.MetaOptions" />
+                <EntryImagesEditor Model="Model.Data.Images" />
+                <EntryMainPageEditor Model="Model.Data.MainPage" />
+                <EntryRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
+                <EntryTagsEditor Model="Model.Data.Tags" MetaOptions="Model.MetaOptions" />
+                <EntryAudioEditor Model="Model.Data.Audio" />
+                <EntryWebsiteEditor Model="Model.Data.Website" />
+            </main>
+        </div>
     </article>
 }
 

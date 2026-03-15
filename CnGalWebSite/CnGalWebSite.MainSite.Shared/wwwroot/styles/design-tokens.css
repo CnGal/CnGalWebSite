@@ -44,4 +44,5 @@
     --cg-color-on-primary: #ffffff;
     --cg-color-focus-ring: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
     --cg-color-hover-overlay: rgba(0, 0, 0, 0.04);
+    --cg-header-height: 56px;
 }
