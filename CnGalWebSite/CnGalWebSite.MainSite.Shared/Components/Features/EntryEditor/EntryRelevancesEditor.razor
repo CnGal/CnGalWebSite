@@ -1,0 +1,338 @@
+@using System.Web
+@using System.Text.RegularExpressions
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+@using CnGalWebSite.Extensions
+@inject ICgToastService ToastService
+
+<section class="entry-editor-section" id="section-relevances">
+    <h2><CgMdiIcon Name="mdiHub" Class="entry-section-icon" aria-hidden="true"/>关联信息</h2>
+    <p>词条关联、动态/文章/视频、外部平台链接与自定义链接。</p>
+
+    @if (Model != null)
+    {
+        <CgFormSection Title="词条关联" Icon="mdiLinkVariant" Flat>
+            <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
+            @if (Model.Type != EntryType.Game)
+            {
+                <EntryRelevanceListEditor Title="STAFF" Items="Model.staffs" AutoCompleteItems="MetaOptions.EntryStaffItems"/>
+            }
+            <EntryRelevanceListEditor Title="组织" Items="Model.Groups" AutoCompleteItems="MetaOptions.EntryGroupItems"/>
+            <EntryRelevanceListEditor Title="游戏" Items="Model.Games" AutoCompleteItems="MetaOptions.EntryGameItems"/>
+            <EntryRelevanceListEditor Title="动态" Items="Model.news" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="文章" Items="Model.articles" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="视频" Items="Model.videos" AutoCompleteItems="MetaOptions.VideoItems"/>
+        </CgFormSection>
+
+        <CgFormSection Title="外部平台 Id/链接" Icon="mdiOpenInNew" Flat>
+            <ChildContent>
+                <p class="cg-tip">支持直接粘贴完整链接，系统会自动截取平台 Id 并拼装标准链接。</p>
+                <CgGrid>
+                    @foreach (var item in _outlinkTypes)
+                    {
+                        var current = item;
+                        <CgFormGroup Label="@current.GetDisplayName()">
+                            <CgInput Value="@GetOutlinkValue(current)" TValue="string"
+                                     ValueChanged="(text) => OnOutlinkValueChanged(current, text)"
+                                     Placeholder="输入平台Id或完整链接"/>
+                        </CgFormGroup>
+                    }
+                </CgGrid>
+            </ChildContent>
+        </CgFormSection>
+
+        <CgFormSection Title="自定义链接" Icon="mdiLinkPlus" Flat>
+            <HeaderActions>
+                <CgButton Variant="primary" OnClick="AddCustomLink">添加</CgButton>
+            </HeaderActions>
+            <ChildContent>
+                <CgTable HasData="@GetCustomLinks().Any()">
+                    <Empty>
+                        <p>暂无自定义链接，请点击"添加"。</p>
+                    </Empty>
+                    <ChildContent>
+                        <thead>
+                        <tr>
+                            <th>唯一名称</th>
+                            <th>链接</th>
+                            <th>简介</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var link in GetCustomLinks())
+                        {
+                            <tr>
+                                <td>@link.DisplayName</td>
+                                <td>@link.Link</td>
+                                <td>@link.DisPlayValue</td>
+                                <td class="cg-actions">
+                                    <CgButton Variant="outline" OnClick="() => EditCustomLink(link)">编辑</CgButton>
+                                    <CgButton Variant="danger" OnClick="() => DeleteCustomLink(link)">删除</CgButton>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </ChildContent>
+                </CgTable>
+            </ChildContent>
+        </CgFormSection>
+    }
+</section>
+
+<CgModal IsOpen="@_customLinkDialogOpen"
+         Title="编辑自定义链接"
+         OnClose="CloseCustomLinkDialogAsync">
+    <ChildContent>
+        @if (_customLinkEditing != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="唯一名称">
+                    <CgInput @bind-Value="_customLinkEditing.DisplayName" Placeholder="如：制作组博客"/>
+                </CgFormGroup>
+                <CgFormGroup Label="链接">
+                    <CgInput @bind-Value="_customLinkEditing.Link" Placeholder="https://example.com"/>
+                </CgFormGroup>
+            </CgGrid>
+            <CgFormGroup Label="简介">
+                <CgInput @bind-Value="_customLinkEditing.DisPlayValue" Placeholder="可选说明"/>
+            </CgFormGroup>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseCustomLinkDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveCustomLink">保存</CgButton>
+    </Footer>
+</CgModal>
+
+
+@code {
+    [Parameter] public EditRelevancesViewModel Model { get; set; } = default!;
+
+    [Parameter] public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private readonly List<OutlinkType> _outlinkTypes = Enum.GetValues<OutlinkType>().ToList();
+
+    /// <summary>
+    /// 每种外部平台类型对应的链接正则，用于从粘贴的完整链接中提取 value。
+    /// 模式与 BuildOutlink 中的拼接规则一一对应。
+    /// </summary>
+    private static readonly Dictionary<OutlinkType, Regex> _outlinkUrlPatterns = new()
+    {
+        [OutlinkType.Moegirl] = new(@"^https?://zh\.moegirl\.org\.cn/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.VNDB] = new(@"^https?://vndb\.org/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YMGal] = new(@"^https?://(?:www\.)?ymgal\.games/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bangumi] = new(@"^https?://bangumi\.tv/(?:subject|character|person)/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.WikiData] = new(@"^https?://(?:www\.)?wikidata\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.BaiDu] = new(@"^https?://baike\.baidu\.com/item/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.ZhWikiPedia] = new(@"^https?://zh\.wikipedia\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType._2DFan] = new(@"^https?://galge\.fun/subjects/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Weibo] = new(@"^https?://weibo\.com/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bilibili] = new(@"^https?://space\.bilibili\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.AcFun] = new(@"^https?://(?:www\.)?acfun\.cn/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Zhihu] = new(@"^https?://(?:www\.)?zhihu\.com/people/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Afdian] = new(@"^https?://afdian\.com/@([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Pixiv] = new(@"^https?://(?:www\.)?pixiv\.net/users/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Twitter] = new(@"^https?://(?:www\.)?(?:twitter|x)\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YouTube] = new(@"^https?://(?:www\.)?youtube\.com/channel/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Facebook] = new(@"^https?://(?:www\.)?facebook\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Modian] = new(@"^https?://zhongchou\.modian\.com/item/([^?#/]+?)\.html", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+    };
+
+
+    private bool _customLinkDialogOpen;
+    private RelevancesModel? _customLinkEditing;
+    private RelevancesModel? _customLinkTarget;
+
+    private List<RelevancesModel> GetCustomLinks()
+    {
+        return Model.others.Where(s => IsCustomName(s.DisplayName)).ToList();
+    }
+
+    private void AddCustomLink()
+    {
+        _customLinkTarget = null;
+        _customLinkEditing = new RelevancesModel();
+        _customLinkDialogOpen = true;
+    }
+
+    private void EditCustomLink(RelevancesModel item)
+    {
+        _customLinkTarget = item;
+        _customLinkEditing = new RelevancesModel
+        {
+            DisplayName = item.DisplayName,
+            DisPlayValue = item.DisPlayValue,
+            Link = item.Link
+        };
+        _customLinkDialogOpen = true;
+    }
+
+    private void DeleteCustomLink(RelevancesModel item)
+    {
+        Model.others.Remove(item);
+    }
+
+    private void SaveCustomLink()
+    {
+        if (_customLinkEditing == null || string.IsNullOrWhiteSpace(_customLinkEditing.DisplayName))
+        {
+            return;
+        }
+
+        if (_customLinkTarget == null)
+        {
+            Model.others.Add(_customLinkEditing);
+        }
+        else
+        {
+            _customLinkTarget.DisplayName = _customLinkEditing.DisplayName;
+            _customLinkTarget.DisPlayValue = _customLinkEditing.DisPlayValue;
+            _customLinkTarget.Link = _customLinkEditing.Link;
+        }
+
+        CloseCustomLinkDialog();
+    }
+
+    private void CloseCustomLinkDialog()
+    {
+        _customLinkDialogOpen = false;
+        _customLinkEditing = null;
+        _customLinkTarget = null;
+    }
+
+    private Task CloseCustomLinkDialogAsync()
+    {
+        CloseCustomLinkDialog();
+        return Task.CompletedTask;
+    }
+
+    private string GetOutlinkValue(OutlinkType type)
+    {
+        var item = Model.others.FirstOrDefault(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+        if (item == null || string.IsNullOrWhiteSpace(item.Link))
+        {
+            return string.Empty;
+        }
+
+        var link = item.Link;
+        if (type == OutlinkType.Official)
+        {
+            return link;
+        }
+
+        // 使用正则从已存储的链接中提取 value
+        var decoded = HttpUtility.UrlDecode(link);
+        if (_outlinkUrlPatterns.TryGetValue(type, out var pattern))
+        {
+            var match = pattern.Match(decoded);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private async Task OnOutlinkValueChanged(OutlinkType type, string? text)
+    {
+        var value = text?.Trim() ?? string.Empty;
+
+        // Official 类型直接存储完整值，不做解析
+        if (type == OutlinkType.Official)
+        {
+            Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                Model.others.Add(new RelevancesModel
+                {
+                    DisplayName = type.GetDisplayName(),
+                    Link = value
+                });
+            }
+
+            return;
+        }
+
+        // 输入包含链接时，使用正则匹配对应平台 URL 并提取 value
+        if (value.Contains("http", StringComparison.OrdinalIgnoreCase))
+        {
+            var decoded = HttpUtility.UrlDecode(value);
+            if (_outlinkUrlPatterns.TryGetValue(type, out var pattern))
+            {
+                var match = pattern.Match(decoded);
+                if (match.Success)
+                {
+                    value = match.Groups[1].Value;
+                }
+                else
+                {
+                    Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+                    ToastService.Show("格式错误", $"请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                    return;
+                }
+            }
+            else
+            {
+                Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+                ToastService.Show("格式错误", $"请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                return;
+            }
+        }
+
+        Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        Model.others.Add(new RelevancesModel
+        {
+            DisplayName = type.GetDisplayName(),
+            Link = BuildOutlink(type, value)
+        });
+    }
+
+    private string BuildOutlink(OutlinkType type, string value) => type switch
+    {
+        OutlinkType.Moegirl => "https://zh.moegirl.org.cn/" + value,
+        OutlinkType.VNDB => "https://vndb.org/" + value,
+        OutlinkType.YMGal => "https://www.ymgal.games/" + value,
+        OutlinkType.Bangumi => "https://bangumi.tv/" + (Model.Type switch
+        {
+            EntryType.Game => "subject/",
+            EntryType.Role => "character/",
+            EntryType.Staff => "person/",
+            EntryType.ProductionGroup => "person/",
+            _ => "subject/"
+        }) + value,
+        OutlinkType.WikiData => "https://www.wikidata.org/wiki/" + value,
+        OutlinkType.BaiDu => "https://baike.baidu.com/item/" + value,
+        OutlinkType.ZhWikiPedia => "https://zh.wikipedia.org/wiki/" + value,
+        OutlinkType._2DFan => "https://galge.fun/subjects/" + value,
+        OutlinkType.Weibo => "https://weibo.com/u/" + value,
+        OutlinkType.Bilibili => "https://space.bilibili.com/" + value,
+        OutlinkType.AcFun => "https://www.acfun.cn/u/" + value,
+        OutlinkType.Zhihu => "https://www.zhihu.com/people/" + value,
+        OutlinkType.Afdian => "https://afdian.com/@" + value,
+        OutlinkType.Pixiv => "https://www.pixiv.net/users/" + value,
+        OutlinkType.Twitter => "https://twitter.com/" + value,
+        OutlinkType.YouTube => "https://www.youtube.com/channel/" + value,
+        OutlinkType.Facebook => "https://www.facebook.com/" + value,
+        OutlinkType.Modian => $"https://zhongchou.modian.com/item/{value}.html",
+        _ => value
+    };
+
+    private bool IsCustomName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return true;
+        }
+
+        return !_outlinkTypes.Any(item => string.Equals(item.GetDisplayName(), name, StringComparison.OrdinalIgnoreCase));
+    }
+
+}

@@ -1,0 +1,36 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+<ul class="entry-role-list">
+    @foreach (var role in Roles.Take(MaxCount))
+    {
+        <li>
+            <a href="@BuildEntryUrl(role.Id)" class="entry-role-item">
+                <div class="entry-role-avatar">
+                    <img src="@role.MainImage" alt="@role.Name" loading="lazy" decoding="async" />
+                </div>
+                <div class="entry-role-content">
+                    <span class="entry-role-name">@role.Name</span>
+                    @if (!string.IsNullOrWhiteSpace(role.CV))
+                    {
+                        <span class="entry-role-cv">CV: @role.CV</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(role.BriefIntroduction))
+                    {
+                        <span class="entry-role-brief">@role.BriefIntroduction</span>
+                    }
+                </div>
+            </a>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<EntryRoleViewModel> Roles { get; set; } = [];
+
+    [Parameter]
+    public int MaxCount { get; set; } = 8;
+
+    [Parameter]
+    public Func<int, string> BuildEntryUrl { get; set; } = id => $"/entries/index/{id}";
+}

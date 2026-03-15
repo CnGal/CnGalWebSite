@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="galgame,cngal,国产galgame,中文galgame,gal,二次元,国产gal,中文gal">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon-512.png">
+
+    <meta name="sogou_site_verification" content="rdtePt6zM1" />
+    <meta name="shenma-site-verification" content="966d1197093bc0c3cb96125cfd07c5bc_1632156168">
+    <meta name="360-site-verification" content="5640406dc9f1d06cee13b5f90b581abf" />
+
+    <base href="/" />
+
+    <!--开放搜索-->
+    <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
+
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["_content/CnGalWebSite.MainSite.Shared/styles/design-tokens.css"]" />
+    <link rel="stylesheet" href="@Assets["CnGalWebSite.MainSite.styles.css"]" />
+    <ImportMap /> 
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        (function () {
+            var circuitDead = false;
+
+            function watchErrorUi() {
+                var el = document.getElementById('blazor-error-ui');
+                if (!el) return;
+                new MutationObserver(function () {
+                    if (el.style.display && el.style.display !== 'none') {
+                        circuitDead = true;
+                    }
+                }).observe(el, { attributes: true, attributeFilter: ['style'] });
+            }
+
+            watchErrorUi();
+
+            Blazor.addEventListener('enhancedload', function () {
+                watchErrorUi();
+                if (circuitDead) {
+                    var modal = document.getElementById('components-reconnect-modal');
+                    if (modal) modal.className = 'components-reconnect-failed';
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

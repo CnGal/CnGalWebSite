@@ -1,0 +1,19 @@
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<ul class="entry-news-list">
+    @foreach (var item in News.Take(MaxCount))
+    {
+        <li>
+            <a href="@GetNewsLink(item)" target="@GetTarget(item.Link)" rel="noopener noreferrer">@item.Title</a>
+            <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<NewsModel> News { get; set; } = [];
+    [Parameter] public int MaxCount { get; set; } = 10;
+    [Parameter] public Func<NewsModel, string> GetNewsLink { get; set; } = _ => "";
+    [Parameter] public Func<string?, string?> GetTarget { get; set; } = _ => null;
+}

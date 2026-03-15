@@ -1,0 +1,41 @@
+.home-card {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.home-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: var(--cg-color-primary-hover);
+}
+
+.home-banner {
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+}
+
+.home-banner a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.home-banner a:hover {
+    color: var(--cg-color-link);
+}
+
+.home-banner img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    object-fit: cover;
+}
+
+.home-banner span {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}

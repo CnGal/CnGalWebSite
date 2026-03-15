@@ -1,0 +1,26 @@
+.entry-special-tips {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.entry-tip {
+    margin: 0;
+    border-radius: var(--cg-radius-md);
+    border: 1px solid transparent;
+    padding: 0.8rem 1rem;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.entry-tip--warning {
+    color: #9a3412;
+    border-color: #fdba74;
+    background: #fff7ed;
+}
+
+.entry-tip--danger {
+    color: #991b1b;
+    border-color: #fca5a5;
+    background: #fef2f2;
+}

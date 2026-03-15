@@ -1,0 +1,19 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+<HomeSection Title="随机推荐" Icon="mdiTrendingUp" IconColor="var(--cg-color-secondary)">
+    <ul class="home-random-recommend-grid">
+        @if (HotRecommends != null)
+        {
+            foreach (var item in HotRecommends.Take(8))
+            {
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+            }
+        }
+    </ul>
+</HomeSection>
+
+@code {
+    [Parameter]
+    public IEnumerable<HotRecommendItemModel> HotRecommends { get; set; } = [];
+}

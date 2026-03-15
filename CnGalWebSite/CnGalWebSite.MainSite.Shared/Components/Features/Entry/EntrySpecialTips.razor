@@ -1,0 +1,19 @@
+@using CnGalWebSite.DataModel.Model
+
+@if (IsHidden || Type == EntryType.Staff)
+{
+    @if (IsHidden)
+    {
+        <CgAlert Variant="warning">当前词条处于隐藏状态，请谨慎传播并联系管理员确认。</CgAlert>
+    }
+    @if (Type == EntryType.Staff)
+    {
+        <CgAlert Variant="error">该词条可能涉及现实人物，请保持客观描述并谨慎编辑。</CgAlert>
+    }
+}
+
+
+@code {
+    [Parameter] public bool IsHidden { get; set; }
+    [Parameter] public EntryType Type { get; set; }
+}

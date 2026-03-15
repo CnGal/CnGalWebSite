@@ -1,0 +1,65 @@
+/* ── EntryTagTreeCard ── */
+
+.tag-tree-card {
+    margin-top: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    overflow: hidden;
+}
+
+/* ── 标题行 ── */
+.tag-tree-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+    background: color-mix(in srgb, var(--cg-color-primary) 4%, var(--cg-color-surface));
+}
+
+::deep .tag-tree-card__header-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.tag-tree-card__title {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+/* ── 搜索框 ── */
+.tag-tree-card__search {
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+::deep .tag-tree-card__search .cg-input {
+    width: 100%;
+    font-size: var(--cg-font-size-sm);
+}
+
+/* ── 树区域 ── */
+.tag-tree-card__tree {
+    padding: var(--cg-spacing-2) var(--cg-spacing-2);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 滚动条美化 */
+.tag-tree-card__tree::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tag-tree-card__tree::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--cg-color-text-muted) 30%, transparent);
+    border-radius: var(--cg-radius-full);
+}
+
+.tag-tree-card__tree::-webkit-scrollbar-track {
+    background: transparent;
+}

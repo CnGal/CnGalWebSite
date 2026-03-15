@@ -1,0 +1,76 @@
+/* ── 图片网格 ── */
+.cg-image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+.cg-image-card {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    background: var(--cg-color-surface);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow var(--cg-transition-normal), transform var(--cg-transition-normal);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-image-card:hover {
+    box-shadow: var(--cg-shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+.cg-image-card__preview {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--cg-color-bg);
+}
+
+.cg-image-card__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--cg-transition-normal);
+}
+
+.cg-image-card:hover .cg-image-card__preview img {
+    transform: scale(1.05);
+}
+
+.cg-image-card__note {
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.cg-image-card__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    gap: var(--cg-spacing-2);
+    border-top: 1px solid var(--cg-color-border);
+    background: var(--cg-color-section-bg);
+}
+
+/* ── 编辑弹窗预览 ── */
+.cg-edit-image-preview {
+    margin-bottom: var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    background-color: var(--cg-color-bg);
+    max-height: 300px;
+}
+
+.cg-edit-image-preview img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    display: block;
+}

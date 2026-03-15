@@ -1,0 +1,17 @@
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<dl class="entry-info-list">
+    @foreach (var item in Information.Take(MaxCount > 0 ? MaxCount : int.MaxValue))
+    {
+        <div>
+            <dt>@item.Name</dt>
+            <dd>@(new MarkupString(item.Value))</dd>
+        </div>
+    }
+</dl>
+
+@code {
+    [Parameter] public IReadOnlyList<EntryInformationModel> Information { get; set; } = [];
+    [Parameter] public int MaxCount { get; set; } = 0;
+}

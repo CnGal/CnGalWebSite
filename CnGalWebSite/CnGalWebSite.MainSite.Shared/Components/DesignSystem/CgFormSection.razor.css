@@ -1,0 +1,80 @@
+.cg-form-section {
+    margin-bottom: var(--cg-spacing-6);
+    padding: var(--cg-spacing-5);
+    background-color: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    border-left: 3px solid color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+    transition: border-left-color var(--cg-transition-fast);
+}
+
+.cg-form-section:hover {
+    border-left-color: var(--cg-color-primary);
+}
+
+/* ── 扁平变体：去除卡片背景 / 边框 / 内边距 ── */
+.cg-form-section--flat {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: var(--cg-spacing-5);
+}
+
+.cg-form-section--flat:hover {
+    border-left-color: transparent;
+}
+
+.cg-form-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-6);
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--cg-color-primary);
+    padding-bottom: .5rem;
+}
+
+/* ── 扁平变体标题行 ── */
+.cg-form-section--flat .cg-form-section__header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cg-form-section--flat .cg-form-section__title-group {
+    width: 100%;
+    border-bottom: 2px solid var(--cg-color-primary);
+    padding-bottom: .5rem;
+    margin-top: .5rem;
+}
+
+/* ── 标题行图标 + 文字排列 ── */
+.cg-form-section__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+::deep .cg-form-section__icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.cg-form-section__title {
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-primary);
+}
+
+/* ── 卡片底部操作区 ── */
+.cg-form-section__footer {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-4);
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px solid var(--cg-color-border);
+}

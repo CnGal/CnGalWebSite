@@ -1,0 +1,41 @@
+<li class="home-role-card">
+    <a href="@Url" class="home-role-card-link">
+        @if (!string.IsNullOrWhiteSpace(Image))
+        {
+            <div class="home-role-card-avatar">
+                <img src="@Image" alt="@Name" loading="lazy" decoding="async" />
+            </div>
+        }
+        else
+        {
+            <div class="home-role-card-avatar home-role-card-avatar--fallback">
+                <CgMdiIcon Name="mdiAccount" aria-hidden="true" />
+            </div>
+        }
+        
+        <div class="home-role-card-content">
+            <div class="home-role-card-title-area">
+                <h4 class="home-role-card-name">@Name</h4>
+                @if (!string.IsNullOrWhiteSpace(GameName))
+                {
+                    <span class="home-role-card-game" title="@GameName">
+                        <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
+                        @GameName
+                    </span>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p class="home-role-card-desc">@BriefIntroduction</p>
+            }
+        </div>
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? Image { get; set; }
+    [Parameter] public string? GameName { get; set; }
+    [Parameter] public string? BriefIntroduction { get; set; }
+}

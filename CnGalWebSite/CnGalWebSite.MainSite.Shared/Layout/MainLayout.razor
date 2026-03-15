@@ -1,0 +1,168 @@
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<div class="cg-layout">
+    <header class="cg-layout__header">
+        <div class="cg-topbar">
+            <div class="cg-topbar__left">
+                <a class="cg-brand" href="/">
+                    <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
+                    <h2 class="cg-brand__text">CnGal资料站</h2>
+                </a>
+
+                <nav class="cg-topbar__nav" aria-label="主导航">
+                    <a href="#">词条</a>
+                    <a href="#">社区</a>
+                    <a href="#">周报</a>
+                    <a href="#">制作组</a>
+                </nav>
+            </div>
+
+            <div class="cg-topbar__right">
+                <label class="cg-topbar__search">
+                    <div class="cg-topbar__search-inner">
+                        <div class="cg-topbar__search-icon">
+                            <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                        </div>
+                        <input type="text" placeholder="搜索词条、制作组..." aria-label="搜索内容" />
+                    </div>
+                </label>
+
+                <div class="cg-topbar__actions">
+                    <AuthorizeView>
+                        <Authorized>
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.UserMenu UserName="@context.User.Identity?.Name" UserId="@context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value" CurrentReturnUrl="@CurrentReturnUrl" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="cg-auth-login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                                <CgMdiIcon Name="mdiAccountCircle" aria-hidden="true" />
+                                <span>登录</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="cg-layout__main">
+        <div class="cg-layout__container">
+            <article class="content">
+                @Body
+            </article>
+        </div>
+    </main>
+
+    <footer class="cg-layout__footer">
+        <div class="cg-footer-main">
+            <div class="cg-footer-intro">
+                <div class="cg-brand">
+                        <CgMdiIcon Name="mdiBookOpenVariant" Class="cg-brand__icon-large" aria-hidden="true" />
+                    <h2 class="cg-brand__text">CnGal资料站</h2>
+                </div>
+                    <p>CnGal是一个非营利性的，立志于收集整理国内制作组创作及中文化的中文Galgame/AVG的介绍、攻略、评测、感想等内容的资料性质的网站。 此外，CnGal官方还会与圈内中文AVG制作组进行友好合作，如免费提供Banner广告位，网站服务器资源等。</p>
+                    <p>不良信息举报邮箱：help@cngal.org</p>
+                <div class="cg-footer-socials" aria-label="社交链接">
+                    <a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="新浪微博">
+                        <CgMdiIcon Name="mdiAt" aria-hidden="true" />
+                    </a>
+                    <a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer" aria-label="Bilibili">
+                        <CgMdiIcon Name="mdiEarth" aria-hidden="true" />
+                    </a>
+                    <a href="https://www.zhihu.com/people/cngalorg" target="_blank" rel="noopener noreferrer" aria-label="知乎">
+                        <CgMdiIcon Name="mdiRss" aria-hidden="true" />
+                    </a>
+                </div>
+            </div>
+
+            <div class="cg-footer-links">
+                <section>
+                        <h4>社交平台</h4>
+                    <ul>
+                            <li><a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer">新浪微博</a></li>
+                            <li><a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer">Bilibili</a></li>
+                            <li><a href="https://www.zhihu.com/people/cngalorg" target="_blank" rel="noopener noreferrer">知乎</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                        <h4>关于我们</h4>
+                    <ul>
+                            <li><a href="/about">概述</a></li>
+                            <li><a href="/structure">组织架构</a></li>
+                            <li><a href="/privacy">隐私协议</a></li>
+                            <li><a href="/document?id=766">更新日志</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                        <h4>其他</h4>
+                    <ul>
+                            <li><a href="https://open.cngal.org/" target="_blank" rel="noopener noreferrer">开放平台</a></li>
+                            <li><a href="https://app.cngal.org/" target="_blank" rel="noopener noreferrer">PWA 应用</a></li>
+                            <li><a href="/data">数据汇总</a></li>
+                            <li><a href="https://github.com/CnGal/CnGalWebSite" target="_blank" rel="noopener noreferrer">源代码仓库</a></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <div class="cg-footer-bottom">
+                <p>© 2025 - CnGal资料站</p>
+            <div class="cg-footer-meta">
+                    <span>
+                        <a href="http://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer">粤ICP备15055899号</a>
+                    </span>
+                    <span>
+                        <a href="https://icp.gov.moe/?keyword=20225899" target="_blank" rel="noopener noreferrer">萌ICP备20225899号</a>
+                    </span>
+          
+            </div>
+        </div>
+    </footer>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    <div class="blazor-error-card">
+        <div class="blazor-error-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg>
+        </div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">发生了一个未处理的错误</p>
+            <p class="blazor-error-detail">页面可能无法正常工作，请尝试重新加载。</p>
+        </div>
+        <div class="blazor-error-actions">
+            <button type="button" class="blazor-error-reload" onclick="location.reload()">重新加载</button>
+            <span class="dismiss" role="button" tabindex="0" aria-label="关闭">✕</span>
+        </div>
+    </div>
+</div>
+
+<div id="components-reconnect-modal">
+    @* 重连中 *@
+    <div class="reconnect-card reconnect-show">
+        <div class="reconnect-spinner" aria-hidden="true"></div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">连接已断开</p>
+            <p class="blazor-error-detail">正在尝试重新连接，请稍候…</p>
+        </div>
+    </div>
+    @* 重连失败 / 被拒绝 *@
+    <div class="reconnect-card reconnect-failed">
+        <div class="blazor-error-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12M22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12M15.5,8C16.3,8 17,8.7 17,9.5C17,10.3 16.3,11 15.5,11C14.7,11 14,10.3 14,9.5C14,8.7 14.7,8 15.5,8M10,9.5C10,10.3 9.3,11 8.5,11C7.7,11 7,10.3 7,9.5C7,8.7 7.7,8 8.5,8C9.3,8 10,8.7 10,9.5M12,14C9.67,14 7.69,15.46 6.89,17.5H17.11C16.31,15.46 14.33,14 12,14Z" /></svg>
+        </div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">连接已断开</p>
+            <p class="blazor-error-detail">请重新加载页面以恢复正常使用。</p>
+        </div>
+        <div class="blazor-error-actions">
+            <button type="button" class="blazor-error-reload" onclick="location.reload()">重新加载</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+}

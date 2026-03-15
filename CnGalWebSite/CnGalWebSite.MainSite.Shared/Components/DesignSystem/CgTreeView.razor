@@ -1,0 +1,225 @@
+@* ── 递归树形节点 ── *@
+@if (FilteredItems is { Count: > 0 })
+{
+    <ul class="cg-tree" role="tree">
+        @foreach (var node in FilteredItems)
+        {
+            RenderNode(node, 0);
+        }
+    </ul>
+}
+
+@{ void RenderNode(CgTreeViewItem node, int depth)
+{
+    var isLeaf = node.Children is not { Count: > 0 };
+    var isExpanded = _expandedKeys.Contains(node.Key);
+    var isSelected = SelectedKeys.Contains(node.Key);
+    var matchesSearch = MatchesSearch(node);
+
+    <li class="cg-tree__node" role="treeitem" aria-expanded="@(isLeaf ? null : isExpanded)">
+        <div class="cg-tree__row @(isSelected ? "cg-tree__row--selected" : "")"
+             style="padding-left: @(depth * 20 + 8)px">
+
+            @* 展开/折叠箭头 *@
+            @if (!isLeaf)
+            {
+                <button type="button"
+                        class="cg-tree__toggle @(isExpanded ? "cg-tree__toggle--open" : "")"
+                        @onclick="() => ToggleExpand(node.Key)"
+                        @onclick:stopPropagation="true"
+                        aria-label="@(isExpanded ? "折叠" : "展开")">
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </button>
+            }
+            else
+            {
+                <span class="cg-tree__toggle-placeholder"></span>
+            }
+
+            @* Checkbox（仅叶子节点可选） *@
+            @if (Selectable && isLeaf)
+            {
+                <CgCheckbox Value="@isSelected"
+                            ValueChanged="(v) => OnCheckChanged(node.Key, v)" />
+            }
+
+            @* 图标 *@
+            @if (!string.IsNullOrWhiteSpace(node.Icon))
+            {
+                <CgMdiIcon Name="@node.Icon" Class="cg-tree__icon" aria-hidden="true" />
+            }
+
+            @* 文本 *@
+            <span class="cg-tree__text" @onclick="() => OnTextClicked(node.Key, isLeaf, isSelected)">
+                @node.Text
+            </span>
+        </div>
+
+        @if (!isLeaf && isExpanded)
+        {
+            <ul class="cg-tree__children" role="group">
+                @foreach (var child in node.Children)
+                {
+                    RenderNode(child, depth + 1);
+                }
+            </ul>
+        }
+    </li>
+} }
+
+@code {
+    /// <summary>
+    /// 树节点数据模型
+    /// </summary>
+    public class CgTreeViewItem
+    {
+        public string Key { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+        public string? Icon { get; set; }
+        public List<CgTreeViewItem> Children { get; set; } = [];
+    }
+
+    /// <summary>
+    /// 树形数据
+    /// </summary>
+    [Parameter]
+    public List<CgTreeViewItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// 搜索过滤文本
+    /// </summary>
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    /// <summary>
+    /// 是否启用 checkbox 选择（仅叶子节点）
+    /// </summary>
+    [Parameter]
+    public bool Selectable { get; set; }
+
+    /// <summary>
+    /// 当前选中的叶子节点 Key 集合
+    /// </summary>
+    [Parameter]
+    public List<string> SelectedKeys { get; set; } = [];
+
+    /// <summary>
+    /// 选中状态变化回调
+    /// </summary>
+    [Parameter]
+    public EventCallback<List<string>> SelectedKeysChanged { get; set; }
+
+    private readonly HashSet<string> _expandedKeys = [];
+
+    private List<CgTreeViewItem>? FilteredItems => string.IsNullOrWhiteSpace(SearchText)
+        ? Items
+        : FilterTree(Items, SearchText);
+
+    /// <summary>
+    /// 递归过滤：保留匹配节点及其祖先
+    /// </summary>
+    private static List<CgTreeViewItem>? FilterTree(List<CgTreeViewItem> items, string search)
+    {
+        var result = new List<CgTreeViewItem>();
+        foreach (var item in items)
+        {
+            var textMatch = item.Text.Contains(search, StringComparison.OrdinalIgnoreCase);
+            var filteredChildren = item.Children is { Count: > 0 }
+                ? FilterTree(item.Children, search)
+                : null;
+
+            if (textMatch || filteredChildren is { Count: > 0 })
+            {
+                result.Add(new CgTreeViewItem
+                {
+                    Key = item.Key,
+                    Text = item.Text,
+                    Icon = item.Icon,
+                    Children = filteredChildren ?? item.Children
+                });
+            }
+        }
+        return result.Count > 0 ? result : null;
+    }
+
+    private bool MatchesSearch(CgTreeViewItem node)
+    {
+        return !string.IsNullOrWhiteSpace(SearchText)
+            && node.Text.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void ToggleExpand(string key)
+    {
+        if (!_expandedKeys.Remove(key))
+        {
+            _expandedKeys.Add(key);
+        }
+    }
+
+    private async Task OnTextClicked(string key, bool isLeaf, bool isCurrentlySelected)
+    {
+        if (Selectable && isLeaf)
+        {
+            await OnCheckChanged(key, !isCurrentlySelected);
+        }
+        else if (!isLeaf)
+        {
+            ToggleExpand(key);
+        }
+    }
+
+    private async Task OnCheckChanged(string key, bool isChecked)
+    {
+        var newList = new List<string>(SelectedKeys);
+        if (isChecked)
+        {
+            if (!newList.Contains(key))
+            {
+                newList.Add(key);
+            }
+        }
+        else
+        {
+            newList.Remove(key);
+        }
+
+        SelectedKeys = newList;
+        await SelectedKeysChanged.InvokeAsync(newList);
+    }
+
+    protected override void OnParametersSet()
+    {
+        // 搜索时自动展开所有匹配路径
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            ExpandMatchingPaths(Items, SearchText);
+        }
+    }
+
+    private void ExpandMatchingPaths(List<CgTreeViewItem> items, string search)
+    {
+        foreach (var item in items)
+        {
+            if (item.Children is { Count: > 0 })
+            {
+                if (HasMatchingDescendant(item.Children, search))
+                {
+                    _expandedKeys.Add(item.Key);
+                }
+                ExpandMatchingPaths(item.Children, search);
+            }
+        }
+    }
+
+    private static bool HasMatchingDescendant(List<CgTreeViewItem> items, string search)
+    {
+        foreach (var item in items)
+        {
+            if (item.Text.Contains(search, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (item.Children is { Count: > 0 } && HasMatchingDescendant(item.Children, search))
+                return true;
+        }
+        return false;
+    }
+}

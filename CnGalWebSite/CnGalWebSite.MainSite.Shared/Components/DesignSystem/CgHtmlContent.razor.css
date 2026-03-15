@@ -1,0 +1,180 @@
+/* ── CgHtmlContent 基础排版 ── */
+.cg-html-content {
+    line-height: 1.8;
+    font-size: var(--cg-font-size-md);
+    color: var(--cg-color-text);
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ── 标题 ── */
+.cg-html-content ::deep h1,
+.cg-html-content ::deep h2,
+.cg-html-content ::deep h3,
+.cg-html-content ::deep h4,
+.cg-html-content ::deep h5,
+.cg-html-content ::deep h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    line-height: 1.4;
+}
+
+.cg-html-content ::deep h1 {
+    font-size: 1.75em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-html-content ::deep h2 {
+    font-size: 1.4em;
+    padding-bottom: 0.25em;
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-html-content ::deep h3 {
+    font-size: 1.2em;
+}
+
+.cg-html-content ::deep h4 {
+    font-size: 1.05em;
+}
+
+.cg-html-content ::deep h5,
+.cg-html-content ::deep h6 {
+    font-size: 0.95em;
+    color: var(--cg-color-text-muted);
+}
+
+/* ── 段落 ── */
+.cg-html-content ::deep p {
+    margin: 0.75em 0;
+}
+
+/* ── 链接 ── */
+.cg-html-content ::deep a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.cg-html-content ::deep a:hover {
+    text-decoration: underline;
+}
+
+/* ── 图片 ── */
+.cg-html-content ::deep img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--cg-radius-md);
+    display: block;
+    margin: 1em auto;
+}
+
+/* ── 行内代码 ── */
+.cg-html-content ::deep code {
+    background: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-sm);
+    padding: 0.15em 0.4em;
+    font-size: 0.9em;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ── 代码块 ── */
+.cg-html-content ::deep pre {
+    background: var(--cg-color-section-bg);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: 1em 1.25em;
+    overflow-x: auto;
+    margin: 1em 0;
+    line-height: 1.6;
+}
+
+.cg-html-content ::deep pre code {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 0.875em;
+}
+
+/* ── 引用块 ── */
+.cg-html-content ::deep blockquote {
+    margin: 1em 0;
+    padding: 0.75em 1em;
+    border-left: 4px solid var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, var(--cg-color-surface));
+    border-radius: 0 var(--cg-radius-sm) var(--cg-radius-sm) 0;
+    color: var(--cg-color-text-muted);
+}
+
+.cg-html-content ::deep blockquote p {
+    margin: 0.25em 0;
+}
+
+/* ── 列表 ── */
+.cg-html-content ::deep ul,
+.cg-html-content ::deep ol {
+    padding-left: 1.75em;
+    margin: 0.75em 0;
+}
+
+.cg-html-content ::deep li {
+    margin: 0.25em 0;
+}
+
+.cg-html-content ::deep li > ul,
+.cg-html-content ::deep li > ol {
+    margin: 0.25em 0;
+}
+
+/* ── 水平线 ── */
+.cg-html-content ::deep hr {
+    border: none;
+    border-top: 1px solid var(--cg-color-border);
+    margin: 1.5em 0;
+}
+
+/* ── 表格 ── */
+.cg-html-content ::deep table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.9em;
+    overflow-x: auto;
+    display: block;
+}
+
+.cg-html-content ::deep thead {
+    background: var(--cg-color-section-bg);
+}
+
+.cg-html-content ::deep th,
+.cg-html-content ::deep td {
+    border: 1px solid var(--cg-color-border);
+    padding: 0.5em 0.75em;
+    text-align: left;
+}
+
+.cg-html-content ::deep th {
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.cg-html-content ::deep tbody tr:nth-child(even) {
+    background: color-mix(in oklab, var(--cg-color-section-bg) 50%, transparent);
+}
+
+/* ── 其他 ── */
+.cg-html-content ::deep strong {
+    font-weight: var(--cg-font-weight-bold);
+}
+
+.cg-html-content ::deep em {
+    font-style: italic;
+}
+
+.cg-html-content ::deep del {
+    text-decoration: line-through;
+    color: var(--cg-color-text-muted);
+}

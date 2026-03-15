@@ -1,0 +1,151 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+<CgFormSection Title="预约" Icon="mdiCalendarCheckOutline" Flat>
+    <ChildContent>
+        <CgGrid>
+            <CgFormGroup Label="预约开关">
+                <CgCheckbox @bind-Value="Booking.Open" Label="开启预约" />
+            </CgFormGroup>
+            @if (Booking.Open)
+            {
+                <CgFormGroup Label="通知设置">
+                    <CgCheckbox @bind-Value="Booking.IsNeedNotification" Label="上线后通知预约用户" />
+                </CgFormGroup>
+            }
+        </CgGrid>
+
+        @if (Booking.Open)
+        {
+            <CgFormGroup Label="关联抽奖">
+                <CgAutoComplete @bind-Value="Booking.LotteryName"
+                                Items="@LotteryItems"
+                                Placeholder="输入或选择抽奖名称" />
+            </CgFormGroup>
+
+            <CgFormSection Title="预约目标" Icon="mdiBullseyeArrow" Flat>
+                <HeaderActions>
+                    <CgButton Variant="primary" OnClick="AddBookingGoal">添加目标</CgButton>
+                </HeaderActions>
+                <ChildContent>
+                    <CgTable HasData="@Booking.Goals.Any()">
+                        <Empty>
+                            <p>暂无预约目标，请点击"添加目标"。</p>
+                        </Empty>
+                        <ChildContent>
+                            <thead>
+                                <tr>
+                                    <th>目标人数</th>
+                                    <th>名称</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var goal in Booking.Goals.OrderBy(s => s.Target))
+                                {
+                                    <tr>
+                                        <td>@goal.Target</td>
+                                        <td>@goal.Name</td>
+                                        <td class="cg-actions">
+                                            <CgButton Variant="outline" OnClick="() => EditBookingGoal(goal)">编辑</CgButton>
+                                            <CgButton Variant="danger" OnClick="() => RemoveBookingGoal(goal)">删除</CgButton>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </ChildContent>
+                    </CgTable>
+                </ChildContent>
+            </CgFormSection>
+        }
+    </ChildContent>
+</CgFormSection>
+
+<CgModal IsOpen="@_bookingGoalDialogOpen"
+         Title="编辑预约目标"
+         OnClose="CloseBookingGoalDialogAsync">
+    <ChildContent>
+        @if (_bookingGoalEditing != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="目标人数">
+                    <CgInput @bind-Value="_bookingGoalEditing.Target" Placeholder="如：1000" />
+                </CgFormGroup>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_bookingGoalEditing.Name" Placeholder="如：公开试玩 DEMO" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseBookingGoalDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveBookingGoal">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public EditBookingModel Booking { get; set; } = default!;
+
+    [Parameter]
+    public List<string> LotteryItems { get; set; } = [];
+
+    private bool _bookingGoalDialogOpen;
+    private EditBookingGoalModel? _bookingGoalEditing;
+    private EditBookingGoalModel? _bookingGoalTarget;
+
+    private void AddBookingGoal()
+    {
+        _bookingGoalTarget = null;
+        _bookingGoalEditing = new EditBookingGoalModel();
+        _bookingGoalDialogOpen = true;
+    }
+
+    private void EditBookingGoal(EditBookingGoalModel model)
+    {
+        _bookingGoalTarget = model;
+        _bookingGoalEditing = new EditBookingGoalModel
+        {
+            Name = model.Name,
+            Target = model.Target
+        };
+        _bookingGoalDialogOpen = true;
+    }
+
+    private void RemoveBookingGoal(EditBookingGoalModel model)
+    {
+        Booking.Goals.Remove(model);
+    }
+
+    private void SaveBookingGoal()
+    {
+        if (_bookingGoalEditing == null || string.IsNullOrWhiteSpace(_bookingGoalEditing.Name))
+        {
+            return;
+        }
+
+        if (_bookingGoalTarget == null)
+        {
+            Booking.Goals.Add(_bookingGoalEditing);
+        }
+        else
+        {
+            _bookingGoalTarget.Name = _bookingGoalEditing.Name;
+            _bookingGoalTarget.Target = _bookingGoalEditing.Target;
+        }
+
+        CloseBookingGoalDialog();
+    }
+
+    private void CloseBookingGoalDialog()
+    {
+        _bookingGoalEditing = null;
+        _bookingGoalTarget = null;
+        _bookingGoalDialogOpen = false;
+    }
+
+    private Task CloseBookingGoalDialogAsync()
+    {
+        CloseBookingGoalDialog();
+        return Task.CompletedTask;
+    }
+}

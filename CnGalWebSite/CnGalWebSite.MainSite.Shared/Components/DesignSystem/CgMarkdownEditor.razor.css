@@ -1,0 +1,191 @@
+.cg-markdown-editor {
+    width: 100%;
+}
+
+/* ── 加载态 ── */
+.cg-markdown-editor__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 200px;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+}
+
+.cg-markdown-editor__loading-text {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+/* ── Vditor 容器适配设计系统 ── */
+.cg-markdown-editor ::deep .vditor {
+    font-family: var(--cg-font-family), sans-serif;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    transition: border-color var(--cg-transition-fast);
+}
+
+.cg-markdown-editor ::deep .vditor--fullscreen {
+    border-radius: 0;
+}
+
+/* ── 工具栏 ── */
+.cg-markdown-editor ::deep .vditor-toolbar {
+    background-color: var(--cg-color-surface);
+    border-bottom: 1px solid var(--cg-color-border);
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+}
+
+.cg-markdown-editor ::deep .vditor-toolbar__item button {
+    color: var(--cg-color-text-primary);
+    border-radius: var(--cg-radius-sm);
+    transition: background-color var(--cg-transition-fast);
+}
+
+.cg-markdown-editor ::deep .vditor-toolbar__item button:hover {
+    background-color: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-markdown-editor ::deep .vditor-toolbar__item button.vditor-menu--current {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary)!important;
+}
+
+.cg-markdown-editor ::deep .vditor-toolbar__divider {
+    background-color: var(--cg-color-border);
+}
+
+.cg-markdown-editor ::deep .vditor-tip__content {
+    margin-left: 0;
+}
+
+.cg-markdown-editor ::deep .vditor-preview__action {
+    display: none;
+}
+
+/* ── 编辑区域 ── */
+.cg-markdown-editor ::deep .vditor-ir,
+.cg-markdown-editor ::deep .vditor-wysiwyg,
+.cg-markdown-editor ::deep .vditor-sv {
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text-primary);
+    font-family: var(--cg-font-family), sans-serif;
+    font-size: var(--cg-font-size-md);
+    line-height: 1.7;
+}
+
+.cg-markdown-editor ::deep .vditor-ir pre.vditor-reset,
+.cg-markdown-editor ::deep .vditor-wysiwyg pre.vditor-reset,
+.cg-markdown-editor ::deep .vditor-sv pre.vditor-reset {
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text-primary);
+    font-family: var(--cg-font-family), sans-serif;
+    font-size: var(--cg-font-size-md);
+    padding: var(--cg-spacing-4);
+}
+
+/* ── 预览面板（分屏模式） ── */
+.cg-markdown-editor ::deep .vditor-preview {
+    background-color: var(--cg-color-bg);
+    padding: var(--cg-spacing-4);
+}
+
+.cg-markdown-editor ::deep .vditor-preview .vditor-reset {
+    color: var(--cg-color-text-primary);
+    font-family: var(--cg-font-family), sans-serif;
+    font-size: var(--cg-font-size-md);
+    line-height: 1.7;
+}
+
+/* ── 标题 ── */
+.cg-markdown-editor ::deep .vditor-reset h1,
+.cg-markdown-editor ::deep .vditor-reset h2,
+.cg-markdown-editor ::deep .vditor-reset h3 {
+    color: var(--cg-color-text-primary);
+    font-weight: var(--cg-font-weight-bold);
+}
+
+/* ── 链接 ── */
+.cg-markdown-editor ::deep .vditor-reset a {
+    color: var(--cg-color-link);
+}
+
+/* ── 行内代码 ── */
+.cg-markdown-editor ::deep .vditor-reset code:not(.hljs) {
+    background-color: var(--cg-color-hover-overlay);
+    padding: 2px 6px;
+    border-radius: var(--cg-radius-sm);
+    font-size: 0.9em;
+}
+
+/* ── 代码块 ── */
+.cg-markdown-editor ::deep .vditor-reset pre {
+    background-color: var(--cg-color-bg);
+    padding: var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    overflow-x: auto;
+}
+
+/* ── 引用 ── */
+.cg-markdown-editor ::deep .vditor-reset blockquote {
+    border-left: 4px solid var(--cg-color-primary);
+    padding-left: var(--cg-spacing-3);
+    color: var(--cg-color-text-muted);
+    margin: var(--cg-spacing-3) 0;
+}
+
+/* ── 图片 ── */
+.cg-markdown-editor ::deep .vditor-reset img {
+    max-width: 100%;
+    border-radius: var(--cg-radius-md);
+}
+
+/* ── 表格 ── */
+.cg-markdown-editor ::deep .vditor-reset table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.cg-markdown-editor ::deep .vditor-reset th,
+.cg-markdown-editor ::deep .vditor-reset td {
+    border: 1px solid var(--cg-color-border);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    text-align: left;
+}
+
+.cg-markdown-editor ::deep .vditor-reset th {
+    background-color: var(--cg-color-surface);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+/* ── 占位文本 ── */
+.cg-markdown-editor ::deep .vditor-placeholder {
+    color: var(--cg-color-text-muted);
+    opacity: 0.6;
+}
+
+/* ── 大纲面板 ── */
+.cg-markdown-editor ::deep .vditor-outline {
+    background-color: var(--cg-color-surface);
+    border-left: 1px solid var(--cg-color-border);
+}
+
+/* ── 提示条 ── */
+.cg-markdown-editor ::deep .vditor-tip {
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text-primary);
+    box-shadow: var(--cg-shadow-md);
+    border-radius: var(--cg-radius-md);
+}
+
+/* ── 错误信息 ── */
+.cg-markdown-editor__error {
+    margin-top: var(--cg-spacing-2);
+    color: var(--cg-color-error);
+    font-size: var(--cg-font-size-sm);
+}

@@ -1,0 +1,37 @@
+/* ── 图片缩略图 ── */
+.cg-website-thumb-cell {
+    width: 80px;
+}
+
+.cg-website-thumb {
+    width: 72px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--cg-radius-md);
+    display: block;
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-website-placeholder {
+    width: 72px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-md);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-secondary);
+    border: 1px dashed var(--cg-color-border);
+}
+
+/* ── HTML 预览 ── */
+.cg-html-preview {
+    margin-top: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+    max-height: 500px;
+    overflow-y: auto;
+}

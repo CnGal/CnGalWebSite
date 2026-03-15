@@ -1,0 +1,74 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+
+<section class="entry-editor-section" id="section-tags">
+    <h2><CgMdiIcon Name="mdiTagOutline" Class="entry-section-icon" aria-hidden="true"/>标签</h2>
+    <p>通过自动补全管理标签（建议使用末级标签）。</p>
+
+    @if (Model != null)
+    {
+        <div class="tag-editor">
+            <div class="tag-editor__header">
+                <CgMdiIcon Name="mdiTagMultipleOutline" Class="tag-editor__icon" aria-hidden="true"/>
+                <h3 class="tag-editor__title">标签列表</h3>
+                <span class="tag-editor__count">@Model.Tags.Count 项</span>
+                <button type="button" class="tag-editor__add" @onclick="AddTag" title="添加标签">
+                    <CgMdiIcon Name="mdiPlus" aria-hidden="true"/>
+                </button>
+            </div>
+
+            @if (Model.Tags.Any())
+            {
+                <div class="tag-editor__list">
+                    @foreach (var item in Model.Tags)
+                    {
+                        <div class="tag-editor__item">
+                            <CgAutoComplete Value="@item.DisplayName"
+                                            ValueChanged="(text) => OnTagChanged(item, text)"
+                                            Items="@MetaOptions.TagItems"
+                                            Placeholder="输入标签名称"/>
+                            <button type="button"
+                                    class="tag-editor__remove"
+                                    title="移除"
+                                    @onclick="() => RemoveTag(item)">
+                                <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true"/>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="tag-editor__empty">暂无标签，点击 <strong>+</strong> 按钮添加。</p>
+            }
+        </div>
+
+        <EntryTagTreeCard TreeItems="@MetaOptions.TagTreeItems"
+                          Tags="@Model.Tags"
+                          OnTagsChanged="StateHasChanged"/>
+    }
+</section>
+
+@code {
+    [Parameter] public EditEntryTagViewModel Model { get; set; } = default!;
+
+    [Parameter] public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private void AddTag()
+    {
+        Model.Tags.Add(new RelevancesModel());
+    }
+
+    private void RemoveTag(RelevancesModel tag)
+    {
+        Model.Tags.Remove(tag);
+    }
+
+    private Task OnTagChanged(RelevancesModel tag, string? value)
+    {
+        tag.DisplayName = value ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+}

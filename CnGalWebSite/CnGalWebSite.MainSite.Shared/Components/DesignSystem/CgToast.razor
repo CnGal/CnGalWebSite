@@ -1,0 +1,74 @@
+@* CgToast — 全局 Toast 容器，由 ICgToastService 驱动 *@
+@inject ICgToastService ToastService
+@implements IDisposable
+
+@if (_visible)
+{
+    <div class="cg-toast cg-toast--@_variant" role="alert">
+        <CgMdiIcon Name="@GetVariantIcon()" Class="cg-toast__icon" aria-hidden="true"/>
+        <div class="cg-toast__content">
+            <div class="cg-toast__title">@_title</div>
+            @if (!string.IsNullOrEmpty(_detail))
+            {
+                <div class="cg-toast__detail">@_detail</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private bool _visible;
+    private string _title = string.Empty;
+    private string? _detail;
+    private string _variant = "info";
+    private CancellationTokenSource? _cts;
+
+    /// <summary>
+    /// 持续时间（毫秒），默认 3000
+    /// </summary>
+    [Parameter] public int Duration { get; set; } = 3000;
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += HandleShow;
+    }
+
+    private async void HandleShow(string title, string? detail, string variant)
+    {
+        // 若已有定时器则取消
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
+        _title = title;
+        _detail = detail;
+        _variant = variant;
+        _visible = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await Task.Delay(Duration, _cts.Token);
+            _visible = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (TaskCanceledException)
+        {
+            // 被新一次 Show 取消，忽略
+        }
+    }
+
+    private string GetVariantIcon() => _variant switch
+    {
+        "success" => "mdiCheckCircleOutline",
+        "warning" => "mdiAlertOutline",
+        "error"   => "mdiAlertCircleOutline",
+        _         => "mdiInformationOutline"
+    };
+
+    public void Dispose()
+    {
+        ToastService.OnShow -= HandleShow;
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

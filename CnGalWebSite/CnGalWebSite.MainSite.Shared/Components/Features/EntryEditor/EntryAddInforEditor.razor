@@ -1,0 +1,63 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+@inject IEntryCommandService EntryCommandService
+
+<section class="entry-editor-section" id="section-addinfo">
+    <h2><CgMdiIcon Name="mdiInformationOutline" Class="entry-section-icon" aria-hidden="true" />附加信息</h2>
+    <p>补充制作信息、发行版本、预约配置与 Staff 图表数据。</p>
+
+    @if (Model != null)
+    {
+        <EntryTypeFieldsEditor Model="Model" />
+
+        <EntryInformationsEditor Informations="Model.Informations" />
+
+        @if (Model.Type == EntryType.Game)
+        {
+            <EntryReleasesEditor Releases="Model.Releases" />
+
+            <EntryBookingEditor Booking="Model.Booking" LotteryItems="MetaOptions.LotteryItems" />
+        }
+
+        @if (Model.Type == EntryType.Game)
+        {
+            <EntryStaffsEditor Staffs="Model.Staffs" />
+        }
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditAddInforViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+
+    /// <summary>
+    /// 按类型重新获取远端配置的基础信息字段列表，保留用户已填写的值
+    /// </summary>
+    public async Task RefreshInformationsAsync(EntryType type)
+    {
+        var result = await EntryCommandService.GetInformationFieldsAsync(type);
+        if (result.Success && result.Data != null)
+        {
+            // 保留用户已填写的值
+            var existingValues = Model.Informations
+                .Where(i => !string.IsNullOrWhiteSpace(i.Value))
+                .ToDictionary(i => i.Name, i => i.Value);
+
+            Model.Informations = result.Data;
+            foreach (var info in Model.Informations)
+            {
+                if (existingValues.TryGetValue(info.Name, out var value))
+                {
+                    info.Value = value;
+                }
+            }
+
+            StateHasChanged();
+        }
+    }
+}

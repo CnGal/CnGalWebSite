@@ -1,0 +1,30 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+@if (Model.Type == EntryType.Game || Model.Type == EntryType.Role)
+{
+    <CgFormSection Title="类型补充字段" Icon="mdiTextBoxEditOutline" Flat>
+        @if (Model.Type == EntryType.Game)
+        {
+            <CgGrid>
+                <CgFormGroup Label="制作组">
+                    <CgInput @bind-Value="Model.ProductionGroup" Placeholder="制作组唯一名称或名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="发行商">
+                    <CgInput @bind-Value="Model.Publisher" Placeholder="发行商唯一名称或名称" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+        else
+        {
+            <CgFormGroup Label="声优">
+                <CgInput @bind-Value="Model.CV" Placeholder="角色声优信息" />
+            </CgFormGroup>
+        }
+    </CgFormSection>
+}
+
+@code {
+    [Parameter]
+    public EditAddInforViewModel Model { get; set; } = default!;
+}

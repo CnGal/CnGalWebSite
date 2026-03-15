@@ -1,0 +1,448 @@
+@* CgDateInput — 自定义日期/时间选择器（4 种模式） *@
+<div class="cg-date-input">
+    <button type="button"
+            class="cg-date-input__trigger"
+            disabled="@Disabled"
+            aria-haspopup="dialog"
+            aria-expanded="@_isOpen"
+            @onclick="TogglePanel">
+        <span class="@(_hasValue ? "cg-date-input__value" : "cg-date-input__value cg-date-input__value--placeholder")">@DisplayText</span>
+        <CgMdiIcon Name="@TriggerIcon" Size="18" />
+    </button>
+
+    @if (_isOpen)
+    {
+        <button type="button"
+                class="cg-date-input__backdrop"
+                aria-label="关闭"
+                @onclick="ClosePanel"></button>
+
+        <div class="cg-date-input__panel" role="dialog" aria-modal="false">
+            @* ── 日历部分（Date / DateTime / MonthDay） ── *@
+            @if (Mode != CgDateInputMode.Time)
+            {
+                <div class="cg-date-input__calendar">
+                    @* 导航头 *@
+                    <div class="cg-date-input__nav">
+                        @if (Mode == CgDateInputMode.MonthDay)
+                        {
+                            @if (_showMonthPicker)
+                            {
+                                <span class="cg-date-input__nav-title">选择月份</span>
+                            }
+                            else
+                            {
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="PrevMonth" aria-label="上一月">
+                                    <CgMdiIcon Name="mdiChevronLeft" Size="20" />
+                                </button>
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
+                                    @_viewMonth 月
+                                </button>
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="NextMonth" aria-label="下一月">
+                                    <CgMdiIcon Name="mdiChevronRight" Size="20" />
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="PrevMonth" aria-label="上一月">
+                                <CgMdiIcon Name="mdiChevronLeft" Size="20" />
+                            </button>
+                            <span class="cg-date-input__nav-title">@_viewYear 年 @_viewMonth 月</span>
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="NextMonth" aria-label="下一月">
+                                <CgMdiIcon Name="mdiChevronRight" Size="20" />
+                            </button>
+                        }
+                    </div>
+
+                    @if (_showMonthPicker)
+                    {
+                        @* 月份选择网格（MonthDay 模式点击标题进入） *@
+                        <div class="cg-date-input__month-grid">
+                            @for (var m = 1; m <= 12; m++)
+                            {
+                                var month = m;
+                                <button type="button"
+                                        class="cg-date-input__month-cell @(month == _viewMonth ? "is-selected" : "")"
+                                        @onclick="() => SelectMonth(month)">
+                                    @month 月
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @* 星期标题 *@
+                        <div class="cg-date-input__weekdays">
+                            @foreach (var d in _weekdays)
+                            {
+                                <span class="cg-date-input__weekday">@d</span>
+                            }
+                        </div>
+
+                        @* 日期网格 *@
+                        <div class="cg-date-input__grid">
+                            @foreach (var cell in _calendarCells)
+                            {
+                                var c = cell;
+                                @if (c.Day == 0)
+                                {
+                                    <span class="cg-date-input__cell cg-date-input__cell--empty"></span>
+                                }
+                                else
+                                {
+                                    var isSelected = IsDaySelected(c.Day);
+                                    var isToday = IsDayToday(c.Day);
+                                    <button type="button"
+                                            class="cg-date-input__cell @(isSelected ? "is-selected" : "") @(isToday ? "is-today" : "")"
+                                            @onclick="() => SelectDay(c.Day)">
+                                        @c.Day
+                                    </button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            @* ── 时间部分（Time / DateTime） ── *@
+            @if (Mode is CgDateInputMode.Time or CgDateInputMode.DateTime)
+            {
+                @if (Mode == CgDateInputMode.DateTime)
+                {
+                    <div class="cg-date-input__divider"></div>
+                }
+
+                <div class="cg-date-input__time">
+                    <div class="cg-date-input__time-col">
+                        <label class="cg-date-input__time-label">时</label>
+                        <div class="cg-date-input__scroll-col">
+                            @for (var h = 0; h < 24; h++)
+                            {
+                                var hour = h;
+                                <button type="button"
+                                        class="cg-date-input__time-cell @(hour == _selectedHour ? "is-selected" : "")"
+                                        @onclick="() => SelectHour(hour)">
+                                    @hour.ToString("D2")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="cg-date-input__time-col">
+                        <label class="cg-date-input__time-label">分</label>
+                        <div class="cg-date-input__scroll-col">
+                            @for (var m = 0; m < 60; m += 5)
+                            {
+                                var minute = m;
+                                <button type="button"
+                                        class="cg-date-input__time-cell @(minute == _selectedMinute ? "is-selected" : "")"
+                                        @onclick="() => SelectMinute(minute)">
+                                    @minute.ToString("D2")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* ── 底部操作栏 ── *@
+            <div class="cg-date-input__footer">
+                @if (Mode is CgDateInputMode.Date or CgDateInputMode.DateTime)
+                {
+                    <button type="button" class="cg-date-input__today-btn" @onclick="GoToday">今天</button>
+                }
+                @if (_hasValue)
+                {
+                    <button type="button" class="cg-date-input__clear-btn" @onclick="ClearValue">清除</button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private static readonly string[] _weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+
+    [Parameter] public DateTime? Value { get; set; }
+    [Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+    [Parameter] public CgDateInputMode Mode { get; set; } = CgDateInputMode.Date;
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+
+    private bool _isOpen;
+    private bool _showMonthPicker;
+    private int _viewYear;
+    private int _viewMonth;
+    private int _selectedHour;
+    private int _selectedMinute;
+    private List<CalendarCell> _calendarCells = [];
+
+    private bool _hasValue => Value.HasValue;
+
+    private string TriggerIcon => Mode is CgDateInputMode.Time
+        ? "mdiClockOutline"
+        : "mdiCalendarBlankOutline";
+
+    private string DisplayText
+    {
+        get
+        {
+            if (!_hasValue)
+            {
+                return Placeholder ?? Mode switch
+                {
+                    CgDateInputMode.Date => "选择日期",
+                    CgDateInputMode.Time => "选择时间",
+                    CgDateInputMode.DateTime => "选择日期时间",
+                    CgDateInputMode.MonthDay => "选择月日",
+                    _ => "选择"
+                };
+            }
+
+            var v = Value!.Value;
+            return Mode switch
+            {
+                CgDateInputMode.Date => v.ToString("yyyy-MM-dd"),
+                CgDateInputMode.Time => v.ToString("HH:mm"),
+                CgDateInputMode.DateTime => v.ToString("yyyy-MM-dd HH:mm"),
+                CgDateInputMode.MonthDay => v.ToString("MM-dd"),
+                _ => v.ToString("yyyy-MM-dd")
+            };
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Value.HasValue)
+        {
+            _selectedHour = Value.Value.Hour;
+            _selectedMinute = Value.Value.Minute;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        InitializeView();
+    }
+
+    private void InitializeView()
+    {
+        var reference = Value ?? DateTime.Today;
+        _viewYear = reference.Year;
+        _viewMonth = reference.Month;
+        _showMonthPicker = false;
+
+        if (Value.HasValue)
+        {
+            _selectedHour = Value.Value.Hour;
+            _selectedMinute = Value.Value.Minute;
+        }
+
+        BuildCalendar();
+    }
+
+    // ── 面板开关 ──
+
+    private void TogglePanel()
+    {
+        if (Disabled) return;
+
+        _isOpen = !_isOpen;
+        if (_isOpen)
+        {
+            InitializeView();
+        }
+    }
+
+    private void ClosePanel()
+    {
+        _isOpen = false;
+        _showMonthPicker = false;
+    }
+
+    // ── 月份选择器（MonthDay 模式专用） ──
+
+    private void OpenMonthPicker()
+    {
+        _showMonthPicker = true;
+    }
+
+    private void SelectMonth(int month)
+    {
+        _viewMonth = month;
+        _showMonthPicker = false;
+        BuildCalendar();
+    }
+
+    // ── 日历导航 ──
+
+    private void PrevMonth()
+    {
+        if (Mode == CgDateInputMode.MonthDay)
+        {
+            _viewMonth = _viewMonth == 1 ? 12 : _viewMonth - 1;
+        }
+        else
+        {
+            if (_viewMonth == 1)
+            {
+                _viewMonth = 12;
+                _viewYear--;
+            }
+            else
+            {
+                _viewMonth--;
+            }
+        }
+        BuildCalendar();
+    }
+
+    private void NextMonth()
+    {
+        if (Mode == CgDateInputMode.MonthDay)
+        {
+            _viewMonth = _viewMonth == 12 ? 1 : _viewMonth + 1;
+        }
+        else
+        {
+            if (_viewMonth == 12)
+            {
+                _viewMonth = 1;
+                _viewYear++;
+            }
+            else
+            {
+                _viewMonth++;
+            }
+        }
+        BuildCalendar();
+    }
+
+    // ── 构建日历网格 ──
+
+    private void BuildCalendar()
+    {
+        _calendarCells = [];
+
+        var year = Mode == CgDateInputMode.MonthDay ? 2000 : _viewYear; // 2000 是闰年，2 月有 29 天
+        var daysInMonth = DateTime.DaysInMonth(year, _viewMonth);
+        var firstDay = new DateTime(year, _viewMonth, 1);
+        var startDow = ((int)firstDay.DayOfWeek + 6) % 7; // 周一=0
+
+        for (var i = 0; i < startDow; i++)
+        {
+            _calendarCells.Add(new CalendarCell(0));
+        }
+
+        for (var d = 1; d <= daysInMonth; d++)
+        {
+            _calendarCells.Add(new CalendarCell(d));
+        }
+    }
+
+    private bool IsDaySelected(int day)
+    {
+        if (!_hasValue) return false;
+        var v = Value!.Value;
+
+        return Mode == CgDateInputMode.MonthDay
+            ? v.Month == _viewMonth && v.Day == day
+            : v.Year == _viewYear && v.Month == _viewMonth && v.Day == day;
+    }
+
+    private bool IsDayToday(int day)
+    {
+        if (Mode == CgDateInputMode.MonthDay) return false;
+        var today = DateTime.Today;
+        return today.Year == _viewYear && today.Month == _viewMonth && today.Day == day;
+    }
+
+    // ── 选择操作 ──
+
+    private async Task SelectDay(int day)
+    {
+        DateTime result;
+
+        if (Mode == CgDateInputMode.MonthDay)
+        {
+            result = new DateTime(2000, _viewMonth, day); // 用固定年份存储月日
+        }
+        else if (Mode == CgDateInputMode.DateTime)
+        {
+            result = new DateTime(_viewYear, _viewMonth, day, _selectedHour, _selectedMinute, 0);
+            // DateTime 模式选择日期后不关闭面板，让用户继续选时间
+            await ValueChanged.InvokeAsync(result);
+            return;
+        }
+        else
+        {
+            result = new DateTime(_viewYear, _viewMonth, day);
+        }
+
+        await ValueChanged.InvokeAsync(result);
+        _isOpen = false;
+    }
+
+    private async Task SelectHour(int hour)
+    {
+        _selectedHour = hour;
+        await EmitTimeValue();
+    }
+
+    private async Task SelectMinute(int minute)
+    {
+        _selectedMinute = minute;
+        await EmitTimeValue();
+
+        if (Mode == CgDateInputMode.Time)
+        {
+            _isOpen = false;
+        }
+    }
+
+    private async Task EmitTimeValue()
+    {
+        DateTime result;
+
+        if (Mode == CgDateInputMode.Time)
+        {
+            result = new DateTime(2000, 1, 1, _selectedHour, _selectedMinute, 0);
+        }
+        else // DateTime
+        {
+            var baseDate = Value ?? new DateTime(_viewYear, _viewMonth, 1);
+            result = new DateTime(baseDate.Year, baseDate.Month, baseDate.Day, _selectedHour, _selectedMinute, 0);
+        }
+
+        await ValueChanged.InvokeAsync(result);
+    }
+
+    private async Task GoToday()
+    {
+        var today = DateTime.Today;
+        _viewYear = today.Year;
+        _viewMonth = today.Month;
+        BuildCalendar();
+
+        if (Mode == CgDateInputMode.DateTime)
+        {
+            var result = new DateTime(today.Year, today.Month, today.Day, _selectedHour, _selectedMinute, 0);
+            await ValueChanged.InvokeAsync(result);
+        }
+        else
+        {
+            await ValueChanged.InvokeAsync(today);
+            _isOpen = false;
+        }
+    }
+
+    private async Task ClearValue()
+    {
+        await ValueChanged.InvokeAsync(null);
+        _isOpen = false;
+    }
+
+    // ── 内部类型 ──
+
+    private record struct CalendarCell(int Day);
+}

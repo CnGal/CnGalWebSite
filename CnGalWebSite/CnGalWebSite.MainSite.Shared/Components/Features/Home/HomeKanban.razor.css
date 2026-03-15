@@ -1,0 +1,75 @@
+.home-kanban-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 3rem;
+    border-radius: var(--cg-radius-lg);
+    text-align: center;    
+    margin-bottom: 3rem;
+}
+
+.home-kanban-content img {
+    height: 12rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.home-kanban-img-flipped {
+    transform: rotateY(180deg);
+}
+
+.home-kanban-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 70rem;
+    flex: 1;
+}
+
+.home-kanban-quote-content {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 0.1rem;
+    color: var(--cg-color-text);
+}
+
+.home-kanban-quote-by {
+    font-size: 0.875rem;
+    letter-spacing: 0.05rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    color: var(--cg-color-text-muted);
+}
+
+.home-kanban-quote-by a {
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: color var(--cg-transition-fast);
+}
+
+.home-kanban-quote-by a:hover {
+    color: var(--cg-color-primary);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .home-kanban-content {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .home-kanban-content img {
+        height: 8rem;
+    }
+
+    .home-kanban-img-flipped {
+        display: none;
+    }
+    
+    .home-kanban-quote-content {
+        font-size: 1.25rem;
+    }
+}

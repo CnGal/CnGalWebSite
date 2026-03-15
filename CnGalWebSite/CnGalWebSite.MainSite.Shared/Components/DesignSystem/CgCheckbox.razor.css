@@ -1,0 +1,28 @@
+.cg-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    cursor: pointer;
+    color: var(--cg-color-text-primary);
+}
+
+.cg-checkbox-input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--cg-color-primary);
+    cursor: pointer;
+}
+
+.cg-checkbox-label {
+    font-size: var(--cg-font-size-sm);
+    user-select: none;
+}
+
+.cg-checkbox--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cg-checkbox--disabled .cg-checkbox-input {
+    cursor: not-allowed;
+}

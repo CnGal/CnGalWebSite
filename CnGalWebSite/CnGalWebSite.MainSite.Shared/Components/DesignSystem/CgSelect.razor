@@ -1,0 +1,107 @@
+<div class="cg-select @ClassName">
+    <button type="button"
+            class="cg-select__trigger"
+            disabled="@Disabled"
+            aria-haspopup="listbox"
+            aria-expanded="@_isOpen"
+            @onclick="ToggleDropdown">
+        <span class="@(HasSelectedOption ? "cg-select__value" : "cg-select__value cg-select__value--placeholder")">@CurrentText</span>
+        <span class="cg-select__arrow" aria-hidden="true"></span>
+    </button>
+
+    @if (_isOpen)
+    {
+        <button type="button"
+                class="cg-select__backdrop"
+                aria-label="关闭下拉框"
+                @onclick="CloseDropdown"></button>
+
+        <ul class="cg-select__menu" role="listbox">
+            @if (!string.IsNullOrWhiteSpace(Placeholder))
+            {
+                <li role="option" aria-selected="@string.IsNullOrEmpty(Value)">
+                    <button type="button"
+                            class="cg-select__option @(string.IsNullOrEmpty(Value) ? "is-selected" : string.Empty)"
+                            @onclick='() => SelectOption(string.Empty)'>
+                        @Placeholder
+                    </button>
+                </li>
+            }
+
+            @foreach (var option in Options)
+            {
+                <li role="option" aria-selected="@(string.Equals(option.Key, Value, StringComparison.Ordinal))">
+                    <button type="button"
+                            class="cg-select__option @(string.Equals(option.Key, Value, StringComparison.Ordinal) ? "is-selected" : string.Empty)"
+                            @onclick='() => SelectOption(option.Key)'>
+                        @option.Value
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private bool _isOpen;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> Options { get; set; } = [];
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string ClassName { get; set; } = string.Empty;
+
+    private bool HasSelectedOption => Options.Any(option => string.Equals(option.Key, Value, StringComparison.Ordinal));
+
+    private string CurrentText
+    {
+        get
+        {
+            var selected = Options.FirstOrDefault(option => string.Equals(option.Key, Value, StringComparison.Ordinal));
+            if (!string.IsNullOrEmpty(selected.Value))
+            {
+                return selected.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Placeholder))
+            {
+                return Placeholder!;
+            }
+
+            return Value ?? string.Empty;
+        }
+    }
+
+    private void ToggleDropdown()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        _isOpen = !_isOpen;
+    }
+
+    private void CloseDropdown()
+    {
+        _isOpen = false;
+    }
+
+    private async Task SelectOption(string? value)
+    {
+        _isOpen = false;
+        await ValueChanged.InvokeAsync(value);
+    }
+}

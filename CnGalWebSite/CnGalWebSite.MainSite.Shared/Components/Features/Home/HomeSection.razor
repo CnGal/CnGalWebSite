@@ -1,0 +1,38 @@
+<section class="home-section">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <div class="home-section-header">
+            <h2 class="home-section-title">
+                @if (!string.IsNullOrWhiteSpace(Icon))
+                {
+                    <CgMdiIcon Name="@Icon" Class="home-section-icon" Style="@(!string.IsNullOrWhiteSpace(IconColor) ? $"color: {IconColor}" : null)" aria-hidden="true" />
+                }
+                @Title
+            </h2>
+            @if (HeaderAppendContent is not null)
+            {
+                <div class="home-section-header-append">
+                    @HeaderAppendContent
+                </div>
+            }
+        </div>
+    }
+    @ChildContent
+</section>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderAppendContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

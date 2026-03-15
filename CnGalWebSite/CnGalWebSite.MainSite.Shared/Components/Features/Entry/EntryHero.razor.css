@@ -1,0 +1,198 @@
+.entry-hero {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.entry-hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+}
+
+.entry-cover {
+    width: 100%;
+    object-fit: cover;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-bg) 90%, white);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.entry-hero--wide .entry-cover {
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-lg);
+    max-width: 100%;
+}
+
+.entry-hero--square .entry-cover {
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    max-width: 240px;
+}
+
+.entry-cover--empty {
+    display: grid;
+    place-items: center;
+    color: var(--cg-color-text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+}
+
+.entry-hero-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.entry-hero-main h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--cg-color-text);
+}
+
+.entry-hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.entry-type {
+    border-radius: var(--cg-radius-sm);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.entry-status {
+    border-radius: var(--cg-radius-sm);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.entry-status--edit {
+    background: color-mix(in oklab, #22c55e 10%, transparent);
+    color: #166534;
+}
+
+.entry-another-name,
+.entry-brief {
+    margin: 0;
+    color: var(--cg-color-text-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.entry-people-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.entry-chip {
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    text-decoration: none;
+    border-radius: var(--cg-radius-full);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--cg-transition-fast);
+}
+
+.entry-chip:hover {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+}
+
+.entry-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.entry-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-primary);
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.entry-edit-btn:hover {
+    opacity: 0.9;
+}
+
+.entry-edit-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.entry-edit-btn--login {
+    background: transparent;
+    color: var(--cg-color-primary);
+}
+
+.entry-edit-btn--login:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    opacity: 1;
+}
+
+@media (min-width: 768px) {
+    .entry-hero {
+        gap: 2.5rem;
+        padding: 2rem;
+        align-items: center;
+    }
+
+    .entry-hero--wide {
+        grid-template-columns: 5fr 7fr;
+    }
+
+    .entry-hero--square {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .entry-hero--wide {
+        grid-template-columns: 5fr 7fr;
+    }
+
+    .entry-hero--square {
+        grid-template-columns: 280px minmax(0, 1fr);
+    }
+
+    .entry-hero--square .entry-cover {
+        max-width: 280px;
+    }
+}

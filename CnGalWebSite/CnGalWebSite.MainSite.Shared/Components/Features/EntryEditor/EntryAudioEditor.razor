@@ -1,0 +1,228 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.SDK.MainSite.Models.Files
+@inject ICgToastService ToastService
+
+<section class="entry-editor-section" id="section-audio">
+    <h2><CgMdiIcon Name="mdiMusicNoteOutline" Class="entry-section-icon" aria-hidden="true" />音频</h2>
+    <p>管理词条的关联音频和音乐。</p>
+
+    @if (Model != null)
+    {
+        <CgAlert Variant="info">
+            音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
+        </CgAlert>
+
+        <CgFormSection Title="音频试听" Icon="mdiPlayCircleOutline" Flat>
+            <HeaderActions>
+                <CgAudioUpload Multiple
+                               OnAudioUploaded="OnAudioUploaded" />
+            </HeaderActions>
+            <ChildContent>
+                <CgTable HasData="@Model.Audio.Any()">
+                    <Empty>
+                        <p>暂无音频，请点击"上传音频"添加。</p>
+                    </Empty>
+                    <ChildContent>
+                        <thead>
+                            <tr>
+                                <th>缩略图</th>
+                                <th>名称</th>
+                                <th>简介</th>
+                                <th>预览</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Audio.OrderByDescending(s => s.Priority))
+                            {
+                                <tr>
+                                    <td class="cg-audio-thumb-cell">
+                                        <img src="@GetThumbnailUrl(item)"
+                                             class="cg-audio-thumb"
+                                             alt="@item.Name" />
+                                    </td>
+                                    <td class="cg-audio-name-cell">@item.Name</td>
+                                    <td class="cg-audio-desc-cell">@item.BriefIntroduction</td>
+                                    <td class="cg-audio-preview-cell">
+                                        <audio controls preload="none" class="cg-audio-player">
+                                            <source src="@item.Url" />
+                                        </audio>
+                                    </td>
+                                    <td class="cg-actions">
+                                        <CgButton Variant="ghost" OnClick="() => EditAudio(item)" aria-label="编辑">
+                                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                        </CgButton>
+                                        <CgButton Variant="ghost-danger" OnClick="() => DeleteAudio(item)" aria-label="删除">
+                                            <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                        </CgButton>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </ChildContent>
+                </CgTable>
+            </ChildContent>
+        </CgFormSection>
+    }
+</section>
+
+@* ── 编辑弹窗 ── *@
+<CgModal IsOpen="@_editDialogOpen"
+         Title="编辑音频"
+         OnClose="CloseEditDialogAsync">
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <p class="cg-edit-hint">音频的名称和简介会在词条页面展示，优先级会影响展示顺序</p>
+
+            <CgFormGroup Label="缩略图">
+                <CgImageUpload @bind-Value="_editingItem.Thumbnail"
+                               ShowCropper
+                               Type="ImageAspectType._1_1"
+                               Text="上传缩略图" />
+            </CgFormGroup>
+
+            <CgFormGroup Label="音频预览">
+                <div class="cg-edit-audio-preview">
+                    <audio controls preload="none" class="cg-audio-player cg-audio-player--full">
+                        <source src="@_editingItem.Url" />
+                    </audio>
+                    <CgAudioUpload Multiple="false"
+                                   OnAudioUploaded="OnReUpload"
+                                   Text="重新上传" />
+                </div>
+            </CgFormGroup>
+
+            <CgGrid>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editingItem.Name" Placeholder="如：OP、ED、BGM" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingItem.Priority" />
+                </CgFormGroup>
+            </CgGrid>
+
+            <CgFormGroup Label="简介">
+                <CgTextarea @bind-Value="_editingItem.BriefIntroduction"
+                            Rows="3"
+                            Placeholder="音频描述" />
+            </CgFormGroup>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveEdit">保存</CgButton>
+    </Footer>
+</CgModal>
+
+
+
+@code {
+    [Parameter]
+    public EditAudioViewModel Model { get; set; } = default!;
+
+
+
+    // ── 编辑弹窗状态 ──
+    private bool _editDialogOpen;
+    private EditAudioAloneModel? _editingItem;
+    private EditAudioAloneModel? _editTarget;
+
+    // ── 上传回调 ──
+    private async Task OnAudioUploaded(AudioUploadResult result)
+    {
+        Model.Audio ??= new();
+
+        if (Model.Audio.Any(s => s.Url == result.Url))
+        {
+            ToastService.Show("添加失败", "这个音频已经添加过了哦~", "error");
+            return;
+        }
+
+        var name = ExtractNameFromFileName(result.FileName) ?? $"音频{Model.Audio.Count + 1}";
+
+        Model.Audio.Add(new EditAudioAloneModel
+        {
+            Name = name,
+            Url = result.Url,
+            Duration = result.Duration
+        });
+    }
+
+    // ── 编辑 ──
+    private void EditAudio(EditAudioAloneModel item)
+    {
+        _editTarget = item;
+        _editingItem = new EditAudioAloneModel
+        {
+            Id = item.Id,
+            Name = item.Name,
+            BriefIntroduction = item.BriefIntroduction,
+            Url = item.Url,
+            Priority = item.Priority,
+            Duration = item.Duration,
+            Thumbnail = item.Thumbnail
+        };
+        _editDialogOpen = true;
+    }
+
+    // ── 保存编辑 ──
+    private void SaveEdit()
+    {
+        if (_editingItem == null || _editTarget == null) return;
+
+        _editTarget.Name = _editingItem.Name;
+        _editTarget.BriefIntroduction = _editingItem.BriefIntroduction;
+        _editTarget.Url = _editingItem.Url;
+        _editTarget.Priority = _editingItem.Priority;
+        _editTarget.Duration = _editingItem.Duration;
+        _editTarget.Thumbnail = _editingItem.Thumbnail;
+
+        CloseEditDialog();
+    }
+
+    // ── 弹窗中重新上传音频 ──
+    private void OnReUpload(AudioUploadResult result)
+    {
+        if (_editingItem == null) return;
+        _editingItem.Url = result.Url;
+        _editingItem.Duration = result.Duration;
+    }
+
+    // ── 删除 ──
+    private void DeleteAudio(EditAudioAloneModel item)
+    {
+        Model.Audio?.Remove(item);
+    }
+
+    // ── 关闭弹窗 ──
+    private void CloseEditDialog()
+    {
+        _editingItem = null;
+        _editTarget = null;
+        _editDialogOpen = false;
+    }
+
+    private Task CloseEditDialogAsync()
+    {
+        CloseEditDialog();
+        return Task.CompletedTask;
+    }
+
+    // ── 工具方法 ──
+    private static string GetThumbnailUrl(EditAudioAloneModel item)
+    {
+        return string.IsNullOrWhiteSpace(item.Thumbnail)
+            ? "https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png"
+            : item.Thumbnail;
+    }
+
+    private static string? ExtractNameFromFileName(string? fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName)) return null;
+        var ext = Path.GetExtension(fileName);
+        return string.IsNullOrWhiteSpace(ext) ? fileName : fileName.Replace(ext, "");
+    }
+}

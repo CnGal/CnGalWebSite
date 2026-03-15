@@ -1,0 +1,98 @@
+@page "/space/index/{Id}"
+@page "/space/index"
+
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.Features.Space
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using Microsoft.AspNetCore.Components.Web
+
+@inject ISpaceQueryService SpaceQueryService
+@inject NavigationManager NavigationManager
+
+@if (_isNotFound)
+{
+    <div class="cg-space-not-found">
+        <h1 class="cg-space-not-found-title">找不到这个用户哦......</h1>
+        <div class="cg-space-not-found-text">有点可怕呢，可以试试联系管理员</div>
+        <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
+    </div>
+}
+else if (_model != null)
+{
+    <PageTitle>@($"{_model.Name} - 个人空间 - CnGal资料站")</PageTitle>
+
+    <div class="cg-space-container">
+        <div class="cg-space-layout-row">
+            <div class="cg-space-layout-sidebar">
+                <SpaceHero Model="_model" />
+                <SpaceBasicInfoCard Model="_model" />
+            </div>
+            
+            <div class="cg-space-layout-main">
+                <SpaceDataOverviewCard Model="_model" />
+                <SpaceMainPage Model="_model" />
+            </div>
+        </div>
+    </div>
+}
+else if (_isError)
+{
+    <div class="cg-space-error">
+        <h1 class="cg-space-error-title">加载失败</h1>
+        <div class="cg-space-error-text">@_errorMessage</div>
+    </div>
+}
+else
+{
+    <div class="cg-space-loading">
+        <span>加载中...</span>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private SpaceDetailViewModel? _model;
+    private bool _isNotFound;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_model != null && !string.IsNullOrWhiteSpace(Id) && _model.Id != Id)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isNotFound = false;
+        _isError = false;
+        _model = null;
+
+        var targetId = Id ?? string.Empty;
+        var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
+
+        if (result.Success && result.Data != null)
+        {
+            _model = result.Data;
+        }
+        else if (result.Error?.StatusCode == 404)
+        {
+            _isNotFound = true;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "未知错误";
+        }
+    }
+}

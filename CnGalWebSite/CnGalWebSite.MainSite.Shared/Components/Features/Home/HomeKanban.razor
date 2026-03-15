@@ -1,0 +1,52 @@
+<div class="home-kanban-content">
+    <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" />
+    <div class="home-kanban-quote">
+        <div class="home-kanban-quote-content">@_item.Content</div>
+        @if (!string.IsNullOrWhiteSpace(_item.Source))
+        {
+            <div class="home-kanban-quote-by">
+                ——<a href="@_item.SourceLink"><i>@_item.Source</i></a>
+            </div>
+        }
+    </div>
+    <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" class="home-kanban-img-flipped" />
+</div>
+
+@code {
+    private class QuoteModel
+    {
+        public string Content { get; set; } = "";
+        public string Source { get; set; } = "";
+        public string SourceLink { get; set; } = "";
+    }
+
+    private static readonly QuoteModel[] _items = new QuoteModel[]
+    {
+        new()
+        {
+            Content = "“每个人都可以参与到编辑中，同时每个人都能享有编辑后的成果。”",
+            Source = "CnGal资料站 V3 正式上线后的感谢！",
+            SourceLink = "/articles/index/257"
+        },
+        new()
+        {
+            Content = "“愿每一个CnGal创作者的作品都能不被忘记”",
+            Source = "CnGal资料站 V3 正式上线后的感谢！",
+            SourceLink = "/articles/index/257"
+        },
+        new()
+        {
+            Content = "“总要做点自己想做的事，为了自己也好，为了别人也好，两全其美更好。”",
+            Source = "写在诞生日",
+            SourceLink = "/articles/index/6"
+        },
+        new()
+        {
+            Content = "“说起来建立这个网站的初衷并不为别的，只是希望能够对国产galgame的推广，宣传乃至发展能有所帮助。”",
+            Source = "写在诞生日",
+            SourceLink = "/articles/index/6"
+        }
+    };
+
+    private QuoteModel _item = _items[new Random().Next(0, _items.Length)];
+}

@@ -1,0 +1,19 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+<ul class="entry-image-grid">
+    @foreach (var item in Pictures.Take(MaxCount))
+    {
+        <li>
+            <a href="@item.Url" target="_blank" rel="noopener noreferrer">
+                <img src="@item.Url" alt="@DisplayTextOrFallback(item.Note, EntryName)" loading="lazy" decoding="async" />
+            </a>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<PicturesAloneViewModel> Pictures { get; set; } = [];
+    [Parameter] public int MaxCount { get; set; } = 12;
+    [Parameter] public string EntryName { get; set; } = "";
+    [Parameter] public Func<string?, string, string> DisplayTextOrFallback { get; set; } = (value, fallback) => string.IsNullOrWhiteSpace(value) ? fallback : value;
+}

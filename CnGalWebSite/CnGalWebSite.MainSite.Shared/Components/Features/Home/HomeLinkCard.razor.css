@@ -1,0 +1,154 @@
+/* ── 通用链接卡片（公告/支持等） ── */
+.home-card {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    padding: 0.75rem 1rem;
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.home-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: var(--cg-color-primary-hover);
+}
+
+.home-card a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.home-card a:hover {
+    color: var(--cg-color-primary);
+}
+
+.home-card strong {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.home-card p {
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    font-size: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── 社区链接卡片（紧凑胶囊风格） ── */
+.home-card--community {
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
+.home-card--community:hover {
+    box-shadow: none;
+}
+
+.home-card--community a {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.625rem;
+    color: inherit;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--cg-radius-md);
+    transition: background-color var(--cg-transition-fast);
+}
+
+.home-card--community a:hover {
+    color: inherit;
+    background: var(--cg-color-hover-overlay);
+}
+
+.home-card-community-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--cg-radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.home-card-community-icon ::deep .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.home-card--community strong {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── 色调变体 ── */
+.home-card-community-icon.is-primary {
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, white);
+    color: var(--cg-color-primary);
+}
+
+.home-card-community-icon.is-secondary {
+    background: color-mix(in oklab, var(--cg-color-secondary) 14%, white);
+    color: var(--cg-color-secondary);
+}
+
+.home-card-community-icon.is-purple {
+    background: color-mix(in oklab, #8b5cf6 15%, white);
+    color: #8b5cf6;
+}
+
+.home-card-community-icon.is-pink {
+    background: color-mix(in oklab, #ff6699 15%, white);
+    color: #ff6699;
+}
+
+.home-card-community-icon.is-red {
+    background: color-mix(in oklab, #e6162d 15%, white);
+    color: #e6162d;
+}
+
+.home-card-community-icon.is-dark {
+    background: color-mix(in oklab, #1f1f1f 15%, white);
+    color: #1f1f1f;
+}
+
+/* hover 时图标变为实心色 */
+.home-card--community a:hover .home-card-community-icon.is-primary {
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.home-card--community a:hover .home-card-community-icon.is-secondary {
+    background: var(--cg-color-secondary);
+    color: #fff;
+}
+
+.home-card--community a:hover .home-card-community-icon.is-purple {
+    background: #8b5cf6;
+    color: #fff;
+}
+
+.home-card--community a:hover .home-card-community-icon.is-pink {
+    background: #ff6699;
+    color: #fff;
+}
+
+.home-card--community a:hover .home-card-community-icon.is-red {
+    background: #e6162d;
+    color: #fff;
+}
+
+.home-card--community a:hover .home-card-community-icon.is-dark {
+    background: #1f1f1f;
+    color: #fff;
+}

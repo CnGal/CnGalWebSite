@@ -1,0 +1,11 @@
+@if (Show)
+{
+    <ul class="entry-link-list">
+        @ChildContent
+    </ul>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

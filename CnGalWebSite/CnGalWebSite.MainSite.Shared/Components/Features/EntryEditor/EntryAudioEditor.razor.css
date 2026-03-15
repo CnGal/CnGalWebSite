@@ -1,0 +1,54 @@
+/* ── 音频表格独有样式 ── */
+.cg-audio-thumb-cell {
+    width: 56px;
+}
+
+.cg-audio-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--cg-radius-md);
+    display: block;
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-audio-name-cell {
+    min-width: 100px;
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.cg-audio-desc-cell {
+    min-width: 180px;
+    overflow-wrap: anywhere;
+    color: var(--cg-color-text-secondary);
+}
+
+.cg-audio-preview-cell {
+    min-width: 200px;
+}
+
+/* ── 音频播放器 ── */
+.cg-audio-player {
+    width: 100%;
+    max-width: 280px;
+    height: 36px;
+}
+
+.cg-audio-player--full {
+    max-width: 100%;
+}
+
+/* ── 编辑弹窗内部 ── */
+.cg-edit-hint {
+    color: var(--cg-color-text-secondary);
+    font-size: var(--cg-font-size-sm);
+    margin-top: 0;
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-edit-audio-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    flex-wrap: wrap;
+}

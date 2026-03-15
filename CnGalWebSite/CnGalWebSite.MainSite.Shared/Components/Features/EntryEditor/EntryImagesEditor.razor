@@ -1,0 +1,150 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+
+<section class="entry-editor-section" id="section-images">
+    <h2><CgMdiIcon Name="mdiImageOutline" Class="entry-section-icon" aria-hidden="true" />相册</h2>
+    <p>编辑词条相册图片。</p>
+
+    @if (Model != null!)
+    {
+        <CgAlert Variant="info">
+            可以在这里上传游戏的宣传图，不涉及<strong>剧透、侵权、违法</strong>的游戏 CG 和角色立绘等图片
+        </CgAlert>
+
+        <CgFormSection Title="图片列表" Icon="mdiImageMultipleOutline" Flat>
+            <HeaderActions>
+                <CgImageUpload Multiple
+                               ShowPreview="false"
+                               Text="上传图片到图床"
+                               OnImageUploaded="OnImageUploaded"/>
+            </HeaderActions>
+            <ChildContent>
+                @if (Model.Images.Any())
+                {
+                    <div class="cg-image-grid">
+                        @foreach (var item in Model.Images.OrderByDescending(s => s.Priority))
+                        {
+                            <div class="cg-image-card">
+                                <div class="cg-image-card__preview">
+                                    <img src="@item.Image" alt="@item.Note"/>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(item.Note))
+                                {
+                                    <div class="cg-image-card__note">@item.Note</div>
+                                }
+                                <div class="cg-image-card__actions">
+                                    <CgButton Variant="outline" Size="sm" OnClick="() => EditImage(item)">编辑</CgButton>
+                                    <CgButton Variant="danger" Size="sm" OnClick="() => DeleteImage(item)">删除</CgButton>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="cg-editor-empty">暂无图片，请点击"上传图片到图床"添加。</p>
+                }
+            </ChildContent>
+        </CgFormSection>
+    }
+</section>
+
+@* ── 编辑弹窗 ── *@
+<CgModal IsOpen="@_editDialogOpen"
+         Title="编辑图片"
+         OnClose="CloseEditDialogAsync">
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <div class="cg-edit-image-preview">
+                @if (!string.IsNullOrWhiteSpace(_editingItem.Image))
+                {
+                    <img src="@_editingItem.Image" alt="预览"/>
+                }
+            </div>
+
+            <CgFormGroup Label="替换图片">
+                <CgImageUpload @bind-Value="_editingItem.Image"
+                               ShowPreview="false"
+                               Text="上传替换图片"/>
+            </CgFormGroup>
+            <CgGrid>
+                <CgFormGroup Label="备注">
+                    <CgInput @bind-Value="_editingItem.Note" Placeholder="图片描述"/>
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingItem.Priority" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveEdit">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter] public EditImagesViewModel Model { get; set; } = default!;
+
+    // ── 编辑弹窗状态 ──
+    private bool _editDialogOpen;
+    private EditImageAloneModel? _editingItem;
+    private EditImageAloneModel? _editTarget;
+
+    // ── 上传回调：多文件上传时每张图回调一次 ──
+    private void OnImageUploaded(string url)
+    {
+        Model.Images ??= new();
+        Model.Images.Add(new EditImageAloneModel { Image = url });
+    }
+
+    // ── 编辑 ──
+    private void EditImage(EditImageAloneModel item)
+    {
+        _editTarget = item;
+        _editingItem = new EditImageAloneModel
+        {
+            Image = item.Image,
+            Note = item.Note,
+            Priority = item.Priority,
+            Modifier = item.Modifier
+        };
+        _editDialogOpen = true;
+    }
+
+    // ── 删除 ──
+    private void DeleteImage(EditImageAloneModel item)
+    {
+        Model.Images?.Remove(item);
+    }
+
+    // ── 保存编辑 ──
+    private void SaveEdit()
+    {
+        if (_editingItem == null || _editTarget == null)
+        {
+            return;
+        }
+
+        _editTarget.Image = _editingItem.Image;
+        _editTarget.Note = _editingItem.Note;
+        _editTarget.Priority = _editingItem.Priority;
+        _editTarget.Modifier = _editingItem.Modifier;
+
+        CloseEditDialog();
+    }
+
+    private void CloseEditDialog()
+    {
+        _editingItem = null;
+        _editTarget = null;
+        _editDialogOpen = false;
+    }
+
+    private Task CloseEditDialogAsync()
+    {
+        CloseEditDialog();
+        return Task.CompletedTask;
+    }
+}

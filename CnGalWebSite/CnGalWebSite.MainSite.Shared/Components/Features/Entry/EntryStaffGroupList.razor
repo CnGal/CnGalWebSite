@@ -1,0 +1,57 @@
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+
+<ul class="entry-staff-group-list">
+    @foreach (var group in TakeIfNeeded(Staffs, MaxGroupCount))
+    {
+        <li>
+            @if (string.IsNullOrWhiteSpace(group.Modifier) is false)
+            {
+                <h3>@group.Modifier</h3>
+            }
+            @foreach (var position in TakeIfNeeded(group.StaffList, MaxPositionCount))
+            {
+                <div class="entry-staff-position">
+                    <strong>@position.Modifier：</strong>
+                    <div class="entry-staff-names">
+                        @for (var i = 0; i < position.Names.Count; i++)
+                        {
+                            var name = position.Names[i];
+                            var isLast = i == position.Names.Count - 1;
+                            
+                            @if (name.Id!=0)
+                            {
+                                <a href="@($"/entries/index/{name.Id}")" class="entry-staff-link">@name.DisplayName</a>
+                            }
+                            else
+                            {
+                                <span>@name.DisplayName</span>
+                            }
+
+                            @if (!isLast)
+                            {
+                                <span class="entry-staff-separator">、</span>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<StaffInforModel> Staffs { get; set; } = [];
+
+    [Parameter]
+    public int MaxGroupCount { get; set; } = 0;
+
+    [Parameter]
+    public int MaxPositionCount { get; set; } = 0;
+
+    private static IEnumerable<T> TakeIfNeeded<T>(IEnumerable<T> source, int maxCount)
+    {
+        return maxCount > 0 ? source.Take(maxCount) : source;
+    }
+}

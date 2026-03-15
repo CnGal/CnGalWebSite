@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.DataReositories;
 using CnGalWebSite.DrawingBed.Models.DataModels;
@@ -42,7 +42,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false)
+        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false, [FromQuery] double cropX = 0, [FromQuery] double cropY = 0, [FromQuery] double cropW = 0, [FromQuery] double cropH = 0)
         {
             if (files.Count == 0)
             {
@@ -53,7 +53,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             {
                 try
                 {
-                    model.Add(await _fileService.UploadFormFile(item, gallery, x, y, type));
+                    model.Add(await _fileService.UploadFormFile(item, gallery, x, y, type, cropX, cropY, cropW, cropH));
                 }
                 catch (Exception ex)
                 {
@@ -76,7 +76,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false)
+        public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false, [FromQuery] double cropX = 0, [FromQuery] double cropY = 0, [FromQuery] double cropW = 0, [FromQuery] double cropH = 0)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -101,7 +101,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-                var result = await _fileService.TransferDepositFile(url, gallery, x, y, type);
+                var result = await _fileService.TransferDepositFile(url, gallery, x, y, type, cropX, cropY, cropW, cropH);
 
                 return result;
             }

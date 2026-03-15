@@ -1,0 +1,101 @@
+.cg-select {
+    position: relative;
+    width: 100%;
+}
+
+.cg-select__trigger {
+    width: 100%;
+    min-height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: 0.4rem 0.7rem;
+    background-color: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.cg-select__trigger:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    border-color: var(--cg-color-primary);
+}
+
+.cg-select__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cg-select__value--placeholder {
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+}
+
+.cg-select__arrow {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid currentColor;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.cg-select__backdrop {
+    position: fixed;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    z-index: 1009;
+}
+
+.cg-select__menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background-color: var(--cg-color-surface);
+    box-shadow: 0 10px 30px color-mix(in oklab, var(--cg-color-text) 12%, transparent);
+    max-height: 16rem;
+    overflow-y: auto;
+    z-index: 1010;
+}
+
+.cg-select__option {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--cg-color-text);
+    text-align: left;
+    padding: 0.45rem 0.5rem;
+    border-radius: var(--cg-radius-sm);
+    cursor: pointer;
+}
+
+.cg-select__option:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+}
+
+.cg-select__option.is-selected {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 18%, transparent);
+    color: var(--cg-color-primary);
+}
+
+.cg-select__trigger:disabled {
+    background-color: var(--cg-color-surface-2, color-mix(in oklab, var(--cg-color-surface) 92%, black));
+    color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
+    border-color: var(--cg-color-border-muted, color-mix(in oklab, var(--cg-color-border) 75%, transparent));
+    cursor: not-allowed;
+    opacity: 0.85;
+}

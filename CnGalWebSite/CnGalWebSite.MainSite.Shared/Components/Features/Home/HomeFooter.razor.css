@@ -1,0 +1,18 @@
+.home-footer {
+    margin-top: 1.1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--cg-color-border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    color: var(--cg-color-text-muted);
+}
+
+.home-footer a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+}
+
+.home-footer a:hover {
+    text-decoration: underline;
+}

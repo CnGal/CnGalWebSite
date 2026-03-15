@@ -1,0 +1,12 @@
+/* Staff 编辑器 — 独有样式 */
+
+.cg-batch-example {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 4%, var(--cg-color-surface));
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 15%, transparent);
+    border-radius: var(--cg-radius-md);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    font-family: monospace;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.8;
+    margin-bottom: var(--cg-spacing-4);
+}

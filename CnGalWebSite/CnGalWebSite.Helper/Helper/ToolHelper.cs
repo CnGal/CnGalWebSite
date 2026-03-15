@@ -32,7 +32,7 @@ namespace CnGalWebSite.DataModel.Helper
         //public static string WebApiPath = "http://172.17.0.1:2001/";
         public static string WebApiPath = "https://api.cngal.org/";
 
-        public static bool? PreSetIsSSR = null; //=> WebApiPath == "http://172.17.0.1:2001/";
+        public static bool? PreSetIsSSR = false; //=> WebApiPath == "http://172.17.0.1:2001/";
         public static bool IsSSR = true; //=> WebApiPath == "http://172.17.0.1:2001/";
 
         public static string ImageApiPath = "https://api.cngal.top/";

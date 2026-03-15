@@ -1,0 +1,121 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Tags
+@using static CnGalWebSite.MainSite.Shared.Components.DesignSystem.CgTreeView
+
+<div class="tag-tree-card">
+    <div class="tag-tree-card__header">
+        <CgMdiIcon Name="mdiFileTreeOutline" Class="tag-tree-card__header-icon" aria-hidden="true" />
+        <h3 class="tag-tree-card__title">标签树</h3>
+    </div>
+
+    <div class="tag-tree-card__search">
+        <CgInput TValue="string"
+                 Value="@_searchText"
+                 ValueChanged="OnSearchChanged"
+                 Placeholder="搜索标签…" />
+    </div>
+
+    <div class="tag-tree-card__tree">
+        <CgTreeView Items="@_treeItems"
+                    SearchText="@_searchText"
+                    Selectable="true"
+                    SelectedKeys="@_selectedKeys"
+                    SelectedKeysChanged="OnTreeSelectionChanged" />
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 标签树原始数据
+    /// </summary>
+    [Parameter]
+    public List<TagTreeModel> TreeItems { get; set; } = [];
+
+    /// <summary>
+    /// 当前已选标签列表（引用传递，与 AutoComplete 编辑器共享）
+    /// </summary>
+    [Parameter]
+    public List<RelevancesModel> Tags { get; set; } = [];
+
+    /// <summary>
+    /// 标签列表变更时通知父组件（用于触发 StateHasChanged）
+    /// </summary>
+    [Parameter]
+    public EventCallback OnTagsChanged { get; set; }
+
+    private string? _searchText;
+    private List<CgTreeViewItem> _treeItems = [];
+    private List<string> _selectedKeys = [];
+    private HashSet<string> _leafKeys = [];
+
+    protected override void OnParametersSet()
+    {
+        // 将 TagTreeModel 转换为 CgTreeViewItem
+        _treeItems = ConvertToTreeItems(TreeItems);
+
+        // 收集叶子节点 Key
+        _leafKeys = [];
+        CollectLeafKeys(_treeItems, _leafKeys);
+
+        // 从当前 Tags 列表同步选中状态
+        _selectedKeys = Tags
+            .Where(t => !string.IsNullOrWhiteSpace(t.DisplayName) && _leafKeys.Contains(t.DisplayName))
+            .Select(t => t.DisplayName)
+            .ToList();
+    }
+
+    private static List<CgTreeViewItem> ConvertToTreeItems(List<TagTreeModel> source)
+    {
+        return source.Select(tag => new CgTreeViewItem
+        {
+            Key = tag.Title ?? string.Empty,
+            Text = tag.Title ?? string.Empty,
+            Icon = string.IsNullOrWhiteSpace(tag.Icon) ? null : tag.Icon,
+            Children = tag.Children is { Count: > 0 }
+                ? ConvertToTreeItems(tag.Children)
+                : []
+        }).ToList();
+    }
+
+    private static void CollectLeafKeys(List<CgTreeViewItem> items, HashSet<string> leafKeys)
+    {
+        foreach (var item in items)
+        {
+            if (item.Children is { Count: > 0 })
+            {
+                CollectLeafKeys(item.Children, leafKeys);
+            }
+            else
+            {
+                leafKeys.Add(item.Key);
+            }
+        }
+    }
+
+    private async Task OnTreeSelectionChanged(List<string> newSelectedKeys)
+    {
+        // 只保留叶子节点
+        var leafSelected = newSelectedKeys.Where(k => _leafKeys.Contains(k)).ToList();
+        _selectedKeys = leafSelected;
+
+        // 同步到 Tags 列表：移除不在选中列表里的叶子标签
+        Tags.RemoveAll(t => _leafKeys.Contains(t.DisplayName) && !leafSelected.Contains(t.DisplayName));
+
+        // 添加新选中的标签
+        var existing = Tags.Select(t => t.DisplayName).ToHashSet();
+        foreach (var key in leafSelected)
+        {
+            if (!existing.Contains(key))
+            {
+                Tags.Add(new RelevancesModel { DisplayName = key });
+            }
+        }
+
+        await OnTagsChanged.InvokeAsync();
+    }
+
+    private void OnSearchChanged(string? text)
+    {
+        _searchText = text;
+    }
+}

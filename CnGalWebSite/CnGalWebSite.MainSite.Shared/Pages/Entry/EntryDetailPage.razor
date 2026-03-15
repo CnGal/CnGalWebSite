@@ -1,0 +1,538 @@
+@page "/entries/index/{Id:int}"
+@inject IEntryQueryService EntryQueryService
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry
+@using CnGalWebSite.Extensions
+
+<PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <section class="entry-not-found">
+        <h1>条目加载失败</h1>
+        <p>@ErrorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (Model is not null)
+{
+    <article class="entry-page">
+        @if (HasAtmosphere())
+        {
+            <EntryAtmosphere BackgroundPicture="@Model.BackgroundPicture" SmallBackgroundPicture="@Model.SmallBackgroundPicture" />
+        }
+
+        <EntryHero Name="@Model.Name" AnotherName="@Model.AnotherName" BriefIntroduction="@Model.BriefIntroduction"
+                   TypeText="@GetTypeText(Model.Type)" IsEdit="Model.IsEdit" HeroImageUrl="@GetHeroImageUrl()"
+                   IsSquareCover="IsSquareCover()" ProductionGroups="Model.ProductionGroups" Publishers="Model.Publishers"
+                   BuildEntryUrl="BuildEntryUrl" EntryId="Id" />
+
+        <EntrySpecialTips IsHidden="Model.IsHidden" Type="Model.Type" />
+
+        <section class="entry-layout entry-layout--desktop" aria-label="桌面详情布局">
+            <main class="entry-main-col">
+                <EntryCard Title="音频" Icon="mdiMusicCircleOutline" Show="Model.Audio.Count > 0">
+                    <EntryAudioList Audio="Model.Audio" MaxCount="6" />
+                </EntryCard>
+
+                <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
+                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="DisplayTextOrFallback" />
+                </EntrySection>
+
+                <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
+                    <CgHtmlContent Content="@Model.MainPage" />
+                </EntryCard>
+
+                <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
+                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="GetTarget" />
+                </EntryCard>
+
+                <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.VideoRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
+                
+                <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.EntryRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                        @foreach (var item in Model.StaffGames.Take(4))
+                        {
+                            <li>
+                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
+                
+                <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
+                    <EntryCardList>
+                        @foreach (var item in Model.ArticleRelevances.Take(8))
+                        {
+                            <li>
+                                <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                            </li>
+                        }
+                    </EntryCardList>
+                </EntrySection>
+
+                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="entry-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法与补充信息。">
+                    <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
+                </EntryCard>
+            </main>
+
+            <aside class="entry-side-col">
+                <EntryBookingCard Booking="Model.Booking" ShowGoals="true" />
+
+                <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
+                    <EntryInfoList Information="Model.Information" />
+                </EntryCard>
+
+                <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
+                    <EntryTagList Tags="Model.Tags" MaxCount="24" />
+                </EntryCard>
+
+                <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
+                    <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
+                </EntryCard>
+
+                <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
+                    <EntryReleaseCards Releases="Model.Releases"
+                                       GetPlatformIcon="GetPlatformIcon"
+                                       GetPlatformImage="GetPlatformImage"
+                                       GetPublishPlatformName="GetPublishPlatformName"
+                                       GetReleaseTypeText="GetReleaseTypeText"
+                                       GetCurrencyPrefix="GetCurrencyPrefix"
+                                       GetGamePlatformName="GetGamePlatformName" />
+                </EntrySection>
+
+                <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
+                    <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                </EntrySection>
+
+                <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
+                    <EntryOutlinkList Links="Model.OtherRelevances"
+                                      MaxCount="8"
+                                      GetExternalLinkIcon="GetExternalLinkIcon"
+                                      GetExternalLinkImage="GetExternalLinkImage"
+                                      GetExternalLinkDescription="GetExternalLinkDescription"
+                                      DisplayTextOrFallback="DisplayTextOrFallback" />
+                </EntrySection>
+            </aside>
+        </section>
+
+        <section class="entry-layout entry-layout--mobile" aria-label="移动端详情布局">
+            <div class="entry-mobile-tabs">
+                <input type="radio" id="entry-tab-home" name="entry-tab" checked>
+                <input type="radio" id="entry-tab-related" name="entry-tab">
+                @if (Model.Staffs.Count > 0)
+                {
+                    <input type="radio" id="entry-tab-staff" name="entry-tab">
+                }
+
+                <nav class="entry-mobile-tab-nav" role="tablist" aria-label="详情页标签">
+                    <label for="entry-tab-home" role="tab">首页</label>
+                    <label for="entry-tab-related" role="tab">相关</label>
+                    @if (Model.Staffs.Count > 0)
+                    {
+                        <label for="entry-tab-staff" role="tab">Staff</label>
+                    }
+                </nav>
+
+                <div class="entry-mobile-panels">
+                    <section class="entry-mobile-panel entry-mobile-panel--home">
+                        <EntryBookingCard Booking="Model.Booking" ShowGoals="false" />
+                        
+                        <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
+                            <EntryInfoList Information="Model.Information" MaxCount="12" />
+                        </EntryCard>
+                        
+                        <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
+                            <EntryTagList Tags="Model.Tags" MaxCount="24" />
+                        </EntryCard>
+                        
+                        <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
+                            <EntryReleaseCards Releases="Model.Releases"
+                                               GetPlatformIcon="GetPlatformIcon"
+                                               GetPlatformImage="GetPlatformImage"
+                                               GetPublishPlatformName="GetPublishPlatformName"
+                                               GetReleaseTypeText="GetReleaseTypeText"
+                                               GetCurrencyPrefix="GetCurrencyPrefix"
+                                               GetGamePlatformName="GetGamePlatformName" />
+                        </EntrySection>
+                        
+                        <EntryCard Title="内容浏览" Icon="mdiViewGridOutline" Show="Model.Audio.Count > 0 || Model.Pictures.Count > 0 || !string.IsNullOrWhiteSpace(Model.MainPage) || Model.NewsOfEntry.Count > 0 || Model.CanComment">
+                            <EntryLinkList>
+                                @if (Model.Audio.Count > 0)
+                                {
+                                    <li>音频：@Model.Audio.Count</li>
+                                }
+                                @if (Model.Pictures.Count > 0)
+                                {
+                                    <li>图片：@Model.Pictures.Count</li>
+                                }
+                                @if (string.IsNullOrWhiteSpace(Model.MainPage) is false)
+                                {
+                                    <li>正文主页：可阅读</li>
+                                }
+                                @if (Model.NewsOfEntry.Count > 0)
+                                {
+                                    <li>动态时间线：@Model.NewsOfEntry.Count</li>
+                                }
+                                @if (Model.CanComment)
+                                {
+                                    <li><a href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a></li>
+                                }
+                            </EntryLinkList>
+                        </EntryCard>
+                    </section>
+
+                    <section class="entry-mobile-panel entry-mobile-panel--related">
+                        <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.VideoRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
+
+                        <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.EntryRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                                @foreach (var item in Model.StaffGames.Take(4))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
+
+                        <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
+                            <EntryCardList>
+                                @foreach (var item in Model.ArticleRelevances.Take(8))
+                                {
+                                    <li>
+                                        <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                    </li>
+                                }
+                            </EntryCardList>
+                        </EntrySection>
+
+                        <EntryCard Title="相关内容" Icon="mdiLinkVariant" Class="entry-card--empty" Show="!HasRelatedContent() && Model.Roles.Count == 0 && (Model.IsHideOutlink || Model.OtherRelevances.Count == 0)">
+                            <p>暂无相关内容。</p>
+                        </EntryCard>
+
+                        <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
+                            <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                        </EntrySection>
+
+                        <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
+                            <EntryOutlinkList Links="Model.OtherRelevances"
+                                              MaxCount="8"
+                                              GetExternalLinkIcon="GetExternalLinkIcon"
+                                              GetExternalLinkImage="GetExternalLinkImage"
+                                              GetExternalLinkDescription="GetExternalLinkDescription"
+                                              DisplayTextOrFallback="DisplayTextOrFallback" />
+                        </EntrySection>
+                    </section>
+
+                    @if (Model.Staffs.Count > 0)
+                    {
+                        <section class="entry-mobile-panel entry-mobile-panel--staff">
+                            <EntryCard Title="Staff" Icon="mdiAccountGroupOutline">
+                                <EntryStaffGroupList Staffs="Model.Staffs" />
+                            </EntryCard>
+                        </section>
+                    }
+                </div>
+            </div>
+        </section>
+    </article>
+}
+else
+{
+    <section class="entry-loading" aria-label="加载中">
+        <div class="entry-loading-block"></div>
+        <div class="entry-loading-block entry-loading-block--wide"></div>
+        <div class="entry-loading-block"></div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EntryDetailViewModel? Model;
+    private string? ErrorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await EntryQueryService.GetEntryDetailAsync(Id);
+        if (result.Success && result.Data is not null)
+        {
+            ErrorMessage = null;
+            Model = result.Data;
+            return;
+        }
+
+        Model = null;
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
+    }
+
+    private bool IsSquareCover()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return Model.Type is EntryType.Role or EntryType.Staff;
+    }
+
+    private string GetHeroImageUrl()
+    {
+        if (Model is null)
+        {
+            return string.Empty;
+        }
+
+        if (Model.Type is EntryType.Role or EntryType.Staff)
+        {
+            return string.IsNullOrWhiteSpace(Model.Thumbnail) ? Model.MainPicture : Model.Thumbnail;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.MainPicture) ? Model.Thumbnail : Model.MainPicture;
+    }
+
+    private static string BuildEntryUrl(int id)
+    {
+        return $"/entries/index/{id}";
+    }
+
+    private static string DisplayTextOrFallback(string? value, string fallback)
+    {
+        return string.IsNullOrWhiteSpace(value) ? fallback : value;
+    }
+
+    private static string GetTypeText(EntryType type)
+    {
+        return type.GetDisplayName();
+    }
+
+    private static bool IsExternalLink(string? link)
+    {
+        return string.IsNullOrWhiteSpace(link) is false
+               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string GetArticleLink(ArticleInforTipViewModel item)
+    {
+        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.Id}";
+    }
+
+    private static string GetNewsLink(NewsModel item)
+    {
+        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.ArticleId}";
+    }
+
+    private static string? GetTarget(string? link)
+    {
+        return IsExternalLink(link) ? "_blank" : null;
+    }
+
+    private string GetExternalLinkIcon(string displayName)
+    {
+        var name = displayName?.ToLower() ?? "";
+        if (name.Contains("steam")) return "mdiSteam";
+        if (name.Contains("bilibili") || name.Contains("b站")) return "mdiTelevisionPlay";
+        if (name.Contains("weibo") || name.Contains("微博")) return "mdiWechat"; // close enough if weibo missing
+        if (name.Contains("twitter") || name.Contains("x")) return "mdiTwitter";
+        if (name.Contains("github")) return "mdiGithub";
+        if (name.Contains("youtube")) return "mdiYoutube";
+        if (name.Contains("tap") || name.Contains("taptap")) return "mdiGamepadVariantOutline";
+        if (name.Contains("qq")) return "mdiQqchat";
+        return "mdiEarth";
+    }
+
+    private string? GetExternalLinkImage(string displayName)
+    {
+        var image = displayName switch
+        {
+            "萌娘百科" => "Moegirl.png",
+            "Bangumi" => "Bangumi.png",
+            "百度百科" => "BaiDuWiki.png",
+            "2DFan" => "2DFan.png",
+            "中文维基百科" => "Wiki.png",
+            "月幕Galgame" => "YMGal.png",
+            "Bilibili" => "bilibili.png",
+            "bilibili" => "bilibili.png",
+            "WikiData" => "Wikidata.png",
+            "微博" => "weibo.png",
+            "AcFun" => "AcFun.png",
+            "知乎" => "zhihu.png",
+            "爱发电" => "Afdian.png",
+            "Pixiv" => "pixiv.png",
+            "Twitter" => "twitter.png",
+            "YouTube" => "Youtube.png",
+            "Facebook" => "Facebook.png",
+            "官网" => "SmartHome.png",
+            "摩点" => "modian.png",
+            "小黑盒" => "xiaoheihe.jpg",
+            _ => null
+        };
+
+        if (string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
+    private string? GetExternalLinkDescription(RelevancesKeyValueModel item)
+    {
+        return item.DisplayName switch
+        {
+            "VNDB" => item.DisplayValue + (string.IsNullOrWhiteSpace(item.DisplayValue) ? "" : " - ") + "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
+            _ => item.DisplayValue
+        };
+    }
+
+    private bool HasRelatedContent()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return Model.VideoRelevances.Count > 0
+            || Model.EntryRelevances.Count > 0
+            || Model.ArticleRelevances.Count > 0
+            || Model.StaffGames.Count > 0;
+    }
+
+    private string GetPublishPlatformName(GameReleaseViewModel release)
+    {
+        if (release.PublishPlatformType == PublishPlatformType.Other && !string.IsNullOrWhiteSpace(release.PublishPlatformName))
+        {
+            return release.PublishPlatformName;
+        }
+        return release.PublishPlatformType.GetDisplayName();
+    }
+
+    private string GetPlatformIcon(GameReleaseViewModel release)
+    {
+        if (release.PublishPlatformType == PublishPlatformType.Other && !string.IsNullOrWhiteSpace(release.PublishPlatformName))
+        {
+            var lowerName = release.PublishPlatformName.ToLower();
+            if (lowerName.Contains("b站") || lowerName.Contains("bilibili")) return "mdiTelevisionPlay";
+            if (lowerName.Contains("微博")) return "mdiWechat";
+        }
+        return release.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "mdiSteam",
+            PublishPlatformType.AppStore => "mdiApple",
+            PublishPlatformType.GooglePlay => "mdiGooglePlay",
+            PublishPlatformType.NS => "mdiNintendoSwitch",
+            PublishPlatformType.Epic => "mdiGamepadVariantOutline",
+            _ => "mdiGamepadVariantOutline"
+        };
+    }
+
+    private string? GetPlatformImage(GameReleaseViewModel release)
+    {
+        var image = release.PublishPlatformType switch
+        {
+            PublishPlatformType.Steam => "Steam.png",
+            PublishPlatformType.AppStore => "AppStore.png",
+            PublishPlatformType.GooglePlay => "GooglePlay.png",
+            PublishPlatformType.DLsite => "DLsite.png",
+            PublishPlatformType.NS => "Nintendo_Switch.png",
+            PublishPlatformType.TapTap => "TapTap.png",
+            PublishPlatformType.Epic => "Epic.png",
+            _ => null
+        };
+
+        if (image == null && string.IsNullOrWhiteSpace(release.PublishPlatformName) == false)
+        {
+            var lowerName = release.PublishPlatformName.ToLower();
+            if (lowerName.Contains("b站") || lowerName.Contains("bilibili"))
+            {
+                image = "bilibili.png";
+            }
+            else if (lowerName.Contains("微博"))
+            {
+                image = "weibo.png";
+            }
+            else if (lowerName.Contains("贴吧") || lowerName.Contains("百度"))
+            {
+                image = "BaiDuWiki.png";
+            }
+            else if (lowerName.Contains("方块游戏"))
+            {
+                image = "CraftGame.png";
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(image))
+        {
+            return null;
+        }
+
+        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+    }
+
+    private string GetGamePlatformName(GamePlatformType type)
+    {
+        return type.GetDisplayName();
+    }
+
+    private string GetReleaseTypeText(GameReleaseType type)
+    {
+        return type.GetDisplayName();
+    }
+
+    private string GetCurrencyPrefix(CurrencyCode code)
+    {
+        return code switch
+        {
+            CurrencyCode.CNY => "¥",
+            CurrencyCode.USD => "$",
+            CurrencyCode.HKD => "HK$",
+            _ => code.ToString() + " "
+        };
+    }
+}

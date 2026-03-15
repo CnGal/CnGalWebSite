@@ -1,0 +1,158 @@
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.Extensions
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="entry-editor-section" id="section-main">
+    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="entry-section-icon" aria-hidden="true"/>主要信息</h2>
+    <p>编辑词条类型、名称、样式模板与主视觉资源。</p>
+
+    @if (Model != null)
+    {
+        <CgFormGroup Label="类型">
+            <div class="entry-type-selector">
+                @foreach (var type in _entryTypes)
+                {
+                    var isActive = Model.Type == type;
+                    <button type="button"
+                            class="entry-type-btn @(isActive ? "active" : "")"
+                            @onclick="() => OnTypeChanged(type)">
+                        <CgMdiIcon Name="@GetEntryTypeIcon(type)" Class="entry-type-icon" aria-hidden="true"/>
+                        <span>@type.GetDisplayName()</span>
+                    </button>
+                }
+            </div>
+        </CgFormGroup>
+
+       
+        <CgGrid MinWidth="150px">
+
+            <CgFormGroup Label="主图">
+                <CgImageUpload @bind-Value="Model.MainPicture"
+                               Text="上传主图"
+                               ShowCropper
+                               Type="@(Model.Type is EntryType.Game or EntryType.ProductionGroup ? ImageAspectType._16_9 : ImageAspectType.None)"/>
+            </CgFormGroup>
+            <CgFormGroup Label="@(Model.Type == EntryType.Staff ? "头像" : "缩略图")">
+                <CgImageUpload @bind-Value="Model.Thumbnail"
+                               Text="@(Model.Type == EntryType.Staff ? "上传头像" : "上传缩略图")"
+                               ShowCropper
+                               Type="ImageAspectType._1_1"/>
+            </CgFormGroup>
+
+            <CgFormGroup Label="背景图">
+                <CgImageUpload @bind-Value="Model.BackgroundPicture"
+                               Text="上传大背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="小背景图">
+                <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
+                               Text="上传小背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+        </CgGrid>
+       
+ <CgGrid>
+            <CgFormGroup Label="样式模板">
+                <CgEnumSelect TEnum="EntryStyleTemplate"
+                              Value="@Model.Template"
+                              ValueChanged="OnTemplateChanged"/>
+            </CgFormGroup> <CgFormGroup Label="名称同步">
+            <CgCheckbox Value="@_syncDisplayName"
+                        ValueChanged="OnSyncDisplayNameChanged"
+                        Label="显示名称与唯一名称保持一致"/>
+        </CgFormGroup>
+        </CgGrid>
+        <CgGrid>
+            <CgFormGroup Label="唯一名称">
+                <CgInput Value="@Model.Name"
+                         ValueChanged="OnNameChanged" TValue="string"/>
+            </CgFormGroup>
+            <CgFormGroup Label="显示名称">
+                <CgInput @bind-Value="Model.DisplayName"
+                         Disabled="_syncDisplayName"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgFormGroup Label="别称">
+            <CgInput @bind-Value="Model.AnotherName"
+                     Placeholder="可选，多个别称可用逗号分隔"/>
+        </CgFormGroup>
+
+        <CgFormGroup Label="简介">
+            <CgTextarea @bind-Value="Model.BriefIntroduction"
+                        Rows="3" Placeholder="简短的介绍"/>
+        </CgFormGroup>
+    }
+</section>
+
+@code {
+    [Parameter] public EditMainViewModel Model { get; set; } = default!;
+
+    [Parameter] public EventCallback<EntryType> TypeChanged { get; set; }
+
+    private bool _syncDisplayName;
+    private bool _syncInitialized;
+
+    private static readonly EntryType[] _entryTypes =
+    [
+        EntryType.Game,
+        EntryType.Role,
+        EntryType.ProductionGroup,
+        EntryType.Staff
+    ];
+
+    private static string GetEntryTypeIcon(EntryType type) => type switch
+    {
+        EntryType.Game => "mdiGamepadVariantOutline",
+        EntryType.Role => "mdiAccountStarOutline",
+        EntryType.ProductionGroup => "mdiAccountGroupOutline",
+        EntryType.Staff => "mdiCardAccountDetailsOutline",
+        _ => "mdiHelpCircleOutline"
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (_syncInitialized)
+        {
+            return;
+        }
+
+        _syncDisplayName = string.Equals(Model.Name, Model.DisplayName, StringComparison.Ordinal);
+        _syncInitialized = true;
+    }
+
+    private async Task OnTypeChanged(EntryType newType)
+    {
+        Model.Type = newType;
+        await TypeChanged.InvokeAsync(newType);
+    }
+
+    private void OnTemplateChanged(EntryStyleTemplate template)
+    {
+        Model.Template = template;
+    }
+
+    private Task OnNameChanged(string? value)
+    {
+        Model.Name = value ?? string.Empty;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnSyncDisplayNameChanged(bool value)
+    {
+        _syncDisplayName = value;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
+
+}

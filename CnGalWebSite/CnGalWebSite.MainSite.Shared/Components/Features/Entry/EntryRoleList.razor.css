@@ -1,0 +1,77 @@
+﻿.entry-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.entry-role-item {
+    display: flex;
+    gap: 0.8rem;
+    padding: 0.6rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-surface) 80%, white);
+    text-decoration: none;
+    color: var(--cg-color-text);
+    transition: var(--cg-transition-fast);
+    align-items: center;
+}
+
+.entry-role-item:hover {
+    border-color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, white);
+}
+
+.entry-role-avatar {
+    width: 4rem;
+    height: 4rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+    border: 1px solid var(--cg-color-border);
+}
+
+.entry-role-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.entry-role-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 0.15rem;
+}
+
+.entry-role-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.entry-role-cv {
+    font-size: 0.75rem;
+    color: var(--cg-color-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.entry-role-brief {
+    font-size: 0.75rem;
+    color: var(--cg-color-text-muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.4;
+}

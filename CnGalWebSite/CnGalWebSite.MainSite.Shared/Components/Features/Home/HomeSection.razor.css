@@ -1,0 +1,31 @@
+.home-section {
+    margin-bottom: 3rem;
+}
+
+.home-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.home-section-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+ ::deep .home-section-icon {
+    color: var(--cg-color-primary);
+    width: 2rem;
+    height: 2rem;
+}
+
+.home-section-header-append {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}

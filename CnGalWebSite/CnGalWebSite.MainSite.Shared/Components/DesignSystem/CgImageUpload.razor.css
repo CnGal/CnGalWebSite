@@ -1,0 +1,226 @@
+/* ── 根容器 ── */
+.cg-image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── 可点击上传区域 ── */
+.cg-image-upload__drop-zone {
+    position: relative;
+    width: 100%;
+    min-height: 10rem;
+    border: 2px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color var(--cg-transition-fast), background var(--cg-transition-fast);
+}
+
+.cg-image-upload__drop-zone:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 55%, transparent);
+    background: color-mix(in oklab, var(--cg-color-primary) 3%, var(--cg-color-surface));
+}
+
+.cg-image-upload__drop-zone--disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+/* 透明覆盖 label — 让整个区域可点击触发文件选择 */
+.cg-image-upload__click-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.cg-image-upload__drop-zone--disabled .cg-image-upload__click-overlay {
+    cursor: not-allowed;
+}
+
+/* ── 预览图 ── */
+.cg-image-upload__preview {
+    width: 100%;
+    max-height: 18rem;
+    object-fit: contain;
+    background: color-mix(in oklab, var(--cg-color-surface) 90%, black);
+}
+
+/* ── 占位区 ── */
+.cg-image-upload__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    padding: var(--cg-spacing-6);
+    user-select: none;
+}
+
+.cg-image-upload__placeholder-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--cg-color-text-muted);
+    opacity: 0.6;
+}
+
+/* ── 清空圆形按钮（浮在图片右上角） ── */
+.cg-image-upload__clear-btn {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
+    z-index: 2;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--cg-radius-full);
+    border: none;
+    background: color-mix(in oklab, var(--cg-color-text) 65%, transparent);
+    color: var(--cg-color-on-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 0;
+    transition: background var(--cg-transition-fast), opacity var(--cg-transition-fast);
+    opacity: 0;
+}
+
+.cg-image-upload__clear-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    display: block;
+    flex-shrink: 0;
+}
+
+.cg-image-upload__drop-zone:hover .cg-image-upload__clear-btn {
+    opacity: 1;
+}
+
+.cg-image-upload__clear-btn:hover {
+    background: var(--cg-color-error);
+}
+
+.cg-image-upload__clear-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0 !important;
+}
+
+/* ── 操作区（仅 ShowPreview=false 时） ── */
+.cg-image-upload__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+}
+
+.cg-image-upload__file-input {
+    display: none;
+}
+
+/* ── 上传按钮（ShowPreview=false 时的 label） ── */
+.cg-image-upload__upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-3) var(--cg-spacing-6);
+    border: 1px solid transparent;
+    border-radius: var(--cg-radius-md);
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-medium);
+    font-family: inherit;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+}
+
+.cg-image-upload__upload-btn:hover {
+    background: var(--cg-color-primary-hover);
+}
+
+.cg-image-upload__upload-btn--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ── 消息提示 ── */
+.cg-image-upload__message {
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.4;
+}
+
+.cg-image-upload__message--error {
+    color: var(--cg-color-error);
+}
+
+/* ── 裁剪对话框 ── */
+.cg-image-upload__cropper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+.cg-image-upload__crop-stage {
+    position: relative;
+    user-select: none;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 0;
+}
+
+.cg-image-upload__crop-preview {
+    width: auto;
+    max-width: 100%;
+    max-height: 28rem;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-surface) 88%, black);
+    display: block;
+}
+
+.cg-image-upload__shade {
+    position: absolute;
+    background: color-mix(in oklab, var(--cg-color-text) 35%, transparent);
+    pointer-events: none;
+}
+
+.cg-image-upload__crop-overlay {
+    position: absolute;
+    border: 2px solid var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    cursor: move;
+    box-sizing: border-box;
+}
+
+.cg-image-upload__crop-handle {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--cg-radius-sm);
+    border: 1px solid var(--cg-color-on-primary);
+    background: var(--cg-color-primary);
+    cursor: nwse-resize;
+    padding: 0;
+}
+
+.cg-image-upload__hint {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+.cg-image-upload__crop-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+}

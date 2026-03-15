@@ -1,0 +1,80 @@
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using CnGalWebSite.SDK.MainSite.Abstractions
+
+@rendermode InteractiveServer
+
+@inject IMainSiteAuthRequestService AuthRequestService
+@inject ISpaceQueryService SpaceQueryService
+
+<CgPopupMenu>
+    <TriggerContent>
+        <button class="cg-action-btn" aria-label="用户菜单">
+            @if (_avatarReady)
+            {
+                <img class="cg-user-menu-avatar"
+                     src="@_avatarUrl"
+                     alt="@($"{UserName ?? "用户"}头像")" />
+            }
+            else
+            {
+                <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+            }
+        </button>
+    </TriggerContent>
+    <ChildContent>
+        <div class="cg-user-menu-header">
+            <div class="cg-user-menu-name">@UserName</div>
+        </div>
+        <div class="cg-user-menu-list">
+            <a class="cg-user-menu-item" href="@($"/space/index/{UserId}")">
+                <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
+                <span>个人空间</span>
+            </a>
+            <a class="cg-user-menu-item" href="/space/messages">
+                <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
+                <span>消息通知</span>
+            </a>
+            <form class="cg-user-menu-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
+                <button class="cg-user-menu-item cg-user-menu-item--danger" type="submit">
+                    <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+                    <span>退出登录</span>
+                </button>
+            </form>
+        </div>
+    </ChildContent>
+</CgPopupMenu>
+
+@code {
+    [Parameter] public string? UserName { get; set; }
+    [Parameter] public string? UserId { get; set; }
+    [Parameter] public string CurrentReturnUrl { get; set; } = string.Empty;
+
+    private string? _lastLoadedUserId;
+    private string _avatarUrl = string.Empty;
+    private bool _avatarReady => string.IsNullOrWhiteSpace(_avatarUrl) == false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(UserId))
+        {
+            _avatarUrl = string.Empty;
+            _lastLoadedUserId = null;
+            return;
+        }
+
+        if (_lastLoadedUserId == UserId)
+        {
+            return;
+        }
+
+        _lastLoadedUserId = UserId;
+        _avatarUrl = string.Empty;
+
+        var result = await SpaceQueryService.GetSpaceDetailAsync(UserId);
+        _avatarUrl = result.Success && result.Data != null && string.IsNullOrWhiteSpace(result.Data.PhotoPath) == false
+            ? result.Data.PhotoPath
+            : string.Empty;
+    }
+}

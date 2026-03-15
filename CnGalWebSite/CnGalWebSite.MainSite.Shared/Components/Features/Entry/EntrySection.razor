@@ -1,0 +1,14 @@
+@if (Show)
+{
+    <section class="entry-section">
+        <h2><CgMdiIcon Name="@Icon" />@Title</h2>
+        @ChildContent
+    </section>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; } = true;
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

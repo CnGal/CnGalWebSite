@@ -1,0 +1,52 @@
+.cg-modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.cg-modal-panel {
+    width: min(640px, 92vw);
+    flex-shrink: 0;
+    margin: auto 0;
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    box-shadow: var(--cg-shadow-lg);
+    border: 1px solid var(--cg-color-border);
+    /* 不设 overflow，让下拉框可以溢出面板 */
+}
+
+.cg-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-modal-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.cg-modal-close {
+    border: 0;
+    background: transparent;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.cg-modal-content {
+    padding: 1rem;
+}
+
+.cg-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+    padding: 0 1rem 1rem;
+}

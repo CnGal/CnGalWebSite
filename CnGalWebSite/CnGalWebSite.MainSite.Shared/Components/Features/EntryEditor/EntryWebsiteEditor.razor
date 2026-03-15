@@ -1,0 +1,235 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.SDK.MainSite.Models.Files
+@using CnGalWebSite.Extensions
+
+<section class="entry-editor-section" id="section-website">
+    <h2><CgMdiIcon Name="mdiEarth" Class="entry-section-icon" aria-hidden="true" />专题页设置</h2>
+    <p>专属样式、图片规格、HTML 覆盖页等内容。</p>
+
+    @if (Model != null)
+    {
+        <CgAlert Variant="warning">
+            此部分仅作用于专题页，具体请参阅 <a href="/articles/index/2350"><strong>《专题页介绍》</strong></a>
+        </CgAlert>
+
+        <CgGrid>
+            <CgFormGroup Label="Logo">
+                <CgImageUpload @bind-Value="Model.Logo"
+                               Type="ImageAspectType.None"
+                               Text="上传Logo" />
+            </CgFormGroup>
+            <CgFormGroup Label="副标题">
+                <CgInput @bind-Value="Model.SubTitle" Placeholder="专题副标题" />
+            </CgFormGroup>
+            <CgFormGroup Label="主题语句">
+                <CgInput @bind-Value="Model.Impressions" Placeholder="如：献给每一位创作者" />
+            </CgFormGroup>
+            <CgFormGroup Label="主题颜色">
+                <CgInput @bind-Value="Model.Color" Placeholder="如：#3B82F6" />
+            </CgFormGroup>
+        </CgGrid>
+
+        @* ── 图片管理 ── *@
+        <CgFormSection Title="专题图片" Icon="mdiImageFilterHdr" Flat>
+            <HeaderActions>
+                <CgImageUpload Multiple
+                               ShowPreview="false"
+                               Text="上传图片到图床"
+                               OnImageUploaded="OnImageUploaded" />
+            </HeaderActions>
+            <ChildContent>
+                <CgTable HasData="@Model.Images.Any()">
+                    <Empty>
+                        <p>暂无图片，请点击"上传图片到图床"添加。</p>
+                    </Empty>
+                    <ChildContent>
+                        <thead>
+                            <tr>
+                                <th>预览</th>
+                                <th>类型</th>
+                                <th>大小</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var img in Model.Images.OrderByDescending(s => s.Priority))
+                            {
+                                <tr>
+                                    <td class="cg-website-thumb-cell">
+                                        @if (!string.IsNullOrWhiteSpace(img.Image))
+                                        {
+                                            <img src="@img.Image"
+                                                 class="cg-website-thumb"
+                                                 alt="@img.Note" />
+                                        }
+                                        else
+                                        {
+                                            <div class="cg-website-placeholder">暂无</div>
+                                        }
+                                    </td>
+                                    <td>@img.Type.GetDisplayName()</td>
+                                    <td>@img.Size.GetDisplayName()</td>
+                                    <td>@img.Note</td>
+                                    <td class="cg-actions">
+                                        <CgButton Variant="outline" Size="sm" OnClick="() => EditImage(img)">编辑</CgButton>
+                                        <CgButton Variant="danger" Size="sm" OnClick="() => RemoveImage(img)">删除</CgButton>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </ChildContent>
+                </CgTable>
+            </ChildContent>
+        </CgFormSection>
+
+        @* ── HTML 编辑区 ── *@
+        <CgAlert Variant="warning">
+            SSR模式下会拦截不受信任的源和内联脚本，请与管理员联系以添加脚本
+        </CgAlert>
+
+        <CgFormGroup Label="自定义 Html（将会覆盖整个页面）">
+            <CgTextarea @bind-Value="Model.Html" Placeholder="在此输入自定义的网页 HTML 代码" Rows="6" Monospace />
+            @if (!string.IsNullOrWhiteSpace(Model.Html))
+            {
+                <div class="cg-html-preview">
+                    @((MarkupString)Model.Html)
+                </div>
+            }
+        </CgFormGroup>
+
+        <CgFormGroup Label="自定义首页（可使用 Html）">
+            <CgTextarea @bind-Value="Model.FirstPage" Placeholder="可选，覆盖专题首页内容" Rows="5" Monospace />
+            @if (!string.IsNullOrWhiteSpace(Model.FirstPage))
+            {
+                <div class="cg-html-preview">
+                    @((MarkupString)Model.FirstPage)
+                </div>
+            }
+        </CgFormGroup>
+
+        <CgFormGroup Label="自定义介绍（可使用 Html）">
+            <CgTextarea @bind-Value="Model.Introduction" Placeholder="可选，覆盖专题介绍内容" Rows="5" Monospace />
+            @if (!string.IsNullOrWhiteSpace(Model.Introduction))
+            {
+                <div class="cg-html-preview">
+                    @((MarkupString)Model.Introduction)
+                </div>
+            }
+        </CgFormGroup>
+    }
+</section>
+
+@* ── 编辑弹窗 ── *@
+<CgModal IsOpen="@_editDialogOpen"
+         Title="编辑图片"
+         OnClose="CloseEditDialogAsync">
+    <ChildContent>
+        @if (_editingItem != null)
+        {
+            <CgFormGroup Label="图片">
+                <CgImageUpload @bind-Value="_editingItem.Image"
+                               Type="ImageAspectType.None"
+                               Text="上传图片" />
+            </CgFormGroup>
+
+            <CgGrid>
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="EntryWebsiteImageType"
+                                  Value="@_editingItem.Type"
+                                  ValueChanged="(type) => { _editingItem.Type = type; }" />
+                </CgFormGroup>
+                <CgFormGroup Label="大小">
+                    <CgEnumSelect TEnum="EntryWebsiteImageSize"
+                                  Value="@_editingItem.Size"
+                                  ValueChanged="(size) => { _editingItem.Size = size; }" />
+                </CgFormGroup>
+            </CgGrid>
+
+            <CgGrid>
+                <CgFormGroup Label="备注">
+                    <CgInput @bind-Value="_editingItem.Note" Placeholder="图片描述" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingItem.Priority" />
+                </CgFormGroup>
+            </CgGrid>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseEditDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveEdit">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public EditEntryWebsiteViewModel Model { get; set; } = default!;
+
+    // ── 编辑弹窗状态 ──
+    private bool _editDialogOpen;
+    private EditWebsiteImageModel? _editingItem;
+    private EditWebsiteImageModel? _editTarget;
+
+    // ── 图片上传回调 ──
+    private void OnImageUploaded(string url)
+    {
+        Model.Images ??= new();
+        Model.Images.Add(new EditWebsiteImageModel
+        {
+            Image = url
+        });
+    }
+
+    // ── 编辑 ──
+    private void EditImage(EditWebsiteImageModel item)
+    {
+        _editTarget = item;
+        _editingItem = new EditWebsiteImageModel
+        {
+            Image = item.Image,
+            Note = item.Note,
+            Priority = item.Priority,
+            Type = item.Type,
+            Size = item.Size
+        };
+        _editDialogOpen = true;
+    }
+
+    // ── 保存编辑 ──
+    private void SaveEdit()
+    {
+        if (_editingItem == null || _editTarget == null) return;
+
+        _editTarget.Image = _editingItem.Image;
+        _editTarget.Note = _editingItem.Note;
+        _editTarget.Priority = _editingItem.Priority;
+        _editTarget.Type = _editingItem.Type;
+        _editTarget.Size = _editingItem.Size;
+
+        CloseEditDialog();
+    }
+
+    // ── 删除 ──
+    private void RemoveImage(EditWebsiteImageModel img)
+    {
+        Model.Images?.Remove(img);
+    }
+
+    // ── 关闭弹窗 ──
+    private void CloseEditDialog()
+    {
+        _editingItem = null;
+        _editTarget = null;
+        _editDialogOpen = false;
+    }
+
+    private Task CloseEditDialogAsync()
+    {
+        CloseEditDialog();
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,80 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<header class="entry-hero @(IsSquareCover ? "entry-hero--square" : "entry-hero--wide")">
+    <div class="entry-hero-side">
+        @if (string.IsNullOrWhiteSpace(HeroImageUrl) is false)
+        {
+            <img src="@HeroImageUrl" alt="@Name" class="entry-cover" loading="eager" decoding="async" />
+        }
+        else
+        {
+            <div class="entry-cover entry-cover--empty" aria-label="暂无封面">NO IMAGE</div>
+        }
+    </div>
+    <div class="entry-hero-main">
+        <div class="entry-hero-top">
+            <span class="entry-type">@TypeText</span>
+            @if (IsEdit)
+            {
+                <span class="entry-status entry-status--edit">可编辑状态</span>
+            }
+        </div>
+        <h1>@Name</h1>
+        @if (string.IsNullOrWhiteSpace(AnotherName) is false)
+        {
+            <p class="entry-another-name">别称：@AnotherName</p>
+        }
+        @if (string.IsNullOrWhiteSpace(BriefIntroduction) is false)
+        {
+            <p class="entry-brief">@BriefIntroduction</p>
+        }
+        @if (ProductionGroups.Count > 0 || Publishers.Count > 0)
+        {
+            <div class="entry-people-chips">
+                @foreach (var item in ProductionGroups)
+                {
+                    <a href="@BuildEntryUrl(item.Id)" class="entry-chip">制作组：@item.DisplayName</a>
+                }
+                @foreach (var item in Publishers)
+                {
+                    <a href="@BuildEntryUrl(item.Id)" class="entry-chip">发行商：@item.DisplayName</a>
+                }
+            </div>
+        }
+        @if (EntryId > 0)
+        {
+            <div class="entry-hero-actions">
+                <AuthorizeView>
+                    <Authorized>
+                        <a class="entry-edit-btn" href="/entries/edit/@EntryId">
+                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            <span>编辑词条</span>
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="entry-edit-btn entry-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/entries/edit/{EntryId}")">
+                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            <span>登录后编辑</span>
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        }
+    </div>
+</header>
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? AnotherName { get; set; }
+    [Parameter] public string? BriefIntroduction { get; set; }
+    [Parameter] public string TypeText { get; set; } = "";
+    [Parameter] public bool IsEdit { get; set; }
+    [Parameter] public int EntryId { get; set; }
+    [Parameter] public string? HeroImageUrl { get; set; }
+    [Parameter] public bool IsSquareCover { get; set; }
+    [Parameter] public IReadOnlyList<StaffNameModel> ProductionGroups { get; set; } = [];
+    [Parameter] public IReadOnlyList<StaffNameModel> Publishers { get; set; } = [];
+    [Parameter] public Func<int, string> BuildEntryUrl { get; set; } = id => $"/entries/index/{id}";
+}

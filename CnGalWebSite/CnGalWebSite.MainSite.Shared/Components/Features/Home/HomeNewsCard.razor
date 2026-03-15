@@ -1,0 +1,50 @@
+<li class="home-news-card @(DevStyle ? "home-news-card--dev" : string.Empty)">
+    <a href="@Url" target="@Target" class="home-news-card-link">
+        @if (!string.IsNullOrWhiteSpace(Image))
+        {
+            <div class="home-news-card-image">
+                <img src="@Image" alt="@Title" loading="lazy" decoding="async" />
+            </div>
+        }
+        <div class="home-news-card-content">
+            <div class="home-news-card-header">
+                <h3 class="home-news-card-title">@Title</h3>
+                @if (DevStyle && !string.IsNullOrWhiteSpace(Time))
+                {
+                    <span class="home-news-card-time home-news-card-time--dev">@Time</span>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Text))
+            {
+                <p class="home-news-card-text">@Text</p>
+            }
+            @if (!DevStyle && (!string.IsNullOrWhiteSpace(Time) || !string.IsNullOrWhiteSpace(Category)))
+            {
+                <div class="home-news-card-meta">
+                    @if (!string.IsNullOrWhiteSpace(Category))
+                    {
+                        <span class="home-news-card-category">@Category</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Time))
+                    {
+                        <span class="home-news-card-time">
+                            <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                            @Time
+                        </span>
+                    }
+                </div>
+            }
+        </div>
+    </a>
+</li>
+
+@code {
+    [Parameter] public string Url { get; set; } = "";
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Time { get; set; }
+    [Parameter] public string? Image { get; set; }
+    [Parameter] public string? Category { get; set; }
+    [Parameter] public bool DevStyle { get; set; }
+}

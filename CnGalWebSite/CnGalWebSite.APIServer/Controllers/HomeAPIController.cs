@@ -1,11 +1,11 @@
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.APIServer.ExamineX; 
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Application.Search.Dtos;

@@ -1,0 +1,20 @@
+<div class="cg-grid" style="--cg-grid-min: @MinWidth; --cg-grid-cols: @Columns;">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 列数（默认 2）
+    /// </summary>
+    [Parameter]
+    public int Columns { get; set; } = 2;
+
+    /// <summary>
+    /// 每列最小宽度（默认 260px）
+    /// </summary>
+    [Parameter]
+    public string MinWidth { get; set; } = "260px";
+}

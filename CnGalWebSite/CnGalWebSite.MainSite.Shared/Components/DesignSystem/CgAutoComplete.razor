@@ -1,0 +1,115 @@
+@* CgAutoComplete — 自定义下拉自动补全（类 CgSelect 风格） *@
+<div class="cg-autocomplete @ClassName"
+     @onfocusout="OnFocusOut"
+     tabindex="-1">
+    <input @key="_inputKey"
+           class="cg-autocomplete__input"
+           type="text"
+           value="@Value"
+           placeholder="@Placeholder"
+           disabled="@Disabled"
+           @oninput="OnInput"
+           @onfocus="OpenDropdown"
+           autocomplete="off"/>
+
+    @if (_isOpen && _filtered.Any())
+    {
+        <ul class="cg-autocomplete__menu" role="listbox">
+            @foreach (var item in _filtered)
+            {
+                <li role="option">
+                    <button type="button"
+                            class="cg-autocomplete__option"
+                            @onclick="() => SelectOption(item)">
+                        @item
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private const int MaxResults = 20;
+    private bool _isOpen;
+    private List<string> _filtered = [];
+    private int _inputKey;
+    private string? _lastUserInput;
+
+    [Parameter] public string? Value { get; set; }
+
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter] public IEnumerable<string> Items { get; set; } = [];
+
+    [Parameter] public string? Placeholder { get; set; }
+
+    [Parameter] public bool Disabled { get; set; }
+
+    [Parameter] public string ClassName { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (_lastUserInput != null && Value != _lastUserInput)
+        {
+            _inputKey++;
+            _lastUserInput = null;
+        }
+    }
+
+    private void UpdateFiltered(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            _filtered = Items.Take(MaxResults).ToList();
+        }
+        else
+        {
+            _filtered = Items
+                .Where(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
+                .Take(MaxResults)
+                .ToList();
+        }
+    }
+
+    private async Task OnInput(ChangeEventArgs args)
+    {
+        var text = args.Value?.ToString();
+        _lastUserInput = text;
+        await ValueChanged.InvokeAsync(text);
+        UpdateFiltered(text);
+        _isOpen = _filtered.Any();
+    }
+
+    private void OpenDropdown()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        UpdateFiltered(Value);
+        _isOpen = _filtered.Any();
+    }
+
+    private void OnFocusOut(FocusEventArgs args)
+    {
+        // focusout 冒泡触发；如果新焦点仍在组件内部（输入框或选项按钮），不关闭
+        // Blazor 的 FocusEventArgs 没有 relatedTarget，所以用延迟让 onfocus/onclick 先处理
+        _ = CloseAfterDelay();
+    }
+
+    private async Task CloseAfterDelay()
+    {
+        await Task.Delay(150);
+        _isOpen = false;
+        StateHasChanged();
+    }
+
+    private async Task SelectOption(string item)
+    {
+        _isOpen = false;
+        await ValueChanged.InvokeAsync(item);
+    }
+
+}

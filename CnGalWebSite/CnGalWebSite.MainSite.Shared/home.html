@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACG Portal - Multi-Tabbed Content Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#66ccff",
+                        "accent-pink": "#ff85c0",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0f1c23",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .skeleton {
+            background: linear-gradient(90deg, #e6f0f4 25%, #f8fbfc 50%, #e6f0f4 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #66ccff33;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden">
+<div class="flex h-full w-full flex-col">
+<header class="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 bg-white dark:bg-slate-900 z-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">star_half</span>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold">ACG Portal</h2>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg pl-9 pr-4 py-1.5 text-xs focus:ring-2 focus:ring-primary" placeholder="Search entries..."/>
+</div>
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary overflow-hidden">
+<img alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY1ydiuh2E2jKk3FeC8hd23uHWOsBtAtvi4XB33PgfR5ZVhF6xOvkniGAUQi_8Hh1Jy04mTXKJ3SGnxuUABkGp6qj4S09a1B3gRMGLXl23rNK9BjuGrdRDZdLT4_ET1nVWn5bDpeljFbRndp4Y52ujlDbNA6I7Kg5lZWz8j9VcbM45CghcVX20xQqTlbBngoLSWei8TbumdUWL1O4Zto5RPxycvsMsOZDNvh3WxZPhLa3uXek0v6UMVe7LZmK7MmQ3GNIKkIU6QE_S"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col p-4 overflow-y-auto custom-scrollbar">
+<div class="mb-6 p-4 bg-primary/5 rounded-xl border border-primary/20">
+<div class="flex items-center gap-2 text-primary mb-1">
+<span class="material-symbols-outlined text-lg">edit</span>
+<h3 class="text-xs font-bold uppercase tracking-widest">Edit Mode Active</h3>
+</div>
+<p class="text-[10px] text-slate-500">Unsaved changes will be lost</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-semibold transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm">Core Details</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">gallery_thumbnail</span>
+<span class="text-sm">Visual Assets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">library_music</span>
+<span class="text-sm">Media &amp; Audio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-sm">Staff &amp; Connections</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="text-sm">Booking &amp; Activity</span>
+</a>
+</nav>
+<div class="mt-6 flex flex-col gap-2">
+<button class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 hover:brightness-105 transition-all text-sm">
+                    Save Changes
+                </button>
+<button class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold py-3 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm">
+                    Cancel
+                </button>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-slate-950 p-8 custom-scrollbar">
+<div class="max-w-5xl mx-auto space-y-8">
+<div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">
+<a class="hover:text-primary transition-colors" href="#">Database</a>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-100">Core Details Editor</span>
+</div>
+<section class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">id_card</span> Primary Identity
+                                </h3>
+<div class="grid grid-cols-1 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Entry Title</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-lg font-bold" placeholder="e.g. Neon Genesis Evangelion" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aliases / Other Names</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="Separated by semicolon (;)" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Synopsis / Introduction</label>
+<textarea class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="Provide a compelling overview of this entry..." rows="6"></textarea>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">category</span> Categorization &amp; Release
+                                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</label>
+<select class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm">
+<option>Select Category</option>
+<option>Anime</option>
+<option>Manga</option>
+<option>Game</option>
+<option>Light Novel</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Release Info</label>
+<input class="w-full border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 text-sm" placeholder="YYYY-MM-DD" type="date"/>
+</div>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tags / Genres</label>
+<div class="flex flex-wrap gap-2 p-3 border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl min-h-[60px]">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 uppercase">Sci-Fi <span class="material-symbols-outlined text-[10px] cursor-pointer">close</span></span>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 uppercase">Mecha <span class="material-symbols-outlined text-[10px] cursor-pointer">close</span></span>
+<button class="text-[10px] font-bold text-primary/60 hover:text-primary transition-colors px-2 py-1">+ Add Tag</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span> Basic Info
+                                </h3>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs">
+<option>Airing / Ongoing</option>
+<option>Completed</option>
+<option>Upcoming</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Episodes / Chapters</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs" type="number" value="26"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Source Material</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-2 text-xs" placeholder="Original" type="text"/>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calendar_month</span> Booking Schedule
+                                </h3>
+<div class="space-y-3">
+<div class="h-8 w-full skeleton rounded-lg"></div>
+<div class="h-8 w-full skeleton rounded-lg"></div>
+<div class="h-8 w-full skeleton rounded-lg"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-40 grayscale pointer-events-none">
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center gap-4">
+<div class="size-20 rounded-full bg-accent-pink/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-accent-pink">image_not_supported</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Visual Assets Preview</h3>
+<p class="text-slate-500 text-[10px] mt-1">Main Image, Backgrounds, and Photo Album data</p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center gap-4">
+<div class="size-20 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary">volume_off</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide">Audio &amp; OSTs</h3>
+<p class="text-slate-500 text-[10px] mt-1">No audio files or playlists linked to this entry</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

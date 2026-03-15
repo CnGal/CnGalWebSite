@@ -1,0 +1,7 @@
+/* Releases 编辑器 — 独有样式（.cg-actions 由 EntryEditPage 统一提供） */
+
+.cg-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-3);
+}

@@ -1,0 +1,91 @@
+.cg-space-hero {
+    position: relative;
+    border-radius: var(--cg-radius-lg);
+    background-color: var(--cg-color-surface);
+    overflow: hidden;
+    box-shadow: var(--cg-shadow-sm);
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-space-hero-bg {
+    width: 100%;
+    height: 240px;
+    position: relative;
+}
+
+.cg-space-hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, rgba(15, 23, 42, 0.28));
+}
+
+.cg-space-hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cg-space-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--cg-spacing-4);
+    margin-top: -60px;
+    position: relative;
+    z-index: 1;
+}
+
+.cg-space-hero-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--cg-color-surface);
+    overflow: hidden;
+    background-color: var(--cg-color-surface);
+    margin-bottom: var(--cg-spacing-3);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.cg-space-hero-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cg-space-hero-name {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+    margin: 0;
+    text-align: center;
+    word-break: break-all;
+}
+
+.cg-space-hero-info {
+    width: 100%;
+}
+
+.cg-space-hero-ranks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+    justify-content: center;
+    margin-top: var(--cg-spacing-2);
+}
+
+.cg-space-hero-rank {
+    font-size: var(--cg-font-size-xs);
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    border-radius: var(--cg-radius-sm);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-space-hero-signature {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    margin-top: var(--cg-spacing-2);
+    text-align: center;
+    line-height: 1.5;
+    word-break: break-word;
+}

@@ -1,0 +1,136 @@
+.home-game-card {
+    list-style: none;
+    min-width: 0;
+}
+
+.home-game-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    transition: border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+}
+
+.home-game-card-link:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 35%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-md);
+    transform: translateY(-1px);
+}
+
+.home-game-card-link:hover .home-game-card-title {
+    color: var(--cg-color-primary);
+}
+
+.home-game-card-link:hover .home-game-card-image {
+    transform: scale(1.1);
+}
+
+.home-game-card-image-wrapper {
+    position: relative;
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+    background-color: var(--cg-color-border);
+    margin: 0;
+}
+
+.home-game-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease-in-out;
+}
+
+.home-game-card-body {
+    padding: 0.75rem 0.8rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 4.8rem;
+}
+
+.home-game-card-title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color var(--cg-transition-fast);
+}
+
+.home-game-card-desc,
+::deep .home-game-card-extra small {
+    margin: 0;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    color: var(--cg-color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.home-game-card-extra {
+    margin-top: auto;
+}
+
+::deep .home-game-card-extra small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+@media (min-width: 1024px) {
+    .home-game-card:not(.home-game-card--horizontal) .home-game-card-body {
+        min-height: 5.2rem;
+    }
+}
+
+.home-game-card--horizontal .home-game-card-link {
+    flex-direction: row;
+    align-items: center;
+    padding: 0.625rem;
+    gap: 0.75rem;
+}
+
+.home-game-card--horizontal .home-game-card-image-wrapper {
+    width: 6.5rem;
+    border-radius: var(--cg-radius-sm);
+    flex-shrink: 0;
+}
+
+.home-game-card--horizontal .home-game-card-body {
+    padding: 0;
+    min-height: auto;
+    flex: 1;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.home-game-card--horizontal .home-game-card-title {
+    font-size: 0.875rem;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+}
+
+.home-game-card--horizontal .home-game-card-desc,
+.home-game-card--horizontal ::deep .home-game-card-extra small {
+    font-size: 0.75rem;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    margin-top: 0;
+}
+
+.home-game-card--horizontal ::deep .home-game-card-extra .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
+}

@@ -1,0 +1,11 @@
+<ul class="entry-tags">
+    @foreach (var tag in Tags.Take(MaxCount))
+    {
+        <li>@tag</li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Tags { get; set; } = [];
+    [Parameter] public int MaxCount { get; set; } = 24;
+}
