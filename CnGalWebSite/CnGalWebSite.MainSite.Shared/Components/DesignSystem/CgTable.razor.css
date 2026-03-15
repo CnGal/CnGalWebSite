@@ -1,33 +1,42 @@
 .cg-table-wrap {
     overflow-x: auto;
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
 }
 
 .cg-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-sm);
-    overflow: hidden;
     background: var(--cg-color-surface);
-    font-size: var(--cg-font-size-md);
+    font-size: var(--cg-font-size-sm);
 }
 
 .cg-table th,
 .cg-table td {
     border-bottom: 1px solid var(--cg-color-border);
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
     text-align: left;
     vertical-align: middle;
 }
 
 .cg-table thead th {
-    background: var(--cg-color-bg);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
+    background: var(--cg-color-section-bg);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text-secondary);
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cg-table tbody tr {
+    transition: background-color var(--cg-transition-fast);
 }
 
 .cg-table tbody tr:hover {
     background-color: var(--cg-color-hover-overlay);
+}
+
+.cg-table tbody tr:last-child td {
+    border-bottom: none;
 }

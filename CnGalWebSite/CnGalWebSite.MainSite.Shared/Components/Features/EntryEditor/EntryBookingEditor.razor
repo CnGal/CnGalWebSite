@@ -1,12 +1,16 @@
 @using CnGalWebSite.DataModel.ViewModel
 
-<CgFormSection Title="预约">
+<CgFormSection Title="预约" Icon="mdiCalendarCheckOutline" Flat>
     <ChildContent>
         <CgGrid>
-            <CgCheckbox @bind-Value="Booking.Open" Label="开启预约" />
+            <CgFormGroup Label="预约开关">
+                <CgCheckbox @bind-Value="Booking.Open" Label="开启预约" />
+            </CgFormGroup>
             @if (Booking.Open)
             {
-                <CgCheckbox @bind-Value="Booking.IsNeedNotification" Label="上线后通知预约用户" />
+                <CgFormGroup Label="通知设置">
+                    <CgCheckbox @bind-Value="Booking.IsNeedNotification" Label="上线后通知预约用户" />
+                </CgFormGroup>
             }
         </CgGrid>
 
@@ -18,12 +22,15 @@
                                 Placeholder="输入或选择抽奖名称" />
             </CgFormGroup>
 
-            <CgFormSection Title="预约目标">
+            <CgFormSection Title="预约目标" Icon="mdiBullseyeArrow" Flat>
                 <HeaderActions>
                     <CgButton Variant="primary" OnClick="AddBookingGoal">添加目标</CgButton>
                 </HeaderActions>
                 <ChildContent>
                     <CgTable HasData="@Booking.Goals.Any()">
+                        <Empty>
+                            <p class="cg-editor-empty">暂无预约目标，请点击"添加目标"。</p>
+                        </Empty>
                         <ChildContent>
                             <thead>
                                 <tr>

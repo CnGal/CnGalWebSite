@@ -1,20 +1,23 @@
-<div class="cg-form-section">
-    @if (!string.IsNullOrWhiteSpace(Title) || HeaderActions != null)
+<div class="@SectionClass">
+    @if (!string.IsNullOrWhiteSpace(Title))
     {
         <div class="cg-form-section__header">
-            @if (!string.IsNullOrWhiteSpace(Title))
-            {
+            <div class="cg-form-section__title-group">
+                @if (!string.IsNullOrWhiteSpace(Icon))
+                {
+                    <CgMdiIcon Name="@Icon" Class="cg-form-section__icon" aria-hidden="true" />
+                }
                 <h3 class="cg-form-section__title">@Title</h3>
-            }
-            @if (HeaderActions != null)
-            {
-                <div class="cg-form-section__actions">
-                    @HeaderActions
-                </div>
-            }
+            </div>
         </div>
     }
     @ChildContent
+    @if (HeaderActions != null)
+    {
+        <div class="cg-form-section__footer">
+            @HeaderActions
+        </div>
+    }
 </div>
 
 @code {
@@ -22,11 +25,19 @@
     public string? Title { get; set; }
 
     [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public bool Flat { get; set; }
+
+    [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// 标题右侧操作区（按钮等）
+    /// 卡片底部操作区（按钮等）
     /// </summary>
     [Parameter]
     public RenderFragment? HeaderActions { get; set; }
+
+    private string SectionClass => Flat ? "cg-form-section cg-form-section--flat" : "cg-form-section";
 }

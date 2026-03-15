@@ -13,6 +13,7 @@
 .cg-relevance-list__header h4 {
     margin: 0;
     font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text-primary);
 }
 

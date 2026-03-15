@@ -1,11 +1,8 @@
+/* Relevances 编辑器 — 独有样式（.cg-actions 由 EntryEditPage 统一提供） */
+
 .cg-tip {
     margin-top: 0;
     margin-bottom: var(--cg-spacing-4);
     color: var(--cg-color-text-secondary);
     font-size: var(--cg-font-size-sm);
-}
-
-.cg-actions {
-    display: flex;
-    gap: var(--cg-spacing-2);
 }

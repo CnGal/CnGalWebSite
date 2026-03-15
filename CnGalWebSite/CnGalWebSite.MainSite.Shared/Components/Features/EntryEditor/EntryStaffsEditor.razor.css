@@ -1,14 +1,4 @@
-.cg-actions {
-    display: flex;
-    gap: var(--cg-spacing-2);
-}
-
-.cg-staff-empty {
-    text-align: center;
-    color: var(--cg-color-text-secondary);
-    padding: var(--cg-spacing-6) 0;
-    font-size: var(--cg-font-size-sm);
-}
+/* Staff 编辑器 — 独有样式（.cg-actions 和空状态由 EntryEditPage 统一提供） */
 
 .cg-batch-tip {
     margin-bottom: var(--cg-spacing-4);
@@ -24,7 +14,9 @@
 .cg-batch-example {
     background-color: var(--cg-color-bg);
     border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-sm);
+    border-radius: var(--cg-radius-md);
     padding: var(--cg-spacing-3);
     font-family: monospace;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.8;
 }

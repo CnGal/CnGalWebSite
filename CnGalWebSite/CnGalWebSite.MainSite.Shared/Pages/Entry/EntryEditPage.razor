@@ -14,6 +14,7 @@
 @inject IEntryCommandService EntryCommandService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject ICgToastService ToastService
 @implements IDisposable
 
 <PageTitle>@(IsCreate ? "创建词条" : $"编辑词条")</PageTitle>
@@ -30,30 +31,17 @@ else if (LoadErrorMessage != null)
     <section class="entry-edit-error">
         <h1>加载失败</h1>
         <p>@LoadErrorMessage</p>
-        <button class="cg-btn cg-btn--primary" @onclick="LoadDataAsync">重试</button>
+        <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
     </section>
 }
 else if (Model != null)
 {
     <article class="entry-edit-page">
-        @if (SubmitErrorMessage != null)
-        {
-            <div class="entry-edit-alert entry-edit-alert--error">
-                @SubmitErrorMessage
-            </div>
-        }
-
-        @if (HasDraftRecovered)
-        {
-            <div class="entry-edit-alert entry-edit-alert--info">
-                <span>发现您上次编辑的未保存草稿，已自动为您恢复。</span>
-                <button class="cg-btn cg-btn--outline" @onclick="DiscardDraft">丢弃草稿</button>
-            </div>
-        }
-
         <div class="entry-edit-layout">
             <EntryEditorSidebar IsCreate="IsCreate"
                                 IsSubmitting="IsSubmitting"
+                                HasDraftRecovered="HasDraftRecovered"
+                                OnDiscardDraft="DiscardDraft"
                                 OnSubmit="SubmitAsync"
                                 OnCancel="Cancel" />
 
@@ -68,6 +56,7 @@ else if (Model != null)
                 <EntryWebsiteEditor Model="Model.Data.Website" />
             </main>
         </div>
+        <CgToast />
     </article>
 }
 
@@ -84,7 +73,6 @@ else if (Model != null)
     private string? LoadErrorMessage;
 
     private bool IsSubmitting = false;
-    private string? SubmitErrorMessage;
 
     private EntryEditViewModel? Model;
     private EntryAddInforEditor? _addInforEditorRef;
@@ -201,12 +189,11 @@ else if (Model != null)
         var validationResult = Model.Data.Validate();
         if (!validationResult.Successful)
         {
-            SubmitErrorMessage = validationResult.Error ?? "请检查表单是否填写正确";
+            ToastService.Show(validationResult.Error ?? "请检查表单是否填写正确", "error");
             return;
         }
 
         IsSubmitting = true;
-        SubmitErrorMessage = null;
         StateHasChanged();
 
         try
@@ -225,12 +212,12 @@ else if (Model != null)
             }
             else
             {
-                SubmitErrorMessage = result.Error?.Message ?? "提交失败";
+                ToastService.Show(result.Error?.Message ?? "提交失败", "error");
             }
         }
         catch (Exception ex)
         {
-            SubmitErrorMessage = "发生未知错误：" + ex.Message;
+            ToastService.Show("发生未知错误：" + ex.Message, "error");
         }
         finally
         {

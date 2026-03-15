@@ -1,12 +1,15 @@
-﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
-<CgFormSection Title="发行列表">
+<CgFormSection Title="发行列表" Icon="mdiRocketLaunchOutline" Flat>
     <HeaderActions>
         <CgButton Variant="primary" OnClick="AddRelease">添加发行版本</CgButton>
     </HeaderActions>
     <ChildContent>
         <CgTable HasData="@Releases.Any()">
+            <Empty>
+                <p class="cg-editor-empty">暂无发行版本，请点击"添加发行版本"。</p>
+            </Empty>
             <ChildContent>
                 <thead>
                     <tr>

@@ -3,13 +3,22 @@
 @implements IAsyncDisposable
 
 <aside class="entry-edit-sidebar">
-    <div class="entry-edit-sidebar__status">
+    <div class="entry-edit-sidebar__card entry-edit-sidebar__card--primary">
         <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
         <div>
             <h3>@(IsCreate ? "创建模式" : "编辑模式")</h3>
-            <p>未保存的更改将会丢失</p>
+            <p>每 10 秒自动保存草稿</p>
         </div>
     </div>
+
+    @if (HasDraftRecovered)
+    {
+        <div class="entry-edit-sidebar__card entry-edit-sidebar__card--warning">
+            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
+            <span>已恢复未保存的草稿</span>
+            <button class="entry-edit-sidebar__card-action" @onclick="OnDiscardDraft">丢弃</button>
+        </div>
+    }
 
     <nav class="entry-edit-sidebar__nav">
         @foreach (var item in _navItems)
@@ -25,7 +34,7 @@
     </nav>
 
     <div class="entry-edit-sidebar__actions">
-        <button class="cg-btn cg-btn--primary cg-btn--block" disabled="@IsSubmitting" @onclick="OnSubmit">
+        <CgButton Variant="primary" Disabled="@IsSubmitting" OnClick="OnSubmit">
             @if (IsSubmitting)
             {
                 <span class="cg-spinner"></span>
@@ -35,8 +44,8 @@
             {
                 <span>提交审核</span>
             }
-        </button>
-        <button class="cg-btn cg-btn--outline cg-btn--block" disabled="@IsSubmitting" @onclick="OnCancel">取消</button>
+        </CgButton>
+        <CgButton Variant="outline" Disabled="@IsSubmitting" OnClick="OnCancel">取消</CgButton>
     </div>
 </aside>
 
@@ -48,10 +57,16 @@
     public bool IsSubmitting { get; set; }
 
     [Parameter]
+    public bool HasDraftRecovered { get; set; }
+
+    [Parameter]
     public EventCallback OnSubmit { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnDiscardDraft { get; set; }
 
     // ── 导航项定义 ──
     private static readonly NavItem[] _navItems =
@@ -98,7 +113,7 @@
 
     private async Task ScrollToSection(string sectionId)
     {
-        _activeSectionId = sectionId;
+        // 不立即设置 _activeSectionId，让 IntersectionObserver 回调自然触发高亮
         if (_jsModule != null)
         {
             await _jsModule.InvokeVoidAsync("scrollToSection", sectionId);

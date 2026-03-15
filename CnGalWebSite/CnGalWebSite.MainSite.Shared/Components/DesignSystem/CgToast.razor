@@ -1,53 +1,57 @@
-@* CgToast — 轻量级 Toast 提示，自动消失 *@
+@* CgToast — 全局 Toast 容器，由 ICgToastService 驱动 *@
+@inject ICgToastService ToastService
+@implements IDisposable
+
 @if (_visible)
 {
-    <div class="cg-toast cg-toast--@Variant" role="alert">
-        <span class="cg-toast-message">@Message</span>
+    <div class="cg-toast cg-toast--@_variant" role="alert">
+        <span class="cg-toast-message">@_message</span>
     </div>
 }
 
 @code {
     private bool _visible;
+    private string _message = string.Empty;
+    private string _variant = "info";
     private CancellationTokenSource? _cts;
-
-    /// <summary>
-    /// 类型：info / success / warning / error
-    /// </summary>
-    [Parameter] public string Variant { get; set; } = "info";
-
-    /// <summary>
-    /// 提示文字
-    /// </summary>
-    [Parameter] public string Message { get; set; } = string.Empty;
 
     /// <summary>
     /// 持续时间（毫秒），默认 3000
     /// </summary>
     [Parameter] public int Duration { get; set; } = 3000;
 
-    /// <summary>
-    /// 显示 Toast
-    /// </summary>
-    public async Task ShowAsync(string message, string variant = "info")
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += HandleShow;
+    }
+
+    private async void HandleShow(string message, string variant)
     {
         // 若已有定时器则取消
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
 
-        Message = message;
-        Variant = variant;
+        _message = message;
+        _variant = variant;
         _visible = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
 
         try
         {
             await Task.Delay(Duration, _cts.Token);
             _visible = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
         catch (TaskCanceledException)
         {
-            // 被新一次 ShowAsync 取消，忽略
+            // 被新一次 Show 取消，忽略
         }
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnShow -= HandleShow;
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

@@ -6,7 +6,7 @@
 @using CnGalWebSite.Extensions
 
 <section class="entry-editor-section" id="section-website">
-    <h2>专题页设置</h2>
+    <h2><CgMdiIcon Name="mdiEarth" Class="entry-section-icon" aria-hidden="true" />专题页设置</h2>
     <p>专属样式、图片规格、HTML 覆盖页等内容。</p>
 
     @if (Model != null)
@@ -33,7 +33,7 @@
         </CgGrid>
 
         @* ── 图片管理 ── *@
-        <CgFormSection Title="专题图片">
+        <CgFormSection Title="专题图片" Icon="mdiImageFilterHdr" Flat>
             <HeaderActions>
                 <CgImageUpload Multiple
                                ShowPreview="false"
@@ -43,7 +43,7 @@
             <ChildContent>
                 <CgTable HasData="@Model.Images.Any()">
                     <Empty>
-                        <p class="cg-website-empty">暂无图片，请点击"上传图片到图床"添加。</p>
+                        <p class="cg-editor-empty">暂无图片，请点击"上传图片到图床"添加。</p>
                     </Empty>
                     <ChildContent>
                         <thead>

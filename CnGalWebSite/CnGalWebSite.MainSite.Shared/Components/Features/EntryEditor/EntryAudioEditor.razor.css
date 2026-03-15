@@ -7,8 +7,9 @@
     width: 48px;
     height: 48px;
     object-fit: cover;
-    border-radius: var(--cg-radius-sm);
+    border-radius: var(--cg-radius-md);
     display: block;
+    box-shadow: var(--cg-shadow-sm);
 }
 
 .cg-audio-name-cell {
@@ -26,13 +27,6 @@
     min-width: 200px;
 }
 
-.cg-actions {
-    white-space: nowrap;
-    display: flex;
-    gap: var(--cg-spacing-2);
-    min-width: 110px;
-}
-
 /* ── 音频播放器 ── */
 .cg-audio-player {
     width: 100%;
@@ -42,14 +36,6 @@
 
 .cg-audio-player--full {
     max-width: 100%;
-}
-
-/* ── 空状态 ── */
-.cg-audio-empty {
-    text-align: center;
-    color: var(--cg-color-text-secondary);
-    padding: var(--cg-spacing-6) 0;
-    font-size: var(--cg-font-size-sm);
 }
 
 /* ── 编辑弹窗内部 ── */

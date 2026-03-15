@@ -1,9 +1,9 @@
-﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.Extensions
 @using System.Globalization
 
-<CgFormSection Title="基础信息项">
+<CgFormSection Title="基础信息项" Icon="mdiFormatListBulleted" Flat>
     @foreach (var info in Informations)
     {
         @if (info.Name == "生日")

@@ -4,7 +4,7 @@
 @using CnGalWebSite.SDK.MainSite.Models.Files
 
 <section class="entry-editor-section" id="section-main">
-    <h2>主要信息</h2>
+    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="entry-section-icon" aria-hidden="true" />主要信息</h2>
     <p>编辑词条类型、名称、样式模板与主视觉资源。</p>
 
     @if (Model != null)
@@ -22,9 +22,11 @@
             </CgFormGroup>
         </CgGrid>
 
-        <CgCheckbox Value="@_syncDisplayName"
-                    ValueChanged="OnSyncDisplayNameChanged"
-                    Label="显示名称与唯一名称保持一致" />
+        <CgFormGroup Label="名称同步">
+            <CgCheckbox Value="@_syncDisplayName"
+                        ValueChanged="OnSyncDisplayNameChanged"
+                        Label="显示名称与唯一名称保持一致" />
+        </CgFormGroup>
 
         <CgGrid>
             <CgFormGroup Label="唯一名称">

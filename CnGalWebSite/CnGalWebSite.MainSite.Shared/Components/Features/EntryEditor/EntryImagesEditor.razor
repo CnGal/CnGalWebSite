@@ -2,7 +2,7 @@
 
 
 <section class="entry-editor-section" id="section-images">
-    <h2>相册</h2>
+    <h2><CgMdiIcon Name="mdiImageOutline" Class="entry-section-icon" aria-hidden="true" />相册</h2>
     <p>编辑词条相册图片。</p>
 
     @if (Model != null!)
@@ -11,7 +11,7 @@
             可以在这里上传游戏的宣传图，不涉及<strong>剧透、侵权、违法</strong>的游戏 CG 和角色立绘等图片
         </CgAlert>
 
-        <CgFormSection Title="图片列表">
+        <CgFormSection Title="图片列表" Icon="mdiImageMultipleOutline" Flat>
             <HeaderActions>
                 <CgImageUpload Multiple
                                ShowPreview="false"
@@ -42,7 +42,7 @@
                 }
                 else
                 {
-                    <p class="cg-image-empty">暂无图片，请点击"上传图片到图床"添加。</p>
+                    <p class="cg-editor-empty">暂无图片，请点击"上传图片到图床"添加。</p>
                 }
             </ChildContent>
         </CgFormSection>

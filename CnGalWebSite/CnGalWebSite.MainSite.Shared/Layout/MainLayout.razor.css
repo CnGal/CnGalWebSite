@@ -44,7 +44,7 @@
 
 .content {
     width: 100%;
-    padding: 1.5rem 0;
+    padding: var(--cg-spacing-6) 0;
 }
 
 .cg-topbar {

@@ -2,7 +2,7 @@
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
-<CgFormSection Title="Staff 列表">
+<CgFormSection Title="Staff 列表" Icon="mdiAccountGroupOutline" Flat>
     <HeaderActions>
         <CgButton Variant="outline" OnClick="OpenBatchDialog">批量导入</CgButton>
         <CgButton Variant="primary" OnClick="AddStaff">添加 Staff</CgButton>
@@ -15,7 +15,7 @@
 
         <CgTable HasData="@Staffs.Any()">
             <Empty>
-                <p class="cg-staff-empty">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
+                <p class="cg-editor-empty">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
             </Empty>
             <ChildContent>
                 <thead>

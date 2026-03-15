@@ -1,4 +1,5 @@
 :root {
+    /* ── 基础色彩 ── */
     --cg-color-bg: #f6f6f8;
     --cg-color-surface: #ffffff;
     --cg-color-border: #e2e8f0;
@@ -6,12 +7,20 @@
     --cg-color-text-muted: #64748b;
     --cg-color-text-primary: var(--cg-color-text);
     --cg-color-text-secondary: var(--cg-color-text-muted);
-    --cg-color-error: #dc2626;
-    --cg-color-link: #3976ef;
+
+    /* ── 语义色彩 ── */
     --cg-color-primary: #3976ef;
     --cg-color-primary-hover: #2563eb;
     --cg-color-secondary: #f472b6;
     --cg-color-secondary-hover: #ec4899;
+    --cg-color-error: #dc2626;
+    --cg-color-danger: var(--cg-color-error);
+    --cg-color-success: #16a34a;
+    --cg-color-warning: #d97706;
+    --cg-color-link: #3976ef;
+    --cg-color-on-primary: #ffffff;
+
+    /* ── 间距 ── */
     --cg-spacing-1: 0.25rem;
     --cg-spacing-2: 0.5rem;
     --cg-spacing-3: 0.75rem;
@@ -20,29 +29,43 @@
     --cg-spacing-6: 1.5rem;
     --cg-spacing-8: 2rem;
     --cg-spacing-10: 2.5rem;
+
+    /* ── 圆角 ── */
     --cg-radius-sm: 0.25rem;
     --cg-radius-md: 0.5rem;
     --cg-radius-lg: 1rem;
     --cg-radius-xl: 1.5rem;
     --cg-radius-full: 9999px;
+
+    /* ── 字号 ── */
     --cg-font-size-xs: 0.75rem;
     --cg-font-size-sm: 0.875rem;
     --cg-font-size-md: 1rem;
     --cg-font-size-lg: 1.125rem;
     --cg-font-size-xl: 1.5rem;
     --cg-font-size-2xl: 1.75rem;
+
+    /* ── 字重 ── */
     --cg-font-weight-medium: 500;
     --cg-font-weight-semibold: 600;
     --cg-font-weight-bold: 700;
+
+    /* ── 阴影 ── */
     --cg-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --cg-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --cg-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --cg-shadow-card-hover: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.06);
+
+    /* ── 字体 ── */
     --cg-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+    /* ── 过渡 ── */
     --cg-transition-fast: 0.15s ease-in-out;
     --cg-transition-normal: 0.3s ease-in-out;
+
+    /* ── 组件 Token ── */
     --cg-color-section-bg: #f8fafc;
-    --cg-color-on-primary: #ffffff;
     --cg-color-focus-ring: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
     --cg-color-hover-overlay: rgba(0, 0, 0, 0.04);
-    --cg-header-height: 56px;
+    --cg-header-height: 64.67px;
 }

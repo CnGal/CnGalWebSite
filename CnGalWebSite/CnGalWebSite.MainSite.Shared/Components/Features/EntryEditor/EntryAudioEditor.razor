@@ -2,9 +2,10 @@
 @using CnGalWebSite.DataModel.ViewModel.Entries
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@inject ICgToastService ToastService
 
 <section class="entry-editor-section" id="section-audio">
-    <h2>音频</h2>
+    <h2><CgMdiIcon Name="mdiMusicNoteOutline" Class="entry-section-icon" aria-hidden="true" />音频</h2>
     <p>管理词条的关联音频和音乐。</p>
 
     @if (Model != null)
@@ -13,7 +14,7 @@
             音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
         </CgAlert>
 
-        <CgFormSection Title="音频试听">
+        <CgFormSection Title="音频试听" Icon="mdiPlayCircleOutline" Flat>
             <HeaderActions>
                 <CgAudioUpload Multiple
                                OnAudioUploaded="OnAudioUploaded" />
@@ -21,7 +22,7 @@
             <ChildContent>
                 <CgTable HasData="@Model.Audio.Any()">
                     <Empty>
-                        <p class="cg-audio-empty">暂无音频，请点击"上传音频"添加。</p>
+                        <p class="cg-editor-empty">暂无音频，请点击"上传音频"添加。</p>
                     </Empty>
                     <ChildContent>
                         <thead>
@@ -112,14 +113,13 @@
     </Footer>
 </CgModal>
 
-<CgToast @ref="_toast" />
+
 
 @code {
     [Parameter]
     public EditAudioViewModel Model { get; set; } = default!;
 
-    // ── Toast ──
-    private CgToast _toast = default!;
+
 
     // ── 编辑弹窗状态 ──
     private bool _editDialogOpen;
@@ -133,7 +133,7 @@
 
         if (Model.Audio.Any(s => s.Url == result.Url))
         {
-            await _toast.ShowAsync("这个音频已经添加过了哦~", "error");
+            ToastService.Show("这个音频已经添加过了哦~", "error");
             return;
         }
 

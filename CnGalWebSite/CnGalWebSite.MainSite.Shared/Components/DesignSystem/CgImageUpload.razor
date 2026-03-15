@@ -9,35 +9,59 @@
 <div class="cg-image-upload @Class">
     @if (ShowPreview)
     {
-        <div class="cg-image-upload__preview-wrap">
+        <div class="cg-image-upload__drop-zone @(Disabled || _isUploading ? "cg-image-upload__drop-zone--disabled" : string.Empty)">
+            <label class="cg-image-upload__click-overlay" for="@_inputId" aria-label="@(_isUploading ? "上传中..." : Text)"></label>
             @if (string.IsNullOrWhiteSpace(CurrentImagePath))
             {
-                <div class="cg-image-upload__placeholder">暂无图片</div>
+                <div class="cg-image-upload__placeholder">
+                    <svg class="cg-image-upload__placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="m21 15-5-5L5 21" />
+                    </svg>
+                    <span>@(_isUploading ? "上传中..." : "点击上传图片")</span>
+                </div>
             }
             else
             {
                 <img class="cg-image-upload__preview" src="@CurrentImagePath" alt="图片预览" />
+                <button class="cg-image-upload__clear-btn"
+                        type="button"
+                        aria-label="清空图片"
+                        disabled="@Disabled"
+                        @onclick="OnCleanAsync"
+                        @onclick:stopPropagation="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             }
         </div>
-    }
-
-    <div class="cg-image-upload__actions">
-        <label class="cg-btn cg-btn--primary @(Rounded ? "cg-image-upload__label--rounded" : string.Empty) @(Disabled || _isUploading ? "cg-image-upload__label--disabled" : string.Empty)"
-               for="@_inputId">
-            @(_isUploading ? "上传中..." : Text)
-        </label>
         <InputFile id="@_inputId"
                    class="cg-image-upload__file-input"
+                   style="display:none"
                    accept="image/*"
                    multiple="@Multiple"
                    disabled="@(Disabled || _isUploading)"
                    OnChange="OnFileChanged" />
-
-        @if (string.IsNullOrWhiteSpace(CurrentImagePath) is false)
-        {
-            <CgButton Variant="secondary" Disabled="@Disabled" OnClick="OnCleanAsync">清空</CgButton>
-        }
-    </div>
+    }
+    else
+    {
+        <div class="cg-image-upload__actions">
+            <label class="cg-image-upload__upload-btn @(Disabled || _isUploading ? "cg-image-upload__upload-btn--disabled" : string.Empty)"
+                   for="@_inputId">
+                @(_isUploading ? "上传中..." : Text)
+            </label>
+            <InputFile id="@_inputId"
+                       class="cg-image-upload__file-input"
+                       style="display:none"
+                       accept="image/*"
+                       multiple="@Multiple"
+                       disabled="@(Disabled || _isUploading)"
+                       OnChange="OnFileChanged" />
+        </div>
+    }
 
     @if (!string.IsNullOrWhiteSpace(_errorMessage))
     {
@@ -143,8 +167,6 @@
     [Parameter]
     public bool Disabled { get; set; }
 
-    [Parameter]
-    public bool Rounded { get; set; } = true;
 
     private string? CurrentImagePath => Value ?? ImagePath ?? _localImagePath;
     private string CropRectStyle =>

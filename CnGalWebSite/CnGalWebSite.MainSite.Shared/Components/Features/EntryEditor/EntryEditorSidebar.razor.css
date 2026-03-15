@@ -9,11 +9,14 @@
     flex-direction: column;
     padding: var(--cg-spacing-4);
     position: sticky;
-    top: calc(var(--cg-header-height) + 30px);
+    top: calc(var(--cg-header-height) + var(--cg-spacing-8) + var(--cg-spacing-6));
     max-height: calc(100vh - var(--cg-header-height) - 60px);
     align-self: flex-start;
     overflow-y: auto;
     z-index: 10;
+    border-radius: var(--cg-radius-lg);
+    margin: var(--cg-spacing-8) 0 var(--cg-spacing-8) var(--cg-spacing-8);
+    box-shadow: var(--cg-shadow-sm);
 }
 
 /* 自定义滚动条 */
@@ -30,38 +33,90 @@
     border-radius: 10px;
 }
 
-/* ── 编辑模式状态提示 ── */
-.entry-edit-sidebar__status {
+.entry-edit-sidebar::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+}
+
+/* ── 统一提示卡片基础样式 ── */
+.entry-edit-sidebar__card {
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-4);
-    background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
-    margin-bottom: var(--cg-spacing-6);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid transparent;
+    margin-bottom: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xs);
 }
 
-.entry-edit-sidebar__status ::deep .cg-mdi-icon {
-    color: var(--cg-color-primary);
-    width: 20px;
-    height: 20px;
+.entry-edit-sidebar__card ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
 }
 
-.entry-edit-sidebar__status h3 {
+.entry-edit-sidebar__card h3 {
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--cg-color-primary);
     margin: 0;
 }
 
-.entry-edit-sidebar__status p {
+.entry-edit-sidebar__card p {
     font-size: 0.625rem;
-    color: var(--cg-color-text-muted);
     margin: 0;
+}
+
+.entry-edit-sidebar__card span {
+    flex: 1;
+}
+
+/* ── primary 变体（编辑/创建模式） ── */
+.entry-edit-sidebar__card--primary {
+    background: color-mix(in oklab, var(--cg-color-primary) 6%, var(--cg-color-surface));
+    border-color: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+}
+
+.entry-edit-sidebar__card--primary ::deep .cg-mdi-icon {
+    color: var(--cg-color-primary);
+}
+
+.entry-edit-sidebar__card--primary h3 {
+    color: var(--cg-color-primary);
+}
+
+.entry-edit-sidebar__card--primary p {
+    color: var(--cg-color-text-muted);
+}
+
+/* ── warning 变体（草稿恢复） ── */
+.entry-edit-sidebar__card--warning {
+    background: color-mix(in oklab, var(--cg-color-warning) 6%, var(--cg-color-surface));
+    border-color: color-mix(in oklab, var(--cg-color-warning) 20%, transparent);
+    color: #92400e;
+}
+
+.entry-edit-sidebar__card--warning ::deep .cg-mdi-icon {
+    color: var(--cg-color-warning);
+}
+
+/* ── 卡片内操作按钮 ── */
+.entry-edit-sidebar__card-action {
+    background: none;
+    border: 1px solid color-mix(in oklab, var(--cg-color-warning) 30%, transparent);
+    border-radius: var(--cg-radius-sm);
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-warning);
+    cursor: pointer;
+    font-weight: var(--cg-font-weight-semibold);
+    transition: all var(--cg-transition-fast);
+    white-space: nowrap;
+}
+
+.entry-edit-sidebar__card-action:hover {
+    background: color-mix(in oklab, var(--cg-color-warning) 12%, transparent);
 }
 
 /* ── 导航列表 ── */
@@ -81,7 +136,7 @@
     font-size: var(--cg-font-size-sm);
     color: var(--cg-color-text-muted);
     text-decoration: none;
-    transition: var(--cg-transition-fast);
+    transition: all var(--cg-transition-fast);
     cursor: pointer;
     user-select: none;
 }
@@ -92,21 +147,23 @@
 }
 
 .entry-edit-nav-item--active {
-    background-color: var(--cg-color-primary);
+    background: linear-gradient(135deg, var(--cg-color-primary), var(--cg-color-primary-hover));
     color: var(--cg-color-on-primary);
     font-weight: var(--cg-font-weight-semibold);
     box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
 }
 
 .entry-edit-nav-item--active:hover {
-    background-color: var(--cg-color-primary);
+    background: linear-gradient(135deg, var(--cg-color-primary), var(--cg-color-primary-hover));
     color: var(--cg-color-on-primary);
+    filter: brightness(1.05);
 }
 
 .entry-edit-nav-item ::deep .cg-mdi-icon {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+    transition: color var(--cg-transition-fast);
 }
 
 .entry-edit-nav-item--active ::deep .cg-mdi-icon {
@@ -123,57 +180,18 @@
     border-top: 1px solid var(--cg-color-border);
 }
 
-/* ── 按钮样式 ── */
-.cg-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--cg-spacing-2);
-    padding: var(--cg-spacing-3) var(--cg-spacing-6);
-    border-radius: var(--cg-radius-md);
-    font-weight: var(--cg-font-weight-medium);
-    cursor: pointer;
-    transition: var(--cg-transition-fast);
-    border: 1px solid transparent;
-    font-size: var(--cg-font-size-sm);
-}
-
-.cg-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.cg-btn--primary {
-    background-color: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-}
-
-.cg-btn--primary:hover:not(:disabled) {
-    background-color: var(--cg-color-primary-hover);
-}
-
-.cg-btn--outline {
-    background-color: transparent;
-    border-color: var(--cg-color-border);
-    color: var(--cg-color-text);
-}
-
-.cg-btn--outline:hover:not(:disabled) {
-    background-color: var(--cg-color-hover-overlay);
-}
-
-.cg-btn--block {
+.entry-edit-sidebar__actions ::deep .cg-btn {
     width: 100%;
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    justify-content: center;
     border-radius: var(--cg-radius-lg);
     font-weight: var(--cg-font-weight-bold);
 }
 
-.cg-btn--primary.cg-btn--block {
+.entry-edit-sidebar__actions ::deep .cg-btn--primary {
     box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
 }
 
-.cg-btn--primary.cg-btn--block:hover:not(:disabled) {
+.entry-edit-sidebar__actions ::deep .cg-btn--primary:hover:not(:disabled) {
     filter: brightness(1.05);
 }
 
@@ -199,11 +217,14 @@
         position: relative;
         border-right: none;
         border-bottom: 1px solid var(--cg-color-border);
+        border-radius: 0;
+        margin: 0;
         padding: var(--cg-spacing-3);
+        box-shadow: none;
     }
 
-    .entry-edit-sidebar__status {
-        margin-bottom: var(--cg-spacing-3);
+    .entry-edit-sidebar__card {
+        margin-bottom: var(--cg-spacing-2);
     }
 
     .entry-edit-sidebar__nav {

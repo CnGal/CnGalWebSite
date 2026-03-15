@@ -1,4 +1,1 @@
-.cg-actions {
-    display: flex;
-    gap: var(--cg-spacing-2);
-}
+/* Booking 编辑器 — 独有样式（.cg-actions 由 EntryEditPage 统一提供） */

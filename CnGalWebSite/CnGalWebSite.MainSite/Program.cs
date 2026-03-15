@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.MainSite.Components;
+using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
 
@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress, imageApiBaseAddress);
+builder.Services.AddMainSiteSharedServices();
 
 var app = builder.Build();
 

@@ -7,8 +7,9 @@
     width: 72px;
     height: 48px;
     object-fit: cover;
-    border-radius: var(--cg-radius-sm);
+    border-radius: var(--cg-radius-md);
     display: block;
+    box-shadow: var(--cg-shadow-sm);
 }
 
 .cg-website-placeholder {
@@ -17,25 +18,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--cg-color-border);
-    border-radius: var(--cg-radius-sm);
-    font-size: var(--cg-font-size-sm);
+    background-color: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-md);
+    font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-secondary);
-}
-
-.cg-actions {
-    white-space: nowrap;
-    display: flex;
-    gap: var(--cg-spacing-2);
-    min-width: 110px;
-}
-
-/* ── 空状态 ── */
-.cg-website-empty {
-    text-align: center;
-    color: var(--cg-color-text-secondary);
-    padding: var(--cg-spacing-6) 0;
-    font-size: var(--cg-font-size-sm);
+    border: 1px dashed var(--cg-color-border);
 }
 
 /* ── HTML 预览 ── */

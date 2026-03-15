@@ -4,14 +4,15 @@
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.SDK.MainSite.Models.EntryEdit
 @using CnGalWebSite.Extensions
+@inject ICgToastService ToastService
 
 <section class="entry-editor-section" id="section-relevances">
-    <h2>关联信息</h2>
+    <h2><CgMdiIcon Name="mdiHub" Class="entry-section-icon" aria-hidden="true" />关联信息</h2>
     <p>词条关联、动态/文章/视频、外部平台链接与自定义链接。</p>
 
     @if (Model != null)
     {
-        <CgFormSection Title="词条关联（自动补全）">
+        <CgFormSection Title="词条关联（自动补全）" Icon="mdiLinkVariant" Flat>
             <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
             @if (Model.Type != EntryType.Game)
             {
@@ -24,7 +25,7 @@
             <EntryRelevanceListEditor Title="视频" Items="Model.videos" AutoCompleteItems="MetaOptions.VideoItems"/>
         </CgFormSection>
 
-        <CgFormSection Title="外部平台 Id/链接">
+        <CgFormSection Title="外部平台 Id/链接" Icon="mdiOpenInNew" Flat>
             <ChildContent>
                 <p class="cg-tip">支持直接粘贴完整链接，系统会自动截取平台 Id 并拼装标准链接。</p>
                 <CgGrid>
@@ -41,12 +42,15 @@
             </ChildContent>
         </CgFormSection>
 
-        <CgFormSection Title="自定义链接">
+        <CgFormSection Title="自定义链接" Icon="mdiLinkPlus" Flat>
             <HeaderActions>
                 <CgButton Variant="primary" OnClick="AddCustomLink">添加</CgButton>
             </HeaderActions>
             <ChildContent>
                 <CgTable HasData="@GetCustomLinks().Any()">
+                    <Empty>
+                        <p class="cg-editor-empty">暂无自定义链接，请点击"添加"。</p>
+                    </Empty>
                     <ChildContent>
                         <thead>
                             <tr>
@@ -102,7 +106,7 @@
     </Footer>
 </CgModal>
 
-<CgToast @ref="_toast" />
+
 
 @code {
     [Parameter]
@@ -139,7 +143,7 @@
         [OutlinkType.Modian]       = new(@"^https?://zhongchou\.modian\.com/item/([^?#/]+?)\.html", RegexOptions.IgnoreCase | RegexOptions.Compiled),
     };
 
-    private CgToast _toast = default!;
+
     private bool _customLinkDialogOpen;
     private RelevancesModel? _customLinkEditing;
     private RelevancesModel? _customLinkTarget;
@@ -268,14 +272,14 @@
                 else
                 {
                     Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
-                    await _toast.ShowAsync($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                    ToastService.Show($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
                     return;
                 }
             }
             else
             {
                 Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
-                await _toast.ShowAsync($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                ToastService.Show($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
                 return;
             }
         }
