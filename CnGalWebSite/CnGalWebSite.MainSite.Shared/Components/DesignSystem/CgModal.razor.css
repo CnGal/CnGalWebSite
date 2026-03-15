@@ -2,19 +2,22 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
     z-index: 1000;
 }
 
 .cg-modal-panel {
     width: min(640px, 92vw);
-    max-height: 90vh;
-    overflow-y: auto;
+    flex-shrink: 0;
+    margin: auto 0;
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     box-shadow: var(--cg-shadow-lg);
     border: 1px solid var(--cg-color-border);
+    /* 不设 overflow，让下拉框可以溢出面板 */
 }
 
 .cg-modal-header {

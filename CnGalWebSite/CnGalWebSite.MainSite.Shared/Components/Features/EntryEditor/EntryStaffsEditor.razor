@@ -15,7 +15,7 @@
 
         <CgTable HasData="@Staffs.Any()">
             <Empty>
-                <p class="cg-editor-empty">暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
+                <p>暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
             </Empty>
             <ChildContent>
                 <thead>
@@ -40,8 +40,12 @@
                         <td>@item.SubordinateOrganization</td>
                         <td>@item.CustomName</td>
                         <td class="cg-actions">
-                            <CgButton Variant="outline" OnClick="() => EditStaff(item)">编辑</CgButton>
-                            <CgButton Variant="danger" OnClick="() => RemoveStaff(item)">删除</CgButton>
+                            <CgButton Variant="ghost" OnClick="() => EditStaff(item)" aria-label="编辑">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            </CgButton>
+                            <CgButton Variant="ghost-danger" OnClick="() => RemoveStaff(item)" aria-label="删除">
+                                <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                            </CgButton>
                         </td>
                     </tr>
                 }
@@ -93,20 +97,18 @@
          Title="批量导入 Staff"
          OnClose="CloseBatchDialogAsync">
     <ChildContent>
-        <div class="cg-batch-tip">
-            <p>按照下方例子整理 Staff 文本后输入可以批量导入 Staff 信息</p>
-            <p>括号中的内容分别是通用职位、配音角色、隶属组织</p>
-            <p>同类项将会自动合并</p>
-            <p>其中"、""，""，"和"："":"和"（）""()"都可作分隔符，如果 Staff 名称中包含分隔符，请单独录入</p>
-            <p>请把有分类的 Staff 放到最后</p>
-            <br/>
-            <p class="cg-batch-example">
-                主催：小明<br/>
-                CV（配音）：小红、小亮（工作室A）、小李<br/>
-                主题曲：<br/>
-                作词：小红（工作室B）<br/>
-                作曲：小刚
-            </p>
+        <CgAlert Variant="info">
+            <p>按照下方例子整理 Staff 文本后输入可以批量导入 Staff 信息。</p>
+            <p>括号中的内容分别是通用职位、配音角色、隶属组织。同类项将会自动合并。</p>
+            <p>其中"、""，""，"和"："":"和"（）""()"都可作分隔符，如果 Staff 名称中包含分隔符，请单独录入。</p>
+            <p>请把有分类的 Staff 放到最后。</p>
+        </CgAlert>
+        <div class="cg-batch-example">
+            主催：小明<br/>
+            CV（配音）：小红、小亮（工作室A）、小李<br/>
+            主题曲：<br/>
+            作词：小红（工作室B）<br/>
+            作曲：小刚
         </div>
         <CgTextarea @bind-Value="_batchText" Rows="7" Placeholder="请输入 Staff 文本" />
     </ChildContent>

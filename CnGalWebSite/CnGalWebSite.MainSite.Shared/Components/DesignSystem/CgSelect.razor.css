@@ -52,7 +52,7 @@
     padding: 0;
     margin: 0;
     background: transparent;
-    z-index: 9;
+    z-index: 1009;
 }
 
 .cg-select__menu {
@@ -69,7 +69,7 @@
     box-shadow: 0 10px 30px color-mix(in oklab, var(--cg-color-text) 12%, transparent);
     max-height: 16rem;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 1010;
 }
 
 .cg-select__option {

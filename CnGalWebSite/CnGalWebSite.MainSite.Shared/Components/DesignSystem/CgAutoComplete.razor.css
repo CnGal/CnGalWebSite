@@ -33,21 +33,12 @@
     color: var(--cg-color-text-muted, color-mix(in oklab, var(--cg-color-text) 65%, transparent));
 }
 
-.cg-autocomplete__backdrop {
-    position: fixed;
-    inset: 0;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    z-index: 9;
-}
-
 .cg-autocomplete__menu {
     position: absolute;
     top: calc(100% + 0.25rem);
     left: 0;
-    right: 0;
+    width: 100%;
+    box-sizing: border-box;
     list-style: none;
     margin: 0;
     padding: 0.25rem;
@@ -57,7 +48,7 @@
     box-shadow: 0 10px 30px color-mix(in oklab, var(--cg-color-text) 12%, transparent);
     max-height: 16rem;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 1010;
 }
 
 .cg-autocomplete__option {

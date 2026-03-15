@@ -12,7 +12,7 @@
 
     @if (Model != null)
     {
-        <CgFormSection Title="词条关联（自动补全）" Icon="mdiLinkVariant" Flat>
+        <CgFormSection Title="词条关联" Icon="mdiLinkVariant" Flat>
             <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
             @if (Model.Type != EntryType.Game)
             {
@@ -49,7 +49,7 @@
             <ChildContent>
                 <CgTable HasData="@GetCustomLinks().Any()">
                     <Empty>
-                        <p class="cg-editor-empty">暂无自定义链接，请点击"添加"。</p>
+                        <p>暂无自定义链接，请点击"添加"。</p>
                     </Empty>
                     <ChildContent>
                         <thead>

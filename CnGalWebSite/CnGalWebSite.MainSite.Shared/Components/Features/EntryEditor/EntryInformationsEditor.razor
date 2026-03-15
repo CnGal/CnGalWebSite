@@ -4,30 +4,33 @@
 @using System.Globalization
 
 <CgFormSection Title="基础信息项" Icon="mdiFormatListBulleted" Flat>
-    @foreach (var info in Informations)
-    {
-        @if (info.Name == "生日")
+    <CgGrid>
+        @foreach (var info in Informations)
         {
-            <CgFormGroup Label="@FormatLabel(info)">
-                <CgDateInput Value="@ParseBirthday(info.Value)"
-                             ValueChanged="(date) => OnBirthdayChanged(date, info)" />
-            </CgFormGroup>
+            @if (info.Name == "生日")
+            {
+                <CgFormGroup Label="@FormatLabel(info)">
+                    <CgDateInput Value="@ParseBirthday(info.Value)"
+                                 ValueChanged="(date) => OnBirthdayChanged(date, info)"
+                                 Mode="CgDateInputMode.MonthDay" />
+                </CgFormGroup>
+            }
+            else if (info.Name == "性别")
+            {
+                <CgFormGroup Label="@FormatLabel(info)">
+                    <CgEnumSelect TEnum="GenderType"
+                                  Value="@GetGenderValue(info.Value)"
+                                  ValueChanged="(v) => OnGenderChanged(v, info)" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <CgFormGroup Label="@FormatLabel(info)">
+                    <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
+                </CgFormGroup>
+            }
         }
-        else if (info.Name == "性别")
-        {
-            <CgFormGroup Label="@FormatLabel(info)">
-                <CgEnumSelect TEnum="GenderType"
-                              Value="@GetGenderValue(info.Value)"
-                              ValueChanged="(v) => OnGenderChanged(v, info)" />
-            </CgFormGroup>
-        }
-        else
-        {
-            <CgFormGroup Label="@FormatLabel(info)">
-                <CgInput @bind-Value="info.Value" Placeholder="@($"请输入{info.Name}")" />
-            </CgFormGroup>
-        }
-    }
+    </CgGrid>
 </CgFormSection>
 
 @code {

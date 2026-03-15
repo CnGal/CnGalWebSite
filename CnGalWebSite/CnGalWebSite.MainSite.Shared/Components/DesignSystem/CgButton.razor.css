@@ -56,6 +56,34 @@
     opacity: 0.9;
 }
 
+/* ── ghost（无背景图标按钮） ── */
+.cg-btn--ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--cg-color-text-secondary);
+    padding: var(--cg-spacing-1);
+    border-radius: var(--cg-radius-md);
+}
+
+.cg-btn--ghost:hover:not(:disabled) {
+    background-color: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+/* ── ghost-danger ── */
+.cg-btn--ghost-danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--cg-color-text-secondary);
+    padding: var(--cg-spacing-1);
+    border-radius: var(--cg-radius-md);
+}
+
+.cg-btn--ghost-danger:hover:not(:disabled) {
+    background-color: color-mix(in oklab, var(--cg-color-error) 10%, transparent);
+    color: var(--cg-color-error);
+}
+
 /* ── sm ── */
 .cg-btn--sm {
     padding: var(--cg-spacing-1) var(--cg-spacing-3);

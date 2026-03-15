@@ -1,26 +1,38 @@
 @using CnGalWebSite.DataModel.ViewModel
 
-<div class="cg-relevance-list">
-    <div class="cg-relevance-list__header">
-        <h4>@Title</h4>
-        <CgButton Variant="outline" OnClick="AddItem">添加</CgButton>
+<div class="relevance-editor">
+    <div class="relevance-editor__header">
+        <h4 class="relevance-editor__title">@Title</h4>
+        <span class="relevance-editor__count">@Items.Count 项</span>
+        <button type="button" class="relevance-editor__add" @onclick="AddItem" title="添加@Title">
+            <CgMdiIcon Name="mdiPlus" aria-hidden="true" />
+        </button>
     </div>
 
     @if (Items.Any())
     {
-        <div class="cg-relevance-grid">
+        <div class="relevance-editor__list">
             @foreach (var item in Items)
             {
                 var current = item;
-                <div class="cg-relevance-row">
+                <div class="relevance-editor__item">
                     <CgAutoComplete Value="@current.DisplayName"
                                     ValueChanged="(text) => current.DisplayName = text ?? string.Empty"
                                     Items="@AutoCompleteItems"
                                     Placeholder="@($"输入{Title}唯一名称")" />
-                    <CgButton Variant="danger" OnClick="() => RemoveItem(current)">删除</CgButton>
+                    <button type="button"
+                            class="relevance-editor__remove"
+                            title="移除"
+                            @onclick="() => RemoveItem(current)">
+                        <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true" />
+                    </button>
                 </div>
             }
         </div>
+    }
+    else
+    {
+        <p class="relevance-editor__empty">暂无@(Title)，点击 <strong>+</strong> 按钮添加。</p>
     }
 </div>
 

@@ -1,4 +1,4 @@
-<button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync">
+<button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
     @if (_isLoading)
     {
         <CgProgressRing Size="sm" />
@@ -33,6 +33,9 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool _isLoading;
 

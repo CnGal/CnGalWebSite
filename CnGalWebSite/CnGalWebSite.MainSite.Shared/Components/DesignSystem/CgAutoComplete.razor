@@ -1,5 +1,7 @@
 @* CgAutoComplete — 自定义下拉自动补全（类 CgSelect 风格） *@
-<div class="cg-autocomplete @ClassName">
+<div class="cg-autocomplete @ClassName"
+     @onfocusout="OnFocusOut"
+     tabindex="-1">
     <input @key="_inputKey"
            class="cg-autocomplete__input"
            type="text"
@@ -12,11 +14,6 @@
 
     @if (_isOpen && _filtered.Any())
     {
-        <button type="button"
-                class="cg-autocomplete__backdrop"
-                aria-label="关闭下拉框"
-                @onclick="CloseDropdown"></button>
-
         <ul class="cg-autocomplete__menu" role="listbox">
             @foreach (var item in _filtered)
             {
@@ -95,9 +92,18 @@
         _isOpen = _filtered.Any();
     }
 
-    private void CloseDropdown()
+    private void OnFocusOut(FocusEventArgs args)
     {
+        // focusout 冒泡触发；如果新焦点仍在组件内部（输入框或选项按钮），不关闭
+        // Blazor 的 FocusEventArgs 没有 relatedTarget，所以用延迟让 onfocus/onclick 先处理
+        _ = CloseAfterDelay();
+    }
+
+    private async Task CloseAfterDelay()
+    {
+        await Task.Delay(150);
         _isOpen = false;
+        StateHasChanged();
     }
 
     private async Task SelectOption(string item)

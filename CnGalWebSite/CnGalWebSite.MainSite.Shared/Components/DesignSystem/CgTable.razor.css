@@ -1,42 +1,78 @@
+/* ── 表格容器 ── */
 .cg-table-wrap {
     overflow-x: auto;
-    border-radius: var(--cg-radius-md);
-    border: 1px solid var(--cg-color-border);
 }
 
-.cg-table {
+/* ── 表格主体 ── */
+::deep .cg-table {
     width: 100%;
-    border-collapse: collapse;
-    background: var(--cg-color-surface);
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
     font-size: var(--cg-font-size-sm);
 }
 
-.cg-table th,
-.cg-table td {
-    border-bottom: 1px solid var(--cg-color-border);
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+/* ── 单元格通用 ── */
+::deep .cg-table th,
+::deep .cg-table td {
+       padding: var(--cg-spacing-1) var(--cg-spacing-1);
     text-align: left;
     vertical-align: middle;
 }
 
-.cg-table thead th {
-    background: var(--cg-color-section-bg);
+/* ── 表头 ── */
+::deep .cg-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--cg-color-surface);
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text-secondary);
     white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--cg-color-border);
 }
 
-.cg-table tbody tr {
+/* ── 数据行 ── */
+::deep .cg-table tbody tr {
+    background: var(--cg-color-surface);
     transition: background-color var(--cg-transition-fast);
+    box-shadow: inset 0 -1px 0 var(--cg-color-border);
 }
 
-.cg-table tbody tr:hover {
-    background-color: var(--cg-color-hover-overlay);
+::deep .cg-table tbody tr:last-child {
+    box-shadow: none;
 }
 
-.cg-table tbody tr:last-child td {
-    border-bottom: none;
+::deep .cg-table tbody tr:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 4%, var(--cg-color-surface));
+}
+
+/* ── 首尾单元格圆角 ── */
+::deep .cg-table tbody tr td:first-child {
+    border-radius: var(--cg-radius-md) 0 0 var(--cg-radius-md);
+}
+
+::deep .cg-table tbody tr td:last-child {
+    border-radius: 0 var(--cg-radius-md) var(--cg-radius-md) 0;
+}
+
+/* ── 操作列（内建） ── */
+::deep .cg-actions {
+    white-space: nowrap;
+    display: flex;
+    gap: var(--cg-spacing-1);
+    align-items: center;
+}
+
+/* ── 空状态 ── */
+.cg-table-empty {
+    text-align: center;
+    color: var(--cg-color-text-muted);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    background: linear-gradient(135deg, var(--cg-color-section-bg) 0%, var(--cg-color-surface) 100%);
+    border: 2px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
 }
