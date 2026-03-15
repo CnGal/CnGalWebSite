@@ -1,4 +1,5 @@
 @using Microsoft.JSInterop
+@using CnGalWebSite.DataModel.Model
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -17,6 +18,14 @@
             <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
             <span>已恢复未保存的草稿</span>
             <button class="entry-edit-sidebar__card-action" @onclick="OnDiscardDraft">丢弃</button>
+        </div>
+    }
+
+    @if (EntryType == EntryType.Staff)
+    {
+        <div class="entry-edit-sidebar__card entry-edit-sidebar__card--error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <span>这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句</span>
         </div>
     }
 
@@ -67,6 +76,9 @@
 
     [Parameter]
     public EventCallback OnDiscardDraft { get; set; }
+
+    [Parameter]
+    public EntryType EntryType { get; set; }
 
     // ── 导航项定义 ──
     private static readonly NavItem[] _navItems =
@@ -130,6 +142,7 @@
                 await _jsModule.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
+            catch (TaskCanceledException) { }
         }
         _dotNetRef?.Dispose();
     }

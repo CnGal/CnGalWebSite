@@ -1,8 +1,3 @@
-.cg-user-menu {
-    position: relative;
-    display: inline-block;
-}
-
 .cg-action-btn {
     display: flex;
     width: 2.5rem;
@@ -39,19 +34,6 @@
     height: 100%;
     object-fit: cover;
     border-radius: var(--cg-radius-full);
-}
-
-.cg-user-menu-dropdown {
-    position: absolute;
-    top: calc(100% + var(--cg-spacing-2));
-    right: 0;
-    width: 200px;
-    background-color: var(--cg-color-surface);
-    border-radius: var(--cg-radius-md);
-    box-shadow: var(--cg-shadow-lg);
-    border: 1px solid var(--cg-color-border);
-    z-index: 100;
-    overflow: hidden;
 }
 
 .cg-user-menu-header {
@@ -129,13 +111,4 @@
     margin: 0;
     padding: 0;
     width: 100%;
-}
-
-.cg-user-menu-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 99;
 }

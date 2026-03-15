@@ -1,42 +1,64 @@
 <div class="cg-popup-menu">
-    <CgButton Variant="@TriggerVariant" OnClick="ToggleAsync">@TriggerText</CgButton>
+    @if (TriggerContent != null)
+    {
+        <div @onclick="Toggle">@TriggerContent</div>
+    }
+    else
+    {
+        <CgButton Variant="@TriggerVariant" OnClick="ToggleAsync">@TriggerText</CgButton>
+    }
     @if (_isOpen)
     {
-        <ul class="cg-popup-menu-panel" role="menu">
-            @foreach (var item in Items)
+        <div class="cg-popup-menu-backdrop" @onclick="Close"></div>
+        <div class="cg-popup-menu-panel" role="menu" @onclick:stopPropagation>
+            @if (ChildContent != null)
             {
-                <li>
-                    <button class="cg-popup-menu-item"
-                            type="button"
-                            role="menuitem"
-                            @onclick="() => OnItemClickAsync(item.Key)">
-                        @item.Value
-                    </button>
-                </li>
+                @ChildContent
             }
-        </ul>
+            else
+            {
+                <ul class="cg-popup-menu-list">
+                    @foreach (var item in Items)
+                    {
+                        <li>
+                            <button class="cg-popup-menu-item"
+                                    type="button"
+                                    role="menuitem"
+                                    @onclick="() => OnItemClickAsync(item.Key)">
+                                @item.Value
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
     }
 </div>
 
 @code {
-    [Parameter]
-    public string TriggerText { get; set; } = "更多操作";
-
-    [Parameter]
-    public string TriggerVariant { get; set; } = "secondary";
-
-    [Parameter]
-    public IEnumerable<KeyValuePair<string, string>> Items { get; set; } = [];
-
-    [Parameter]
-    public EventCallback<string> ItemSelected { get; set; }
+    [Parameter] public string TriggerText { get; set; } = "更多操作";
+    [Parameter] public string TriggerVariant { get; set; } = "secondary";
+    [Parameter] public IEnumerable<KeyValuePair<string, string>> Items { get; set; } = [];
+    [Parameter] public EventCallback<string> ItemSelected { get; set; }
+    [Parameter] public RenderFragment? TriggerContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private bool _isOpen;
+
+    private void Toggle()
+    {
+        _isOpen = !_isOpen;
+    }
 
     private Task ToggleAsync(MouseEventArgs _)
     {
         _isOpen = !_isOpen;
         return Task.CompletedTask;
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
     }
 
     private async Task OnItemClickAsync(string key)

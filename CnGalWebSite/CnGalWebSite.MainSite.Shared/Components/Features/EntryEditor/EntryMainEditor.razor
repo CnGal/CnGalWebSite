@@ -31,11 +31,11 @@
                 <CgImageUpload @bind-Value="Model.MainPicture"
                                Text="上传主图"
                                ShowCropper
-                               Type="ImageAspectType._16_9"/>
+                               Type="@(Model.Type is EntryType.Game or EntryType.ProductionGroup ? ImageAspectType._16_9 : ImageAspectType.None)"/>
             </CgFormGroup>
-            <CgFormGroup Label="缩略图">
+            <CgFormGroup Label="@(Model.Type == EntryType.Staff ? "头像" : "缩略图")">
                 <CgImageUpload @bind-Value="Model.Thumbnail"
-                               Text="上传缩略图"
+                               Text="@(Model.Type == EntryType.Staff ? "上传头像" : "上传缩略图")"
                                ShowCropper
                                Type="ImageAspectType._1_1"/>
             </CgFormGroup>
@@ -66,25 +66,22 @@
         <CgGrid>
             <CgFormGroup Label="唯一名称">
                 <CgInput Value="@Model.Name"
-                         ValueChanged="OnNameChanged" TValue="string"
-                         Placeholder="如：game_name"/>
+                         ValueChanged="OnNameChanged" TValue="string"/>
             </CgFormGroup>
             <CgFormGroup Label="显示名称">
                 <CgInput @bind-Value="Model.DisplayName"
-                         Disabled="_syncDisplayName"
-                         Placeholder="展示在页面上的名称"/>
+                         Disabled="_syncDisplayName"/>
             </CgFormGroup>
         </CgGrid>
 
         <CgFormGroup Label="别称">
             <CgInput @bind-Value="Model.AnotherName"
-                     Placeholder="可选，多个别称可用分隔符组织"/>
+                     Placeholder="可选，多个别称可用逗号分隔"/>
         </CgFormGroup>
 
         <CgFormGroup Label="简介">
             <CgTextarea @bind-Value="Model.BriefIntroduction"
-                        Placeholder="简短的一句话介绍"
-                        Rows="3"/>
+                        Rows="3" Placeholder="简短的介绍"/>
         </CgFormGroup>
     }
 </section>

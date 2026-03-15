@@ -194,7 +194,11 @@ export function setValue(value) {
  */
 export function disposeEditor() {
     if (_vditor) {
-        _vditor.destroy();
+        try {
+            _vditor.destroy();
+        } catch (e) {
+            // DOM element may already be removed during circuit teardown
+        }
         _vditor = null;
     }
     _dotNetRef = null;

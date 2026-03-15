@@ -46,7 +46,7 @@
 
         <EntryTagTreeCard TreeItems="@MetaOptions.TagTreeItems"
                           Tags="@Model.Tags"
-                          OnTagsChanged="StateHasChanged" />
+                          OnTagsChanged="StateHasChanged"/>
     }
 </section>
 
@@ -70,4 +70,5 @@
         tag.DisplayName = value ?? string.Empty;
         return Task.CompletedTask;
     }
+
 }

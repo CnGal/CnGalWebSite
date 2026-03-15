@@ -7,7 +7,7 @@
 @inject ICgToastService ToastService
 
 <section class="entry-editor-section" id="section-relevances">
-    <h2><CgMdiIcon Name="mdiHub" Class="entry-section-icon" aria-hidden="true" />关联信息</h2>
+    <h2><CgMdiIcon Name="mdiHub" Class="entry-section-icon" aria-hidden="true"/>关联信息</h2>
     <p>词条关联、动态/文章/视频、外部平台链接与自定义链接。</p>
 
     @if (Model != null)
@@ -35,7 +35,7 @@
                         <CgFormGroup Label="@current.GetDisplayName()">
                             <CgInput Value="@GetOutlinkValue(current)" TValue="string"
                                      ValueChanged="(text) => OnOutlinkValueChanged(current, text)"
-                                     Placeholder="输入平台Id或完整链接" />
+                                     Placeholder="输入平台Id或完整链接"/>
                         </CgFormGroup>
                     }
                 </CgGrid>
@@ -53,26 +53,26 @@
                     </Empty>
                     <ChildContent>
                         <thead>
-                            <tr>
-                                <th>唯一名称</th>
-                                <th>链接</th>
-                                <th>简介</th>
-                                <th>操作</th>
-                            </tr>
+                        <tr>
+                            <th>唯一名称</th>
+                            <th>链接</th>
+                            <th>简介</th>
+                            <th>操作</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach (var link in GetCustomLinks())
-                            {
-                                <tr>
-                                    <td>@link.DisplayName</td>
-                                    <td>@link.Link</td>
-                                    <td>@link.DisPlayValue</td>
-                                    <td class="cg-actions">
-                                        <CgButton Variant="outline" OnClick="() => EditCustomLink(link)">编辑</CgButton>
-                                        <CgButton Variant="danger" OnClick="() => DeleteCustomLink(link)">删除</CgButton>
-                                    </td>
-                                </tr>
-                            }
+                        @foreach (var link in GetCustomLinks())
+                        {
+                            <tr>
+                                <td>@link.DisplayName</td>
+                                <td>@link.Link</td>
+                                <td>@link.DisPlayValue</td>
+                                <td class="cg-actions">
+                                    <CgButton Variant="outline" OnClick="() => EditCustomLink(link)">编辑</CgButton>
+                                    <CgButton Variant="danger" OnClick="() => DeleteCustomLink(link)">删除</CgButton>
+                                </td>
+                            </tr>
+                        }
                         </tbody>
                     </ChildContent>
                 </CgTable>
@@ -89,14 +89,14 @@
         {
             <CgGrid>
                 <CgFormGroup Label="唯一名称">
-                    <CgInput @bind-Value="_customLinkEditing.DisplayName" Placeholder="如：制作组博客" />
+                    <CgInput @bind-Value="_customLinkEditing.DisplayName" Placeholder="如：制作组博客"/>
                 </CgFormGroup>
                 <CgFormGroup Label="链接">
-                    <CgInput @bind-Value="_customLinkEditing.Link" Placeholder="https://example.com" />
+                    <CgInput @bind-Value="_customLinkEditing.Link" Placeholder="https://example.com"/>
                 </CgFormGroup>
             </CgGrid>
             <CgFormGroup Label="简介">
-                <CgInput @bind-Value="_customLinkEditing.DisPlayValue" Placeholder="可选说明" />
+                <CgInput @bind-Value="_customLinkEditing.DisPlayValue" Placeholder="可选说明"/>
             </CgFormGroup>
         }
     </ChildContent>
@@ -107,13 +107,10 @@
 </CgModal>
 
 
-
 @code {
-    [Parameter]
-    public EditRelevancesViewModel Model { get; set; } = default!;
+    [Parameter] public EditRelevancesViewModel Model { get; set; } = default!;
 
-    [Parameter]
-    public EntryEditMetaOptions MetaOptions { get; set; } = default!;
+    [Parameter] public EntryEditMetaOptions MetaOptions { get; set; } = default!;
 
     private readonly List<OutlinkType> _outlinkTypes = Enum.GetValues<OutlinkType>().ToList();
 
@@ -123,24 +120,24 @@
     /// </summary>
     private static readonly Dictionary<OutlinkType, Regex> _outlinkUrlPatterns = new()
     {
-        [OutlinkType.Moegirl]      = new(@"^https?://zh\.moegirl\.org\.cn/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.VNDB]         = new(@"^https?://vndb\.org/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.YMGal]        = new(@"^https?://(?:www\.)?ymgal\.games/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Bangumi]      = new(@"^https?://bangumi\.tv/(?:subject|character|person)/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.WikiData]     = new(@"^https?://(?:www\.)?wikidata\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.BaiDu]        = new(@"^https?://baike\.baidu\.com/item/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.ZhWikiPedia]  = new(@"^https?://zh\.wikipedia\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType._2DFan]       = new(@"^https?://galge\.fun/subjects/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Weibo]        = new(@"^https?://weibo\.com/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Bilibili]     = new(@"^https?://space\.bilibili\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.AcFun]        = new(@"^https?://(?:www\.)?acfun\.cn/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Zhihu]        = new(@"^https?://(?:www\.)?zhihu\.com/people/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Afdian]       = new(@"^https?://afdian\.com/@([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Pixiv]        = new(@"^https?://(?:www\.)?pixiv\.net/users/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Twitter]      = new(@"^https?://(?:www\.)?(?:twitter|x)\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.YouTube]      = new(@"^https?://(?:www\.)?youtube\.com/channel/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Facebook]     = new(@"^https?://(?:www\.)?facebook\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-        [OutlinkType.Modian]       = new(@"^https?://zhongchou\.modian\.com/item/([^?#/]+?)\.html", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Moegirl] = new(@"^https?://zh\.moegirl\.org\.cn/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.VNDB] = new(@"^https?://vndb\.org/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YMGal] = new(@"^https?://(?:www\.)?ymgal\.games/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bangumi] = new(@"^https?://bangumi\.tv/(?:subject|character|person)/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.WikiData] = new(@"^https?://(?:www\.)?wikidata\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.BaiDu] = new(@"^https?://baike\.baidu\.com/item/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.ZhWikiPedia] = new(@"^https?://zh\.wikipedia\.org/wiki/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType._2DFan] = new(@"^https?://galge\.fun/subjects/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Weibo] = new(@"^https?://weibo\.com/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Bilibili] = new(@"^https?://space\.bilibili\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.AcFun] = new(@"^https?://(?:www\.)?acfun\.cn/u/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Zhihu] = new(@"^https?://(?:www\.)?zhihu\.com/people/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Afdian] = new(@"^https?://afdian\.com/@([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Pixiv] = new(@"^https?://(?:www\.)?pixiv\.net/users/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Twitter] = new(@"^https?://(?:www\.)?(?:twitter|x)\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.YouTube] = new(@"^https?://(?:www\.)?youtube\.com/channel/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Facebook] = new(@"^https?://(?:www\.)?facebook\.com/([^?#/]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+        [OutlinkType.Modian] = new(@"^https?://zhongchou\.modian\.com/item/([^?#/]+?)\.html", RegexOptions.IgnoreCase | RegexOptions.Compiled),
     };
 
 
@@ -255,6 +252,7 @@
                     Link = value
                 });
             }
+
             return;
         }
 
@@ -336,4 +334,5 @@
 
         return !_outlinkTypes.Any(item => string.Equals(item.GetDisplayName(), name, StringComparison.OrdinalIgnoreCase));
     }
+
 }

@@ -21,7 +21,10 @@
             <EntryBookingEditor Booking="Model.Booking" LotteryItems="MetaOptions.LotteryItems" />
         }
 
-        <EntryStaffsEditor Staffs="Model.Staffs" />
+        @if (Model.Type == EntryType.Game)
+        {
+            <EntryStaffsEditor Staffs="Model.Staffs" />
+        }
     }
 </section>
 

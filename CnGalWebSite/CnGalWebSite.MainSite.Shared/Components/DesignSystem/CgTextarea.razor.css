@@ -5,7 +5,7 @@
     background-color: var(--cg-color-surface);
     color: var(--cg-color-text-primary);
     font-family: inherit;
-    font-size: var(--cg-font-size-md);
+    font-size: var(--cg-font-size-sm);
     transition: border-color var(--cg-transition-fast);
     resize: vertical;
     width: 100%;

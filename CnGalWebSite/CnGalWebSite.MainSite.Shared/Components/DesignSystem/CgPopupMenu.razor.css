@@ -1,8 +1,14 @@
 .cg-popup-menu {
     position: relative;
     display: inline-block;
+    z-index: 20;
 }
 
+.cg-popup-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+}
 .cg-popup-menu-panel {
     position: absolute;
     z-index: 20;
@@ -11,11 +17,17 @@
     min-width: 180px;
     margin: 0;
     padding: var(--cg-spacing-2);
-    list-style: none;
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
     background: var(--cg-color-surface);
     box-shadow: var(--cg-shadow-md);
+    overflow: hidden;
+}
+
+.cg-popup-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .cg-popup-menu-item {
