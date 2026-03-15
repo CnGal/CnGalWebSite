@@ -70,17 +70,8 @@
 .cg-brand__icon {
     width: 2rem;
     height: 2rem;
-    background-color: var(--cg-color-primary);
     border-radius: var(--cg-radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-}
-
-.cg-brand__icon ::deep .cg-mdi-icon {
-    width: 1.35rem;
-    height: 1.35rem;
+    object-fit: contain;
 }
 
 .cg-brand__text {
@@ -443,23 +434,267 @@
     color: var(--cg-color-primary);
 }
 
+/* ── Blazor Error UI ── */
+
+@keyframes blazor-error-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 #blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
     display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
     position: fixed;
+    bottom: var(--cg-spacing-6);
+    right: var(--cg-spacing-6);
+    z-index: 10000;
+    max-width: 400px;
+    width: calc(100% - var(--cg-spacing-8));
+}
+
+#blazor-error-ui .blazor-error-card {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+
+    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.03);
+
+    font-family: var(--cg-font-family);
+    color: var(--cg-color-text);
+    animation: blazor-error-slide-in 0.35s ease-out;
+}
+
+#blazor-error-ui .blazor-error-icon {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--cg-color-error);
+}
+
+#blazor-error-ui .blazor-error-icon svg {
     width: 100%;
-    z-index: 1000;
+    height: 100%;
+}
+
+#blazor-error-ui .blazor-error-content {
+    flex: 1;
+    min-width: 0;
+}
+
+#blazor-error-ui .blazor-error-title {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    line-height: 1.4;
+}
+
+#blazor-error-ui .blazor-error-detail {
+    margin: 0.15rem 0 0;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    line-height: 1.4;
+}
+
+#blazor-error-ui .blazor-error-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+#blazor-error-ui .blazor-error-reload {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.85rem;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-on-primary);
+    background-color: var(--cg-color-primary);
+    border: none;
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast);
+}
+
+#blazor-error-ui .blazor-error-reload:hover {
+    background-color: var(--cg-color-primary-hover);
 }
 
 #blazor-error-ui .dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--cg-radius-md);
     cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
+    color: var(--cg-color-text-muted);
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: all var(--cg-transition-fast);
+}
+
+#blazor-error-ui .dismiss:hover {
+    background-color: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+@media (max-width: 480px) {
+    #blazor-error-ui {
+        right: var(--cg-spacing-3);
+        bottom: var(--cg-spacing-3);
+        max-width: none;
+        width: calc(100% - var(--cg-spacing-6));
+    }
+}
+
+/* ── Reconnect Modal ── */
+
+#components-reconnect-modal {
+    display: none;
+    position: fixed;
+    bottom: var(--cg-spacing-6);
+    right: var(--cg-spacing-6);
+    z-index: 10000;
+    max-width: 400px;
+    width: calc(100% - var(--cg-spacing-8));
+}
+
+#components-reconnect-modal .reconnect-card {
+    display: none;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+
+    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.03);
+
+    font-family: var(--cg-font-family);
+    color: var(--cg-color-text);
+    animation: blazor-error-slide-in 0.35s ease-out;
+}
+
+/* State: reconnecting */
+#components-reconnect-modal.components-reconnect-show {
+    display: block;
+}
+
+#components-reconnect-modal.components-reconnect-show .reconnect-show {
+    display: flex;
+}
+
+/* State: failed or rejected */
+#components-reconnect-modal.components-reconnect-failed,
+#components-reconnect-modal.components-reconnect-rejected {
+    display: block;
+}
+
+#components-reconnect-modal.components-reconnect-failed .reconnect-failed,
+#components-reconnect-modal.components-reconnect-rejected .reconnect-failed {
+    display: flex;
+}
+
+/* State: reconnected — hide everything */
+#components-reconnect-modal.components-reconnect-hide {
+    display: none;
+}
+
+/* Spinner */
+@keyframes reconnect-spin {
+    to { transform: rotate(360deg); }
+}
+
+#components-reconnect-modal .reconnect-spinner {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2.5px solid var(--cg-color-border);
+    border-top-color: var(--cg-color-primary);
+    border-radius: var(--cg-radius-full);
+    animation: reconnect-spin 0.8s linear infinite;
+}
+
+/* Shared inner styles — reuse blazor-error tokens */
+#components-reconnect-modal .blazor-error-icon {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--cg-color-warning);
+}
+
+#components-reconnect-modal .blazor-error-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+#components-reconnect-modal .blazor-error-content {
+    flex: 1;
+    min-width: 0;
+}
+
+#components-reconnect-modal .blazor-error-title {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    line-height: 1.4;
+}
+
+#components-reconnect-modal .blazor-error-detail {
+    margin: 0.15rem 0 0;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    line-height: 1.4;
+}
+
+#components-reconnect-modal .blazor-error-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+#components-reconnect-modal .blazor-error-reload {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.85rem;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-on-primary);
+    background-color: var(--cg-color-primary);
+    border: none;
+    border-radius: var(--cg-radius-md);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast);
+}
+
+#components-reconnect-modal .blazor-error-reload:hover {
+    background-color: var(--cg-color-primary-hover);
+}
+
+@media (max-width: 480px) {
+    #components-reconnect-modal {
+        right: var(--cg-spacing-3);
+        bottom: var(--cg-spacing-3);
+        max-width: none;
+        width: calc(100% - var(--cg-spacing-6));
+    }
 }

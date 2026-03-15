@@ -4,11 +4,9 @@
     justify-content: center;
     flex-wrap: nowrap;
     gap: 3rem;
-    padding: 2rem;
-    background-color: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-lg);
-    text-align: center;
+    text-align: center;    
+    margin-bottom: 3rem;
 }
 
 .home-kanban-content img {

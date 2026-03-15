@@ -5,10 +5,10 @@ namespace CnGalWebSite.MainSite.Shared.Services;
 /// </summary>
 public class CgToastService : ICgToastService
 {
-    public event Action<string, string>? OnShow;
+    public event Action<string, string?, string>? OnShow;
 
-    public void Show(string message, string variant = "info")
+    public void Show(string title, string? detail = null, string variant = "info")
     {
-        OnShow?.Invoke(message, variant);
+        OnShow?.Invoke(title, detail, variant);
     }
 }

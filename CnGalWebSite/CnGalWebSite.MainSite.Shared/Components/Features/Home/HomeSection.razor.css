@@ -6,8 +6,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--cg-color-border);
-    padding-bottom: 1rem;
     margin-bottom: 1.5rem;
 }
 
@@ -17,13 +15,13 @@
     font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
 }
 
-.home-section-icon {
+ ::deep .home-section-icon {
     color: var(--cg-color-primary);
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 2rem;
+    height: 2rem;
 }
 
 .home-section-header-append {

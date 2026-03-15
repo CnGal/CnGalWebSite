@@ -7,9 +7,7 @@
         <div class="cg-topbar">
             <div class="cg-topbar__left">
                 <a class="cg-brand" href="/">
-                    <div class="cg-brand__icon">
-                        <CgMdiIcon Name="mdiAutoFix" aria-hidden="true" />
-                    </div>
+                    <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
                     <h2 class="cg-brand__text">CnGal资料站</h2>
                 </a>
 
@@ -126,9 +124,43 @@
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <div class="blazor-error-card">
+        <div class="blazor-error-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg>
+        </div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">发生了一个未处理的错误</p>
+            <p class="blazor-error-detail">页面可能无法正常工作，请尝试重新加载。</p>
+        </div>
+        <div class="blazor-error-actions">
+            <button type="button" class="blazor-error-reload" onclick="location.reload()">重新加载</button>
+            <span class="dismiss" role="button" tabindex="0" aria-label="关闭">✕</span>
+        </div>
+    </div>
+</div>
+
+<div id="components-reconnect-modal">
+    @* 重连中 *@
+    <div class="reconnect-card reconnect-show">
+        <div class="reconnect-spinner" aria-hidden="true"></div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">连接已断开</p>
+            <p class="blazor-error-detail">正在尝试重新连接，请稍候…</p>
+        </div>
+    </div>
+    @* 重连失败 / 被拒绝 *@
+    <div class="reconnect-card reconnect-failed">
+        <div class="blazor-error-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12M22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12M15.5,8C16.3,8 17,8.7 17,9.5C17,10.3 16.3,11 15.5,11C14.7,11 14,10.3 14,9.5C14,8.7 14.7,8 15.5,8M10,9.5C10,10.3 9.3,11 8.5,11C7.7,11 7,10.3 7,9.5C7,8.7 7.7,8 8.5,8C9.3,8 10,8.7 10,9.5M12,14C9.67,14 7.69,15.46 6.89,17.5H17.11C16.31,15.46 14.33,14 12,14Z" /></svg>
+        </div>
+        <div class="blazor-error-content">
+            <p class="blazor-error-title">连接已断开</p>
+            <p class="blazor-error-detail">请重新加载页面以恢复正常使用。</p>
+        </div>
+        <div class="blazor-error-actions">
+            <button type="button" class="blazor-error-reload" onclick="location.reload()">重新加载</button>
+        </div>
+    </div>
 </div>
 
 @code {

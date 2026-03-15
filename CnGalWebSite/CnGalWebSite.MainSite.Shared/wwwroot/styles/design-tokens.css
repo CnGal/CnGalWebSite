@@ -69,3 +69,29 @@
     --cg-color-hover-overlay: rgba(0, 0, 0, 0.04);
     --cg-header-height: 64.67px;
 }
+
+/* ── 全局重置 ── */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--cg-font-family);
+    color: var(--cg-color-text);
+    background: var(--cg-color-bg);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+a {
+    color: var(--cg-color-link);
+}
+
+h1:focus,
+h2:focus,
+h3:focus {
+    outline: none;
+}

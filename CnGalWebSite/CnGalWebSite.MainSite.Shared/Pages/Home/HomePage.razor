@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -212,23 +212,43 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="支持我们" Icon="mdiHandHeartOutline" IconColor="var(--cg-color-primary)">
-                    <ul class="home-list">
-                        @foreach (var item in Model.SupportLinks)
-                        {
-                            <HomeLinkCard Url="@item.Link" Title="@item.Title" Text="@item.Text" Target="_blank" />
-                        }
-                    </ul>
-                </HomeSection>
+                <div class="home-support-tags-panel">
+                    <HomeSection Title="支持我们" Icon="mdiHandHeartOutline" IconColor="var(--cg-color-primary)">
+                        <ul class="home-support-grid">
+                            @foreach (var item in Model.SupportLinks)
+                            {
+                                <li>
+                                    <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="home-support-card">
+                                        <span class="home-support-card__icon">
+                                            <CgMdiIcon Name="mdiHeartOutline" aria-hidden="true" />
+                                        </span>
+                                        <span class="home-support-card__body">
+                                            <strong>@item.Title</strong>
+                                            @if (!string.IsNullOrWhiteSpace(item.Text))
+                                            {
+                                                <small>@item.Text</small>
+                                            }
+                                        </span>
+                                        <span class="home-support-card__arrow">
+                                            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                                        </span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </HomeSection>
 
-                <HomeSection Title="热门标签" Icon="mdiTagOutline" IconColor="var(--cg-color-secondary)">
-                    <ul class="home-tag-list">
-                        @foreach (var item in Model.HotTags.Take(20))
-                        {
-                            <li><a href="@item.Url">@item.Name</a></li>
-                        }
-                    </ul>
-                </HomeSection>
+                    <HomeSection Title="热门标签" Icon="mdiTagMultipleOutline" IconColor="var(--cg-color-secondary)">
+                        <ul class="home-hot-tags">
+                            @foreach (var (item, i) in Model.HotTags.Take(20).Select((v, i) => (v, i)))
+                            {
+                                <li style="--_tag-hue: @(200 + i * 17 % 160)">
+                                    <a href="@item.Url">@item.Name</a>
+                                </li>
+                            }
+                        </ul>
+                    </HomeSection>
+                </div>
             </div>
         </div>
 

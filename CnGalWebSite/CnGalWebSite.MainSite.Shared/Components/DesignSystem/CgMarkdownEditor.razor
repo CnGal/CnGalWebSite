@@ -1,4 +1,4 @@
-@using Microsoft.JSInterop
+﻿@using Microsoft.JSInterop
 @using Microsoft.Extensions.Configuration
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
@@ -15,10 +15,6 @@
 
     <div @ref="_containerRef" style="@(_loading ? "display:none" : null)"></div>
 
-    @if (!string.IsNullOrWhiteSpace(_errorMessage))
-    {
-        <div class="cg-markdown-editor__error">@_errorMessage</div>
-    }
 </div>
 
 @code {
@@ -29,7 +25,6 @@
     private bool _initialized;
     private bool _loading;
     private string? _lastKnownValue;
-    private string? _errorMessage;
 
     [Parameter]
     public string? Value { get; set; }

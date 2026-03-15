@@ -116,6 +116,7 @@
 | `CgImageUpload` | 图片上传（含 JS Interop） |
 | `CgAudioUpload` | 音频上传 |
 | `CgProgressRing` | 圆环进度指示器（确定进度/无限进度） |
+| `CgHtmlContent` | HTML 内容显示（渲染 markdown 解析生成的 HTML，统一排版样式） |
 | `CgMdiIcon` | MDI 图标（配合 `CgMdiIconMap.g.cs` 自动生成映射） |
 
 ---

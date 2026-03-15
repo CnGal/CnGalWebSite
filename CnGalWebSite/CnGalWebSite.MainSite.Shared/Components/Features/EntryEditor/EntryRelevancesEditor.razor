@@ -270,14 +270,14 @@
                 else
                 {
                     Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
-                    ToastService.Show($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                    ToastService.Show("格式错误", $"请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
                     return;
                 }
             }
             else
             {
                 Model.others.RemoveAll(s => string.Equals(s.DisplayName, type.GetDisplayName(), StringComparison.OrdinalIgnoreCase));
-                ToastService.Show($"链接格式不正确，请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
+                ToastService.Show("格式错误", $"请输入{type.GetDisplayName()}的平台 Id 或对应的链接", "error");
                 return;
             }
         }

@@ -137,7 +137,7 @@
 
         if (Model.Audio.Any(s => s.Url == result.Url))
         {
-            ToastService.Show("这个音频已经添加过了哦~", "error");
+            ToastService.Show("添加失败", "这个音频已经添加过了哦~", "error");
             return;
         }
 

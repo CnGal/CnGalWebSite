@@ -6,14 +6,15 @@ namespace CnGalWebSite.MainSite.Shared.Services;
 public interface ICgToastService
 {
     /// <summary>
-    /// 当需要显示 Toast 时触发。参数：(message, variant)
+    /// 当需要显示 Toast 时触发。参数：(title, detail, variant)
     /// </summary>
-    event Action<string, string>? OnShow;
+    event Action<string, string?, string>? OnShow;
 
     /// <summary>
     /// 显示一条 Toast 消息
     /// </summary>
-    /// <param name="message">提示文字</param>
+    /// <param name="title">标题文字</param>
+    /// <param name="detail">详细描述（可选）</param>
     /// <param name="variant">类型：info / success / warning / error</param>
-    void Show(string message, string variant = "info");
+    void Show(string title, string? detail = null, string variant = "info");
 }

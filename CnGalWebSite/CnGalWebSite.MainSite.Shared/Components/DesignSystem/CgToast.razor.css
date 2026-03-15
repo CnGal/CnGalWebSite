@@ -1,49 +1,110 @@
+/* ── Container ── */
 .cg-toast {
     position: fixed;
-    top: var(--cg-spacing-4);
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: var(--cg-spacing-6);
+    right: var(--cg-spacing-6);
     z-index: 9999;
-    padding: var(--cg-spacing-3) var(--cg-spacing-6);
-    border-radius: var(--cg-radius-md);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
-    box-shadow: var(--cg-shadow-lg);
-    animation: cg-toast-in var(--cg-transition-normal) ease-out;
+    max-width: 400px;
+    width: calc(100% - var(--cg-spacing-8));
+
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+
+    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.03);
+
+    font-family: var(--cg-font-family);
+    color: var(--cg-color-text);
+    animation: cg-toast-slide-in 0.35s ease-out;
     pointer-events: none;
 }
 
-/* ── info ── */
+/* ── Icon ── */
+::deep .cg-toast__icon {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* ── Content ── */
+.cg-toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.cg-toast__title {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    line-height: 1.4;
+}
+
+.cg-toast__detail {
+    margin: 0.15rem 0 0;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    line-height: 1.4;
+}
+
+/* ── Variant icon colors ── */
+.cg-toast--info ::deep .cg-toast__icon {
+    color: var(--cg-color-primary);
+}
+
+.cg-toast--success ::deep .cg-toast__icon {
+    color: var(--cg-color-success);
+}
+
+.cg-toast--warning ::deep .cg-toast__icon {
+    color: var(--cg-color-warning);
+}
+
+.cg-toast--error ::deep .cg-toast__icon {
+    color: var(--cg-color-error);
+}
+
+/* ── Variant left accent ── */
 .cg-toast--info {
-    background-color: #1e40af;
-    color: #ffffff;
+    border-left: 3px solid var(--cg-color-primary);
 }
 
-/* ── success ── */
 .cg-toast--success {
-    background-color: #166534;
-    color: #ffffff;
+    border-left: 3px solid var(--cg-color-success);
 }
 
-/* ── warning ── */
 .cg-toast--warning {
-    background-color: #92400e;
-    color: #ffffff;
+    border-left: 3px solid var(--cg-color-warning);
 }
 
-/* ── error ── */
 .cg-toast--error {
-    background-color: var(--cg-color-error);
-    color: #ffffff;
+    border-left: 3px solid var(--cg-color-error);
 }
 
-@keyframes cg-toast-in {
+/* ── Slide-in animation ── */
+@keyframes cg-toast-slide-in {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(-0.5rem);
+        transform: translateY(1rem);
     }
     to {
         opacity: 1;
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
+    }
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 480px) {
+    .cg-toast {
+        right: var(--cg-spacing-3);
+        bottom: var(--cg-spacing-3);
+        max-width: none;
+        width: calc(100% - var(--cg-spacing-6));
     }
 }

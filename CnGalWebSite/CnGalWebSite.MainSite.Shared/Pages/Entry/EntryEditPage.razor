@@ -201,7 +201,7 @@ else if (Model != null)
         var validationResult = Model.Data.Validate();
         if (!validationResult.Successful)
         {
-            ToastService.Show(validationResult.Error ?? "请检查表单是否填写正确", "error");
+            ToastService.Show("校验失败", validationResult.Error ?? "请检查表单是否填写正确", "error");
             return;
         }
 
@@ -224,12 +224,12 @@ else if (Model != null)
             }
             else
             {
-                ToastService.Show(result.Error?.Message ?? "提交失败", "error");
+                ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
             }
         }
         catch (Exception ex)
         {
-            ToastService.Show("发生未知错误：" + ex.Message, "error");
+            ToastService.Show("发生错误", ex.Message, "error");
         }
         finally
         {

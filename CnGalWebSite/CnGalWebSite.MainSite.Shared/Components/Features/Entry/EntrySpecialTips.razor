@@ -1,15 +1,17 @@
 @using CnGalWebSite.DataModel.Model
 
-<section class="entry-special-tips" aria-label="特殊提示">
+@if (IsHidden || Type == EntryType.Staff)
+{
     @if (IsHidden)
     {
-        <p class="entry-tip entry-tip--warning">当前词条处于隐藏状态，请谨慎传播并联系管理员确认。</p>
+        <CgAlert Variant="warning">当前词条处于隐藏状态，请谨慎传播并联系管理员确认。</CgAlert>
     }
     @if (Type == EntryType.Staff)
     {
-        <p class="entry-tip entry-tip--danger">该词条可能涉及现实人物，请保持客观描述并谨慎编辑。</p>
+        <CgAlert Variant="error">该词条可能涉及现实人物，请保持客观描述并谨慎编辑。</CgAlert>
     }
-</section>
+}
+
 
 @code {
     [Parameter] public bool IsHidden { get; set; }

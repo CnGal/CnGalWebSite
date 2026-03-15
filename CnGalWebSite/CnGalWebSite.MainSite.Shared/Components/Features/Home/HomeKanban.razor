@@ -1,18 +1,16 @@
-<HomeSection Title="CnGal" Icon="mdiBookOpenVariant" IconColor="var(--cg-color-secondary)">
-    <div class="home-kanban-content">
-        <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" />
-        <div class="home-kanban-quote">
-            <div class="home-kanban-quote-content">@_item.Content</div>
-            @if (!string.IsNullOrWhiteSpace(_item.Source))
-            {
-                <div class="home-kanban-quote-by">
-                    ——<a href="@_item.SourceLink"><i>@_item.Source</i></a>
-                </div>
-            }
-        </div>
-        <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" class="home-kanban-img-flipped" />
+<div class="home-kanban-content">
+    <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" />
+    <div class="home-kanban-quote">
+        <div class="home-kanban-quote-content">@_item.Content</div>
+        @if (!string.IsNullOrWhiteSpace(_item.Source))
+        {
+            <div class="home-kanban-quote-by">
+                ——<a href="@_item.SourceLink"><i>@_item.Source</i></a>
+            </div>
+        }
     </div>
-</HomeSection>
+    <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338?https://image.cngal.org/images/upload/20231108/b10db068dafcc6df54bb6a665a7070d7c7331196.png" alt="看板娘在摸鱼" loading="lazy" decoding="async" class="home-kanban-img-flipped" />
+</div>
 
 @code {
     private class QuoteModel

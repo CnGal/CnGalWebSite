@@ -5,13 +5,7 @@
             <span class="home-card-community-icon @(GetToneClass())">
                 <CgMdiIcon Name="@Icon" aria-hidden="true" />
             </span>
-            <span class="home-card-community-content">
-                <strong>@Title</strong>
-                @if (!string.IsNullOrWhiteSpace(Text))
-                {
-                    <p>@Text</p>
-                }
-            </span>
+            <strong>@Title</strong>
         }
         else
         {

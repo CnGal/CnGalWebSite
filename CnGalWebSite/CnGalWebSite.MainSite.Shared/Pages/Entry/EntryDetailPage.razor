@@ -42,9 +42,7 @@ else if (Model is not null)
                 </EntrySection>
 
                 <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
-                    <div class="entry-markdown">
-                        @(new MarkupString(Model.MainPage))
-                    </div>
+                    <CgHtmlContent Content="@Model.MainPage" />
                 </EntryCard>
 
                 <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">

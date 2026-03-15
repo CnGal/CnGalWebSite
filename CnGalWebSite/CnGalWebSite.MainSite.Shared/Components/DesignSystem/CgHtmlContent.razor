@@ -1,0 +1,15 @@
+@* CgHtmlContent — 通用 HTML 内容显示组件，用于渲染 markdown 解析生成的 HTML *@
+@if (!string.IsNullOrWhiteSpace(Content))
+{
+    <div class="cg-html-content">
+        @(new MarkupString(Content))
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 要渲染的 HTML 内容字符串（通常由 markdown 解析生成）
+    /// </summary>
+    [Parameter]
+    public string? Content { get; set; }
+}

@@ -25,18 +25,6 @@
     gap: 1.5rem;
 }
 
-.entry-markdown {
-    line-height: 1.8;
-    white-space: pre-wrap;
-    font-size: 0.95rem;
-    color: var(--cg-color-text);
-}
-
-.entry-markdown ::deep img {
-    max-width: 100%;
-    height: auto;
-}
-
 .entry-layout--mobile {
     display: block;
 }

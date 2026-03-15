@@ -5,13 +5,21 @@
 @if (_visible)
 {
     <div class="cg-toast cg-toast--@_variant" role="alert">
-        <span class="cg-toast-message">@_message</span>
+        <CgMdiIcon Name="@GetVariantIcon()" Class="cg-toast__icon" aria-hidden="true"/>
+        <div class="cg-toast__content">
+            <div class="cg-toast__title">@_title</div>
+            @if (!string.IsNullOrEmpty(_detail))
+            {
+                <div class="cg-toast__detail">@_detail</div>
+            }
+        </div>
     </div>
 }
 
 @code {
     private bool _visible;
-    private string _message = string.Empty;
+    private string _title = string.Empty;
+    private string? _detail;
     private string _variant = "info";
     private CancellationTokenSource? _cts;
 
@@ -25,13 +33,14 @@
         ToastService.OnShow += HandleShow;
     }
 
-    private async void HandleShow(string message, string variant)
+    private async void HandleShow(string title, string? detail, string variant)
     {
         // 若已有定时器则取消
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
 
-        _message = message;
+        _title = title;
+        _detail = detail;
         _variant = variant;
         _visible = true;
         await InvokeAsync(StateHasChanged);
@@ -47,6 +56,14 @@
             // 被新一次 Show 取消，忽略
         }
     }
+
+    private string GetVariantIcon() => _variant switch
+    {
+        "success" => "mdiCheckCircleOutline",
+        "warning" => "mdiAlertOutline",
+        "error"   => "mdiAlertCircleOutline",
+        _         => "mdiInformationOutline"
+    };
 
     public void Dispose()
     {
