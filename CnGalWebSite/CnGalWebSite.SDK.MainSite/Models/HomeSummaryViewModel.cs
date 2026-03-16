@@ -2,6 +2,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Tables;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -43,7 +44,7 @@ public sealed class HomeSummaryViewModel
 
     public required IReadOnlyList<EvaluationItemModel> Evaluations { get; init; }
 
-    public required IReadOnlyList<HomeSupportLinkViewModel> SupportLinks { get; init; }
+    public required HomeSupportLinkViewModel? SupportLink { get; init; }
 
     public required IReadOnlyList<HotTagItemModel> HotTags { get; init; }
 
@@ -52,6 +53,8 @@ public sealed class HomeSummaryViewModel
     public required IReadOnlyList<FreeGameItemModel> FreeGames { get; init; }
 
     public required IReadOnlyList<DiscountGameItemModel> DiscountGames { get; init; }
+
+    public required TableViewModel CommunityStats { get; init; }
 
     public required IReadOnlyList<SdkErrorModel> Warnings { get; init; }
 }

@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.HealthCheck.Models;
+using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
@@ -48,12 +48,38 @@ app.UseHealthChecks("/healthz", ServiceStatus.Options);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAntiforgery();
+// 覆写 SSR 页面的 Cache-Control，按登录状态区分缓存策略
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var contentType = context.Response.ContentType;
+        if (contentType != null
+            && contentType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase)
+            && context.Response.StatusCode == 200)
+        {
+            if (context.User.Identity?.IsAuthenticated != true)
+            {
+                // 未登录：CDN 可缓存 5 分钟，浏览器不缓存（避免登录后看到旧页面）
+                context.Response.Headers.CacheControl = "public, s-maxage=300, max-age=0, must-revalidate";
+            }
+            else
+            {
+                // 已登录：任何缓存层都不得缓存
+                context.Response.Headers.CacheControl = "private, no-cache, no-store";
+            }
+            context.Response.Headers.Remove("Pragma");
+        }
+        return Task.CompletedTask;
+    });
+    await next();
+});
 
 app.MapStaticAssets();
 app.MapMainSiteAuthenticationEndpoints();
 app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(AssemblyMarker).Assembly)
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .DisableAntiforgery();
 
 app.Run();

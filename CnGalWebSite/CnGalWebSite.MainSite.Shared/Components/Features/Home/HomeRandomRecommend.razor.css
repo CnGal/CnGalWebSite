@@ -24,3 +24,25 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
+
+/* ── 推荐理由标签 ── */
+::deep .home-recommend-reason {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    color: var(--cg-color-secondary);
+    background: color-mix(in oklab, var(--cg-color-secondary) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-secondary) 18%, transparent);
+    white-space: nowrap;
+}
+
+::deep .home-recommend-reason .cg-mdi-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+}

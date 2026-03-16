@@ -6,7 +6,7 @@
         <CgButton Variant="primary" OnClick="AddRelease">添加发行版本</CgButton>
     </HeaderActions>
     <ChildContent>
-        <CgTable HasData="@Releases.Any()">
+        <CgTable HasData="@Releases.Any()" MaxHeight="400px">
             <Empty>
                 <p>暂无发行版本，请点击"添加发行版本"。</p>
             </Empty>
@@ -31,8 +31,12 @@
                             <td>@string.Join("、", item.GamePlatformTypes.Select(s => s.GetDisplayName()))</td>
                             <td>@GetReleaseTimeText(item)</td>
                             <td class="cg-actions">
-                                <CgButton Variant="outline" OnClick="() => EditRelease(item)">编辑</CgButton>
-                                <CgButton Variant="danger" OnClick="() => RemoveRelease(item)">删除</CgButton>
+                                <CgButton Variant="ghost" OnClick="() => EditRelease(item)" aria-label="编辑">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                </CgButton>
+                                <CgButton Variant="ghost-danger" OnClick="() => RemoveRelease(item)" aria-label="删除">
+                                    <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                </CgButton>
                             </td>
                         </tr>
                     }

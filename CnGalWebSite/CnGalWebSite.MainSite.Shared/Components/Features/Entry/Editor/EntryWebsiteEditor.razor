@@ -41,7 +41,7 @@
                                OnImageUploaded="OnImageUploaded" />
             </HeaderActions>
             <ChildContent>
-                <CgTable HasData="@Model.Images.Any()">
+                <CgTable HasData="@Model.Images.Any()" MaxHeight="400px">
                     <Empty>
                         <p>暂无图片，请点击"上传图片到图床"添加。</p>
                     </Empty>

@@ -60,8 +60,10 @@
 .home-role-card-title-area {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
     margin-bottom: 0.25rem;
+    flex-wrap: wrap;
 }
 
 .home-role-card-name {
@@ -92,7 +94,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     flex-shrink: 0;
-    max-width: 50%;
 }
 
 .home-role-card-game ::deep .cg-mdi-icon {

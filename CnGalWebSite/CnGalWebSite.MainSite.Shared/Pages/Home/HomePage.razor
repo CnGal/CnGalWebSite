@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -48,7 +48,7 @@ else
                 <ul class="home-game-grid">
                     @foreach (var item in Model.PublishedGames.Take(8))
                     {
-                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
                     }
                 </ul>
             </HomeSection>
@@ -57,7 +57,7 @@ else
                 <ul class="home-game-grid">
                     @foreach (var item in Model.RecentlyDemoGames.Take(8))
                     {
-                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
                     }
                 </ul>
             </HomeSection>
@@ -65,7 +65,7 @@ else
 
             @if (Model.ActivityCarousels.Any())
             {
-                <HomeSection Title="活动" Icon="mdiPartyPopper" IconColor="var(--cg-color-secondary)">
+                <HomeSection>
                     <ul class="home-carousel-grid">
                         @foreach (var item in Model.ActivityCarousels.Take(3))
                         {
@@ -118,6 +118,51 @@ else
             </div>
 
             <div class="home-grid-sidebar">
+                <div class="home-support-row">
+                    @if (Model.SupportLink is not null)
+                    {
+                        <a href="@Model.SupportLink.Link" target="_blank" rel="noopener noreferrer" class="home-support-card">
+                            <span class="home-support-card__icon">
+                                <CgMdiIcon Name="mdiFlash" aria-hidden="true"/>
+                            </span>
+                            <strong class="home-support-card__title">@Model.SupportLink.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(Model.SupportLink.Text))
+                            {
+                                <p class="home-support-card__desc">@Model.SupportLink.Text</p>
+                            }
+                            <span class="home-support-card__action">
+                                前往支持
+                                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
+                            </span>
+                        </a>
+                    }
+
+
+                    <div class="home-stats-card">
+                        <h3 class="home-stats-card__title">CnGal资料站数据</h3>
+                        <div class="home-stats-card__grid">
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">游戏</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.GamesCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">制作组/发行商</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.GroupsCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">角色</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.RolesCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">制作人员</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.StaffsCount.ToString("N0")</span>
+                            </div>
+                        </div>
+                        <span class="home-stats-card__decor">
+                            <CgMdiIcon Name="mdiAccountGroup" aria-hidden="true"/>
+                        </span>
+                    </div>
+                </div>
                 <HomeSection Title="每周速报" Icon="mdiTextLong" IconColor="var(--cg-color-primary)">
                     @{
                         var latestWeekly = Model.WeeklyNews.FirstOrDefault();
@@ -129,7 +174,7 @@ else
                                 <CgMdiIcon Name="mdiNewspaper" aria-hidden="true" />
                                 CnGal 周报
                             </h3>
-                            <p>第 @TrimWeeklyNewsTitle(latestWeekly.Name) 期</p>
+                            <p>@TrimWeeklyNewsTitle(latestWeekly.Name)</p>
                             <span class="home-weekly-digest-action">立即阅读</span>
                         </a>
                     }
@@ -150,7 +195,7 @@ else
                     <ul class="home-list home-dev-news-list-connected">
                         @foreach (var item in Model.HomeNews.Take(6))
                         {
-                            <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@item.Time.ToString("yyyy-MM-dd HH:mm")" Image="@item.Image" Category="@item.Type" DevStyle="true" />
+                            <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@FormatRelativeTime(item.Time)" Image="@item.Image" Category="@item.Type" DevStyle="true" />
                         }
                     </ul>
                 </HomeSection>
@@ -158,9 +203,15 @@ else
                 <HomeSection Title="角色生日" Icon="mdiCake" IconColor="var(--cg-color-secondary)">
                     @if (Model.Birthdays.Count == 0)
                     {
-                        <div class="home-card">
-                            <p>好像今天没人过生日欸</p>
-                            <a href="/birthday">前往生日日历提前准备</a>
+                        <div class="home-empty-state-card">
+                            <div class="home-empty-state-card__icon">
+                                <CgMdiIcon Name="mdiCakeVariantOutline" aria-hidden="true" />
+                            </div>
+                            <p class="home-empty-state-card__text">好像今天没人过生日欸</p>
+                            <a href="/birthday" class="home-empty-state-card__action">
+                                <CgMdiIcon Name="mdiCalendarSearch" aria-hidden="true" />
+                                前往生日日历提前准备
+                            </a>
                         </div>
                     }
                     else
@@ -213,31 +264,6 @@ else
                 </HomeSection>
 
                 <div class="home-support-tags-panel">
-                    <HomeSection Title="支持我们" Icon="mdiHandHeartOutline" IconColor="var(--cg-color-primary)">
-                        <ul class="home-support-grid">
-                            @foreach (var item in Model.SupportLinks)
-                            {
-                                <li>
-                                    <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="home-support-card">
-                                        <span class="home-support-card__icon">
-                                            <CgMdiIcon Name="mdiHeartOutline" aria-hidden="true" />
-                                        </span>
-                                        <span class="home-support-card__body">
-                                            <strong>@item.Title</strong>
-                                            @if (!string.IsNullOrWhiteSpace(item.Text))
-                                            {
-                                                <small>@item.Text</small>
-                                            }
-                                        </span>
-                                        <span class="home-support-card__arrow">
-                                            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
-                                        </span>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </HomeSection>
-
                     <HomeSection Title="热门标签" Icon="mdiTagMultipleOutline" IconColor="var(--cg-color-secondary)">
                         <ul class="home-hot-tags">
                             @foreach (var (item, i) in Model.HotTags.Take(20).Select((v, i) => (v, i)))
@@ -258,9 +284,7 @@ else
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.FreeGames.Take(5))
                 {
-                    <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
-                        <span class="home-free-label">免费游玩</span>
-                    </HomeGameCard>
+                    <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
                 }
             </ul>
         </HomeSection>
@@ -325,11 +349,12 @@ else
         RecentlyEditedGames = [],
         CommunityLinks = [],
         Evaluations = [],
-        SupportLinks = [],
+        SupportLink = null,
         HotTags = [],
         LatestComments = [],
         FreeGames = [],
         DiscountGames = [],
+        CommunityStats = new CnGalWebSite.DataModel.ViewModel.Tables.TableViewModel(),
         Warnings = []
     };
 
@@ -396,5 +421,17 @@ else
             5 => "dark",
             _ => "pink"
         };
+    }
+
+    private static string FormatRelativeTime(DateTime time)
+    {
+        var span = DateTime.Now - time;
+
+        if (span.TotalMinutes < 1) return "刚刚";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes}分钟前";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours}小时前";
+        if (span.TotalDays < 30) return $"{(int)span.TotalDays}天前";
+        if (span.TotalDays < 365) return $"{(int)(span.TotalDays / 30)}个月前";
+        return $"{(int)(span.TotalDays / 365)}年前";
     }
 }

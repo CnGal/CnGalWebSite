@@ -13,7 +13,7 @@
             <CgAlert Variant="error">@_errorMessage</CgAlert>
         }
 
-        <CgTable HasData="@Staffs.Any()">
+        <CgTable HasData="@Staffs.Any()" MaxHeight="400px">
             <Empty>
                 <p>暂无 Staff 数据，请点击"添加 Staff"或"批量导入"。</p>
             </Empty>

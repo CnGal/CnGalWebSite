@@ -1,6 +1,6 @@
 .home-comment-card {
     border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     padding: 0.75rem 1rem;
     transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast), transform var(--cg-transition-fast);

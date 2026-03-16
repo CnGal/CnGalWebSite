@@ -1,6 +1,6 @@
 .home-evaluation-card {
     border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast), transform var(--cg-transition-fast);
     display: flex;

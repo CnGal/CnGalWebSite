@@ -6,6 +6,7 @@
 }
 
 .cg-image-card {
+    position: relative;
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-lg);
     overflow: hidden;
@@ -51,26 +52,25 @@
 }
 
 .cg-image-card__actions {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
     display: flex;
-    justify-content: flex-end;
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    gap: var(--cg-spacing-2);
-    border-top: 1px solid var(--cg-color-border);
-    background: var(--cg-color-section-bg);
+    gap: var(--cg-spacing-1);
+    opacity: 0;
+    transition: opacity var(--cg-transition-fast);
+    z-index: 2;
 }
 
-/* ── 编辑弹窗预览 ── */
-.cg-edit-image-preview {
-    margin-bottom: var(--cg-spacing-4);
+.cg-image-card:hover .cg-image-card__actions {
+    opacity: 1;
+}
+
+/* give ghost buttons on the overlay a subtle backdrop so icons stay visible on any image */
+.cg-image-card__actions ::deep .cg-btn {
+    background: color-mix(in oklab, var(--cg-color-surface) 80%, transparent);
+    backdrop-filter: blur(4px);
     border-radius: var(--cg-radius-md);
-    overflow: hidden;
-    background-color: var(--cg-color-bg);
-    max-height: 300px;
 }
 
-.cg-edit-image-preview img {
-    width: 100%;
-    max-height: 300px;
-    object-fit: contain;
-    display: block;
-}
+

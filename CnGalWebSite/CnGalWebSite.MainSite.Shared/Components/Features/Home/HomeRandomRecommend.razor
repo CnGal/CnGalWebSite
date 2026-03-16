@@ -1,5 +1,6 @@
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.DataModel.Model
 
 <HomeSection Title="随机推荐" Icon="mdiTrendingUp" IconColor="var(--cg-color-secondary)">
     <ul class="home-random-recommend-grid">
@@ -7,7 +8,15 @@
         {
             foreach (var item in HotRecommends.Take(8))
             {
-                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" />
+                <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
+                    @if (item.Reason != RecommendReason.None)
+                    {
+                        <span class="home-recommend-reason">
+                            <CgMdiIcon Name="mdiStarOutline" aria-hidden="true" />
+                            @item.Reason.GetDisplayName()
+                        </span>
+                    }
+                </HomeGameCard>
             }
         }
     </ul>

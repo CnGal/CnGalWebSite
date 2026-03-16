@@ -41,7 +41,7 @@
 ### 3.1 接口分层（MUST）
 
 - SDK 服务按语义拆分为：
-  - `Queries/`：只读查询，不产生副作用（如 `HomeQueryService`、`EntryQueryService`、`SpaceQueryService`）。
+  - `Queries/`：只读查询，不产生副作用（如 `HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`）。
   - `Commands/`：写操作（编辑提交、文件上传等，如 `EntryCommandService`、`FileCommandService`）。
 - 交互页不得直接拼接 API 路径；路径细节只允许存在于 SDK 内部。
 
@@ -62,7 +62,8 @@
 
 ### 3.4 容错与日志（MUST）
 
-- Query 服务继承 `QueryServiceBase`，使用其 `GetAsyncWithBody`、`Deserialize<T>` 和 `TrimForLog` 方法。
+- Query 服务继承 `QueryServiceBase`，使用其底层辅助方法（`GetAsyncWithBody`、`Deserialize<T>`、`TrimForLog`）和模板方法（`GetSingleAsync`、`GetListSafeAsync`、`GetAsync`），避免在每个服务中重复编写容错逻辑。
+- Command 服务继承 `CommandServiceBase`，使用其 `GetFromJsonAsync`、`PostAsJsonAsync`、`PostAsJsonRawAsync`、`ReadResponseAsync` 方法，所有序列化操作统一使用 `SdkJsonSerializerOptions.Default`。
 - 每个外部调用必须覆盖三类失败：HTTP 非成功、反序列化失败、运行时异常。
 - 日志必须包含：`Path`、`StatusCode`、`BaseAddress`、业务 `ErrorCode`。
 - 响应体日志必须截断（使用 `TrimForLog`，默认 800 字符），禁止无上限输出。
@@ -105,7 +106,7 @@
 
 - `Components/DesignSystem/`：基础组件（Button/Input/Modal/Pagination...），不包含业务术语，前缀 `Cg`。
 - `Components/Features/{Domain}/`：业务组件（如词条卡片、文章摘要、评分区），按领域分组。
-  - 当前领域：`Entry`（词条详情）、`EntryEditor`（词条编辑）、`Home`（首页）、`Space`（个人空间）。
+  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Home`（首页）、`Space`（个人空间）。
 - `Components/Layout/`：非全局壳的布局辅助组件（如 `UserMenu`）。
 - `Layout/`：全局壳与导航（`MainLayout`），不承载业务查询逻辑。
 
@@ -135,14 +136,15 @@
 
 - 设计变量统一收敛到 `wwwroot/styles/design-tokens.css`，使用 `:root` 声明。
 - 当前 Token 分类：
-  - **颜色**：`--cg-color-bg`、`--cg-color-surface`、`--cg-color-border`、`--cg-color-text`、`--cg-color-text-muted`、`--cg-color-primary`、`--cg-color-secondary`、`--cg-color-error`、`--cg-color-link`、`--cg-color-on-primary`、`--cg-color-focus-ring`、`--cg-color-hover-overlay` 等。
+  - **颜色**：`--cg-color-bg`、`--cg-color-surface`、`--cg-color-border`、`--cg-color-text`、`--cg-color-text-muted`、`--cg-color-primary`、`--cg-color-secondary`、`--cg-color-error`、`--cg-color-link`、`--cg-color-on-primary`、`--cg-color-focus-ring`、`--cg-color-hover-overlay`、`--cg-color-primary-hover`、`--cg-color-secondary-hover`、`--cg-color-danger`（`var(--cg-color-error)` 别名）、`--cg-color-success`、`--cg-color-warning`、`--cg-color-text-primary`、`--cg-color-text-secondary`、`--cg-color-section-bg` 等。
   - **间距**：`--cg-spacing-1` 到 `--cg-spacing-10`。
   - **圆角**：`--cg-radius-sm` / `md` / `lg` / `xl` / `full`。
   - **字号**：`--cg-font-size-xs` 到 `--cg-font-size-2xl`。
   - **字重**：`--cg-font-weight-medium` / `semibold` / `bold`。
-  - **阴影**：`--cg-shadow-sm` / `md` / `lg`。
+  - **阴影**：`--cg-shadow-sm` / `md` / `lg`、`--cg-shadow-card-hover`。
   - **过渡**：`--cg-transition-fast` / `normal`。
   - **字体**：`--cg-font-family`（Plus Jakarta Sans）。
+  - **组件 Token**：`--cg-header-height`。
 - 组件样式与页面样式禁止硬编码重复色值；优先消费 `--cg-*` 变量。
 
 ### 5.2 样式隔离（MUST）
@@ -181,15 +183,17 @@
   - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Space/`）
   - `Layout/`（`MainLayout`）
   - `Components/DesignSystem/`（基础组件）
-  - `Components/Features/{Domain}/`（业务组件，如 `Entry/`、`EntryEditor/`、`Home/`、`Space/`）
+  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Home/`、`Space/`）
   - `Components/Layout/`（布局辅助组件，如 `UserMenu`）
+  - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`）
+  - `Extensions/`（DI 注册扩展，如 `ServiceCollectionExtensions.AddMainSiteSharedServices`）
 - `SDK.MainSite` 当前结构：
-  - `Abstractions/`
+  - `Abstractions/`（7 个接口，含新增 `ITagQueryService`）
   - `Queries/`
   - `Commands/`
   - `Auth/`
-  - `Models/`（含子目录 `EntryEdit/`、`Files/`）
-  - `Infrastructure/`
+  - `Models/`（含子目录 `EntryEdit/`、`Files/`；`Files/` 下新增 `AudioUploadResult`、`ImageAspectType`、`ImageCropRect`）
+  - `Infrastructure/`（含 `QueryServiceBase`、`CommandServiceBase`、`SdkJsonSerializerOptions`、`StaffBatchParser`）
   - `Extensions/`
 
 ### 6.2 命名规范（MUST）
@@ -197,6 +201,7 @@
 - 页面组件：`{Domain}{Function}Page.razor`（如 `HomePage.razor`、`EntryDetailPage.razor`、`EntryEditPage.razor`）。
 - 基础组件：`Cg{Component}.razor`（如 `CgButton.razor`、`CgEnumSelect.razor`）。
 - 业务组件：`{Domain}{Feature}.razor`（如 `EntryHero.razor`、`HomeGameCard.razor`、`SpaceHero.razor`）。
+- 业务组件按领域分组后可进一步按子场景分子目录，如 `Entry/Detail/EntryHero.razor`、`Entry/Editor/EntryMainEditor.razor`。
 - Query Service：`{Domain}QueryService`，接口 `I{Domain}QueryService`。
 - Command Service：`{Domain}CommandService`，接口 `I{Domain}CommandService`。
 - Result 错误码：全大写蛇形，带领域前缀（如 `ENTRY_NOT_FOUND`、`HOME_ALL_REQUESTS_FAILED`）。
@@ -226,6 +231,7 @@
 
 - 页面必须提供失败态 UI（错误文案 + 可恢复动作）。
   - 当前已实现：`HomePage` 使用 `HomeError` 组件、`EntryDetailPage` 使用错误区块+返回首页链接、`EntryEditPage` 使用错误区块+重试按钮、`SpaceIndexPage` 区分 404 和通用错误。
+- 交互页面可使用 `ICgToastService` 进行轻量级操作反馈通知（成功/失败/警告/信息），服务通过 `AddMainSiteSharedServices()` 注册。
 - 不可恢复错误要有明确回退路径（返回首页、重试等）。
 
 ---

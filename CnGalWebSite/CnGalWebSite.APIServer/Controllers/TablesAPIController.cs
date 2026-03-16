@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
@@ -132,6 +132,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new TableViewModel
             {
                 EntriesCount = await _entryRepository.CountAsync(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false),
+                GamesCount = await _entryRepository.CountAsync(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false),
+                RolesCount = await _entryRepository.CountAsync(s => s.Type == EntryType.Role && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false),
+                StaffsCount = await _entryRepository.CountAsync(s => s.Type == EntryType.Staff && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false),
+                GroupsCount = await _entryRepository.CountAsync(s => s.Type == EntryType.ProductionGroup && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false),
                 ArticlesCount = await _articleRepository.LongCountAsync(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
             };
             if (await _examineRepository.GetAll().AnyAsync())

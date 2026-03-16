@@ -1,0 +1,40 @@
+@if (!string.IsNullOrWhiteSpace(AuthorName))
+{
+    <section class="article-author">
+        <a href="@SpaceUrl" class="article-author-link">
+            @if (!string.IsNullOrWhiteSpace(AuthorAvatar))
+            {
+                <img class="article-author-avatar" src="@AuthorAvatar" alt="@AuthorName" loading="lazy" />
+            }
+            else
+            {
+                <div class="article-author-avatar article-author-avatar--placeholder">
+                    <CgMdiIcon Name="mdiAccount" />
+                </div>
+            }
+            <span class="article-author-name">@AuthorName</span>
+        </a>
+
+        @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
+        {
+            <div class="article-author-original">
+                <CgMdiIcon Name="mdiPencilOutline" />
+                <span>原作者：@OriginalAuthor</span>
+                @if (!string.IsNullOrWhiteSpace(OriginalLink))
+                {
+                    <a href="@OriginalLink" target="_blank" rel="noopener noreferrer">原文链接</a>
+                }
+            </div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public string AuthorName { get; set; } = "";
+    [Parameter] public string AuthorAvatar { get; set; } = "";
+    [Parameter] public string AuthorId { get; set; } = "";
+    [Parameter] public string OriginalAuthor { get; set; } = "";
+    [Parameter] public string OriginalLink { get; set; } = "";
+
+    private string SpaceUrl => string.IsNullOrWhiteSpace(AuthorId) ? "#" : $"/space/index/{AuthorId}";
+}

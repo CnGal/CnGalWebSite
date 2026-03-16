@@ -123,36 +123,40 @@ public static class ServiceCollectionExtensions
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddTransient<AccessTokenHandler>();
-        services.AddHttpClient<IHomeQueryService, HomeQueryService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        })
-        .AddHttpMessageHandler<AccessTokenHandler>();
-        services.AddHttpClient<IEntryQueryService, EntryQueryService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        })
-        .AddHttpMessageHandler<AccessTokenHandler>();
-        services.AddHttpClient<ISpaceQueryService, SpaceQueryService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        })
-        .AddHttpMessageHandler<AccessTokenHandler>();
-        services.AddHttpClient<IEntryCommandService, EntryCommandService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        })
-        .AddHttpMessageHandler<AccessTokenHandler>();
-        services.AddHttpClient<IFileCommandService, FileCommandService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
-        });
-        services.AddHttpClient<ITagQueryService, TagQueryService>(client =>
-        {
-            client.BaseAddress = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        })
-        .AddHttpMessageHandler<AccessTokenHandler>();
+
+        var apiBase = new Uri(EnsureTrailingSlash(apiBaseAddress));
+        var imageApiBase = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
+
+        // Query 服务（均需认证）
+        RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase, withAuth: true);
+
+        // Command 服务
+        RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
+
         return services;
+    }
+
+    private static void RegisterSdkHttpClient<TInterface, TImpl>(
+        IServiceCollection services,
+        Uri baseAddress,
+        bool withAuth)
+        where TInterface : class
+        where TImpl : class, TInterface
+    {
+        var builder = services.AddHttpClient<TInterface, TImpl>(client =>
+        {
+            client.BaseAddress = baseAddress;
+        });
+
+        if (withAuth)
+        {
+            builder.AddHttpMessageHandler<AccessTokenHandler>();
+        }
     }
 
     private static string EnsureTrailingSlash(string address)
