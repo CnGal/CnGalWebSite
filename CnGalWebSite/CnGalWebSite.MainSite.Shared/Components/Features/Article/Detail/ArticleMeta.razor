@@ -1,0 +1,28 @@
+<section class="article-meta">
+    <div class="article-meta-item">
+        <CgMdiIcon Name="mdiEyeOutline" />
+        <span>@ReaderCount 阅读</span>
+    </div>
+    <div class="article-meta-item">
+        <CgMdiIcon Name="mdiThumbUpOutline" />
+        <span>@ThumbsUpCount 点赞</span>
+    </div>
+    <div class="article-meta-item">
+        <CgMdiIcon Name="mdiCommentTextOutline" />
+        <span>@CommentCount 评论</span>
+    </div>
+    @if (LastEditTime != default)
+    {
+        <div class="article-meta-item article-meta-item--time">
+            <CgMdiIcon Name="mdiClockEditOutline" />
+            <span>最后编辑于 @LastEditTime.ToString("yyyy-MM-dd")</span>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public int ThumbsUpCount { get; set; }
+    [Parameter] public long CommentCount { get; set; }
+    [Parameter] public DateTime LastEditTime { get; set; }
+}

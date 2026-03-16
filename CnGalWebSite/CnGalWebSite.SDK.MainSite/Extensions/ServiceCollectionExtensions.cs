@@ -132,6 +132,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);

@@ -1,0 +1,45 @@
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <section class="article-hero">
+        @if (HasBackground)
+        {
+            <div class="article-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+        }
+
+        <div class="article-hero-content">
+            @if (!string.IsNullOrWhiteSpace(MainPicture))
+            {
+                <img class="article-hero-image" src="@MainPicture" alt="@Title" loading="eager" />
+            }
+
+            <div class="article-hero-text">
+                <span class="article-hero-type">@TypeText</span>
+                <h1>@Title</h1>
+                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+                {
+                    <p class="article-hero-intro">@BriefIntroduction</p>
+                }
+                <div class="article-hero-time">
+                    <CgMdiIcon Name="mdiCalendarOutline" />
+                    <time datetime="@TimeValue">@TimeDisplay</time>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string BriefIntroduction { get; set; } = "";
+    [Parameter] public string MainPicture { get; set; } = "";
+    [Parameter] public string BackgroundPicture { get; set; } = "";
+    [Parameter] public string TypeText { get; set; } = "";
+    [Parameter] public DateTime? PubishTime { get; set; }
+    [Parameter] public DateTime CreateTime { get; set; }
+
+    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
+
+    private DateTime EffectiveTime => PubishTime ?? CreateTime;
+    private string TimeValue => EffectiveTime.ToString("yyyy-MM-dd");
+    private string TimeDisplay => EffectiveTime.ToString("yyyy 年 M 月 d 日");
+}
