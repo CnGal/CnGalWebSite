@@ -1,0 +1,232 @@
+@page "/tags/create"
+@page "/tags/createtag"
+@page "/tags/edit/{Id:int}"
+
+@rendermode InteractiveServer
+@using CnGalWebSite.DataModel.ViewModel.Tags
+@using CnGalWebSite.MainSite.Shared.Components.Features.Tag.Editor
+@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.SDK.MainSite.Models.TagEdit
+@using System.Text.Json
+@using Microsoft.JSInterop
+@inject ITagCommandService TagCommandService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject ICgToastService ToastService
+@implements IDisposable
+
+<PageTitle>@(IsCreate ? "创建标签" : "编辑标签")</PageTitle>
+
+@if (IsLoading)
+{
+    <section class="tag-edit-loading" aria-label="加载中">
+        <div class="tag-edit-loading-spinner"></div>
+        <p>正在获取数据...</p>
+    </section>
+}
+else if (LoadErrorMessage != null)
+{
+    <section class="tag-edit-error">
+        <h1>加载失败</h1>
+        <p>@LoadErrorMessage</p>
+        <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+    </section>
+}
+else if (Model != null)
+{
+    <article class="tag-edit-page">
+        <div class="tag-edit-layout">
+            <TagEditorSidebar IsCreate="IsCreate"
+                              IsSubmitting="IsSubmitting"
+                              HasDraftRecovered="HasDraftRecovered"
+                              OnDiscardDraft="DiscardDraft"
+                              OnSubmit="SubmitAsync"
+                              OnCancel="Cancel" />
+
+            <main class="tag-edit-main">
+                <TagMainEditor Model="Model.Data.Main" TagItems="Model.MetaOptions.TagItems" />
+                <TagChildEntriesEditor Model="Model.Data.Entries" EntryItems="Model.MetaOptions.EntryItems" />
+                <TagChildTagsEditor Model="Model.Data.Tags" TagItems="Model.MetaOptions.TagItems" />
+            </main>
+        </div>
+        <CgToast />
+    </article>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private bool IsCreate => Id is null || Id <= 0;
+
+    private bool IsLoading = true;
+    private string? LoadErrorMessage;
+
+    private bool IsSubmitting = false;
+
+    private TagEditViewModel? Model;
+
+    private System.Threading.Timer? _autoSaveTimer;
+    private string DraftKey => IsCreate ? "TagDraft_Create" : $"TagDraft_Edit_{Id}";
+
+    private bool HasDraftRecovered = false;
+    private CreateTagViewModel? OriginalData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+        _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private void AutoSaveCallback(object? state)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            if (Model != null && !IsSubmitting && !IsLoading)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(Model.Data);
+                    await JS.InvokeVoidAsync("localStorage.setItem", DraftKey, json);
+                }
+                catch { /* Ignore local storage errors */ }
+            }
+        });
+    }
+
+    public void Dispose()
+    {
+        _autoSaveTimer?.Dispose();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        IsLoading = true;
+        LoadErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            SdkResult<TagEditViewModel> result;
+            if (IsCreate)
+            {
+                result = await TagCommandService.GetTagCreateTemplateAsync();
+            }
+            else
+            {
+                result = await TagCommandService.GetTagEditAsync(Id!.Value);
+            }
+
+            if (result.Success && result.Data != null)
+            {
+                Model = result.Data;
+                OriginalData = JsonSerializer.Deserialize<CreateTagViewModel>(JsonSerializer.Serialize(result.Data.Data));
+
+                // 尝试恢复草稿
+                try
+                {
+                    var draftStr = await JS.InvokeAsync<string>("localStorage.getItem", DraftKey);
+                    if (!string.IsNullOrWhiteSpace(draftStr))
+                    {
+                        var draft = JsonSerializer.Deserialize<CreateTagViewModel>(draftStr);
+                        if (draft != null)
+                        {
+                            Model.Data = draft;
+                            HasDraftRecovered = true;
+                        }
+                    }
+                }
+                catch { }
+
+                // 加载候选列表
+                var metaResult = await TagCommandService.GetTagEditMetaOptionsAsync();
+                if (metaResult.Success && metaResult.Data != null)
+                {
+                    Model.MetaOptions = metaResult.Data;
+                }
+            }
+            else
+            {
+                LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
+            }
+        }
+        catch (Exception ex)
+        {
+            LoadErrorMessage = "发生未知错误：" + ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DiscardDraft()
+    {
+        if (OriginalData != null && Model != null)
+        {
+            Model.Data = JsonSerializer.Deserialize<CreateTagViewModel>(JsonSerializer.Serialize(OriginalData))!;
+            HasDraftRecovered = false;
+            await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (Model == null || IsSubmitting) return;
+
+        var validationResult = Model.Data.Validate();
+        if (!validationResult.Successful)
+        {
+            ToastService.Show("校验失败", validationResult.Error ?? "请检查表单是否填写正确", "error");
+            return;
+        }
+
+        IsSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var request = new TagEditRequest
+            {
+                IsCreate = IsCreate,
+                Data = Model.Data
+            };
+
+            var result = await TagCommandService.SubmitEditAsync(request);
+            if (result.Success)
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                NavigationManager.NavigateTo($"/tags/index/{result.Data}");
+            }
+            else
+            {
+                ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+        finally
+        {
+            IsSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel()
+    {
+        if (IsCreate)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/tags/index/{Id}");
+        }
+    }
+}

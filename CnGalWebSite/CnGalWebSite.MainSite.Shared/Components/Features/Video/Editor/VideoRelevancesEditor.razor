@@ -1,0 +1,162 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Videos
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
+@using CnGalWebSite.SDK.MainSite.Models.VideoEdit
+
+<section class="entry-editor-section" id="section-relevances">
+    <h2><CgMdiIcon Name="mdiHub" Class="entry-section-icon" aria-hidden="true"/>关联信息</h2>
+    <p>关联词条、文章、视频与外部链接。</p>
+
+    @if (Model != null)
+    {
+        <CgFormSection Title="关联词条与内容" Icon="mdiLinkVariant" Flat>
+            <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
+            <EntryRelevanceListEditor Title="STAFF" Items="Model.staffs" AutoCompleteItems="MetaOptions.EntryStaffItems"/>
+            <EntryRelevanceListEditor Title="游戏" Items="Model.Games" AutoCompleteItems="MetaOptions.EntryGameItems"/>
+            <EntryRelevanceListEditor Title="组织" Items="Model.Groups" AutoCompleteItems="MetaOptions.EntryGroupItems"/>
+            <EntryRelevanceListEditor Title="动态" Items="Model.news" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="文章" Items="Model.articles" AutoCompleteItems="MetaOptions.ArticleItems"/>
+            <EntryRelevanceListEditor Title="视频" Items="Model.videos" AutoCompleteItems="MetaOptions.VideoItems"/>
+        </CgFormSection>
+
+        <CgFormSection Title="自定义链接" Icon="mdiLinkPlus" Flat>
+            <HeaderActions>
+                <CgButton Variant="primary" OnClick="AddOtherLink">添加</CgButton>
+            </HeaderActions>
+            <ChildContent>
+                <CgTable HasData="@Model.others.Any()" MaxHeight="400px">
+                    <Empty>
+                        <p>暂无自定义链接，请点击"添加"。</p>
+                    </Empty>
+                    <ChildContent>
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>链接</th>
+                            <th>说明</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var link in Model.others)
+                        {
+                            <tr>
+                                <td>@link.DisplayName</td>
+                                <td>@link.Link</td>
+                                <td>@link.DisPlayValue</td>
+                                <td class="cg-actions">
+                                    <CgButton Variant="ghost" OnClick="() => EditOtherLink(link)" aria-label="编辑">
+                                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    </CgButton>
+                                    <CgButton Variant="ghost-danger" OnClick="() => DeleteOtherLink(link)" aria-label="删除">
+                                        <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                                    </CgButton>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </ChildContent>
+                </CgTable>
+            </ChildContent>
+        </CgFormSection>
+
+        <CgFormSection Title="外部链接" Icon="mdiOpenInNew" Flat>
+            <CgGrid>
+                <CgFormGroup Label="B站视频Id（bvid/aid）">
+                    <CgInput @bind-Value="Model.BilibiliId" Placeholder="例如：BV1xx411c7mD"/>
+                </CgFormGroup>
+            </CgGrid>
+        </CgFormSection>
+    }
+</section>
+
+@* ── 编辑弹窗 ── *@
+<CgModal IsOpen="@_dialogOpen"
+         Title="编辑自定义链接"
+         OnClose="CloseDialogAsync">
+    <ChildContent>
+        @if (_editing != null)
+        {
+            <CgGrid>
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editing.DisplayName" Placeholder="如：作者主页"/>
+                </CgFormGroup>
+                <CgFormGroup Label="链接">
+                    <CgInput @bind-Value="_editing.Link" Placeholder="https://example.com"/>
+                </CgFormGroup>
+            </CgGrid>
+            <CgFormGroup Label="说明">
+                <CgInput @bind-Value="_editing.DisPlayValue" Placeholder="可选说明"/>
+            </CgFormGroup>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="CloseDialog">取消</CgButton>
+        <CgButton Variant="primary" OnClick="SaveOtherLink">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter] public EditVideoRelevancesViewModel Model { get; set; } = default!;
+
+    [Parameter] public VideoEditMetaOptions MetaOptions { get; set; } = default!;
+
+    private bool _dialogOpen;
+    private RelevancesModel? _editing;
+    private RelevancesModel? _editTarget;
+
+    private void AddOtherLink()
+    {
+        _editTarget = null;
+        _editing = new RelevancesModel();
+        _dialogOpen = true;
+    }
+
+    private void EditOtherLink(RelevancesModel item)
+    {
+        _editTarget = item;
+        _editing = new RelevancesModel
+        {
+            DisplayName = item.DisplayName,
+            DisPlayValue = item.DisPlayValue,
+            Link = item.Link
+        };
+        _dialogOpen = true;
+    }
+
+    private void DeleteOtherLink(RelevancesModel item)
+    {
+        Model.others.Remove(item);
+    }
+
+    private void SaveOtherLink()
+    {
+        if (_editing == null || string.IsNullOrWhiteSpace(_editing.DisplayName)) return;
+
+        if (_editTarget == null)
+        {
+            Model.others.Add(_editing);
+        }
+        else
+        {
+            _editTarget.DisplayName = _editing.DisplayName;
+            _editTarget.DisPlayValue = _editing.DisPlayValue;
+            _editTarget.Link = _editing.Link;
+        }
+
+        CloseDialog();
+    }
+
+    private void CloseDialog()
+    {
+        _dialogOpen = false;
+        _editing = null;
+        _editTarget = null;
+    }
+
+    private Task CloseDialogAsync()
+    {
+        CloseDialog();
+        return Task.CompletedTask;
+    }
+}

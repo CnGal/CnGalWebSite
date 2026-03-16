@@ -1,0 +1,65 @@
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <section class="video-hero">
+        @if (HasBackground)
+        {
+            <div class="video-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+        }
+
+        <div class="video-hero-content">
+            @if (!string.IsNullOrWhiteSpace(MainPicture))
+            {
+                <img class="video-hero-image" src="@MainPicture" alt="@Title" loading="eager" />
+            }
+
+            <div class="video-hero-text">
+                <span class="video-hero-type">
+                    <CgMdiIcon Name="mdiMovieOpenOutline" />
+                    @TypeText
+                </span>
+                <h1>@Title</h1>
+                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+                {
+                    <p class="video-hero-intro">@BriefIntroduction</p>
+                }
+                <div class="video-hero-time">
+                    <CgMdiIcon Name="mdiCalendarOutline" />
+                    <time datetime="@TimeValue">@TimeDisplay</time>
+                    @if (Duration > TimeSpan.Zero)
+                    {
+                        <span class="video-hero-duration">
+                            <CgMdiIcon Name="mdiTimerOutline" />
+                            @FormatDuration(Duration)
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string BriefIntroduction { get; set; } = "";
+    [Parameter] public string MainPicture { get; set; } = "";
+    [Parameter] public string BackgroundPicture { get; set; } = "";
+    [Parameter] public string TypeText { get; set; } = "";
+    [Parameter] public DateTime PubishTime { get; set; }
+    [Parameter] public DateTime CreateTime { get; set; }
+    [Parameter] public TimeSpan Duration { get; set; }
+
+    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
+
+    private DateTime EffectiveTime => PubishTime != default ? PubishTime : CreateTime;
+    private string TimeValue => EffectiveTime.ToString("yyyy-MM-dd");
+    private string TimeDisplay => EffectiveTime.ToString("yyyy 年 M 月 d 日");
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+        {
+            return $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}";
+        }
+        return $"{duration.Minutes:D2}:{duration.Seconds:D2}";
+    }
+}

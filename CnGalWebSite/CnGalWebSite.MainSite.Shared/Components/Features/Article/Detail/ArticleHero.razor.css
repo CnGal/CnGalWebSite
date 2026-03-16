@@ -98,6 +98,58 @@
     border: 1px solid var(--cg-color-border);
 }
 
+/* ── 编辑按钮 ── */
+.article-hero-actions {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-2);
+}
+
+.article-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: none;
+    transition: all var(--cg-transition-fast);
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.article-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.article-hero:not(:has(.article-hero-bg)) .article-edit-btn {
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    border-color: transparent;
+}
+
+.article-hero:not(:has(.article-hero-bg)) .article-edit-btn:hover {
+    background: var(--cg-color-primary-hover);
+}
+
+.article-edit-btn--login {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.article-hero:not(:has(.article-hero-bg)) .article-edit-btn--login {
+    background: transparent;
+    color: var(--cg-color-primary);
+    border: 1px solid var(--cg-color-primary);
+}
+
+.article-hero:not(:has(.article-hero-bg)) .article-edit-btn--login:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
 @media (max-width: 640px) {
     .article-hero-content {
         flex-direction: column;
@@ -121,4 +173,9 @@
     .article-hero-time {
         justify-content: center;
     }
+
+    .article-hero-actions {
+        justify-content: center;
+    }
 }
+

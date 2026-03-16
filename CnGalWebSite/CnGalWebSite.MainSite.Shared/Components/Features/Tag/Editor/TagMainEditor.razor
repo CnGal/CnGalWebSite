@@ -1,0 +1,57 @@
+@using CnGalWebSite.DataModel.ViewModel.Tags
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="entry-editor-section" id="section-tag-main">
+    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="entry-section-icon" aria-hidden="true"/>主要信息</h2>
+    <p>编辑标签名称、父标签、图片与简介。</p>
+
+    @if (Model != null)
+    {
+        <CgGrid MinWidth="150px">
+            <CgFormGroup Label="主图">
+                <CgImageUpload @bind-Value="Model.MainPicture"
+                               Text="上传主图"
+                               ShowCropper
+                               Type="ImageAspectType._16_9"/>
+            </CgFormGroup>
+            <CgFormGroup Label="缩略图">
+                <CgImageUpload @bind-Value="Model.Thumbnail"
+                               Text="上传缩略图"
+                               ShowCropper
+                               Type="ImageAspectType._1_1"/>
+            </CgFormGroup>
+            <CgFormGroup Label="大背景图">
+                <CgImageUpload @bind-Value="Model.BackgroundPicture"
+                               Text="上传大背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="小背景图">
+                <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
+                               Text="上传小背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgGrid>
+            <CgFormGroup Label="唯一名称">
+                <CgInput @bind-Value="Model.Name"/>
+            </CgFormGroup>
+            <CgFormGroup Label="父标签">
+                <CgAutoComplete Value="@Model.ParentTagName"
+                                ValueChanged="(text) => Model.ParentTagName = text ?? string.Empty"
+                                Items="@TagItems"
+                                Placeholder="输入父标签名称"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgFormGroup Label="简介">
+            <CgTextarea @bind-Value="Model.BriefIntroduction"
+                        Rows="3" Placeholder="简短的介绍"/>
+        </CgFormGroup>
+    }
+</section>
+
+@code {
+    [Parameter] public EditTagMainViewModel Model { get; set; } = default!;
+    [Parameter] public IEnumerable<string> TagItems { get; set; } = [];
+}

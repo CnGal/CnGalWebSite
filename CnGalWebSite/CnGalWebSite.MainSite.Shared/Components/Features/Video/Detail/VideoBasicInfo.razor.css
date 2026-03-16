@@ -1,0 +1,37 @@
+.video-basic-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+}
+
+.video-basic-info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+.video-basic-info-item--time {
+    margin-left: auto;
+}
+
+::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 640px) {
+    .video-basic-info {
+        gap: 0.5rem 1rem;
+    }
+
+    .video-basic-info-item--time {
+        margin-left: 0;
+        width: 100%;
+    }
+}

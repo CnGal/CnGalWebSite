@@ -1,0 +1,70 @@
+@page "/tags/index/{Id:int}"
+@inject ITagQueryService TagQueryService
+@using CnGalWebSite.DataModel.ViewModel.Tags
+@using CnGalWebSite.MainSite.Shared.Components.Features.Tag.Detail
+
+<PageTitle>@(Model is null ? "标签详情" : $"{Model.Name} - 标签详情")</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <section class="tag-not-found">
+        <h1>标签加载失败</h1>
+        <p>@ErrorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (Model is not null)
+{
+    <article class="tag-page">
+        <TagBreadcrumb TagLevels="Model.Taglevels" />
+
+        <TagHero Name="@Model.Name"
+                 BriefIntroduction="@Model.BriefIntroduction"
+                 MainPicture="@Model.MainPicture"
+                 BackgroundPicture="@Model.BackgroundPicture"
+                 ReaderCount="Model.ReaderCount" />
+
+        @if (Model.IsHidden)
+        {
+            <CgAlert Variant="warning">
+                当前标签处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CgAlert>
+        }
+
+        <section class="tag-content">
+            <TagChildTags Tags="Model.ChildrenTags" />
+
+            <TagChildEntries Entries="Model.ChildrenEntries" />
+        </section>
+    </article>
+}
+else
+{
+    <section class="tag-loading" aria-label="加载中">
+        <div class="tag-loading-block"></div>
+        <div class="tag-loading-block tag-loading-block--wide"></div>
+        <div class="tag-loading-block"></div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private TagIndexViewModel? Model;
+    private string? ErrorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await TagQueryService.GetTagDetailAsync(Id);
+        if (result.Success && result.Data is not null)
+        {
+            ErrorMessage = null;
+            Model = result.Data;
+            return;
+        }
+
+        Model = null;
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+}

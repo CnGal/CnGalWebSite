@@ -1,0 +1,42 @@
+@using CnGalWebSite.DataModel.ViewModel.Search
+
+@if (Entries is not null && Entries.Count > 0)
+{
+    <section class="tag-child-entries" aria-label="关联词条">
+        <h2 class="tag-entries-title">
+            <CgMdiIcon Name="mdiGamepadVariantOutline" />
+            关联词条
+            <span class="tag-entries-count">@Entries.Count</span>
+        </h2>
+        <ul class="tag-entries-grid">
+            @foreach (var entry in Entries)
+            {
+                <li>
+                    <a class="tag-entry-card" href="/entries/index/@entry.Id">
+                        @if (!string.IsNullOrWhiteSpace(entry.MainImage))
+                        {
+                            <img src="@entry.MainImage" alt="@entry.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="tag-entry-card-placeholder">
+                                <CgMdiIcon Name="mdiImageOffOutline" />
+                            </div>
+                        }
+                        <div class="tag-entry-card-body">
+                            <span class="tag-entry-card-name">@entry.Name</span>
+                            @if (!string.IsNullOrWhiteSpace(entry.BriefIntroduction))
+                            {
+                                <span class="tag-entry-card-intro">@entry.BriefIntroduction</span>
+                            }
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@code {
+    [Parameter] public List<EntryInforTipViewModel>? Entries { get; set; }
+}

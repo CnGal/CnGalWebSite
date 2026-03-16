@@ -1,52 +1,57 @@
-@page "/articles/index/{Id:long}"
-@inject IArticleQueryService ArticleQueryService
-@using CnGalWebSite.DataModel.Model
+@page "/videos/index/{Id:long}"
+@inject IVideoQueryService VideoQueryService
 @using CnGalWebSite.DataModel.ViewModel.Search
-@using CnGalWebSite.MainSite.Shared.Components.Features.Article.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
-@using CnGalWebSite.Extensions
 
-<PageTitle>@(Model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
+<PageTitle>@(Model is null ? "视频详情" : $"{GetDisplayTitle()} - 视频详情")</PageTitle>
 
 @if (ErrorMessage is not null)
 {
-    <section class="article-not-found">
-        <h1>文章加载失败</h1>
+    <section class="video-not-found">
+        <h1>视频加载失败</h1>
         <p>@ErrorMessage</p>
         <a href="/">返回首页</a>
     </section>
 }
 else if (Model is not null)
 {
-    <article class="article-page">
+    <article class="video-page">
 
-        <ArticleHero Title="@GetDisplayTitle()"
-                     BriefIntroduction="@Model.BriefIntroduction"
-                     MainPicture="@Model.MainPicture"
-                     BackgroundPicture="@Model.BackgroundPicture"
-                     TypeText="@GetTypeText(Model.Type)"
-                     PubishTime="@Model.PubishTime"
-                     CreateTime="@Model.CreateTime"
-                     ArticleId="@Model.Id" />
+        <VideoHero Title="@GetDisplayTitle()"
+                   BriefIntroduction="@Model.BriefIntroduction"
+                   MainPicture="@Model.MainPicture"
+                   BackgroundPicture="@Model.BackgroundPicture"
+                   TypeText="@GetTypeText()"
+                   PubishTime="@Model.PubishTime"
+                   CreateTime="@Model.CreateTime"
+                   Duration="@Model.Duration" />
 
         @if (Model.IsHidden)
         {
             <CgAlert Variant="warning">
-                当前文章处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                当前视频处于隐藏状态，如果你看到了这个提示，请立即联系管理员
             </CgAlert>
         }
 
-        <section class="article-layout article-layout--desktop" aria-label="桌面详情布局">
-            <main class="article-main-col">
+        <section class="video-layout video-layout--desktop" aria-label="桌面详情布局">
+            <main class="video-main-col">
+
+                @if (Model.Pictures.Count > 0)
+                {
+                    <EntrySection Title="图片" Icon="mdiImageOutline">
+                        <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" />
+                    </EntrySection>
+                }
 
                 @if (!string.IsNullOrWhiteSpace(Model.MainPage))
                 {
-                    <EntryCard Title="正文" Icon="mdiTextBoxOutline">
+                    <EntryCard Title="正文主页" Icon="mdiTextBoxOutline">
                         <CgHtmlContent Content="@Model.MainPage" />
                     </EntryCard>
                 }
 
-                <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
+                <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
                     <EntryCardList>
                         @foreach (var item in Model.RelatedEntries.Take(8))
                         {
@@ -57,7 +62,7 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
 
-                <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
+                <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
                     <EntryCardList>
                         @foreach (var item in Model.RelatedArticles.Take(8))
                         {
@@ -68,7 +73,7 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
 
-                <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
+                <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
                     <EntryCardList>
                         @foreach (var item in Model.RelatedVideos.Take(8))
                         {
@@ -79,25 +84,27 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
 
-                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                    <a class="article-action-btn" href="@($"/space/comments?type=article&id={Model.Id}")">前往评论区</a>
+                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="video-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
+                    <a class="video-action-btn" href="@($"/space/comments?type=video&id={Model.Id}")">前往评论区</a>
                 </EntryCard>
             </main>
 
-            <aside class="article-side-col">
-                <ArticleAuthor AuthorName="@Model.AuthorName"
-                               AuthorAvatar="@Model.AuthorAvatar"
-                               AuthorId="@Model.AuthorId"
-                               OriginalAuthor="@Model.OriginalAuthor"
-                               OriginalLink="@Model.OriginalLink" />
+            <aside class="video-side-col">
+                <VideoAuthorCard AuthorName="@Model.AuthorName"
+                                 AuthorAvatar="@Model.AuthorAvatar"
+                                 AuthorId="@Model.AuthorId"
+                                 OriginalAuthor="@Model.OriginalAuthor"
+                                 IsOriginal="Model.IsAuthorOriginal" />
 
-                <ArticleMeta ReaderCount="Model.ReaderCount"
-                             ThumbsUpCount="Model.ThumbsUpCount"
-                             CommentCount="Model.CommentCount"
-                             LastEditTime="Model.LastEditTime" />
+                <VideoBasicInfo ReaderCount="Model.ReaderCount"
+                                CommentCount="Model.CommentCount"
+                                Type="@Model.Type"
+                                Copyright="Model.Copyright"
+                                IsInteractive="Model.IsInteractive"
+                                LastEditTime="Model.LastEditTime" />
 
                 <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.RelatedOutlinks.Count > 0">
-                    <ul class="article-outlink-list">
+                    <ul class="video-outlink-list">
                         @foreach (var item in Model.RelatedOutlinks.Take(8))
                         {
                             <li>
@@ -112,26 +119,35 @@ else if (Model is not null)
             </aside>
         </section>
 
-        <section class="article-layout article-layout--mobile" aria-label="移动端详情布局">
-            <ArticleAuthor AuthorName="@Model.AuthorName"
-                           AuthorAvatar="@Model.AuthorAvatar"
-                           AuthorId="@Model.AuthorId"
-                           OriginalAuthor="@Model.OriginalAuthor"
-                           OriginalLink="@Model.OriginalLink" />
+        <section class="video-layout video-layout--mobile" aria-label="移动端详情布局">
+            <VideoAuthorCard AuthorName="@Model.AuthorName"
+                             AuthorAvatar="@Model.AuthorAvatar"
+                             AuthorId="@Model.AuthorId"
+                             OriginalAuthor="@Model.OriginalAuthor"
+                             IsOriginal="Model.IsAuthorOriginal" />
 
-            <ArticleMeta ReaderCount="Model.ReaderCount"
-                         ThumbsUpCount="Model.ThumbsUpCount"
-                         CommentCount="Model.CommentCount"
-                         LastEditTime="Model.LastEditTime" />
+            <VideoBasicInfo ReaderCount="Model.ReaderCount"
+                            CommentCount="Model.CommentCount"
+                            Type="@Model.Type"
+                            Copyright="Model.Copyright"
+                            IsInteractive="Model.IsInteractive"
+                            LastEditTime="Model.LastEditTime" />
+
+            @if (Model.Pictures.Count > 0)
+            {
+                <EntrySection Title="图片" Icon="mdiImageOutline">
+                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" />
+                </EntrySection>
+            }
 
             @if (!string.IsNullOrWhiteSpace(Model.MainPage))
             {
-                <EntryCard Title="正文" Icon="mdiTextBoxOutline">
+                <EntryCard Title="正文主页" Icon="mdiTextBoxOutline">
                     <CgHtmlContent Content="@Model.MainPage" />
                 </EntryCard>
             }
 
-            <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
+            <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
                 <EntryCardList>
                     @foreach (var item in Model.RelatedEntries.Take(8))
                     {
@@ -142,7 +158,7 @@ else if (Model is not null)
                 </EntryCardList>
             </EntrySection>
 
-            <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
+            <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
                 <EntryCardList>
                     @foreach (var item in Model.RelatedArticles.Take(8))
                     {
@@ -153,7 +169,7 @@ else if (Model is not null)
                 </EntryCardList>
             </EntrySection>
 
-            <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
+            <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
                 <EntryCardList>
                     @foreach (var item in Model.RelatedVideos.Take(8))
                     {
@@ -165,7 +181,7 @@ else if (Model is not null)
             </EntrySection>
 
             <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.RelatedOutlinks.Count > 0">
-                <ul class="article-outlink-list">
+                <ul class="video-outlink-list">
                     @foreach (var item in Model.RelatedOutlinks.Take(8))
                     {
                         <li>
@@ -178,8 +194,8 @@ else if (Model is not null)
                 </ul>
             </EntrySection>
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="article-action-btn" href="@($"/space/comments?type=article&id={Model.Id}")">前往评论区</a>
+            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="video-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
+                <a class="video-action-btn" href="@($"/space/comments?type=video&id={Model.Id}")">前往评论区</a>
             </EntryCard>
         </section>
 
@@ -187,10 +203,10 @@ else if (Model is not null)
 }
 else
 {
-    <section class="article-loading" aria-label="加载中">
-        <div class="article-loading-block"></div>
-        <div class="article-loading-block article-loading-block--wide"></div>
-        <div class="article-loading-block"></div>
+    <section class="video-loading" aria-label="加载中">
+        <div class="video-loading-block"></div>
+        <div class="video-loading-block video-loading-block--wide"></div>
+        <div class="video-loading-block"></div>
     </section>
 }
 
@@ -198,12 +214,12 @@ else
     [Parameter]
     public long Id { get; set; }
 
-    private ArticleDetailViewModel? Model;
+    private VideoDetailViewModel? Model;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await ArticleQueryService.GetArticleDetailAsync(Id);
+        var result = await VideoQueryService.GetVideoDetailAsync(Id);
         if (result.Success && result.Data is not null)
         {
             ErrorMessage = null;
@@ -225,9 +241,14 @@ else
         return string.IsNullOrWhiteSpace(Model.DisplayName) ? Model.Name : Model.DisplayName;
     }
 
-    private static string GetTypeText(ArticleType type)
+    private string GetTypeText()
     {
-        return type.GetDisplayName();
+        if (Model is null || string.IsNullOrWhiteSpace(Model.Type))
+        {
+            return "视频";
+        }
+
+        return Model.Type;
     }
 
     private static bool IsExternalLink(string? link)

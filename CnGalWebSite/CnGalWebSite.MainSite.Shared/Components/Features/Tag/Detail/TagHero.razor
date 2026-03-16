@@ -1,0 +1,42 @@
+@if (!string.IsNullOrWhiteSpace(Name))
+{
+    <section class="tag-hero">
+        @if (HasBackground)
+        {
+            <div class="tag-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+        }
+
+        <div class="tag-hero-content">
+            @if (!string.IsNullOrWhiteSpace(MainPicture))
+            {
+                <img class="tag-hero-image" src="@MainPicture" alt="@Name" loading="eager" />
+            }
+
+            <div class="tag-hero-text">
+                <span class="tag-hero-type">
+                    <CgMdiIcon Name="mdiTagMultipleOutline" />
+                    标签
+                </span>
+                <h1>@Name</h1>
+                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+                {
+                    <p class="tag-hero-intro">@BriefIntroduction</p>
+                }
+                <div class="tag-hero-meta">
+                    <CgMdiIcon Name="mdiEyeOutline" />
+                    <span>@ReaderCount 次浏览</span>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? BriefIntroduction { get; set; }
+    [Parameter] public string? MainPicture { get; set; }
+    [Parameter] public string? BackgroundPicture { get; set; }
+    [Parameter] public int ReaderCount { get; set; }
+
+    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
+}

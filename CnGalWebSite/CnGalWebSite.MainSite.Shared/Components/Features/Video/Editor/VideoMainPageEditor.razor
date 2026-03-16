@@ -1,0 +1,20 @@
+@using CnGalWebSite.DataModel.ViewModel.Videos
+
+<section class="entry-editor-section" id="section-mainpage">
+    <h2><CgMdiIcon Name="mdiBookOpenVariant" Class="entry-section-icon" aria-hidden="true" />正文</h2>
+    <p>使用 Markdown 编辑视频详情内容。</p>
+
+    @if (Model != null)
+    {
+        <CgAlert Variant="info">
+            可以在这里填写视频的详细介绍、剧情梗概等信息，支持 Markdown 语法
+        </CgAlert>
+        <CgMarkdownEditor @bind-Value="Model.Context"
+                           Placeholder="支持 Markdown 语法..." />
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditVideoMainPageViewModel Model { get; set; } = default!;
+}

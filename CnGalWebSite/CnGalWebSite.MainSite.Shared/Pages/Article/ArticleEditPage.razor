@@ -1,0 +1,231 @@
+@page "/articles/create"
+@page "/articles/edit/{Id:long}"
+
+@rendermode InteractiveServer
+@using CnGalWebSite.DataModel.ViewModel.Articles
+@using CnGalWebSite.MainSite.Shared.Components.Features.Article.Editor
+@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.SDK.MainSite.Models.ArticleEdit
+@using System.Text.Json
+@using Microsoft.JSInterop
+@inject IArticleCommandService ArticleCommandService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject ICgToastService ToastService
+@implements IDisposable
+
+<PageTitle>@(IsCreate ? "发表文章" : "编辑文章")</PageTitle>
+
+@if (IsLoading)
+{
+    <section class="article-edit-loading" aria-label="加载中">
+        <div class="article-edit-loading-spinner"></div>
+        <p>正在获取数据...</p>
+    </section>
+}
+else if (LoadErrorMessage != null)
+{
+    <section class="article-edit-error">
+        <h1>加载失败</h1>
+        <p>@LoadErrorMessage</p>
+        <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+    </section>
+}
+else if (Model != null)
+{
+    <article class="article-edit-page">
+        <div class="article-edit-layout">
+            <ArticleEditorSidebar IsCreate="IsCreate"
+                                  IsSubmitting="IsSubmitting"
+                                  HasDraftRecovered="HasDraftRecovered"
+                                  OnDiscardDraft="DiscardDraft"
+                                  OnSubmit="SubmitAsync"
+                                  OnCancel="Cancel" />
+
+            <main class="article-edit-main">
+                <ArticleMainEditor Model="Model.Data.Main" />
+                <ArticleMainPageEditor Model="Model.Data.MainPage" />
+                <ArticleRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
+            </main>
+        </div>
+        <CgToast />
+    </article>
+}
+
+@code {
+    [Parameter]
+    public long? Id { get; set; }
+
+    private bool IsCreate => Id is null or <= 0;
+
+    private bool IsLoading = true;
+    private string? LoadErrorMessage;
+
+    private bool IsSubmitting = false;
+
+    private ArticleEditViewModel? Model;
+
+    private System.Threading.Timer? _autoSaveTimer;
+    private string DraftKey => IsCreate ? "ArticleDraft_Create" : $"ArticleDraft_Edit_{Id}";
+
+    private bool HasDraftRecovered = false;
+    private CreateArticleViewModel? OriginalData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+        _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private void AutoSaveCallback(object? state)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            if (Model != null && !IsSubmitting && !IsLoading)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(Model.Data);
+                    await JS.InvokeVoidAsync("localStorage.setItem", DraftKey, json);
+                }
+                catch { /* Ignore local storage errors */ }
+            }
+        });
+    }
+
+    public void Dispose()
+    {
+        _autoSaveTimer?.Dispose();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        IsLoading = true;
+        LoadErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            SdkResult<ArticleEditViewModel> result;
+            if (IsCreate)
+            {
+                result = await ArticleCommandService.GetArticleCreateTemplateAsync();
+            }
+            else
+            {
+                result = await ArticleCommandService.GetArticleEditAsync(Id!.Value);
+            }
+
+            if (result.Success && result.Data != null)
+            {
+                Model = result.Data;
+                OriginalData = JsonSerializer.Deserialize<CreateArticleViewModel>(JsonSerializer.Serialize(result.Data.Data));
+
+                // 尝试恢复草稿
+                try
+                {
+                    var draftStr = await JS.InvokeAsync<string>("localStorage.getItem", DraftKey);
+                    if (!string.IsNullOrWhiteSpace(draftStr))
+                    {
+                        var draft = JsonSerializer.Deserialize<CreateArticleViewModel>(draftStr);
+                        if (draft != null)
+                        {
+                            Model.Data = draft;
+                            HasDraftRecovered = true;
+                        }
+                    }
+                }
+                catch { }
+
+                // 获取关联候选列表
+                var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync();
+                if (metaResult.Success && metaResult.Data != null)
+                {
+                    Model.MetaOptions = metaResult.Data;
+                }
+            }
+            else
+            {
+                LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
+            }
+        }
+        catch (Exception ex)
+        {
+            LoadErrorMessage = "发生未知错误：" + ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DiscardDraft()
+    {
+        if (OriginalData != null && Model != null)
+        {
+            Model.Data = JsonSerializer.Deserialize<CreateArticleViewModel>(JsonSerializer.Serialize(OriginalData))!;
+            HasDraftRecovered = false;
+            await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (Model == null || IsSubmitting) return;
+
+        var validationResult = Model.Data.Validate();
+        if (!validationResult.Successful)
+        {
+            ToastService.Show("校验失败", validationResult.Error ?? "请检查表单是否填写正确", "error");
+            return;
+        }
+
+        IsSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var request = new ArticleEditRequest
+            {
+                IsCreate = IsCreate,
+                Data = Model.Data
+            };
+
+            var result = await ArticleCommandService.SubmitEditAsync(request);
+            if (result.Success)
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                NavigationManager.NavigateTo($"/articles/index/{result.Data}");
+            }
+            else
+            {
+                ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+        finally
+        {
+            IsSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel()
+    {
+        if (IsCreate)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/articles/index/{Id}");
+        }
+    }
+}

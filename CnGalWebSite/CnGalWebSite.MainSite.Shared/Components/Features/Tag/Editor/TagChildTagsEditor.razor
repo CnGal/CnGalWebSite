@@ -1,0 +1,65 @@
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Tags
+
+<section class="entry-editor-section" id="section-tag-childtags">
+    <h2><CgMdiIcon Name="mdiTagMultipleOutline" Class="entry-section-icon" aria-hidden="true"/>子标签</h2>
+    <p>管理该标签的子标签。注意标签的层级关系，确保添加的都是最后一级的标签。</p>
+
+    @if (Model != null)
+    {
+        <CgAlert Variant="info">
+            标签可以帮助我们对词条进行分类；可以关注一下标签的层级关系哦~
+        </CgAlert>
+
+        <div class="relevance-editor">
+            <div class="relevance-editor__header">
+                <h4 class="relevance-editor__title">标签</h4>
+                <span class="relevance-editor__count">@Model.Tags.Count 项</span>
+                <button type="button" class="relevance-editor__add" @onclick="AddItem" title="添加标签">
+                    <CgMdiIcon Name="mdiPlus" aria-hidden="true" />
+                </button>
+            </div>
+
+            @if (Model.Tags.Any())
+            {
+                <div class="relevance-editor__list">
+                    @foreach (var item in Model.Tags)
+                    {
+                        var current = item;
+                        <div class="relevance-editor__item">
+                            <CgAutoComplete Value="@current.DisplayName"
+                                            ValueChanged="(text) => current.DisplayName = text ?? string.Empty"
+                                            Items="@TagItems"
+                                            Placeholder="输入标签唯一名称" />
+                            <button type="button"
+                                    class="relevance-editor__remove"
+                                    title="移除"
+                                    @onclick="() => RemoveItem(current)">
+                                <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true" />
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="relevance-editor__empty">暂无子标签，点击 <strong>+</strong> 按钮添加。</p>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public EditTagChildTagsViewModel Model { get; set; } = default!;
+    [Parameter] public IEnumerable<string> TagItems { get; set; } = [];
+
+    private void AddItem()
+    {
+        Model.Tags.Add(new RelevancesModel());
+    }
+
+    private void RemoveItem(RelevancesModel item)
+    {
+        Model.Tags.Remove(item);
+    }
+}
