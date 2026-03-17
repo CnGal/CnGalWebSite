@@ -1,11 +1,15 @@
+@using CnGalWebSite.DataModel.ViewModel
+
 <ul class="entry-tags">
     @foreach (var tag in Tags.Take(MaxCount))
     {
-        <li>@tag</li>
+        <li>
+            <a href="/tags/index/@tag.Id">@tag.Name</a>
+        </li>
     }
 </ul>
 
 @code {
-    [Parameter] public IReadOnlyList<string> Tags { get; set; } = [];
+    [Parameter] public IReadOnlyList<TagsViewModel> Tags { get; set; } = [];
     [Parameter] public int MaxCount { get; set; } = 24;
 }

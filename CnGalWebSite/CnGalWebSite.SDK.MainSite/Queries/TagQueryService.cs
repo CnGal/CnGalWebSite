@@ -20,4 +20,15 @@ public sealed class TagQueryService(
             "标签树",
             cancellationToken);
     }
+
+    public Task<SdkResult<TagIndexViewModel>> GetTagDetailAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return GetSingleAsync<TagIndexViewModel, TagIndexViewModel>(
+            $"api/tags/gettag/{id}",
+            dto => dto,
+            "TAG",
+            "标签",
+            id,
+            cancellationToken);
+    }
 }

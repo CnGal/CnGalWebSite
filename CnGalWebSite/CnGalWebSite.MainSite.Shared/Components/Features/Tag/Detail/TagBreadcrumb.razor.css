@@ -1,0 +1,41 @@
+.tag-breadcrumb {
+    padding: 0.5rem 0;
+}
+
+.tag-breadcrumb ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.tag-breadcrumb li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--cg-font-size-sm);
+}
+
+.tag-breadcrumb a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.tag-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.tag-breadcrumb-current {
+    color: var(--cg-color-text);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.tag-breadcrumb ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--cg-color-text-muted);
+}

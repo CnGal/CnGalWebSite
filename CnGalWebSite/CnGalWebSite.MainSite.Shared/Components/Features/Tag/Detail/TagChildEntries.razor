@@ -1,0 +1,20 @@
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+<EntrySection Title="关联词条" Icon="mdiGamepadVariantOutline" Show="Entries is not null && Entries.Count > 0">
+    <EntryCardList>
+        @if (Entries is not null)
+        {
+            @foreach (var entry in Entries)
+            {
+                <li>
+                    <EntryCardItem Url="@($"/entries/index/{entry.Id}")" Image="@entry.MainImage" Title="@entry.Name" />
+                </li>
+            }
+        }
+    </EntryCardList>
+</EntrySection>
+
+@code {
+    [Parameter] public List<EntryInforTipViewModel>? Entries { get; set; }
+}

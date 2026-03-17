@@ -3,10 +3,10 @@
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CnGal - Chinese Galgame Database</title>
+<title>The Evolution of Chinese Visual Novels | CnGal</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -14,513 +14,307 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#3976ef",
-                        "secondary": "#f472b6",
-                        "background-light": "#f6f6f8",
-                        "background-dark": "#101622",
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
                     },
                     fontFamily: {
-                        "display": ["Plus Jakarta Sans"]
+                        "display": ["Public Sans"]
                     },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
                 },
             },
         }
     </script>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
-<div class="layout-container flex flex-col min-h-screen">
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-200">
 <!-- Top Navigation Bar -->
-<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-8">
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-2 text-primary">
-<span class="material-symbols-outlined text-3xl">auto_stories</span>
-<h1 class="text-xl font-bold tracking-tight">CnGal</h1>
-</div>
+<header class="sticky top-0 z-50 w-full border-b border-primary/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex h-16 items-center justify-between gap-4">
+<div class="flex items-center gap-8">
+<a class="flex items-center gap-2 text-primary" href="#">
+<span class="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
+<span class="text-xl font-black tracking-tight">CnGal</span>
+</a>
 <nav class="hidden md:flex items-center gap-6">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Games</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Characters</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Articles</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">News</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors text-secondary" href="#">Community</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Entries</a>
+<a class="text-sm font-semibold text-primary transition-colors" href="#">Articles</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Videos</a>
 </nav>
 </div>
-<div class="flex-1 max-w-md relative group">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search for games, developers, or tags..." type="text"/>
+<div class="flex flex-1 items-center justify-end gap-4">
+<div class="relative hidden sm:block w-full max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-slate-200/50 dark:bg-slate-800/50 border-none rounded-xl py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary text-sm" placeholder="Search database..." type="text"/>
 </div>
-<div class="flex items-center gap-3">
-<button class="px-5 py-2 text-sm font-bold bg-primary text-white rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all">Login</button>
-<button class="px-5 py-2 text-sm font-bold bg-secondary/10 text-secondary border border-secondary/20 rounded-xl hover:bg-secondary/20 transition-all">Register</button>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-primary/10 rounded-xl transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-primary/10 rounded-xl transition-colors">
+<span class="material-symbols-outlined">person</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 overflow-hidden ml-2">
+<img class="w-full h-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEXzWsbTousrO-WXKEhJmbn1RRCYh2qZZjIYKlE1khb2XEA56jospNjgSDv06v0T2W8q0XDpv08OVtBnW2-uh3rOP1mtvqUsA1gf-_Gvvy0ltcOi2wg6ij_5_YmTiOOvcKp0gHWY0jFQqPZxK3O6mM2_hRGD5NdJTdhflEsFWKVUAb3m8gjz_izlE62LGzkgjEcxAUEVUjzR296Gin0f-uAm4_aNbOX-dykXf1Z_-30QVj_PooCY0sXI9GhhQ1VmO1WctQwx_17g"/>
+</div>
+</div>
+</div>
 </div>
 </div>
 </header>
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-<!-- Hero Section: Carousel & Featured -->
-<section class="grid grid-cols-12 gap-6">
-<div class="col-span-12 lg:col-span-8 relative rounded-xl overflow-hidden group aspect-[16/9] lg:aspect-auto">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="High quality anime game character illustration in a fantasy setting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhVnuOaBsD9oIaouPvntTe_BdD9ZPnGImUuImx4T56Gr4iGVdB82SNZFekyOeA6fpTG_o4nB0ikwEQNQ89aS8-xKIsjynnvKVjUei4XxgGYpW-ySyqDjg8JbIUqMH_jBvESw3fHtBTTS7SDPlA9NCRAR1m6b2aKuhlB2gePm8bkoM8zFvmboUcOPmHFPRa-FkOvFtoie9p3Z6bpD_jhb59kkZZa9QER575cHycnz6b2LbuI7n6-pnbIfgJ3kbSZtzlnvaEZdhHx1oj')"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-<div class="absolute bottom-0 left-0 p-8">
-<span class="inline-block px-3 py-1 bg-secondary text-white text-xs font-bold rounded mb-4 uppercase tracking-wider">Editor's Pick</span>
-<h2 class="text-3xl font-extrabold text-white mb-2">The Legend of Sakura Script: Rebirth</h2>
-<p class="text-slate-200 line-clamp-2 max-w-xl">Experience the definitive edition of the 2023 masterpiece. Now featuring fully voiced side-stories and enhanced 4K visuals.</p>
-</div>
-<div class="absolute bottom-8 right-8 flex gap-2">
-<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center hover:bg-white/40 transition-colors">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center hover:bg-white/40 transition-colors">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</div>
-</div>
-<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
-<div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex-1 flex flex-col justify-between">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="flex flex-col lg:flex-row gap-12">
+<!-- Left Sidebar (Table of Contents) -->
+<aside class="hidden lg:block w-64 shrink-0">
+<div class="sticky top-24 space-y-8">
 <div>
-<div class="flex items-center justify-between mb-4">
-<h3 class="font-bold text-lg flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary">trending_up</span>
-                                    Trending Now
-                                </h3>
-<a class="text-xs text-primary font-bold" href="#">View Ranking</a>
-</div>
-<ul class="space-y-4">
-<li class="flex items-center gap-4 group cursor-pointer">
-<div class="w-16 h-10 rounded bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0" data-alt="Small thumbnail for a popular game title" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAn86XCqO7gQ5w5h1RfmBgi4dK5MIuwBwbCfturm5DllhPCd-dCZw4mvvXoEpC39MboqafbnDljmTkeRAb_AuL6gmHuZ24-2pZZCD9GkiKUTwnqEl330gVzIm_Trb_pSvhd1IUBDbc80TKXwm0ZoPQfv45ZbcTuGubAPkySqmLQpaCTuKqoP_a0nLcA1I1MVJVIp0hQioz2ssWFT0Vw43IT10tNyzXdgJarv8x5Q7xA4cmdVP3vTsXNJ6lcX6CkCiUA3N7FjWlEplc8')"></div>
-<div class="overflow-hidden">
-<p class="text-sm font-bold truncate group-hover:text-primary transition-colors">Symphony of the Blue Moon</p>
-<p class="text-xs text-slate-500">Visual Novel / Sci-Fi</p>
-</div>
-</li>
-<li class="flex items-center gap-4 group cursor-pointer">
-<div class="w-16 h-10 rounded bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0" data-alt="Thumbnail for featured visual novel game" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDx9MZwdfPDPsYesyPCgATEb3ohZZup8-9KNjS0NLwU_xzGepdTGBm2fB8yGl4gVHpYSF6rfP84pYEbyQMSX0bXnECQkYct944XELXti6AzsoCKj_49YBAe14RDRaTkTOL8cwdMAnLO1_JW-t8z1byZ4SfL1ulztI8iWHWI02i1IVNyw5RzvIK-tPvSTcxJj1jwYNLCWyA3yqVn6Uc-E9AzCv4zWpvBFtrwRsY6fuwCWKm0AlLXkGdheph3eMpnVixmURW7QlLL9r13')"></div>
-<div class="overflow-hidden">
-<p class="text-sm font-bold truncate group-hover:text-primary transition-colors">Echoes of Summer</p>
-<p class="text-xs text-slate-500">Romance / High School</p>
-</div>
-</li>
-<li class="flex items-center gap-4 group cursor-pointer">
-<div class="w-16 h-10 rounded bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0" data-alt="Atmospheric thumbnail for a mystery game" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpa9V0bhdntsuDXk_9Pzcs-cJoKS8DjqlpTXh64xVgx92Xrnby0igQoKxODHEkKc2ROVYtfpr3nemJ6xCTgoCt5g3cbZ6lhMrXNYWGe4CFaMQf7S8AJjj8-z5H3X7tIoEsW4gnet-dbafuKq0nDSYWuK725aVCycU8p21vuEDNghZ65INFUZmmTG_xdjaESMwSmE2JuDtXJxjamg_-FvbXRy5CdoW3-bn7LZdYD8kS87I2BnaNPQgRhTQSGV3cRVxQUhGtJwR6b5IX')"></div>
-<div class="overflow-hidden">
-<p class="text-sm font-bold truncate group-hover:text-primary transition-colors">The Last Train Home</p>
-<p class="text-xs text-slate-500">Mystery / Thriller</p>
-</div>
-</li>
-</ul>
-</div>
-<button class="w-full py-2.5 mt-6 bg-primary/10 text-primary font-bold rounded-lg hover:bg-primary text-sm hover:text-white transition-all">Explore Database</button>
-</div>
-</div>
-</section>
-<!-- Activity Group & Status Tabs -->
-<section class="space-y-6">
-<div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-<div class="flex gap-8">
-<button class="relative pb-4 text-sm font-bold text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary">Released Games</button>
-<button class="pb-4 text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Recent Demos</button>
-<button class="pb-4 text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Upcoming Releases</button>
-</div>
-<div class="flex gap-3">
-<div class="flex -space-x-2">
-<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">TR</div>
-<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-secondary/20 flex items-center justify-center text-[10px] font-bold text-secondary">RV</div>
-<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-600">DV</div>
-</div>
-<span class="text-xs font-semibold text-slate-500 self-center">Join 12+ Working Groups</span>
-</div>
-</div>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-<!-- Game Card Template -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Cover art for a newly released visual novel" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBXXqGOwx5SzC_-l-S0QY8IRJOjb1XSzm-YksD00KJTJJZXbeMmJn5Z62EzJPmWTI636cFmIPp3OURy8__z4AT5f9fE3AbyvvLyS2bn8ps1kdFdm40iVt5J1XYoCvcJP8L_pWr-vYLmLpZKAlFQYu1a3mDMRevBAzItcCjpzB2K3Z4jzfmjOEHYteyZlyE86Gc8d_6dmlweqXDpmcUMcr6Owy3RJwsL0s9mbu6pHgt5o1G675uq90eV6J6TO9yynUze1e88a3hSasMm')"></div>
-<div class="absolute top-2 right-2 px-2 py-1 bg-primary text-[10px] font-bold text-white rounded shadow-sm">NEW</div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Fate of the Sky</h4>
-<p class="text-xs text-slate-500">Jan 12, 2024</p>
-</div>
-<!-- Card 2 -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Beautifully illustrated game cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDcumGnsckTU1B5a58HidOLLQHIxUvbq2epx3S11mxgQ8GlCQyauO2poVc7AfOwNQ45lTVezeyX9yB6arBr9rrgimVJJsWuGwMPA-8sJy91I0DHvY6Gwep9WM2cmu4phJ-UdSUf6jfr3WVBn0jGA0xrdKcEtRY461JPP4gCQoBeGczr4L1IP8Ou97yuF3oV4qoDfG60NFmEOYPaaNSR0CzT2z_AHC2G3QOB6TZrmBZLCYwo5flPL1wnv6_ahpkF-EmLXtTop1ZEDcTC')"></div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Lunar Memory</h4>
-<p class="text-xs text-slate-500">Jan 10, 2024</p>
-</div>
-<!-- Card 3 -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Atmospheric abstract background for game card" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAbXA2eE6mUaE6AwnjJwEy_64Om1dq-iZfTnf8lipNlmFcZBtHhJiizMf-esDk-rLDsRCk78llbm3D_imSkcLoRt8PM_uY1NS13D2FKSJqX9p80RXQzetuvP9XonBjf55zjoPmaijZgmazlWUMEAi91xD4JmRMgPNKH_5qGZheK3cCzrfs8Cm437Tl38A75oxB_Qtf2ssER_ZLtTsiqd0P2gwZZiH5DQ3a-_0awx1Kc6eOWv7IFzajewG5Ufm2Ds9mtWfPtdx3ZAFeq')"></div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Midnight Protocol</h4>
-<p class="text-xs text-slate-500">Jan 05, 2024</p>
-</div>
-<!-- Card 4 -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Game cover with vibrant colors" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6ZPFjfWc-rfGhbkVGixbAwDcjDm0kOvtgFigGEOLqBDtfV0hCRs4mBlxVp2B0TseWwAUnoS8epWDLBxp-fjnMI-GnQUZBw0glgrTpDd3Ls7p625t9YTkC2_9Cvy9_7iWRUPPxoXvhkvoQnH1GKkyIPshcvxyp5H80zsATowLko_OqJINs2O1ka1PhJKH5RK9rh8liB-a7j6eZw1i19DBd767lnBZpVdS4rZiuBLpQn_ZqQMCdDC9ssh9i3RfXQeAJ7X_Jz7qp7Mhw')"></div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Wind Chimes</h4>
-<p class="text-xs text-slate-500">Dec 28, 2023</p>
-</div>
-<!-- Card 5 -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Stylized character art on a game cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAnQ8nwm-xn-Zyjt0HwmaVJ1CpvmuhS1BK4oDE7kQ9gLAagVGF1F4y6fw0kFt-ApLuTV4zlJqZNm1OocsKnWVqXwj_Usf8LHmzc3OqVMutUTHOlc8KsiR2YYkOGpYZ-MTo0nIaFY5bDXkkB_LAQR4QuiANmF4n8F8oF8DJQ0FST29sqFnvOh5XlM3Xi2wKNHv5M6mhnNLERxy-b18K4roTI2Nz71uWAA3I_4NXZT86T92ZskwWsVqRALXON6L058TA9_qZsnq-LAebo')"></div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Under the Same Sky</h4>
-<p class="text-xs text-slate-500">Dec 25, 2023</p>
-</div>
-<!-- Card 6 -->
-<div class="group cursor-pointer">
-<div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
-<div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" data-alt="Abstract gradient for game cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFlKkguWxaPRhYw5gvi_ZTuaTI_ZmhLkMcoyROhAEppbC2_9qbtvrig8DdAwi0ImIjBqfL32CNaPraWCSAx_CFBvkyMnYqSM3BvrVFJTuc1v9pfPeCJ_ZgjO--7EljLTTU_aom-AWbFKE4eVna0ZO5Ef-OVlE5LNuXKwABzbjT2Zz28PQ_ZenkY79pWl3juyX3tnnjalsM5G9cPk971CT8-rcMkNtiVQ1WlW0Z3UkISoBN3Gin0X72XHNJI0ejHp0pqQRvth_louPX')"></div>
-</div>
-<h4 class="text-sm font-bold truncate group-hover:text-primary transition-colors">Fragment of Dreams</h4>
-<p class="text-xs text-slate-500">Dec 20, 2023</p>
-</div>
-</div>
-</section>
-<!-- News & Weekly Report -->
-<section class="grid grid-cols-12 gap-8">
-<div class="col-span-12 lg:col-span-8 space-y-6">
-<div class="flex items-center justify-between">
-<h2 class="text-xl font-extrabold flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">newspaper</span>
-                            Latest News
-                        </h2>
-<button class="text-xs font-bold text-slate-400 hover:text-primary flex items-center gap-1">More News <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
-</div>
-<div class="space-y-4">
-<!-- News Item 1 -->
-<article class="flex gap-5 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow cursor-pointer">
-<div class="w-40 h-24 rounded-lg bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0" data-alt="News article preview image showing a game studio logo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBYj3oqEIaybuUT0y0k9eI4VdMozO0XtWWwCuMYUumGqeo7v6u6S6EPEvFVahtSJelb9YVrhaVtOKo3gH6ZpcuwM0Kl1-OjOXQIw7AftfGyazz48dvgNrgm0XIkxZxzNx4jehWl-OVwBZRgrUkBOWK_FBnQCliSE8HryoNCVKPHtSUf1SkCCqSzpQCndDW4pp_rbWZ7emjq0_iNft2DjtombMXO945m40yyK5kYaS2lvGlWCsK_PszZz3eaiWTL26vLWJQmS8Q7dwG')"></div>
-<div class="flex-1 flex flex-col justify-between">
-<h3 class="font-bold text-base line-clamp-1 hover:text-primary transition-colors">Miku World Tour officially announced for next Summer</h3>
-<p class="text-sm text-slate-500 line-clamp-2">The development team behind the critically acclaimed 'Snow Crystal' series has revealed their biggest project yet...</p>
-<div class="flex items-center gap-4 mt-2">
-<span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded">Industry</span>
-<span class="text-[10px] text-slate-400">2 hours ago</span>
-</div>
-</div>
-</article>
-<!-- News Item 2 -->
-<article class="flex gap-5 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow cursor-pointer">
-<div class="w-40 h-24 rounded-lg bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0" data-alt="Visual novel concept art showing a rainy street" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDf2cF6beLHSUOXUu_QuG7nJ-2F0GfTMrg9o6JBfu-UY981fUztf1_KUrdmdtREFcBC-8FostylnUexb54aWTOevNmii3na7MPi0ea5CPwznqv8d0m__ZrTvzEiRFt_ngGKhdrPFWCqnTjUVMySHOE4hHMzAbVXeY399imDjoZnMw0fAWkfabdI4tp0h0RAyAigEZg7Qv1MBDGAavf8e3t71xemR-5vMj0XJ7PQ_zVJMESFnjckv3C6C9XaTKtrbC636-fjrDPUc9jH')"></div>
-<div class="flex-1 flex flex-col justify-between">
-<h3 class="font-bold text-base line-clamp-1 hover:text-primary transition-colors">Rainy City: Developer Interview and New Trailer Released</h3>
-<p class="text-sm text-slate-500 line-clamp-2">We sat down with the lead writer to discuss the complex narrative branches and the emotional impact of the upcoming title...</p>
-<div class="flex items-center gap-4 mt-2">
-<span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded">Developer</span>
-<span class="text-[10px] text-slate-400">5 hours ago</span>
-</div>
-</div>
-</article>
-</div>
-</div>
-<div class="col-span-12 lg:col-span-4">
-<div class="bg-gradient-to-br from-primary to-indigo-600 rounded-xl p-6 text-white shadow-xl shadow-primary/20">
-<div class="flex items-center justify-between mb-6">
-<h2 class="text-lg font-bold flex items-center gap-2">
-<span class="material-symbols-outlined">summarize</span>
-                                Weekly Report
-                            </h2>
-<span class="text-xs font-bold bg-white/20 px-2 py-1 rounded">Vol. 142</span>
-</div>
-<ul class="space-y-4">
-<li class="flex gap-3 group cursor-pointer">
-<div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0 group-hover:scale-150 transition-transform"></div>
-<p class="text-sm font-medium text-slate-100 line-clamp-2">Steam Winter Sale: Best 20 Visual Novels for your backlog</p>
-</li>
-<li class="flex gap-3 group cursor-pointer">
-<div class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0 group-hover:scale-150 transition-transform"></div>
-<p class="text-sm font-medium text-slate-100 line-clamp-2">New Database Feature: Character Relationships Visualizer</p>
-</li>
-<li class="flex gap-3 group cursor-pointer">
-<div class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0 group-hover:scale-150 transition-transform"></div>
-<p class="text-sm font-medium text-slate-100 line-clamp-2">Community Spotlight: Fan Translation of 'Ethereal Knot'</p>
-</li>
-</ul>
-<button class="w-full mt-8 py-2.5 bg-white text-primary font-bold rounded-lg text-sm hover:shadow-lg transition-all">Read Full Report</button>
-</div>
-</div>
-</section>
-<!-- Community & Content Section -->
-<section class="grid grid-cols-12 gap-8">
-<!-- Content Left -->
-<div class="col-span-12 lg:col-span-8 space-y-10">
-<!-- Latest Articles -->
-<div class="space-y-6">
-<h2 class="text-xl font-extrabold flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary">edit_note</span>
-                            Latest Articles
-                        </h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden group hover:border-secondary/50 transition-colors cursor-pointer">
-<div class="h-40 bg-cover bg-center" data-alt="Deep dive article illustration about game design" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCL4c4qLV2mNYy7BMjKTAOqLDQFc-OjLAMm9tSlW2qVxfv4ObBa4YQbsoxLCD1KxxQVVS7urplzldDMBveXw20Sf31re67qvWN4qmIRVMArslq7D4Ie2YQ6btji-vlgkqtqHAT5qap3dmaeD32jdSiA1XVBG7e6c0JSyUmUlSX_AmArBhaOHTois-t7VYuAxxqUD4zOpLCIU6oCJS0MB_UkYsmpyjZsgKve5_vwwzR0QO9xYHifyTvyCQO74QvFJ1lqopM4GTE4sd77')"></div>
-<div class="p-4">
-<h4 class="font-bold text-sm mb-2 group-hover:text-secondary transition-colors">The evolution of choice in modern AVGs</h4>
-<p class="text-xs text-slate-500 line-clamp-2 mb-4">How narrative branching has changed since the early days of the genre...</p>
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-slate-200 bg-cover bg-center" data-alt="User avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAj4qfXfhE3zYGZ6I0KAk1Nsc5ESd3QJsrBCIS9hAxMZTFN9LgIjUQSJCGkQp-M-RAqO9cT4RQETQg8r40TQDSQD0lK9nVgPJ3Kxsgkvitbv5YHSYepBETtQDXv3G1JvoYYkFUSCVna1prAflauJq31eT8pVWl3PQp1RUC1wnQxxDKkKDhBcO_WQbPD_wMSI2-_6cJATFKzLBJQBk45UHTWGOrH6M7GzX091s7CMAdYEcOmN03az7HuW25i9atyziDPQ6Er3rjYdFrl')"></div>
-<span class="text-[10px] font-bold">AzureSky</span>
-</div>
-</div>
-</div>
-<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden group hover:border-secondary/50 transition-colors cursor-pointer">
-<div class="h-40 bg-cover bg-center" data-alt="Technical breakdown article feature image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCS8oPKT4a2ljaDtCc5YU1UeYW5kHBQAJ2iYSZCVG0dHM3WkzltxBjN6jH8Nlkj6-KQx_6oN5it14oiazrQRxmTq2P7Yqgfwo2gz15sbROTx53_FLvM5vXm0KP8YY57c_vUkoF9VUrI2l-OD34s6douMndU3IkkA-uMffVM8nGP6nyGb5WVa558LRWABaMvPKTJ7UQ0mLDo_FKe5qGFZNE6UGZypbgtadRM-rZmcp3kmpzCKxApZ71hACA6qCCrxhuD25YBb3rDe4gE')"></div>
-<div class="p-4">
-<h4 class="font-bold text-sm mb-2 group-hover:text-secondary transition-colors">Technical Analysis: Live2D vs Spine 2D</h4>
-<p class="text-xs text-slate-500 line-clamp-2 mb-4">A deep dive into animation systems used in current Japanese and Chinese titles...</p>
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-slate-200 bg-cover bg-center" data-alt="User avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA0G6J-nkdX0jommFO0q0vQWMarpZj_FblVbXnyKJJXLZXa3X0UefUpY2htaTxhTUIl_CmVGm1Tu6zzJFQJdSobBtTNydqR9wpWN56rWjhJA9SlMH9Wyr1yBHm6QwXNzrk-VNAlFXaXlgyEyQvRkiTH9pzZfNoLYr6HXKZjPW1q1SaP8ovDzcXpA7mDiWFVrXuofS9XZp8-VATQEJd7R94GjepqsLL10D299vOCvlMJMO4ZH22jZCoasiVXEavutSL5FIGOMiA4CKbC')"></div>
-<span class="text-[10px] font-bold">TechGuru</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Latest Videos -->
-<div class="space-y-6">
-<h2 class="text-xl font-extrabold flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">play_circle</span>
-                            Featured Videos
-                        </h2>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div class="group cursor-pointer">
-<div class="relative aspect-video rounded-lg overflow-hidden mb-2">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Video thumbnail showing a game trailer" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAIFKF4VNUd0qkDknvJNrSEg6Ucq_i1CXv9s2MP0uyMEKNPcQqK0XcDqZp8vCHHeRTDNJr-hz4CcwsIq-bq77kJ2L8VF7yjG2ULcGy3TT9IrbQYNzJ7va-S1jOsGow71e_N7BMyQ5dttqv5RzaPb1Kq-cNAhZyCB2JFfjNkUTGBiswk2E2jCa74coCxFsBKduFZfXuydJPJ4JQvaacnjdE85y-jJRG0A5F7frCblLkVdzKeW3TVoGW5PAK-fsmXj9RqROzUbRah6I-4')"></div>
-<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-<span class="material-symbols-outlined text-white text-4xl">play_arrow</span>
-</div>
-<span class="absolute bottom-1 right-1 px-1 py-0.5 bg-black/60 text-white text-[10px] rounded">12:45</span>
-</div>
-<p class="text-xs font-bold line-clamp-2 group-hover:text-primary transition-colors">Top 10 Hidden Gems of 2023 You Must Play</p>
-</div>
-<div class="group cursor-pointer">
-<div class="relative aspect-video rounded-lg overflow-hidden mb-2">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Cinematic video thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCl3VdvRTpmxlT5nBGN8C9shsCWcbSG3pICRh2aurVMPXlwgWwUtQbcb3o0KNLPViQquSnEbSfds2Bj7KxTMIAk6nU0DSjRwYKevJnHFyhZ0BlkN6tqOt3aBBylUOd-58GiegkkOrDTYYM9mtAvT_2Il9-7VbQwwjDh6Dtb38IGAHhsfzvAvFLBwEYCG_BVYtDjaBupHmxT_3jfbIi_qMSuw-xX6YOStyvPM7epoP3Q-kHazO8UqS4D2scJnw5fMRaBhCZN_KvUGyB9')"></div>
-<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-<span class="material-symbols-outlined text-white text-4xl">play_arrow</span>
-</div>
-<span class="absolute bottom-1 right-1 px-1 py-0.5 bg-black/60 text-white text-[10px] rounded">08:12</span>
-</div>
-<p class="text-xs font-bold line-clamp-2 group-hover:text-primary transition-colors">Developer Diary: Creating Ethereal Landscapes</p>
-</div>
-<div class="group cursor-pointer">
-<div class="relative aspect-video rounded-lg overflow-hidden mb-2">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Review video thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCg7fHGrTd6xAv6_vnrGK5IfIkIsC-uMTv0WOgxZUFtqzPjVceBT8MY6QTn24j91g--HoeCPyX-cYisL8isz0Njm8eeNRn2s1kB3Wo_cdVLk7iARYzqf7FtY-Q8YJnIXRzbfPDMb_uwP0MRnUgVMktRMytNnK6pwg2gDAEBrPkfOCxnvDIGqbr1f7bvNYCS3RLzr5IFIVIsl95RE6QO4ygKApvvhvTAw2Hxl8QTO8U0AYhGr0S2duVbwIib4NR1aFLJaWTw6w8I9VNS')"></div>
-<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-<span class="material-symbols-outlined text-white text-4xl">play_arrow</span>
-</div>
-<span class="absolute bottom-1 right-1 px-1 py-0.5 bg-black/60 text-white text-[10px] rounded">15:20</span>
-</div>
-<p class="text-xs font-bold line-clamp-2 group-hover:text-primary transition-colors">Why "Summer Rain" is a masterpiece of storytelling</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Community Right -->
-<div class="col-span-12 lg:col-span-4 space-y-8">
-<!-- Character Birthdays -->
-<div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-<h3 class="font-bold text-sm mb-4 flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary">cake</span>
-                            Today's Birthdays
-                        </h3>
-<div class="flex items-center gap-4 p-3 bg-secondary/5 rounded-lg border border-secondary/10">
-<div class="w-12 h-12 rounded-full bg-cover bg-center ring-2 ring-secondary/20" data-alt="Portrait of a birthday character" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC_kNFh5rAWhOfvJrDTgxq_j5jKcCi-JD2bAMFypA18FyqSyiFu6ZXiraZJi8ULnlfJLKvajLWIRG9FSHyeAYqA3rg9__qwfAF5Pi6EgJysxdwvrUyuX29DgRqhXm__c5XCEagn2buYd_J2bwfYtOWa1Ig6_c6PUk_uIrWTdtG8KsTbL1bzr6YS6xKzRWXslUBTUCKcXMUtoPd5l3O0H8vNFc_zp0YD4KukFKRD3F7Q5gyhcLGk8CYAINcEkbDLGrU2LCiOznH9195R')"></div>
-<div>
-<p class="text-sm font-bold">Ayaka Shirayuki</p>
-<p class="text-[10px] text-slate-500">From: Winter Bells</p>
-</div>
-<button class="ml-auto text-secondary"><span class="material-symbols-outlined">favorite</span></button>
-</div>
-<p class="text-center mt-4 text-[10px] text-slate-400">View Birthday Calendar</p>
-</div>
-<!-- Announcements -->
-<div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-<h3 class="font-bold text-sm mb-4 flex items-center gap-2">
-<span class="material-symbols-outlined text-amber-500">campaign</span>
-                            Announcements
-                        </h3>
-<ul class="space-y-3">
-<li class="text-xs flex gap-2">
-<span class="text-slate-400 shrink-0">01/15</span>
-<a class="hover:text-primary truncate" href="#">CnGal App Beta testing phase 2 starting now...</a>
-</li>
-<li class="text-xs flex gap-2">
-<span class="text-slate-400 shrink-0">01/12</span>
-<a class="hover:text-primary truncate" href="#">Lunar New Year Event: Creative Contest...</a>
-</li>
-<li class="text-xs flex gap-2">
-<span class="text-slate-400 shrink-0">01/08</span>
-<a class="hover:text-primary truncate" href="#">Server maintenance scheduled for Jan 20...</a>
-</li>
-</ul>
-</div>
-<!-- Recently Edited -->
-<div class="space-y-4">
-<h3 class="font-bold text-sm flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">history</span>
-                            Recently Edited
-                        </h3>
-<div class="space-y-2">
-<div class="flex items-center justify-between text-xs p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
-<span class="truncate pr-4">Eternal Symphony: Official Website</span>
-<span class="text-slate-400 whitespace-nowrap">2m ago</span>
-</div>
-<div class="flex items-center justify-between text-xs p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
-<span class="truncate pr-4">Character: Yuki Sato (Voice Actor)</span>
-<span class="text-slate-400 whitespace-nowrap">15m ago</span>
-</div>
-<div class="flex items-center justify-between text-xs p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
-<span class="truncate pr-4">Studio: Blue Moon Productions</span>
-<span class="text-slate-400 whitespace-nowrap">45m ago</span>
-</div>
-</div>
-</div>
-<!-- Community Entry Card -->
-<div class="relative rounded-xl overflow-hidden bg-primary p-6 text-white group cursor-pointer shadow-lg shadow-primary/20">
-<div class="absolute -right-4 -bottom-4 opacity-20 group-hover:rotate-12 transition-transform duration-500">
-<span class="material-symbols-outlined text-9xl">forum</span>
-</div>
-<h3 class="text-xl font-bold mb-2">Join the Community</h3>
-<p class="text-xs text-slate-100 mb-6 relative z-10">Connect with 50,000+ creators and players on our official Discord and forums.</p>
-<button class="bg-white text-primary px-4 py-2 rounded-lg text-xs font-bold hover:shadow-lg transition-all relative z-10">Enter Forum</button>
-</div>
-</div>
-</section>
-<!-- About Section -->
-<section class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 relative overflow-hidden">
-<div class="grid md:grid-cols-2 gap-8 items-center relative z-10">
-<div class="space-y-4">
-<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-<span class="material-symbols-outlined text-3xl">database</span>
-</div>
-<h2 class="text-2xl font-bold">The Heart of Chinese Visual Novels</h2>
-<p class="text-slate-500 leading-relaxed">CnGal is a comprehensive database and community platform dedicated to Chinese Galgames and AVGs. Our mission is to preserve history, support creators, and connect fans with the stories that matter most.</p>
-<div class="flex gap-4">
-<div class="text-center">
-<p class="text-2xl font-black text-primary">12k+</p>
-<p class="text-[10px] uppercase font-bold text-slate-400">Games</p>
-</div>
-<div class="w-px h-10 bg-slate-200 dark:bg-slate-800"></div>
-<div class="text-center">
-<p class="text-2xl font-black text-primary">85k+</p>
-<p class="text-[10px] uppercase font-bold text-slate-400">Entries</p>
-</div>
-<div class="w-px h-10 bg-slate-200 dark:bg-slate-800"></div>
-<div class="text-center">
-<p class="text-2xl font-black text-primary">200+</p>
-<p class="text-[10px] uppercase font-bold text-slate-400">Studios</p>
-</div>
-</div>
-</div>
-<div class="relative flex justify-center">
-<div class="w-64 h-64 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl absolute animate-pulse"></div>
-<img alt="About CnGal mascot or logo illustration" class="w-full max-w-xs relative z-10 drop-shadow-2xl" data-alt="Stylized mascot illustration representing the community" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2B3zmRigkn2MDlUQowoKfmLwtQIz1F7GKVQ1nVBu6Um_WEhxk7xTbkNyCjvIFKRRYLcun4hf-BoO9PCFTjJHyY3hhmxRBNZ54IJn2d3tEm0BoP9MtHbNj3f4rSU71tMydLv-t6VJlwg-zrPo9bnm-cnwkjOxRnZPA-iFAHRMq4CmTjTavQNy_R1Ii_PblD3pTcBS7eaGFOhp1SwpJr3lXFbrDpHn8ilAPjmgPDmbGnxa5-FWEzQJaMp20-o_8---_UI3OijeliJ5G"/>
-</div>
-</div>
-</section>
-<!-- Special Topics Grid -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-<!-- Card: Reviews -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all group">
-<span class="material-symbols-outlined text-secondary mb-4 text-3xl group-hover:scale-110 transition-transform">star_half</span>
-<h3 class="font-bold mb-2">Review Aggregator</h3>
-<p class="text-xs text-slate-500 mb-4">See what the community and critics are saying about recent releases.</p>
-<a class="text-xs font-bold text-primary flex items-center gap-1" href="#">Browse Scores <span class="material-symbols-outlined text-sm">arrow_outward</span></a>
-</div>
-<!-- Card: Support Us -->
-<div class="bg-primary/5 p-6 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/50 transition-all group">
-<span class="material-symbols-outlined text-primary mb-4 text-3xl group-hover:bounce transition-all">volunteer_activism</span>
-<h3 class="font-bold mb-2">Support CnGal</h3>
-<p class="text-xs text-slate-500 mb-4">Help us maintain servers and develop new features for the database.</p>
-<a class="text-xs font-bold text-primary flex items-center gap-1" href="#">Donate Now <span class="material-symbols-outlined text-sm">favorite</span></a>
-</div>
-<!-- Card: Free Games -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all group">
-<span class="material-symbols-outlined text-emerald-500 mb-4 text-3xl group-hover:scale-110 transition-transform">redeem</span>
-<h3 class="font-bold mb-2">Free Games</h3>
-<p class="text-xs text-slate-500 mb-4">A curated list of high-quality freeware titles and fan projects.</p>
-<a class="text-xs font-bold text-emerald-600 flex items-center gap-1" href="#">Play for Free <span class="material-symbols-outlined text-sm">rocket_launch</span></a>
-</div>
-<!-- Card: Discounts -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all group">
-<span class="material-symbols-outlined text-amber-500 mb-4 text-3xl group-hover:rotate-12 transition-transform">sell</span>
-<h3 class="font-bold mb-2">Active Deals</h3>
-<p class="text-xs text-slate-500 mb-4">Don't miss out on current sales from Steam, DLSite, and more.</p>
-<a class="text-xs font-bold text-amber-600 flex items-center gap-1" href="#">View Sales <span class="material-symbols-outlined text-sm">shopping_cart</span></a>
-</div>
-</section>
-<!-- Footer-style Friendly Links -->
-<section class="border-t border-slate-200 dark:border-slate-800 pt-8 pb-12">
-<div class="flex flex-wrap items-center gap-6">
-<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Partners:</span>
-<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">VNDB</a>
-<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Bangumi</a>
-<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Key Visual Arts</a>
-<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">A9VG</a>
-<a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">NGA Community</a>
-</div>
-</section>
-</main>
-<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex flex-col md:flex-row justify-between gap-8 mb-12">
-<div class="max-w-sm">
-<div class="flex items-center gap-2 text-primary mb-4">
-<span class="material-symbols-outlined text-3xl">auto_stories</span>
-<span class="text-xl font-bold tracking-tight">CnGal</span>
-</div>
-<p class="text-sm text-slate-500 mb-6">Built by fans, for fans. The most comprehensive archive for the Chinese visual novel ecosystem since 2013.</p>
-<div class="flex gap-4">
-<a class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-lg">share</span></a>
-<a class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-secondary hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-lg">alternate_email</span></a>
-<a class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-lg">rss_feed</span></a>
-</div>
-</div>
-<div class="grid grid-cols-2 sm:grid-cols-3 gap-8">
-<div>
-<h4 class="font-bold text-sm mb-4">Database</h4>
-<ul class="space-y-2 text-xs text-slate-500">
-<li><a class="hover:text-primary" href="#">Game List</a></li>
-<li><a class="hover:text-primary" href="#">Staff List</a></li>
-<li><a class="hover:text-primary" href="#">Studio Directory</a></li>
-<li><a class="hover:text-primary" href="#">Tag Cloud</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold text-sm mb-4">Resources</h4>
-<ul class="space-y-2 text-xs text-slate-500">
-<li><a class="hover:text-primary" href="#">API Documentation</a></li>
-<li><a class="hover:text-primary" href="#">Wiki Guidelines</a></li>
-<li><a class="hover:text-primary" href="#">Media Kit</a></li>
-<li><a class="hover:text-primary" href="#">RSS Feeds</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold text-sm mb-4">CnGal</h4>
-<ul class="space-y-2 text-xs text-slate-500">
-<li><a class="hover:text-primary" href="#">About Us</a></li>
-<li><a class="hover:text-primary" href="#">Privacy Policy</a></li>
-<li><a class="hover:text-primary" href="#">Terms of Service</a></li>
-<li><a class="hover:text-primary" href="#">Contact</a></li>
-</ul>
-</div>
-</div>
-</div>
-<div class="border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-<p class="text-[10px] text-slate-400">© 2013-2024 CnGal Project. All game images and trademarks are property of their respective owners.</p>
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Table of Contents</h3>
+<nav class="flex flex-col gap-1 border-l-2 border-slate-200 dark:border-slate-800">
+<a class="pl-4 py-2 border-l-2 border-primary -ml-[2px] text-primary font-bold text-sm" href="#intro">Introduction</a>
+<a class="pl-4 py-2 border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 text-sm transition-all" href="#early">Early Years (2000-2010)</a>
+<a class="pl-4 py-2 border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 text-sm transition-all" href="#golden">The Golden Age</a>
+<a class="pl-4 py-2 border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 text-sm transition-all" href="#modern">Modern Trends</a>
+<a class="pl-4 py-2 border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 text-sm transition-all" href="#future">Future Prospects</a>
+</nav>
+</div>
+<div class="p-4 bg-primary/5 rounded-xl border border-primary/10">
+<p class="text-xs font-medium text-primary mb-2">Enjoying this article?</p>
+<p class="text-xs text-slate-500 mb-3">Subscribe to our newsletter for more visual novel history and analysis.</p>
+<button class="w-full bg-primary text-white text-xs font-bold py-2 rounded-lg">Subscribe</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<article class="flex-1 min-w-0">
+<!-- Article Header -->
+<header class="mb-8">
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase rounded tracking-wider">Original</span>
+<span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold uppercase rounded tracking-wider">History</span>
+<span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold uppercase rounded tracking-wider">Analysis</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-black leading-tight mb-6 text-slate-900 dark:text-slate-100">
+                        The Evolution of Chinese Visual Novels: From Doujin Roots to Global Steam Success
+                    </h1>
+<div class="flex items-center justify-between pb-8 border-b border-slate-200 dark:border-slate-800">
 <div class="flex items-center gap-4">
-<span class="flex items-center gap-1 text-[10px] text-slate-400"><span class="material-symbols-outlined text-sm">language</span> English</span>
-<span class="flex items-center gap-1 text-[10px] text-slate-400"><span class="material-symbols-outlined text-sm">visibility</span> 1.2M Monthly Visits</span>
+<div class="w-12 h-12 rounded-full bg-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of the article author" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaEIv5zAe1zpXGSI66e1OwaZZMA4x7eIVRnFXyQwAvuYyjB6OZgLeyqpyA_bESPhK_JAk1b8QTU_eZxv_qQzDL84oDjpcMGwN7EHVqmwh6gbjDaSIjMWziDPRViMtC9pTCzlJDuAjeeco3RQ1p8x3eFy8VitSCSpmb9-AUdtvzuBSXKDpr0n87X9WUVxDnx3Ht_AkFFzQxlV4koWeTqIiGqhBed4kvtLD1KpJAInbD6McT-apbjDBcVBEJS_QBmBnVncS7k1JdWg"/>
 </div>
+<div>
+<p class="text-sm font-bold">AuthorName</p>
+<p class="text-xs text-slate-500">Oct 24, 2023 · 15 min read</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-xl">share</span>
+</button>
+<button class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-xl">bookmark</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Hero Image -->
+<div class="mb-10 rounded-2xl overflow-hidden aspect-[21/9] relative group">
+<img class="w-full h-full object-cover" data-alt="Cinematic collage of Chinese visual novel characters" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC36uw6A8EyrNm4R-7PIsJapFBzvnQDY-deTC4fbScjUswCk6GUnxQAPS-ybldeSueiQN2qg0OVVG05sLduTSPOQdhadn_IJj76p7j6-0hBg4_uRCgUjHwXCG2rDwilVzHF44dzMUcbvO7ev8Q_Sqf4HEt3zppLJGjOeWzf_jVxsiw2fB-YEDF80LnbbztjEfJa8XBE4zReI3fCRHi-Y0ZY3D1Irt32DhnvVJBihVPx0BHLuVy9cdBZm_S-fyTWfQcCx3UL6pU_Aw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<p class="text-white/80 text-xs italic">Artwork from various iconic Chinese visual novels over the last two decades.</p>
+</div>
+</div>
+<!-- Content -->
+<div class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+<p id="intro">The landscape of the Chinese gaming industry has undergone a radical transformation over the past twenty years. While grand wuxia RPGs and mobile titans often grab the headlines, a quieter revolution has been brewing in the realm of <strong>Visual Novels (VN)</strong>.</p>
+<p>What started as a niche hobbyist community translating Japanese classics has blossomed into a sophisticated ecosystem of professional studios producing world-class narrative experiences. Today, Chinese VNs are no longer just "clones" but are defining their own aesthetic and storytelling tropes.</p>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-12 mb-4" id="early">Early Years (2000-2010): The Doujin Spirit</h2>
+<p>In the early 2000s, the Chinese VN scene was almost entirely driven by passion. Small circles, often referred to as "doujin" groups, operated on forums and BBS boards. These developers were motivated not by profit, but by a desire to tell stories that resonated with the local youth culture.</p>
+<div class="bg-primary/5 border-l-4 border-primary p-6 my-8 rounded-r-xl italic">
+                        "We didn't have engines like Unity back then. We hacked together tools, translated scripts by hand, and shared our games on physical CDs at local conventions."
+                        <span class="block mt-2 font-bold not-italic text-sm text-slate-500">— Early Developer Interview</span>
+</div>
+<p>Games from this era often featured hand-drawn art and localized themes, blending traditional Chinese values with the visual language of Japanese anime. It was a foundational period that established the groundwork for what was to come.</p>
+</div>
+<!-- Article Bottom Actions -->
+<div class="mt-16 flex flex-col items-center gap-6 py-12 border-y border-slate-200 dark:border-slate-800">
+<p class="font-bold text-slate-500 uppercase text-xs tracking-widest">Show your support</p>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">favorite</span>
+<span>Like (1,248)</span>
+</button>
+<button class="flex items-center gap-2 px-8 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span>Award</span>
+</button>
+</div>
+</div>
+<!-- Comment System -->
+<section class="mt-16">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-2xl font-black">Comments (42)</h3>
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span>Sort by:</span>
+<button class="font-bold text-primary">Best</button>
+<span class="mx-1">|</span>
+<button class="hover:text-slate-900 dark:hover:text-slate-100">Newest</button>
+</div>
+</div>
+<!-- Post Comment -->
+<div class="mb-10 bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl flex gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/20 shrink-0">
+<img class="w-full h-full object-cover" data-alt="Current user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI1RFJq877BbUc_WyU-4knuL-StNKsOcIR7Irj_PMElNVE_6ALmHyGct02myc0Dy0nd5IfH2KPzOICW1Bljc7fdF1I0YwaD2L2r1bwn-62wglK5DqzE_1_8ob5KekKaycbPcg6rPz5is_dQcDI9A9Y12p11wavIe8qHpuvfdVJ5-oeqeOanxelDxZyzwqM1eIbK9Y8T1BalIiOB0Y5iX7MCxhtsaJIQ8g3Vvtabx-5-jD_3kBHT7882wfkJ_JzqcAsrcIU8ZlEYw"/>
+</div>
+<div class="flex-1">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none min-h-[80px] text-sm" placeholder="Share your thoughts..." rows="3"></textarea>
+<div class="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-800">
+<button class="bg-primary text-white px-6 py-2 rounded-xl text-sm font-bold">Post Comment</button>
+</div>
+</div>
+</div>
+<!-- Comment List -->
+<div class="space-y-8">
+<!-- Comment Item -->
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full bg-slate-300 shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Commenter avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXCgwxhgh-GrPnC1foDNlz6kbIvAPQVq-s-yDdubN0nD08cEENipPqgxae4ctnLXBmQSECmTP5bgJehIWkmdNca14jHsVbH9rRIMpVIg7CBDYi75xstDKR-x_6C07grNRXvM0XlCi9mx64EDU9s1okwpBDHDRRQgQTHtRVcIMShadJCZcPwNkuXev3R9hcif2C4ddeexlvPpiutRseNOqzz37RO45vaoyYq83M9gpMlo3L9LiIwfEs5NF-A_QOgwcksowboI3oNw"/>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-center gap-2">
+<span class="text-sm font-bold">VN_Enthusiast</span>
+<span class="text-xs text-slate-500">2 hours ago</span>
+</div>
+<p class="text-sm leading-relaxed text-slate-600 dark:text-slate-400">This article is a great deep dive! I remember playing some of those early doujin titles. It's amazing to see how far the production quality has come with titles like 'Tricolour Lovestory'.</p>
+<div class="flex items-center gap-4 text-xs font-bold text-slate-500">
+<button class="flex items-center gap-1 hover:text-primary"><span class="material-symbols-outlined text-sm">thumb_up</span> 24</button>
+<button class="hover:text-primary">Reply</button>
+</div>
+<!-- Nested Comment -->
+<div class="mt-4 pt-4 border-l-2 border-slate-200 dark:border-slate-800 pl-4 space-y-6">
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-slate-400 shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Nested commenter avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZcepsxcSLcjFIzcu_k1PnIQkiVub_xelY1LUJ85KTlWY2UMZt9cKZeupV3iQXXVhqPBF_d5hakRyVaNsdWHEbzyJA7FzEzJ8uGQALqAIbLMC1joJ5WNSW25EV2EPDA-I09RUKzPiBUAKeB8t0iCb-brisgmrXDhWsFY-vpxvVXaKpdJ-HSm28BWKcftiLq7IPxzdICovFqjVbFHMuA6z-pZUZ9FdbZWxtNLwcfPdzP0KmP1u6yDHq2bGdI8q9yfOh8z4NPSlruQ"/>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold">HistoryBuff99</span>
+<span class="text-[10px] text-slate-500">1 hour ago</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400">Totally agree. The shift to Steam was the real game changer for accessibility.</p>
+<div class="flex items-center gap-4 text-xs font-bold text-slate-500">
+<button class="flex items-center gap-1 hover:text-primary"><span class="material-symbols-outlined text-sm">thumb_up</span> 5</button>
+<button class="hover:text-primary">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</article>
+<!-- Right Sidebar (Related Content) -->
+<aside class="w-full lg:w-80 shrink-0 space-y-10">
+<!-- Related Entries -->
+<section>
+<h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center justify-between">
+                        Related Entries
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</h3>
+<div class="flex flex-col gap-4">
+<!-- Entry Card -->
+<a class="group flex gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700" href="#">
+<div class="w-20 h-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Cover art of a romantic visual novel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnimSIlrPZiUkZ9oNhSIQuK2fZ22H4ZxCyNS9RhLZsE_r-74TXJ7GhaF9XZEENyR7Eu2ukTQKwaSxpELDByywxEdiOnkc_aq9BInBJEBVZ4J8lH3BXYEcXK8V3NCTkXlzCpyFpY5AvVH4zzlB7C6i0vXc1jMgqfhUNAq39PCOnMrp6lAzqN_4faiddRbgp3v7X6Ogj6Erc2Wp0ynd0wnH_qRonEiXHQRa9UgDLFQSCgy34dqPX4_Sva3DeOu81MC-TWHHYnQ0fJQ"/>
+</div>
+<div class="flex flex-col justify-center gap-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">Tricolour Lovestory</h4>
+<p class="text-[10px] text-slate-500 uppercase font-medium">Romance / Slice of Life</p>
+<div class="flex items-center gap-1 mt-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold">9.2</span>
+</div>
+</div>
+</a>
+<!-- Entry Card -->
+<a class="group flex gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700" href="#">
+<div class="w-20 h-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Cover art of a mystery visual novel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgp-9F9kwGUmQ0HFOe2DH_kfYfTQ4ajMByQUp7Y5A7e5M9XCXCJ3h1CjdBr3TgvNj6dTPK7D2zEHZp9N2XUw20kj-mAM0LYLb16tdj6GRPYJG9kYC1uEiVC4MZy76BktZtBHjPH8X3kIY3VpnD8JGZI3YUIg5QJSrK9qJPv_t9_gBtk-nRXdhuLHznHnXA7pZgAkPofwhuqVNokwnirj1XXNGW3fQEf8063Xi5ut5mkc4C4OYz0kcvlBtYeV5ei7MycMKqlKYsjw"/>
+</div>
+<div class="flex flex-col justify-center gap-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">Will: A Wonderful World</h4>
+<p class="text-[10px] text-slate-500 uppercase font-medium">Mystery / Puzzle</p>
+<div class="flex items-center gap-1 mt-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold">8.8</span>
+</div>
+</div>
+</a>
+<!-- Entry Card -->
+<a class="group flex gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700" href="#">
+<div class="w-20 h-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Cover art of a cyberpunk visual novel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCi1dqAYonRCd-Aq3XGoaf1b1u7tyjw42tMWE2YAuZLsYZ8FVDELT1C0dmI9xRmQ6hsbGhbFXX6w67atF1xUQbaS76UHC2oD45VVEWXLzEgUl4Inynwn-Z9Qk2RnMSroXw_ZkCNy_bf1_yQRE1fHeOFjlD4noJH2xC-OnKCK8OCUE3k1gMNBMJZjT7oPBZx_fueObQ2NhNwHFMuEUOx47BhlwpuGndikae7mxvgC3PcNjQNQWecyA2-hbFkBIY1GxIQs4ZQaIXNtg"/>
+</div>
+<div class="flex flex-col justify-center gap-1">
+<h4 class="text-sm font-bold group-hover:text-primary transition-colors">Tales of the Neon Sea</h4>
+<p class="text-[10px] text-slate-500 uppercase font-medium">Cyberpunk / Detective</p>
+<div class="flex items-center gap-1 mt-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold">8.5</span>
+</div>
+</div>
+</a>
+</div>
+</section>
+<!-- Popular Articles -->
+<section>
+<h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">Popular Right Now</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<span class="text-2xl font-black text-primary/30">01</span>
+<a class="text-sm font-bold hover:text-primary leading-snug" href="#">Top 10 Hidden Gem VNs from the 2010s</a>
+</div>
+<div class="flex items-start gap-3">
+<span class="text-2xl font-black text-primary/30">02</span>
+<a class="text-sm font-bold hover:text-primary leading-snug" href="#">Interview with the Lead Writer of 'Gale of Winds'</a>
+</div>
+<div class="flex items-start gap-3">
+<span class="text-2xl font-black text-primary/30">03</span>
+<a class="text-sm font-bold hover:text-primary leading-snug" href="#">How to get started with VN development in 2024</a>
+</div>
+</div>
+</section>
+<!-- Newsletter Card -->
+<div class="bg-slate-900 dark:bg-primary/20 text-white p-6 rounded-2xl relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-lg font-bold mb-2">Weekly VN Digest</h4>
+<p class="text-xs text-white/70 mb-4">Get the latest reviews, release schedules, and historical deep dives delivered to your inbox.</p>
+<input class="w-full bg-white/10 border-white/20 rounded-xl py-2 px-4 mb-3 text-xs placeholder:text-white/50 focus:ring-primary" placeholder="email@example.com" type="email"/>
+<button class="w-full bg-primary text-white font-bold py-2 rounded-xl text-xs">Join 5,000+ Readers</button>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-white/5 rotate-12">mail</span>
+</div>
+</aside>
+</div>
+</main>
+<footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-12 bg-slate-50 dark:bg-slate-900/30">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2 text-primary opacity-50">
+<span class="material-symbols-outlined text-2xl font-bold">rocket_launch</span>
+<span class="text-lg font-black tracking-tight">CnGal</span>
+</div>
+<div class="flex gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
+<a class="hover:text-primary" href="#">About Us</a>
+<a class="hover:text-primary" href="#">Contact</a>
+<a class="hover:text-primary" href="#">Terms</a>
+<a class="hover:text-primary" href="#">Privacy</a>
+</div>
+<p class="text-xs text-slate-500">© 2023 CnGal. All rights reserved.</p>
 </div>
 </div>
 </footer>
-</div>
 </body></html>

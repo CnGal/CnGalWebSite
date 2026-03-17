@@ -1,0 +1,41 @@
+@if (!string.IsNullOrWhiteSpace(AuthorName))
+{
+    <section class="video-author">
+        <a href="@SpaceUrl" class="video-author-link">
+            @if (!string.IsNullOrWhiteSpace(AuthorAvatar))
+            {
+                <img class="video-author-avatar" src="@AuthorAvatar" alt="@AuthorName" loading="lazy" />
+            }
+            else
+            {
+                <div class="video-author-avatar video-author-avatar--placeholder">
+                    <CgMdiIcon Name="mdiAccount" />
+                </div>
+            }
+            <span class="video-author-name">@AuthorName</span>
+        </a>
+
+        <div class="video-author-meta">
+            <span>·</span>
+            <span class="video-author-badge @(IsOriginal ? "video-author-badge--original" : "video-author-badge--repost")">
+                @(IsOriginal ? "原创" : "搬运")
+            </span>
+            @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
+            {
+                <span>·</span>
+                <CgMdiIcon Name="mdiPencilOutline" />
+                <span>原作者：@OriginalAuthor</span>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string AuthorName { get; set; } = "";
+    [Parameter] public string AuthorAvatar { get; set; } = "";
+    [Parameter] public string AuthorId { get; set; } = "";
+    [Parameter] public string OriginalAuthor { get; set; } = "";
+    [Parameter] public bool IsOriginal { get; set; }
+
+    private string SpaceUrl => string.IsNullOrWhiteSpace(AuthorId) ? "#" : $"/space/index/{AuthorId}";
+}

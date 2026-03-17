@@ -10,9 +10,26 @@
 .entry-tags li {
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
     border-radius: var(--cg-radius-md);
-    padding: 0.25rem 0.75rem;
     font-size: 0.8rem;
     font-weight: 600;
     background: color-mix(in oklab, var(--cg-color-bg) 60%, white);
-    color: var(--cg-color-text-muted);
+    transition: var(--cg-transition-fast);
 }
+
+.entry-tags li:hover {
+    border-color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, white);
+}
+
+.entry-tags li a {
+    display: block;
+    padding: 0.25rem 0.75rem;
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.entry-tags li:hover a {
+    color: var(--cg-color-primary);
+}
+

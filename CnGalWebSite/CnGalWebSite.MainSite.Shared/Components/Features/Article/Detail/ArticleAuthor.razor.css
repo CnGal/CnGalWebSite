@@ -1,11 +1,12 @@
 .article-author {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
 }
 
 .article-author-link {
@@ -22,8 +23,8 @@
 }
 
 .article-author-avatar {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
     flex-shrink: 0;
@@ -40,14 +41,15 @@
 
 .article-author-name {
     font-size: var(--cg-font-size-base);
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
 }
 
 .article-author-original {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: var(--cg-font-size-xs);
+    font-size: var(--cg-font-size-sm);
     color: var(--cg-color-text-muted);
     flex-wrap: wrap;
 }
@@ -59,4 +61,9 @@
 
 .article-author-original a:hover {
     text-decoration: underline;
+}
+
+::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
 }

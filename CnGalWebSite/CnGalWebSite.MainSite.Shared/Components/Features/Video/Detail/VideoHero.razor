@@ -1,0 +1,73 @@
+@inject IMainSiteAuthRequestService AuthRequestService
+
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <section class="video-hero">
+        @if (!string.IsNullOrWhiteSpace(MainPicture))
+        {
+            <div class="video-hero-image-wrapper">
+                <img class="video-hero-image" src="@MainPicture" alt="@Title" loading="eager" />
+                @if (Duration > TimeSpan.Zero)
+                {
+                    <span class="video-hero-duration">
+                        @FormatDuration(Duration)
+                    </span>
+                }
+            </div>
+        }
+
+        <div class="video-hero-text">
+            <span class="video-hero-type">@TypeText</span>
+            <h1>@Title</h1>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p class="video-hero-intro">@BriefIntroduction</p>
+            }
+            <div class="video-hero-actions">
+                @if (!string.IsNullOrWhiteSpace(WatchUrl))
+                {
+                    <a class="video-action-btn-primary" href="@WatchUrl" target="_blank" rel="noopener noreferrer">
+                        <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
+                        <span>前往观看</span>
+                    </a>
+                }
+                @if (VideoId > 0)
+                {
+                    <AuthorizeView>
+                        <Authorized>
+                            <a class="video-edit-btn" href="/videos/edit/@VideoId">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>编辑视频</span>
+                            </a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="video-edit-btn video-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/videos/edit/{VideoId}")">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>登录后编辑</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string BriefIntroduction { get; set; } = "";
+    [Parameter] public string MainPicture { get; set; } = "";
+    [Parameter] public string TypeText { get; set; } = "";
+    [Parameter] public TimeSpan Duration { get; set; }
+    [Parameter] public long VideoId { get; set; }
+    [Parameter] public string WatchUrl { get; set; } = "";
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+        {
+            return $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}";
+        }
+        return $"{duration.Minutes:D2}:{duration.Seconds:D2}";
+    }
+}

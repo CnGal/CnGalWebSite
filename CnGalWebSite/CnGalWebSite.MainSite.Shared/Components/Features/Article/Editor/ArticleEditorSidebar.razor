@@ -1,0 +1,118 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime Js
+@implements IAsyncDisposable
+
+<aside class="article-edit-sidebar">
+    <div class="article-edit-sidebar__card article-edit-sidebar__card--primary">
+        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+        <div>
+            <h3>@(IsCreate ? "创建模式" : "编辑模式")</h3>
+            <p>每 10 秒自动保存草稿</p>
+        </div>
+    </div>
+
+    @if (HasDraftRecovered)
+    {
+        <div class="article-edit-sidebar__card article-edit-sidebar__card--warning">
+            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
+            <span>已恢复未保存的草稿</span>
+            <button class="article-edit-sidebar__card-action" @onclick="OnDiscardDraft">丢弃</button>
+        </div>
+    }
+
+    <nav class="article-edit-sidebar__nav">
+        @foreach (var item in NavItems)
+        {
+            <a class="article-edit-nav-item @(item.Id == _activeSectionId ? "article-edit-nav-item--active" : "")"
+               href="javascript:void(0)"
+               @onclick="() => ScrollToSection(item.Id)"
+               @onclick:preventDefault>
+                <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                <span>@item.Label</span>
+            </a>
+        }
+    </nav>
+
+    <div class="article-edit-sidebar__actions">
+        <CgButton Variant="primary" Disabled="@IsSubmitting" OnClick="OnSubmit">
+            @if (IsSubmitting)
+            {
+                <span class="cg-spinner"></span>
+                <span>提交中...</span>
+            }
+            else
+            {
+                <span>提交审核</span>
+            }
+        </CgButton>
+        <CgButton Variant="outline" Disabled="@IsSubmitting" OnClick="OnCancel">取消</CgButton>
+    </div>
+</aside>
+
+@code {
+    [Parameter] public bool IsCreate { get; set; }
+    [Parameter] public bool IsSubmitting { get; set; }
+    [Parameter] public bool HasDraftRecovered { get; set; }
+    [Parameter] public EventCallback OnSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnDiscardDraft { get; set; }
+
+    private static readonly NavItem[] NavItems =
+    [
+        new("section-article-main", "主要信息", "mdiFileDocumentOutline"),
+        new("section-article-mainpage", "正文", "mdiBookOpenVariant"),
+        new("section-article-relevances", "关联信息", "mdiHub"),
+    ];
+
+    private record NavItem(string Id, string Label, string Icon);
+
+    private string _activeSectionId = "section-article-main";
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<ArticleEditorSidebar>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await Js.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-edit-nav.js");
+
+            _dotNetRef = DotNetObjectReference.Create(this);
+            var sectionIds = NavItems.Select(n => n.Id).ToArray();
+            await _jsModule.InvokeVoidAsync("initSectionObserver", _dotNetRef, sectionIds);
+        }
+    }
+
+    [JSInvokable]
+    public void OnSectionVisible(string sectionId)
+    {
+        if (_activeSectionId != sectionId)
+        {
+            _activeSectionId = sectionId;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ScrollToSection(string sectionId)
+    {
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("scrollToSection", sectionId);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule != null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("disposeSectionObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+            catch (TaskCanceledException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

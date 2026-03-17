@@ -43,7 +43,7 @@ public sealed class EntryDetailViewModel
 
     public required IReadOnlyList<EntryInformationModel> Information { get; init; }
 
-    public required IReadOnlyList<string> Tags { get; init; }
+    public required IReadOnlyList<TagsViewModel> Tags { get; init; }
 
     public required IReadOnlyList<EditAudioAloneModel> Audio { get; init; }
 

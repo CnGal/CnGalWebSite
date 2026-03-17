@@ -1,0 +1,17 @@
+@using CnGalWebSite.DataModel.ViewModel.Articles
+
+<section class="article-editor-section" id="section-article-mainpage">
+    <h2><CgMdiIcon Name="mdiBookOpenVariant" Class="article-section-icon" aria-hidden="true"/>正文</h2>
+    <p>使用 Markdown 编辑文章正文内容。</p>
+
+    <CgAlert Variant="info">
+        你可以在这里自由发挥撰写文章内容，支持 Markdown 语法。
+    </CgAlert>
+    <CgMarkdownEditor @bind-Value="Model.Context"
+                       Placeholder="支持 Markdown 语法..." />
+</section>
+
+@code {
+    [Parameter]
+    public EditArticleMainPageViewModel Model { get; set; } = default!;
+}

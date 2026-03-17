@@ -1,0 +1,31 @@
+.video-basic-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.video-basic-info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+.video-basic-info-item--time {
+    margin-left: auto;
+}
+
+::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 640px) {
+    .video-basic-info-item--time {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+

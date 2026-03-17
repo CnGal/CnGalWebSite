@@ -1,0 +1,156 @@
+.video-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.video-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+
+.video-info-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--cg-color-border);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.video-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.video-prose {
+    font-size: var(--cg-font-size-lg);
+    line-height: 1.8;
+    color: var(--cg-color-text);
+}
+
+.video-footer-related {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    border-top: 1px solid var(--cg-color-border);
+    padding-top: 3rem;
+}
+
+.video-hidden-alert {
+    margin-bottom: 2rem;
+}
+
+.video-not-found {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.video-not-found h1 {
+    font-size: var(--cg-font-size-xl);
+    color: var(--cg-color-text);
+    margin-bottom: 0.5rem;
+}
+
+.video-not-found p {
+    color: var(--cg-color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.video-not-found a {
+    color: var(--cg-color-link);
+}
+
+.video-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 960px;
+    margin: 2rem auto;
+}
+
+.video-loading-block {
+    border-radius: var(--cg-radius-lg);
+    height: 140px;
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: video-loading 1.2s infinite;
+}
+
+.video-loading-block--wide {
+    height: 400px;
+}
+
+@keyframes video-loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+.video-action-btn {
+    border-radius: var(--cg-radius-full);
+    border: 1px solid var(--cg-color-primary);
+    color: white;
+    background: var(--cg-color-primary);
+    text-decoration: none;
+    padding: 0.8rem 2rem;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-bold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--cg-transition-fast);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.video-action-btn:hover {
+    background: var(--cg-color-primary-hover);
+    border-color: var(--cg-color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.video-outlink-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.video-outlink-list li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cg-color-link);
+    font-size: var(--cg-font-size-base);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    padding: 0.5rem 0;
+}
+
+.video-outlink-list li a:hover {
+    text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+    .video-page {
+        padding: 3rem 2rem 5rem;
+    }
+}
+

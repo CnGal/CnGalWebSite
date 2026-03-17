@@ -18,10 +18,12 @@
         @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
         {
             <div class="article-author-original">
+                <span>·</span>
                 <CgMdiIcon Name="mdiPencilOutline" />
                 <span>原作者：@OriginalAuthor</span>
                 @if (!string.IsNullOrWhiteSpace(OriginalLink))
                 {
+                    <span>·</span>
                     <a href="@OriginalLink" target="_blank" rel="noopener noreferrer">原文链接</a>
                 }
             </div>

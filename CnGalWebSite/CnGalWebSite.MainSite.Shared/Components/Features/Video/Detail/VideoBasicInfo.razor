@@ -1,0 +1,70 @@
+@using CnGalWebSite.DataModel.Model
+
+<section class="video-basic-info">
+    <div class="video-basic-info-item">
+        <CgMdiIcon Name="mdiEyeOutline" />
+        <span>@ReaderCount 播放</span>
+    </div>
+    <div class="video-basic-info-item">
+        <CgMdiIcon Name="mdiCommentTextOutline" />
+        <span>@CommentCount 评论</span>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Type))
+    {
+        <div class="video-basic-info-item">
+            <CgMdiIcon Name="mdiTagOutline" />
+            <span>@Type</span>
+        </div>
+    }
+    <div class="video-basic-info-item">
+        <CgMdiIcon Name="mdiShieldCheckOutline" />
+        <span>@GetCopyrightText()</span>
+    </div>
+    @if (IsInteractive)
+    {
+        <div class="video-basic-info-item">
+            <CgMdiIcon Name="mdiGestureTapButton" />
+            <span>互动视频</span>
+        </div>
+    }
+    <div class="video-basic-info-item video-basic-info-item--time">
+        <CgMdiIcon Name="mdiCalendarOutline" />
+        <time datetime="@TimeValue">@TimeDisplay</time>
+    </div>
+</section>
+
+@code {
+    [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public int CommentCount { get; set; }
+    [Parameter] public string Type { get; set; } = "";
+    [Parameter] public CopyrightType Copyright { get; set; }
+    [Parameter] public bool IsInteractive { get; set; }
+    [Parameter] public DateTime PublishTime { get; set; }
+    [Parameter] public DateTime CreateTime { get; set; }
+    [Parameter] public DateTime LastEditTime { get; set; }
+
+    private DateTime EffectiveTime
+    {
+        get
+        {
+            if (PublishTime.Year >= 1900)
+            {
+                return PublishTime;
+            }
+            return CreateTime.Year < 1900 ? LastEditTime : CreateTime;
+        }
+    }
+
+    private string TimeValue => EffectiveTime.ToString("yyyy-MM-dd");
+    private string TimeDisplay => EffectiveTime.ToString("yyyy-MM-dd");
+
+    private string GetCopyrightText()
+    {
+        return Copyright switch
+        {
+            CopyrightType.Original => "原创",
+            CopyrightType.Transshipment => "转载",
+            _ => "未知版权"
+        };
+    }
+}

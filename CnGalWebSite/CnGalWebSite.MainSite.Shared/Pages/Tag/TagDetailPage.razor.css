@@ -1,0 +1,90 @@
+.tag-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px; /* Aligned with article page readable width */
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+}
+
+.tag-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+}
+
+.tag-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.tag-footer-related {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    border-top: 1px solid var(--cg-color-border);
+    padding-top: 3rem;
+}
+
+.tag-hidden-alert {
+    margin-bottom: 2rem;
+}
+
+.tag-not-found {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.tag-not-found h1 {
+    font-size: var(--cg-font-size-xl);
+    color: var(--cg-color-text);
+    margin-bottom: 0.5rem;
+}
+
+.tag-not-found p {
+    color: var(--cg-color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.tag-not-found a {
+    color: var(--cg-color-link);
+}
+
+.tag-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 960px;
+    margin: 2rem auto;
+}
+
+.tag-loading-block {
+    border-radius: var(--cg-radius-lg);
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: tag-loading 1.2s infinite;
+    height: 140px;
+}
+
+.tag-loading-block--wide {
+    height: 300px;
+}
+
+@keyframes tag-loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+@media (min-width: 768px) {
+    .tag-page {
+        padding: 3rem 2rem 5rem;
+    }
+}

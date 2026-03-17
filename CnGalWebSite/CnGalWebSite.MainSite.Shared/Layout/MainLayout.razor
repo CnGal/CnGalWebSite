@@ -32,6 +32,7 @@
                 <div class="cg-topbar__actions">
                     <AuthorizeView>
                         <Authorized>
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.CreateMenu />
                             <CnGalWebSite.MainSite.Shared.Components.Layout.UserMenu UserName="@context.User.Identity?.Name" UserId="@context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value" CurrentReturnUrl="@CurrentReturnUrl" />
                         </Authorized>
                         <NotAuthorized>

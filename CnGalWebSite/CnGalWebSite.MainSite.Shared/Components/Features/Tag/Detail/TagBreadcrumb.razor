@@ -1,0 +1,30 @@
+@using CnGalWebSite.DataModel.ViewModel.Tags
+
+@if (TagLevels is not null && TagLevels.Count > 0)
+{
+    <nav class="tag-breadcrumb" aria-label="标签层级导航">
+        <ol>
+            @for (var i = 0; i < TagLevels.Count; i++)
+            {
+                var level = TagLevels[i];
+                var isLast = i == TagLevels.Count - 1;
+
+                <li>
+                    @if (isLast)
+                    {
+                        <span class="tag-breadcrumb-current" aria-current="page">@level.Name</span>
+                    }
+                    else
+                    {
+                        <a href="/tags/index/@level.Id">@level.Name</a>
+                        <CgMdiIcon Name="mdiChevronRight" />
+                    }
+                </li>
+            }
+        </ol>
+    </nav>
+}
+
+@code {
+    [Parameter] public List<TagLevelViewModel>? TagLevels { get; set; }
+}

@@ -65,9 +65,8 @@ public sealed class EntryQueryService(
             Booking = entry.Booking,
             Information = entry.Information?.ToList() ?? [],
             Tags = entry.Tags?
-                .Select(s => s.Name)
-                .Where(s => string.IsNullOrWhiteSpace(s) is false)
-                .Distinct()
+                .Where(s => string.IsNullOrWhiteSpace(s.Name) is false)
+                .DistinctBy(s => s.Id)
                 .Take(24)
                 .ToList() ?? [],
             Audio = entry.Audio?
