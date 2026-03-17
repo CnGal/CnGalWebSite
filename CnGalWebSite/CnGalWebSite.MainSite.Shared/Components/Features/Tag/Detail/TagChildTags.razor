@@ -1,35 +1,19 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
-@if (Tags is not null && Tags.Count > 0)
-{
-    <section class="tag-child-tags" aria-label="子标签">
-        <h2 class="tag-section-title">
-            <CgMdiIcon Name="mdiTagMultipleOutline" />
-            子标签
-            <span class="tag-section-count">@Tags.Count</span>
-        </h2>
-        <ul class="tag-child-tags-grid">
+<EntrySection Title="子标签" Icon="mdiTagMultipleOutline" Show="Tags is not null && Tags.Count > 0">
+    <EntryCardList>
+        @if (Tags is not null)
+        {
             @foreach (var tag in Tags)
             {
                 <li>
-                    <a class="tag-child-card" href="/tags/index/@tag.Id">
-                        @if (!string.IsNullOrWhiteSpace(tag.MainImage))
-                        {
-                            <img src="@tag.MainImage" alt="@tag.Name" loading="lazy" />
-                        }
-                        <div class="tag-child-card-body">
-                            <span class="tag-child-card-name">@tag.Name</span>
-                            @if (!string.IsNullOrWhiteSpace(tag.BriefIntroduction))
-                            {
-                                <span class="tag-child-card-intro">@tag.BriefIntroduction</span>
-                            }
-                        </div>
-                    </a>
+                    <EntryCardItem Url="@($"/tags/index/{tag.Id}")" Image="@tag.MainImage" Title="@tag.Name" />
                 </li>
             }
-        </ul>
-    </section>
-}
+        }
+    </EntryCardList>
+</EntrySection>
 
 @code {
     [Parameter] public List<TagInforTipViewModel>? Tags { get; set; }

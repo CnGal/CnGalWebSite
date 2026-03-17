@@ -12,21 +12,21 @@
                     <CgMdiIcon Name="mdiAccount" />
                 </div>
             }
-            <div class="video-author-info">
-                <span class="video-author-name">@AuthorName</span>
-                <span class="video-author-badge @(IsOriginal ? "video-author-badge--original" : "video-author-badge--repost")">
-                    @(IsOriginal ? "作者" : "搬运")
-                </span>
-            </div>
+            <span class="video-author-name">@AuthorName</span>
         </a>
 
-        @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
-        {
-            <div class="video-author-original">
+        <div class="video-author-meta">
+            <span>·</span>
+            <span class="video-author-badge @(IsOriginal ? "video-author-badge--original" : "video-author-badge--repost")">
+                @(IsOriginal ? "原创" : "搬运")
+            </span>
+            @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
+            {
+                <span>·</span>
                 <CgMdiIcon Name="mdiPencilOutline" />
                 <span>原作者：@OriginalAuthor</span>
-            </div>
-        }
+            }
+        </div>
     </section>
 }
 

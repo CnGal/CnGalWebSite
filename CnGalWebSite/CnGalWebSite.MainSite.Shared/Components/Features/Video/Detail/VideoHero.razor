@@ -1,38 +1,53 @@
+@inject IMainSiteAuthRequestService AuthRequestService
+
 @if (!string.IsNullOrWhiteSpace(Title))
 {
     <section class="video-hero">
-        @if (HasBackground)
+        @if (!string.IsNullOrWhiteSpace(MainPicture))
         {
-            <div class="video-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+            <div class="video-hero-image-wrapper">
+                <img class="video-hero-image" src="@MainPicture" alt="@Title" loading="eager" />
+                @if (Duration > TimeSpan.Zero)
+                {
+                    <span class="video-hero-duration">
+                        @FormatDuration(Duration)
+                    </span>
+                }
+            </div>
         }
 
-        <div class="video-hero-content">
-            @if (!string.IsNullOrWhiteSpace(MainPicture))
+        <div class="video-hero-text">
+            <span class="video-hero-type">@TypeText</span>
+            <h1>@Title</h1>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
             {
-                <img class="video-hero-image" src="@MainPicture" alt="@Title" loading="eager" />
+                <p class="video-hero-intro">@BriefIntroduction</p>
             }
-
-            <div class="video-hero-text">
-                <span class="video-hero-type">
-                    <CgMdiIcon Name="mdiMovieOpenOutline" />
-                    @TypeText
-                </span>
-                <h1>@Title</h1>
-                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            <div class="video-hero-actions">
+                @if (!string.IsNullOrWhiteSpace(WatchUrl))
                 {
-                    <p class="video-hero-intro">@BriefIntroduction</p>
+                    <a class="video-action-btn-primary" href="@WatchUrl" target="_blank" rel="noopener noreferrer">
+                        <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
+                        <span>前往观看</span>
+                    </a>
                 }
-                <div class="video-hero-time">
-                    <CgMdiIcon Name="mdiCalendarOutline" />
-                    <time datetime="@TimeValue">@TimeDisplay</time>
-                    @if (Duration > TimeSpan.Zero)
-                    {
-                        <span class="video-hero-duration">
-                            <CgMdiIcon Name="mdiTimerOutline" />
-                            @FormatDuration(Duration)
-                        </span>
-                    }
-                </div>
+                @if (VideoId > 0)
+                {
+                    <AuthorizeView>
+                        <Authorized>
+                            <a class="video-edit-btn" href="/videos/edit/@VideoId">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>编辑视频</span>
+                            </a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="video-edit-btn video-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/videos/edit/{VideoId}")">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>登录后编辑</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
             </div>
         </div>
     </section>
@@ -42,17 +57,10 @@
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public string BriefIntroduction { get; set; } = "";
     [Parameter] public string MainPicture { get; set; } = "";
-    [Parameter] public string BackgroundPicture { get; set; } = "";
     [Parameter] public string TypeText { get; set; } = "";
-    [Parameter] public DateTime PubishTime { get; set; }
-    [Parameter] public DateTime CreateTime { get; set; }
     [Parameter] public TimeSpan Duration { get; set; }
-
-    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
-
-    private DateTime EffectiveTime => PubishTime != default ? PubishTime : CreateTime;
-    private string TimeValue => EffectiveTime.ToString("yyyy-MM-dd");
-    private string TimeDisplay => EffectiveTime.ToString("yyyy 年 M 月 d 日");
+    [Parameter] public long VideoId { get; set; }
+    [Parameter] public string WatchUrl { get; set; } = "";
 
     private static string FormatDuration(TimeSpan duration)
     {

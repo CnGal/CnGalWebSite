@@ -43,10 +43,10 @@ public sealed class VideoCommandService(
     {
         try
         {
-            var mainTask = GetFromJsonAsync<EditVideoMainViewModel>($"api/videos/EditMainAsync/{id}", cancellationToken);
-            var imagesTask = GetFromJsonAsync<EditVideoImagesViewModel>($"api/videos/EditImagesAsync/{id}", cancellationToken);
+            var mainTask = GetFromJsonAsync<EditVideoMainViewModel>($"api/videos/EditMain/{id}", cancellationToken);
+            var imagesTask = GetFromJsonAsync<EditVideoImagesViewModel>($"api/videos/EditImages/{id}", cancellationToken);
             var relevancesTask = GetFromJsonAsync<EditVideoRelevancesViewModel>($"api/videos/EditRelevances/{id}", cancellationToken);
-            var mainPageTask = GetFromJsonAsync<EditVideoMainPageViewModel>($"api/videos/EditMainPageAsync/{id}", cancellationToken);
+            var mainPageTask = GetFromJsonAsync<EditVideoMainPageViewModel>($"api/videos/EditMainPage/{id}", cancellationToken);
 
             await Task.WhenAll(mainTask, imagesTask, relevancesTask, mainPageTask);
 
@@ -133,10 +133,10 @@ public sealed class VideoCommandService(
                 var errors = new List<string>();
 
                 var responses = await Task.WhenAll(
-                    SubmitPartAsync("api/videos/EditMainAsync", request.Data.Main, cancellationToken),
-                    SubmitPartAsync("api/videos/EditImagesAsync", request.Data.Images, cancellationToken),
+                    SubmitPartAsync("api/videos/EditMain", request.Data.Main, cancellationToken),
+                    SubmitPartAsync("api/videos/EditImages", request.Data.Images, cancellationToken),
                     SubmitPartAsync("api/videos/EditRelevances", request.Data.Relevances, cancellationToken),
-                    SubmitPartAsync("api/videos/EditMainPageAsync", request.Data.MainPage, cancellationToken)
+                    SubmitPartAsync("api/videos/EditMainPage", request.Data.MainPage, cancellationToken)
                 );
 
                 foreach (var res in responses)

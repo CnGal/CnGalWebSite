@@ -1,11 +1,12 @@
 .article-meta {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 1rem;
-    padding: 0.75rem 1.25rem;
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
 }
 
 .article-meta-item {
@@ -16,10 +17,6 @@
     color: var(--cg-color-text-muted);
 }
 
-.article-meta-item--time {
-    margin-left: auto;
-}
-
 ::deep .cg-mdi-icon {
     width: 16px;
     height: 16px;
@@ -28,10 +25,5 @@
 @media (max-width: 640px) {
     .article-meta {
         gap: 0.5rem 1rem;
-    }
-
-    .article-meta-item--time {
-        margin-left: 0;
-        width: 100%;
     }
 }

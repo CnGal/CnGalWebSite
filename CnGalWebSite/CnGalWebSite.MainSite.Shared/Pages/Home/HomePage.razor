@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -163,6 +163,39 @@ else
                         </span>
                     </div>
                 </div>
+
+
+                <HomeSection Title="角色生日" Icon="mdiCake" IconColor="var(--cg-color-secondary)">
+                    @if (Model.Birthdays.Count == 0)
+                    {
+                        <div class="home-empty-state-card">
+                            <div class="home-empty-state-card__icon">
+                                <CgMdiIcon Name="mdiCakeVariantOutline" aria-hidden="true"/>
+                            </div>
+                            <p class="home-empty-state-card__text">好像今天没人过生日欸</p>
+                            <a href="/birthday" class="home-empty-state-card__action">
+                                <CgMdiIcon Name="mdiCalendarSearch" aria-hidden="true"/>
+                                前往生日日历提前准备
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="home-list">
+                            @foreach (var item in Model.Birthdays.Take(4))
+                            {
+                                var gameInfor = item.AddInfors.FirstOrDefault(x => x.Modifier == "登场游戏");
+                                var gameName = gameInfor?.Contents.FirstOrDefault()?.DisplayName ?? "未知游戏";
+                                <HomeRoleCard Url="@($"/entries/index/{item.Id}")"
+                                              Name="@item.Name"
+                                              Image="@item.MainImage"
+                                              GameName="@gameName"
+                                              BriefIntroduction="@item.BriefIntroduction"/>
+                            }
+                        </ul>
+                    }
+                </HomeSection>
+
                 <HomeSection Title="每周速报" Icon="mdiTextLong" IconColor="var(--cg-color-primary)">
                     @{
                         var latestWeekly = Model.WeeklyNews.FirstOrDefault();
@@ -192,7 +225,7 @@ else
                 </HomeSection>
 
                 <HomeSection Title="制作组动态" Icon="mdiAccountGroupOutline" IconColor="var(--cg-color-primary)">
-                    <ul class="home-list home-dev-news-list-connected">
+                    <ul class="home-list home-list-connected">
                         @foreach (var item in Model.HomeNews.Take(6))
                         {
                             <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@FormatRelativeTime(item.Time)" Image="@item.Image" Category="@item.Type" DevStyle="true" />
@@ -200,39 +233,9 @@ else
                     </ul>
                 </HomeSection>
 
-                <HomeSection Title="角色生日" Icon="mdiCake" IconColor="var(--cg-color-secondary)">
-                    @if (Model.Birthdays.Count == 0)
-                    {
-                        <div class="home-empty-state-card">
-                            <div class="home-empty-state-card__icon">
-                                <CgMdiIcon Name="mdiCakeVariantOutline" aria-hidden="true" />
-                            </div>
-                            <p class="home-empty-state-card__text">好像今天没人过生日欸</p>
-                            <a href="/birthday" class="home-empty-state-card__action">
-                                <CgMdiIcon Name="mdiCalendarSearch" aria-hidden="true" />
-                                前往生日日历提前准备
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <ul class="home-list">
-                            @foreach (var item in Model.Birthdays.Take(4))
-                            {
-                                var gameInfor = item.AddInfors.FirstOrDefault(x => x.Modifier == "登场游戏");
-                                var gameName = gameInfor?.Contents.FirstOrDefault()?.DisplayName ?? "未知游戏";
-                                <HomeRoleCard Url="@($"/entries/index/{item.Id}")"
-                                              Name="@item.Name"
-                                              Image="@item.MainImage"
-                                              GameName="@gameName"
-                                              BriefIntroduction="@item.BriefIntroduction" />
-                            }
-                        </ul>
-                    }
-                </HomeSection>
 
                 <HomeSection Title="公告" Icon="mdiBullhornOutline" IconColor="#f59e0b">
-                    <ul class="home-list">
+                    <ul class="home-list home-list-connected">
                         @foreach (var item in Model.Announcements.Take(12))
                         {
                             <HomeLinkCard Url="@item.Url" Title="@item.Name" Text="@item.BriefIntroduction" />
@@ -241,7 +244,7 @@ else
                 </HomeSection>
 
                 <HomeSection Title="近期编辑" Icon="mdiHistory" IconColor="var(--cg-color-primary)">
-                    <ul class="home-list">
+                    <ul class="home-list home-list-connected">
                         @foreach (var item in Model.RecentlyEditedGames.Take(8))
                         {
                             <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" Horizontal="true">

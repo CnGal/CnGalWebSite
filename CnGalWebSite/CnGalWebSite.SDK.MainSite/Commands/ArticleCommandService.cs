@@ -43,9 +43,9 @@ public sealed class ArticleCommandService(
     {
         try
         {
-            var mainTask = GetFromJsonAsync<EditArticleMainViewModel>($"api/articles/EditMainAsync/{id}", cancellationToken);
-            var mainPageTask = GetFromJsonAsync<EditArticleMainPageViewModel>($"api/articles/EditMainPageAsync/{id}", cancellationToken);
-            var relevancesTask = GetFromJsonAsync<EditArticleRelevancesViewModel>($"api/articles/EditRelevancesAsync/{id}", cancellationToken);
+            var mainTask = GetFromJsonAsync<EditArticleMainViewModel>($"api/articles/EditMain/{id}", cancellationToken);
+            var mainPageTask = GetFromJsonAsync<EditArticleMainPageViewModel>($"api/articles/EditMainPage/{id}", cancellationToken);
+            var relevancesTask = GetFromJsonAsync<EditArticleRelevancesViewModel>($"api/articles/EditRelevances/{id}", cancellationToken);
 
             await Task.WhenAll(mainTask, mainPageTask, relevancesTask);
 
@@ -129,9 +129,9 @@ public sealed class ArticleCommandService(
                 var errors = new List<string>();
 
                 var responses = await Task.WhenAll(
-                    SubmitPartAsync("api/articles/EditMainAsync", request.Data.Main, cancellationToken),
-                    SubmitPartAsync("api/articles/EditMainPageAsync", request.Data.MainPage, cancellationToken),
-                    SubmitPartAsync("api/articles/EditRelevancesAsync", request.Data.Relevances, cancellationToken)
+                    SubmitPartAsync("api/articles/EditMain", request.Data.Main, cancellationToken),
+                    SubmitPartAsync("api/articles/EditMainPage", request.Data.MainPage, cancellationToken),
+                    SubmitPartAsync("api/articles/EditRelevances", request.Data.Relevances, cancellationToken)
                 );
 
                 foreach (var res in responses)

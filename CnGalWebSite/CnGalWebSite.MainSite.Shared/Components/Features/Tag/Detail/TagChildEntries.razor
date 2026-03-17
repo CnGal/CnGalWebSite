@@ -1,41 +1,19 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
-@if (Entries is not null && Entries.Count > 0)
-{
-    <section class="tag-child-entries" aria-label="关联词条">
-        <h2 class="tag-entries-title">
-            <CgMdiIcon Name="mdiGamepadVariantOutline" />
-            关联词条
-            <span class="tag-entries-count">@Entries.Count</span>
-        </h2>
-        <ul class="tag-entries-grid">
+<EntrySection Title="关联词条" Icon="mdiGamepadVariantOutline" Show="Entries is not null && Entries.Count > 0">
+    <EntryCardList>
+        @if (Entries is not null)
+        {
             @foreach (var entry in Entries)
             {
                 <li>
-                    <a class="tag-entry-card" href="/entries/index/@entry.Id">
-                        @if (!string.IsNullOrWhiteSpace(entry.MainImage))
-                        {
-                            <img src="@entry.MainImage" alt="@entry.Name" loading="lazy" />
-                        }
-                        else
-                        {
-                            <div class="tag-entry-card-placeholder">
-                                <CgMdiIcon Name="mdiImageOffOutline" />
-                            </div>
-                        }
-                        <div class="tag-entry-card-body">
-                            <span class="tag-entry-card-name">@entry.Name</span>
-                            @if (!string.IsNullOrWhiteSpace(entry.BriefIntroduction))
-                            {
-                                <span class="tag-entry-card-intro">@entry.BriefIntroduction</span>
-                            }
-                        </div>
-                    </a>
+                    <EntryCardItem Url="@($"/entries/index/{entry.Id}")" Image="@entry.MainImage" Title="@entry.Name" />
                 </li>
             }
-        </ul>
-    </section>
-}
+        }
+    </EntryCardList>
+</EntrySection>
 
 @code {
     [Parameter] public List<EntryInforTipViewModel>? Entries { get; set; }

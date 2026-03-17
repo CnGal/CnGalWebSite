@@ -25,9 +25,9 @@
 }
 
 .tag-hero-image {
-    width: 160px;
+    width: 240px;
     height: auto;
-    max-height: 220px;
+    max-height: 320px;
     object-fit: cover;
     border-radius: var(--cg-radius-lg);
     box-shadow: var(--cg-shadow-lg);
@@ -51,7 +51,7 @@
 }
 
 .tag-hero:not(:has(.tag-hero-bg)) .tag-hero-text h1 {
-    color: var(--cg-color-text);
+    color: var(--cg-color-text-primary);
     text-shadow: none;
 }
 
@@ -64,7 +64,9 @@
     padding: 0.2rem 0.75rem;
     border-radius: var(--cg-radius-full);
     font-size: var(--cg-font-size-xs);
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     width: fit-content;
 }
 
@@ -100,6 +102,52 @@
     border: 1px solid var(--cg-color-border);
 }
 
+/* ── 编辑按钮 ── */
+.tag-hero-actions {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-2);
+}
+
+.tag-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: none;
+    transition: all var(--cg-transition-fast);
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    z-index: 2; /* Ensure clickability above background */
+    position: relative;
+}
+
+.tag-edit-btn:hover {
+    background: var(--cg-color-primary-hover);
+}
+
+.tag-edit-btn--login {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cg-color-primary);
+    border: 1px solid var(--cg-color-primary);
+}
+
+.tag-edit-btn--login:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tag-hero:not(:has(.tag-hero-bg)) .tag-edit-btn--login {
+    background: transparent;
+    border-color: var(--cg-color-primary);
+}
+
+.tag-hero:not(:has(.tag-hero-bg)) .tag-edit-btn--login:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
 @media (max-width: 640px) {
     .tag-hero-content {
         flex-direction: column;
@@ -109,7 +157,7 @@
     }
 
     .tag-hero-image {
-        width: 120px;
+        width: 160px;
     }
 
     .tag-hero-text h1 {
@@ -120,7 +168,8 @@
         align-self: center;
     }
 
-    .tag-hero-meta {
+    .tag-hero-meta, .tag-hero-actions {
         justify-content: center;
+        align-self: center;
     }
 }

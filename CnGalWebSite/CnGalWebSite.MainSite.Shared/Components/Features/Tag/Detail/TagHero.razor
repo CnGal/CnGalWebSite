@@ -1,3 +1,5 @@
+@inject IMainSiteAuthRequestService AuthRequestService
+
 @if (!string.IsNullOrWhiteSpace(Name))
 {
     <section class="tag-hero">
@@ -26,6 +28,26 @@
                     <CgMdiIcon Name="mdiEyeOutline" />
                     <span>@ReaderCount 次浏览</span>
                 </div>
+                
+                @if (TagId > 0)
+                {
+                    <div class="tag-hero-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                <a class="tag-edit-btn" href="/tags/edit/@TagId">
+                                    <CgMdiIcon Name="mdiPencilOutline" />
+                                    <span>编辑标签</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="tag-edit-btn tag-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/tags/edit/{TagId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                }
             </div>
         </div>
     </section>
@@ -37,6 +59,7 @@
     [Parameter] public string? MainPicture { get; set; }
     [Parameter] public string? BackgroundPicture { get; set; }
     [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public int TagId { get; set; }
 
     private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
 }

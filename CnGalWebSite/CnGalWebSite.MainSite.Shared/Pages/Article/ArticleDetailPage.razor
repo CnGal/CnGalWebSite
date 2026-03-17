@@ -4,136 +4,63 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
-@using CnGalWebSite.Extensions
 
-<PageTitle>@(Model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
+<PageTitle>@(_model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
 
-@if (ErrorMessage is not null)
+@if (_errorMessage is not null)
 {
     <section class="article-not-found">
         <h1>文章加载失败</h1>
-        <p>@ErrorMessage</p>
+        <p>@_errorMessage</p>
         <a href="/">返回首页</a>
     </section>
 }
-else if (Model is not null)
+else if (_model is not null)
 {
     <article class="article-page">
+        <header class="article-header">
+            <ArticleHero Title="@GetDisplayTitle()"
+                         BriefIntroduction="@_model.BriefIntroduction"
+                         MainPicture="@_model.MainPicture"
+                         TypeText="@GetTypeText(_model.Type)"
+                         ArticleId="@_model.Id" />
 
-        <ArticleHero Title="@GetDisplayTitle()"
-                     BriefIntroduction="@Model.BriefIntroduction"
-                     MainPicture="@Model.MainPicture"
-                     BackgroundPicture="@Model.BackgroundPicture"
-                     TypeText="@GetTypeText(Model.Type)"
-                     PubishTime="@Model.PubishTime"
-                     CreateTime="@Model.CreateTime"
-                     ArticleId="@Model.Id" />
+            <div class="article-info-bar">
+                <ArticleAuthor AuthorName="@_model.AuthorName"
+                               AuthorAvatar="@_model.AuthorAvatar"
+                               AuthorId="@_model.AuthorId"
+                               OriginalAuthor="@_model.OriginalAuthor"
+                               OriginalLink="@_model.OriginalLink" />
 
-        @if (Model.IsHidden)
+                <ArticleMeta ReaderCount="_model.ReaderCount"
+                             ThumbsUpCount="_model.ThumbsUpCount"
+                             CommentCount="_model.CommentCount"
+                             PublishTime="_model.PubishTime"
+                             CreateTime="_model.CreateTime"
+                             LastEditTime="_model.LastEditTime" />
+            </div>
+        </header>
+
+        @if (_model.IsHidden)
         {
-            <CgAlert Variant="warning">
+            <CgAlert Variant="warning" Class="article-hidden-alert">
                 当前文章处于隐藏状态，如果你看到了这个提示，请立即联系管理员
             </CgAlert>
         }
 
-        <section class="article-layout article-layout--desktop" aria-label="桌面详情布局">
-            <main class="article-main-col">
-
-                @if (!string.IsNullOrWhiteSpace(Model.MainPage))
-                {
-                    <EntryCard Title="正文" Icon="mdiTextBoxOutline">
-                        <CgHtmlContent Content="@Model.MainPage" />
-                    </EntryCard>
-                }
-
-                <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.RelatedEntries.Take(8))
-                        {
-                            <li>
-                                <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-
-                <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.RelatedArticles.Take(8))
-                        {
-                            <li>
-                                <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-
-                <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.RelatedVideos.Take(8))
-                        {
-                            <li>
-                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-
-                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                    <a class="article-action-btn" href="@($"/space/comments?type=article&id={Model.Id}")">前往评论区</a>
-                </EntryCard>
-            </main>
-
-            <aside class="article-side-col">
-                <ArticleAuthor AuthorName="@Model.AuthorName"
-                               AuthorAvatar="@Model.AuthorAvatar"
-                               AuthorId="@Model.AuthorId"
-                               OriginalAuthor="@Model.OriginalAuthor"
-                               OriginalLink="@Model.OriginalLink" />
-
-                <ArticleMeta ReaderCount="Model.ReaderCount"
-                             ThumbsUpCount="Model.ThumbsUpCount"
-                             CommentCount="Model.CommentCount"
-                             LastEditTime="Model.LastEditTime" />
-
-                <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.RelatedOutlinks.Count > 0">
-                    <ul class="article-outlink-list">
-                        @foreach (var item in Model.RelatedOutlinks.Take(8))
-                        {
-                            <li>
-                                <a href="@item.DisplayValue" target="_blank" rel="noopener noreferrer">
-                                    <CgMdiIcon Name="mdiEarth" />
-                                    @(!string.IsNullOrWhiteSpace(item.DisplayName) ? item.DisplayName : item.DisplayValue)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </EntrySection>
-            </aside>
-        </section>
-
-        <section class="article-layout article-layout--mobile" aria-label="移动端详情布局">
-            <ArticleAuthor AuthorName="@Model.AuthorName"
-                           AuthorAvatar="@Model.AuthorAvatar"
-                           AuthorId="@Model.AuthorId"
-                           OriginalAuthor="@Model.OriginalAuthor"
-                           OriginalLink="@Model.OriginalLink" />
-
-            <ArticleMeta ReaderCount="Model.ReaderCount"
-                         ThumbsUpCount="Model.ThumbsUpCount"
-                         CommentCount="Model.CommentCount"
-                         LastEditTime="Model.LastEditTime" />
-
-            @if (!string.IsNullOrWhiteSpace(Model.MainPage))
+        <main class="article-main-content">
+            @if (!string.IsNullOrWhiteSpace(_model.MainPage))
             {
-                <EntryCard Title="正文" Icon="mdiTextBoxOutline">
-                    <CgHtmlContent Content="@Model.MainPage" />
-                </EntryCard>
+                <div class="article-prose">
+                    <CgHtmlContent Content="@_model.MainPage" />
+                </div>
             }
+        </main>
 
-            <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
+        <footer class="article-footer-related">
+            <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="_model.RelatedEntries.Count > 0">
                 <EntryCardList>
-                    @foreach (var item in Model.RelatedEntries.Take(8))
+                    @foreach (var item in _model.RelatedEntries.Take(8))
                     {
                         <li>
                             <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
@@ -142,9 +69,9 @@ else if (Model is not null)
                 </EntryCardList>
             </EntrySection>
 
-            <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
+            <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="_model.RelatedArticles.Count > 0">
                 <EntryCardList>
-                    @foreach (var item in Model.RelatedArticles.Take(8))
+                    @foreach (var item in _model.RelatedArticles.Take(8))
                     {
                         <li>
                             <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
@@ -153,9 +80,9 @@ else if (Model is not null)
                 </EntryCardList>
             </EntrySection>
 
-            <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
+            <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="_model.RelatedVideos.Count > 0">
                 <EntryCardList>
-                    @foreach (var item in Model.RelatedVideos.Take(8))
+                    @foreach (var item in _model.RelatedVideos.Take(8))
                     {
                         <li>
                             <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
@@ -164,9 +91,9 @@ else if (Model is not null)
                 </EntryCardList>
             </EntrySection>
 
-            <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.RelatedOutlinks.Count > 0">
+            <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="_model.RelatedOutlinks.Count > 0">
                 <ul class="article-outlink-list">
-                    @foreach (var item in Model.RelatedOutlinks.Take(8))
+                    @foreach (var item in _model.RelatedOutlinks.Take(8))
                     {
                         <li>
                             <a href="@item.DisplayValue" target="_blank" rel="noopener noreferrer">
@@ -178,18 +105,17 @@ else if (Model is not null)
                 </ul>
             </EntrySection>
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="article-action-btn" href="@($"/space/comments?type=article&id={Model.Id}")">前往评论区</a>
+            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="_model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
+                <a class="article-action-btn" href="@($"/space/comments?type=article&id={_model.Id}")">前往评论区</a>
             </EntryCard>
-        </section>
-
+        </footer>
     </article>
 }
 else
 {
     <section class="article-loading" aria-label="加载中">
-        <div class="article-loading-block"></div>
         <div class="article-loading-block article-loading-block--wide"></div>
+        <div class="article-loading-block"></div>
         <div class="article-loading-block"></div>
     </section>
 }
@@ -198,31 +124,31 @@ else
     [Parameter]
     public long Id { get; set; }
 
-    private ArticleDetailViewModel? Model;
-    private string? ErrorMessage;
+    private ArticleDetailViewModel? _model;
+    private string? _errorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
         var result = await ArticleQueryService.GetArticleDetailAsync(Id);
         if (result.Success && result.Data is not null)
         {
-            ErrorMessage = null;
-            Model = result.Data;
+            _errorMessage = null;
+            _model = result.Data;
             return;
         }
 
-        Model = null;
-        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+        _model = null;
+        _errorMessage = result.Error?.Message ?? "请稍后重试";
     }
 
     private string GetDisplayTitle()
     {
-        if (Model is null)
+        if (_model is null)
         {
             return string.Empty;
         }
 
-        return string.IsNullOrWhiteSpace(Model.DisplayName) ? Model.Name : Model.DisplayName;
+        return string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName;
     }
 
     private static string GetTypeText(ArticleType type)

@@ -27,13 +27,10 @@
             <span>互动视频</span>
         </div>
     }
-    @if (LastEditTime != default)
-    {
-        <div class="video-basic-info-item video-basic-info-item--time">
-            <CgMdiIcon Name="mdiClockEditOutline" />
-            <span>最后编辑于 @LastEditTime.ToString("yyyy-MM-dd")</span>
-        </div>
-    }
+    <div class="video-basic-info-item video-basic-info-item--time">
+        <CgMdiIcon Name="mdiCalendarOutline" />
+        <time datetime="@TimeValue">@TimeDisplay</time>
+    </div>
 </section>
 
 @code {
@@ -42,7 +39,24 @@
     [Parameter] public string Type { get; set; } = "";
     [Parameter] public CopyrightType Copyright { get; set; }
     [Parameter] public bool IsInteractive { get; set; }
+    [Parameter] public DateTime PublishTime { get; set; }
+    [Parameter] public DateTime CreateTime { get; set; }
     [Parameter] public DateTime LastEditTime { get; set; }
+
+    private DateTime EffectiveTime
+    {
+        get
+        {
+            if (PublishTime.Year >= 1900)
+            {
+                return PublishTime;
+            }
+            return CreateTime.Year < 1900 ? LastEditTime : CreateTime;
+        }
+    }
+
+    private string TimeValue => EffectiveTime.ToString("yyyy-MM-dd");
+    private string TimeDisplay => EffectiveTime.ToString("yyyy-MM-dd");
 
     private string GetCopyrightText()
     {

@@ -2,16 +2,35 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    max-width: 1280px;
+    max-width: 1200px; /* Aligned with article page readable width */
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 2rem 1rem 4rem;
 }
 
-.tag-content {
+.tag-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+}
+
+.tag-main-content {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.tag-footer-related {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    border-top: 1px solid var(--cg-color-border);
+    padding-top: 3rem;
+}
+
+.tag-hidden-alert {
+    margin-bottom: 2rem;
 }
 
 .tag-not-found {
@@ -37,14 +56,13 @@
 .tag-loading {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    max-width: 920px;
+    gap: 1.5rem;
+    max-width: 960px;
     margin: 2rem auto;
 }
 
 .tag-loading-block {
     border-radius: var(--cg-radius-lg);
-    height: 140px;
     background: linear-gradient(
         120deg,
         color-mix(in oklab, var(--cg-color-bg) 90%, white),
@@ -53,10 +71,11 @@
     );
     background-size: 200% 100%;
     animation: tag-loading 1.2s infinite;
+    height: 140px;
 }
 
 .tag-loading-block--wide {
-    height: 220px;
+    height: 300px;
 }
 
 @keyframes tag-loading {
@@ -66,11 +85,6 @@
 
 @media (min-width: 768px) {
     .tag-page {
-        padding: 2rem 1.5rem 4rem;
-        gap: 2rem;
-    }
-
-    .tag-content {
-        gap: 2.5rem;
+        padding: 3rem 2rem 5rem;
     }
 }
