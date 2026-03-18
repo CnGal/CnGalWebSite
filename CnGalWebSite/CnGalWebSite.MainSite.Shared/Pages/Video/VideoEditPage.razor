@@ -2,6 +2,7 @@
 @page "/videos/edit/{Id:long}"
 
 @rendermode InteractiveServer
+@attribute [Authorize]
 @using CnGalWebSite.DataModel.ViewModel.Videos
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Editor
 @using CnGalWebSite.MainSite.Shared.Services

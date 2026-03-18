@@ -2,6 +2,7 @@
 @page "/articles/edit/{Id:long}"
 
 @rendermode InteractiveServer
+@attribute [Authorize]
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Editor
 @using CnGalWebSite.MainSite.Shared.Services
@@ -14,6 +15,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject ICgToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @implements IDisposable
 
 <PageTitle>@(IsCreate ? "发表文章" : "编辑文章")</PageTitle>
@@ -45,8 +47,9 @@ else if (Model != null)
                                   OnCancel="Cancel" />
 
             <main class="article-edit-main">
-                <ArticleMainEditor Model="Model.Data.Main" />
-                <ArticleMainPageEditor Model="Model.Data.MainPage" />
+                <ArticleMainEditor Model="Model.Data.Main" MainPageModel="Model.Data.MainPage" IsAdmin="_isAdmin"
+                                   OnTypeChangedCallback="StateHasChanged" />
+                <ArticleSupplementaryEditor Model="Model.Data.Main" IsAdmin="_isAdmin" />
                 <ArticleRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
             </main>
         </div>
@@ -72,9 +75,13 @@ else if (Model != null)
 
     private bool HasDraftRecovered = false;
     private CreateArticleViewModel? OriginalData;
+    private bool _isAdmin;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _isAdmin = authState.User.IsInRole("Admin");
+
         await LoadDataAsync();
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }

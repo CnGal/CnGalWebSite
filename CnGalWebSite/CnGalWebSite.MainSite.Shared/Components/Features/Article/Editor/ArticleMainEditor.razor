@@ -2,153 +2,88 @@
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@using System.Linq
 
 <section class="article-editor-section" id="section-article-main">
-    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="article-section-icon" aria-hidden="true"/>主要信息</h2>
-    <p>编辑文章类型、名称与主视觉资源。</p>
+    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="article-section-icon" aria-hidden="true"/>核心内容</h2>
+    <p>设置文章主图、标题、类型与正文内容。</p>
 
     @if (Model != null)
-    {
+    {     
         <CgFormGroup Label="类型">
-            <CgEnumSelect TEnum="ArticleType"
-                          Value="@Model.Type"
-                          ValueChanged="OnTypeChanged"/>
+            <div class="article-type-selector">
+                @foreach (var type in VisibleArticleTypes)
+                {
+                    var isActive = Model.Type == type;
+                    <button type="button"
+                            class="article-type-btn @(isActive ? "active" : "")"
+                            @onclick="() => OnTypeChanged(type)">
+                        <CgMdiIcon Name="@GetArticleTypeIcon(type)" Class="article-type-icon" aria-hidden="true"/>
+                        <span>@type.GetDisplayName()</span>
+                    </button>
+                }
+            </div>
+        </CgFormGroup>
+        <CgFormGroup Label="主图">
+            <CgImageUpload @bind-Value="Model.MainPicture"
+                           Text="上传主图"
+                           Type="ImageAspectType.None"/>
         </CgFormGroup>
 
-        <CgGrid>
-            <CgFormGroup Label="唯一名称">
-                <CgInput Value="@Model.Name"
-                         ValueChanged="OnNameChanged" TValue="string"/>
-            </CgFormGroup>
-            <CgFormGroup Label="显示名称">
-                <CgInput @bind-Value="Model.DisplayName"
-                         Disabled="_syncDisplayName"/>
-            </CgFormGroup>
-        </CgGrid>
-
-        <CgFormGroup Label="名称同步">
-            <CgCheckbox Value="@_syncDisplayName"
-                        ValueChanged="OnSyncDisplayNameChanged"
-                        Label="显示名称与唯一名称保持一致"/>
+        <CgFormGroup Label="标题">
+            <CgInput @bind-Value="Model.Name" TValue="string"/>
         </CgFormGroup>
 
-        <CgFormGroup Label="简介">
-            <CgTextarea @bind-Value="Model.BriefIntroduction"
-                        Rows="3" Placeholder="简短的介绍"/>
-        </CgFormGroup>
 
-        <CgGrid MinWidth="150px">
-            <CgFormGroup Label="主图">
-                <CgImageUpload @bind-Value="Model.MainPicture"
-                               Text="上传主图"
-                               Type="ImageAspectType.None"/>
-            </CgFormGroup>
-            <CgFormGroup Label="背景图">
-                <CgImageUpload @bind-Value="Model.BackgroundPicture"
-                               Text="上传背景图"
-                               Type="ImageAspectType.None"/>
-            </CgFormGroup>
-            <CgFormGroup Label="小背景图">
-                <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
-                               Text="上传小背景图"
-                               Type="ImageAspectType.None"/>
-            </CgFormGroup>
-        </CgGrid>
 
-        <CgFormGroup Label="发布时间">
-            <CgDateInput Value="@((DateTime?)Model.PubishTime)"
-                         ValueChanged="OnPublishTimeChanged"
-                         Mode="CgDateInputMode.DateTime"/>
-        </CgFormGroup>
-
-        <CgFormGroup Label="原创标记">
-            <CgCheckbox @bind-Value="Model.IsCreatedByCurrentUser"
-                        Label="本文为本人创作"/>
-        </CgFormGroup>
-
-        @if (!Model.IsCreatedByCurrentUser)
-        {
-            <CgGrid>
-                <CgFormGroup Label="原作者">
-                    <CgInput @bind-Value="Model.OriginalAuthor" Placeholder="原作者名称"/>
-                </CgFormGroup>
-                <CgFormGroup Label="原文链接">
-                    <CgInput @bind-Value="Model.OriginalLink" Placeholder="https://..."/>
-                </CgFormGroup>
-            </CgGrid>
-        }
-
-        @if (Model.Type == ArticleType.News)
-        {
-            <CgGrid>
-                <CgFormGroup Label="动态类别">
-                    <CgInput @bind-Value="Model.NewsType" Placeholder="动态类别"/>
-                </CgFormGroup>
-                <CgFormGroup Label="动态发生时间">
-                    <CgDateInput Value="@((DateTime?)_realNewsTime)"
-                                 ValueChanged="OnRealNewsTimeChanged"
-                                 Mode="CgDateInputMode.DateTime"/>
-                </CgFormGroup>
-            </CgGrid>
-        }
+        <CgAlert Variant="info">
+            你可以在这里自由发挥撰写文章内容，支持 Markdown 语法。
+        </CgAlert>
+        <CgMarkdownEditor @bind-Value="MainPageModel.Context"
+                           Placeholder="支持 Markdown 语法..." />
     }
 </section>
 
 @code {
     [Parameter] public EditArticleMainViewModel Model { get; set; } = default!;
+    [Parameter] public EditArticleMainPageViewModel MainPageModel { get; set; } = default!;
+    [Parameter] public bool IsAdmin { get; set; }
+    [Parameter] public EventCallback OnTypeChangedCallback { get; set; }
 
-    private bool _syncDisplayName;
-    private bool _syncInitialized;
-    private DateTime _realNewsTime;
+    private static readonly ArticleType[] _articleTypes =
+    [
+        ArticleType.Tought,
+        ArticleType.Strategy,
+        ArticleType.Interview,
+        ArticleType.News,
+        ArticleType.Evaluation,
+        ArticleType.Peripheral,
+        ArticleType.Notice,
+        ArticleType.None,
+        ArticleType.Fan
+    ];
 
-    protected override void OnParametersSet()
+    private ArticleType[] VisibleArticleTypes => IsAdmin
+        ? _articleTypes
+        : _articleTypes.Where(t => t != ArticleType.Notice).ToArray();
+
+    private static string GetArticleTypeIcon(ArticleType type) => type switch
     {
-        if (_syncInitialized) return;
+        ArticleType.Tought => "mdiHeadLightbulbOutline",
+        ArticleType.Strategy => "mdiMapOutline",
+        ArticleType.Interview => "mdiAccountVoice",
+        ArticleType.News => "mdiNewspaperVariantOutline",
+        ArticleType.Evaluation => "mdiStarCheckOutline",
+        ArticleType.Peripheral => "mdiGiftOutline",
+        ArticleType.Notice => "mdiBullhornOutline",
+        ArticleType.None => "mdiTextBoxOutline",
+        ArticleType.Fan => "mdiPaletteOutline",
+        _ => "mdiHelpCircleOutline"
+    };
 
-        _syncDisplayName = string.Equals(Model.Name, Model.DisplayName, StringComparison.Ordinal);
-        _realNewsTime = Model.RealNewsTime ?? DateTime.Now;
-        _syncInitialized = true;
-    }
-
-    private void OnTypeChanged(ArticleType newType)
+    private async Task OnTypeChanged(ArticleType newType)
     {
         Model.Type = newType;
-    }
-
-    private Task OnNameChanged(string? value)
-    {
-        Model.Name = value ?? string.Empty;
-        if (_syncDisplayName)
-        {
-            Model.DisplayName = Model.Name;
-        }
-        return Task.CompletedTask;
-    }
-
-    private Task OnSyncDisplayNameChanged(bool value)
-    {
-        _syncDisplayName = value;
-        if (_syncDisplayName)
-        {
-            Model.DisplayName = Model.Name;
-        }
-        return Task.CompletedTask;
-    }
-
-    private void OnPublishTimeChanged(DateTime? value)
-    {
-        if (value.HasValue)
-        {
-            Model.PubishTime = value.Value;
-        }
-    }
-
-    private void OnRealNewsTimeChanged(DateTime? value)
-    {
-        if (value.HasValue)
-        {
-            _realNewsTime = value.Value;
-            Model.RealNewsTime = value.Value;
-        }
+        await OnTypeChangedCallback.InvokeAsync();
     }
 }
