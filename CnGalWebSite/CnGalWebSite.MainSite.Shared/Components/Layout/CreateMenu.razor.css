@@ -1,8 +1,9 @@
 .cg-action-btn {
     display: flex;
-    width: 2.5rem;
+    width: auto;
     height: 2.5rem;
-    padding: 0;
+    padding: 0 0.85rem;
+    gap: 0.35rem;
     align-items: center;
     justify-content: center;
     border-radius: var(--cg-radius-xl);
@@ -12,6 +13,8 @@
     overflow: hidden;
     cursor: pointer;
     transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 .cg-action-btn:hover {

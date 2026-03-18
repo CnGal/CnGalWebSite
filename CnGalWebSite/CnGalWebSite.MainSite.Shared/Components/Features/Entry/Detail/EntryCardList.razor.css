@@ -58,14 +58,29 @@
 }
 
 .entry-card-list-btn ::deep .icon-arrow {
-    transition: transform var(--cg-transition-normal) cubic-bezier(0.2, 0, 0, 1);
+    transition: transform var(--cg-transition-normal);
+    transform-origin: center;
+    transform: rotate(0deg);
 }
 
 .entry-card-list-toggle:checked ~ .entry-card-list-action ::deep .icon-arrow {
     transform: rotate(180deg);
 }
 
-/* 隐藏超出限制的子元素 (突破 CSS 隔离) */
+/* 隐藏超出限制的子元素动画设置 (突破 CSS 隔离) */
+.entry-card-list ::deep li {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, grid-template-rows 0.3s ease-out, display 0.3s allow-discrete;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.entry-card-list ::deep li > * {
+    min-height: 0;
+}
+
+/* 隐藏状态 */
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
@@ -75,21 +90,23 @@
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
     display: none !important;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-10px);
 }
 
-/* 展开时的入场动画 */
-@keyframes cg-fade-in-down {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
-.entry-card-list-toggle:checked ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
-    animation: cg-fade-in-down 0.4s ease forwards;
+/* 展开时的入场动画起始状态 */
+@starting-style {
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
+    .entry-card-list-toggle:checked ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        transform: translateY(-10px);
+    }
 }

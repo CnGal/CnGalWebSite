@@ -1,20 +1,66 @@
-﻿@using CnGalWebSite.Core.Models
-@using CnGalWebSite.DataModel.ViewModel
-<ul class="entry-audio-list">
-    @foreach (var item in Audio.Take(MaxCount))
-    {
-        <li>
-            <div>
-                <h3>@item.Name</h3>
-                @if (string.IsNullOrWhiteSpace(item.BriefIntroduction) is false)
-                {
-                    <p>@item.BriefIntroduction</p>
-                }
-            </div>
-            <audio controls preload="none" src="@item.Url"></audio>
-        </li>
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<div class="cg-audio-playlist">
+    @{
+        var firstAudio = Audio.FirstOrDefault();
     }
-</ul>
+    @if (firstAudio != null)
+    {
+        <div class="cg-audio-header">
+            <img class="cg-audio-thumbnail" src="@firstAudio.Thumbnail" alt="Audio Cover" style="display: @(string.IsNullOrWhiteSpace(firstAudio.Thumbnail) ? "none" : "block")" />
+            <div class="cg-audio-title-wrapper">
+                <div class="cg-audio-title-bar"></div>
+                <h3 class="cg-audio-title-text">@firstAudio.Name</h3>
+            </div>
+        </div>
+        
+        <div class="cg-audio-tracks">
+            @for (var i = 0; i < Audio.Take(MaxCount).Count(); i++)
+            {
+                var item = Audio[i];
+                var index = i + 1;
+                <div class="cg-audio-item @(i == 0 ? "active" : "")" 
+                     data-url="@item.Url" data-name="@item.Name" data-thumbnail="@(item.Thumbnail ?? "")"
+                     onclick="var p = this.closest('.cg-audio-playlist');
+                              var a = p.querySelector('.cg-audio-player');
+                              if(a.src.endsWith(this.dataset.url)) {
+                                  a.paused ? a.play() : a.pause();
+                                  return;
+                              }
+                              a.src = this.dataset.url;
+                              a.play();
+                              var t = p.querySelector('.cg-audio-title-text');
+                              if(t) t.textContent = this.dataset.name;
+                              var i = p.querySelector('.cg-audio-thumbnail');
+                              if(i) {
+                                  if(this.dataset.thumbnail) {
+                                      i.src = this.dataset.thumbnail;
+                                      i.style.display = 'block';
+                                  } else {
+                                      i.style.display = 'none';
+                                  }
+                              }
+                              p.querySelectorAll('.cg-audio-item').forEach(function(e){ e.classList.remove('active'); });
+                              this.classList.add('active');">
+                    <div class="cg-audio-item-icon">
+                        <CgMdiIcon Icon="mdiPlayBox" />
+                    </div>
+                    <div class="cg-audio-item-name">
+                        @index. @item.Name
+                    </div>
+                    <div class="cg-audio-item-duration">
+                        @(item.Duration.TotalSeconds > 0 ? item.Duration.ToString("m\\:ss") : "0:00")
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="cg-audio-player-wrapper">
+            <audio controls preload="none" src="@firstAudio.Url" class="cg-audio-player"></audio>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter] public IReadOnlyList<EditAudioAloneModel> Audio { get; set; } = [];

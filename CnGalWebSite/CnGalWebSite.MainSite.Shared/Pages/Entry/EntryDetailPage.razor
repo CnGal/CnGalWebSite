@@ -6,6 +6,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.Extensions
+@using CnGalWebSite.SDK.MainSite.Infrastructure
 
 <PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
 
@@ -61,29 +62,13 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
                 
-                <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                    <EntryCardList LimitCount="9" ShowExpandButton="(Model.EntryRelevances.Count + Model.StaffGames.Count) > 9">
-                        @foreach (var item in Model.EntryRelevances)
-                        {
-                            <li>
-                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
-                            </li>
-                        }
-                        @foreach (var item in Model.StaffGames)
-                        {
-                            <li>
-                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-                
+                @RenderRelevancesBlocks
                 <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
                     <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
                         @foreach (var item in Model.ArticleRelevances)
                         {
                             <li>
-                                <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
                             </li>
                         }
                     </EntryCardList>
@@ -212,29 +197,14 @@ else if (Model is not null)
                             </EntryCardList>
                         </EntrySection>
 
-                        <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                            <EntryCardList LimitCount="9" ShowExpandButton="(Model.EntryRelevances.Count + Model.StaffGames.Count) > 9">
-                                @foreach (var item in Model.EntryRelevances)
-                                {
-                                    <li>
-                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
-                                    </li>
-                                }
-                                @foreach (var item in Model.StaffGames)
-                                {
-                                    <li>
-                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                                    </li>
-                                }
-                            </EntryCardList>
-                        </EntrySection>
+                        @RenderRelevancesBlocks
 
                         <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
                             <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
                                 @foreach (var item in Model.ArticleRelevances)
                                 {
                                     <li>
-                                        <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                        <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
                                     </li>
                                 }
                             </EntryCardList>
@@ -455,5 +425,90 @@ else
             CurrencyCode.HKD => "HK$",
             _ => code.ToString() + " "
         };
+    }
+
+    private RenderFragment RenderRelevanceGroup(string title, string icon, IEnumerable<EntryInforTipViewModel> sourceItems) => __builder =>
+    {
+        var items = sourceItems.ToList();
+        if (items.Count > 0)
+        {
+            var displayTitle = items.Count > 4 ? $"{title} ({items.Count})" : title;
+            <EntrySection Title="@displayTitle" Icon="@icon" Show="true">
+                <EntryCardList LimitCount="9" ShowExpandButton="items.Count > 9">
+                    @foreach (var item in items)
+                    {
+                        <li>
+                            <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
+                        </li>
+                    }
+                </EntryCardList>
+            </EntrySection>
+        }
+    };
+
+    private RenderFragment RenderRelevancesBlocks => __builder =>
+    {
+        @RenderRelevanceGroup("配音作品", "mdiMicrophoneOutline", GetCastWorks())
+        @RenderRelevanceGroup("制作作品", "mdiHammerWrench", GetProductionGroupWorks())
+        @RenderRelevanceGroup("发行作品", "mdiPublish", GetPublisherWorks())
+        @RenderRelevanceGroup("参与作品", "mdiHandshakeOutline", GetParticipationWorks())
+        @RenderRelevanceGroup("特别感谢", "mdiHeartOutline", GetAppreciatedParticWorks())
+
+        @RenderRelevanceGroup("相关游戏", "mdiGamepadVariantOutline", GetGameRelevances())
+        @RenderRelevanceGroup("相关组织", "mdiDomain", GetGroupRelevances())
+        @RenderRelevanceGroup("相关STAFF", "mdiAccountTieOutline", GetStaffRelevances())
+        @RenderRelevanceGroup("相关角色", "mdiAccountStarOutline", GetRoleRelevances())
+    };
+
+    private IEnumerable<EntryInforTipViewModel> GetCastWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.CV)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetProductionGroupWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetPublisherWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.Publisher) &&
+            a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup) == false));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetParticipationWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.CV && StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.SpecialThanks) &&
+            a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup || StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.Publisher) == false));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetAppreciatedParticWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.SpecialThanks)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetGameRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Game) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetGroupRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetStaffRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Staff) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetRoleRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Role) ?? Array.Empty<EntryInforTipViewModel>();
     }
 }
