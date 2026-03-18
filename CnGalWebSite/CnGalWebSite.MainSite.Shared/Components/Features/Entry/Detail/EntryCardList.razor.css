@@ -1,8 +1,95 @@
 .entry-card-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+@media (min-width: 640px) {
+    .entry-card-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.25rem;
+    }
+
+}
+
+.entry-card-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.entry-card-list-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.entry-card-list-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.75rem;
+    border-radius: var(--cg-radius-full);
+    background-color: transparent;
+    border: 1px solid var(--cg-color-border);
+    color: var(--cg-color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--cg-transition-normal);
+    user-select: none;
+}
+
+.entry-card-list-btn:hover {
+    color: var(--cg-color-primary);
+    border-color: var(--cg-color-primary);
+    background-color: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+}
+
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list-action .hide-text {
+    display: none;
+}
+
+.entry-card-list-toggle:checked ~ .entry-card-list-action .show-text {
+    display: none;
+}
+
+.entry-card-list-btn ::deep .icon-arrow {
+    transition: transform var(--cg-transition-normal) cubic-bezier(0.2, 0, 0, 1);
+}
+
+.entry-card-list-toggle:checked ~ .entry-card-list-action ::deep .icon-arrow {
+    transform: rotate(180deg);
+}
+
+/* 隐藏超出限制的子元素 (突破 CSS 隔离) */
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
+.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
+    display: none !important;
+}
+
+/* 展开时的入场动画 */
+@keyframes cg-fade-in-down {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
+.entry-card-list-toggle:checked ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
+    animation: cg-fade-in-down 0.4s ease forwards;
 }

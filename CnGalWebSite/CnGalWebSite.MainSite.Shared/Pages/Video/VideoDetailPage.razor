@@ -1,5 +1,6 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Services
@@ -69,19 +70,19 @@ else if (Model is not null)
 
         <footer class="video-footer-related">
             <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedEntries.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedEntries.Count > 9">
+                    @foreach (var item in Model.RelatedEntries)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
                         </li>
                     }
                 </EntryCardList>
             </EntrySection>
 
             <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedArticles.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedArticles.Count > 9">
+                    @foreach (var item in Model.RelatedArticles)
                     {
                         <li>
                             <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
@@ -91,11 +92,11 @@ else if (Model is not null)
             </EntrySection>
 
             <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedVideos.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedVideos.Count > 9">
+                    @foreach (var item in Model.RelatedVideos)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                         </li>
                     }
                 </EntryCardList>

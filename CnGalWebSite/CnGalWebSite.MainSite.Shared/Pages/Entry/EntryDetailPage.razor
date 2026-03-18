@@ -51,25 +51,25 @@ else if (Model is not null)
                 </EntryCard>
 
                 <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.VideoRelevances.Take(8))
+                    <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
+                        @foreach (var item in Model.VideoRelevances)
                         {
                             <li>
-                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                             </li>
                         }
                     </EntryCardList>
                 </EntrySection>
                 
                 <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.EntryRelevances.Take(8))
+                    <EntryCardList LimitCount="9" ShowExpandButton="(Model.EntryRelevances.Count + Model.StaffGames.Count) > 9">
+                        @foreach (var item in Model.EntryRelevances)
                         {
                             <li>
-                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
                             </li>
                         }
-                        @foreach (var item in Model.StaffGames.Take(4))
+                        @foreach (var item in Model.StaffGames)
                         {
                             <li>
                                 <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
@@ -79,8 +79,8 @@ else if (Model is not null)
                 </EntrySection>
                 
                 <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.ArticleRelevances.Take(8))
+                    <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
+                        @foreach (var item in Model.ArticleRelevances)
                         {
                             <li>
                                 <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
@@ -202,25 +202,25 @@ else if (Model is not null)
 
                     <section class="entry-mobile-panel entry-mobile-panel--related">
                         <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.VideoRelevances.Take(8))
+                            <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
+                                @foreach (var item in Model.VideoRelevances)
                                 {
                                     <li>
-                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                                     </li>
                                 }
                             </EntryCardList>
                         </EntrySection>
 
                         <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.EntryRelevances.Take(8))
+                            <EntryCardList LimitCount="9" ShowExpandButton="(Model.EntryRelevances.Count + Model.StaffGames.Count) > 9">
+                                @foreach (var item in Model.EntryRelevances)
                                 {
                                     <li>
-                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
+                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
                                     </li>
                                 }
-                                @foreach (var item in Model.StaffGames.Take(4))
+                                @foreach (var item in Model.StaffGames)
                                 {
                                     <li>
                                         <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
@@ -230,8 +230,8 @@ else if (Model is not null)
                         </EntrySection>
 
                         <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.ArticleRelevances.Take(8))
+                            <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
+                                @foreach (var item in Model.ArticleRelevances)
                                 {
                                     <li>
                                         <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />

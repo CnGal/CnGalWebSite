@@ -1,6 +1,16 @@
 <a href="@Url" class="entry-card-item" target="@Target" rel="@(Target == "_blank" ? "noopener noreferrer" : null)">
-    <div class="entry-card-item-image">
-        <img src="@Image" alt="@Title" loading="lazy" decoding="async" />
+    <div class="entry-card-item-image @(IsSquareCover ? "is-square" : "")">
+        @if (IsSquareCover)
+        {
+            <img src="@Image" alt="" class="bg-blur" loading="lazy" decoding="async" aria-hidden="true" />
+        }
+        <img src="@Image" alt="@Title" class="main-img" loading="lazy" decoding="async" />
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <div class="entry-card-item-icon">
+                <CgMdiIcon Name="@Icon" />
+            </div>
+        }
     </div>
     <div class="entry-card-item-content">
         <span class="entry-card-item-title">@Title</span>
@@ -12,4 +22,6 @@
     [Parameter] public string Image { get; set; } = "";
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public string? Target { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public bool IsSquareCover { get; set; }
 }

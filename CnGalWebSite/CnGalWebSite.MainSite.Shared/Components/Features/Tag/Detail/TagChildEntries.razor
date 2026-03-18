@@ -1,5 +1,6 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.DataModel.Model
 
 <EntrySection Title="关联词条" Icon="mdiGamepadVariantOutline" Show="Entries is not null && Entries.Count > 0">
     <EntryCardList>
@@ -8,7 +9,7 @@
             @foreach (var entry in Entries)
             {
                 <li>
-                    <EntryCardItem Url="@($"/entries/index/{entry.Id}")" Image="@entry.MainImage" Title="@entry.Name" />
+                    <EntryCardItem Url="@($"/entries/index/{entry.Id}")" Image="@entry.MainImage" Title="@entry.Name" IsSquareCover="entry.Type == EntryType.Role || entry.Type == EntryType.Staff" />
                 </li>
             }
         }
