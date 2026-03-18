@@ -50,10 +50,10 @@
 
 1. **静态页（默认）**
    - 使用纯 SSR，不启用交互式渲染。
-   - 当前已实现的静态页：`HomePage`、`EntryDetailPage`、`SpaceIndexPage`。
+   - 当前已实现的静态页：`HomePage`、`EntryDetailPage`、`SpaceIndexPage`、`ArticleDetailPage`、`VideoDetailPage`、`TagDetailPage`。
 2. **交互页（按页启用）**
    - 仅当页面存在明显交互需求时启用交互式组件。
-   - 当前已实现的交互页：`EntryEditPage`（`@rendermode InteractiveServer`）。
+   - 当前已实现的交互页：`EntryEditPage`、`ArticleEditPage`、`VideoEditPage`、`TagEditPage`（`@rendermode InteractiveServer`）。
 
 > 约束：默认新页面必须是静态页；如需交互，必须在 PR 说明中写明原因。
 
@@ -131,31 +131,41 @@
 1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`。
 2. **交互动作接口（Commands）**
    - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
-   - 当前已实现：`EntryCommandService`、`FileCommandService`。
+   - 当前已实现：`EntryCommandService`、`FileCommandService`、`ArticleCommandService`、`VideoCommandService`、`TagCommandService`。
 
 ### 5.1 当前 SDK 目录结构
 
 ```text
 CnGalWebSite.SDK.MainSite
-├─ Abstractions/          # 7 个接口
+├─ Abstractions/          # 12 个接口
 │  ├─ IHomeQueryService
 │  ├─ IEntryQueryService
 │  ├─ ISpaceQueryService
 │  ├─ ITagQueryService
+│  ├─ IArticleQueryService
+│  ├─ IVideoQueryService
 │  ├─ IEntryCommandService
+│  ├─ IArticleCommandService
+│  ├─ IVideoCommandService
+│  ├─ ITagCommandService
 │  ├─ IFileCommandService
 │  └─ IMainSiteAuthRequestService
 ├─ Queries/               # 只读查询服务
 │  ├─ HomeQueryService
 │  ├─ EntryQueryService
 │  ├─ SpaceQueryService
-│  └─ TagQueryService
+│  ├─ TagQueryService
+│  ├─ ArticleQueryService
+│  └─ VideoQueryService
 ├─ Commands/              # 写操作命令服务
 │  ├─ EntryCommandService
+│  ├─ ArticleCommandService
+│  ├─ VideoCommandService
+│  ├─ TagCommandService
 │  └─ FileCommandService
 ├─ Auth/                  # OIDC 认证与令牌管理
 │  ├─ MainSiteAuthRequestService
@@ -165,9 +175,14 @@ CnGalWebSite.SDK.MainSite
 │  ├─ SdkResult.cs
 │  ├─ HomeSummaryViewModel.cs
 │  ├─ EntryDetailViewModel.cs
+│  ├─ ArticleDetailViewModel.cs
+│  ├─ VideoDetailViewModel.cs
 │  ├─ SpaceDetailViewModel.cs
 │  ├─ MainSiteOidcOptions.cs
 │  ├─ EntryEdit/          # 词条编辑相关模型
+│  ├─ ArticleEdit/        # 文章编辑相关模型
+│  ├─ VideoEdit/          # 视频编辑相关模型
+│  ├─ TagEdit/            # 标签编辑相关模型
 │  └─ Files/              # 文件上传相关模型（ImageAspectType、ImageCropRect、AudioUploadResult）
 ├─ Infrastructure/        # 基础设施
 │  ├─ QueryServiceBase    # 查询服务基类（HttpClient 封装、反序列化、日志截断）
@@ -206,12 +221,21 @@ CnGalWebSite.SDK.MainSite
 - [x] 条目详情页（`EntryDetailPage`）— 纯静态 SSR。
 - [x] 条目编辑页（`EntryEditPage`）— InteractiveServer（含草稿恢复、自动保存、客户端校验）。
 - [x] 个人空间页（`SpaceIndexPage`）— 纯静态 SSR。
-- [x] 封装 SDK Query 服务（Home、Entry、Space、Tag）与 Command 服务（Entry、File）。
+- [x] 文章详情页（`ArticleDetailPage`）— 纯静态 SSR。
+- [x] 文章编辑页（`ArticleEditPage`）— InteractiveServer（含草稿恢复、自动保存、客户端校验）。
+- [x] 视频详情页（`VideoDetailPage`）— 纯静态 SSR。
+- [x] 视频编辑页（`VideoEditPage`）— InteractiveServer（含草稿恢复、自动保存、客户端校验）。
+- [x] 标签详情页（`TagDetailPage`）— 纯静态 SSR。
+- [x] 标签编辑页（`TagEditPage`）— InteractiveServer（含草稿恢复、自动保存、标签树选择）。
+- [x] 封装 SDK Query 服务（Home、Entry、Space、Tag、Article、Video）与 Command 服务（Entry、Article、Video、Tag、File）。
 - [x] 数据读取全部改为 SDK 服务。
 
 ### 阶段 C：交互页面精细化 🔄 进行中
 
 - [x] 条目编辑页已按页启用 `@rendermode InteractiveServer`。
+- [x] 文章编辑页已按页启用 `@rendermode InteractiveServer`。
+- [x] 视频编辑页已按页启用 `@rendermode InteractiveServer`。
+- [x] 标签编辑页已按页启用 `@rendermode InteractiveServer`。
 - [x] 编辑页包含完整交互功能（自动保存草稿、丢弃草稿、类型联动、表单校验、提交审核）。
 - [ ] 其他需交互页面（如登录、个人中心编辑）待按需增加。
 - [ ] 统一异常提示机制进一步完善。
@@ -220,7 +244,7 @@ CnGalWebSite.SDK.MainSite
 
 - [ ] 删除已不使用的第三方组件库包与静态资源。
 - [ ] 统一 UI 一致性检查（间距、字号、颜色、交互反馈）。
-- [ ] 补充更多页面（文章详情、搜索列表等）。
+- [ ] 补充更多页面（搜索列表等）。
 - [ ] 完成 E2E 冒烟与关键路径压测。
 
 ---
@@ -276,6 +300,15 @@ CnGalWebSite.MainSite.Shared
 │  │  ├─ Entry/
 │  │  │  ├─ Detail/           # 词条详情（18 个组件）
 │  │  │  └─ Editor/           # 词条编辑（16 个组件）
+│  │  ├─ Article/
+│  │  │  ├─ Detail/           # 文章详情（3 个组件）
+│  │  │  └─ Editor/           # 文章编辑（5 个组件）
+│  │  ├─ Video/
+│  │  │  ├─ Detail/           # 视频详情（3 个组件）
+│  │  │  └─ Editor/           # 视频编辑（5 个组件）
+│  │  ├─ Tag/
+│  │  │  ├─ Detail/           # 标签详情（4 个组件）
+│  │  │  └─ Editor/           # 标签编辑（4 个组件）
 │  │  ├─ Home/                # 首页（14 个组件）
 │  │  └─ Space/               # 个人空间（4 个组件）
 │  └─ Layout/
@@ -288,6 +321,15 @@ CnGalWebSite.MainSite.Shared
 │  ├─ Entry/
 │  │  ├─ EntryDetailPage.razor / .razor.css
 │  │  └─ EntryEditPage.razor / .razor.css
+│  ├─ Article/
+│  │  ├─ ArticleDetailPage.razor / .razor.css
+│  │  └─ ArticleEditPage.razor / .razor.css
+│  ├─ Video/
+│  │  ├─ VideoDetailPage.razor / .razor.css
+│  │  └─ VideoEditPage.razor / .razor.css
+│  ├─ Tag/
+│  │  ├─ TagDetailPage.razor / .razor.css
+│  │  └─ TagEditPage.razor / .razor.css
 │  └─ Space/
 │     └─ SpaceIndexPage.razor / .razor.css
 ├─ wwwroot/
@@ -299,7 +341,8 @@ CnGalWebSite.MainSite.Shared
 │     └─ cg-edit-nav.js       # 编辑页导航辅助 JS
 ├─ Services/
 │  ├─ ICgToastService.cs      # Toast 通知服务接口
-│  └─ CgToastService.cs       # Toast 通知服务实现
+│  ├─ CgToastService.cs       # Toast 通知服务实现
+│  └─ ExternalLinkHelper.cs   # 外部链接共享帮助方法（图标/图片/描述映射）
 ├─ Extensions/
 │  └─ ServiceCollectionExtensions.cs  # AddMainSiteSharedServices
 ├─ _Imports.razor
@@ -343,7 +386,7 @@ CnGalWebSite.MainSite.Shared
 
 ## 11. 下一步工作
 
-1. 继续补充更多页面（文章详情、搜索列表、登录/注册等）。
+1. 继续补充更多页面（搜索列表、登录/注册等）。
 2. 清理并移除不再使用的第三方组件库依赖。
 3. 完善 SDK 缓存策略（当前尚未建立独立 `Caching/` 模块）。
 4. 统一 UI 一致性检查与可访问性审计。
