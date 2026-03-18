@@ -1,7 +1,29 @@
-<ul class="entry-card-list">
-    @ChildContent
-</ul>
+<div class="entry-card-list-container">
+    @if (LimitCount > 0 && ShowExpandButton)
+    {
+        <input type="checkbox" id="tgl_@_guid" class="entry-card-list-toggle" hidden />
+    }
+
+    <ul class="entry-card-list @(LimitCount > 0 ? $"limit-{LimitCount}" : "")">
+        @ChildContent
+    </ul>
+
+    @if (LimitCount > 0 && ShowExpandButton)
+    {
+        <div class="entry-card-list-action">
+            <label for="tgl_@_guid" class="entry-card-list-btn">
+                <span class="show-text">展开</span>
+                <span class="hide-text">收起</span>
+                <CgMdiIcon Name="mdiChevronDown" Class="icon-arrow" />
+            </label>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int LimitCount { get; set; }
+    [Parameter] public bool ShowExpandButton { get; set; }
+
+    private readonly string _guid = Guid.NewGuid().ToString("N");
 }

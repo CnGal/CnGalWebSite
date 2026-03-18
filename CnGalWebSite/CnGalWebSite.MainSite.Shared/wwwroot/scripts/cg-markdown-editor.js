@@ -55,12 +55,24 @@ function loadScript(src) {
 
 /**
  * 确保 Vditor CDN 资源已加载（幂等，多次调用只触发一次加载）
+ * 注意：Blazor 增强导航会在页面切换时移除动态添加的 <link> 标签，
+ * 因此即使 window.Vditor 仍存在，也需要检查并重新注入 CSS。
  * @returns {Promise<void>}
  */
 function ensureVditorLoaded() {
-    if (window.Vditor) {
+    // 即使 Vditor JS 已加载，也要确保 CSS <link> 仍存在于 DOM 中
+    // （Blazor 增强导航可能在页面切换时将其移除）
+    var cssPresent = !!document.querySelector('link[href="' + VDITOR_CSS_URL + '"]');
+
+    if (window.Vditor && cssPresent) {
         return Promise.resolve();
     }
+
+    // JS 已加载但 CSS 被移除：只需重新注入 CSS
+    if (window.Vditor && !cssPresent) {
+        return loadCss(VDITOR_CSS_URL);
+    }
+
     if (!_vditorLoadPromise) {
         _vditorLoadPromise = loadCss(VDITOR_CSS_URL)
             .then(function () { return loadScript(VDITOR_JS_URL); })

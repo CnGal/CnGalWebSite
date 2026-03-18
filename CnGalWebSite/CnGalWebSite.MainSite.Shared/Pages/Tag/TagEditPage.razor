@@ -3,6 +3,7 @@
 @page "/tags/edit/{Id:int}"
 
 @rendermode InteractiveServer
+@attribute [Authorize]
 @using CnGalWebSite.DataModel.ViewModel.Tags
 @using CnGalWebSite.MainSite.Shared.Components.Features.Tag.Editor
 @using CnGalWebSite.MainSite.Shared.Services
@@ -12,6 +13,7 @@
 @using System.Text.Json
 @using Microsoft.JSInterop
 @inject ITagCommandService TagCommandService
+@inject ITagQueryService TagQueryService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject ICgToastService ToastService
@@ -48,7 +50,7 @@ else if (Model != null)
             <main class="tag-edit-main">
                 <TagMainEditor Model="Model.Data.Main" TagItems="Model.MetaOptions.TagItems" />
                 <TagChildEntriesEditor Model="Model.Data.Entries" EntryItems="Model.MetaOptions.EntryItems" />
-                <TagChildTagsEditor Model="Model.Data.Tags" TagItems="Model.MetaOptions.TagItems" />
+                <TagChildTagsEditor Model="Model.Data.Tags" TagItems="Model.MetaOptions.TagItems" TagTreeItems="Model.MetaOptions.TagTreeItems" />
             </main>
         </div>
         <CgToast />
@@ -140,11 +142,21 @@ else if (Model != null)
                 }
                 catch { }
 
-                // 加载候选列表
-                var metaResult = await TagCommandService.GetTagEditMetaOptionsAsync();
+                // 加载候选列表与标签树
+                var metaTask = TagCommandService.GetTagEditMetaOptionsAsync();
+                var tagTreeTask = TagQueryService.GetTagTreeAsync();
+                await Task.WhenAll(metaTask, tagTreeTask);
+
+                var metaResult = metaTask.Result;
                 if (metaResult.Success && metaResult.Data != null)
                 {
                     Model.MetaOptions = metaResult.Data;
+                }
+
+                var tagTreeResult = tagTreeTask.Result;
+                if (tagTreeResult.Success && tagTreeResult.Data != null)
+                {
+                    Model.MetaOptions.TagTreeItems = tagTreeResult.Data;
                 }
             }
             else

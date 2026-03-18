@@ -1,5 +1,6 @@
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Tags
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
 
 <section class="entry-editor-section" id="section-tag-childtags">
     <h2><CgMdiIcon Name="mdiTagMultipleOutline" Class="entry-section-icon" aria-hidden="true"/>子标签</h2>
@@ -46,12 +47,17 @@
                 <p class="relevance-editor__empty">暂无子标签，点击 <strong>+</strong> 按钮添加。</p>
             }
         </div>
+
+        <EntryTagTreeCard TreeItems="@TagTreeItems"
+                          Tags="@Model.Tags"
+                          OnTagsChanged="StateHasChanged" />
     }
 </section>
 
 @code {
     [Parameter] public EditTagChildTagsViewModel Model { get; set; } = default!;
     [Parameter] public IEnumerable<string> TagItems { get; set; } = [];
+    [Parameter] public List<TagTreeModel> TagTreeItems { get; set; } = [];
 
     private void AddItem()
     {

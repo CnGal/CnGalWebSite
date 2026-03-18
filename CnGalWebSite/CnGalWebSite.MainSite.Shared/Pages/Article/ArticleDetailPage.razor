@@ -4,6 +4,7 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Services
 
 <PageTitle>@(_model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
 
@@ -59,33 +60,33 @@ else if (_model is not null)
 
         <footer class="article-footer-related">
             <EntrySection Title="关联词条" Icon="mdiLinkVariant" Show="_model.RelatedEntries.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in _model.RelatedEntries.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="_model.RelatedEntries.Count > 9">
+                    @foreach (var item in _model.RelatedEntries)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
                         </li>
                     }
                 </EntryCardList>
             </EntrySection>
 
             <EntrySection Title="关联文章" Icon="mdiTextBoxOutline" Show="_model.RelatedArticles.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in _model.RelatedArticles.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="_model.RelatedArticles.Count > 9">
+                    @foreach (var item in _model.RelatedArticles)
                     {
                         <li>
-                            <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
                         </li>
                     }
                 </EntryCardList>
             </EntrySection>
 
             <EntrySection Title="关联视频" Icon="mdiAnimationPlayOutline" Show="_model.RelatedVideos.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in _model.RelatedVideos.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="_model.RelatedVideos.Count > 9">
+                    @foreach (var item in _model.RelatedVideos)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                         </li>
                     }
                 </EntryCardList>
@@ -154,22 +155,5 @@ else
     private static string GetTypeText(ArticleType type)
     {
         return type.GetDisplayName();
-    }
-
-    private static bool IsExternalLink(string? link)
-    {
-        return string.IsNullOrWhiteSpace(link) is false
-               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static string GetArticleLink(ArticleInforTipViewModel item)
-    {
-        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.Id}";
-    }
-
-    private static string? GetTarget(string? link)
-    {
-        return IsExternalLink(link) ? "_blank" : null;
     }
 }

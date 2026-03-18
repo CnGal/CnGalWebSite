@@ -41,8 +41,8 @@
 ### 3.1 接口分层（MUST）
 
 - SDK 服务按语义拆分为：
-  - `Queries/`：只读查询，不产生副作用（如 `HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`）。
-  - `Commands/`：写操作（编辑提交、文件上传等，如 `EntryCommandService`、`FileCommandService`）。
+  - `Queries/`：只读查询，不产生副作用（如 `HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`）。
+  - `Commands/`：写操作（编辑提交、文件上传等，如 `EntryCommandService`、`ArticleCommandService`、`VideoCommandService`、`TagCommandService`、`FileCommandService`）。
 - 交互页不得直接拼接 API 路径；路径细节只允许存在于 SDK 内部。
 
 ### 3.2 契约设计（MUST）
@@ -106,7 +106,7 @@
 
 - `Components/DesignSystem/`：基础组件（Button/Input/Modal/Pagination...），不包含业务术语，前缀 `Cg`。
 - `Components/Features/{Domain}/`：业务组件（如词条卡片、文章摘要、评分区），按领域分组。
-  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Home`（首页）、`Space`（个人空间）。
+  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Article`（文章，含 `Detail/` 与 `Editor/`）、`Video`（视频，含 `Detail/` 与 `Editor/`）、`Tag`（标签，含 `Detail/` 与 `Editor/`）、`Home`（首页）、`Space`（个人空间）。
 - `Components/Layout/`：非全局壳的布局辅助组件（如 `UserMenu`）。
 - `Layout/`：全局壳与导航（`MainLayout`），不承载业务查询逻辑。
 
@@ -120,7 +120,7 @@
 ### 4.4 生命周期规范（MUST）
 
 - 首次加载优先 `OnInitializedAsync`。
-- 依赖路由参数变化的加载逻辑使用 `OnParametersSetAsync`（如 `EntryDetailPage`、`SpaceIndexPage`）。
+- 依赖路由参数变化的加载逻辑使用 `OnParametersSetAsync`（如 `EntryDetailPage`、`ArticleDetailPage`、`VideoDetailPage`、`TagDetailPage`、`SpaceIndexPage`）。
 - 所有异步调用都要传递 `CancellationToken`（页面可在后续引入取消源统一管理）。
 
 ### 4.5 交互边界（MUST）
@@ -180,19 +180,19 @@
 ### 6.1 目录规范（MUST）
 
 - `MainSite.Shared` 当前结构：
-  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Space/`）
+  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Article/`、`Pages/Video/`、`Pages/Tag/`、`Pages/Space/`）
   - `Layout/`（`MainLayout`）
   - `Components/DesignSystem/`（基础组件）
-  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Home/`、`Space/`）
+  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`）
   - `Components/Layout/`（布局辅助组件，如 `UserMenu`）
-  - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`）
+  - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`；共享帮助方法，如 `ExternalLinkHelper`）
   - `Extensions/`（DI 注册扩展，如 `ServiceCollectionExtensions.AddMainSiteSharedServices`）
 - `SDK.MainSite` 当前结构：
-  - `Abstractions/`（7 个接口，含新增 `ITagQueryService`）
-  - `Queries/`
-  - `Commands/`
+  - `Abstractions/`（12 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`）
+  - `Queries/`（6 个查询服务：`Home`、`Entry`、`Space`、`Tag`、`Article`、`Video`）
+  - `Commands/`（5 个命令服务：`Entry`、`Article`、`Video`、`Tag`、`File`）
   - `Auth/`
-  - `Models/`（含子目录 `EntryEdit/`、`Files/`；`Files/` 下新增 `AudioUploadResult`、`ImageAspectType`、`ImageCropRect`）
+  - `Models/`（含子目录 `EntryEdit/`、`ArticleEdit/`、`VideoEdit/`、`TagEdit/`、`Files/`）
   - `Infrastructure/`（含 `QueryServiceBase`、`CommandServiceBase`、`SdkJsonSerializerOptions`、`StaffBatchParser`）
   - `Extensions/`
 
@@ -230,7 +230,7 @@
 ### 7.3 异常降级（MUST）
 
 - 页面必须提供失败态 UI（错误文案 + 可恢复动作）。
-  - 当前已实现：`HomePage` 使用 `HomeError` 组件、`EntryDetailPage` 使用错误区块+返回首页链接、`EntryEditPage` 使用错误区块+重试按钮、`SpaceIndexPage` 区分 404 和通用错误。
+  - 当前已实现：`HomePage` 使用 `HomeError` 组件、`EntryDetailPage` 使用错误区块+返回首页链接、`EntryEditPage` 使用错误区块+重试按钮、`SpaceIndexPage` 区分 404 和通用错误、`ArticleDetailPage` / `VideoDetailPage` / `TagDetailPage` 使用错误区块+返回首页、`ArticleEditPage` / `VideoEditPage` / `TagEditPage` 使用错误区块+重试按钮。
 - 交互页面可使用 `ICgToastService` 进行轻量级操作反馈通知（成功/失败/警告/信息），服务通过 `AddMainSiteSharedServices()` 注册。
 - 不可恢复错误要有明确回退路径（返回首页、重试等）。
 

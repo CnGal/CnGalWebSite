@@ -1,10 +1,12 @@
-﻿@page "/entries/index/{Id:int}"
+@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.Extensions
+@using CnGalWebSite.SDK.MainSite.Infrastructure
 
 <PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
 
@@ -38,7 +40,7 @@ else if (Model is not null)
                 </EntryCard>
 
                 <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
-                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="DisplayTextOrFallback" />
+                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
 
                 <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
@@ -46,43 +48,27 @@ else if (Model is not null)
                 </EntryCard>
 
                 <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
-                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="GetTarget" />
+                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
                 </EntryCard>
 
                 <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.VideoRelevances.Take(8))
+                    <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
+                        @foreach (var item in Model.VideoRelevances)
                         {
                             <li>
-                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                             </li>
                         }
                     </EntryCardList>
                 </EntrySection>
                 
-                <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.EntryRelevances.Take(8))
-                        {
-                            <li>
-                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                        @foreach (var item in Model.StaffGames.Take(4))
-                        {
-                            <li>
-                                <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-                
+                @RenderRelevancesBlocks
                 <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                    <EntryCardList>
-                        @foreach (var item in Model.ArticleRelevances.Take(8))
+                    <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
+                        @foreach (var item in Model.ArticleRelevances)
                         {
                             <li>
-                                <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
                             </li>
                         }
                     </EntryCardList>
@@ -125,10 +111,10 @@ else if (Model is not null)
                 <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
                     <EntryOutlinkList Links="Model.OtherRelevances"
                                       MaxCount="8"
-                                      GetExternalLinkIcon="GetExternalLinkIcon"
-                                      GetExternalLinkImage="GetExternalLinkImage"
-                                      GetExternalLinkDescription="GetExternalLinkDescription"
-                                      DisplayTextOrFallback="DisplayTextOrFallback" />
+                                      GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
+                                      GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
+                                      GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
+                                      DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
             </aside>
         </section>
@@ -201,39 +187,24 @@ else if (Model is not null)
 
                     <section class="entry-mobile-panel entry-mobile-panel--related">
                         <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.VideoRelevances.Take(8))
+                            <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
+                                @foreach (var item in Model.VideoRelevances)
                                 {
                                     <li>
-                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                        <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                                     </li>
                                 }
                             </EntryCardList>
                         </EntrySection>
 
-                        <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.EntryRelevances.Count > 0 || Model.StaffGames.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.EntryRelevances.Take(8))
-                                {
-                                    <li>
-                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                                    </li>
-                                }
-                                @foreach (var item in Model.StaffGames.Take(4))
-                                {
-                                    <li>
-                                        <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" />
-                                    </li>
-                                }
-                            </EntryCardList>
-                        </EntrySection>
+                        @RenderRelevancesBlocks
 
                         <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                            <EntryCardList>
-                                @foreach (var item in Model.ArticleRelevances.Take(8))
+                            <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
+                                @foreach (var item in Model.ArticleRelevances)
                                 {
                                     <li>
-                                        <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                                        <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
                                     </li>
                                 }
                             </EntryCardList>
@@ -250,10 +221,10 @@ else if (Model is not null)
                         <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
                             <EntryOutlinkList Links="Model.OtherRelevances"
                                               MaxCount="8"
-                                              GetExternalLinkIcon="GetExternalLinkIcon"
-                                              GetExternalLinkImage="GetExternalLinkImage"
-                                              GetExternalLinkDescription="GetExternalLinkDescription"
-                                              DisplayTextOrFallback="DisplayTextOrFallback" />
+                                              GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
+                                              GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
+                                              GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
+                                              DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                         </EntrySection>
                     </section>
 
@@ -341,94 +312,14 @@ else
         return $"/entries/index/{id}";
     }
 
-    private static string DisplayTextOrFallback(string? value, string fallback)
-    {
-        return string.IsNullOrWhiteSpace(value) ? fallback : value;
-    }
-
     private static string GetTypeText(EntryType type)
     {
         return type.GetDisplayName();
     }
 
-    private static bool IsExternalLink(string? link)
-    {
-        return string.IsNullOrWhiteSpace(link) is false
-               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static string GetArticleLink(ArticleInforTipViewModel item)
-    {
-        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.Id}";
-    }
-
     private static string GetNewsLink(NewsModel item)
     {
-        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.ArticleId}";
-    }
-
-    private static string? GetTarget(string? link)
-    {
-        return IsExternalLink(link) ? "_blank" : null;
-    }
-
-    private string GetExternalLinkIcon(string displayName)
-    {
-        var name = displayName?.ToLower() ?? "";
-        if (name.Contains("steam")) return "mdiSteam";
-        if (name.Contains("bilibili") || name.Contains("b站")) return "mdiTelevisionPlay";
-        if (name.Contains("weibo") || name.Contains("微博")) return "mdiWechat"; // close enough if weibo missing
-        if (name.Contains("twitter") || name.Contains("x")) return "mdiTwitter";
-        if (name.Contains("github")) return "mdiGithub";
-        if (name.Contains("youtube")) return "mdiYoutube";
-        if (name.Contains("tap") || name.Contains("taptap")) return "mdiGamepadVariantOutline";
-        if (name.Contains("qq")) return "mdiQqchat";
-        return "mdiEarth";
-    }
-
-    private string? GetExternalLinkImage(string displayName)
-    {
-        var image = displayName switch
-        {
-            "萌娘百科" => "Moegirl.png",
-            "Bangumi" => "Bangumi.png",
-            "百度百科" => "BaiDuWiki.png",
-            "2DFan" => "2DFan.png",
-            "中文维基百科" => "Wiki.png",
-            "月幕Galgame" => "YMGal.png",
-            "Bilibili" => "bilibili.png",
-            "bilibili" => "bilibili.png",
-            "WikiData" => "Wikidata.png",
-            "微博" => "weibo.png",
-            "AcFun" => "AcFun.png",
-            "知乎" => "zhihu.png",
-            "爱发电" => "Afdian.png",
-            "Pixiv" => "pixiv.png",
-            "Twitter" => "twitter.png",
-            "YouTube" => "Youtube.png",
-            "Facebook" => "Facebook.png",
-            "官网" => "SmartHome.png",
-            "摩点" => "modian.png",
-            "小黑盒" => "xiaoheihe.jpg",
-            _ => null
-        };
-
-        if (string.IsNullOrWhiteSpace(image))
-        {
-            return null;
-        }
-
-        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
-    }
-
-    private string? GetExternalLinkDescription(RelevancesKeyValueModel item)
-    {
-        return item.DisplayName switch
-        {
-            "VNDB" => item.DisplayValue + (string.IsNullOrWhiteSpace(item.DisplayValue) ? "" : " - ") + "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
-            _ => item.DisplayValue
-        };
+        return ExternalLinkHelper.IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.ArticleId}";
     }
 
     private bool HasRelatedContent()
@@ -534,5 +425,90 @@ else
             CurrencyCode.HKD => "HK$",
             _ => code.ToString() + " "
         };
+    }
+
+    private RenderFragment RenderRelevanceGroup(string title, string icon, IEnumerable<EntryInforTipViewModel> sourceItems) => __builder =>
+    {
+        var items = sourceItems.ToList();
+        if (items.Count > 0)
+        {
+            var displayTitle = items.Count > 4 ? $"{title} ({items.Count})" : title;
+            <EntrySection Title="@displayTitle" Icon="@icon" Show="true">
+                <EntryCardList LimitCount="9" ShowExpandButton="items.Count > 9">
+                    @foreach (var item in items)
+                    {
+                        <li>
+                            <EntryCardItem Url="@BuildEntryUrl(item.Id)" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
+                        </li>
+                    }
+                </EntryCardList>
+            </EntrySection>
+        }
+    };
+
+    private RenderFragment RenderRelevancesBlocks => __builder =>
+    {
+        @RenderRelevanceGroup("配音作品", "mdiMicrophoneOutline", GetCastWorks())
+        @RenderRelevanceGroup("制作作品", "mdiHammerWrench", GetProductionGroupWorks())
+        @RenderRelevanceGroup("发行作品", "mdiPublish", GetPublisherWorks())
+        @RenderRelevanceGroup("参与作品", "mdiHandshakeOutline", GetParticipationWorks())
+        @RenderRelevanceGroup("特别感谢", "mdiHeartOutline", GetAppreciatedParticWorks())
+
+        @RenderRelevanceGroup("相关游戏", "mdiGamepadVariantOutline", GetGameRelevances())
+        @RenderRelevanceGroup("相关组织", "mdiDomain", GetGroupRelevances())
+        @RenderRelevanceGroup("相关STAFF", "mdiAccountTieOutline", GetStaffRelevances())
+        @RenderRelevanceGroup("相关角色", "mdiAccountStarOutline", GetRoleRelevances())
+    };
+
+    private IEnumerable<EntryInforTipViewModel> GetCastWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.CV)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetProductionGroupWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetPublisherWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.Publisher) &&
+            a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup) == false));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetParticipationWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.CV && StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.SpecialThanks) &&
+            a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup || StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.Publisher) == false));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetAppreciatedParticWorks()
+    {
+        if (Model is null) return Array.Empty<EntryInforTipViewModel>();
+        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.SpecialThanks)));
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetGameRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Game) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetGroupRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetStaffRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Staff) ?? Array.Empty<EntryInforTipViewModel>();
+    }
+
+    private IEnumerable<EntryInforTipViewModel> GetRoleRelevances()
+    {
+        return Model?.EntryRelevances.Where(s => s.Type == EntryType.Role) ?? Array.Empty<EntryInforTipViewModel>();
     }
 }

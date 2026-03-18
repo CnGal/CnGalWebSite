@@ -1,9 +1,9 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
-@using CnGalWebSite.DataModel.ViewModel
-@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Services
 
 <PageTitle>@(Model is null ? "视频详情" : $"{GetDisplayTitle()} - 视频详情")</PageTitle>
 
@@ -56,7 +56,7 @@ else if (Model is not null)
             @if (Model.Pictures.Count > 0)
             {
                 <EntrySection Title="截图" Icon="mdiImageOutline">
-                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="DisplayTextOrFallback" />
+                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
             }
 
@@ -70,33 +70,33 @@ else if (Model is not null)
 
         <footer class="video-footer-related">
             <EntrySection Title="相关词条" Icon="mdiLinkVariant" Show="Model.RelatedEntries.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedEntries.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedEntries.Count > 9">
+                    @foreach (var item in Model.RelatedEntries)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/entries/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
                         </li>
                     }
                 </EntryCardList>
             </EntrySection>
 
             <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.RelatedArticles.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedArticles.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedArticles.Count > 9">
+                    @foreach (var item in Model.RelatedArticles)
                     {
                         <li>
-                            <EntryCardItem Url="@GetArticleLink(item)" Target="@GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@ExternalLinkHelper.GetArticleLink(item)" Target="@ExternalLinkHelper.GetTarget(item.Link)" Image="@item.MainImage" Title="@item.Name" />
                         </li>
                     }
                 </EntryCardList>
             </EntrySection>
 
             <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.RelatedVideos.Count > 0">
-                <EntryCardList>
-                    @foreach (var item in Model.RelatedVideos.Take(8))
+                <EntryCardList LimitCount="9" ShowExpandButton="Model.RelatedVideos.Count > 9">
+                    @foreach (var item in Model.RelatedVideos)
                     {
                         <li>
-                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                            <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
                         </li>
                     }
                 </EntryCardList>
@@ -105,10 +105,10 @@ else if (Model is not null)
             <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.RelatedOutlinks.Count > 0">
                 <EntryOutlinkList Links="Model.RelatedOutlinks"
                                   MaxCount="8"
-                                  GetExternalLinkIcon="GetExternalLinkIcon"
-                                  GetExternalLinkImage="GetExternalLinkImage"
-                                  GetExternalLinkDescription="GetExternalLinkDescription"
-                                  DisplayTextOrFallback="DisplayTextOrFallback" />
+                                  GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
+                                  GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
+                                  GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
+                                  DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
             </EntrySection>
 
             <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="video-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
@@ -165,85 +165,5 @@ else
         }
 
         return Model.Type;
-    }
-
-    private static bool IsExternalLink(string? link)
-    {
-        return string.IsNullOrWhiteSpace(link) is false
-               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static string GetArticleLink(ArticleInforTipViewModel item)
-    {
-        return IsExternalLink(item.Link) ? item.Link : $"/articles/index/{item.Id}";
-    }
-
-    private static string GetTarget(string? link)
-    {
-        return IsExternalLink(link) ? "_blank" : null;
-    }
-
-    private string GetExternalLinkIcon(string displayName)
-    {
-        var name = displayName?.ToLower() ?? "";
-        if (name.Contains("steam")) return "mdiSteam";
-        if (name.Contains("bilibili") || name.Contains("b站")) return "mdiTelevisionPlay";
-        if (name.Contains("weibo") || name.Contains("微博")) return "mdiWechat"; 
-        if (name.Contains("twitter") || name.Contains("x")) return "mdiTwitter";
-        if (name.Contains("github")) return "mdiGithub";
-        if (name.Contains("youtube")) return "mdiYoutube";
-        if (name.Contains("tap") || name.Contains("taptap")) return "mdiGamepadVariantOutline";
-        if (name.Contains("qq")) return "mdiQqchat";
-        return "mdiEarth";
-    }
-
-    private string? GetExternalLinkImage(string displayName)
-    {
-        var image = displayName switch
-        {
-            "萌娘百科" => "Moegirl.png",
-            "Bangumi" => "Bangumi.png",
-            "百度百科" => "BaiDuWiki.png",
-            "2DFan" => "2DFan.png",
-            "中文维基百科" => "Wiki.png",
-            "月幕Galgame" => "YMGal.png",
-            "Bilibili" => "bilibili.png",
-            "bilibili" => "bilibili.png",
-            "WikiData" => "Wikidata.png",
-            "微博" => "weibo.png",
-            "AcFun" => "AcFun.png",
-            "知乎" => "zhihu.png",
-            "爱发电" => "Afdian.png",
-            "Pixiv" => "pixiv.png",
-            "Twitter" => "twitter.png",
-            "YouTube" => "Youtube.png",
-            "Facebook" => "Facebook.png",
-            "官网" => "SmartHome.png",
-            "摩点" => "modian.png",
-            "小黑盒" => "xiaoheihe.jpg",
-            _ => null
-        };
-
-        if (string.IsNullOrWhiteSpace(image))
-        {
-            return null;
-        }
-
-        return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
-    }
-
-    private string? GetExternalLinkDescription(RelevancesKeyValueModel item)
-    {
-        return item.DisplayName switch
-        {
-            "VNDB" => item.DisplayValue + (string.IsNullOrWhiteSpace(item.DisplayValue) ? "" : " - ") + "VNDB.org力争成为一个关于视觉小说的全面的信息数据库",
-            _ => item.DisplayValue
-        };
-    }
-
-    private static string DisplayTextOrFallback(string? value, string fallback)
-    {
-        return string.IsNullOrWhiteSpace(value) ? fallback : value;
     }
 }

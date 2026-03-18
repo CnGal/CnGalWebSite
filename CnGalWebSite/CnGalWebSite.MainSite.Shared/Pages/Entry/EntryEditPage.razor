@@ -1,8 +1,9 @@
-﻿@page "/entries/establish"
+@page "/entries/establish"
 @page "/entries/create"
 @page "/entries/edit/{Id:int}"
 
 @rendermode InteractiveServer
+@attribute [Authorize]
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
 @using CnGalWebSite.MainSite.Shared.Services
