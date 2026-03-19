@@ -1,0 +1,121 @@
+@using CnGalWebSite.DataModel.ViewModel.Space
+@using CnGalWebSite.MainSite.Shared.Services
+
+@inject ICgToastService ToastService
+
+<section class="space-editor-section" id="section-account">
+    <h2><CgMdiIcon Name="mdiShieldAccountOutline" Class="space-section-icon" aria-hidden="true"/>账户安全</h2>
+    <p>管理账户安全设置、第三方绑定和用户认证。</p>
+
+    @if (Model != null)
+    {
+        <div class="space-account-grid">
+            @* ── 账户安全（跳转安全中心） ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon">
+                    <CgMdiIcon Name="mdiLockOutline" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>账户安全</h3>
+                    <p>修改密码、邮箱、手机号、第三方登入等信息</p>
+                </div>
+                <div class="space-account-card__action">
+                    <a href="https://oauth2.cngal.org/Account/SelectModifyField" target="_blank" rel="noopener noreferrer" class="space-account-link-btn">
+                        <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true"/>
+                        <span>前往安全中心</span>
+                    </a>
+                </div>
+            </div>
+
+            @* ── 邮箱 ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon">
+                    <CgMdiIcon Name="mdiEmailOutline" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>电子邮箱</h3>
+                    <p>@(string.IsNullOrWhiteSpace(Model.Email) ? "未绑定" : Model.Email)</p>
+                </div>
+            </div>
+
+            @* ── 手机号 ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon">
+                    <CgMdiIcon Name="mdiCellphone" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>手机号</h3>
+                    <p>@(string.IsNullOrWhiteSpace(Model.Phone) ? "未绑定" : Model.Phone)</p>
+                </div>
+            </div>
+
+            @* ── 密码 ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon">
+                    <CgMdiIcon Name="mdiKeyOutline" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>密码</h3>
+                    <p>定期修改密码可提高账户安全性</p>
+                    @if (Model.LastChangePasswordTime != null)
+                    {
+                        <span class="space-account-card__meta">上次修改：@Model.LastChangePasswordTime.Value.ToString("yyyy-MM-dd")</span>
+                    }
+                </div>
+            </div>
+
+            @* ── QQ 群绑定 ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon">
+                    <CgMdiIcon Name="mdiChat" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>群聊 QQ 号</h3>
+                    @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
+                    {
+                        <p>未绑定 — 在 QQ 群(490888010)中发送绑定指令即可绑定</p>
+                    }
+                    else
+                    {
+                        <p>QQ号：@Model.GroupQQ</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.QQAccountName))
+                    {
+                        <span class="space-account-card__meta">QQ昵称：@Model.QQAccountName</span>
+                    }
+                </div>
+            </div>
+
+            @* ── 用户认证 ── *@
+            <div class="space-account-card">
+                <div class="space-account-card__icon space-account-card__icon--cert">
+                    <CgMdiIcon Name="mdiCertificateOutline" aria-hidden="true"/>
+                </div>
+                <div class="space-account-card__body">
+                    <h3>用户认证</h3>
+                    @if (Model.UserCertificationModel == null || string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
+                    {
+                        <p>认证后可以审核对应词条的编辑</p>
+                    }
+                    else
+                    {
+                        <p>认证：@Model.UserCertificationModel.EntryName</p>
+                        @if (Model.UserCertificationModel.IsPending)
+                        {
+                            <span class="space-account-card__badge space-account-card__badge--pending">审核中</span>
+                        }
+                        else
+                        {
+                            <span class="space-account-card__badge space-account-card__badge--verified">已认证</span>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = default!;
+}

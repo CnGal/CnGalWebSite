@@ -1,0 +1,25 @@
+.space-steam-ids {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+.space-steam-id-row {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.space-steam-id-row ::deep .cg-input {
+    flex: 1;
+}
+
+.space-steam-id-row ::deep .cg-btn {
+    flex-shrink: 0;
+}
+
+.space-steam-id-row ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-error);
+}

@@ -1,0 +1,5 @@
+.space-rank-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-3);
+}

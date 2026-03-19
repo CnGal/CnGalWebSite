@@ -1,0 +1,72 @@
+@using CnGalWebSite.DataModel.ViewModel.Space
+
+<section class="space-editor-section" id="section-privacy">
+    <h2><CgMdiIcon Name="mdiShieldAccountOutline" Class="space-section-icon" aria-hidden="true"/>隐私与设置</h2>
+    <p>管理 Steam 绑定、隐私偏好和互动设置。</p>
+
+    @if (Model != null)
+    {
+        <CgFormGroup Label="Steam ID">
+            <CgAlert Variant="info">
+                填写 64 位的数字 SteamID，可用逗号分隔多个 ID。绑定后可展示游玩记录。
+            </CgAlert>
+            <div class="space-steam-ids">
+                @for (var i = 0; i < Model.SteamIds.Count; i++)
+                {
+                    var index = i;
+                    <div class="space-steam-id-row">
+                        <CgInput Value="@Model.SteamIds[index]"
+                                 ValueChanged="(string? v) => OnSteamIdChanged(index, v)"
+                                 TValue="string"
+                                 Placeholder="输入 SteamID64"/>
+                        <CgButton Variant="outline" OnClick="() => RemoveSteamId(index)">
+                            <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true"/>
+                        </CgButton>
+                    </div>
+                }
+                <CgButton Variant="outline" OnClick="AddSteamId">
+                    <CgMdiIcon Name="mdiPlus" aria-hidden="true"/>
+                    <span>添加 SteamID</span>
+                </CgButton>
+            </div>
+        </CgFormGroup>
+
+        <CgGrid>
+            <CgFormGroup Label="空间留言">
+                <CgCheckbox @bind-Value="Model.CanComment" Label="开启空间留言"/>
+            </CgFormGroup>
+            <CgFormGroup Label="收藏夹">
+                <CgCheckbox @bind-Value="Model.IsShowFavorites" Label="公开收藏夹"/>
+            </CgFormGroup>
+            <CgFormGroup Label="游玩记录">
+                <CgCheckbox @bind-Value="Model.IsShowGameRecord" Label="公开游玩记录"/>
+            </CgFormGroup>
+        </CgGrid>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = default!;
+
+    private void OnSteamIdChanged(int index, string? value)
+    {
+        if (index >= 0 && index < Model.SteamIds.Count)
+        {
+            Model.SteamIds[index] = value ?? string.Empty;
+        }
+    }
+
+    private void AddSteamId()
+    {
+        Model.SteamIds.Add(string.Empty);
+    }
+
+    private void RemoveSteamId(int index)
+    {
+        if (index >= 0 && index < Model.SteamIds.Count)
+        {
+            Model.SteamIds.RemoveAt(index);
+        }
+    }
+}

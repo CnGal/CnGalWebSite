@@ -1,0 +1,17 @@
+using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.SpaceEdit;
+
+namespace CnGalWebSite.SDK.MainSite.Abstractions;
+
+public interface ISpaceCommandService
+{
+    /// <summary>
+    /// 获取当前用户的编辑数据（个人资料 + 个人主页）。
+    /// </summary>
+    Task<SdkResult<SpaceEditViewModel>> GetSpaceEditAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 提交个人资料和个人主页的编辑。
+    /// </summary>
+    Task<SdkResult<string>> SubmitEditAsync(SpaceEditViewModel model, CancellationToken cancellationToken = default);
+}

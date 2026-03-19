@@ -1,9 +1,11 @@
 @page "/space/index/{Id}"
 @page "/space/index"
 
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using Microsoft.AspNetCore.Components.Web
 
@@ -27,6 +29,26 @@ else if (_model != null)
             <div class="cg-space-layout-sidebar">
                 <SpaceHero Model="_model" />
                 <SpaceBasicInfoCard Model="_model" />
+                @if (_model.IsCurrentUser)
+                {
+                    <a class="cg-space-edit-btn" href="/space/edit">
+                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                        <span>编辑个人空间</span>
+                    </a>
+                }
+                @if (_model.UserCertification != null)
+                {
+                    <div class="cg-space-cert-section">
+                        <div class="cg-space-cert-header">
+                            <CgMdiIcon Name="mdiCertificateOutline" Class="cg-space-cert-icon" />
+                            <h2 class="cg-space-cert-title">用户认证</h2>
+                        </div>
+                        <EntryCardItem Url="@($"/entries/index/{_model.UserCertification.Id}")"
+                                       Image="@_model.UserCertification.MainImage"
+                                       Title="@_model.UserCertification.Name"
+                                       IsSquareCover="@(_model.UserCertification.Type is EntryType.Role or EntryType.Staff)" />
+                    </div>
+                }
             </div>
             
             <div class="cg-space-layout-main">

@@ -141,6 +141,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITagCommandService, TagCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IVideoCommandService, VideoCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ISpaceCommandService, SpaceCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
 
         return services;
