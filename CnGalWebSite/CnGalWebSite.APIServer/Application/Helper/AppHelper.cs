@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -42,8 +42,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
 {
     public class AppHelper : IAppHelper
     {
-
-
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -69,13 +67,21 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
 
-        public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository,
-            IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
-            IRepository<Comment, long> commentRepository, IConfiguration configuration, IRepository<Loginkey, long> loginkeyRepository,
-        IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
-            IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<UserIntegral, long> userIntegralRepository)
+        public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository,
+            IRepository<SignInDay, long> signInDayRepository,
+            IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
+            IRepository<UserFile, int> userFileRepository,
+            IRepository<FavoriteFolder, long> favoriteFolderRepository,
+            IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
+            IRepository<Comment, long> commentRepository, IConfiguration configuration,
+            IRepository<Loginkey, long> loginkeyRepository,
+            IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository,
+            IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
+            IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository,
+            IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
+            IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository,
+            IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository,
+            IRepository<UserIntegral, long> userIntegralRepository)
         {
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
@@ -105,7 +111,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task<bool> IsEntryLockedAsync(long entryId, string userId, Operation operation)
         {
-            return await _examineRepository.FirstOrDefaultAsync(s => s.EntryId == entryId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != null;
+            return await _examineRepository.FirstOrDefaultAsync(s =>
+                s.EntryId == entryId && s.ApplicationUserId != userId && s.IsPassed == null &&
+                s.Operation == operation) != null;
         }
 
         public string GetImagePath(string image, string defaultStr)
@@ -119,6 +127,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 return "";
             }
+
             return str.Length < length * 2.5 ? str : string.Concat(str.AsSpan(0, (int)(length * 2.5)), "......");
         }
 
@@ -130,11 +139,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 return null;
             }
+
             var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
             if (user != null)
             {
                 //是否更新SteamId
-                if (string.IsNullOrWhiteSpace(user.SteamId) || user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
+                if (string.IsNullOrWhiteSpace(user.SteamId) ||
+                    user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
                 {
                     var steamId = context.User?.Claims?.GetUserSteamId();
                     if (string.IsNullOrWhiteSpace(steamId) == false)
@@ -143,6 +154,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         await _userRepository.UpdateAsync(user);
                     }
                 }
+
                 return user;
             }
 
@@ -156,6 +168,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 name = "用户_" + new Random(DateTime.Now.Millisecond).Next(0, 99999).ToString();
             }
+
             user = new ApplicationUser
             {
                 Id = id,
@@ -175,14 +188,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 // 插入失败说明同时并发的请求已经插入了
             }
-            
+
             return user;
         }
 
         public async Task<bool> DeleteFieAsync(ApplicationUser user, string fileName)
         {
             //获取文件管理
-            var fileManager = await _fileManagerRepository.GetAll().Include(s => s.UserFiles).FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
+            var fileManager = await _fileManagerRepository.GetAll().Include(s => s.UserFiles)
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
             if (fileManager == null)
             {
                 return false;
@@ -218,7 +232,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 return false;
             }
-
         }
 
         public async Task<string> GetTagListStringAsync(Tag tag)
@@ -233,7 +246,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //尝试向上索引
                 while (tag.ParentCodeNavigation != null)
                 {
-                    tag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Name == tag.ParentCodeNavigation.Name);
+                    tag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.ParentCodeNavigation)
+                        .FirstOrDefaultAsync(s => s.Name == tag.ParentCodeNavigation.Name);
                     if (tag != null)
                     {
                         result = tag.Name + "->" + result;
@@ -243,44 +257,53 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         break;
                     }
                 }
+
                 return result;
             }
         }
 
         public async Task<bool> IsTagLockedAsync(int tagId, string userId, Operation operation)
         {
-            return await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != false;
+            return await _examineRepository.GetAll().AsNoTracking().AnyAsync(s =>
+                       s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null &&
+                       s.Operation == operation) !=
+                   false;
         }
 
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
             _articleRepository.Clear();
-            _ = await _articleRepository.GetAll().Where(s => s.Id == articleId).ExecuteUpdateAsync(s => s.SetProperty(a => a.ReaderCount, b => b.ReaderCount + 1));
-
+            _ = await _articleRepository.GetAll().Where(s => s.Id == articleId)
+                .ExecuteUpdateAsync(s => s.SetProperty(a => a.ReaderCount, b => b.ReaderCount + 1));
         }
 
         public async Task EntryReaderNumUpAsync(int entryId)
         {
             _entryRepository.Clear();
-            _ = await _entryRepository.GetAll().Where(s => s.Id == entryId).ExecuteUpdateAsync(s => s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
+            _ = await _entryRepository.GetAll().Where(s => s.Id == entryId)
+                .ExecuteUpdateAsync(s => s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
         }
 
         public async Task UpdateFavoritesCountAsync(long[] favoriteFolderIds)
         {
             foreach (var item in favoriteFolderIds)
             {
-                var count = await _favoriteFolderRepository.GetAll().Include(s => s.FavoriteObjects).Where(s => s.Id == item).Select(s => s.FavoriteObjects.Count).FirstOrDefaultAsync();
-                _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s => s.SetProperty(s => s.Count, b => count));
+                var count = await _favoriteFolderRepository.GetAll().Include(s => s.FavoriteObjects)
+                    .Where(s => s.Id == item).Select(s => s.FavoriteObjects.Count).FirstOrDefaultAsync();
+                _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == item)
+                    .ExecuteUpdateAsync(s => s.SetProperty(s => s.Count, b => count));
             }
         }
 
         public async Task DeleteComment(long id)
         {
-            var comment = await _commentRepository.GetAll().Include(s => s.InverseParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == id);
+            var comment = await _commentRepository.GetAll().Include(s => s.InverseParentCodeNavigation)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (comment == null)
             {
                 return;
             }
+
             //删除关联审核
             await _examineRepository.DeleteAsync(s => s.CommentId == id);
             //遍历删除子评论
@@ -288,6 +311,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 await DeleteComment(item.Id);
             }
+
             await _commentRepository.DeleteAsync(comment);
             return;
         }
@@ -295,7 +319,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public async Task<bool> IsExceedMaxSendCount(string mail, int limit, int maxMinutes)
         {
             var timeNow = DateTime.Now.ToCstTime();
-            var errors = await _sendCountRepository.GetAll().CountAsync(s => s.Mail == mail && s.SendTime.AddMinutes(maxMinutes) > timeNow);
+            var errors = await _sendCountRepository.GetAll()
+                .CountAsync(s => s.Mail == mail && s.SendTime.AddMinutes(maxMinutes) > timeNow);
             return errors >= limit;
         }
 
@@ -303,9 +328,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         {
             _ = await _sendCountRepository.InsertAsync(new SendCount
             {
-                SendTime = DateTime.Now.ToCstTime(),
-                Type = type,
-                Mail = mail
+                SendTime = DateTime.Now.ToCstTime(), Type = type, Mail = mail
             });
         }
 
@@ -331,7 +354,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         }
 
 
-
         public ArticleInforTipViewModel GetArticleInforTipViewModel(Article item)
         {
             return new ArticleInforTipViewModel
@@ -349,7 +371,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 ThumbsUpCount = item.ThumbsUpCount,
                 CommentCount = item.CommentCount,
                 Link = item.OriginalLink
-
             };
         }
 
@@ -374,7 +395,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry)
         {
-
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
@@ -412,7 +432,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 if (entry.Type == EntryType.Role)
                 {
                     //查找配音
-                    var cvs = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.CV);
+                    var cvs =
+                        entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.CV);
                     if (cvs.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel
@@ -420,7 +441,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
                             Modifier = "配音",
                             Contents = cvs.Select(s => new StaffNameModel
                             {
-                                DisplayName = string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
+                                DisplayName =
+                                    string.IsNullOrWhiteSpace(s.CustomName)
+                                        ? (s.ToEntryNavigation?.Name ?? s.Name)
+                                        : s.CustomName,
                                 Id = s.ToEntryNavigation?.Id ?? -1
                             }).ToList()
                         });
@@ -428,30 +452,23 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                     //查找登场游戏
                     var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
+                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s =>
+                                 s.ToEntryNavigation.IsHidden == false))
                     {
                         var item = nav.ToEntryNavigation;
                         if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
                         {
-                            gameNames.Add(new StaffNameModel
-                            {
-
-                                DisplayName = item.DisplayName,
-                                Id = item.Id
-                            });
+                            gameNames.Add(new StaffNameModel { DisplayName = item.DisplayName, Id = item.Id });
                             if (gameNames.Count >= 3)
                             {
                                 break;
                             }
                         }
                     }
+
                     if (gameNames.Count > 0)
                     {
-                        model.AddInfors.Add(new EntryInforTipAddInforModel
-                        {
-                            Modifier = "登场游戏",
-                            Contents = gameNames
-                        });
+                        model.AddInfors.Add(new EntryInforTipAddInforModel { Modifier = "登场游戏", Contents = gameNames });
                     }
                 }
                 else if (entry.Type == EntryType.Staff)
@@ -459,7 +476,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     //查找参与作品
                     var gameNames = entry.EntryStaffToEntryNavigation
                         .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
-                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false &&
+                                    s.FromEntryNavigation.Type == EntryType.Game &&
+                                    string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
                         .GroupBy(s => s.FromEntry)
                         .Take(3)
                         .Select(s => new StaffNameModel
@@ -469,11 +488,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         }).ToList();
                     if (gameNames.Any())
                     {
-                        model.AddInfors.Add(new EntryInforTipAddInforModel
-                        {
-                            Modifier = "参与作品",
-                            Contents = gameNames
-                        });
+                        model.AddInfors.Add(new EntryInforTipAddInforModel { Modifier = "参与作品", Contents = gameNames });
                     }
                 }
                 else if (entry.Type == EntryType.ProductionGroup)
@@ -481,7 +496,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     //查找参与作品
                     var gameNames = entry.EntryStaffToEntryNavigation
                         .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
-                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false &&
+                                    s.FromEntryNavigation.Type == EntryType.Game &&
+                                    string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
                         .GroupBy(s => s.FromEntry)
                         .Take(3)
                         .Select(s => new StaffNameModel
@@ -491,14 +508,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         }).ToList();
                     if (gameNames.Any())
                     {
-                        model.AddInfors.Add(new EntryInforTipAddInforModel
-                        {
-                            Modifier = "参与作品",
-                            Contents = gameNames
-                        });
+                        model.AddInfors.Add(new EntryInforTipAddInforModel { Modifier = "参与作品", Contents = gameNames });
                     }
                 }
-
             }
 
             return model;
@@ -542,21 +554,12 @@ namespace CnGalWebSite.APIServer.Application.Helper
             //处理附加信息
             if (periphery.RelatedEntries != null && periphery.RelatedEntries.Any())
             {
-                var temp = new EntryInforTipAddInforModel
-                {
-                    Modifier = "关联词条",
-                    Contents = new List<StaffNameModel>()
-                };
-                model.AddInfors.Add(temp); ;
+                var temp = new EntryInforTipAddInforModel { Modifier = "关联词条", Contents = new List<StaffNameModel>() };
+                model.AddInfors.Add(temp);
+                ;
                 foreach (var item in periphery.RelatedEntries)
                 {
-                    temp.Contents.Add(new StaffNameModel
-                    {
-                        DisplayName = item.DisplayName,
-                        Id = item.Id,
-                    });
-
-
+                    temp.Contents.Add(new StaffNameModel { DisplayName = item.DisplayName, Id = item.Id, });
                 }
             }
 
@@ -576,9 +579,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 var textWriter = new StringWriter();
                 var jsonWriter = new JsonTextWriter(textWriter)
                 {
-                    Formatting = Formatting.Indented,
-                    Indentation = 4,
-                    IndentChar = ' '
+                    Formatting = Formatting.Indented, Indentation = 4, IndentChar = ' '
                 };
                 serializer.Serialize(jsonWriter, obj);
                 return textWriter.ToString();
@@ -595,6 +596,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 return "";
             }
+
             var resulte = "``` json\n" + ConvertJsonString(jsonStr) + "\n```";
             //使用markdown渲染
             return MarkdownToHtml(resulte);
@@ -623,8 +625,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             sb = ProcBilibiliVideo(sb, text);
 
 
-
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak()
+                .UseFigures().Build();
             var html = Markdown.ToHtml(sb.ToString(), pipeline);
             html = AddLazyLoading(html);
             return html;
@@ -656,7 +658,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             //查找所有图片链接
             var regImg = new Regex(@"\!\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 
-            var images = regImg.Matches(text).Where(s => string.IsNullOrWhiteSpace(s.Value) == false).Select(s => s.Value).ToList().Purge();
+            var images = regImg.Matches(text).Where(s => string.IsNullOrWhiteSpace(s.Value) == false)
+                .Select(s => s.Value).ToList().Purge();
 
             foreach (var item in images)
             {
@@ -679,11 +682,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var regLink = new Regex(@"\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 
             var links = regLink.Matches(text).Select(s => s.Value);
-            links = links.Where(s => string.IsNullOrWhiteSpace(s) == false && s.Contains("https://www.bilibili.com/video")).ToList().Purge();
+            links = links
+                .Where(s => string.IsNullOrWhiteSpace(s) == false && s.Contains("https://www.bilibili.com/video"))
+                .ToList().Purge();
 
             foreach (var item in links)
             {
-                var id = item.MidStrEx("https://www.bilibili.com/video/", "/") ?? item.MidStrEx("https://www.bilibili.com/video/", "?") ?? item.MidStrEx("https://www.bilibili.com/video/", ")");
+                var id = item.MidStrEx("https://www.bilibili.com/video/", "/") ??
+                         item.MidStrEx("https://www.bilibili.com/video/", "?") ??
+                         item.MidStrEx("https://www.bilibili.com/video/", ")");
                 //找到注释
                 var infor = new Regex(@"(?<=\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
 
@@ -693,8 +700,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 }
 
 
-                sb = sb.Replace(item, $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1&autoplay=0\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor.Trim()}**\n\n")}");
-
+                sb = sb.Replace(item,
+                    $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1&autoplay=0\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor.Trim()}**\n\n")}");
             }
 
             return sb;
@@ -722,22 +729,40 @@ namespace CnGalWebSite.APIServer.Application.Helper
             try
             {
                 //编辑
-                var temp_1 = await _examineRepository.GetAll().Where(s => s.ApplyTime > time).Where(s => s.ApplicationUserId == userId && s.IsPassed == true)
-                 .Select(n => new { Time = n.ApplyTime.Date, n.EntryId, n.TagId, n.ArticleId, n.CommentId, n.DisambigId, n.PeripheryId })
-                 // 分类
-                 .ToListAsync();
+                var temp_1 = await _examineRepository.GetAll().Where(s => s.ApplyTime > time)
+                    .Where(s => s.ApplicationUserId == userId && s.IsPassed == true)
+                    .Select(n => new
+                    {
+                        Time = n.ApplyTime.Date,
+                        n.EntryId,
+                        n.TagId,
+                        n.ArticleId,
+                        n.CommentId,
+                        n.DisambigId,
+                        n.PeripheryId
+                    })
+                    // 分类
+                    .ToListAsync();
                 // 返回汇总样式
                 var temp_2 = temp_1.GroupBy(s => s.Time);
-                var integral_1 = (temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() * entryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() * tagIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() * disambigIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count()).Sum() * peripheryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
-                                            .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited);
+                var integral_1 =
+                    (temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() *
+                     entryIntegral)
+                    + (temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() *
+                       tagIntegral)
+                    + (temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() *
+                       disambigIntegral)
+                    + (temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count())
+                        .Sum() * peripheryIntegral)
+                    + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
+                           .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() *
+                       commentLimited);
 
 
                 //发表文章
-                var integral_2 = await _articleRepository.GetAll().Where(s => s.CreateTime > time).CountAsync(s => s.CreateUserId == userId) * articleIntegral;
+                var integral_2 =
+                    await _articleRepository.GetAll().Where(s => s.CreateTime > time)
+                        .CountAsync(s => s.CreateUserId == userId) * articleIntegral;
 
                 return integral_1 + integral_2;
             }
@@ -749,7 +774,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task GetAllSteamImageToGame()
         {
-            var entries = await _entryRepository.GetAll().Include(s => s.Information).Where(s => string.IsNullOrWhiteSpace(s.MainPicture) && s.Type == EntryType.Game).ToListAsync();
+            var entries = await _entryRepository.GetAll().Include(s => s.Information)
+                .Where(s => string.IsNullOrWhiteSpace(s.MainPicture) && s.Type == EntryType.Game).ToListAsync();
 
             foreach (var item in entries)
             {
@@ -764,7 +790,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
                             steamId = infor.DisplayValue;
                             break;
                         }
-
                     }
                 }
 
@@ -785,15 +810,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var entries = await _entryRepository.GetAll().Include(s => s.Pictures).ToListAsync();
             foreach (var item in entries)
             {
-
                 if (string.IsNullOrWhiteSpace(item.SmallBackgroundPicture) == false)
                 {
                     item.SmallBackgroundPicture = item.SmallBackgroundPicture.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.BackgroundPicture) == false)
                 {
                     item.BackgroundPicture = item.BackgroundPicture.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.MainPage) == false)
                 {
                     item.MainPage = item.MainPage.Replace(oldName, newName);
@@ -809,19 +835,21 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 _ = await _entryRepository.UpdateAsync(item);
             }
+
             //查找文章
             var articles = await _articleRepository.GetAll().ToListAsync();
             foreach (var item in articles)
             {
-
                 if (string.IsNullOrWhiteSpace(item.SmallBackgroundPicture) == false)
                 {
                     item.SmallBackgroundPicture = item.SmallBackgroundPicture.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.BackgroundPicture) == false)
                 {
                     item.BackgroundPicture = item.BackgroundPicture.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.MainPage) == false)
                 {
                     item.MainPage = item.MainPage.Replace(oldName, newName);
@@ -829,23 +857,26 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 _ = await _articleRepository.UpdateAsync(item);
             }
+
             //查找用户
             var users = await _userRepository.GetAll().ToListAsync();
             foreach (var item in users)
             {
-
                 if (string.IsNullOrWhiteSpace(item.SBgImage) == false)
                 {
                     item.SBgImage = item.SBgImage.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.MBgImage) == false)
                 {
                     item.MBgImage = item.MBgImage.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.BackgroundImage) == false)
                 {
                     item.BackgroundImage = item.BackgroundImage.Replace(oldName, newName);
                 }
+
                 if (string.IsNullOrWhiteSpace(item.MainPageContext) == false)
                 {
                     item.MainPageContext = item.MainPageContext.Replace(oldName, newName);
@@ -853,11 +884,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 _ = await _userRepository.UpdateAsync(item);
             }
+
             //查找所有文件
             var files = await _userFileRepository.GetAll().ToListAsync();
             foreach (var item in files)
             {
-
                 if (string.IsNullOrWhiteSpace(item.FileName) == false)
                 {
                     item.FileName = item.FileName.Replace(oldName, newName);
@@ -877,10 +908,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 _ = await _loginkeyRepository.InsertAsync(new Loginkey
                 {
-                    UserId = userId,
-                    Key = keyStr,
-                    IsOneTime = isOneTime,
-                    CreateTime = tempDateTimeNow,
+                    UserId = userId, Key = keyStr, IsOneTime = isOneTime, CreateTime = tempDateTimeNow,
                 });
             }
             else
@@ -890,21 +918,26 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 key.IsOneTime = isOneTime;
                 _ = await _loginkeyRepository.UpdateAsync(key);
             }
+
             return keyStr;
         }
 
         public async Task<string> GetUserFromLoginKeyAsync(string key)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
-            var result = await _loginkeyRepository.FirstOrDefaultAsync(s => s.Key == key && s.CreateTime.AddHours(1) > tempDateTimeNow);
+            var result =
+                await _loginkeyRepository.FirstOrDefaultAsync(s =>
+                    s.Key == key && s.CreateTime.AddHours(1) > tempDateTimeNow);
             if (result != null)
             {
                 if (result.IsOneTime)
                 {
                     await _loginkeyRepository.DeleteAsync(result);
                 }
+
                 return result.UserId;
             }
+
             return null;
         }
 

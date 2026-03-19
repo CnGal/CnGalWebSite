@@ -54,8 +54,11 @@
 2. **交互页（按页启用）**
    - 仅当页面存在明显交互需求时启用交互式组件。
    - 当前已实现的交互页：`EntryEditPage`、`ArticleEditPage`、`VideoEditPage`、`TagEditPage`（`@rendermode InteractiveServer`）。
+3. **静态页中的登录交互控件（允许）**
+   - 静态页中仅在用户登录后才可见的局部控件（如点赞、收藏、评论等操作入口），允许将该控件单独声明为 `@rendermode InteractiveServer`，无需将整个页面升级为交互页。
+   - 此类控件必须被 `AuthorizeView` 或等效授权机制包裹，确保未登录用户仍获得纯静态体验，不产生额外交互开销。
 
-> 约束：默认新页面必须是静态页；如需交互，必须在 PR 说明中写明原因。
+> 约束：默认新页面必须是静态页；如需整页交互，必须在 PR 说明中写明原因。静态页中的登录交互控件无需整页交互声明，但需确保控件被授权机制包裹。
 
 ### 3.2 Blazor 渲染模式配置
 
@@ -360,6 +363,7 @@ CnGalWebSite.MainSite.Shared
 
 - 禁止在 `MainSite.Shared` 中出现业务 API 直连逻辑。
 - 新增页面若含 `@rendermode`，必须附带"交互必要性"说明。
+- 静态页中仅登录可见的控件允许声明 `@rendermode InteractiveServer`，此类控件必须被 `AuthorizeView` 包裹，无需整页交互声明，但需在 PR 中注明涉及的控件。
 - 静态页禁止引入无必要 JS 互操作。
 - 页面 PR 必须包含"替换了哪些第三方组件调用点"的说明。
 - 组件必须提供基础可访问性（键盘焦点、语义标签、ARIA 基本属性）。

@@ -1,0 +1,52 @@
+.space-steam-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    flex-wrap: wrap;
+}
+
+.space-steam-toolbar__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+    cursor: pointer;
+    border: none;
+    line-height: 1.4;
+}
+
+.space-steam-toolbar__btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.space-steam-toolbar__btn--bind {
+    color: var(--cg-color-on-primary);
+    background: var(--cg-color-primary);
+}
+
+.space-steam-toolbar__btn--bind:hover {
+    background: var(--cg-color-primary-hover);
+}
+
+.space-steam-toolbar__btn--edit {
+    color: var(--cg-color-text-secondary);
+    background: var(--cg-color-bg);
+}
+
+.space-steam-toolbar__btn--edit:hover {
+    background: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+/* Inline progress ring for refresh button */
+.space-steam-toolbar ::deep .cg-progress-ring {
+    width: 16px;
+    height: 16px;
+}

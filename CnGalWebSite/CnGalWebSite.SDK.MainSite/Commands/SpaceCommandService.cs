@@ -77,4 +77,23 @@ public sealed class SpaceCommandService(
             return SdkResult<string>.Fail("SPACE_EDIT_SUBMIT_EXCEPTION", "提交用户编辑数据时发生异常");
         }
     }
+
+    public async Task<SdkResult<string>> RefreshSteamInfoAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor", cancellationToken);
+            if (result is { Successful: true })
+            {
+                return SdkResult<string>.Ok("刷新成功");
+            }
+
+            return SdkResult<string>.Fail("STEAM_REFRESH_FAILED", result?.Error ?? "刷新 Steam 信息失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "刷新 Steam 信息异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("STEAM_REFRESH_EXCEPTION", "刷新 Steam 信息时发生异常");
+        }
+    }
 }

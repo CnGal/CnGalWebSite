@@ -1,5 +1,6 @@
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -15,8 +16,10 @@ public sealed class PlayedGameQueryService(
 {
     private static readonly TimeSpan OverviewCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan RecordsCacheDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan SteamInfoCacheDuration = TimeSpan.FromMinutes(5);
     private const string OverviewPathTemplate = "api/playedgame/GetPlayedGameOverview/{0}";
     private const string UserRecordsPathTemplate = "api/playedgame/GetUserGameRecords/{0}";
+    private const string UserSteamInfoPathTemplate = "api/steam/GetUserSteamInfor/{0}";
 
     protected override ILogger Logger => logger;
 
@@ -71,6 +74,40 @@ public sealed class PlayedGameQueryService(
         var viewModel = MapRecordsToViewModel(result.Data);
         memoryCache.Set(cacheKey, viewModel, RecordsCacheDuration);
         return SdkResult<UserGameRecordsViewModel>.Ok(viewModel);
+    }
+
+    public async Task<SdkResult<IReadOnlyList<SteamUserInfoItem>>> GetUserSteamInfoAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:user-steam-info:{userId}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<SteamUserInfoItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(cached);
+        }
+
+        var path = string.Format(UserSteamInfoPathTemplate, userId);
+        var result = await GetAsync<List<SteamUserInforModel>>(
+            path,
+            "USER_STEAM_INFO",
+            "用户Steam信息",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            // Steam 信息获取失败时返回空列表而非错误，保证页面可渲染
+            return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(Array.Empty<SteamUserInfoItem>());
+        }
+
+        IReadOnlyList<SteamUserInfoItem> items = result.Data
+            .Select(s => new SteamUserInfoItem
+            {
+                SteamId = s.SteamId ?? string.Empty,
+                Name = s.Name ?? string.Empty,
+                Image = s.Image ?? string.Empty,
+            })
+            .ToList();
+
+        memoryCache.Set(cacheKey, items, SteamInfoCacheDuration);
+        return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(items);
     }
 
     private static PlayedGameOverviewViewModel MapOverviewToViewModel(PlayedGameOverviewModel model)
@@ -159,3 +196,4 @@ public sealed class PlayedGameQueryService(
         };
     }
 }
+

@@ -1,31 +1,30 @@
-@using CnGalWebSite.SDK.MainSite.Models
+@* 游玩记录列表 + Steam 信息 *@
 
-<section class="space-game-record-list" aria-label="游玩记录">
-    <header class="space-game-record-list__header">
-        <CgMdiIcon Name="mdiControllerClassicOutline" />
-        <h2>游玩记录</h2>
-        <span class="space-game-record-list__count">@VisibleRecords.Count 款游戏</span>
-    </header>
+<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="Model" />
 
-    @if (VisibleRecords.Count > 0)
-    {
-        <ul class="space-game-record-list__grid">
-            @foreach (var record in VisibleRecords)
-            {
-                <li>
-                    <SpaceGameRecordItem Model="record" />
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <div class="space-game-record-list__empty">
-            <CgMdiIcon Name="mdiGamepadVariantOutline" />
-            <p>暂无游玩记录</p>
-        </div>
-    }
-</section>
+@if (IsCurrentUser)
+{
+    <SpaceSteamToolbar SteamId="@SteamId" />
+}
+
+@if (VisibleRecords.Count > 0)
+{
+    <ul class="space-game-record-list__grid">
+        @foreach (var record in VisibleRecords)
+        {
+            <li>
+                <SpaceGameRecordItem Model="record" />
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="space-game-record-list__empty">
+        <CgMdiIcon Name="mdiGamepadVariantOutline" />
+        <p>暂无游玩记录</p>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -33,6 +32,12 @@
 
     [Parameter]
     public bool IsCurrentUser { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<SteamUserInfoItem> SteamUsers { get; set; } = [];
+
+    [Parameter]
+    public string SteamId { get; set; } = string.Empty;
 
     private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
         .Where(r => !r.IsHidden && (r.ShowPublicly || IsCurrentUser))

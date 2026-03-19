@@ -1,33 +1,3 @@
-.space-game-record-list {
-    padding: var(--cg-spacing-6) 0;
-}
-
-.space-game-record-list__header {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
-    margin-bottom: var(--cg-spacing-5);
-}
-
-.space-game-record-list__header ::deep .cg-mdi-icon {
-    width: 24px;
-    height: 24px;
-    fill: var(--cg-color-primary);
-}
-
-.space-game-record-list__header h2 {
-    font-size: var(--cg-font-size-xl);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text);
-    margin: 0;
-}
-
-.space-game-record-list__count {
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
-    margin-left: auto;
-}
-
 .space-game-record-list__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -44,9 +14,6 @@
     align-items: center;
     justify-content: center;
     padding: var(--cg-spacing-10);
-    background: var(--cg-color-surface);
-    border: 1px dashed var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
 }
 
 .space-game-record-list__empty ::deep .cg-mdi-icon {

@@ -14,4 +14,9 @@ public interface ISpaceCommandService
     /// 提交个人资料和个人主页的编辑。
     /// </summary>
     Task<SdkResult<string>> SubmitEditAsync(SpaceEditViewModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 刷新当前用户的 Steam 游玩记录。
+    /// </summary>
+    Task<SdkResult<string>> RefreshSteamInfoAsync(CancellationToken cancellationToken = default);
 }

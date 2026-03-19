@@ -13,4 +13,9 @@ public interface IPlayedGameQueryService
     /// 获取用户的游玩记录列表。
     /// </summary>
     Task<SdkResult<UserGameRecordsViewModel>> GetUserGameRecordsAsync(string userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取用户的 Steam 账号信息列表。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<SteamUserInfoItem>>> GetUserSteamInfoAsync(string userId, CancellationToken cancellationToken = default);
 }

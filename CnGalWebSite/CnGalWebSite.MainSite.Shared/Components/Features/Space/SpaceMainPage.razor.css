@@ -1,38 +1,3 @@
-.cg-space-card {
-    background-color: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-sm);
-    margin-bottom: var(--cg-spacing-4);
-    overflow: hidden;
-}
-
-.cg-space-card-header {
-    display: flex;
-    align-items: center;
-    padding: var(--cg-spacing-4) var(--cg-spacing-4) 0;
-}
-
-.cg-space-card-icon {
-    margin-right: var(--cg-spacing-2);
-}
-
-.cg-space-card-header ::deep .cg-space-card-icon {
-    width: 24px;
-    height: 24px;
-    color: var(--cg-color-primary);
-}
-
-.cg-space-card-title {
-    font-size: var(--cg-font-size-lg);
-    font-weight: var(--cg-font-weight-bold);
-    margin: 0;
-    color: var(--cg-color-text-primary);
-}
-
-.cg-space-card-body {
-    padding: var(--cg-spacing-4);
-}
-
 .cg-markdown-body {
     font-size: var(--cg-font-size-md);
     line-height: 1.6;
@@ -53,4 +18,28 @@
 
 .cg-markdown-body ::deep a:hover {
     text-decoration: underline;
+}
+
+/* ── Empty state ── */
+
+.cg-space-main-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-10);
+}
+
+.cg-space-main-empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    fill: var(--cg-color-text-muted);
+    opacity: 0.4;
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.cg-space-main-empty p {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
 }

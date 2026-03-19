@@ -52,3 +52,13 @@ public sealed class GameRecordItem
     public bool IsScored => MusicScore != 0 && ShowScore != 0 && TotalScore != 0
                          && PaintScore != 0 && ScriptScore != 0 && CVScore != 0 && SystemScore != 0;
 }
+
+/// <summary>
+/// Steam 用户信息（面向 SpaceIndexPage 静态展示）。
+/// </summary>
+public sealed class SteamUserInfoItem
+{
+    public required string SteamId { get; init; }
+    public required string Name { get; init; }
+    public required string Image { get; init; }
+}

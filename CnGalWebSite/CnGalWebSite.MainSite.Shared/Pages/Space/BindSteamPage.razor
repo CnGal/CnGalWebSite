@@ -1,0 +1,105 @@
+@page "/bind-steam/{ReturnUrl}"
+
+@using CnGalWebSite.DataModel.ViewModel.Space
+@using CnGalWebSite.SDK.MainSite.Infrastructure
+
+@inject ISpaceCommandService SpaceCommandService
+@inject NavigationManager NavigationManager
+@inject ICgToastService ToastService
+
+<PageTitle>绑定 Steam 账号 - CnGal资料站</PageTitle>
+
+<div class="cg-bind-steam-loading" style="display: flex; justify-content: center; align-items: center; height: 50vh;">
+    <CgProgressRing />
+    <span style="margin-left: 1rem;">正在处理 Steam 绑定...</span>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "openid.claimed_id")]
+    [Parameter]
+    public string? OpenIdClaimedId { get; set; }
+
+    [Parameter]
+    public string? ReturnUrl { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(OpenIdClaimedId))
+                {
+                    ToastService.Show("绑定失败", "未收到 Steam 返回的认证信息", "error");
+                    NavigateBack();
+                    return;
+                }
+
+                var ids = OpenIdClaimedId.Split("/");
+                if (ids.Length < 2)
+                {
+                    ToastService.Show("绑定失败", "Steam 认证信息格式不正确", "error");
+                    NavigateBack();
+                    return;
+                }
+
+                var steamId = ids.Last();
+
+                var editResult = await SpaceCommandService.GetSpaceEditAsync();
+                if (!editResult.Success || editResult.Data == null)
+                {
+                    ToastService.Show("绑定失败", editResult.Error?.Message ?? "无法获取当前个人空间数据", "error");
+                    NavigateBack();
+                    return;
+                }
+
+                var model = editResult.Data;
+                
+                if (model.UserData.SteamIds.Contains(steamId))
+                {
+                    ToastService.Show("提示", "该 Steam 账号已绑定", "info");
+                    NavigateBack();
+                    return;
+                }
+
+                model.UserData.SteamIds.Add(steamId);
+
+                var submitResult = await SpaceCommandService.SubmitEditAsync(model);
+                if (submitResult.Success)
+                {
+                    ToastService.Show("绑定成功", "已成功绑定 Steam 账号", "success");
+                }
+                else
+                {
+                    ToastService.Show("绑定失败", submitResult.Error?.Message ?? "保存 Steam 绑定信息失败", "error");
+                }
+
+                NavigateBack();
+            }
+            catch (Exception ex)
+            {
+                ToastService.Show("绑定失败", $"发生未知错误：{ex.Message}", "error");
+                NavigateBack();
+            }
+        }
+    }
+
+    private void NavigateBack()
+    {
+        if (!string.IsNullOrWhiteSpace(ReturnUrl))
+        {
+            try
+            {
+                NavigationManager.NavigateTo(SdkToolHelper.Base64DecodeUrl(ReturnUrl));
+            }
+            catch
+            {
+                NavigationManager.NavigateTo("/");
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

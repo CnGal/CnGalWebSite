@@ -1,0 +1,56 @@
+@* Steam 用户信息卡片（纯静态 SSR） *@
+
+@if (SteamUsers.Count > 0)
+{
+    <div class="space-steam-info-card">
+        <div class="space-steam-info-card__accounts">
+            @foreach (var user in SteamUsers)
+            {
+                <a href="@($"https://steamcommunity.com/profiles/{user.SteamId}")"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="space-steam-info-card__account">
+                    @if (!string.IsNullOrWhiteSpace(user.Image))
+                    {
+                        <img src="@user.Image" alt="@user.Name" class="space-steam-info-card__avatar" loading="lazy" />
+                    }
+                    <span class="space-steam-info-card__name">@user.Name</span>
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true" />
+                </a>
+            }
+        </div>
+
+        @if (GameRecords is not null)
+        {
+            var steamCount = GameRecords.Records.Count(r => r.IsInSteam);
+            var totalHours = GameRecords.Records.Sum(r => r.PlayDuration) / 60.0;
+            var totalCount = GameRecords.Records.Count;
+
+            <div class="space-steam-info-card__stats">
+                <div class="space-steam-info-card__stat">
+                    <CgMdiIcon Name="mdiCounter" aria-hidden="true" />
+                    <span class="space-steam-info-card__stat-value">@totalCount</span>
+                    <span class="space-steam-info-card__stat-label">总记录</span>
+                </div>
+                <div class="space-steam-info-card__stat">
+                    <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                    <span class="space-steam-info-card__stat-value">@steamCount</span>
+                    <span class="space-steam-info-card__stat-label">Steam</span>
+                </div>
+                <div class="space-steam-info-card__stat">
+                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                    <span class="space-steam-info-card__stat-value">@totalHours.ToString("0.0")</span>
+                    <span class="space-steam-info-card__stat-label">小时</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<SteamUserInfoItem> SteamUsers { get; set; } = [];
+
+    [Parameter]
+    public UserGameRecordsViewModel? GameRecords { get; set; }
+}

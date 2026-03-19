@@ -1,0 +1,213 @@
+@using CnGalWebSite.SDK.MainSite.Models.SpaceEdit
+@using CnGalWebSite.SDK.MainSite.Infrastructure
+
+@inject ISpaceCommandService SpaceCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager NavigationManager
+
+<CgModal IsOpen="Visible"
+         OnClose="CloseModal"
+         Title="绑定 Steam 账号">
+    <ChildContent>
+        <div class="space-steam-edit">
+            <div class="space-steam-edit__header">
+                <p>绑定后可以同步 Steam 库中的游戏和游玩时间。</p>
+            </div>
+
+            <div class="space-steam-edit__actions">
+                <CgButton Variant="primary" OnClick="NavigateToSteamOAuth">
+                    <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                    <span>添加 Steam 账号</span>
+                </CgButton>
+            </div>
+
+            @if (_isLoading)
+            {
+                <div class="space-steam-edit__loading">
+                    <CgProgressRing />
+                    <span>加载中...</span>
+                </div>
+            }
+            else if (_model != null)
+            {
+                <div class="space-steam-edit__table-container">
+                    <CgTable>
+                        <table class="cg-table">
+                            <thead>
+                                <tr>
+                                    <th>Steam ID</th>
+                                    <th style="width: 80px; text-align: center;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (_model.UserData.SteamIds.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="2" class="space-steam-edit__empty">暂无绑定的 Steam 账号</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var steamId in _model.UserData.SteamIds)
+                                    {
+                                        <tr>
+                                            <td>@steamId</td>
+                                            <td style="text-align: center;">
+                                                <CgButton Variant="outline" OnClick="() => RemoveSteamId(steamId)" Title="删除">
+                                                    <CgMdiIcon Name="mdiTrashCanOutline" aria-hidden="true" />
+                                                </CgButton>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </CgTable>
+                </div>
+
+                <CgAlert Variant="info">
+                    Steam 个人资料隐私设置<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>，<a href="/articles/index/5" target="_blank" class="cg-link">点击阅读教程</a>
+                </CgAlert>
+            }
+            else
+            {
+                <div class="space-steam-edit__error">
+                    加载个人数据失败，请重试
+                </div>
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="space-steam-edit__footer">
+            <CgButton Variant="outline" OnClick="CloseModal">取消</CgButton>
+            <CgButton Variant="primary" Disabled="_isSubmitting" OnClick="SubmitAsync">
+                @if (_isSubmitting)
+                {
+                    <CgProgressRing />
+                }
+                else
+                {
+                    <CgMdiIcon Name="mdiContentSaveOutline" aria-hidden="true" />
+                }
+                <span>保存</span>
+            </CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    private bool _isLoading;
+    private bool _isSubmitting;
+    private SpaceEditViewModel? _model;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Visible && !_isLoading && _model == null)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await SpaceCommandService.GetSpaceEditAsync();
+            if (result.Success && result.Data != null)
+            {
+                _model = result.Data;
+            }
+            else
+            {
+                ToastService.Show("加载失败", result.Error?.Message ?? "无法获取个人数据", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateToSteamOAuth()
+    {
+        var returnUrl = $"{NavigationManager.BaseUri}bind-steam/{SdkToolHelper.Base64EncodeUrl(NavigationManager.Uri)}/";
+        var qs = "openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select" +
+                 "&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select" +
+                 "&openid.mode=checkid_setup" +
+                 "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0" +
+                 $"&openid.realm={Uri.EscapeDataString(NavigationManager.BaseUri)}" +
+                 $"&openid.return_to={Uri.EscapeDataString(returnUrl)}" +
+                 "&openid.ns.ax=http%3A%2F%2Fopenid.net%2Fsrv%2Fax%2F1.0" +
+                 "&openid.ax.mode=fetch_request" +
+                 "&openid.ax.type.email=http%3A%2F%2Faxschema.org%2Fcontact%2Femail" +
+                 "&openid.ax.type.name=http%3A%2F%2Faxschema.org%2FnamePerson" +
+                 "&openid.ax.type.first=http%3A%2F%2Faxschema.org%2FnamePerson%2Ffirst" +
+                 "&openid.ax.type.last=http%3A%2F%2Faxschema.org%2FnamePerson%2Flast" +
+                 "&openid.ax.required=email,name,first,last";
+        
+        NavigationManager.NavigateTo($"https://steamcommunity.com/openid/login?{qs}");
+    }
+
+    private void RemoveSteamId(string steamId)
+    {
+        if (_model != null && _model.UserData.SteamIds.Contains(steamId))
+        {
+            _model.UserData.SteamIds.Remove(steamId);
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (_model == null || _isSubmitting) return;
+
+        _isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await SpaceCommandService.SubmitEditAsync(_model);
+            if (result.Success)
+            {
+                ToastService.Show("保存成功", "Steam 账号信息已更新", "success");
+                await CloseModal();
+                await OnSaved.InvokeAsync();
+            }
+            else
+            {
+                ToastService.Show("保存失败", result.Error?.Message ?? "无法保存 Steam 账户信息", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+}
