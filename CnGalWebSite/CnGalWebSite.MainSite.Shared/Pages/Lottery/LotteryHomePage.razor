@@ -1,0 +1,79 @@
+@page "/lotteries/home"
+@page "/lotteries"
+@inject ILotteryQueryService LotteryQueryService
+@using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Home
+
+<PageTitle>抽奖板块 - CnGal</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <section class="lottery-home-error" aria-label="加载失败">
+        <div class="lottery-home-error-icon">
+            <CgMdiIcon Name="mdiAlertCircleOutline" />
+        </div>
+        <h1>抽奖列表加载失败</h1>
+        <p>@_errorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (_cards is not null)
+{
+    <article class="lottery-home">
+        <header class="lottery-home-header">
+            <div class="lottery-home-header-text">
+                <h1 class="lottery-home-title">
+                    <CgMdiIcon Name="mdiGiftOutline" />
+                    抽奖板块
+                </h1>
+                <p class="lottery-home-subtitle">快来参加抽奖吧</p>
+            </div>
+        </header>
+
+        @if (_cards.Count == 0)
+        {
+            <section class="lottery-home-empty" aria-label="暂无抽奖">
+                <div class="lottery-home-empty-icon">
+                    <CgMdiIcon Name="mdiGiftOpenOutline" />
+                </div>
+                <p>暂时没有进行中的抽奖活动</p>
+                <a href="/">返回首页</a>
+            </section>
+        }
+        else
+        {
+            <ul class="lottery-home-grid">
+                @foreach (var item in _cards)
+                {
+                    <LotteryCardItem Model="item" />
+                }
+            </ul>
+        }
+    </article>
+}
+else
+{
+    <section class="lottery-home-loading" aria-label="加载中">
+        <div class="lottery-home-loading-block lottery-home-loading-block--wide"></div>
+        <div class="lottery-home-loading-block"></div>
+        <div class="lottery-home-loading-block"></div>
+    </section>
+}
+
+@code {
+    private IReadOnlyList<LotteryCardItemModel>? _cards;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await LotteryQueryService.GetLotteryCardsAsync();
+        if (result.Success && result.Data is not null)
+        {
+            _errorMessage = null;
+            _cards = result.Data;
+            return;
+        }
+
+        _cards = null;
+        _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+}

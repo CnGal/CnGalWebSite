@@ -131,7 +131,7 @@
 1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`、`LotteryQueryService`。
 2. **交互动作接口（Commands）**
    - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
@@ -245,6 +245,8 @@ CnGalWebSite.SDK.MainSite
 - [ ] 删除已不使用的第三方组件库包与静态资源。
 - [ ] 统一 UI 一致性检查（间距、字号、颜色、交互反馈）。
 - [ ] 补充更多页面（搜索列表等）。
+- [x] 抽奖主页（`LotteryHomePage`）— 纯静态 SSR。
+- [x] 抽奖详情页（`LotteryDetailPage`）— 纯静态 SSR。
 - [ ] 完成 E2E 冒烟与关键路径压测。
 
 ---
@@ -310,7 +312,10 @@ CnGalWebSite.MainSite.Shared
 │  │  │  ├─ Detail/           # 标签详情（4 个组件）
 │  │  │  └─ Editor/           # 标签编辑（4 个组件）
 │  │  ├─ Home/                # 首页（14 个组件）
-│  │  └─ Space/               # 个人空间（4 个组件）
+│  │  ├─ Space/               # 个人空间（4 个组件）
+│  │  └─ Lottery/             # 抽奖
+│  │     ├─ Detail/           # 抽奖详情（4 个组件）
+│  │     └─ Home/             # 抽奖主页（1 个组件）
 │  └─ Layout/
 │     └─ UserMenu.razor / .razor.css
 ├─ Layout/

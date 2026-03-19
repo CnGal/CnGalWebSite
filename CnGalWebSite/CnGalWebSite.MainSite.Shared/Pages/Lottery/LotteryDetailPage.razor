@@ -1,0 +1,134 @@
+@page "/lotteries/index/{Id:long}"
+@inject ILotteryQueryService LotteryQueryService
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+<PageTitle>@(_model is null ? "抽奖详情" : $"{GetDisplayTitle()} - 抽奖详情")</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <section class="lottery-not-found">
+        <h1>抽奖加载失败</h1>
+        <p>@_errorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (_model is not null)
+{
+    <article class="lottery-page">
+        <LotteryHero DisplayName="@GetDisplayTitle()"
+                     BriefIntroduction="@_model.BriefIntroduction"
+                     MainPicture="@_model.MainPicture"
+                     IsEnd="@_model.IsEnd"
+                     BeginTime="@_model.BeginTime"
+                     EndTime="@_model.EndTime"
+                     Count="@_model.Count"
+                     ReaderCount="@_model.ReaderCount" />
+
+        @if (_model.IsHidden)
+        {
+            <CgAlert Variant="warning" Class="lottery-hidden-alert">
+                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CgAlert>
+        }
+
+        <section class="lottery-layout lottery-layout--desktop" aria-label="桌面详情布局">
+            <main class="lottery-main-col">
+                @if (!string.IsNullOrWhiteSpace(_model.MainPage))
+                {
+                    <EntryCard Title="活动详情" Icon="mdiTextBoxOutline">
+                        <CgHtmlContent Content="@_model.MainPage" />
+                    </EntryCard>
+                }
+
+                <LotteryAwardList Awards="_model.Awards" />
+
+                <LotteryWinnerList Awards="_model.Awards" />
+
+                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="lottery-card--comment" Show="_model.CanComment"
+                           Description="可前往评论区参与讨论，分享你的看法。">
+                    <a class="lottery-action-btn" href="@($"/space/comments?type=lottery&id={_model.Id}")">前往评论区</a>
+                </EntryCard>
+            </main>
+
+            <aside class="lottery-side-col">
+                <LotteryInfoCard BeginTime="@_model.BeginTime"
+                                 EndTime="@_model.EndTime"
+                                 LotteryTime="@_model.LotteryTime"
+                                 Type="@_model.Type"
+                                 ConditionType="@_model.ConditionType"
+                                 Count="@_model.Count"
+                                 ReaderCount="@_model.ReaderCount"
+                                 CommentCount="@_model.CommentCount" />
+            </aside>
+        </section>
+
+        <section class="lottery-layout lottery-layout--mobile" aria-label="移动端详情布局">
+            <LotteryInfoCard BeginTime="@_model.BeginTime"
+                             EndTime="@_model.EndTime"
+                             LotteryTime="@_model.LotteryTime"
+                             Type="@_model.Type"
+                             ConditionType="@_model.ConditionType"
+                             Count="@_model.Count"
+                             ReaderCount="@_model.ReaderCount"
+                             CommentCount="@_model.CommentCount" />
+
+            @if (!string.IsNullOrWhiteSpace(_model.MainPage))
+            {
+                <EntryCard Title="活动详情" Icon="mdiTextBoxOutline">
+                    <CgHtmlContent Content="@_model.MainPage" />
+                </EntryCard>
+            }
+
+            <LotteryAwardList Awards="_model.Awards" />
+
+            <LotteryWinnerList Awards="_model.Awards" />
+
+            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="lottery-card--comment" Show="_model.CanComment"
+                       Description="可前往评论区参与讨论，分享你的看法。">
+                <a class="lottery-action-btn" href="@($"/space/comments?type=lottery&id={_model.Id}")">前往评论区</a>
+            </EntryCard>
+        </section>
+    </article>
+}
+else
+{
+    <section class="lottery-loading" aria-label="加载中">
+        <div class="lottery-loading-block lottery-loading-block--wide"></div>
+        <div class="lottery-loading-block"></div>
+        <div class="lottery-loading-block"></div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private LotteryDetailViewModel? _model;
+    private string? _errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await LotteryQueryService.GetLotteryDetailAsync(Id);
+        if (result.Success && result.Data is not null)
+        {
+            _errorMessage = null;
+            _model = result.Data;
+            return;
+        }
+
+        _model = null;
+        _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private string GetDisplayTitle()
+    {
+        if (_model is null)
+        {
+            return string.Empty;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName;
+    }
+}

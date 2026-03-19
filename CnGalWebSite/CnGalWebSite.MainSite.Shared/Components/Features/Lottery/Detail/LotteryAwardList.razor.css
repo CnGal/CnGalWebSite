@@ -1,0 +1,129 @@
+.lottery-award-list {
+    border-radius: var(--cg-radius-xl);
+    background: var(--cg-color-surface);
+    padding: 1.25rem;
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.lottery-award-list-title {
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+::deep .lottery-award-list-title .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-primary);
+}
+
+.lottery-award-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.lottery-award-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    transition: var(--cg-transition-fast);
+}
+
+.lottery-award-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 20%, var(--cg-color-border));
+}
+
+.lottery-award-image-wrapper {
+    width: 100%;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 240px;
+}
+
+.lottery-award-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    max-height: 240px;
+}
+
+.lottery-award-body {
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.lottery-award-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lottery-award-name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.lottery-award-type-badge {
+    font-size: var(--cg-font-size-xs);
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.lottery-award-meta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.lottery-award-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-link);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.lottery-award-link:hover {
+    text-decoration: underline;
+}
+
+::deep .lottery-award-link .cg-mdi-icon {
+    width: 12px;
+    height: 12px;
+}
+
+@media (min-width: 640px) {
+    .lottery-award-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .lottery-award-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

@@ -1,0 +1,129 @@
+.lottery-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.lottery-layout {
+    position: relative;
+    z-index: 1;
+}
+
+.lottery-layout--desktop {
+    display: none;
+}
+
+.lottery-main-col,
+.lottery-side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.lottery-layout--mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.lottery-not-found {
+    max-width: 600px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.lottery-not-found h1 {
+    font-size: var(--cg-font-size-xl);
+    color: var(--cg-color-text);
+    margin-bottom: 0.5rem;
+}
+
+.lottery-not-found p {
+    color: var(--cg-color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.lottery-not-found a {
+    color: var(--cg-color-link);
+}
+
+.lottery-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 920px;
+    margin: 2rem auto;
+}
+
+.lottery-loading-block {
+    border-radius: var(--cg-radius-lg);
+    height: 140px;
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: lottery-loading 1.2s infinite;
+}
+
+.lottery-loading-block--wide {
+    height: 220px;
+}
+
+@keyframes lottery-loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+.lottery-action-btn {
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-primary);
+    color: white;
+    background: var(--cg-color-primary);
+    text-decoration: none;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--cg-transition-fast);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.lottery-action-btn:hover {
+    background: var(--cg-color-primary-hover);
+    border-color: var(--cg-color-primary-hover);
+}
+
+@media (min-width: 768px) {
+    .lottery-page {
+        padding: 2rem 1.5rem 4rem;
+        gap: 2rem;
+    }
+
+    .lottery-layout--mobile {
+        display: none;
+    }
+
+    .lottery-layout--desktop {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .lottery-layout--desktop {
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+        gap: 2rem;
+        align-items: start;
+    }
+}

@@ -1,0 +1,74 @@
+@if (!string.IsNullOrWhiteSpace(MainPicture))
+{
+    <section class="lottery-hero">
+        <div class="lottery-hero-image-wrapper">
+            <img src="@MainPicture" alt="@DisplayName" class="lottery-hero-image" loading="eager" />
+        </div>
+        <div class="lottery-hero-content">
+            <div class="lottery-hero-status">
+                <span class="lottery-status-badge lottery-status-badge--@StatusCssClass">
+                    <CgMdiIcon Name="@StatusIcon" />
+                    @StatusText
+                </span>
+            </div>
+            <h1 class="lottery-hero-title">@DisplayName</h1>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p class="lottery-hero-intro">@BriefIntroduction</p>
+            }
+            <div class="lottery-hero-stats">
+                <span class="lottery-hero-stat">
+                    <CgMdiIcon Name="mdiAccountGroupOutline" />
+                    @Count 人参与
+                </span>
+                <span class="lottery-hero-stat">
+                    <CgMdiIcon Name="mdiEyeOutline" />
+                    @ReaderCount 次浏览
+                </span>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <section class="lottery-hero lottery-hero--no-image">
+        <div class="lottery-hero-content">
+            <div class="lottery-hero-status">
+                <span class="lottery-status-badge lottery-status-badge--@StatusCssClass">
+                    <CgMdiIcon Name="@StatusIcon" />
+                    @StatusText
+                </span>
+            </div>
+            <h1 class="lottery-hero-title">@DisplayName</h1>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p class="lottery-hero-intro">@BriefIntroduction</p>
+            }
+            <div class="lottery-hero-stats">
+                <span class="lottery-hero-stat">
+                    <CgMdiIcon Name="mdiAccountGroupOutline" />
+                    @Count 人参与
+                </span>
+                <span class="lottery-hero-stat">
+                    <CgMdiIcon Name="mdiEyeOutline" />
+                    @ReaderCount 次浏览
+                </span>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string DisplayName { get; set; } = "";
+    [Parameter] public string BriefIntroduction { get; set; } = "";
+    [Parameter] public string MainPicture { get; set; } = "";
+    [Parameter] public bool IsEnd { get; set; }
+    [Parameter] public DateTime BeginTime { get; set; }
+    [Parameter] public DateTime EndTime { get; set; }
+    [Parameter] public long Count { get; set; }
+    [Parameter] public int ReaderCount { get; set; }
+
+    private string StatusText => IsEnd ? "已结束" : (DateTime.Now < BeginTime ? "未开始" : (DateTime.Now > EndTime ? "已截止" : "进行中"));
+    private string StatusCssClass => IsEnd ? "ended" : (DateTime.Now < BeginTime ? "upcoming" : (DateTime.Now > EndTime ? "ended" : "active"));
+    private string StatusIcon => IsEnd ? "mdiCheckCircleOutline" : (DateTime.Now < BeginTime ? "mdiClockOutline" : (DateTime.Now > EndTime ? "mdiClockAlertOutline" : "mdiPlayCircleOutline"));
+}
