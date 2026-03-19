@@ -1,0 +1,40 @@
+@using CnGalWebSite.SDK.MainSite.Models
+
+<section class="space-game-record-list" aria-label="游玩记录">
+    <header class="space-game-record-list__header">
+        <CgMdiIcon Name="mdiControllerClassicOutline" />
+        <h2>游玩记录</h2>
+        <span class="space-game-record-list__count">@VisibleRecords.Count 款游戏</span>
+    </header>
+
+    @if (VisibleRecords.Count > 0)
+    {
+        <ul class="space-game-record-list__grid">
+            @foreach (var record in VisibleRecords)
+            {
+                <li>
+                    <SpaceGameRecordItem Model="record" />
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="space-game-record-list__empty">
+            <CgMdiIcon Name="mdiGamepadVariantOutline" />
+            <p>暂无游玩记录</p>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public required UserGameRecordsViewModel Model { get; set; }
+
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
+        .Where(r => !r.IsHidden && (r.ShowPublicly || IsCurrentUser))
+        .ToList();
+}

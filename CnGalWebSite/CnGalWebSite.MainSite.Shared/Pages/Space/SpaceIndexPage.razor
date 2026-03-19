@@ -10,6 +10,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 @inject ISpaceQueryService SpaceQueryService
+@inject IPlayedGameQueryService PlayedGameQueryService
 @inject NavigationManager NavigationManager
 
 @if (_isNotFound)
@@ -54,6 +55,11 @@ else if (_model != null)
             <div class="cg-space-layout-main">
                 <SpaceDataOverviewCard Model="_model" />
                 <SpaceMainPage Model="_model" />
+
+                @if (_gameRecords is not null)
+                {
+                    <SpaceGameRecordList Model="_gameRecords" IsCurrentUser="_model.IsCurrentUser" />
+                }
             </div>
         </div>
     </div>
@@ -77,6 +83,7 @@ else
     public string? Id { get; set; }
 
     private SpaceDetailViewModel? _model;
+    private UserGameRecordsViewModel? _gameRecords;
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
@@ -99,13 +106,20 @@ else
         _isNotFound = false;
         _isError = false;
         _model = null;
+        _gameRecords = null;
 
         var targetId = Id ?? string.Empty;
-        var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
+        var spaceTask = SpaceQueryService.GetSpaceDetailAsync(targetId);
+
+        var result = await spaceTask;
 
         if (result.Success && result.Data != null)
         {
             _model = result.Data;
+
+            // 并行加载游玩记录
+            var recordsResult = await PlayedGameQueryService.GetUserGameRecordsAsync(_model.Id);
+            _gameRecords = recordsResult.Success ? recordsResult.Data : null;
         }
         else if (result.Error?.StatusCode == 404)
         {

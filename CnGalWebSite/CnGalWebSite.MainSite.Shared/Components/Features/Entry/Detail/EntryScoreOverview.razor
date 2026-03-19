@@ -1,0 +1,108 @@
+@using CnGalWebSite.SDK.MainSite.Models
+
+<section class="entry-score-overview" aria-label="评分概览">
+    <header class="entry-score-header">
+        <CgMdiIcon Name="mdiStarBoxMultipleOutline" />
+        <h2>评分概览</h2>
+        <span class="entry-score-count">@Model.ScoredCount 人评分</span>
+    </header>
+
+    @if (Model.TotalScores.IsScored)
+    {
+        <div class="entry-score-summary">
+            <div class="entry-score-total">
+                <span class="entry-score-total__number">@Model.TotalScores.TotalScore.ToString("0.0")</span>
+                <span class="entry-score-total__label">综合评分</span>
+            </div>
+            <div class="entry-score-dimensions">
+                <div class="entry-score-dim">
+                    <span class="entry-score-dim__label">音乐</span>
+                    <div class="entry-score-dim__bar">
+                        <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.MusicScore / 10.0 * 100).ToString("0"))%"></div>
+                    </div>
+                    <span class="entry-score-dim__value">@Model.TotalScores.MusicScore.ToString("0.0")</span>
+                </div>
+                <div class="entry-score-dim">
+                    <span class="entry-score-dim__label">美术</span>
+                    <div class="entry-score-dim__bar">
+                        <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.PaintScore / 10.0 * 100).ToString("0"))%"></div>
+                    </div>
+                    <span class="entry-score-dim__value">@Model.TotalScores.PaintScore.ToString("0.0")</span>
+                </div>
+                <div class="entry-score-dim">
+                    <span class="entry-score-dim__label">剧本</span>
+                    <div class="entry-score-dim__bar">
+                        <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.ScriptScore / 10.0 * 100).ToString("0"))%"></div>
+                    </div>
+                    <span class="entry-score-dim__value">@Model.TotalScores.ScriptScore.ToString("0.0")</span>
+                </div>
+                <div class="entry-score-dim">
+                    <span class="entry-score-dim__label">演出</span>
+                    <div class="entry-score-dim__bar">
+                        <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.ShowScore / 10.0 * 100).ToString("0"))%"></div>
+                    </div>
+                    <span class="entry-score-dim__value">@Model.TotalScores.ShowScore.ToString("0.0")</span>
+                </div>
+                <div class="entry-score-dim">
+                    <span class="entry-score-dim__label">程序</span>
+                    <div class="entry-score-dim__bar">
+                        <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.SystemScore / 10.0 * 100).ToString("0"))%"></div>
+                    </div>
+                    <span class="entry-score-dim__value">@Model.TotalScores.SystemScore.ToString("0.0")</span>
+                </div>
+                @if (Model.IsDubbing)
+                {
+                    <div class="entry-score-dim">
+                        <span class="entry-score-dim__label">配音</span>
+                        <div class="entry-score-dim__bar">
+                            <div class="entry-score-dim__fill" style="width: @((Model.TotalScores.CVScore / 10.0 * 100).ToString("0"))%"></div>
+                        </div>
+                        <span class="entry-score-dim__value">@Model.TotalScores.CVScore.ToString("0.0")</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* SEO schema.org 结构化数据 *@
+        <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating" style="display:none">
+            <meta itemprop="ratingValue" content="@Model.TotalScores.TotalScore" />
+            <meta itemprop="worstRating" content="1">
+            <meta itemprop="bestRating" content="10" />
+            <meta itemprop="ratingCount" content="@Model.ScoredCount" />
+        </div>
+    }
+    else
+    {
+        <div class="entry-score-empty">
+            <CgMdiIcon Name="mdiStarOutline" />
+            <p>暂无评分，快来成为第一个评分的人吧！</p>
+        </div>
+    }
+
+    @if (ScoredUsers.Count > 0)
+    {
+        <div class="entry-score-users">
+            <h3 class="entry-score-users__title">用户评价</h3>
+            <ul class="entry-score-users__list">
+                @foreach (var user in ScoredUsers.Take(MaxUserScores))
+                {
+                    <li>
+                        <EntryUserScoreCard Model="user" IsDubbing="Model.IsDubbing" />
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public required PlayedGameOverviewViewModel Model { get; set; }
+
+    [Parameter]
+    public int MaxUserScores { get; set; } = 12;
+
+    private IReadOnlyList<UserScoreItem> ScoredUsers => Model.UserScores
+        .Where(s => s.IsScored || !string.IsNullOrWhiteSpace(s.PlayImpressions))
+        .ToList();
+}

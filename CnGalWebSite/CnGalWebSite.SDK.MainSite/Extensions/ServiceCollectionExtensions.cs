@@ -135,6 +135,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IVideoQueryService, VideoQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ILotteryQueryService, LotteryQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IPlayedGameQueryService, PlayedGameQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);

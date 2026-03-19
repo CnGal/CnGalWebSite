@@ -50,4 +50,6 @@ public sealed class SpaceDetailViewModel
     public required EntryInforTipViewModel? UserCertification { get; init; }
 
     public required bool IsCurrentUser { get; init; }
+
+    public required string SteamId { get; init; }
 }

@@ -1,0 +1,116 @@
+.entry-user-score-card {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.entry-user-score-card:hover {
+    box-shadow: var(--cg-shadow-card-hover);
+}
+
+/* Header */
+.entry-user-score-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.entry-user-score-card__user {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    text-decoration: none;
+    color: inherit;
+}
+
+.entry-user-score-card__user:hover .entry-user-score-card__name {
+    color: var(--cg-color-primary);
+}
+
+.entry-user-score-card__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--cg-radius-full);
+    object-fit: cover;
+    border: 1px solid var(--cg-color-border);
+}
+
+.entry-user-score-card__name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text);
+    transition: color var(--cg-transition-fast);
+}
+
+.entry-user-score-card__time {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+/* Total score with stars */
+.entry-user-score-card__total {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.entry-user-score-card__stars {
+    display: flex;
+    gap: 1px;
+}
+
+.entry-user-score-card__star {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--cg-color-border);
+}
+
+.entry-user-score-card__star--filled {
+    background: var(--cg-color-primary);
+}
+
+.entry-user-score-card__total-num {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-primary);
+}
+
+/* Score dimensions */
+.entry-user-score-card__dims {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+}
+
+.entry-user-score-card__dims span {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    background: var(--cg-color-bg);
+    padding: 2px var(--cg-spacing-2);
+    border-radius: var(--cg-radius-sm);
+}
+
+/* Impressions */
+.entry-user-score-card__impressions {
+    border-top: 1px solid var(--cg-color-border);
+    padding-top: var(--cg-spacing-3);
+}
+
+.entry-user-score-card__impressions p {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: pre-wrap;
+}

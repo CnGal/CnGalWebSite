@@ -1,0 +1,59 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.DataModel.Model
+
+<div class="space-game-record-tag">
+    @if (Model.IsInSteam)
+    {
+        <span class="space-game-record-tag__chip space-game-record-tag__chip--steam">
+            <CgMdiIcon Name="mdiSteam" />
+            @((Model.PlayDuration / 60.0).ToString("0.0")) 小时
+        </span>
+    }
+
+    @if (Model.IsScored)
+    {
+        <span class="space-game-record-tag__chip space-game-record-tag__chip--score">
+            <CgMdiIcon Name="mdiStarOutline" />
+            @Model.TotalScore 分
+        </span>
+    }
+
+    @switch (Model.Type)
+    {
+        case PlayedGameType.WantToPlay:
+            <span class="space-game-record-tag__chip">
+                <CgMdiIcon Name="mdiHeartOutline" />
+                想玩
+            </span>
+            break;
+        case PlayedGameType.Playing:
+            <span class="space-game-record-tag__chip space-game-record-tag__chip--active">
+                <CgMdiIcon Name="mdiControllerClassicOutline" />
+                正在玩
+            </span>
+            break;
+        case PlayedGameType.Played:
+            <span class="space-game-record-tag__chip space-game-record-tag__chip--done">
+                <CgMdiIcon Name="mdiCheckCircleOutline" />
+                已玩
+            </span>
+            break;
+        case PlayedGameType.Uninterested:
+            <span class="space-game-record-tag__chip space-game-record-tag__chip--muted">
+                <CgMdiIcon Name="mdiCloseCircleOutline" />
+                不感兴趣
+            </span>
+            break;
+        case PlayedGameType.UnPlayed:
+            <span class="space-game-record-tag__chip space-game-record-tag__chip--muted">
+                <CgMdiIcon Name="mdiMinusCircleOutline" />
+                未玩
+            </span>
+            break;
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required GameRecordItem Model { get; set; }
+}
