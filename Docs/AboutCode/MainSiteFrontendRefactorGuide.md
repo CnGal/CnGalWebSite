@@ -54,8 +54,11 @@
 2. **交互页（按页启用）**
    - 仅当页面存在明显交互需求时启用交互式组件。
    - 当前已实现的交互页：`EntryEditPage`、`ArticleEditPage`、`VideoEditPage`、`TagEditPage`（`@rendermode InteractiveServer`）。
+3. **静态页中的登录交互控件（允许）**
+   - 静态页中仅在用户登录后才可见的局部控件（如点赞、收藏、评论等操作入口），允许将该控件单独声明为 `@rendermode InteractiveServer`，无需将整个页面升级为交互页。
+   - 此类控件必须被 `AuthorizeView` 或等效授权机制包裹，确保未登录用户仍获得纯静态体验，不产生额外交互开销。
 
-> 约束：默认新页面必须是静态页；如需交互，必须在 PR 说明中写明原因。
+> 约束：默认新页面必须是静态页；如需整页交互，必须在 PR 说明中写明原因。静态页中的登录交互控件无需整页交互声明，但需确保控件被授权机制包裹。
 
 ### 3.2 Blazor 渲染模式配置
 
@@ -131,7 +134,7 @@
 1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`、`LotteryQueryService`。
 2. **交互动作接口（Commands）**
    - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
@@ -245,6 +248,8 @@ CnGalWebSite.SDK.MainSite
 - [ ] 删除已不使用的第三方组件库包与静态资源。
 - [ ] 统一 UI 一致性检查（间距、字号、颜色、交互反馈）。
 - [ ] 补充更多页面（搜索列表等）。
+- [x] 抽奖主页（`LotteryHomePage`）— 纯静态 SSR。
+- [x] 抽奖详情页（`LotteryDetailPage`）— 纯静态 SSR。
 - [ ] 完成 E2E 冒烟与关键路径压测。
 
 ---
@@ -310,7 +315,10 @@ CnGalWebSite.MainSite.Shared
 │  │  │  ├─ Detail/           # 标签详情（4 个组件）
 │  │  │  └─ Editor/           # 标签编辑（4 个组件）
 │  │  ├─ Home/                # 首页（14 个组件）
-│  │  └─ Space/               # 个人空间（4 个组件）
+│  │  ├─ Space/               # 个人空间（4 个组件）
+│  │  └─ Lottery/             # 抽奖
+│  │     ├─ Detail/           # 抽奖详情（4 个组件）
+│  │     └─ Home/             # 抽奖主页（1 个组件）
 │  └─ Layout/
 │     └─ UserMenu.razor / .razor.css
 ├─ Layout/
@@ -355,6 +363,7 @@ CnGalWebSite.MainSite.Shared
 
 - 禁止在 `MainSite.Shared` 中出现业务 API 直连逻辑。
 - 新增页面若含 `@rendermode`，必须附带"交互必要性"说明。
+- 静态页中仅登录可见的控件允许声明 `@rendermode InteractiveServer`，此类控件必须被 `AuthorizeView` 包裹，无需整页交互声明，但需在 PR 中注明涉及的控件。
 - 静态页禁止引入无必要 JS 互操作。
 - 页面 PR 必须包含"替换了哪些第三方组件调用点"的说明。
 - 组件必须提供基础可访问性（键盘焦点、语义标签、ARIA 基本属性）。

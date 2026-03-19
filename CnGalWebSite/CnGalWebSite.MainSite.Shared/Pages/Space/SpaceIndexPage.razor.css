@@ -62,3 +62,179 @@
     color: var(--cg-color-text-secondary);
     margin-bottom: var(--cg-spacing-4);
 }
+
+/* ── User Certification Section (no card) ── */
+
+.cg-space-cert-section {
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-space-cert-header {
+    display: flex;
+    align-items: center;
+    padding: var(--cg-spacing-2) 0;
+}
+
+.cg-space-cert-header ::deep .cg-space-cert-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+    margin-right: var(--cg-spacing-2);
+}
+
+.cg-space-cert-title {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    margin: 0;
+    color: var(--cg-color-text-primary);
+}
+
+/* ── Edit Button ── */
+
+.cg-space-edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-4);
+    border-radius: var(--cg-radius-lg);
+    background: linear-gradient(135deg, var(--cg-color-primary), var(--cg-color-primary-hover));
+    color: var(--cg-color-on-primary);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: none;
+    transition: all var(--cg-transition-fast);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+    cursor: pointer;
+}
+
+.cg-space-edit-btn:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 6px 16px color-mix(in oklab, var(--cg-color-primary) 35%, transparent);
+    transform: translateY(-1px);
+}
+
+.cg-space-edit-btn ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-on-primary);
+}
+
+/* ── Tabs ── */
+
+.cg-space-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.cg-space-tab-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cg-space-tab-bar {
+    display: flex;
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+    overflow: hidden;
+    position: relative;
+}
+
+.cg-space-tab-label {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-5);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: color var(--cg-transition-fast);
+    user-select: none;
+}
+
+.cg-space-tab-label::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--cg-spacing-5);
+    right: var(--cg-spacing-5);
+    height: 2px;
+    background-color: var(--cg-color-primary);
+    border-radius: 1px 1px 0 0;
+    transform: scaleX(0);
+    transition: transform var(--cg-transition-fast);
+}
+
+.cg-space-tab-label:hover {
+    color: var(--cg-color-text-primary);
+    background-color: var(--cg-color-hover-overlay);
+}
+
+.cg-space-tab-label ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.cg-space-tab-badge {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    background-color: var(--cg-color-border);
+    color: var(--cg-color-text-secondary);
+    padding: 1px 6px;
+    border-radius: var(--cg-radius-full);
+    line-height: 1.4;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+/* ── Tab panels: default hidden ── */
+
+.cg-space-tab-panel {
+    display: none;
+}
+
+.cg-space-tab-card {
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+    padding: var(--cg-spacing-4);
+    overflow: hidden;
+}
+
+/* ── Radio-driven active states ── */
+
+/* Tab 1 (home) checked → activate first label + first panel */
+#space-tab-home:checked ~ .cg-space-tab-bar .cg-space-tab-label:nth-child(1) {
+    color: var(--cg-color-primary);
+}
+
+#space-tab-home:checked ~ .cg-space-tab-bar .cg-space-tab-label:nth-child(1)::after {
+    transform: scaleX(1);
+}
+
+#space-tab-home:checked ~ .cg-space-tab-panel--home {
+    display: block;
+}
+
+/* Tab 2 (records) checked → activate second label + second panel */
+#space-tab-records:checked ~ .cg-space-tab-bar .cg-space-tab-label:nth-child(2) {
+    color: var(--cg-color-primary);
+}
+
+#space-tab-records:checked ~ .cg-space-tab-bar .cg-space-tab-label:nth-child(2)::after {
+    transform: scaleX(1);
+}
+
+#space-tab-records:checked ~ .cg-space-tab-bar .cg-space-tab-label:nth-child(2) .cg-space-tab-badge {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 15%, transparent);
+    color: var(--cg-color-primary);
+}
+
+#space-tab-records:checked ~ .cg-space-tab-panel--records {
+    display: block;
+}

@@ -134,12 +134,15 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IVideoQueryService, VideoQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ILotteryQueryService, LotteryQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IPlayedGameQueryService, PlayedGameQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITagCommandService, TagCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IVideoCommandService, VideoCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ISpaceCommandService, SpaceCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
 
         return services;

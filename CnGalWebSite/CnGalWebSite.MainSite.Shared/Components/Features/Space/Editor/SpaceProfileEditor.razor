@@ -1,0 +1,69 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Space
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="space-editor-section" id="section-profile">
+    <h2><CgMdiIcon Name="mdiAccountOutline" Class="space-section-icon" aria-hidden="true"/>个人资料</h2>
+    <p>编辑头像、用户名、个性签名与基本信息。</p>
+
+    @if (Model != null)
+    {
+        <CgGrid MinWidth="150px">
+            <CgFormGroup Label="头像">
+                <CgImageUpload @bind-Value="Model.PhotoName"
+                               Text="上传头像"
+                               ShowCropper
+                               Type="ImageAspectType._1_1"/>
+            </CgFormGroup>
+            <CgFormGroup Label="背景图">
+                <CgImageUpload @bind-Value="Model.BackgroundName"
+                               Text="上传背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="大屏背景">
+                <CgImageUpload @bind-Value="Model.SBgImageName"
+                               Text="上传大屏背景"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="小屏背景">
+                <CgImageUpload @bind-Value="Model.MBgImageName"
+                               Text="上传小屏背景"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgGrid>
+            <CgFormGroup Label="用户名">
+                <CgInput @bind-Value="Model.UserName" Placeholder="请输入用户名"/>
+            </CgFormGroup>
+            <CgFormGroup Label="个性签名">
+                <CgInput @bind-Value="Model.PersonalSignature" Placeholder="一句话介绍自己"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgGrid>
+            <CgFormGroup Label="生日">
+                <CgDateInput @bind-Value="Model.Birthday" Mode="CgDateInputMode.MonthDay"/>
+            </CgFormGroup>
+            <CgFormGroup Label="邮箱">
+                <CgInput Value="@Model.Email" Disabled="true"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        @if (Model.Ranks != null && Model.Ranks.Count > 0)
+        {
+            <CgFormGroup Label="展示头衔">
+                <div class="space-rank-list">
+                    @foreach (var rank in Model.Ranks)
+                    {
+                        <CgCheckbox @bind-Value="rank.IsShow" Label="@rank.Name"/>
+                    }
+                </div>
+            </CgFormGroup>
+        }
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = default!;
+}

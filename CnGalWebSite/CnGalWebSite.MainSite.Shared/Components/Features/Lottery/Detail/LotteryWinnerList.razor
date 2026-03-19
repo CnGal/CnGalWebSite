@@ -1,0 +1,41 @@
+@if (HasWinners)
+{
+    <section class="lottery-winner-list">
+        <h2 class="lottery-winner-list-title">
+            <CgMdiIcon Name="mdiTrophyOutline" />
+            中奖名单
+        </h2>
+        <div class="lottery-winner-groups">
+            @foreach (var award in Awards.Where(a => a.Winners.Count > 0))
+            {
+                <div class="lottery-winner-group">
+                    <h3 class="lottery-winner-group-title">@award.Name</h3>
+                    <ul class="lottery-winner-user-list">
+                        @foreach (var winner in award.Winners)
+                        {
+                            <li class="lottery-winner-user">
+                                @if (!string.IsNullOrWhiteSpace(winner.PhotoPath))
+                                {
+                                    <img src="@winner.PhotoPath" alt="@winner.Name" class="lottery-winner-avatar" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="lottery-winner-avatar lottery-winner-avatar--placeholder">
+                                        <CgMdiIcon Name="mdiAccountOutline" />
+                                    </span>
+                                }
+                                <span class="lottery-winner-name">@winner.Name</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<LotteryAwardDetailModel> Awards { get; set; } = [];
+
+    private bool HasWinners => Awards.Any(a => a.Winners.Count > 0);
+}

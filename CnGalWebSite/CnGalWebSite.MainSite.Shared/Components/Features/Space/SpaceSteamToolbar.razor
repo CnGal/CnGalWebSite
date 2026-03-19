@@ -1,0 +1,86 @@
+@rendermode InteractiveServer
+
+@inject ISpaceCommandService SpaceCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager NavigationManager
+
+<div class="space-steam-toolbar">
+    @if (string.IsNullOrWhiteSpace(SteamId))
+    {
+        <button type="button" class="space-steam-toolbar__btn space-steam-toolbar__btn--bind" @onclick="OpenEditModal">
+            <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+            <span>绑定 Steam 账号</span>
+        </button>
+    }
+    else
+    {
+        <CgButton Variant="secondary"
+                  Disabled="_isRefreshing"
+                  OnClick="HandleRefreshAsync">
+            @if (_isRefreshing)
+            {
+                <CgProgressRing />
+            }
+            else
+            {
+                <CgMdiIcon Name="mdiRefresh" aria-hidden="true" />
+            }
+            <span>刷新 Steam</span>
+        </CgButton>
+
+        <button type="button" class="space-steam-toolbar__btn space-steam-toolbar__btn--edit" @onclick="OpenEditModal">
+            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+            <span>编辑 Steam</span>
+        </button>
+    }
+</div>
+
+<SpaceSteamEditModal @bind-Visible="_showEditModal" OnSaved="HandleSaved" />
+
+@code {
+    [Parameter]
+    public string SteamId { get; set; } = string.Empty;
+
+    private bool _isRefreshing;
+    private bool _showEditModal;
+
+    private async Task HandleRefreshAsync()
+    {
+        _isRefreshing = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await SpaceCommandService.RefreshSteamInfoAsync();
+            if (result.Success)
+            {
+                ToastService.Show("Steam 数据刷新成功", variant: "success");
+                // 刷新页面以获取最新数据
+                NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+            }
+            else
+            {
+                ToastService.Show("刷新失败", result.Error?.Message ?? "刷新 Steam 信息失败", "error");
+            }
+        }
+        catch
+        {
+            ToastService.Show("刷新 Steam 信息时发生异常", variant: "error");
+        }
+        finally
+        {
+            _isRefreshing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenEditModal()
+    {
+        _showEditModal = true;
+    }
+
+    private void HandleSaved()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+}

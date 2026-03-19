@@ -1,0 +1,53 @@
+@using CnGalWebSite.DataModel.Model
+
+<section class="lottery-info-card">
+    <h2 class="lottery-info-card-title">
+        <CgMdiIcon Name="mdiInformationOutline" />
+        基础信息
+    </h2>
+    <dl class="lottery-info-list">
+        <div class="lottery-info-item">
+            <dt>开始时间</dt>
+            <dd>@BeginTime.ToString("yyyy-MM-dd HH:mm")</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>截止时间</dt>
+            <dd>@EndTime.ToString("yyyy-MM-dd HH:mm")</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>开奖时间</dt>
+            <dd>@LotteryTime.ToString("yyyy-MM-dd HH:mm")</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>抽奖类型</dt>
+            <dd>@Type.GetDisplayName()</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>参与条件</dt>
+            <dd>@ConditionType.GetDisplayName()</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>参与人数</dt>
+            <dd>@Count</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>阅读数</dt>
+            <dd>@ReaderCount</dd>
+        </div>
+        <div class="lottery-info-item">
+            <dt>评论数</dt>
+            <dd>@CommentCount</dd>
+        </div>
+    </dl>
+</section>
+
+@code {
+    [Parameter] public DateTime BeginTime { get; set; }
+    [Parameter] public DateTime EndTime { get; set; }
+    [Parameter] public DateTime LotteryTime { get; set; }
+    [Parameter] public LotteryType Type { get; set; }
+    [Parameter] public LotteryConditionType ConditionType { get; set; }
+    [Parameter] public long Count { get; set; }
+    [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public int CommentCount { get; set; }
+}

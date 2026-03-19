@@ -1,0 +1,130 @@
+/* ── 账户安全卡片网格 ── */
+.space-account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+/* ── 单张卡片 ── */
+.space-account-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-5);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+    background-color: var(--cg-color-surface);
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.space-account-card:hover {
+    box-shadow: var(--cg-shadow-sm);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+}
+
+/* ── 图标 ── */
+.space-account-card__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, var(--cg-color-surface));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.space-account-card__icon ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--cg-color-primary);
+}
+
+.space-account-card__icon--cert {
+    background: color-mix(in oklab, var(--cg-color-success) 8%, var(--cg-color-surface));
+}
+
+.space-account-card__icon--cert ::deep .cg-mdi-icon {
+    color: var(--cg-color-success);
+}
+
+/* ── 内容区 ── */
+.space-account-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.space-account-card__body h3 {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0 0 var(--cg-spacing-1) 0;
+}
+
+.space-account-card__body p {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.space-account-card__meta {
+    display: block;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin-top: var(--cg-spacing-1);
+}
+
+/* ── 认证徽章 ── */
+.space-account-card__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    border-radius: var(--cg-radius-sm);
+    font-size: 0.625rem;
+    font-weight: var(--cg-font-weight-semibold);
+    margin-top: var(--cg-spacing-2);
+}
+
+.space-account-card__badge--pending {
+    background: color-mix(in oklab, var(--cg-color-warning) 10%, var(--cg-color-surface));
+    color: var(--cg-color-warning);
+    border: 1px solid color-mix(in oklab, var(--cg-color-warning) 25%, transparent);
+}
+
+.space-account-card__badge--verified {
+    background: color-mix(in oklab, var(--cg-color-success) 10%, var(--cg-color-surface));
+    color: var(--cg-color-success);
+    border: 1px solid color-mix(in oklab, var(--cg-color-success) 25%, transparent);
+}
+
+/* ── 操作区 ── */
+.space-account-card__action {
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.space-account-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-primary);
+    text-decoration: none;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+    transition: all var(--cg-transition-fast);
+    white-space: nowrap;
+}
+
+.space-account-link-btn:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    border-color: var(--cg-color-primary);
+}
+
+.space-account-link-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}

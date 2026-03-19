@@ -1,5 +1,6 @@
 @page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
+@inject IPlayedGameQueryService PlayedGameQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Search
@@ -73,6 +74,11 @@ else if (Model is not null)
                         }
                     </EntryCardList>
                 </EntrySection>
+
+                @if (ScoreOverview is not null)
+                {
+                    <EntryScoreOverview Model="ScoreOverview" />
+                }
 
                 <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="entry-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法与补充信息。">
                     <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
@@ -255,19 +261,37 @@ else
     public int Id { get; set; }
 
     private EntryDetailViewModel? Model;
+    private PlayedGameOverviewViewModel? ScoreOverview;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await EntryQueryService.GetEntryDetailAsync(Id);
+        // 并行请求词条详情和评分概览
+        var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
+        var scoreTask = PlayedGameQueryService.GetOverviewAsync(Id);
+
+        var result = await entryTask;
         if (result.Success && result.Data is not null)
         {
             ErrorMessage = null;
             Model = result.Data;
+
+            // 仅游戏类词条加载评分概览
+            if (Model.Type == EntryType.Game)
+            {
+                var scoreResult = await scoreTask;
+                ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
+            }
+            else
+            {
+                ScoreOverview = null;
+            }
+
             return;
         }
 
         Model = null;
+        ScoreOverview = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

@@ -1,4 +1,4 @@
-﻿.cg-space-card {
+.cg-space-card {
     background-color: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     box-shadow: var(--cg-shadow-sm);
@@ -34,12 +34,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-3);
-}
-
-.cg-space-card-divider {
-    height: 1px;
-    background-color: var(--cg-color-border);
-    margin: 0 var(--cg-spacing-4);
 }
 
 .cg-space-info-item {

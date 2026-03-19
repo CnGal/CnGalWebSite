@@ -1,7 +1,5 @@
-﻿@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
-@using CnGalWebSite.MainSite.Shared.Components.Features.Entry
 
 <div class="cg-space-card">
     <div class="cg-space-card-body">
@@ -38,20 +36,6 @@
             <span>UID：@Model.Id</span>
         </div>
     </div>
-    
-    @if (Model.UserCertification != null)
-    {
-        <div class="cg-space-card-divider"></div>
-        <div class="cg-space-card-header">
-            <CgMdiIcon Name="mdiCertificateOutline" Class="cg-space-card-icon" />
-            <h2 class="cg-space-card-title">用户认证</h2>
-        </div>
-        <div class="cg-space-card-body">
-            <EntryCardItem Url="@($"/entries/index/{Model.UserCertification.Id}")" 
-                           Image="@Model.UserCertification.MainImage" 
-                           Title="@Model.UserCertification.Name" />
-        </div>
-    }
 </div>
 
 @code {

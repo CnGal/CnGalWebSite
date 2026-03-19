@@ -1,0 +1,76 @@
+@using CnGalWebSite.SDK.MainSite.Models
+
+<div class="entry-user-score-card">
+    <div class="entry-user-score-card__header">
+        <a href="@($"/space/index/{Model.UserId}")" class="entry-user-score-card__user">
+            <img src="@Model.UserPhoto" alt="@Model.UserName" class="entry-user-score-card__avatar" loading="lazy" />
+            <span class="entry-user-score-card__name">@Model.UserName</span>
+        </a>
+        <time class="entry-user-score-card__time" datetime="@Model.LastEditTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+            @Model.LastEditTime.ToString("yyyy-MM-dd")
+        </time>
+    </div>
+
+    @if (Model.IsScored)
+    {
+        <div class="entry-user-score-card__total">
+            <div class="entry-user-score-card__stars" title="总评 @Model.TotalScore 分" aria-label="总评 @Model.TotalScore 分">
+                @for (int i = 1; i <= 10; i++)
+                {
+                    var starClass = i <= (int)Model.TotalScore ? "entry-user-score-card__star entry-user-score-card__star--filled" : "entry-user-score-card__star";
+                    <span class="@starClass"></span>
+                }
+            </div>
+            <span class="entry-user-score-card__total-num">@Model.TotalScore</span>
+        </div>
+
+        <div class="entry-user-score-card__dims">
+            <span>音乐 @Model.MusicScore</span>
+            <span>美术 @Model.PaintScore</span>
+            <span>剧本 @Model.ScriptScore</span>
+            <span>演出 @Model.ShowScore</span>
+            <span>程序 @Model.SystemScore</span>
+            @if (IsDubbing && Model.CVScore > 0)
+            {
+                <span>配音 @Model.CVScore</span>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.PlayImpressions))
+    {
+        <div class="entry-user-score-card__impressions">
+            <p>@TruncateText(Model.PlayImpressions, 200)</p>
+        </div>
+    }
+
+    @* schema.org Review 结构化数据 *@
+    <div itemprop="review" itemscope itemtype="https://schema.org/Review" style="display:none">
+        <meta itemprop="datePublished" content="@Model.LastEditTime.ToString("yyyy-MM-dd")">
+        @if (Model.IsScored)
+        {
+            <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+                <meta itemprop="worstRating" content="1">
+                <meta itemprop="bestRating" content="10" />
+                <meta itemprop="ratingValue" content="@Model.TotalScore" />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public required UserScoreItem Model { get; set; }
+
+    [Parameter]
+    public bool IsDubbing { get; set; }
+
+    private static string TruncateText(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+        {
+            return text;
+        }
+        return text[..maxLength] + "...";
+    }
+}

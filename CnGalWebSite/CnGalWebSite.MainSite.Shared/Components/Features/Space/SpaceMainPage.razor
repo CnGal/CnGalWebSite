@@ -1,18 +1,16 @@
 @using CnGalWebSite.SDK.MainSite.Models
-@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
 @if (!string.IsNullOrWhiteSpace(Model.MainPageHtml))
 {
-    <div class="cg-space-card">
-        <div class="cg-space-card-header">
-            <CgMdiIcon Name="mdiHomeOutline" Class="cg-space-card-icon" />
-            <h2 class="cg-space-card-title">个人介绍</h2>
-        </div>
-        <div class="cg-space-card-body">
-            <div class="cg-markdown-body">
-                @((MarkupString)Model.MainPageHtml)
-            </div>
-        </div>
+    <div class="cg-markdown-body">
+        @((MarkupString)Model.MainPageHtml)
+    </div>
+}
+else
+{
+    <div class="cg-space-main-empty">
+        <CgMdiIcon Name="mdiTextBoxOutline" aria-hidden="true" />
+        <p>这个人很懒，还没有写个人介绍~</p>
     </div>
 }
 

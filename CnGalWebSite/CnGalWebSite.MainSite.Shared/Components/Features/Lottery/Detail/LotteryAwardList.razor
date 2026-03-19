@@ -1,0 +1,52 @@
+@using CnGalWebSite.DataModel.Model
+
+@if (Awards.Count > 0)
+{
+    <section class="lottery-award-list">
+        <h2 class="lottery-award-list-title">
+            <CgMdiIcon Name="mdiGiftOutline" />
+            奖品列表
+        </h2>
+        <div class="lottery-award-grid">
+            @foreach (var award in Awards)
+            {
+                <div class="lottery-award-card">
+                    @if (!string.IsNullOrWhiteSpace(award.Image))
+                    {
+                        <div class="lottery-award-image-wrapper">
+                            <img src="@award.Image" alt="@award.Name" class="lottery-award-image" loading="lazy" />
+                        </div>
+                    }
+                    <div class="lottery-award-body">
+                        <div class="lottery-award-header">
+                            <h3 class="lottery-award-name">@award.Name</h3>
+                            <span class="lottery-award-type-badge">@award.Type.GetDisplayName()</span>
+                        </div>
+                        <div class="lottery-award-meta">
+                            <span>数量：@award.Count</span>
+                            @if (!string.IsNullOrWhiteSpace(award.Sponsor))
+                            {
+                                <span>赞助：@award.Sponsor</span>
+                            }
+                            @if (award.Integral > 0)
+                            {
+                                <span>附加积分：@award.Integral</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(award.Link))
+                        {
+                            <a href="@award.Link" target="_blank" rel="noopener noreferrer" class="lottery-award-link">
+                                <CgMdiIcon Name="mdiOpenInNew" />
+                                查看详情
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<LotteryAwardDetailModel> Awards { get; set; } = [];
+}

@@ -1,0 +1,16 @@
+@using CnGalWebSite.SDK.MainSite.Models
+
+<a href="@($"/entries/index/{Model.GameId}")" class="space-game-record-item" title="@Model.GameName">
+    <div class="space-game-record-item__cover">
+        <img src="@Model.GameImage" alt="@Model.GameName" loading="lazy" />
+    </div>
+    <div class="space-game-record-item__info">
+        <h3 class="space-game-record-item__name">@Model.GameName</h3>
+        <SpaceGameRecordTag Model="Model" />
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public required GameRecordItem Model { get; set; }
+}

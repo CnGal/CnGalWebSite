@@ -1,0 +1,20 @@
+@using CnGalWebSite.DataModel.ViewModel.Space
+
+<section class="space-editor-section" id="section-mainpage">
+    <h2><CgMdiIcon Name="mdiBookOpenVariant" Class="space-section-icon" aria-hidden="true"/>个人主页</h2>
+    <p>使用 Markdown 编辑个人空间的主页内容。</p>
+
+    @if (Model != null)
+    {
+        <CgAlert Variant="info">
+            你可以在这里编辑个人介绍、展示作品等内容。支持 Markdown 语法，内嵌图片会影响加载速度，建议使用链接方式显示图片。
+        </CgAlert>
+        <CgMarkdownEditor @bind-Value="Model.MainPage"
+                           Placeholder="在这里编写你的个人主页内容..."/>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public EditUserMainPageViewModel Model { get; set; } = default!;
+}

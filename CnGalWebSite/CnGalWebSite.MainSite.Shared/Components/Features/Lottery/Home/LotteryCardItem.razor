@@ -1,0 +1,43 @@
+<li>
+    <a class="lottery-card" href="@($"/lotteries/index/{Model.Id}")">
+        @if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
+        {
+            <div class="lottery-card-image-wrapper">
+                <img src="@Model.Thumbnail" alt="@Model.Name" class="lottery-card-image" loading="lazy" />
+            </div>
+        }
+        <div class="lottery-card-body">
+            <span class="lottery-card-badge lottery-card-badge--@StatusCss">
+                <CgMdiIcon Name="@StatusIcon" />
+                @StatusText
+            </span>
+            <h3 class="lottery-card-title">@Model.Name</h3>
+            @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+            {
+                <p class="lottery-card-intro">@Model.BriefIntroduction</p>
+            }
+            <div class="lottery-card-meta">
+                <span class="lottery-card-meta-item">
+                    <CgMdiIcon Name="mdiAccountGroupOutline" />
+                    @Model.Count 人参与
+                </span>
+                <span class="lottery-card-meta-item">
+                    <CgMdiIcon Name="mdiCalendarClock" />
+                    截止 @Model.EndTime.ToString("yyyy/M/d")
+                </span>
+            </div>
+        </div>
+    </a>
+</li>
+
+@code {
+    [Parameter, EditorRequired]
+    public LotteryCardItemModel Model { get; set; } = default!;
+
+    private bool IsEnded => Model.IsEnd || DateTime.Now > Model.EndTime;
+    private bool IsUpcoming => DateTime.Now < Model.BeginTime;
+
+    private string StatusText => IsEnded ? "已结束" : (IsUpcoming ? "未开始" : "进行中");
+    private string StatusCss => IsEnded ? "ended" : (IsUpcoming ? "upcoming" : "active");
+    private string StatusIcon => IsEnded ? "mdiCheckCircleOutline" : (IsUpcoming ? "mdiClockOutline" : "mdiPlayCircleOutline");
+}

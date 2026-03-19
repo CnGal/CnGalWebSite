@@ -1,0 +1,84 @@
+.space-steam-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    margin-bottom: var(--cg-spacing-4);
+}
+
+/* Account list */
+.space-steam-info-card__accounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+}
+
+.space-steam-info-card__account {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    background: var(--cg-color-bg);
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    color: var(--cg-color-text);
+    transition: background var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.space-steam-info-card__account:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, var(--cg-color-bg));
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.space-steam-info-card__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--cg-radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.space-steam-info-card__name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.space-steam-info-card__account ::deep .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+    fill: var(--cg-color-text-muted);
+    opacity: 0.6;
+}
+
+/* Stats row */
+.space-steam-info-card__stats {
+    display: flex;
+    gap: var(--cg-spacing-4);
+    flex-wrap: wrap;
+}
+
+.space-steam-info-card__stat {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+}
+
+.space-steam-info-card__stat ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--cg-color-text-muted);
+}
+
+.space-steam-info-card__stat-value {
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+.space-steam-info-card__stat-label {
+    color: var(--cg-color-text-muted);
+}

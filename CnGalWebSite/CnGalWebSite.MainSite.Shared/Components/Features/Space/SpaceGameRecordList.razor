@@ -1,0 +1,45 @@
+@* 游玩记录列表 + Steam 信息 *@
+
+<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="Model" />
+
+@if (IsCurrentUser)
+{
+    <SpaceSteamToolbar SteamId="@SteamId" />
+}
+
+@if (VisibleRecords.Count > 0)
+{
+    <ul class="space-game-record-list__grid">
+        @foreach (var record in VisibleRecords)
+        {
+            <li>
+                <SpaceGameRecordItem Model="record" />
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="space-game-record-list__empty">
+        <CgMdiIcon Name="mdiGamepadVariantOutline" />
+        <p>暂无游玩记录</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public required UserGameRecordsViewModel Model { get; set; }
+
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<SteamUserInfoItem> SteamUsers { get; set; } = [];
+
+    [Parameter]
+    public string SteamId { get; set; } = string.Empty;
+
+    private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
+        .Where(r => !r.IsHidden && (r.ShowPublicly || IsCurrentUser))
+        .ToList();
+}

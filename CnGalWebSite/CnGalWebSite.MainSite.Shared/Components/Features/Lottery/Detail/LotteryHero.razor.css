@@ -1,0 +1,120 @@
+.lottery-hero {
+    display: flex;
+    gap: 1.5rem;
+    border-radius: var(--cg-radius-xl);
+    background: var(--cg-color-surface);
+    overflow: hidden;
+    box-shadow: var(--cg-shadow-md);
+}
+
+.lottery-hero-image-wrapper {
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+}
+
+.lottery-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.lottery-hero--no-image {
+    padding: 2rem;
+}
+
+.lottery-hero-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    justify-content: center;
+}
+
+.lottery-hero--no-image .lottery-hero-content {
+    padding: 0;
+}
+
+.lottery-hero-status {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lottery-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+::deep .lottery-status-badge .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.lottery-status-badge--active {
+    background: color-mix(in oklab, var(--cg-color-success) 15%, transparent);
+    color: var(--cg-color-success);
+}
+
+.lottery-status-badge--ended {
+    background: color-mix(in oklab, var(--cg-color-text-muted) 15%, transparent);
+    color: var(--cg-color-text-muted);
+}
+
+.lottery-status-badge--upcoming {
+    background: color-mix(in oklab, var(--cg-color-warning) 15%, transparent);
+    color: var(--cg-color-warning);
+}
+
+.lottery-hero-title {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.lottery-hero-intro {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.lottery-hero-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.25rem;
+}
+
+.lottery-hero-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+::deep .lottery-hero-stat .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 767px) {
+    .lottery-hero {
+        flex-direction: column;
+    }
+
+    .lottery-hero-image-wrapper {
+        flex: none;
+    }
+
+    .lottery-hero-content {
+        padding: 0 1.25rem 1.25rem;
+    }
+}
