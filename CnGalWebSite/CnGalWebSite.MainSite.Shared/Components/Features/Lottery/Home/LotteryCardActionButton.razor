@@ -1,0 +1,100 @@
+@rendermode InteractiveServer
+
+@inject ILotteryCommandService LotteryCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+
+<div class="lottery-card-action">
+    @if (_isLoading)
+    {
+        <CgProgressRing Size="sm" />
+    }
+    else if (IsEnded)
+    {
+        <CgButton Href="@($"/lotteries/index/{LotteryId}")" class="lottery-card-action-btn lottery-card-action-btn--outline">
+            <CgMdiIcon Name="mdiGiftOpenOutline" />
+            <span>查看抽奖</span>
+        </CgButton>
+    }
+    else if (_hasParticipated)
+    {
+        <CgButton Href="@($"/lotteries/index/{LotteryId}")" class="lottery-card-action-btn lottery-card-action-btn--outline">
+            <CgMdiIcon Name="mdiGiftOpenOutline" />
+            <span>查看抽奖</span>
+        </CgButton>
+    }
+    else
+    {
+        <CgButton Variant="primary" Async OnClick="HandleParticipateAsync" class="lottery-card-action-btn">
+            <CgMdiIcon Name="mdiGiftOutline" />
+            <span>参与抽奖</span>
+        </CgButton>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public long LotteryId { get; set; }
+
+    [Parameter]
+    public bool IsEnd { get; set; }
+
+    [Parameter]
+    public DateTime BeginTime { get; set; }
+
+    [Parameter]
+    public DateTime EndTime { get; set; }
+
+    private bool _isLoading = true;
+    private bool _hasParticipated;
+
+    private bool IsEnded => IsEnd || DateTime.Now > EndTime;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStateAsync();
+    }
+
+    private async Task LoadStateAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var result = await LotteryCommandService.GetUserLotteryStateAsync(LotteryId);
+            if (result.Success && result.Data is not null)
+            {
+                _hasParticipated = result.Data.State != UserLotteryState.NotInvolved
+                                && result.Data.State != UserLotteryState.NoCondition;
+            }
+        }
+        catch
+        {
+            // fallback: show participate button
+            _hasParticipated = false;
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task HandleParticipateAsync()
+    {
+        try
+        {
+            var result = await LotteryCommandService.ParticipateInLotteryAsync(LotteryId);
+            if (result.Success)
+            {
+                ToastService.Show("参与抽奖成功", variant: "success");
+                await LoadStateAsync();
+            }
+            else
+            {
+                ToastService.Show("参与抽奖失败", result.Error?.Message ?? "请稍后重试", "error");
+            }
+        }
+        catch
+        {
+            ToastService.Show("参与抽奖时发生异常", variant: "error");
+        }
+    }
+}

@@ -1,14 +1,29 @@
-<button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
-    @if (_isLoading)
-    {
-        <CgProgressRing Size="sm" />
-    }
-    @ChildContent
-</button>
+@if (!string.IsNullOrEmpty(Href))
+{
+    <a class="@CssClass" href="@Href" @attributes="AdditionalAttributes">
+        @ChildContent
+    </a>
+}
+else
+{
+    <button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
+        @if (_isLoading)
+        {
+            <CgProgressRing Size="sm" />
+        }
+        @ChildContent
+    </button>
+}
 
 @code {
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 设置后按钮渲染为 &lt;a&gt; 标签。
+    /// </summary>
+    [Parameter]
+    public string? Href { get; set; }
 
     [Parameter]
     public string Type { get; set; } = "button";

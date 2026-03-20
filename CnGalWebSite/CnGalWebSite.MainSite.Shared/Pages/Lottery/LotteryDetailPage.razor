@@ -24,7 +24,8 @@ else if (_model is not null)
                      BeginTime="@_model.BeginTime"
                      EndTime="@_model.EndTime"
                      Count="@_model.Count"
-                     ReaderCount="@_model.ReaderCount" />
+                     ReaderCount="@_model.ReaderCount"
+                     LotteryId="@_model.Id" />
 
         @if (_model.IsHidden)
         {
@@ -61,6 +62,18 @@ else if (_model is not null)
                                  Count="@_model.Count"
                                  ReaderCount="@_model.ReaderCount"
                                  CommentCount="@_model.CommentCount" />
+
+                <AuthorizeView>
+                    <Authorized>
+                        <LotteryOperationCard LotteryId="@_model.Id"
+                                              BeginTime="@_model.BeginTime"
+                                              EndTime="@_model.EndTime"
+                                              IsEnd="@_model.IsEnd" />
+                    </Authorized>
+                    <NotAuthorized>
+                        <LotteryLoginGuide IsEnd="@_model.IsEnd" />
+                    </NotAuthorized>
+                </AuthorizeView>
             </aside>
         </section>
 
@@ -73,6 +86,18 @@ else if (_model is not null)
                              Count="@_model.Count"
                              ReaderCount="@_model.ReaderCount"
                              CommentCount="@_model.CommentCount" />
+
+            <AuthorizeView>
+                <Authorized>
+                    <LotteryOperationCard LotteryId="@_model.Id"
+                                          BeginTime="@_model.BeginTime"
+                                          EndTime="@_model.EndTime"
+                                          IsEnd="@_model.IsEnd" />
+                </Authorized>
+                <NotAuthorized>
+                    <LotteryLoginGuide IsEnd="@_model.IsEnd" />
+                </NotAuthorized>
+            </AuthorizeView>
 
             @if (!string.IsNullOrWhiteSpace(_model.MainPage))
             {

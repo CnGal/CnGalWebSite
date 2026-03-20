@@ -1,0 +1,14 @@
+
+.lottery-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-6);
+}
+
+.lottery-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-4);
+}

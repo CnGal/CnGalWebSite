@@ -4,7 +4,8 @@
     padding: 1.5rem 1rem 3rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 2rem;    
+    max-width: 800px;
 }
 
 /* ── Header ── */
@@ -12,7 +13,7 @@
 .lottery-home-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 1rem;
 }
 
@@ -20,6 +21,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    align-items: center;
 }
 
 .lottery-home-title {
@@ -47,12 +49,12 @@
 /* ── Grid ── */
 
 .lottery-home-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
     list-style: none;
     padding: 0;
-    margin: 0;
+    width: 100%;
 }
 
 /* ── Empty state ── */
@@ -171,16 +173,5 @@
 @media (min-width: 640px) {
     .lottery-home {
         padding: 2rem 1.5rem 4rem;
-    }
-
-    .lottery-home-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-    .lottery-home-grid {
-        grid-template-columns: repeat(3, 1fr);
     }
 }

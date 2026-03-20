@@ -80,10 +80,14 @@ else if (_model != null)
                     </div>
 
                     <div class="cg-space-tab-panel cg-space-tab-panel--records">
-                        @if (_gameRecords is not null)
+                        @if (_model.IsCurrentUser)
+                        {
+                            <SpaceGameRecordSection UserId="@_model.Id" SteamId="@_model.SteamId" />
+                        }
+                        else if (_gameRecords is not null)
                         {
                             <SpaceGameRecordList Model="_gameRecords"
-                                                IsCurrentUser="_model.IsCurrentUser"
+                                                IsCurrentUser="false"
                                                 SteamUsers="_steamUsers"
                                                 SteamId="@_model.SteamId" />
                         }
@@ -139,27 +143,28 @@ else
         _gameRecords = null;
 
         var targetId = Id ?? string.Empty;
-        var spaceTask = SpaceQueryService.GetSpaceDetailAsync(targetId);
-
-        var result = await spaceTask;
+        var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
 
         if (result.Success && result.Data != null)
         {
             _model = result.Data;
 
-            // 并行加载游玩记录和 Steam 用户信息
-            var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model.Id);
-            var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id);
+            // 非当前用户：静态加载游玩记录（当前用户由 SpaceGameRecordSection 交互式加载）
+            if (!_model.IsCurrentUser)
+            {
+                var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model.Id);
+                var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id);
 
-            await Task.WhenAll(recordsTask, steamInfoTask);
+                await Task.WhenAll(recordsTask, steamInfoTask);
 
-            var recordsResult = recordsTask.Result;
-            _gameRecords = recordsResult.Success ? recordsResult.Data : null;
+                var recordsResult = recordsTask.Result;
+                _gameRecords = recordsResult.Success ? recordsResult.Data : null;
 
-            var steamInfoResult = steamInfoTask.Result;
-            _steamUsers = steamInfoResult.Success && steamInfoResult.Data is not null
-                ? steamInfoResult.Data
-                : [];
+                var steamInfoResult = steamInfoTask.Result;
+                _steamUsers = steamInfoResult.Success && steamInfoResult.Data is not null
+                    ? steamInfoResult.Data
+                    : [];
+            }
         }
         else if (result.Error?.StatusCode == 404)
         {
@@ -172,3 +177,4 @@ else
         }
     }
 }
+

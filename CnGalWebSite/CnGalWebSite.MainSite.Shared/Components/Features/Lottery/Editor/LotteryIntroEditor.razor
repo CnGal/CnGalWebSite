@@ -1,0 +1,15 @@
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+
+<section class="lottery-editor-section" id="section-lottery-intro">
+    <h2><CgMdiIcon Name="mdiTextBoxOutline" Class="lottery-section-icon" aria-hidden="true"/>介绍</h2>
+    <p>使用 Markdown 编辑抽奖的详细介绍内容。</p>
+
+    @if (Model != null)
+    {
+        <CgMarkdownEditor @bind-Value="Model.MainPage" Placeholder="支持 Markdown 语法..." />
+    }
+</section>
+
+@code {
+    [Parameter] public EditLotteryModel Model { get; set; } = default!;
+}

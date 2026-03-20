@@ -1,0 +1,171 @@
+@rendermode InteractiveServer
+
+@inject ILotteryCommandService LotteryCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using CnGalWebSite.DataModel.Model
+
+<div class="lottery-op-card">
+    @if (_isLoading)
+    {
+        <div class="lottery-op-card__loading">
+            <CgProgressRing />
+            <span>加载中…</span>
+        </div>
+    }
+    else if (_state is not null)
+    {
+        @switch (_state.State)
+        {
+            case UserLotteryState.NotInvolved when !IsEnd && DateTime.Now >= BeginTime && DateTime.Now <= EndTime:
+                <div class="lottery-op-card__action">
+                    <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338" alt="抽奖" class="lottery-op-card__img" />
+                    <CgButton Variant="primary" OnClick="HandleParticipateAsync" Disabled="_isParticipating">
+                        @if (_isParticipating)
+                        {
+                            <CgProgressRing />
+                        }
+                        else
+                        {
+                            <CgMdiIcon Name="mdiTicketConfirmationOutline" aria-hidden="true" />
+                        }
+                        <span>参与抽奖</span>
+                    </CgButton>
+                </div>
+                break;
+
+            case UserLotteryState.NotInvolved when IsEnd || DateTime.Now > EndTime:
+                <CgAlert Variant="warning">没有参与这个抽奖哦，下次再来吧</CgAlert>
+                break;
+
+            case UserLotteryState.NotInvolved when DateTime.Now < BeginTime:
+                <CgAlert Variant="warning">抽奖还没有开始呢，再等一会吧</CgAlert>
+                break;
+
+            case UserLotteryState.WaitingDraw:
+                <CgAlert Variant="info">给，这是你的号码，记得来看结果哦~</CgAlert>
+                <div class="lottery-op-card__number">
+                    <div class="lottery-op-card__number-ring">
+                        <span class="lottery-op-card__number-value">@_state.Number</span>
+                    </div>
+                </div>
+                break;
+
+            case UserLotteryState.NoCondition:
+                <CgAlert Variant="warning">没有满足抽奖条件哦，看看旁边的说明吧</CgAlert>
+                break;
+
+            case UserLotteryState.NotWin:
+                <CgAlert Variant="info">没有中奖欸，呜~~~</CgAlert>
+                break;
+
+            case UserLotteryState.Win when _state.Award is not null:
+                @if (_state.Award.Type == LotteryAwardType.ActivationCode)
+                {
+                    <CgAlert Variant="success">
+                        恭喜中奖！你的奖品是：<strong>@_state.Award.Name</strong>
+                    </CgAlert>
+                }
+                else if (_state.Award.Type == LotteryAwardType.Integral)
+                {
+                    <CgAlert Variant="success">
+                        恭喜你中奖了，已经把积分打到你的账户里了哦。你的奖品是：<strong>@_state.Award.Name</strong>
+                    </CgAlert>
+                }
+                break;
+
+            case UserLotteryState.WaitAddress when _state.Award is not null:
+                <CgAlert Variant="success">
+                    中奖啦！请填写收货地址。你的奖品是：<strong>@_state.Award.Name</strong>
+                </CgAlert>
+                break;
+
+            case UserLotteryState.WaitShipments when _state.Award is not null:
+                <CgAlert Variant="success">
+                    看板娘正在努力发货中。你的奖品是：<strong>@_state.Award.Name</strong>
+                </CgAlert>
+                break;
+
+            case UserLotteryState.Shipped when _state.Award is not null:
+                <CgAlert Variant="success">
+                    发货啦，记得给五星好评哦~。你的奖品是：<strong>@_state.Award.Name</strong>
+                </CgAlert>
+                break;
+        }
+    }
+    else if (_errorMessage is not null)
+    {
+        <CgAlert Variant="warning">@_errorMessage</CgAlert>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long LotteryId { get; set; }
+
+    [Parameter]
+    public DateTime BeginTime { get; set; }
+
+    [Parameter]
+    public DateTime EndTime { get; set; }
+
+    [Parameter]
+    public bool IsEnd { get; set; }
+
+    private UserLotteryStateModel? _state;
+    private bool _isLoading = true;
+    private bool _isParticipating;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStateAsync();
+    }
+
+    private async Task LoadStateAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        var result = await LotteryCommandService.GetUserLotteryStateAsync(LotteryId);
+        if (result.Success && result.Data is not null)
+        {
+            _state = result.Data;
+        }
+        else
+        {
+            _errorMessage = result.Error?.Message ?? "获取抽奖状态失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task HandleParticipateAsync()
+    {
+        _isParticipating = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await LotteryCommandService.ParticipateInLotteryAsync(LotteryId);
+            if (result.Success)
+            {
+                ToastService.Show("参与抽奖成功", variant: "success");
+                await LoadStateAsync();
+            }
+            else
+            {
+                ToastService.Show("参与抽奖失败", result.Error?.Message ?? "请稍后重试", "error");
+            }
+        }
+        catch
+        {
+            ToastService.Show("参与抽奖时发生异常", variant: "error");
+        }
+        finally
+        {
+            _isParticipating = false;
+            StateHasChanged();
+        }
+    }
+}

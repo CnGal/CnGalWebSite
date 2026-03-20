@@ -1,0 +1,46 @@
+.lottery-login-guide {
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    overflow: hidden;
+}
+
+.lottery-login-guide__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-5);
+}
+
+.lottery-login-guide__img {
+    max-width: 200px;
+    width: 100%;
+    border-radius: var(--cg-radius-md);
+}
+
+.lottery-login-guide__text {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    text-align: center;
+}
+
+.lottery-login-guide__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-primary);
+    color: white;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.lottery-login-guide__btn:hover {
+    background: var(--cg-color-primary-hover);
+}

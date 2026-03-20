@@ -105,6 +105,36 @@
     height: 16px;
 }
 
+.lottery-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.lottery-hero-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-primary);
+    background: var(--cg-color-primary);
+    color: #fff;
+}
+
+.lottery-hero-edit-btn:hover {
+    opacity: 0.9;
+}
+
+::deep .lottery-hero-edit-btn .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
 @media (max-width: 767px) {
     .lottery-hero {
         flex-direction: column;

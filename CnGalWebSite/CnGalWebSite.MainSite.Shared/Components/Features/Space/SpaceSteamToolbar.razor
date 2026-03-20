@@ -41,6 +41,12 @@
     [Parameter]
     public string SteamId { get; set; } = string.Empty;
 
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
+
     private bool _isRefreshing;
     private bool _showEditModal;
 
@@ -51,12 +57,12 @@
 
         try
         {
-            var result = await SpaceCommandService.RefreshSteamInfoAsync();
+            var result = await SpaceCommandService.RefreshSteamInfoAsync(UserId);
             if (result.Success)
             {
                 ToastService.Show("Steam 数据刷新成功", variant: "success");
-                // 刷新页面以获取最新数据
-                NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+                // 通知父组件交互式刷新数据
+                await OnDataChanged.InvokeAsync();
             }
             else
             {
@@ -79,8 +85,8 @@
         _showEditModal = true;
     }
 
-    private void HandleSaved()
+    private async Task HandleSaved()
     {
-        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        await OnDataChanged.InvokeAsync();
     }
 }
