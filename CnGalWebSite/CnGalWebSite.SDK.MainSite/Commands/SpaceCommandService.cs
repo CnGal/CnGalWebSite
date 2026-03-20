@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.SpaceEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class SpaceCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<SpaceCommandService> logger) : CommandServiceBase(httpClient), ISpaceCommandService
 {
     protected override ILogger Logger => logger;
@@ -45,19 +47,14 @@ public sealed class SpaceCommandService(
         {
             var errors = new List<string>();
 
-            // 并发提交个人资料和个人主页
-            var userDataTask = PostAsJsonAsync<EditUserDataViewModel, Result>("api/space/edituserdata", model.UserData, cancellationToken);
-            var mainPageTask = PostAsJsonAsync<EditUserMainPageViewModel, Result>("api/space/editmainpage", model.MainPage, cancellationToken);
-
-            await Task.WhenAll(userDataTask, mainPageTask);
-
-            var userDataResult = userDataTask.Result;
+            // 顺序提交：先保存个人资料（含 SteamId 等），再保存个人主页，避免并发导致数据覆盖
+            var userDataResult = await PostAsJsonAsync<EditUserDataViewModel, Result>("api/space/edituserdata", model.UserData, cancellationToken);
             if (userDataResult is { Successful: false })
             {
                 errors.Add(userDataResult.Error ?? "保存个人资料失败");
             }
 
-            var mainPageResult = mainPageTask.Result;
+            var mainPageResult = await PostAsJsonAsync<EditUserMainPageViewModel, Result>("api/space/editmainpage", model.MainPage, cancellationToken);
             if (mainPageResult is { Successful: false })
             {
                 errors.Add(mainPageResult.Error ?? "保存个人主页失败");
@@ -68,8 +65,12 @@ public sealed class SpaceCommandService(
                 return SdkResult<string>.Fail("SPACE_EDIT_SUBMIT_FAILED", string.Join("；", errors));
             }
 
+            // 清空对应用户的空间详情、游玩记录、Steam 信息缓存
+            var userId = model.UserData.Id ?? string.Empty;
+            InvalidateUserCaches(userId);
+
             // 返回用户 ID 以供跳转
-            return SdkResult<string>.Ok(model.UserData.Id ?? string.Empty);
+            return SdkResult<string>.Ok(userId);
         }
         catch (Exception ex)
         {
@@ -78,13 +79,19 @@ public sealed class SpaceCommandService(
         }
     }
 
-    public async Task<SdkResult<string>> RefreshSteamInfoAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<string>> RefreshSteamInfoAsync(string? userId = null, CancellationToken cancellationToken = default)
     {
         try
         {
             var result = await GetFromJsonAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor", cancellationToken);
             if (result is { Successful: true })
             {
+                // 清空相关缓存，确保后续查询获取最新数据
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    InvalidateUserCaches(userId);
+                }
+
                 return SdkResult<string>.Ok("刷新成功");
             }
 
@@ -95,5 +102,12 @@ public sealed class SpaceCommandService(
             logger.LogError(ex, "刷新 Steam 信息异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
             return SdkResult<string>.Fail("STEAM_REFRESH_EXCEPTION", "刷新 Steam 信息时发生异常");
         }
+    }
+
+    private void InvalidateUserCaches(string userId)
+    {
+        memoryCache.Remove($"main-site:space-detail:{userId}");
+        memoryCache.Remove($"main-site:user-game-records:{userId}");
+        memoryCache.Remove($"main-site:user-steam-info:{userId}");
     }
 }

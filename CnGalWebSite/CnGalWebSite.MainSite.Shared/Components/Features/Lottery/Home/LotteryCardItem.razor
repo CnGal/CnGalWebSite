@@ -1,33 +1,41 @@
+@using CnGalWebSite.Extensions
+
 <li>
-    <a class="lottery-card" href="@($"/lotteries/index/{Model.Id}")">
+    <div class="lottery-card">
         @if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
         {
-            <div class="lottery-card-image-wrapper">
+            <a class="lottery-card-image-wrapper" href="@($"/lotteries/index/{Model.Id}")">
                 <img src="@Model.Thumbnail" alt="@Model.Name" class="lottery-card-image" loading="lazy" />
-            </div>
+            </a>
         }
         <div class="lottery-card-body">
-            <span class="lottery-card-badge lottery-card-badge--@StatusCss">
-                <CgMdiIcon Name="@StatusIcon" />
-                @StatusText
-            </span>
-            <h3 class="lottery-card-title">@Model.Name</h3>
+            <a class="lottery-card-title-link" href="@($"/lotteries/index/{Model.Id}")">
+                <h3 class="lottery-card-title">@Model.Name</h3>
+            </a>
+            
+            <div class="lottery-card-meta">
+                <span class="lottery-card-meta-item">参与人数：@Model.Count</span>
+                <span class="lottery-card-meta-item">截止时间：@Model.EndTime.ToString("yyyy年M月d日 H点")</span>
+            </div>
+
             @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
             {
                 <p class="lottery-card-intro">@Model.BriefIntroduction</p>
             }
-            <div class="lottery-card-meta">
-                <span class="lottery-card-meta-item">
-                    <CgMdiIcon Name="mdiAccountGroupOutline" />
-                    @Model.Count 人参与
-                </span>
-                <span class="lottery-card-meta-item">
-                    <CgMdiIcon Name="mdiCalendarClock" />
-                    截止 @Model.EndTime.ToString("yyyy/M/d")
-                </span>
+
+            <div class="lottery-card-footer">
+                <div class="lottery-card-condition">
+                    <span class="lottery-card-condition-label">参与条件：</span>
+                    <span class="lottery-card-condition-value">@Model.ConditionType.GetDisplayName()</span>
+                </div>
+                
+                <CgButton Href="@($"/lotteries/index/{Model.Id}")" Variant="primary" class="lottery-card-btn">
+                    <CgMdiIcon Name="mdiGiftOutline" />
+                    <span class="lottery-card-btn-text">查看抽奖</span>
+                </CgButton>
             </div>
         </div>
-    </a>
+    </div>
 </li>
 
 @code {

@@ -80,6 +80,7 @@ public sealed class LotteryQueryService(
             BeginTime = dto.BeginTime,
             EndTime = dto.EndTime,
             Count = dto.Count,
+            ConditionType = dto.ConditionType,
             IsEnd = dto.EndTime < now,
         };
     }

@@ -5,101 +5,117 @@
 
 @inject ISpaceCommandService SpaceCommandService
 @inject NavigationManager NavigationManager
-@inject ICgToastService ToastService
 
 <PageTitle>绑定 Steam 账号 - CnGal资料站</PageTitle>
 
-<div class="cg-bind-steam-loading" style="display: flex; justify-content: center; align-items: center; height: 50vh;">
-    <CgProgressRing />
-    <span style="margin-left: 1rem;">正在处理 Steam 绑定...</span>
-</div>
+@if (!string.IsNullOrEmpty(_statusMessage))
+{
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh; gap: 1rem;">
+        <CgAlert Variant="@_statusVariant">@_statusMessage</CgAlert>
+        <CgButton Variant="outline" Href="@_returnHref">返回</CgButton>
+    </div>
+}
+else
+{
+    <div style="display: flex; justify-content: center; align-items: center; height: 50vh;">
+        <CgProgressRing />
+        <span style="margin-left: 1rem;">正在处理 Steam 绑定...</span>
+    </div>
+}
 
 @code {
-    [SupplyParameterFromQuery(Name = "openid.claimed_id")]
-    [Parameter]
-    public string? OpenIdClaimedId { get; set; }
-
     [Parameter]
     public string? ReturnUrl { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private string? _statusMessage;
+    private string _statusVariant = "info";
+    private string _returnHref = "/";
+
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(OpenIdClaimedId))
-                {
-                    ToastService.Show("绑定失败", "未收到 Steam 返回的认证信息", "error");
-                    NavigateBack();
-                    return;
-                }
-
-                var ids = OpenIdClaimedId.Split("/");
-                if (ids.Length < 2)
-                {
-                    ToastService.Show("绑定失败", "Steam 认证信息格式不正确", "error");
-                    NavigateBack();
-                    return;
-                }
-
-                var steamId = ids.Last();
-
-                var editResult = await SpaceCommandService.GetSpaceEditAsync();
-                if (!editResult.Success || editResult.Data == null)
-                {
-                    ToastService.Show("绑定失败", editResult.Error?.Message ?? "无法获取当前个人空间数据", "error");
-                    NavigateBack();
-                    return;
-                }
-
-                var model = editResult.Data;
-                
-                if (model.UserData.SteamIds.Contains(steamId))
-                {
-                    ToastService.Show("提示", "该 Steam 账号已绑定", "info");
-                    NavigateBack();
-                    return;
-                }
-
-                model.UserData.SteamIds.Add(steamId);
-
-                var submitResult = await SpaceCommandService.SubmitEditAsync(model);
-                if (submitResult.Success)
-                {
-                    ToastService.Show("绑定成功", "已成功绑定 Steam 账号", "success");
-                }
-                else
-                {
-                    ToastService.Show("绑定失败", submitResult.Error?.Message ?? "保存 Steam 绑定信息失败", "error");
-                }
-
-                NavigateBack();
-            }
-            catch (Exception ex)
-            {
-                ToastService.Show("绑定失败", $"发生未知错误：{ex.Message}", "error");
-                NavigateBack();
-            }
-        }
-    }
-
-    private void NavigateBack()
-    {
+        // 预先计算返回链接
         if (!string.IsNullOrWhiteSpace(ReturnUrl))
         {
             try
             {
-                NavigationManager.NavigateTo(SdkToolHelper.Base64DecodeUrl(ReturnUrl));
+                _returnHref = SdkToolHelper.Base64DecodeUrl(ReturnUrl);
             }
             catch
             {
-                NavigationManager.NavigateTo("/");
+                _returnHref = "/";
             }
         }
-        else
+
+        try
         {
-            NavigationManager.NavigateTo("/");
+            // 手动从 URL 解析 openid.claimed_id，避免 SupplyParameterFromQuery 对含点号参数名的兼容问题
+            var uri = new Uri(NavigationManager.Uri);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var openIdClaimedId = query["openid.claimed_id"];
+
+            if (string.IsNullOrWhiteSpace(openIdClaimedId))
+            {
+                SetStatus("未收到 Steam 返回的认证信息", "error");
+                return;
+            }
+
+            var ids = openIdClaimedId.Split("/");
+            if (ids.Length < 2)
+            {
+                SetStatus("Steam 认证信息格式不正确", "error");
+                return;
+            }
+
+            var steamId = ids.Last();
+
+            var editResult = await SpaceCommandService.GetSpaceEditAsync();
+            if (!editResult.Success || editResult.Data == null)
+            {
+                SetStatus(editResult.Error?.Message ?? "无法获取当前个人空间数据", "error");
+                return;
+            }
+
+            var model = editResult.Data;
+
+            if (model.UserData.SteamIds.Contains(steamId))
+            {
+                SetStatus("该 Steam 账号已绑定", "info");
+                return;
+            }
+
+            model.UserData.SteamIds.Add(steamId);
+
+            var submitResult = await SpaceCommandService.SubmitEditAsync(model);
+            if (submitResult.Success)
+            {
+                // 绑定成功后，刷新 Steam 相关缓存以拉取最新游玩数据
+                var userId = model.UserData.Id ?? string.Empty;
+                var refreshResult = await SpaceCommandService.RefreshSteamInfoAsync(userId);
+                if (refreshResult.Success)
+                {
+                    SetStatus("已成功绑定 Steam 账号并刷新游玩数据", "success");
+                }
+                else
+                {
+                    // 绑定本身成功，但缓存刷新失败，提示用户可稍后手动刷新
+                    SetStatus("已成功绑定 Steam 账号，但刷新游玩数据失败，可稍后在个人空间手动刷新", "warning");
+                }
+            }
+            else
+            {
+                SetStatus(submitResult.Error?.Message ?? "保存 Steam 绑定信息失败", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"发生未知错误：{ex.Message}", "error");
         }
     }
+
+    private void SetStatus(string message, string variant)
+    {
+        _statusMessage = message;
+        _statusVariant = variant;
+    }
 }
+

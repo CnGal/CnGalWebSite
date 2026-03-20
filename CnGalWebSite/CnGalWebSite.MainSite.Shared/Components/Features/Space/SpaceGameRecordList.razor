@@ -4,7 +4,7 @@
 
 @if (IsCurrentUser)
 {
-    <SpaceSteamToolbar SteamId="@SteamId" />
+    <SpaceSteamToolbar SteamId="@SteamId" UserId="@UserId" OnDataChanged="OnDataChanged" />
 }
 
 @if (VisibleRecords.Count > 0)
@@ -38,6 +38,12 @@ else
 
     [Parameter]
     public string SteamId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
 
     private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
         .Where(r => !r.IsHidden && (r.ShowPublicly || IsCurrentUser))

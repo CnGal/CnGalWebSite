@@ -1,0 +1,84 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="lottery-editor-section" id="section-lottery-main">
+    <h2><CgMdiIcon Name="mdiInformationOutline" Class="lottery-section-icon" aria-hidden="true"/>主要信息</h2>
+    <p>设置抽奖的图片、类型、名称、时间等基本信息。</p>
+
+    @if (Model != null)
+    {
+        <div class="lottery-images-grid">
+            <CgFormGroup Label="主图">
+                <CgImageUpload @bind-Value="Model.MainPicture" Text="上传主图" Type="ImageAspectType._16_9" />
+            </CgFormGroup>
+            <CgFormGroup Label="缩略图">
+                <CgImageUpload @bind-Value="Model.Thumbnail" Text="上传缩略图" Type="ImageAspectType.None" />
+            </CgFormGroup>
+            <CgFormGroup Label="大背景图">
+                <CgImageUpload @bind-Value="Model.BackgroundPicture" Text="上传大背景图" Type="ImageAspectType.None" />
+            </CgFormGroup>
+            <CgFormGroup Label="小背景图">
+                <CgImageUpload @bind-Value="Model.SmallBackgroundPicture" Text="上传小背景图" Type="ImageAspectType.None" />
+            </CgFormGroup>
+        </div>
+
+        <div class="lottery-fields-grid">
+            <CgFormGroup Label="名称">
+                <CgInput @bind-Value="Model.Name" TValue="string" />
+            </CgFormGroup>
+
+            <CgFormGroup Label="显示名称">
+                <CgInput @bind-Value="Model.DisplayName" TValue="string" />
+            </CgFormGroup>
+
+            <CgFormGroup Label="类型">
+                <CgEnumSelect @bind-Value="Model.Type" TEnum="LotteryType" />
+            </CgFormGroup>
+
+            <CgFormGroup Label="参加抽奖的条件">
+                <CgEnumSelect @bind-Value="Model.ConditionType" TEnum="LotteryConditionType" />
+            </CgFormGroup>
+
+            @if (Model.ConditionType == LotteryConditionType.BookingGame)
+            {
+                <CgFormGroup Label="关联游戏">
+                    <CgAutoComplete @bind-Value="Model.GameName" Items="EntryGameItems" Placeholder="搜索游戏..." />
+                </CgFormGroup>
+            }
+
+            @if (Model.ConditionType == LotteryConditionType.Wishlist || Model.ConditionType == LotteryConditionType.SteamLibrary)
+            {
+                <CgFormGroup Label="游戏SteamId">
+                    <CgInput @bind-Value="Model.GameSteamId" TValue="string" />
+                </CgFormGroup>
+            }
+        </div>
+
+        <CgFormGroup Label="简介">
+            <CgTextarea @bind-Value="Model.BriefIntroduction" Rows="3" />
+        </CgFormGroup>
+
+        <div class="lottery-fields-grid">
+            <CgFormGroup Label="开始时间">
+                <CgDateInput Value="Model.BeginTime" ValueChanged="v => { if (v.HasValue) Model.BeginTime = v.Value; }" Mode="CgDateInputMode.DateTime" />
+            </CgFormGroup>
+
+            <CgFormGroup Label="结束时间">
+                <CgDateInput Value="Model.EndTime" ValueChanged="v => { if (v.HasValue) Model.EndTime = v.Value; }" Mode="CgDateInputMode.DateTime" />
+            </CgFormGroup>
+
+            @if (Model.Type == LotteryType.Automatic)
+            {
+                <CgFormGroup Label="抽奖时间">
+                    <CgDateInput Value="Model.LotteryTime" ValueChanged="v => { if (v.HasValue) Model.LotteryTime = v.Value; }" Mode="CgDateInputMode.DateTime" />
+                </CgFormGroup>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public EditLotteryModel Model { get; set; } = default!;
+    [Parameter] public IEnumerable<string> EntryGameItems { get; set; } = [];
+}

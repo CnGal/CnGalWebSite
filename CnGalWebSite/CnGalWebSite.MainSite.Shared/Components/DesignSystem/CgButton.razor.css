@@ -11,6 +11,7 @@
     line-height: 1.2;
     cursor: pointer;
     transition: all var(--cg-transition-fast);
+    text-decoration: none;
 }
 
 .cg-btn:disabled {

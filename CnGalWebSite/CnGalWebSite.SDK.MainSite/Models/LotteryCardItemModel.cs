@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.Model;
+
 namespace CnGalWebSite.SDK.MainSite.Models;
 
 public sealed class LotteryCardItemModel
@@ -17,6 +19,8 @@ public sealed class LotteryCardItemModel
     public required DateTime EndTime { get; init; }
 
     public required long Count { get; init; }
+
+    public required LotteryConditionType ConditionType { get; init; }
 
     public required bool IsEnd { get; init; }
 }

@@ -144,16 +144,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
             if (user != null)
             {
                 //是否更新SteamId
-                if (string.IsNullOrWhiteSpace(user.SteamId) ||
-                    user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
-                {
-                    var steamId = context.User?.Claims?.GetUserSteamId();
-                    if (string.IsNullOrWhiteSpace(steamId) == false)
-                    {
-                        user.SteamId = context.User?.Claims?.GetUserSteamId();
-                        await _userRepository.UpdateAsync(user);
-                    }
-                }
+                // if (string.IsNullOrWhiteSpace(user.SteamId) ||
+                //     user.SteamId.Replace("、", ",").Replace("，", ",").Contains(',') == false)
+                // {
+                //     var steamId = context.User?.Claims?.GetUserSteamId();
+                //     if (string.IsNullOrWhiteSpace(steamId) == false)
+                //     {
+                //         user.SteamId = context.User?.Claims?.GetUserSteamId();
+                //         await _userRepository.UpdateAsync(user);
+                //     }
+                // }
 
                 return user;
             }

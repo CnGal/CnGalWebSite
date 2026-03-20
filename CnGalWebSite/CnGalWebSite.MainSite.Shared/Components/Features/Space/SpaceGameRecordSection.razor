@@ -1,0 +1,64 @@
+@* 游玩记录区域（交互式包装器，仅当前用户使用）
+   拥有数据所有权并处理刷新，将渲染委托给 SpaceGameRecordList *@
+
+@rendermode InteractiveServer
+
+@inject IPlayedGameQueryService PlayedGameQueryService
+@inject ISpaceQueryService SpaceQueryService
+
+@if (_gameRecords is not null)
+{
+    <SpaceGameRecordList Model="_gameRecords"
+                         IsCurrentUser="true"
+                         SteamUsers="_steamUsers"
+                         SteamId="@_steamId"
+                         UserId="@UserId"
+                         OnDataChanged="RefreshAsync" />
+}
+
+@code {
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string SteamId { get; set; } = string.Empty;
+
+    private string _steamId = string.Empty;
+    private UserGameRecordsViewModel? _gameRecords;
+    private IReadOnlyList<SteamUserInfoItem> _steamUsers = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _steamId = SteamId;
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(UserId);
+        var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(UserId);
+
+        await Task.WhenAll(recordsTask, steamInfoTask);
+
+        var recordsResult = recordsTask.Result;
+        _gameRecords = recordsResult.Success ? recordsResult.Data : null;
+
+        var steamInfoResult = steamInfoTask.Result;
+        _steamUsers = steamInfoResult.Success && steamInfoResult.Data is not null
+            ? steamInfoResult.Data
+            : [];
+    }
+
+    private async Task RefreshAsync()
+    {
+        // 重新加载游玩记录和 Steam 用户信息
+        await LoadDataAsync();
+
+        // 重新获取 Space 详情以更新 SteamId（编辑后可能已变更）
+        var spaceResult = await SpaceQueryService.GetSpaceDetailAsync(UserId);
+        if (spaceResult.Success && spaceResult.Data is not null)
+        {
+            _steamId = spaceResult.Data.SteamId;
+        }
+    }
+}

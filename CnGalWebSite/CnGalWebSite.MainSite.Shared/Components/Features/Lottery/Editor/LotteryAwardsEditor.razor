@@ -1,0 +1,307 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="lottery-editor-section" id="section-lottery-awards">
+    <h2><CgMdiIcon Name="mdiGiftOutline" Class="lottery-section-icon" aria-hidden="true"/>奖品列表</h2>
+    <p>管理抽奖的奖品，可以添加、编辑或删除奖品。</p>
+
+    @if (Model != null)
+    {
+        <div class="lottery-awards-actions">
+            <CgButton Variant="primary" OnClick="AddAward">
+                <CgMdiIcon Name="mdiPlus" aria-hidden="true" />
+                <span>添加奖品</span>
+            </CgButton>
+            <CgButton Variant="outline" OnClick="OpenBatchImport">
+                <CgMdiIcon Name="mdiDatabaseImportOutline" aria-hidden="true" />
+                <span>批量导入</span>
+            </CgButton>
+        </div>
+
+        @if (Model.Awards.Count == 0)
+        {
+            <div class="lottery-awards-empty">
+                <CgMdiIcon Name="mdiGiftOpenOutline" aria-hidden="true" />
+                <p>暂无奖品，请点击"添加奖品"按钮</p>
+            </div>
+        }
+        else
+        {
+            <div class="lottery-awards-list">
+                @foreach (var award in Model.Awards.OrderByDescending(s => s.Priority))
+                {
+                    <div class="lottery-award-card">
+                        @if (!string.IsNullOrWhiteSpace(award.Image))
+                        {
+                            <img src="@award.Image" alt="@award.Name" class="lottery-award-card__image" />
+                        }
+                        <div class="lottery-award-card__body">
+                            <h3 class="lottery-award-card__name">@(string.IsNullOrWhiteSpace(award.Name) ? "未命名奖品" : award.Name)</h3>
+                            <div class="lottery-award-card__meta">
+                                <span>数量：@award.Count</span>
+                                <span>类型：@award.Type.GetDisplayName()</span>
+                                <span>优先级：@award.Priority</span>
+                                @if (!string.IsNullOrWhiteSpace(award.Sponsor))
+                                {
+                                    <span>赞助商：@award.Sponsor</span>
+                                }
+                                @if (award.Integral > 0)
+                                {
+                                    <span>附加积分：@award.Integral</span>
+                                }
+                            </div>
+                            @if (award.Type == LotteryAwardType.ActivationCode && award.Prizes.Count > 0)
+                            {
+                                <div class="lottery-award-card__codes">
+                                    <span class="lottery-award-card__codes-label">激活码：@award.Prizes.Count 个</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="lottery-award-card__actions">
+                            <button type="button" class="lottery-award-btn lottery-award-btn--edit" @onclick="() => EditAward(award)" aria-label="编辑">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                            </button>
+                            <button type="button" class="lottery-award-btn lottery-award-btn--delete" @onclick="() => DeleteAward(award)" aria-label="删除">
+                                <CgMdiIcon Name="mdiTrashCanOutline" aria-hidden="true" />
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</section>
+
+@* ── 奖品编辑弹窗 ── *@
+<CgModal IsOpen="_isEditModalOpen" OnClose="CloseEditModal" Title="@(_isNewAward ? "添加奖品" : "编辑奖品")">
+    @if (_editingAward != null)
+    {
+        <div class="lottery-award-edit-form">
+            <CgFormGroup Label="预览图">
+                <CgImageUpload @bind-Value="_editingAward.Image" Text="上传预览图" Type="ImageAspectType.None" />
+            </CgFormGroup>
+
+            <div class="lottery-award-edit-grid">
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editingAward.Name" TValue="string" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect @bind-Value="_editingAward.Type" TEnum="LotteryAwardType" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="数量">
+                    <CgInput @bind-Value="_editingAward.Count" TValue="int" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editingAward.Priority" TValue="int" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="赞助商">
+                    <CgInput @bind-Value="_editingAward.Sponsor" TValue="string" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="附加积分">
+                    <CgInput @bind-Value="_editingAward.Integral" TValue="int" />
+                </CgFormGroup>
+            </div>
+
+            <CgFormGroup Label="链接">
+                <CgInput @bind-Value="_editingAward.Link" TValue="string" />
+            </CgFormGroup>
+
+            @if (_editingAward.Type == LotteryAwardType.ActivationCode)
+            {
+                <div class="lottery-prize-section">
+                    <h4>激活码列表</h4>
+                    <div class="lottery-prize-actions">
+                        <CgButton Variant="outline" OnClick="AddPrize">
+                            <CgMdiIcon Name="mdiPlus" aria-hidden="true" />
+                            <span>添加</span>
+                        </CgButton>
+                        <CgButton Variant="outline" OnClick="OpenPrizeBatchImport">
+                            <CgMdiIcon Name="mdiDatabaseImportOutline" aria-hidden="true" />
+                            <span>批量导入</span>
+                        </CgButton>
+                    </div>
+
+                    @if (_editingAward.Prizes.Count > 0)
+                    {
+                        <div class="lottery-prize-list">
+                            @foreach (var prize in _editingAward.Prizes)
+                            {
+                                <div class="lottery-prize-item">
+                                    <span class="lottery-prize-item__text">@prize.Context</span>
+                                    <button type="button" class="lottery-award-btn lottery-award-btn--delete" @onclick="() => DeletePrize(prize)" aria-label="删除">
+                                        <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true" />
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="lottery-award-edit-actions">
+                <CgButton Variant="primary" OnClick="SaveAward">保存</CgButton>
+                <CgButton Variant="outline" OnClick="CloseEditModal">取消</CgButton>
+            </div>
+        </div>
+    }
+</CgModal>
+
+@* ── 批量导入弹窗（奖品名） ── *@
+<CgModal IsOpen="_isBatchModalOpen" OnClose="CloseBatchModal" Title="批量导入奖品">
+    <div class="lottery-batch-form">
+        <CgAlert Variant="info">每行一个奖品名称，将自动创建数量为1的奖品。</CgAlert>
+        <CgTextarea @bind-Value="_batchText" Rows="8" />
+        <div class="lottery-award-edit-actions">
+            <CgButton Variant="primary" OnClick="ConfirmBatchImport">导入</CgButton>
+            <CgButton Variant="outline" OnClick="CloseBatchModal">取消</CgButton>
+        </div>
+    </div>
+</CgModal>
+
+@* ── 批量导入激活码弹窗 ── *@
+<CgModal IsOpen="_isPrizeBatchModalOpen" OnClose="ClosePrizeBatchModal" Title="批量导入激活码">
+    <div class="lottery-batch-form">
+        <CgAlert Variant="info">每行一个激活码。</CgAlert>
+        <CgTextarea @bind-Value="_prizeBatchText" Rows="8" />
+        <div class="lottery-award-edit-actions">
+            <CgButton Variant="primary" OnClick="ConfirmPrizeBatchImport">导入</CgButton>
+            <CgButton Variant="outline" OnClick="ClosePrizeBatchModal">取消</CgButton>
+        </div>
+    </div>
+</CgModal>
+
+@code {
+    [Parameter] public EditLotteryModel Model { get; set; } = default!;
+    [Parameter] public ICgToastService? ToastService { get; set; }
+
+    private bool _isEditModalOpen;
+    private bool _isNewAward;
+    private EditLotteryAwardModel? _editingAward;
+
+    private bool _isBatchModalOpen;
+    private string _batchText = string.Empty;
+
+    private bool _isPrizeBatchModalOpen;
+    private string _prizeBatchText = string.Empty;
+
+    // ── 奖品 CRUD ──
+
+    private void AddAward()
+    {
+        _editingAward = new EditLotteryAwardModel();
+        _isNewAward = true;
+        _isEditModalOpen = true;
+    }
+
+    private void EditAward(EditLotteryAwardModel award)
+    {
+        _editingAward = award;
+        _isNewAward = false;
+        _isEditModalOpen = true;
+    }
+
+    private void DeleteAward(EditLotteryAwardModel award)
+    {
+        Model.Awards.Remove(award);
+    }
+
+    private void SaveAward()
+    {
+        if (_editingAward == null) return;
+
+        var result = _editingAward.Validate();
+        if (!result.Successful)
+        {
+            ToastService?.Show("校验失败", result.Error ?? "请检查奖品信息是否完整", "error");
+            return;
+        }
+
+        if (_isNewAward && !Model.Awards.Contains(_editingAward))
+        {
+            Model.Awards.Add(_editingAward);
+        }
+
+        _isEditModalOpen = false;
+    }
+
+    private void CloseEditModal()
+    {
+        _isEditModalOpen = false;
+    }
+
+    // ── 批量导入奖品 ──
+
+    private void OpenBatchImport()
+    {
+        _batchText = string.Empty;
+        _isBatchModalOpen = true;
+    }
+
+    private void ConfirmBatchImport()
+    {
+        if (string.IsNullOrWhiteSpace(_batchText))
+        {
+            _isBatchModalOpen = false;
+            return;
+        }
+
+        var lines = _batchText.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var line in lines)
+        {
+            Model.Awards.Add(new EditLotteryAwardModel { Name = line, Count = 1 });
+        }
+
+        _isBatchModalOpen = false;
+    }
+
+    private void CloseBatchModal()
+    {
+        _isBatchModalOpen = false;
+    }
+
+    // ── 激活码 CRUD ──
+
+    private void AddPrize()
+    {
+        _editingAward?.Prizes.Add(new EditLotteryPrizeModel { Context = "占位符" });
+    }
+
+    private void DeletePrize(EditLotteryPrizeModel prize)
+    {
+        _editingAward?.Prizes.Remove(prize);
+    }
+
+    private void OpenPrizeBatchImport()
+    {
+        _prizeBatchText = string.Empty;
+        _isPrizeBatchModalOpen = true;
+    }
+
+    private void ConfirmPrizeBatchImport()
+    {
+        if (_editingAward == null || string.IsNullOrWhiteSpace(_prizeBatchText))
+        {
+            _isPrizeBatchModalOpen = false;
+            return;
+        }
+
+        var lines = _prizeBatchText.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var line in lines)
+        {
+            _editingAward.Prizes.Add(new EditLotteryPrizeModel { Context = line });
+        }
+
+        _isPrizeBatchModalOpen = false;
+    }
+
+    private void ClosePrizeBatchModal()
+    {
+        _isPrizeBatchModalOpen = false;
+    }
+}

@@ -1,0 +1,230 @@
+
+/* ── 操作按钮区 ── */
+.lottery-awards-actions {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-4);
+}
+
+/* ── 空状态 ── */
+.lottery-awards-empty {
+    text-align: center;
+    color: var(--cg-color-text-muted);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    background: linear-gradient(135deg, var(--cg-color-section-bg) 0%, var(--cg-color-surface) 100%);
+    border: 2px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+}
+
+.lottery-awards-empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-text-muted);
+    margin-bottom: var(--cg-spacing-3);
+    opacity: 0.5;
+}
+
+.lottery-awards-empty p {
+    margin: 0;
+}
+
+/* ── 奖品列表 ── */
+.lottery-awards-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── 奖品卡片 ── */
+.lottery-award-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.lottery-award-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.lottery-award-card__image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--cg-radius-sm);
+    flex-shrink: 0;
+}
+
+.lottery-award-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.lottery-award-card__name {
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0 0 var(--cg-spacing-2) 0;
+}
+
+.lottery-award-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2) var(--cg-spacing-4);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.lottery-award-card__codes {
+    margin-top: var(--cg-spacing-2);
+}
+
+.lottery-award-card__codes-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.lottery-award-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    flex-shrink: 0;
+}
+
+/* ── 操作小按钮 ── */
+.lottery-award-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--cg-radius-sm);
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-surface);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+}
+
+.lottery-award-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.lottery-award-btn--edit {
+    color: var(--cg-color-primary);
+}
+
+.lottery-award-btn--edit:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-surface));
+    border-color: var(--cg-color-primary);
+}
+
+.lottery-award-btn--delete {
+    color: var(--cg-color-error);
+}
+
+.lottery-award-btn--delete:hover {
+    background: color-mix(in oklab, var(--cg-color-error) 10%, var(--cg-color-surface));
+    border-color: var(--cg-color-error);
+}
+
+/* ── 奖品编辑表单 ── */
+.lottery-award-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.lottery-award-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+.lottery-award-edit-actions {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    justify-content: flex-end;
+    padding-top: var(--cg-spacing-3);
+    border-top: 1px solid var(--cg-color-border);
+}
+
+/* ── 激活码区域 ── */
+.lottery-prize-section {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    padding: var(--cg-spacing-4);
+    background: var(--cg-color-section-bg);
+}
+
+.lottery-prize-section h4 {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    margin: 0 0 var(--cg-spacing-3) 0;
+    color: var(--cg-color-text);
+}
+
+.lottery-prize-actions {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.lottery-prize-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.lottery-prize-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-sm);
+    font-size: var(--cg-font-size-sm);
+}
+
+.lottery-prize-item__text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── 批量导入表单 ── */
+.lottery-batch-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 640px) {
+    .lottery-award-card {
+        flex-direction: column;
+    }
+
+    .lottery-award-card__image {
+        width: 100%;
+        height: 120px;
+    }
+
+    .lottery-award-card__actions {
+        flex-direction: row;
+    }
+
+    .lottery-award-edit-grid {
+        grid-template-columns: 1fr;
+    }
+}
