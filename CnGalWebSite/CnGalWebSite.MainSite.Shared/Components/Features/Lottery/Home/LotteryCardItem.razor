@@ -1,4 +1,5 @@
 @using CnGalWebSite.Extensions
+@using CnGalWebSite.DataModel.Model
 
 <li>
     <div class="lottery-card">
@@ -25,14 +26,49 @@
 
             <div class="lottery-card-footer">
                 <div class="lottery-card-condition">
-                    <span class="lottery-card-condition-label">参与条件：</span>
-                    <span class="lottery-card-condition-value">@Model.ConditionType.GetDisplayName()</span>
+                    @if (Model.ConditionType == LotteryConditionType.Wishlist)
+                    {
+                        <span>参与条件：把游戏 </span>
+                        <a class="lottery-card-steam-link" target="_blank" href="@($"https://store.steampowered.com/app/{Model.GameSteamId}")">加入Steam愿望单</a>
+                    }
+                    else if (Model.ConditionType == LotteryConditionType.SteamLibrary)
+                    {
+                        <span>参与条件：把游戏 </span>
+                        <a class="lottery-card-steam-link" target="_blank" href="@($"https://store.steampowered.com/app/{Model.GameSteamId}")">加入Steam库</a>
+                    }
+                    else
+                    {
+                        <span class="lottery-card-condition-label">参与条件：</span>
+                        <span class="lottery-card-condition-value">@Model.ConditionType.GetDisplayName()</span>
+                    }
                 </div>
                 
-                <CgButton Href="@($"/lotteries/index/{Model.Id}")" Variant="primary" class="lottery-card-btn">
-                    <CgMdiIcon Name="mdiGiftOutline" />
-                    <span class="lottery-card-btn-text">查看抽奖</span>
-                </CgButton>
+                <div class="lottery-card-btn-area">
+                    <AuthorizeView>
+                        <Authorized>
+                            <LotteryCardActionButton LotteryId="Model.Id"
+                                                      IsEnd="Model.IsEnd"
+                                                      BeginTime="Model.BeginTime"
+                                                      EndTime="Model.EndTime" />
+                        </Authorized>
+                        <NotAuthorized>
+                            @if (IsEnded)
+                            {
+                                <CgButton Href="@($"/lotteries/index/{Model.Id}")" class="lottery-card-btn lottery-card-btn--outline">
+                                    <CgMdiIcon Name="mdiGiftOpenOutline" />
+                                    <span class="lottery-card-btn-text">查看抽奖</span>
+                                </CgButton>
+                            }
+                            else
+                            {
+                                <a class="lottery-card-login-btn" href="/authentication/login">
+                                    <CgMdiIcon Name="mdiLogin" />
+                                    <span>登入后参与抽奖</span>
+                                </a>
+                            }
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
             </div>
         </div>
     </div>

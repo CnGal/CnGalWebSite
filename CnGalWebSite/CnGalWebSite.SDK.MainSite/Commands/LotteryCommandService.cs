@@ -86,4 +86,46 @@ public sealed class LotteryCommandService(
             return SdkResult<long>.Fail("LOTTERY_EDIT_EXCEPTION", "编辑抽奖时发生异常");
         }
     }
+
+    public async Task<SdkResult<UserLotteryStateModel>> GetUserLotteryStateAsync(long lotteryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var model = await GetFromJsonAsync<UserLotteryStateModel>($"api/lotteries/GetUserLotteryState/{lotteryId}", cancellationToken);
+            if (model is null)
+            {
+                return SdkResult<UserLotteryStateModel>.Fail("LOTTERY_STATE_NOT_FOUND", "未获取到用户抽奖状态");
+            }
+            return SdkResult<UserLotteryStateModel>.Ok(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取用户抽奖状态异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
+            return SdkResult<UserLotteryStateModel>.Fail("LOTTERY_STATE_EXCEPTION", "获取用户抽奖状态时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await PostAsJsonRawAsync("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+            {
+                Id = lotteryId,
+            }, cancellationToken);
+            var result = await ReadResponseAsync<Result>(response, cancellationToken);
+
+            if (result?.Successful == true)
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("LOTTERY_PARTICIPATE_FAILED", result?.Error ?? "参与抽奖失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "参与抽奖异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("LOTTERY_PARTICIPATE_EXCEPTION", "参与抽奖时发生异常");
+        }
+    }
 }

@@ -82,6 +82,7 @@ public sealed class LotteryQueryService(
             Count = dto.Count,
             ConditionType = dto.ConditionType,
             IsEnd = dto.EndTime < now,
+            GameSteamId = dto.GameSteamId ?? string.Empty,
         };
     }
 

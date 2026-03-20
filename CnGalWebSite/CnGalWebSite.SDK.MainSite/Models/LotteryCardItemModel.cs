@@ -23,4 +23,6 @@ public sealed class LotteryCardItemModel
     public required LotteryConditionType ConditionType { get; init; }
 
     public required bool IsEnd { get; init; }
+
+    public required string GameSteamId { get; init; }
 }

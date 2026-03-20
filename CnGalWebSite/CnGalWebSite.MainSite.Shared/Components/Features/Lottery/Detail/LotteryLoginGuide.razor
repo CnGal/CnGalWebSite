@@ -1,0 +1,23 @@
+<div class="lottery-login-guide">
+    <div class="lottery-login-guide__content">
+        <img src="https://tucang.cngal.top/api/image/show/47560a67088d68778f872c64ba8ad338" alt="抽奖" class="lottery-login-guide__img" />
+
+        @if (IsEnd)
+        {
+            <p class="lottery-login-guide__text">该抽奖活动已结束</p>
+        }
+        else
+        {
+            <p class="lottery-login-guide__text">登录后即可参与抽奖</p>
+            <a class="lottery-login-guide__btn" href="/authentication/login">
+                <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                <span>登录参与</span>
+            </a>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsEnd { get; set; }
+}

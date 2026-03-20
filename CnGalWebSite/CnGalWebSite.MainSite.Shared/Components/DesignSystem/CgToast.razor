@@ -1,32 +1,36 @@
-@* CgToast — 全局 Toast 容器，由 ICgToastService 驱动 *@
+@* CgToast — 全局 Toast 容器，由 ICgToastService 驱动，支持多条消息堆叠 *@
 @inject ICgToastService ToastService
 @implements IDisposable
 
-@if (_visible)
-{
-    <div class="cg-toast cg-toast--@_variant" role="alert">
-        <CgMdiIcon Name="@GetVariantIcon()" Class="cg-toast__icon" aria-hidden="true"/>
-        <div class="cg-toast__content">
-            <div class="cg-toast__title">@_title</div>
-            @if (!string.IsNullOrEmpty(_detail))
-            {
-                <div class="cg-toast__detail">@_detail</div>
-            }
+<div class="cg-toast-container" aria-live="polite">
+    @foreach (var item in _items)
+    {
+        <div class="cg-toast cg-toast--@item.Variant @(item.Dismissing ? "cg-toast--exit" : "")" role="alert">
+            <CgMdiIcon Name="@GetVariantIcon(item.Variant)" Class="cg-toast__icon" aria-hidden="true"/>
+            <div class="cg-toast__content">
+                <div class="cg-toast__title">@item.Title</div>
+                @if (!string.IsNullOrEmpty(item.Detail))
+                {
+                    <div class="cg-toast__detail">@item.Detail</div>
+                }
+            </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
-    private bool _visible;
-    private string _title = string.Empty;
-    private string? _detail;
-    private string _variant = "info";
-    private CancellationTokenSource? _cts;
+    /// <summary>
+    /// 最多同时显示的 Toast 条数
+    /// </summary>
+    private const int MaxVisible = 5;
 
     /// <summary>
     /// 持续时间（毫秒），默认 3000
     /// </summary>
     [Parameter] public int Duration { get; set; } = 3000;
+
+    private readonly List<ToastItem> _items = new();
+    private int _nextId;
 
     protected override void OnInitialized()
     {
@@ -35,29 +39,46 @@
 
     private async void HandleShow(string title, string? detail, string variant)
     {
-        // 若已有定时器则取消
-        _cts?.Cancel();
-        _cts = new CancellationTokenSource();
+        var id = ++_nextId;
+        var item = new ToastItem(id, title, detail, variant);
 
-        _title = title;
-        _detail = detail;
-        _variant = variant;
-        _visible = true;
+        _items.Add(item);
+
+        // 超过上限时移除最旧的
+        while (_items.Count > MaxVisible)
+        {
+            _items.RemoveAt(0);
+        }
+
         await InvokeAsync(StateHasChanged);
 
-        try
-        {
-            await Task.Delay(Duration, _cts.Token);
-            _visible = false;
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (TaskCanceledException)
-        {
-            // 被新一次 Show 取消，忽略
-        }
+        // 启动自动消失定时器
+        _ = DismissAfterDelay(id);
     }
 
-    private string GetVariantIcon() => _variant switch
+    private async Task DismissAfterDelay(int id)
+    {
+        await Task.Delay(Duration);
+        await Dismiss(id);
+    }
+
+    private async Task Dismiss(int id)
+    {
+        var item = _items.FirstOrDefault(x => x.Id == id);
+        if (item is null) return;
+
+        // 标记为退出动画中
+        item.Dismissing = true;
+        await InvokeAsync(StateHasChanged);
+
+        // 等待退出动画完成
+        await Task.Delay(300);
+
+        _items.Remove(item);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static string GetVariantIcon(string variant) => variant switch
     {
         "success" => "mdiCheckCircleOutline",
         "warning" => "mdiAlertOutline",
@@ -68,7 +89,14 @@
     public void Dispose()
     {
         ToastService.OnShow -= HandleShow;
-        _cts?.Cancel();
-        _cts?.Dispose();
+    }
+
+    private sealed class ToastItem(int id, string title, string? detail, string variant)
+    {
+        public int Id { get; } = id;
+        public string Title { get; } = title;
+        public string? Detail { get; } = detail;
+        public string Variant { get; } = variant;
+        public bool Dismissing { get; set; }
     }
 }

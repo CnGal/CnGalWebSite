@@ -131,19 +131,72 @@
     border-radius: var(--cg-radius-full);
     padding: 0.5rem 2.5rem;
     font-size: var(--cg-font-size-base);
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    cursor: pointer;
+    font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-primary) !important;
     background: transparent !important;
     border: 1px solid var(--cg-color-primary) !important;
-    text-decoration: none !important;
+    transition: background var(--cg-transition-fast);
 }
 
-::deep .lottery-card-btn:hover {
+::deep .lottery-card-btn--outline {
+    color: var(--cg-color-primary) !important;
+    background: transparent !important;
+    border: 1px solid var(--cg-color-primary) !important;
+}
+
+::deep .lottery-card-btn--outline:hover {
     background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent) !important;
 }
 
 ::deep .lottery-card-btn .cg-mdi-icon {
     width: 20px;
     height: 20px;
-    margin-right: var(--cg-spacing-2);
+}
+
+.lottery-card-steam-link {
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: none;
+    transition: color var(--cg-transition-fast);
+}
+
+.lottery-card-steam-link:hover {
+    color: var(--cg-color-primary-hover);
+    text-decoration: underline;
+}
+
+.lottery-card-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    border-radius: var(--cg-radius-full);
+    padding: 0.5rem 2.5rem;
+    font-size: var(--cg-font-size-base);
+    color: var(--cg-color-on-primary);
+    background: var(--cg-color-primary);
+    text-decoration: none;
+    font-weight: var(--cg-font-weight-semibold);
+    transition: background var(--cg-transition-fast);
+}
+
+.lottery-card-login-btn:hover {
+    background: var(--cg-color-primary-hover);
+}
+
+::deep .lottery-card-login-btn .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.lottery-card-btn-area {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 

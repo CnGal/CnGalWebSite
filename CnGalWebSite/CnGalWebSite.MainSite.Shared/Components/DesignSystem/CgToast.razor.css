@@ -1,5 +1,5 @@
-/* ── Container ── */
-.cg-toast {
+/* ── Toast container (stacks from bottom-right) ── */
+.cg-toast-container {
     position: fixed;
     bottom: var(--cg-spacing-6);
     right: var(--cg-spacing-6);
@@ -7,6 +7,14 @@
     max-width: 400px;
     width: calc(100% - var(--cg-spacing-8));
 
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--cg-spacing-3);
+    pointer-events: none;
+}
+
+/* ── Individual toast ── */
+.cg-toast {
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-3);
@@ -22,7 +30,12 @@
     font-family: var(--cg-font-family);
     color: var(--cg-color-text);
     animation: cg-toast-slide-in 0.35s ease-out;
-    pointer-events: none;
+    pointer-events: auto;
+}
+
+/* ── Exit animation ── */
+.cg-toast--exit {
+    animation: cg-toast-slide-out 0.3s ease-in forwards;
 }
 
 /* ── Icon ── */
@@ -87,11 +100,11 @@
     border-left: 3px solid var(--cg-color-error);
 }
 
-/* ── Slide-in animation ── */
+/* ── Slide-in animation (from bottom) ── */
 @keyframes cg-toast-slide-in {
     from {
         opacity: 0;
-        transform: translateY(1rem);
+        transform: translateY(-1rem);
     }
     to {
         opacity: 1;
@@ -99,9 +112,21 @@
     }
 }
 
+/* ── Slide-out animation ── */
+@keyframes cg-toast-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
 /* ── Mobile responsive ── */
 @media (max-width: 480px) {
-    .cg-toast {
+    .cg-toast-container {
         right: var(--cg-spacing-3);
         bottom: var(--cg-spacing-3);
         max-width: none;
