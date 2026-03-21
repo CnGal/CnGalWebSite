@@ -39,7 +39,7 @@
     padding: var(--cg-spacing-2);
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 70%, transparent);
     border-radius: var(--cg-radius-lg);
-    background: color-mix(in oklab, var(--cg-color-surface) 88%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     box-shadow: var(--cg-shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.02);

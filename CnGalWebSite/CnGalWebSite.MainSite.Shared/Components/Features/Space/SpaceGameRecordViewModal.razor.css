@@ -1,0 +1,66 @@
+.space-game-record-view__cover {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+}
+
+.space-game-record-view__cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform var(--cg-transition-normal);
+}
+
+.space-game-record-view__cover:hover img {
+    transform: scale(1.02);
+}
+
+.space-game-record-view__intro {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.space-game-record-view__tags {
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.space-game-record-view__scores {
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.space-game-record-view__no-score {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    text-align: center;
+    padding: var(--cg-spacing-4) 0;
+}
+
+.space-game-record-view__impressions {
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.space-game-record-view__impressions h4 {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0 0 var(--cg-spacing-2) 0;
+}
+
+.space-game-record-view__impressions p {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.space-game-record-view__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}

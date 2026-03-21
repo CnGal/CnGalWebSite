@@ -2,8 +2,7 @@
 
 <section class="entry-score-overview" aria-label="评分概览">
     <header class="entry-score-header">
-        <CgMdiIcon Name="mdiStarBoxMultipleOutline" />
-        <h2>评分概览</h2>
+        <h2><CgMdiIcon Name="mdiStarBoxMultipleOutline" />用户评分</h2>
         <span class="entry-score-count">@Model.ScoredCount 人评分</span>
     </header>
 
@@ -82,7 +81,7 @@
     @if (ScoredUsers.Count > 0)
     {
         <div class="entry-score-users">
-            <h3 class="entry-score-users__title">用户评价</h3>
+            <h2 class="entry-score-users__title"><CgMdiIcon Name="mdiCommentTextMultipleOutline" />用户评价</h2>
             <ul class="entry-score-users__list">
                 @foreach (var user in ScoredUsers.Take(MaxUserScores))
                 {
@@ -93,6 +92,21 @@
             </ul>
         </div>
     }
+
+    @* 添加/编辑游玩记录按钮（仅登录用户可见） *@
+    <AuthorizeView>
+        <Authorized>
+            <EntryScoreAction GameId="Model.GameId"
+                              IsDubbing="Model.IsDubbing"
+                              IsCurrentUserScoreExist="Model.IsCurrentUserScoreExist"
+                              OnDataChanged="OnDataChanged" />
+        </Authorized>
+        <NotAuthorized>
+            <div class="entry-score-login-hint">
+                <a href="/authentication/login">登录后添加游玩记录</a>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 </section>
 
 @code {
@@ -101,6 +115,9 @@
 
     [Parameter]
     public int MaxUserScores { get; set; } = 12;
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
 
     private IReadOnlyList<UserScoreItem> ScoredUsers => Model.UserScores
         .Where(s => s.IsScored || !string.IsNullOrWhiteSpace(s.PlayImpressions))

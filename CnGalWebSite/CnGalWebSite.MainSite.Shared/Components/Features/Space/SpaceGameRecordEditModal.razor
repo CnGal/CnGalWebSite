@@ -1,0 +1,198 @@
+@* 游玩记录编辑/添加弹窗 *@
+
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.PlayedGames
+
+@inject IPlayedGameCommandService PlayedGameCommandService
+@inject IPlayedGameQueryService PlayedGameQueryService
+@inject ICgDeviceIdentificationService DeviceIdentificationService
+@inject ICgToastService ToastService
+
+<CgModal IsOpen="_isOpen" Title="编辑游玩记录" OnClose="CloseAsync">
+    <ChildContent>
+        @if (_isLoading)
+        {
+            <div class="space-game-record-edit__loading">
+                <CgProgressRing />
+            </div>
+        }
+        else if (_model is not null)
+        {
+            <p class="space-game-record-edit__hint">你可以在这里记录游玩状态和评分，还可以在个人空间中绑定 Steam 库存</p>
+
+            @* 游玩状态选择 *@
+            <div class="space-game-record-edit__type">
+                @foreach (var type in _gameTypes)
+                {
+                    <button type="button"
+                            class="space-game-record-edit__type-btn @(_model.Type == type.Value ? "space-game-record-edit__type-btn--active" : "")"
+                            @onclick="() => _model.Type = type.Value">
+                        @type.Label
+                    </button>
+                }
+            </div>
+
+            @* 评分区域 *@
+            <div class="space-game-record-edit__scores">
+                <CgRating Label="音乐" Value="_model.MusicSocre" ValueChanged="v => _model.MusicSocre = v" />
+                <CgRating Label="美术" Value="_model.PaintSocre" ValueChanged="v => _model.PaintSocre = v" />
+                <CgRating Label="剧本" Value="_model.ScriptSocre" ValueChanged="v => _model.ScriptSocre = v" />
+                <CgRating Label="演出" Value="_model.ShowSocre" ValueChanged="v => _model.ShowSocre = v" />
+                <CgRating Label="程序" Value="_model.SystemSocre" ValueChanged="v => _model.SystemSocre = v" />
+                @if (_isDubbing)
+                {
+                    <CgRating Label="配音" Value="_model.CVSocre" ValueChanged="v => _model.CVSocre = v" />
+                }
+                <CgRating Label="总评" Value="_model.TotalSocre" ValueChanged="v => _model.TotalSocre = v" />
+            </div>
+
+            @* 评语 *@
+            <div class="space-game-record-edit__impressions">
+                <label class="space-game-record-edit__impressions-label">
+                    @(_model.LoadSteamReview ? "评语（已加载关联 Steam 账号数据）" : "评语")
+                </label>
+                <CgTextarea Value="@_model.PlayImpressions"
+                            ValueChanged="v => _model.PlayImpressions = v"
+                            Rows="5"
+                            Placeholder="超过 20 字才会被年度游戏评选收录哦~" />
+            </div>
+
+            @* 可见性选项 *@
+            <div class="space-game-record-edit__options">
+                <CgCheckbox Label="公开（参与评选）"
+                            Value="_model.ShowPublicly"
+                            ValueChanged="v => _model.ShowPublicly = v" />
+                <CgCheckbox Label="不展示在个人主页中"
+                            Value="_model.IsHidden"
+                            ValueChanged="v => _model.IsHidden = v" />
+            </div>
+        }
+    </ChildContent>
+
+    <Footer>
+        <div class="space-game-record-edit__footer">
+            <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="CloseAsync">取消</CgButton>
+            <CgButton Variant="CgButton.ButtonVariant.Primary" OnClick="SaveAsync" Disabled="_isSaving">
+                @(_isSaving ? "保存中..." : "保存")
+            </CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    private bool _isOpen;
+    private bool _isLoading;
+    private bool _isSaving;
+    private bool _isDubbing;
+    private EditGameRecordModel? _model;
+
+    /// <summary>
+    /// 当前用户 Id，用于保存后清除缓存
+    /// </summary>
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    private static readonly (PlayedGameType Value, string Label)[] _gameTypes =
+    [
+        (PlayedGameType.WantToPlay, "想玩"),
+        (PlayedGameType.Playing, "正在玩"),
+        (PlayedGameType.Played, "已玩"),
+        (PlayedGameType.Uninterested, "不感兴趣"),
+        (PlayedGameType.UnPlayed, "未玩"),
+    ];
+
+    /// <summary>
+    /// 打开编辑弹窗
+    /// </summary>
+    public async Task OpenAsync(int gameId, bool isDubbing)
+    {
+        _isDubbing = isDubbing;
+        _isOpen = true;
+        _isLoading = true;
+        _model = null;
+        StateHasChanged();
+
+        var result = await PlayedGameCommandService.GetEditDataAsync(gameId);
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取游玩记录失败", null, "error");
+            _isOpen = false;
+        }
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null) return;
+
+        // 校验：如果有部分评分为0，则必须全部为0或全部填写
+        if (!_isDubbing)
+        {
+            _model.CVSocre = -1;
+        }
+
+        var scores = new[] { _model.MusicSocre, _model.PaintSocre, _model.ScriptSocre, _model.ShowSocre, _model.SystemSocre, _model.TotalSocre };
+        if (_isDubbing)
+        {
+            scores = [.. scores, _model.CVSocre];
+        }
+
+        var hasZero = scores.Any(s => s == 0);
+        var hasNonZero = scores.Any(s => s != 0);
+
+        if (hasZero && hasNonZero)
+        {
+            ToastService.Show("请填写所有项目的评分", null, "error");
+            return;
+        }
+
+        _isSaving = true;
+        StateHasChanged();
+
+        try
+        {
+            // 收集设备识别信息
+            _model.Identification = await DeviceIdentificationService.GetIdentificationAsync();
+
+            var result = await PlayedGameCommandService.SaveAsync(_model);
+            if (result.Success)
+            {
+                // 清除缓存，确保刷新时获取最新数据
+                PlayedGameQueryService.InvalidateOverviewCache(_model.GameId);
+                if (!string.IsNullOrEmpty(UserId))
+                {
+                    PlayedGameQueryService.InvalidateUserRecordsCache(UserId);
+                }
+
+                ToastService.Show("保存成功", null, "success");
+                _isOpen = false;
+                await OnSaved.InvokeAsync();
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "保存游玩记录失败", null, "error");
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task CloseAsync()
+    {
+        _isOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

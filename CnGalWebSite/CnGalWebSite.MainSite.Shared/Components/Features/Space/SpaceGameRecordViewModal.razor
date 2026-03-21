@@ -1,0 +1,138 @@
+@* 游玩记录查看弹窗 — 点击游玩记录卡片后打开，展示详情，可进入编辑 *@
+
+@inject IPlayedGameCommandService PlayedGameCommandService
+@inject IPlayedGameQueryService PlayedGameQueryService
+@inject ICgToastService ToastService
+
+<CgModal IsOpen="_isOpen" Title="@(_record?.GameName ?? "游玩记录")" OnClose="CloseAsync">
+    <ChildContent>
+        @if (_record is not null)
+        {
+            @* 封面图 *@
+            <a href="@($"/entries/index/{_record.GameId}")" class="space-game-record-view__cover">
+                <img src="@_record.GameImage" alt="@_record.GameName" />
+            </a>
+
+            @* 简介 *@
+            @if (!string.IsNullOrWhiteSpace(_record.GameBriefIntroduction))
+            {
+                <p class="space-game-record-view__intro">@_record.GameBriefIntroduction</p>
+            }
+
+            @* 标签 *@
+            <div class="space-game-record-view__tags">
+                <SpaceGameRecordTag Model="_record" />
+            </div>
+
+            @* 评分（只读） *@
+            @if (_record.IsScored)
+            {
+                <div class="space-game-record-view__scores">
+                    <CgRating Label="音乐" Value="_record.MusicScore" Disabled="true" />
+                    <CgRating Label="美术" Value="_record.PaintScore" Disabled="true" />
+                    <CgRating Label="剧本" Value="_record.ScriptScore" Disabled="true" />
+                    <CgRating Label="演出" Value="_record.ShowScore" Disabled="true" />
+                    <CgRating Label="程序" Value="_record.SystemScore" Disabled="true" />
+                    @if (_record.CVScore > 0 && _record.IsDubbing)
+                    {
+                        <CgRating Label="配音" Value="_record.CVScore" Disabled="true" />
+                    }
+                    <CgRating Label="总评" Value="_record.TotalScore" Disabled="true" />
+                </div>
+            }
+            else
+            {
+                <p class="space-game-record-view__no-score">未评分</p>
+            }
+
+            @* 评语（仅当前用户可见） *@
+            @if (IsCurrentUser && !string.IsNullOrWhiteSpace(_record.PlayImpressions))
+            {
+                <div class="space-game-record-view__impressions">
+                    <h4>评语</h4>
+                    <p>@_record.PlayImpressions</p>
+                </div>
+            }
+        }
+    </ChildContent>
+
+    <Footer>
+        @if (_record is not null && IsCurrentUser)
+        {
+            <div class="space-game-record-view__footer">
+                <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnToggleHidden">
+                    <CgMdiIcon Name="@(_record.IsHidden ? "mdiEyeOutline" : "mdiEyeOffOutline")" />
+                    @(_record.IsHidden ? "显示" : "隐藏")
+                </CgButton>
+                <CgButton Variant="CgButton.ButtonVariant.Primary" OnClick="OnEditClick">
+                    <CgMdiIcon Name="mdiPencilOutline" /> 编辑游玩记录
+                </CgButton>
+            </div>
+        }
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    [Parameter]
+    public EventCallback OnEditRequest { get; set; }
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
+
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    private bool _isOpen;
+    private GameRecordItem? _record;
+
+    /// <summary>
+    /// 打开查看弹窗
+    /// </summary>
+    public void Open(GameRecordItem record)
+    {
+        _record = record;
+        _isOpen = true;
+        StateHasChanged();
+    }
+
+    private Task CloseAsync()
+    {
+        _isOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private async Task OnEditClick()
+    {
+        _isOpen = false;
+        StateHasChanged();
+        // 通知外部打开编辑弹窗
+        await OnEditRequest.InvokeAsync();
+    }
+
+    private async Task OnToggleHidden()
+    {
+        if (_record is null) return;
+
+        var result = await PlayedGameCommandService.ToggleHiddenAsync(_record.GameId, !_record.IsHidden);
+        if (result.Success)
+        {
+            // 清除缓存
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                PlayedGameQueryService.InvalidateUserRecordsCache(UserId);
+            }
+
+            ToastService.Show(!_record.IsHidden ? "已隐藏" : "已显示", null, "success");
+            _isOpen = false;
+            await OnDataChanged.InvokeAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "修改隐藏状态失败", null, "error");
+        }
+    }
+}

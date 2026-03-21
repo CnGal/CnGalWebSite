@@ -13,7 +13,7 @@
         @foreach (var record in VisibleRecords)
         {
             <li>
-                <SpaceGameRecordItem Model="record" />
+                <SpaceGameRecordItem Model="record" OnClick="() => OnCardClick(record)" />
             </li>
         }
     </ul>
@@ -24,6 +24,19 @@ else
         <CgMdiIcon Name="mdiGamepadVariantOutline" />
         <p>暂无游玩记录</p>
     </div>
+}
+
+@* 查看弹窗（点击卡片后打开） *@
+<SpaceGameRecordViewModal @ref="_viewModal"
+                           IsCurrentUser="IsCurrentUser"
+                           UserId="@UserId"
+                           OnEditRequest="OnEditFromView"
+                           OnDataChanged="OnDataChanged" />
+
+@* 编辑弹窗（从查看弹窗的"编辑"按钮打开） *@
+@if (IsCurrentUser)
+{
+    <SpaceGameRecordEditModal @ref="_editModal" UserId="@UserId" OnSaved="OnRecordSaved" />
 }
 
 @code {
@@ -45,7 +58,36 @@ else
     [Parameter]
     public EventCallback OnDataChanged { get; set; }
 
+    private SpaceGameRecordViewModal? _viewModal;
+    private SpaceGameRecordEditModal? _editModal;
+    private GameRecordItem? _currentRecord;
+
     private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
-        .Where(r => !r.IsHidden && (r.ShowPublicly || IsCurrentUser))
+        .Where(r => !r.IsHidden || IsCurrentUser)
         .ToList();
+
+    /// <summary>
+    /// 第1步：点击卡片 → 打开查看弹窗
+    /// </summary>
+    private void OnCardClick(GameRecordItem record)
+    {
+        _currentRecord = record;
+        _viewModal?.Open(record);
+    }
+
+    /// <summary>
+    /// 第2步：查看弹窗中点击"编辑" → 打开编辑弹窗
+    /// </summary>
+    private async Task OnEditFromView()
+    {
+        if (_currentRecord is not null && _editModal is not null)
+        {
+            await _editModal.OpenAsync(_currentRecord.GameId, _currentRecord.IsDubbing);
+        }
+    }
+
+    private async Task OnRecordSaved()
+    {
+        await OnDataChanged.InvokeAsync();
+    }
 }

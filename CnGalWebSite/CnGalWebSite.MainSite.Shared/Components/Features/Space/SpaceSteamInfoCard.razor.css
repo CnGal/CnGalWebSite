@@ -1,44 +1,54 @@
 .space-steam-info-card {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-5);
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-xl);
     border: 1px solid var(--cg-color-border);
     margin-bottom: var(--cg-spacing-4);
+    box-shadow: var(--cg-shadow-sm);
+    transition: box-shadow var(--cg-transition-normal);
+}
+
+.space-steam-info-card:hover {
+    box-shadow: var(--cg-shadow-md);
 }
 
 /* Account list */
 .space-steam-info-card__accounts {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--cg-spacing-2);
+    gap: var(--cg-spacing-3);
 }
 
 .space-steam-info-card__account {
     display: inline-flex;
     align-items: center;
     gap: var(--cg-spacing-2);
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    padding: var(--cg-spacing-1) var(--cg-spacing-3) var(--cg-spacing-1) var(--cg-spacing-1);
     background: var(--cg-color-bg);
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-full);
     text-decoration: none;
     color: var(--cg-color-text);
-    transition: background var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-border);
+    transition: all var(--cg-transition-fast);
 }
 
 .space-steam-info-card__account:hover {
-    background: color-mix(in srgb, var(--cg-color-primary) 8%, var(--cg-color-bg));
+    background: var(--cg-color-surface);
+    border-color: var(--cg-color-primary);
     box-shadow: var(--cg-shadow-sm);
+    color: var(--cg-color-primary);
 }
 
 .space-steam-info-card__avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
     flex-shrink: 0;
+    box-shadow: var(--cg-shadow-sm);
 }
 
 .space-steam-info-card__name {
@@ -50,35 +60,58 @@
     width: 14px;
     height: 14px;
     fill: var(--cg-color-text-muted);
-    opacity: 0.6;
+    transition: fill var(--cg-transition-fast);
+}
+
+.space-steam-info-card__account:hover ::deep .cg-mdi-icon {
+    fill: var(--cg-color-primary);
 }
 
 /* Stats row */
 .space-steam-info-card__stats {
     display: flex;
-    gap: var(--cg-spacing-4);
+    gap: var(--cg-spacing-6);
     flex-wrap: wrap;
+    padding-top: var(--cg-spacing-3);
+    border-top: 1px dashed var(--cg-color-border);
 }
 
 .space-steam-info-card__stat {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-secondary);
+    gap: var(--cg-spacing-3);
 }
 
-.space-steam-info-card__stat ::deep .cg-mdi-icon {
-    width: 16px;
-    height: 16px;
-    fill: var(--cg-color-text-muted);
+.space-steam-info-card__stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: color-mix(in srgb, var(--cg-color-primary) 10%, var(--cg-color-bg));
+    border-radius: var(--cg-radius-md);
+    color: var(--cg-color-primary);
+}
+
+.space-steam-info-card__stat-icon ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.space-steam-info-card__stat-content {
+    display: flex;
+    flex-direction: column;
 }
 
 .space-steam-info-card__stat-value {
-    font-weight: var(--cg-font-weight-semibold);
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
+    line-height: 1.2;
 }
 
 .space-steam-info-card__stat-label {
+    font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-muted);
 }

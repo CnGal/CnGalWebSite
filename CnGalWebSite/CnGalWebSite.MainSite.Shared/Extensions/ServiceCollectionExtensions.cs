@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMainSiteSharedServices(this IServiceCollection services)
     {
         services.AddScoped<ICgToastService, CgToastService>();
+        services.AddScoped<ICgDeviceIdentificationService, CgDeviceIdentificationService>();
         return services;
     }
 }

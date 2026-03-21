@@ -30,39 +30,29 @@
             }
             else if (_model != null)
             {
-                <div class="space-steam-edit__table-container">
-                    <CgTable>
-                        <table class="cg-table">
-                            <thead>
-                                <tr>
-                                    <th>Steam ID</th>
-                                    <th style="width: 80px; text-align: center;">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (_model.UserData.SteamIds.Count == 0)
-                                {
-                                    <tr>
-                                        <td colspan="2" class="space-steam-edit__empty">暂无绑定的 Steam 账号</td>
-                                    </tr>
-                                }
-                                else
-                                {
-                                    @foreach (var steamId in _model.UserData.SteamIds)
-                                    {
-                                        <tr>
-                                            <td>@steamId</td>
-                                            <td style="text-align: center;">
-                                                <CgButton Variant="outline" OnClick="() => RemoveSteamId(steamId)" Title="删除">
-                                                    <CgMdiIcon Name="mdiTrashCanOutline" aria-hidden="true" />
-                                                </CgButton>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
-                    </CgTable>
+                <div class="space-steam-edit__list">
+                    @if (_model.UserData.SteamIds.Count == 0)
+                    {
+                        <div class="space-steam-edit__empty">
+                            <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                            <p>暂无绑定的 Steam 账号</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var steamId in _model.UserData.SteamIds)
+                        {
+                            <div class="space-steam-edit__list-item">
+                                <div class="space-steam-edit__list-item-content">
+                                    <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                                    <span>@steamId</span>
+                                </div>
+                                <CgButton Variant="outline" OnClick="() => RemoveSteamId(steamId)" Title="删除">
+                                    <CgMdiIcon Name="mdiTrashCanOutline" aria-hidden="true" />
+                                </CgButton>
+                            </div>
+                        }
+                    }
                 </div>
 
                 <CgAlert Variant="info">

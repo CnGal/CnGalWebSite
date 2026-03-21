@@ -1,0 +1,34 @@
+@* 评分概览区域（交互式包装器，仅登录用户使用）
+   拥有数据所有权并处理刷新，将渲染委托给 EntryScoreOverview *@
+
+@rendermode InteractiveServer
+
+@inject IPlayedGameQueryService PlayedGameQueryService
+
+@if (_model is not null)
+{
+    <EntryScoreOverview Model="_model" OnDataChanged="RefreshAsync" />
+}
+
+@code {
+    [Parameter]
+    public int EntryId { get; set; }
+
+    private PlayedGameOverviewViewModel? _model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var result = await PlayedGameQueryService.GetOverviewAsync(EntryId);
+        _model = result.Success ? result.Data : null;
+    }
+
+    private async Task RefreshAsync()
+    {
+        await LoadDataAsync();
+    }
+}

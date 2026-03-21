@@ -1,0 +1,46 @@
+@* 星级评分组件（1-10 分） *@
+
+<div class="cg-rating @(Disabled ? "cg-rating--disabled" : "")">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <span class="cg-rating__label">@Label</span>
+    }
+    <div class="cg-rating__stars" role="group" aria-label="@Label 评分">
+        @for (var i = 1; i <= 10; i++)
+        {
+            var starIndex = i;
+            var isFilled = starIndex <= Value;
+            <button type="button"
+                    class="cg-rating__star @(isFilled ? "cg-rating__star--filled" : "")"
+                    disabled="@Disabled"
+                    aria-label="@starIndex 分"
+                    @onclick="() => OnStarClick(starIndex)">
+            </button>
+        }
+    </div>
+    @if (Value > 0)
+    {
+        <span class="cg-rating__value">@Value</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private async Task OnStarClick(int index)
+    {
+        if (Disabled) return;
+        Value = index;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

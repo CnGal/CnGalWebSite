@@ -1,12 +1,18 @@
 .cg-modal-mask {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: flex-start;
     overflow-y: auto;
     z-index: 1000;
+    animation: cg-modal-mask-fade-in var(--cg-transition-normal);
+}
+
+.cg-modal-closing {
+    animation: cg-modal-mask-fade-out 0.25s ease-out forwards;
 }
 
 .cg-modal-panel {
@@ -15,38 +21,84 @@
     margin: auto 0;
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
-    box-shadow: var(--cg-shadow-lg);
+    box-shadow: var(--cg-shadow-card-hover);
     border: 1px solid var(--cg-color-border);
-    /* 不设 overflow，让下拉框可以溢出面板 */
+    animation: cg-modal-panel-fade-in var(--cg-transition-normal) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cg-modal-panel.cg-modal-panel-closing {
+    animation: cg-modal-panel-fade-out 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .cg-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 1rem;
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--cg-color-border);
 }
 
 .cg-modal-header h3 {
     margin: 0;
-    font-size: 1.05rem;
-}
-
-.cg-modal-close {
-    border: 0;
-    background: transparent;
-    font-size: 1.1rem;
-    cursor: pointer;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
 }
 
 .cg-modal-content {
-    padding: 1rem;
+    padding: 1.5rem;
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-md);
+    line-height: 1.6;
 }
 
 .cg-modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: var(--cg-spacing-3);
-    padding: 0 1rem 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--cg-color-border);
+    background: var(--cg-color-section-bg);
+    border-bottom-left-radius: var(--cg-radius-lg);
+    border-bottom-right-radius: var(--cg-radius-lg);
+}
+
+@keyframes cg-modal-mask-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cg-modal-mask-fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes cg-modal-panel-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes cg-modal-panel-fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
 }

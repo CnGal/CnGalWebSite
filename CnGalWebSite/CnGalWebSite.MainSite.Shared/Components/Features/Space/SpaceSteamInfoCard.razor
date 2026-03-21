@@ -28,19 +28,31 @@
 
             <div class="space-steam-info-card__stats">
                 <div class="space-steam-info-card__stat">
-                    <CgMdiIcon Name="mdiCounter" aria-hidden="true" />
-                    <span class="space-steam-info-card__stat-value">@totalCount</span>
-                    <span class="space-steam-info-card__stat-label">总记录</span>
+                    <div class="space-steam-info-card__stat-icon">
+                        <CgMdiIcon Name="mdiCounter" aria-hidden="true" />
+                    </div>
+                    <div class="space-steam-info-card__stat-content">
+                        <span class="space-steam-info-card__stat-value">@totalCount</span>
+                        <span class="space-steam-info-card__stat-label">总记录</span>
+                    </div>
                 </div>
                 <div class="space-steam-info-card__stat">
-                    <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
-                    <span class="space-steam-info-card__stat-value">@steamCount</span>
-                    <span class="space-steam-info-card__stat-label">Steam</span>
+                    <div class="space-steam-info-card__stat-icon">
+                        <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                    </div>
+                    <div class="space-steam-info-card__stat-content">
+                        <span class="space-steam-info-card__stat-value">@steamCount</span>
+                        <span class="space-steam-info-card__stat-label">Steam</span>
+                    </div>
                 </div>
                 <div class="space-steam-info-card__stat">
-                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
-                    <span class="space-steam-info-card__stat-value">@totalHours.ToString("0.0")</span>
-                    <span class="space-steam-info-card__stat-label">小时</span>
+                    <div class="space-steam-info-card__stat-icon">
+                        <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                    </div>
+                    <div class="space-steam-info-card__stat-content">
+                        <span class="space-steam-info-card__stat-value">@totalHours.ToString("0.0")</span>
+                        <span class="space-steam-info-card__stat-label">小时</span>
+                    </div>
                 </div>
             </div>
         }
