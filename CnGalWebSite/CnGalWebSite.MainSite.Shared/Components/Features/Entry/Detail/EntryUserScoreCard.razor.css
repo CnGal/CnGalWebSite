@@ -7,6 +7,7 @@
     flex-direction: column;
     gap: var(--cg-spacing-3);
     transition: box-shadow var(--cg-transition-fast);
+        height: 100%;
 }
 
 .entry-user-score-card:hover {

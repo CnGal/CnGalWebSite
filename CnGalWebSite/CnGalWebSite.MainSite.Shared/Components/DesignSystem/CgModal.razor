@@ -1,20 +1,21 @@
-@if (IsOpen)
+@if (_isOpenInternal)
 {
-    <div class="cg-modal-mask" @onclick="OnMaskClick">
-        <section class="cg-modal-panel" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
-            <header class="cg-modal-header">
-                <h3>@Title</h3>
-                <button class="cg-modal-close" type="button" @onclick="CloseAsync">x</button>
-            </header>
-            <div class="cg-modal-content">
-                @ChildContent
-            </div>
-            @if (Footer != null)
-            {
-                <footer class="cg-modal-footer">
-                    @Footer
-                </footer>
-            }
+    <div class="cg-modal-mask @(_isClosing ? "cg-modal-closing" : "")" @onclick="OnMaskClick">
+        <section class="cg-modal-panel @(_isClosing ? "cg-modal-panel-closing" : "")" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
+            <CgRenderFreeze Freeze="_isClosing">
+                <header class="cg-modal-header">
+                    <h3>@Title</h3>
+                </header>
+                <div class="cg-modal-content">
+                    @ChildContent
+                </div>
+                @if (Footer != null)
+                {
+                    <footer class="cg-modal-footer">
+                        @Footer
+                    </footer>
+                }
+            </CgRenderFreeze>
         </section>
     </div>
 }
@@ -37,6 +38,37 @@
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+
+    private bool _isOpenInternal;
+    private bool _isClosing;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen)
+        {
+            _isOpenInternal = true;
+            _isClosing = false;
+        }
+        else if (!IsOpen && _isOpenInternal && !_isClosing)
+        {
+            _ = PlayCloseAnimationAsync();
+        }
+    }
+
+    private async Task PlayCloseAnimationAsync()
+    {
+        _isClosing = true;
+        await InvokeAsync(StateHasChanged);
+        
+        await Task.Delay(250);
+        
+        if (_isClosing)
+        {
+            _isOpenInternal = false;
+            _isClosing = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private Task OnMaskClick()
     {

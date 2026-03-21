@@ -1,0 +1,14 @@
+@ChildContent
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Freeze { get; set; }
+
+    protected override bool ShouldRender()
+    {
+        return !Freeze;
+    }
+}

@@ -12,6 +12,7 @@
     cursor: pointer;
     transition: all var(--cg-transition-fast);
     text-decoration: none;
+    gap: .5rem;
 }
 
 .cg-btn:disabled {

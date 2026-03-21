@@ -7,31 +7,37 @@
 <div class="space-steam-toolbar">
     @if (string.IsNullOrWhiteSpace(SteamId))
     {
-        <button type="button" class="space-steam-toolbar__btn space-steam-toolbar__btn--bind" @onclick="OpenEditModal">
-            <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
-            <span>绑定 Steam 账号</span>
-        </button>
+        <div class="space-steam-toolbar__wrapper space-steam-toolbar__wrapper--primary">
+            <CgButton Variant="primary" OnClick="OpenEditModal">
+                <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+                <span>绑定 Steam 账号</span>
+            </CgButton>
+        </div>
     }
     else
     {
-        <CgButton Variant="secondary"
-                  Disabled="_isRefreshing"
-                  OnClick="HandleRefreshAsync">
-            @if (_isRefreshing)
-            {
-                <CgProgressRing />
-            }
-            else
-            {
-                <CgMdiIcon Name="mdiRefresh" aria-hidden="true" />
-            }
-            <span>刷新 Steam</span>
-        </CgButton>
+        <div class="space-steam-toolbar__wrapper space-steam-toolbar__wrapper--pill">
+            <CgButton Variant="secondary"
+                      Disabled="_isRefreshing"
+                      OnClick="HandleRefreshAsync">
+                @if (_isRefreshing)
+                {
+                    <CgProgressRing />
+                }
+                else
+                {
+                    <CgMdiIcon Name="mdiRefresh" aria-hidden="true" />
+                }
+                <span>刷新 Steam 数据</span>
+            </CgButton>
 
-        <button type="button" class="space-steam-toolbar__btn space-steam-toolbar__btn--edit" @onclick="OpenEditModal">
-            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-            <span>编辑 Steam</span>
-        </button>
+            <div class="space-steam-toolbar__divider"></div>
+
+            <CgButton Variant="secondary" OnClick="OpenEditModal">
+                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                <span>管理 Steam 账号</span>
+            </CgButton>
+        </div>
     }
 </div>
 

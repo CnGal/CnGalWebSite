@@ -1,48 +1,50 @@
 .space-steam-toolbar {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
-    flex-wrap: wrap;
+    margin-bottom: var(--cg-spacing-4);
 }
 
-.space-steam-toolbar__btn {
+.space-steam-toolbar__wrapper {
     display: inline-flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    font-size: var(--cg-font-size-sm);
+}
+
+.space-steam-toolbar__wrapper--pill {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-full);
+    padding: var(--cg-spacing-1);
+    box-shadow: var(--cg-shadow-sm);
+    transition: box-shadow var(--cg-transition-normal);
+}
+
+.space-steam-toolbar__wrapper--pill:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.space-steam-toolbar__wrapper--pill ::deep .cg-btn {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: var(--cg-radius-full);
+    padding: var(--cg-spacing-2) var(--cg-spacing-4);
     font-weight: var(--cg-font-weight-medium);
-    border-radius: var(--cg-radius-md);
-    text-decoration: none;
-    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
-    cursor: pointer;
-    border: none;
-    line-height: 1.4;
-}
-
-.space-steam-toolbar__btn ::deep .cg-mdi-icon {
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
-}
-
-.space-steam-toolbar__btn--bind {
-    color: var(--cg-color-on-primary);
-    background: var(--cg-color-primary);
-}
-
-.space-steam-toolbar__btn--bind:hover {
-    background: var(--cg-color-primary-hover);
-}
-
-.space-steam-toolbar__btn--edit {
     color: var(--cg-color-text-secondary);
-    background: var(--cg-color-bg);
+    transition: all var(--cg-transition-fast);
 }
 
-.space-steam-toolbar__btn--edit:hover {
-    background: var(--cg-color-hover-overlay);
-    color: var(--cg-color-text);
+.space-steam-toolbar__wrapper--pill ::deep .cg-btn:hover {
+    background: var(--cg-color-hover-overlay) !important;
+    color: var(--cg-color-text) !important;
+}
+
+.space-steam-toolbar__wrapper--pill ::deep .cg-btn:active {
+    background: color-mix(in srgb, var(--cg-color-bg) 20%, transparent) !important;
+}
+
+.space-steam-toolbar__divider {
+    width: 1px;
+    height: 16px;
+    background: var(--cg-color-border);
+    margin: 0 var(--cg-spacing-1);
 }
 
 /* Inline progress ring for refresh button */

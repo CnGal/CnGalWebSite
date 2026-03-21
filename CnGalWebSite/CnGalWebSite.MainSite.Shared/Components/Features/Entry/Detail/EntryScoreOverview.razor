@@ -2,8 +2,7 @@
 
 <section class="entry-score-overview" aria-label="评分概览">
     <header class="entry-score-header">
-        <CgMdiIcon Name="mdiStarBoxMultipleOutline" />
-        <h2>评分概览</h2>
+        <h2><CgMdiIcon Name="mdiStarBoxMultipleOutline" />用户评分</h2>
         <span class="entry-score-count">@Model.ScoredCount 人评分</span>
     </header>
 
@@ -82,7 +81,7 @@
     @if (ScoredUsers.Count > 0)
     {
         <div class="entry-score-users">
-            <h3 class="entry-score-users__title">用户评价</h3>
+            <h2 class="entry-score-users__title"><CgMdiIcon Name="mdiCommentTextMultipleOutline" />用户评价</h2>
             <ul class="entry-score-users__list">
                 @foreach (var user in ScoredUsers.Take(MaxUserScores))
                 {
