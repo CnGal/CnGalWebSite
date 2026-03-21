@@ -1,16 +1,34 @@
 @using CnGalWebSite.SDK.MainSite.Models
 
-<a href="@($"/entries/index/{Model.GameId}")" class="space-game-record-item" title="@Model.GameName">
-    <div class="space-game-record-item__cover">
-        <img src="@Model.GameImage" alt="@Model.GameName" loading="lazy" />
+@if (OnClick.HasDelegate)
+{
+    <div class="space-game-record-item space-game-record-item--clickable" title="@Model.GameName" @onclick="OnClick">
+        <div class="space-game-record-item__cover">
+            <img src="@Model.GameImage" alt="@Model.GameName" loading="lazy" />
+        </div>
+        <div class="space-game-record-item__info">
+            <h3 class="space-game-record-item__name">@Model.GameName</h3>
+            <SpaceGameRecordTag Model="Model" />
+        </div>
     </div>
-    <div class="space-game-record-item__info">
-        <h3 class="space-game-record-item__name">@Model.GameName</h3>
-        <SpaceGameRecordTag Model="Model" />
-    </div>
-</a>
+}
+else
+{
+    <a href="@($"/entries/index/{Model.GameId}")" class="space-game-record-item" title="@Model.GameName">
+        <div class="space-game-record-item__cover">
+            <img src="@Model.GameImage" alt="@Model.GameName" loading="lazy" />
+        </div>
+        <div class="space-game-record-item__info">
+            <h3 class="space-game-record-item__name">@Model.GameName</h3>
+            <SpaceGameRecordTag Model="Model" />
+        </div>
+    </a>
+}
 
 @code {
     [Parameter]
     public required GameRecordItem Model { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
 }

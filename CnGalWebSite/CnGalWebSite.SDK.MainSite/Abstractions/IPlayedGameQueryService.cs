@@ -18,4 +18,14 @@ public interface IPlayedGameQueryService
     /// 获取用户的 Steam 账号信息列表。
     /// </summary>
     Task<SdkResult<IReadOnlyList<SteamUserInfoItem>>> GetUserSteamInfoAsync(string userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 清除指定用户的游玩记录缓存。
+    /// </summary>
+    void InvalidateUserRecordsCache(string userId);
+
+    /// <summary>
+    /// 清除指定词条的评分概览缓存。
+    /// </summary>
+    void InvalidateOverviewCache(int entryId);
 }

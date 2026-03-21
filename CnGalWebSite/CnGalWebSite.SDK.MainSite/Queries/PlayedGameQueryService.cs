@@ -195,5 +195,17 @@ public sealed class PlayedGameQueryService(
                 .ToList()
         };
     }
+
+    public void InvalidateUserRecordsCache(string userId)
+    {
+        var cacheKey = $"main-site:user-game-records:{userId}";
+        memoryCache.Remove(cacheKey);
+    }
+
+    public void InvalidateOverviewCache(int entryId)
+    {
+        var cacheKey = $"main-site:played-game-overview:{entryId}";
+        memoryCache.Remove(cacheKey);
+    }
 }
 

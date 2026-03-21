@@ -92,6 +92,21 @@
             </ul>
         </div>
     }
+
+    @* 添加/编辑游玩记录按钮（仅登录用户可见） *@
+    <AuthorizeView>
+        <Authorized>
+            <EntryScoreAction GameId="Model.GameId"
+                              IsDubbing="Model.IsDubbing"
+                              IsCurrentUserScoreExist="Model.IsCurrentUserScoreExist"
+                              OnDataChanged="OnDataChanged" />
+        </Authorized>
+        <NotAuthorized>
+            <div class="entry-score-login-hint">
+                <a href="/authentication/login">登录后添加游玩记录</a>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 </section>
 
 @code {
@@ -100,6 +115,9 @@
 
     [Parameter]
     public int MaxUserScores { get; set; } = 12;
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
 
     private IReadOnlyList<UserScoreItem> ScoredUsers => Model.UserScores
         .Where(s => s.IsScored || !string.IsNullOrWhiteSpace(s.PlayImpressions))

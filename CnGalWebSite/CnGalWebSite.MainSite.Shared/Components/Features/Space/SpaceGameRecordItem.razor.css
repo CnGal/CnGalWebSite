@@ -10,6 +10,10 @@
     transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
 }
 
+.space-game-record-item--clickable {
+    cursor: pointer;
+}
+
 .space-game-record-item:hover {
     box-shadow: var(--cg-shadow-card-hover);
     transform: translateY(-2px);

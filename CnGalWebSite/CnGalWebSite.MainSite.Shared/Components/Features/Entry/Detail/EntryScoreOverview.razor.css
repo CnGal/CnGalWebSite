@@ -178,3 +178,20 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Login hint for unauthenticated users */
+.entry-score-login-hint {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-sm);
+}
+
+.entry-score-login-hint a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+}
+
+.entry-score-login-hint a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,52 @@
+@* 词条详情页中的"添加/编辑游玩记录"交互按钮 *@
+@* 此组件声明为 InteractiveServer，嵌套在静态页中，被 AuthorizeView 包裹 *@
+
+@rendermode InteractiveServer
+
+@using CnGalWebSite.MainSite.Shared.Components.Features.Space
+
+<div class="entry-score-action">
+    @if (IsCurrentUserScoreExist)
+    {
+        <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnEditClick">
+            <CgMdiIcon Name="mdiPencilOutline" /> 编辑我的记录
+        </CgButton>
+    }
+    else
+    {
+        <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnEditClick">
+            <CgMdiIcon Name="mdiPlus" /> 添加游玩记录
+        </CgButton>
+    }
+</div>
+
+<SpaceGameRecordEditModal @ref="_editModal" OnSaved="OnSaved" />
+
+@code {
+    [Parameter]
+    public int GameId { get; set; }
+
+    [Parameter]
+    public bool IsDubbing { get; set; }
+
+    [Parameter]
+    public bool IsCurrentUserScoreExist { get; set; }
+
+    [Parameter]
+    public EventCallback OnDataChanged { get; set; }
+
+    private SpaceGameRecordEditModal? _editModal;
+
+    private async Task OnEditClick()
+    {
+        if (_editModal is not null)
+        {
+            await _editModal.OpenAsync(GameId, IsDubbing);
+        }
+    }
+
+    private async Task OnSaved()
+    {
+        await OnDataChanged.InvokeAsync();
+    }
+}

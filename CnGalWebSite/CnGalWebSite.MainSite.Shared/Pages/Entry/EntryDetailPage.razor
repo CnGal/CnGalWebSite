@@ -75,10 +75,18 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
 
-                @if (ScoreOverview is not null)
-                {
-                    <EntryScoreOverview Model="ScoreOverview" />
-                }
+                @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                <AuthorizeView>
+                    <Authorized>
+                        <EntryScoreSection EntryId="Id" />
+                    </Authorized>
+                    <NotAuthorized>
+                        @if (ScoreOverview is not null)
+                        {
+                            <EntryScoreOverview Model="ScoreOverview" />
+                        }
+                    </NotAuthorized>
+                </AuthorizeView>
 
                 <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="entry-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法与补充信息。">
                     <a class="entry-action-btn" href="@($"/space/comments?type=entry&id={Model.Id}")">前往评论区</a>
