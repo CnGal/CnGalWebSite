@@ -1,0 +1,72 @@
+@using CnGalWebSite.DataModel.ViewModel.Stores
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@inject NavigationManager NavigationManager
+
+<a href="/entries/index/@Item.Id" class="revenue-card" @onclick:preventDefault="false">
+    <div class="revenue-card__rank">
+        <span class="revenue-card__rank-num">#@Item.Index</span>
+    </div>
+
+    <div class="revenue-card__image-wrap">
+        <img class="revenue-card__image" src="@Item.MainImage" alt="@Item.Name" loading="lazy" decoding="async" />
+        <div class="revenue-card__publisher">@Item.Publisher</div>
+    </div>
+
+    <div class="revenue-card__body">
+        <h3 class="revenue-card__name" title="@Item.Name">@Item.Name</h3>
+
+        <div class="revenue-card__stats">
+            <div class="revenue-card__stat-item">
+                <span class="revenue-card__stat-label">价格</span>
+                <span class="revenue-card__stat-value--price">¥ @Item.Price</span>
+            </div>
+            <div class="revenue-card__stat-item">
+                <span class="revenue-card__stat-label">评测</span>
+                <span class="revenue-card__stat-value">@Item.EvaluationCount</span>
+            </div>
+            <div class="revenue-card__stat-item">
+                <span class="revenue-card__stat-label">好评率</span>
+                <span class="revenue-card__stat-value">@(Math.Round(Item.RecommendationRate * 100))%</span>
+            </div>
+            <div class="revenue-card__stat-item">
+                <span class="revenue-card__stat-label">平均时长</span>
+                <span class="revenue-card__stat-value">@Math.Round(Item.PlayTime / 60.0, 1) h</span>
+            </div>
+        </div>
+
+        <div class="revenue-card__main-stats">
+            <div class="revenue-card__main-stat">
+                <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
+                <span class="revenue-card__main-stat-label">销量</span>
+                <span class="revenue-card__main-stat-value">@FormatNumber(Item.Owner)</span>
+            </div>
+            <div class="revenue-card__main-stat">
+                <CgMdiIcon Name="mdiCurrencyCny" aria-hidden="true" />
+                <span class="revenue-card__main-stat-label">销售额</span>
+                <span class="revenue-card__main-stat-value--highlight">@FormatNumber(Item.Revenue) 元</span>
+            </div>
+        </div>
+
+        @if (Item.PublishTime.HasValue)
+        {
+            <span class="revenue-card__date">
+                <CgMdiIcon Name="mdiCalendar" aria-hidden="true" />
+                @Item.PublishTime.Value.ToString("yyyy年MM月dd日")
+            </span>
+        }
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public GameRevenueInfoCardModel Item { get; set; } = null!;
+
+    private string FormatNumber(int number)
+    {
+        if (number >= 10000)
+        {
+            return $"{(number / 10000.0):0.#} 万";
+        }
+        return number.ToString("N0");
+    }
+}

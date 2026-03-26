@@ -1,0 +1,204 @@
+/* ── Card container (vertical layout) ── */
+.revenue-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--cg-transition-fast),
+                box-shadow var(--cg-transition-fast),
+                border-color var(--cg-transition-fast);
+}
+
+.revenue-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--cg-shadow-card-hover);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+}
+
+/* ── Rank badge ── */
+.revenue-card__rank {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    padding: var(--cg-spacing-1) var(--cg-spacing-3);
+    border-bottom-right-radius: var(--cg-radius-lg);
+    font-weight: var(--cg-font-weight-bold);
+    font-size: var(--cg-font-size-lg);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+/* ── Image area (banner, 460:215 ratio) ── */
+.revenue-card__image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+}
+
+.revenue-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.revenue-card:hover .revenue-card__image {
+    transform: scale(1.05);
+}
+
+/* gradient overlay at bottom of image */
+.revenue-card__image-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent);
+    pointer-events: none;
+}
+
+/* ── Overlay badges ── */
+.revenue-card__publisher {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    border-radius: var(--cg-radius-md);
+    font-size: var(--cg-font-size-xs);
+    backdrop-filter: blur(4px);
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.revenue-card__date {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-semibold);
+    margin-top: auto;
+    padding: 0.25rem 0.625rem;
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    border-radius: var(--cg-radius-full);
+    width: fit-content;
+}
+
+::deep .revenue-card__date .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Card body ── */
+.revenue-card__body {
+    display: flex;
+    flex-direction: column;
+    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-3);
+    flex: 1;
+}
+
+.revenue-card__name {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-semibold);
+    margin: 0;
+    color: var(--cg-color-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+/* ── Stats grid (2×2) ── */
+.revenue-card__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cg-spacing-2);
+    background: var(--cg-color-bg);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+}
+
+.revenue-card__stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+}
+
+.revenue-card__stat-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.revenue-card__stat-value {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text);
+}
+
+.revenue-card__stat-value--price {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-primary);
+}
+
+/* ── Main stats (revenue / owners, inline rows) ── */
+.revenue-card__main-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    border-top: 1px dashed var(--cg-color-border);
+    padding-top: var(--cg-spacing-3);
+    margin-top: auto;
+}
+
+.revenue-card__main-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+::deep .revenue-card__main-stat .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-primary);
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+.revenue-card__main-stat-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    flex-shrink: 0;
+}
+
+.revenue-card__main-stat-value {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin-left: auto;
+}
+
+.revenue-card__main-stat-value--highlight {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-error);
+    margin-left: auto;
+}

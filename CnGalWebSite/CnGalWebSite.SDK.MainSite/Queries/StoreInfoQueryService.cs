@@ -1,19 +1,31 @@
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.DataModel.ViewModel.Stores;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class StoreInfoQueryService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<StoreInfoQueryService> logger) : QueryServiceBase(httpClient), IStoreInfoQueryService
 {
+    private static readonly TimeSpan StoreInfoCacheDuration = TimeSpan.FromMinutes(5);
+
     protected override ILogger Logger => logger;
 
-    public async Task<SdkResult<IReadOnlyList<DiscountGameItem>>> GetAllGameStoreInfoAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<IReadOnlyList<DiscountGameItem>>> GetAllGameStoreInfoAsync(
+        CancellationToken cancellationToken = default)
     {
+        const string cacheKey = "main-site:all-game-store-info";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<DiscountGameItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<DiscountGameItem>>.Ok(cached);
+        }
+
         var result = await GetAsync<List<StoreInfoCardModel>>(
             "api/storeinfo/GetAllGameStoreInfo",
             "STORE_INFO",
@@ -29,6 +41,9 @@ public sealed class StoreInfoQueryService(
         }
 
         IReadOnlyList<DiscountGameItem> items = result.Data.Select(MapToViewModel).ToList();
+
+        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration);
+
         return SdkResult<IReadOnlyList<DiscountGameItem>>.Ok(items);
     }
 
@@ -50,5 +65,33 @@ public sealed class StoreInfoQueryService(
             RecommendationRate = dto.RecommendationRate ?? 0,
             PlayTime = dto.PlayTime ?? 0,
         };
+    }
+
+    public async Task<SdkResult<GameRevenueInfoViewModel>> GetGameRevenueInfoAsync(
+        int year, int page, int max, int order, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:game-revenue-info:{year}:{page}:{max}:{order}";
+        if (memoryCache.TryGetValue(cacheKey, out GameRevenueInfoViewModel? cached) && cached is not null)
+        {
+            return SdkResult<GameRevenueInfoViewModel>.Ok(cached);
+        }
+
+        var result = await GetAsync<GameRevenueInfoViewModel>(
+            $"api/storeinfo/GetGameRevenueInfo?year={year}&page={page}&max={max}&order={order}",
+            "STORE_REVENUE_INFO",
+            "游戏销量信息",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<GameRevenueInfoViewModel>.Fail(
+                result.Error?.Code ?? "STORE_REVENUE_INFO_FAILED",
+                result.Error?.Message ?? "获取游戏销量信息失败",
+                result.Error?.StatusCode);
+        }
+
+        memoryCache.Set(cacheKey, result.Data, StoreInfoCacheDuration);
+
+        return SdkResult<GameRevenueInfoViewModel>.Ok(result.Data);
     }
 }

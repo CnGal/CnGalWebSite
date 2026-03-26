@@ -1,0 +1,244 @@
+/* ── Page container ── */
+.revenue-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--cg-spacing-6) var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+/* ── Header (card style, unified with GamePublishTimesPage / DiscountPage) ── */
+.revenue-page__header {
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-xl);
+    padding: var(--cg-spacing-8) var(--cg-spacing-6);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    text-align: center;
+}
+
+.revenue-page__title {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    margin: 0;
+    color: var(--cg-color-text);
+}
+
+/* ── Info card (legacy descriptive text) ── */
+.revenue-page__info {
+    width: 100%;
+    background: var(--cg-color-bg);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4) var(--cg-spacing-6);
+    text-align: left;
+}
+
+.revenue-page__info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    line-height: 1.7;
+}
+
+.revenue-page__info-list li {
+    position: relative;
+    padding-left: var(--cg-spacing-4);
+}
+
+.revenue-page__info-list li::before {
+    content: "●";
+    position: absolute;
+    left: 0;
+    color: var(--cg-color-primary);
+    font-size: var(--cg-font-size-xs);
+    line-height: 1.7;
+}
+
+.revenue-page__info-list s {
+    opacity: 0.6;
+}
+
+.revenue-page__info-sub {
+    display: block;
+    padding-left: var(--cg-spacing-2);
+    color: var(--cg-color-text-muted);
+    opacity: 0.7;
+    font-size: var(--cg-font-size-xs);
+}
+
+.revenue-page__info-list a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-weight: var(--cg-font-weight-medium);
+    transition: color var(--cg-transition-fast);
+}
+
+.revenue-page__info-list a:hover {
+    text-decoration: underline;
+}
+
+/* ── Controls ── */
+.revenue-page__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-3);
+    justify-content: center;
+    align-items: center;
+}
+
+/* ── Toggle group (pill shape, matching other pages) ── */
+.revenue-page__toggle-group {
+    display: flex;
+    border-radius: var(--cg-radius-full);
+    overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-bg);
+}
+
+.revenue-page__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-2) var(--cg-spacing-4);
+    border: none;
+    background: transparent;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    font-family: var(--cg-font-family);
+    border-radius: var(--cg-radius-full);
+}
+
+.revenue-page__toggle:hover {
+    background: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+.revenue-page__toggle--active {
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+}
+
+.revenue-page__toggle--active:hover {
+    background: var(--cg-color-primary-hover);
+    color: var(--cg-color-on-primary);
+}
+
+::deep .revenue-page__toggle .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ── Card grid ── */
+.revenue-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--cg-spacing-5);
+}
+
+/* ── Loading ── */
+.revenue-page__loading {
+    display: flex;
+    justify-content: center;
+    padding: var(--cg-spacing-10) 0;
+}
+
+/* ── Error (card container with pill button) ── */
+.revenue-page__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    text-align: center;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+::deep .revenue-page__error .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-error);
+}
+
+.revenue-page__error p {
+    margin: 0;
+    font-size: var(--cg-font-size-md);
+    color: var(--cg-color-text-muted);
+}
+
+.revenue-page__error-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--cg-spacing-2) var(--cg-spacing-5);
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    border-radius: var(--cg-radius-full);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    transition: all var(--cg-transition-fast);
+}
+
+.revenue-page__error-link:hover {
+    background: var(--cg-color-primary-hover);
+    color: var(--cg-color-on-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--cg-shadow-md);
+}
+
+/* ── Empty (dashed card with subtle icon) ── */
+.revenue-page__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    text-align: center;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px dashed var(--cg-color-border);
+}
+
+::deep .revenue-page__empty .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-text-muted);
+    opacity: 0.5;
+}
+
+.revenue-page__empty p {
+    margin: 0;
+    font-size: var(--cg-font-size-md);
+    color: var(--cg-color-text-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .revenue-page {
+        padding: var(--cg-spacing-4) var(--cg-spacing-3);
+    }
+
+    .revenue-page__header {
+        padding: var(--cg-spacing-6) var(--cg-spacing-4);
+        border-radius: var(--cg-radius-lg);
+    }
+
+    .revenue-page__grid {
+        grid-template-columns: 1fr;
+    }
+}

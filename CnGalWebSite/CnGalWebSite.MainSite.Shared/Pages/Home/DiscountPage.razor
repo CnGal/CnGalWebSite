@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 @inject IStoreInfoQueryService StoreInfoQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.DataModel.ViewModel.Steam
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -70,17 +71,36 @@
 </div>
 
 @code {
+    // ── URL query parameters ──
+    [SupplyParameterFromQuery(Name = "screen")]
+    public int QueryScreenType { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public int QuerySortType { get; set; }
+
+    [SupplyParameterFromQuery(Name = "noDiscount")]
+    public bool ShowNoDiscount { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int QueryPageSize { get; set; }
+
+    [SupplyParameterFromQuery(Name = "maxPrice")]
+    public double QueryMaxOriginalPrice { get; set; }
+
+    [SupplyParameterFromQuery(Name = "minRate")]
+    public double MinRecommendationRate { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int CurrentPage { get; set; }
+
     // ── Raw data ──
     private IReadOnlyList<DiscountGameItem> AllItems = [];
 
-    // ── Filter state ──
+    // ── Parsed filter state ──
     private ScreenSteamType ScreenType;
     private SteamSortType SortType = SteamSortType.Discount;
-    private bool ShowNoDiscount;
     private int PageSize = 12;
     private double MaxOriginalPrice = DiscountFilterPanel.MaxPriceLimit;
-    private double MinRecommendationRate;
-    private int CurrentPage = 1;
 
     // ── Derived data ──
     private IReadOnlyList<DiscountGameItem> FilteredItems = [];
@@ -90,9 +110,31 @@
     // ── Loading state ──
     private bool IsLoading = true;
     private string? ErrorMessage;
+    private bool _initialized;
+    private bool _selfNavigating;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        // Parse query parameters into typed values
+        ScreenType = Enum.IsDefined(typeof(ScreenSteamType), QueryScreenType)
+            ? (ScreenSteamType)QueryScreenType
+            : ScreenSteamType.All;
+
+        SortType = Enum.IsDefined(typeof(SteamSortType), QuerySortType)
+            ? (SteamSortType)QuerySortType
+            : SteamSortType.Discount;
+
+        PageSize = QueryPageSize > 0 ? QueryPageSize : 12;
+        MaxOriginalPrice = QueryMaxOriginalPrice > 0 ? QueryMaxOriginalPrice : DiscountFilterPanel.MaxPriceLimit;
+        if (CurrentPage < 1) CurrentPage = 1;
+
         IsLoading = true;
         ErrorMessage = null;
 
@@ -170,44 +212,59 @@
     {
         ScreenType = value;
         CurrentPage = 1;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnSortTypeChanged(SteamSortType value)
     {
         SortType = value;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnShowNoDiscountChanged(bool value)
     {
         ShowNoDiscount = value;
         CurrentPage = 1;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnPageSizeChanged(int value)
     {
         PageSize = value;
         CurrentPage = 1;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnMaxOriginalPriceChanged(double value)
     {
         MaxOriginalPrice = value;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnMinRecommendationRateChanged(double value)
     {
         MinRecommendationRate = value;
-        ApplyFilterAndSort();
+        Refresh();
     }
 
     private void OnPageChanged(int page)
     {
         CurrentPage = page;
-        ApplyPaging();
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _selfNavigating = true;
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["screen"] = (int)ScreenType,
+            ["sort"] = (int)SortType,
+            ["noDiscount"] = ShowNoDiscount,
+            ["pageSize"] = PageSize,
+            ["maxPrice"] = MaxOriginalPrice,
+            ["minRate"] = MinRecommendationRate,
+            ["page"] = CurrentPage,
+        }));
     }
 }

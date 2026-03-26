@@ -1,10 +1,87 @@
+/* ── Container ── */
 .cg-pagination {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-4) 0;
+    flex-wrap: wrap;
 }
 
-.cg-pagination-info {
-    font-size: 0.92rem;
+/* ── Base button (shared by page numbers and nav arrows) ── */
+.cg-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--cg-spacing-2);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    font-family: var(--cg-font-family);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    user-select: none;
+}
+
+.cg-pagination__btn:hover:not(:disabled):not(.cg-pagination__btn--active) {
+    background: var(--cg-color-hover-overlay);
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+}
+
+.cg-pagination__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Active page ── */
+.cg-pagination__btn--active {
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    border-color: var(--cg-color-primary);
+    box-shadow: var(--cg-shadow-sm);
+    cursor: default;
+}
+
+/* ── Nav arrows ── */
+.cg-pagination__nav {
+    min-width: 36px;
+    padding: 0;
+}
+
+::deep .cg-pagination__nav .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ── Ellipsis ── */
+.cg-pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    font-size: var(--cg-font-size-sm);
     color: var(--cg-color-text-muted);
+    user-select: none;
+    letter-spacing: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .cg-pagination__btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: var(--cg-font-size-xs);
+    }
+
+    .cg-pagination__ellipsis {
+        min-width: 28px;
+        height: 32px;
+    }
 }

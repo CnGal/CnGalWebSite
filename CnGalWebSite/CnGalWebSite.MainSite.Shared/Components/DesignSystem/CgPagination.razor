@@ -1,7 +1,34 @@
 <nav class="cg-pagination" aria-label="Pagination">
-    <CgButton Variant="secondary" Disabled="@(CurrentPage <= 1)" OnClick="GoPreviousAsync">上一页</CgButton>
-    <span class="cg-pagination-info">第 @CurrentPage 页 / 共 @TotalPages 页</span>
-    <CgButton Variant="secondary" Disabled="@(CurrentPage >= TotalPages)" OnClick="GoNextAsync">下一页</CgButton>
+    <button class="cg-pagination__btn cg-pagination__nav"
+            disabled="@(CurrentPage <= 1)"
+            @onclick="GoPreviousAsync"
+            aria-label="上一页">
+        <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+    </button>
+
+    @foreach (var item in GetPageItems())
+    {
+        @if (item == -1)
+        {
+            <span class="cg-pagination__ellipsis">…</span>
+        }
+        else
+        {
+            <button class="cg-pagination__btn @(item == CurrentPage ? "cg-pagination__btn--active" : "")"
+                    @onclick="() => GoToPageAsync(item)"
+                    aria-label="@($"第 {item} 页")"
+                    aria-current="@(item == CurrentPage ? "page" : null)">
+                @item
+            </button>
+        }
+    }
+
+    <button class="cg-pagination__btn cg-pagination__nav"
+            disabled="@(CurrentPage >= TotalPages)"
+            @onclick="GoNextAsync"
+            aria-label="下一页">
+        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+    </button>
 </nav>
 
 @code {
@@ -14,23 +41,65 @@
     [Parameter]
     public EventCallback<int> CurrentPageChanged { get; set; }
 
-    private Task GoPreviousAsync(MouseEventArgs _)
-    {
-        if (CurrentPage <= 1)
-        {
-            return Task.CompletedTask;
-        }
+    /// <summary>
+    /// How many sibling pages to show around the current page.
+    /// </summary>
+    private const int Siblings = 1;
 
+    private Task GoPreviousAsync()
+    {
+        if (CurrentPage <= 1) return Task.CompletedTask;
         return CurrentPageChanged.InvokeAsync(CurrentPage - 1);
     }
 
-    private Task GoNextAsync(MouseEventArgs _)
+    private Task GoNextAsync()
     {
-        if (CurrentPage >= TotalPages)
+        if (CurrentPage >= TotalPages) return Task.CompletedTask;
+        return CurrentPageChanged.InvokeAsync(CurrentPage + 1);
+    }
+
+    private Task GoToPageAsync(int page)
+    {
+        if (page == CurrentPage || page < 1 || page > TotalPages) return Task.CompletedTask;
+        return CurrentPageChanged.InvokeAsync(page);
+    }
+
+    /// <summary>
+    /// Generates page number items. -1 represents an ellipsis.
+    /// Always shows first page, last page, and <c>Siblings</c> pages around current.
+    /// </summary>
+    private IEnumerable<int> GetPageItems()
+    {
+        if (TotalPages <= 0) yield break;
+
+        // For small total pages, show all
+        if (TotalPages <= (Siblings * 2 + 5))
         {
-            return Task.CompletedTask;
+            for (int i = 1; i <= TotalPages; i++)
+                yield return i;
+            yield break;
         }
 
-        return CurrentPageChanged.InvokeAsync(CurrentPage + 1);
+        // Always show page 1
+        yield return 1;
+
+        int leftBound = Math.Max(2, CurrentPage - Siblings);
+        int rightBound = Math.Min(TotalPages - 1, CurrentPage + Siblings);
+
+        // Left ellipsis
+        if (leftBound > 2)
+            yield return -1;
+
+        // Middle pages
+        for (int i = leftBound; i <= rightBound; i++)
+            yield return i;
+
+        // Right ellipsis
+        if (rightBound < TotalPages - 1)
+            yield return -1;
+
+        // Always show last page
+        if (TotalPages > 1)
+            yield return TotalPages;
     }
 }
