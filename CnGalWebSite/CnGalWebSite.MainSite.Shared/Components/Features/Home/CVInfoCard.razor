@@ -1,0 +1,38 @@
+@using CnGalWebSite.DataModel.ViewModel.ThematicPages
+
+<a href="/entries/index/@Item.Infor.Id" class="cv-info-card">
+    <div class="cv-info-card__avatar-wrap">
+        @if (!string.IsNullOrWhiteSpace(Item.Infor.MainImage))
+        {
+            <img src="@Item.Infor.MainImage" alt="@Item.Infor.Name" class="cv-info-card__avatar" loading="lazy" decoding="async" />
+        }
+        else
+        {
+            <div class="cv-info-card__avatar-placeholder">
+                <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+            </div>
+        }
+        @if (Item.IsCertificated)
+        {
+            <span class="cv-info-card__badge" title="已认证">
+                <CgMdiIcon Name="mdiCheckDecagram" aria-hidden="true" />
+            </span>
+        }
+    </div>
+    <div class="cv-info-card__name">@Item.Infor.Name</div>
+    @if (Item.WorkCount > 0)
+    {
+        <div class="cv-info-card__meta">@Item.WorkCount 部作品</div>
+    }
+    @if (Item.Audio.Count > 0 && !string.IsNullOrWhiteSpace(Item.Audio[0].Url))
+    {
+        <div class="cv-info-card__audio-hint">
+            <CgMdiIcon Name="mdiVolumeHigh" aria-hidden="true" />
+        </div>
+    }
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public CVInforViewModel Item { get; set; } = default!;
+}

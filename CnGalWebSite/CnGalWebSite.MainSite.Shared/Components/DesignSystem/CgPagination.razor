@@ -1,7 +1,34 @@
 <nav class="cg-pagination" aria-label="Pagination">
-    <CgButton Variant="secondary" Disabled="@(CurrentPage <= 1)" OnClick="GoPreviousAsync">上一页</CgButton>
-    <span class="cg-pagination-info">第 @CurrentPage 页 / 共 @TotalPages 页</span>
-    <CgButton Variant="secondary" Disabled="@(CurrentPage >= TotalPages)" OnClick="GoNextAsync">下一页</CgButton>
+    <button class="cg-pagination__btn cg-pagination__nav"
+            disabled="@(CurrentPage <= 1)"
+            @onclick="GoPreviousAsync"
+            aria-label="上一页">
+        <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+    </button>
+
+    @foreach (var item in GetPageItems())
+    {
+        @if (item.Page == -1)
+        {
+            <span class="cg-pagination__ellipsis">…</span>
+        }
+        else
+        {
+            <button class="cg-pagination__btn @(item.Page == CurrentPage ? "cg-pagination__btn--active" : "") @item.CssClass"
+                    @onclick="() => GoToPageAsync(item.Page)"
+                    aria-label="@($"第 {item.Page} 页")"
+                    aria-current="@(item.Page == CurrentPage ? "page" : null)">
+                @item.Page
+            </button>
+        }
+    }
+
+    <button class="cg-pagination__btn cg-pagination__nav"
+            disabled="@(CurrentPage >= TotalPages)"
+            @onclick="GoNextAsync"
+            aria-label="下一页">
+        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+    </button>
 </nav>
 
 @code {
@@ -14,23 +41,91 @@
     [Parameter]
     public EventCallback<int> CurrentPageChanged { get; set; }
 
-    private Task GoPreviousAsync(MouseEventArgs _)
-    {
-        if (CurrentPage <= 1)
-        {
-            return Task.CompletedTask;
-        }
+    /// <summary>
+    /// Maximum siblings to show around the current page.
+    /// Extra siblings beyond 1 get CSS classes so they can be hidden on narrow viewports.
+    /// </summary>
+    private const int MaxSiblings = 3;
 
+    private Task GoPreviousAsync()
+    {
+        if (CurrentPage <= 1) return Task.CompletedTask;
         return CurrentPageChanged.InvokeAsync(CurrentPage - 1);
     }
 
-    private Task GoNextAsync(MouseEventArgs _)
+    private Task GoNextAsync()
     {
-        if (CurrentPage >= TotalPages)
+        if (CurrentPage >= TotalPages) return Task.CompletedTask;
+        return CurrentPageChanged.InvokeAsync(CurrentPage + 1);
+    }
+
+    private Task GoToPageAsync(int page)
+    {
+        if (page == CurrentPage || page < 1 || page > TotalPages) return Task.CompletedTask;
+        return CurrentPageChanged.InvokeAsync(page);
+    }
+
+    private record PageItem(int Page, string CssClass = "");
+
+    /// <summary>
+    /// Generates page items. Page == -1 means ellipsis.
+    /// Pages within 1 sibling of current are always visible.
+    /// Pages at distance 2 get "cg-pagination__page--s2" (shown ≥ 600px).
+    /// Pages at distance 3 get "cg-pagination__page--s3" (shown ≥ 800px).
+    /// First and last page are always visible.
+    /// </summary>
+    private IEnumerable<PageItem> GetPageItems()
+    {
+        if (TotalPages <= 0) yield break;
+
+        // For very small page counts, show all
+        if (TotalPages <= (MaxSiblings * 2 + 3))
         {
-            return Task.CompletedTask;
+            for (int i = 1; i <= TotalPages; i++)
+            {
+                var css = GetSiblingClass(i);
+                yield return new PageItem(i, css);
+            }
+            yield break;
         }
 
-        return CurrentPageChanged.InvokeAsync(CurrentPage + 1);
+        // Always show page 1
+        yield return new PageItem(1);
+
+        int leftBound = Math.Max(2, CurrentPage - MaxSiblings);
+        int rightBound = Math.Min(TotalPages - 1, CurrentPage + MaxSiblings);
+
+        // Left ellipsis
+        if (leftBound > 2)
+            yield return new PageItem(-1);
+
+        // Middle pages
+        for (int i = leftBound; i <= rightBound; i++)
+        {
+            var css = GetSiblingClass(i);
+            yield return new PageItem(i, css);
+        }
+
+        // Right ellipsis
+        if (rightBound < TotalPages - 1)
+            yield return new PageItem(-1);
+
+        // Always show last page
+        if (TotalPages > 1)
+            yield return new PageItem(TotalPages);
+    }
+
+    private string GetSiblingClass(int page)
+    {
+        if (page == 1 || page == TotalPages || page == CurrentPage)
+            return "";
+
+        var distance = Math.Abs(page - CurrentPage);
+        return distance switch
+        {
+            <= 1 => "",
+            2 => "cg-pagination__page--s2",
+            _ => "cg-pagination__page--s3",
+        };
     }
 }

@@ -1,0 +1,133 @@
+/* ── Container ── */
+.cg-slider {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    width: 100%;
+}
+
+.cg-slider--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ── Label ── */
+.cg-slider__label {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-muted);
+    user-select: none;
+}
+
+/* ── Track wrapper ── */
+.cg-slider__track-wrap {
+    position: relative;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+/* Thin background track */
+.cg-slider__track-wrap::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    border-radius: 3px;
+    background: var(--cg-color-border);
+    pointer-events: none;
+}
+
+/* ── Fill bar ── */
+.cg-slider__fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    border-radius: 3px;
+    background: var(--cg-color-primary);
+    pointer-events: none;
+    transition: width 60ms ease-out;
+}
+
+/* ── Native range input ── */
+.cg-slider__input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 24px;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+
+/* ── Thumb – WebKit ── */
+.cg-slider__input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--cg-radius-full);
+    background: var(--cg-color-primary);
+    border: 2px solid var(--cg-color-surface);
+    box-shadow: var(--cg-shadow-sm);
+    cursor: pointer;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.cg-slider__input:hover::-webkit-slider-thumb {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+}
+
+.cg-slider__input:active::-webkit-slider-thumb {
+    transform: scale(1.1);
+}
+
+/* ── Thumb – Firefox ── */
+.cg-slider__input::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--cg-radius-full);
+    background: var(--cg-color-primary);
+    border: 2px solid var(--cg-color-surface);
+    box-shadow: var(--cg-shadow-sm);
+    cursor: pointer;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.cg-slider__input:hover::-moz-range-thumb {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+}
+
+.cg-slider__input::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: transparent;
+    border: none;
+}
+
+/* ── Make native track transparent so fill shows through ── */
+.cg-slider__input::-webkit-slider-runnable-track {
+    background: transparent;
+}
+
+/* ── Value badge ── */
+.cg-slider__value {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    width: fit-content;
+    align-self: flex-end;
+}

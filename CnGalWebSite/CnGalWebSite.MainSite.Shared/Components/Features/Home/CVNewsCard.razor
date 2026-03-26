@@ -1,0 +1,41 @@
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+<div class="cv-news">
+    <h2 class="cv-news__title">
+        <CgMdiIcon Name="mdiNewspaperVariantOutline" aria-hidden="true" />
+        最新动态
+    </h2>
+    <div class="cv-news__list">
+        @foreach (var item in Items.Take(6))
+        {
+            <a href="@GetNewsLink(item)"
+               class="cv-news__item"
+               target="@(!string.IsNullOrWhiteSpace(item.Link) ? "_blank" : "")">
+                @if (!string.IsNullOrWhiteSpace(item.Image))
+                {
+                    <img src="@item.Image" alt="@item.Title" class="cv-news__item-img" loading="lazy" decoding="async" />
+                }
+                <div class="cv-news__item-body">
+                    <div class="cv-news__item-head">
+                        <span class="cv-news__item-name">@item.Title</span>
+                        <span class="cv-news__item-time">@item.Time.ToString("yyyy-MM-dd")</span>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Text))
+                    {
+                        <p class="cv-news__item-text">@item.Text</p>
+                    }
+                </div>
+            </a>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public List<HomeNewsAloneViewModel> Items { get; set; } = [];
+
+    private static string GetNewsLink(HomeNewsAloneViewModel item)
+    {
+        return !string.IsNullOrWhiteSpace(item.Link) ? item.Link : $"/articles/index/{item.ArticleId}";
+    }
+}

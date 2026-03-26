@@ -1,0 +1,57 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.ThematicPages
+
+<div class="cv-filter">
+    <div class="cv-filter__summary">
+        已筛选 <strong>@FilteredCount</strong> 位配音演员
+    </div>
+
+    <div class="cv-filter__row">
+        <div class="cv-filter__group">
+            <label class="cv-filter__label">搜索</label>
+            <CgInput Value="@SearchString" ValueChanged="OnSearchChanged" TValue="string" placeholder="搜索配音演员..." />
+        </div>
+
+        <div class="cv-filter__group">
+            <label class="cv-filter__label">排序方式</label>
+            <CgEnumSelect TEnum="CVThematicPageSortType" Value="SortType" ValueChanged="OnSortChanged" />
+        </div>
+
+        <div class="cv-filter__group">
+            <label class="cv-filter__label">每页数量</label>
+            <CgSelect Value="@PageSize.ToString()" ValueChanged="OnPageSizeChanged" Options="@_pageSizeOptions" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public CVThematicPageSortType SortType { get; set; }
+    [Parameter] public EventCallback<CVThematicPageSortType> SortTypeChanged { get; set; }
+
+    [Parameter] public string? SearchString { get; set; }
+    [Parameter] public EventCallback<string?> SearchStringChanged { get; set; }
+
+    [Parameter] public int PageSize { get; set; } = 18;
+    [Parameter] public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter] public int FilteredCount { get; set; }
+
+    private static readonly List<KeyValuePair<string, string>> _pageSizeOptions =
+    [
+        new("18", "18"),
+        new("36", "36"),
+        new("72", "72"),
+    ];
+
+    private Task OnSortChanged(CVThematicPageSortType value) => SortTypeChanged.InvokeAsync(value);
+
+    private Task OnSearchChanged(string? value) => SearchStringChanged.InvokeAsync(value);
+
+    private Task OnPageSizeChanged(string? value)
+    {
+        if (int.TryParse(value, out var size))
+        {
+            return PageSizeChanged.InvokeAsync(size);
+        }
+        return Task.CompletedTask;
+    }
+}

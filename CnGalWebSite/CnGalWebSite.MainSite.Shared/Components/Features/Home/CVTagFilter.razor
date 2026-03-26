@@ -1,0 +1,102 @@
+@using CnGalWebSite.DataModel.ViewModel.Tags
+
+<div class="cv-tag-filter">
+    @foreach (var group in TagGroups.OrderByDescending(g => g.Children.Count))
+    {
+        <div class="cv-tag-filter__group">
+            @{
+                var hasSelectedInGroup = group.Children.Any(c => SelectedTags.Contains(c.Title));
+                var groupLabel = group.Title
+                    .Replace("所属配音", "")
+                    .Replace("配音演员", "")
+                    .Replace("按STAFF性别分", "性别");
+            }
+
+            <button type="button"
+                    class="cv-tag-filter__chip @(!hasSelectedInGroup ? "cv-tag-filter__chip--active" : "")"
+                    @onclick="() => OnClearGroup(group)">
+                @groupLabel
+            </button>
+
+            @foreach (var child in group.Children.Where(c => c.Children.Any() || !HideEmptyTag))
+            {
+                var isSelected = SelectedTags.Contains(child.Title);
+                <button type="button"
+                        class="cv-tag-filter__chip @(isSelected ? "cv-tag-filter__chip--active" : "")"
+                        @onclick="() => OnClickTag(child)">
+                    @($"{child.Title.Replace("STAFF", "")} ({child.EntryCount})")
+                </button>
+            }
+
+            @{
+                var isUnlabeled = UnlabeledTags.Contains(group.Title);
+                var unlabeledCount = TotalCVCount - group.Children.Sum(c => c.EntryCount);
+            }
+            <button type="button"
+                    class="cv-tag-filter__chip @(isUnlabeled ? "cv-tag-filter__chip--active" : "")"
+                    @onclick="() => OnClickUnlabeled(group)">
+                @($"未标注 ({unlabeledCount})")
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public List<TagTreeModel> TagGroups { get; set; } = [];
+
+    [Parameter]
+    public int TotalCVCount { get; set; }
+
+    [Parameter]
+    public HashSet<string> SelectedTags { get; set; } = [];
+
+    [Parameter]
+    public HashSet<string> UnlabeledTags { get; set; } = [];
+
+    [Parameter]
+    public EventCallback OnFilterChanged { get; set; }
+
+    [Parameter]
+    public bool HideEmptyTag { get; set; }
+
+    private async Task OnClickTag(TagTreeModel tag)
+    {
+        if (SelectedTags.Contains(tag.Title))
+        {
+            SelectedTags.Remove(tag.Title);
+        }
+        else
+        {
+            SelectedTags.Add(tag.Title);
+        }
+        await OnFilterChanged.InvokeAsync();
+    }
+
+    private async Task OnClearGroup(TagTreeModel group)
+    {
+        foreach (var child in group.Children)
+        {
+            SelectedTags.Remove(child.Title);
+        }
+        await OnFilterChanged.InvokeAsync();
+    }
+
+    private async Task OnClickUnlabeled(TagTreeModel group)
+    {
+        if (UnlabeledTags.Contains(group.Title))
+        {
+            UnlabeledTags.Remove(group.Title);
+        }
+        else
+        {
+            UnlabeledTags.Add(group.Title);
+            // Clear tag selection within this group when showing unlabeled
+            foreach (var child in group.Children)
+            {
+                SelectedTags.Remove(child.Title);
+            }
+        }
+        await OnFilterChanged.InvokeAsync();
+    }
+}

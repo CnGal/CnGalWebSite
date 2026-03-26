@@ -1,0 +1,112 @@
+/* ── News section ── */
+.cv-news {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    box-shadow: var(--cg-shadow-sm);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.cv-news__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0 0 var(--cg-spacing-2) 0;
+}
+
+::deep .cv-news__title .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-primary);
+}
+
+/* ── News list ── */
+.cv-news__list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.cv-news__item {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2);
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--cg-transition-fast);
+}
+
+.cv-news__item:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.cv-news__item-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.cv-news__item-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    min-width: 0;
+    flex: 1;
+}
+
+.cv-news__item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cg-spacing-2);
+}
+
+.cv-news__item-name {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cv-news__item-time {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    flex-shrink: 0;
+}
+
+.cv-news__item-text {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .cv-news {
+        padding: var(--cg-spacing-4);
+        border-radius: var(--cg-radius-lg);
+    }
+
+    .cv-news__item-img {
+        width: 44px;
+        height: 44px;
+    }
+}

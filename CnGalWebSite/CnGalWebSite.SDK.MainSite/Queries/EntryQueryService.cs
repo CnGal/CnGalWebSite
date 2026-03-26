@@ -1,4 +1,6 @@
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -41,6 +43,88 @@ public sealed class EntryQueryService(
 
         return result;
     }
+
+    public async Task<SdkResult<IReadOnlyList<GamePublishTimesCardItem>>> GetPublishGamesByTimeAsync(
+        int year, int month, int mode = 0, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:publish-games-by-time:{year}:{month}:{mode}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesCardItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<GamePublishTimesCardItem>>.Ok(cached);
+        }
+
+        var path = $"api/entries/GetPublishGamesByTime?year={year}&month={month}&mode={mode}";
+
+        var result = await GetAsync<List<EntryInforTipViewModel>>(
+            path, "ENTRY_PUBLISH_TIMES", "游戏发布时间列表", cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<GamePublishTimesCardItem>>.Fail(
+                result.Error?.Code ?? "ENTRY_PUBLISH_TIMES_FAILED",
+                result.Error?.Message ?? "获取游戏发布时间列表失败",
+                result.Error?.StatusCode);
+        }
+
+        IReadOnlyList<GamePublishTimesCardItem> items = result.Data
+            .Select(MapToCardItem)
+            .OrderBy(x => x.PublishTime)
+            .ToList();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration);
+        return SdkResult<IReadOnlyList<GamePublishTimesCardItem>>.Ok(items);
+    }
+
+    public async Task<SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>> GetPublishGamesTimelineAsync(
+        long afterTime, long beforeTime, int mode = 0, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:publish-games-timeline:{afterTime}:{beforeTime}:{mode}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesTimelineItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Ok(cached);
+        }
+
+        var path = $"api/entries/GetPublishGamesTimeline?afterTime={afterTime}&beforeTime={beforeTime}&mode={mode}";
+
+        var result = await GetAsync<List<PublishGamesTimelineModel>>(
+            path, "ENTRY_PUBLISH_TIMES", "游戏发布时间线", cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Fail(
+                result.Error?.Code ?? "ENTRY_PUBLISH_TIMELINE_FAILED",
+                result.Error?.Message ?? "获取游戏发布时间线失败",
+                result.Error?.StatusCode);
+        }
+
+        IReadOnlyList<GamePublishTimesTimelineItem> items = result.Data
+            .Select(MapToTimelineItem)
+            .OrderByDescending(x => x.PublishTime)
+            .ToList();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration);
+        return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Ok(items);
+    }
+
+    private static GamePublishTimesCardItem MapToCardItem(EntryInforTipViewModel dto) => new()
+    {
+        Id = dto.Id,
+        Name = dto.Name ?? "",
+        Image = dto.MainImage ?? "",
+        BriefIntroduction = dto.BriefIntroduction ?? "",
+        PublishTime = dto.PublishTime
+    };
+
+    private static GamePublishTimesTimelineItem MapToTimelineItem(PublishGamesTimelineModel dto) => new()
+    {
+        Id = dto.Id,
+        Name = dto.Name ?? "",
+        Image = dto.MainImage ?? "",
+        BriefIntroduction = dto.BriefIntroduction ?? "",
+        Thumbnail = dto.Thumbnail ?? "",
+        PublishTime = dto.PublishTime,
+        PublishTimeNote = dto.PublishTimeNote
+    };
 
     private static EntryDetailViewModel MapToViewModel(EntryIndexViewModel entry)
     {
@@ -96,3 +180,4 @@ public sealed class EntryQueryService(
         };
     }
 }
+

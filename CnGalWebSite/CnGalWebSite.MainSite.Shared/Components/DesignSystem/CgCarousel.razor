@@ -1,0 +1,134 @@
+@* ────────────────────────────────────────────────────────────
+    CgCarousel — 纯 CSS 交叉淡入淡出轮播图
+    ‑ 单张时不启用动画，直接展示
+    ‑ 多张时由 CSS animation + 动态 <style> 驱动自动循环
+    ‑ 尊重 prefers-reduced-motion
+   ──────────────────────────────────────────────────────────── *@
+
+<div class="cg-carousel" style="aspect-ratio: @AspectRatio;">
+    @if (Items is not null && Items.Count > 0)
+    {
+        var count = Items.Count;
+
+        @if (count == 1)
+        {
+            var solo = Items[0];
+            @if (!string.IsNullOrEmpty(solo.Link))
+            {
+                <a class="cg-carousel__slide cg-carousel__slide--solo"
+                   href="@solo.Link"
+                   aria-label="@solo.Alt">
+                    <img class="cg-carousel__image"
+                         src="@solo.Image"
+                         alt="@solo.Alt"
+                         loading="eager"
+                         fetchpriority="high"
+                         decoding="async"
+                         width="@ImageWidth"
+                         height="@ImageHeight" />
+                </a>
+            }
+            else
+            {
+                <div class="cg-carousel__slide cg-carousel__slide--solo">
+                    <img class="cg-carousel__image"
+                         src="@solo.Image"
+                         alt="@solo.Alt"
+                         loading="eager"
+                         fetchpriority="high"
+                         decoding="async"
+                         width="@ImageWidth"
+                         height="@ImageHeight" />
+                </div>
+            }
+        }
+        else
+        {
+            @for (var i = 0; i < count; i++)
+            {
+                var item = Items[i];
+                @if (!string.IsNullOrEmpty(item.Link))
+                {
+                    <a class="cg-carousel__slide"
+                       href="@item.Link"
+                       style="--slide-index: @i;"
+                       aria-label="@item.Alt">
+                        <img class="cg-carousel__image"
+                             src="@item.Image"
+                             alt="@item.Alt"
+                             loading="@(i == 0 ? "eager" : "lazy")"
+                             fetchpriority="@(i == 0 ? "high" : "low")"
+                             decoding="async"
+                             width="@ImageWidth"
+                             height="@ImageHeight" />
+                    </a>
+                }
+                else
+                {
+                    <div class="cg-carousel__slide"
+                         style="--slide-index: @i;">
+                        <img class="cg-carousel__image"
+                             src="@item.Image"
+                             alt="@item.Alt"
+                             loading="@(i == 0 ? "eager" : "lazy")"
+                             fetchpriority="@(i == 0 ? "high" : "low")"
+                             decoding="async"
+                             width="@ImageWidth"
+                             height="@ImageHeight" />
+                    </div>
+                }
+            }
+
+            @*
+                交叉淡入淡出：当前幻灯片在自己时间窗口结束后仍短暂保持可见，
+                其淡出过程与下一张的淡入过程重叠，避免露出背景色。
+            *@
+            var totalDurationSec = count * SlideDurationSeconds;
+            var slidePercent = 100.0 / count;
+            var transPercent = slidePercent * 0.15;
+            var fadeInEnd = transPercent;
+            var holdEnd = slidePercent;
+            var fadeOutEnd = slidePercent + transPercent;
+
+            <style>
+                .cg-carousel__slide {
+                    animation: cg-carousel-fade @(totalDurationSec)s infinite;
+                    animation-delay: calc(var(--slide-index) * @(SlideDurationSeconds)s);
+                }
+
+                @@keyframes cg-carousel-fade {
+                    0%                      { opacity: 0; visibility: hidden; }
+                    @($"{fadeInEnd:F1}")%    { opacity: 1; visibility: visible; }
+                    @($"{holdEnd:F1}")%      { opacity: 1; visibility: visible; }
+                    @($"{fadeOutEnd:F1}")%   { opacity: 0; visibility: hidden; }
+                    100%                     { opacity: 0; visibility: hidden; }
+                }
+            </style>
+        }
+    }
+</div>
+
+@code {
+    /// <summary>轮播项列表</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CgCarouselItem> Items { get; set; } = [];
+
+    /// <summary>容器宽高比（CSS aspect-ratio 值）</summary>
+    [Parameter]
+    public string AspectRatio { get; set; } = "2048 / 400";
+
+    /// <summary>每张幻灯片停留秒数</summary>
+    [Parameter]
+    public int SlideDurationSeconds { get; set; } = 5;
+
+    /// <summary>图片原始宽度（性能提示）</summary>
+    [Parameter]
+    public int ImageWidth { get; set; } = 2048;
+
+    /// <summary>图片原始高度（性能提示）</summary>
+    [Parameter]
+    public int ImageHeight { get; set; } = 400;
+
+    /// <summary>轮播项数据模型</summary>
+    public record CgCarouselItem(string Image, string? Link, string? Alt);
+}

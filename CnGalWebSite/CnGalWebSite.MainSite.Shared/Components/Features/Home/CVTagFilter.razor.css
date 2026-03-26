@@ -1,0 +1,66 @@
+/* ── Tag filter container ── */
+.cv-tag-filter {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    padding: var(--cg-spacing-5) var(--cg-spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cv-tag-filter__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+    padding-bottom: var(--cg-spacing-3);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cv-tag-filter__group:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* ── Chip button ── */
+.cv-tag-filter__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--cg-spacing-1) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-full);
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-bg);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    white-space: nowrap;
+}
+
+.cv-tag-filter__chip:hover {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+}
+
+.cv-tag-filter__chip--active {
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    border-color: var(--cg-color-primary);
+}
+
+.cv-tag-filter__chip--active:hover {
+    background: var(--cg-color-primary-hover);
+    color: var(--cg-color-on-primary);
+    border-color: var(--cg-color-primary-hover);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .cv-tag-filter {
+        padding: var(--cg-spacing-4);
+        border-radius: var(--cg-radius-lg);
+    }
+}

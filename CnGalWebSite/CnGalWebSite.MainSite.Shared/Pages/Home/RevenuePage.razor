@@ -1,0 +1,202 @@
+@page "/revenues"
+@rendermode InteractiveServer
+
+@inject IStoreInfoQueryService StoreInfoQueryService
+@inject NavigationManager NavigationManager
+@using CnGalWebSite.DataModel.ViewModel.Stores
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+<PageTitle>国G销量年榜 - CnGal</PageTitle>
+
+<div class="revenue-page">
+    <div class="revenue-page__header">
+        <h1 class="revenue-page__title">国G销量年榜</h1>
+
+        <div class="revenue-page__info">
+            <ul class="revenue-page__info-list">
+                <li>
+                    榜单仅收录当年新发售，且在CnGal资料站中收录的作品
+                    <span class="revenue-page__info-sub">（P.S 因为没收录的用SQL查不出来）</span>
+                </li>
+                <li>
+                    CnGal资料站收录范围是：以美少女为主要角色或以美少女为主要攻略对象的冒险、视觉小说、养成、角色扮演等类型的游戏
+                    <s>可爱的男孩子作品也可以收录</s>（汗流浃背了，兄弟）
+                    <span class="revenue-page__info-sub">由于CnGal人手有限，存在即便满足了定义但并未收录的作品</span>
+                </li>
+                <li>欢迎同好们一起参与到资料站编辑中</li>
+                <li>
+                    销量和销售额的数据源采用
+                    (<a href="https://gamalytic.com/" target="_blank" rel="noopener noreferrer">Gamalytic</a> +
+                    <a href="https://vginsights.com/" target="_blank" rel="noopener noreferrer">VG Insights</a>) / 2 +
+                    <a href="https://www.taptap.cn/" target="_blank" rel="noopener noreferrer">TapTap</a>。所以肯定不准，图一乐就好。
+                </li>
+                <li>
+                    值得注意的是，销售额并不代表开发者实际所能获得的收入，Steam等平台会收取一定比例的分成（30%）。在这个分成基础上，发行商会再收取一定比例的分成。剩余的部分才是开发者实际所能获得的收入（用于支付给外包或是项目人员工资或是分成）。国G回本不易，开坑需谨慎。
+                </li>
+            </ul>
+        </div>
+
+        <div class="revenue-page__controls">
+            <!-- Year filter -->
+            <CgSelect Value="@Year.ToString()" ValueChanged="OnYearStringChanged" Options="YearOptions" />
+
+            <!-- Order switch buttons -->
+            <div class="revenue-page__toggle-group">
+                <button class="revenue-page__toggle @(Order == 0 ? "revenue-page__toggle--active" : "")"
+                        @onclick="() => OnOrderChanged(0)">
+                    <CgMdiIcon Name="mdiCurrencyCny" aria-hidden="true" />
+                    <span>销售额</span>
+                </button>
+                <button class="revenue-page__toggle @(Order == 1 ? "revenue-page__toggle--active" : "")"
+                        @onclick="() => OnOrderChanged(1)">
+                    <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
+                    <span>销量</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="revenue-page__loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="revenue-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@ErrorMessage</p>
+            <a href="/" class="revenue-page__error-link">返回首页</a>
+        </div>
+    }
+    else
+    {
+        @if (Items.Count == 0)
+        {
+            <div class="revenue-page__empty">
+                <CgMdiIcon Name="mdiFinance" aria-hidden="true" />
+                <p>暂无数据</p>
+            </div>
+        }
+        else
+        {
+            <div class="revenue-page__grid">
+                @foreach (var item in Items)
+                {
+                    <RevenueGameCard Item="item" />
+                }
+            </div>
+
+            @if (TotalPages > 1)
+            {
+                <CgPagination CurrentPage="CurrentPage"
+                              TotalPages="TotalPages"
+                              CurrentPageChanged="OnPageChanged" />
+            }
+        }
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "year")]
+    public int Year { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int CurrentPage { get; set; }
+
+    [SupplyParameterFromQuery(Name = "max")]
+    public int Max { get; set; }
+
+    [SupplyParameterFromQuery(Name = "order")]
+    public int Order { get; set; }
+
+    private IReadOnlyList<GameRevenueInfoCardModel> Items = [];
+    private int TotalPages = 0;
+
+    private bool IsLoading = true;
+    private string? ErrorMessage;
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    private IEnumerable<KeyValuePair<string, string>> YearOptions = [];
+
+    protected override void OnInitialized()
+    {
+        var currentYear = DateTime.Now.Year;
+        var options = new List<KeyValuePair<string, string>>
+        {
+            new("0", "全部年份")
+        };
+        for (int y = currentYear; y >= 2014; y--)
+        {
+            options.Add(new(y.ToString(), $"{y}年"));
+        }
+        YearOptions = options;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        if (CurrentPage < 1) CurrentPage = 1;
+        if (Max <= 0 || Max > 100) Max = 20;
+        Order = Order == 1 ? 1 : 0; // 0 for Revenue, 1 for Owner
+
+        IsLoading = true;
+        ErrorMessage = null;
+
+        var result = await StoreInfoQueryService.GetGameRevenueInfoAsync(Year, CurrentPage - 1, Max, Order);
+        if (result.Success && result.Data is not null)
+        {
+            Items = result.Data.Items;
+            TotalPages = result.Data.TotalPages;
+        }
+        else
+        {
+            ErrorMessage = result.Error?.Message ?? "获取游戏销量信息失败";
+        }
+
+        IsLoading = false;
+    }
+
+    private void OnYearStringChanged(string? newYearStr)
+    {
+        if (int.TryParse(newYearStr, out int newYear))
+        {
+            Year = newYear;
+            CurrentPage = 1;
+            Refresh();
+        }
+    }
+
+    private void OnOrderChanged(int newOrder)
+    {
+        Order = newOrder;
+        CurrentPage = 1;
+        Refresh();
+    }
+
+    private void OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _selfNavigating = true;
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["year"] = Year,
+            ["page"] = CurrentPage,
+            ["max"] = Max,
+            ["order"] = Order,
+        }));
+    }
+}

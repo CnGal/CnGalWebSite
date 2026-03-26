@@ -95,7 +95,7 @@
 
 ### 4.3 当前基础组件清单（Design System）
 
-以下组件已实现（共 23 个），均位于 `Components/DesignSystem/` 目录：
+以下组件已实现（共 24 个），均位于 `Components/DesignSystem/` 目录：
 
 | 组件 | 说明 |
 |---|---|

@@ -1,0 +1,80 @@
+/* ── Filter panel container ── */
+.discount-filter {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    padding: var(--cg-spacing-5) var(--cg-spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+/* ── Summary with left accent ── */
+.discount-filter__summary {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    padding-left: var(--cg-spacing-3);
+    border-left: 3px solid var(--cg-color-primary);
+}
+
+.discount-filter__summary a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+}
+
+.discount-filter__summary a:hover {
+    text-decoration: underline;
+}
+
+/* ── Uniform grid rows ── */
+.discount-filter__row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cg-spacing-4);
+    align-items: end;
+}
+
+.discount-filter__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+}
+
+.discount-filter__group--check {
+    justify-content: flex-end;
+    padding-bottom: var(--cg-spacing-2);
+}
+
+.discount-filter__label {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-muted);
+}
+
+/* ── Slider row uses 2 columns ── */
+.discount-filter__row:last-child {
+    grid-template-columns: 1fr 1fr;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .discount-filter__row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .discount-filter__row:last-child {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .discount-filter {
+        padding: var(--cg-spacing-4);
+        border-radius: var(--cg-radius-lg);
+    }
+
+    .discount-filter__row {
+        grid-template-columns: 1fr;
+    }
+}

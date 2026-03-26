@@ -1,0 +1,96 @@
+@using CnGalWebSite.DataModel.ViewModel.Steam
+
+<div class="discount-filter">
+    <div class="discount-filter__summary">
+        已筛选 <strong>@FilteredCount</strong> 个游戏 ·
+        Steam 信息来源：<a href="https://isthereanydeal.com/" rel="noreferrer" target="_blank">isthereanydeal.com</a>
+    </div>
+
+    <div class="discount-filter__row">
+        <div class="discount-filter__group">
+            <label class="discount-filter__label">折扣筛选</label>
+            <CgEnumSelect TEnum="ScreenSteamType" Value="ScreenType" ValueChanged="OnScreenTypeChanged" />
+        </div>
+
+        <div class="discount-filter__group">
+            <label class="discount-filter__label">排序方式</label>
+            <CgEnumSelect TEnum="SteamSortType" Value="SortType" ValueChanged="OnSortTypeChanged" />
+        </div>
+
+        <div class="discount-filter__group">
+            <label class="discount-filter__label">每页数量</label>
+            <CgSelect Value="@PageSize.ToString()" ValueChanged="OnPageSizeChanged" Options="@_pageSizeOptions" />
+        </div>
+
+        <div class="discount-filter__group discount-filter__group--check">
+            <CgCheckbox Value="ShowNoDiscount" ValueChanged="OnShowNoDiscountChanged" Label="显示无折扣的游戏" />
+        </div>
+    </div>
+
+    <div class="discount-filter__row">
+        <div class="discount-filter__group">
+            <CgSlider Label="@PriceLabelText"
+                      Value="MaxOriginalPrice"
+                      ValueChanged="MaxOriginalPriceChanged"
+                      Min="5" Max="@MaxPriceLimit" Step="5" />
+        </div>
+
+        <div class="discount-filter__group">
+            <CgSlider Label="@($"好评率不低于 {MinRecommendationRate:0}%")"
+                      Value="MinRecommendationRate"
+                      ValueChanged="MinRecommendationRateChanged"
+                      Min="0" Max="100" Step="2" />
+        </div>
+    </div>
+</div>
+
+@code {
+    public const double MaxPriceLimit = 55;
+
+    [Parameter] public ScreenSteamType ScreenType { get; set; }
+    [Parameter] public EventCallback<ScreenSteamType> ScreenTypeChanged { get; set; }
+
+    [Parameter] public SteamSortType SortType { get; set; }
+    [Parameter] public EventCallback<SteamSortType> SortTypeChanged { get; set; }
+
+    [Parameter] public bool ShowNoDiscount { get; set; }
+    [Parameter] public EventCallback<bool> ShowNoDiscountChanged { get; set; }
+
+    [Parameter] public int PageSize { get; set; } = 12;
+    [Parameter] public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter] public double MaxOriginalPrice { get; set; } = MaxPriceLimit;
+    [Parameter] public EventCallback<double> MaxOriginalPriceChanged { get; set; }
+
+    [Parameter] public double MinRecommendationRate { get; set; }
+    [Parameter] public EventCallback<double> MinRecommendationRateChanged { get; set; }
+
+    [Parameter] public int FilteredCount { get; set; }
+
+    private static readonly List<KeyValuePair<string, string>> _pageSizeOptions =
+    [
+        new("12", "12"),
+        new("24", "24"),
+        new("48", "48"),
+        new("96", "96"),
+    ];
+
+    private string PriceLabelText => MaxOriginalPrice >= MaxPriceLimit
+        ? "任意价格"
+        : MaxOriginalPrice < 10
+            ? "免费发布的游戏"
+            : $"原价低于 {MaxOriginalPrice:0} ￥";
+
+    private Task OnScreenTypeChanged(ScreenSteamType value) => ScreenTypeChanged.InvokeAsync(value);
+    private Task OnSortTypeChanged(SteamSortType value) => SortTypeChanged.InvokeAsync(value);
+    private Task OnShowNoDiscountChanged(bool value) => ShowNoDiscountChanged.InvokeAsync(value);
+
+    private Task OnPageSizeChanged(string? value)
+    {
+        if (int.TryParse(value, out var size))
+        {
+            return PageSizeChanged.InvokeAsync(size);
+        }
+        return Task.CompletedTask;
+    }
+}
