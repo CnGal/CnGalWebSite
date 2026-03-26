@@ -72,7 +72,31 @@
     letter-spacing: 2px;
 }
 
-/* ── Responsive ── */
+/* ── Adaptive: hide farther siblings on narrow viewports ── */
+
+/* Distance 3: only show on wide screens (≥ 800px) */
+.cg-pagination__page--s3 {
+    display: none;
+}
+
+@media (min-width: 800px) {
+    .cg-pagination__page--s3 {
+        display: inline-flex;
+    }
+}
+
+/* Distance 2: only show on medium+ screens (≥ 600px) */
+.cg-pagination__page--s2 {
+    display: none;
+}
+
+@media (min-width: 600px) {
+    .cg-pagination__page--s2 {
+        display: inline-flex;
+    }
+}
+
+/* ── Small screens ── */
 @media (max-width: 480px) {
     .cg-pagination__btn {
         min-width: 32px;

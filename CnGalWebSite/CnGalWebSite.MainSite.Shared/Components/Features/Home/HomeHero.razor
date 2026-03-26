@@ -1,81 +1,18 @@
 @using CnGalWebSite.DataModel.ViewModel.Home
+@using static CnGalWebSite.MainSite.Shared.Components.DesignSystem.CgCarousel
 
 <section class="home-hero-section">
-    <div class="home-hero-carousel">
-        @if (Carousels != null && Carousels.Any())
-        {
-            var items = Carousels.ToList();
-            var count = items.Count;
-
-            @if (count == 1)
-            {
-                <!-- 单张：无需动画，直接展示 -->
-                <a class="home-hero-carousel-slide home-hero-carousel-slide--solo"
-                   href="@items[0].Link"
-                   aria-label="@items[0].Note">
-                    <img class="home-hero-carousel-image"
-                         src="@items[0].Image"
-                         alt="@items[0].Note"
-                         loading="eager"
-                         fetchpriority="high"
-                         decoding="async"
-                         width="2048"
-                         height="400" />
-                </a>
-            }
-            else
-            {
-                <!-- 多张：CSS 动画驱动自动循环 -->
-                @for (var i = 0; i < count; i++)
-                {
-                    var item = items[i];
-                    <a class="home-hero-carousel-slide"
-                       href="@item.Link"
-                       style="--slide-index: @i;"
-                       aria-label="@item.Note">
-                        <img class="home-hero-carousel-image"
-                             src="@item.Image"
-                             alt="@item.Note"
-                             loading="@(i == 0 ? "eager" : "lazy")"
-                             fetchpriority="@(i == 0 ? "high" : "low")"
-                             decoding="async"
-                             width="2048"
-                             height="400" />
-                    </a>
-                }
-
-                <!--
-                    交叉淡入淡出：当前幻灯片在自己时间窗口结束后仍短暂保持可见，
-                    其淡出过程与下一张的淡入过程重叠，避免露出背景色。
-                -->
-                var slideDurationSec = 5;
-                var totalDurationSec = count * slideDurationSec;
-                var slidePercent = 100.0 / count;
-                var transPercent = slidePercent * 0.15;
-                var fadeInEnd = transPercent;
-                var holdEnd = slidePercent;
-                var fadeOutEnd = slidePercent + transPercent;
-
-                <style>
-                    .home-hero-carousel-slide {
-                        animation: home-hero-fade @(totalDurationSec)s infinite;
-                        animation-delay: calc(var(--slide-index) * @(slideDurationSec)s);
-                    }
-
-                    @@keyframes home-hero-fade {
-                        0%                      { opacity: 0; visibility: hidden; }
-                        @($"{fadeInEnd:F1}")%    { opacity: 1; visibility: visible; }
-                        @($"{holdEnd:F1}")%      { opacity: 1; visibility: visible; }
-                        @($"{fadeOutEnd:F1}")%   { opacity: 0; visibility: hidden; }
-                        100%                     { opacity: 0; visibility: hidden; }
-                    }
-                </style>
-            }
-        }
-    </div>
+    <CgCarousel Items="@MapToCarouselItems()" />
 </section>
 
 @code {
     [Parameter]
     public IEnumerable<CarouselViewModel> Carousels { get; set; } = [];
+
+    private IReadOnlyList<CgCarouselItem> MapToCarouselItems()
+    {
+        return (Carousels ?? [])
+            .Select(c => new CgCarouselItem(c.Image, c.Link, c.Note))
+            .ToList();
+    }
 }

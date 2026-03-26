@@ -1,0 +1,309 @@
+@page "/cv"
+@rendermode InteractiveServer
+
+@inject ITagQueryService TagQueryService
+@inject NavigationManager NavigationManager
+@using CnGalWebSite.DataModel.ViewModel.ThematicPages
+@using CnGalWebSite.DataModel.ViewModel.Tags
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+@using static CnGalWebSite.MainSite.Shared.Components.DesignSystem.CgCarousel
+
+<PageTitle>专题页 - CV - CnGal</PageTitle>
+
+<div class="cv-page">
+    @if (IsLoading)
+    {
+        <div class="cv-page__loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="cv-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@ErrorMessage</p>
+            <a href="/" class="cv-page__error-link">返回首页</a>
+        </div>
+    }
+    else
+    {
+        @* ── News + Carousel 两列布局 ── *@
+        <div class="cv-page__hero-row">
+            @if (News.Count > 0)
+            {
+                <div class="cv-page__hero-col">
+                    <CVNewsCard Items="News" />
+                </div>
+            }
+            @if (DisplayCarousels.Count > 0)
+            {
+                <div class="cv-page__hero-col">
+                    <CgCarousel Items="@MapToCarouselItems()"
+                                AspectRatio="4 / 3" />
+                </div>
+            }
+        </div>
+
+        @* ── Tag filters ── *@
+        @if (TagGroups.Count > 0)
+        {
+            <CVTagFilter TagGroups="TagGroups"
+                         TotalCVCount="AllCVInfors.Count"
+                         SelectedTags="SelectedTags"
+                         UnlabeledTags="UnlabeledTags"
+                         OnFilterChanged="OnTagFilterChanged" />
+        }
+
+        @* ── Search + sort panel ── *@
+        <CVFilterPanel SortType="SortType"
+                       SortTypeChanged="OnSortTypeChanged"
+                       SearchString="@SearchString"
+                       SearchStringChanged="OnSearchStringChanged"
+                       PageSize="PageSize"
+                       PageSizeChanged="OnPageSizeChanged"
+                       FilteredCount="FilteredItems.Count" />
+
+        @* ── CV card grid ── *@
+        @if (PagedItems.Count == 0)
+        {
+            <div class="cv-page__empty">
+                <CgMdiIcon Name="mdiAccountOffOutline" aria-hidden="true" />
+                <p>没有符合条件的配音演员</p>
+            </div>
+        }
+        else
+        {
+            <div class="cv-page__grid">
+                @foreach (var item in PagedItems)
+                {
+                    <CVInfoCard Item="item" />
+                }
+            </div>
+        }
+
+        @* ── Pagination ── *@
+        @if (TotalPages > 1)
+        {
+            <CgPagination CurrentPage="CurrentPage"
+                          TotalPages="TotalPages"
+                          CurrentPageChanged="OnPageChanged" />
+        }
+    }
+</div>
+
+@code {
+    // ── URL query parameters ──
+    [SupplyParameterFromQuery(Name = "sort")]
+    public int QuerySortType { get; set; }
+
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? SearchString { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int CurrentPage { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int QueryPageSize { get; set; }
+
+    // ── Raw data ──
+    private List<CVInforViewModel> AllCVInfors = [];
+    private List<HomeNewsAloneViewModel> News = [];
+    private List<CarouselViewModel> Carousels = [];
+    private List<CarouselViewModel> DisplayCarousels = [];
+    private List<TagTreeModel> TagGroups = [];
+
+    // ── Filter state ──
+    private CVThematicPageSortType SortType;
+    private int PageSize = 18;
+    private HashSet<string> SelectedTags = [];
+    private HashSet<string> UnlabeledTags = [];
+
+    // ── Derived data ──
+    private IReadOnlyList<CVInforViewModel> FilteredItems = [];
+    private IReadOnlyList<CVInforViewModel> PagedItems = [];
+    private int TotalPages => FilteredItems.Count == 0 ? 1 : ((FilteredItems.Count - 1) / PageSize) + 1;
+
+    // ── Loading state ──
+    private bool IsLoading = true;
+    private string? ErrorMessage;
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        // Parse query parameters
+        SortType = Enum.IsDefined(typeof(CVThematicPageSortType), QuerySortType)
+            ? (CVThematicPageSortType)QuerySortType
+            : CVThematicPageSortType.None;
+
+        PageSize = QueryPageSize > 0 ? QueryPageSize : 18;
+        if (CurrentPage < 1) CurrentPage = 1;
+
+        IsLoading = true;
+        ErrorMessage = null;
+
+        var result = await TagQueryService.GetCVThematicPageAsync();
+        if (result.Success && result.Data is not null)
+        {
+            AllCVInfors = result.Data.CVInfors;
+            News = result.Data.News;
+            Carousels = result.Data.Carousels;
+            TagGroups = result.Data.Tags;
+            PrepareCarousels();
+            ApplyFilterAndSort();
+        }
+        else
+        {
+            ErrorMessage = result.Error?.Message ?? "获取CV专题页数据失败";
+        }
+
+        IsLoading = false;
+    }
+
+    private void PrepareCarousels()
+    {
+        DisplayCarousels = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
+        if (Carousels.Count >= 6)
+        {
+            var remaining = Carousels
+                .Where(s => !DisplayCarousels.Any(x => x.Image == s.Image))
+                .OrderBy(_ => Random.Shared.Next())
+                .Take(3);
+            DisplayCarousels.AddRange(remaining);
+        }
+        else
+        {
+            DisplayCarousels.AddRange(Carousels.Where(s => !DisplayCarousels.Any(x => x.Image == s.Image)));
+        }
+    }
+
+    private IReadOnlyList<CgCarouselItem> MapToCarouselItems()
+    {
+        return DisplayCarousels
+            .Select(c => new CgCarouselItem(
+                c.Image,
+                !string.IsNullOrWhiteSpace(c.Link) ? c.Link : $"/entries/index/{c.Id}",
+                c.Note))
+            .ToList();
+    }
+
+    // ── Filter & sort logic ──
+    private void ApplyFilterAndSort()
+    {
+        IEnumerable<CVInforViewModel> items = AllCVInfors;
+
+        // Tag filter
+        if (SelectedTags.Count > 0)
+        {
+            foreach (var group in TagGroups)
+            {
+                var selectedInGroup = group.Children.Where(c => SelectedTags.Contains(c.Title)).ToList();
+                if (selectedInGroup.Count > 0)
+                {
+                    var selectedTitles = selectedInGroup.Select(s => s.Title).ToHashSet();
+                    items = items.Where(cv => cv.Tags.Any(t => selectedTitles.Contains(t.Name)));
+                }
+            }
+        }
+
+        // Unlabeled filter
+        if (UnlabeledTags.Count > 0)
+        {
+            foreach (var unlabeledTitle in UnlabeledTags)
+            {
+                var group = TagGroups.FirstOrDefault(g => g.Title == unlabeledTitle);
+                if (group is not null && group.Children.Count > 0)
+                {
+                    var groupChildTitles = group.Children.Select(c => c.Title).ToHashSet();
+                    items = items.Where(cv => !cv.Tags.Any(t => groupChildTitles.Contains(t.Name)));
+                }
+            }
+        }
+
+        // Search
+        if (!string.IsNullOrWhiteSpace(SearchString))
+        {
+            var search = SearchString.ToUpperInvariant();
+            items = items.Where(cv =>
+                cv.Infor.Name.ToUpperInvariant().Contains(search) ||
+                search.Contains(cv.Infor.Name.ToUpperInvariant()));
+        }
+
+        // Sort
+        items = SortType switch
+        {
+            CVThematicPageSortType.Random => items.OrderBy(_ => Random.Shared.Next()),
+            CVThematicPageSortType.ReadCount => items.OrderByDescending(s => s.Infor.ReaderCount),
+            CVThematicPageSortType.WorkCount => items.OrderByDescending(s => s.WorkCount),
+            CVThematicPageSortType.RecentlyPublish => items.OrderByDescending(s => s.LastPublishTime),
+            _ => items.OrderByDescending(s => s.LastUploadAudioTime)
+                      .ThenByDescending(s => s.IsCertificated)
+                      .ThenBy(s => s.Infor.MainImage),
+        };
+
+        FilteredItems = items.ToList();
+        ApplyPaging();
+    }
+
+    private void ApplyPaging()
+    {
+        if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+        if (CurrentPage < 1) CurrentPage = 1;
+        PagedItems = FilteredItems.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    // ── Event handlers ──
+    private void OnSortTypeChanged(CVThematicPageSortType value)
+    {
+        SortType = value;
+        CurrentPage = 1;
+        Refresh();
+    }
+
+    private void OnSearchStringChanged(string? value)
+    {
+        SearchString = value;
+        CurrentPage = 1;
+        Refresh();
+    }
+
+    private void OnPageSizeChanged(int value)
+    {
+        PageSize = value;
+        CurrentPage = 1;
+        Refresh();
+    }
+
+    private void OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        Refresh();
+    }
+
+    private void OnTagFilterChanged()
+    {
+        CurrentPage = 1;
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        ApplyFilterAndSort();
+        _selfNavigating = true;
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["sort"] = (int)SortType,
+            ["search"] = string.IsNullOrWhiteSpace(SearchString) ? null : SearchString,
+            ["pageSize"] = PageSize,
+            ["page"] = CurrentPage,
+        }));
+    }
+}

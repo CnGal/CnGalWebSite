@@ -8,17 +8,17 @@
 
     @foreach (var item in GetPageItems())
     {
-        @if (item == -1)
+        @if (item.Page == -1)
         {
             <span class="cg-pagination__ellipsis">…</span>
         }
         else
         {
-            <button class="cg-pagination__btn @(item == CurrentPage ? "cg-pagination__btn--active" : "")"
-                    @onclick="() => GoToPageAsync(item)"
-                    aria-label="@($"第 {item} 页")"
-                    aria-current="@(item == CurrentPage ? "page" : null)">
-                @item
+            <button class="cg-pagination__btn @(item.Page == CurrentPage ? "cg-pagination__btn--active" : "") @item.CssClass"
+                    @onclick="() => GoToPageAsync(item.Page)"
+                    aria-label="@($"第 {item.Page} 页")"
+                    aria-current="@(item.Page == CurrentPage ? "page" : null)">
+                @item.Page
             </button>
         }
     }
@@ -42,9 +42,10 @@
     public EventCallback<int> CurrentPageChanged { get; set; }
 
     /// <summary>
-    /// How many sibling pages to show around the current page.
+    /// Maximum siblings to show around the current page.
+    /// Extra siblings beyond 1 get CSS classes so they can be hidden on narrow viewports.
     /// </summary>
-    private const int Siblings = 1;
+    private const int MaxSiblings = 3;
 
     private Task GoPreviousAsync()
     {
@@ -64,42 +65,67 @@
         return CurrentPageChanged.InvokeAsync(page);
     }
 
+    private record PageItem(int Page, string CssClass = "");
+
     /// <summary>
-    /// Generates page number items. -1 represents an ellipsis.
-    /// Always shows first page, last page, and <c>Siblings</c> pages around current.
+    /// Generates page items. Page == -1 means ellipsis.
+    /// Pages within 1 sibling of current are always visible.
+    /// Pages at distance 2 get "cg-pagination__page--s2" (shown ≥ 600px).
+    /// Pages at distance 3 get "cg-pagination__page--s3" (shown ≥ 800px).
+    /// First and last page are always visible.
     /// </summary>
-    private IEnumerable<int> GetPageItems()
+    private IEnumerable<PageItem> GetPageItems()
     {
         if (TotalPages <= 0) yield break;
 
-        // For small total pages, show all
-        if (TotalPages <= (Siblings * 2 + 5))
+        // For very small page counts, show all
+        if (TotalPages <= (MaxSiblings * 2 + 3))
         {
             for (int i = 1; i <= TotalPages; i++)
-                yield return i;
+            {
+                var css = GetSiblingClass(i);
+                yield return new PageItem(i, css);
+            }
             yield break;
         }
 
         // Always show page 1
-        yield return 1;
+        yield return new PageItem(1);
 
-        int leftBound = Math.Max(2, CurrentPage - Siblings);
-        int rightBound = Math.Min(TotalPages - 1, CurrentPage + Siblings);
+        int leftBound = Math.Max(2, CurrentPage - MaxSiblings);
+        int rightBound = Math.Min(TotalPages - 1, CurrentPage + MaxSiblings);
 
         // Left ellipsis
         if (leftBound > 2)
-            yield return -1;
+            yield return new PageItem(-1);
 
         // Middle pages
         for (int i = leftBound; i <= rightBound; i++)
-            yield return i;
+        {
+            var css = GetSiblingClass(i);
+            yield return new PageItem(i, css);
+        }
 
         // Right ellipsis
         if (rightBound < TotalPages - 1)
-            yield return -1;
+            yield return new PageItem(-1);
 
         // Always show last page
         if (TotalPages > 1)
-            yield return TotalPages;
+            yield return new PageItem(TotalPages);
+    }
+
+    private string GetSiblingClass(int page)
+    {
+        if (page == 1 || page == TotalPages || page == CurrentPage)
+            return "";
+
+        var distance = Math.Abs(page - CurrentPage);
+        return distance switch
+        {
+            <= 1 => "",
+            2 => "cg-pagination__page--s2",
+            _ => "cg-pagination__page--s3",
+        };
     }
 }
