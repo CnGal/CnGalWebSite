@@ -1,0 +1,44 @@
+<div class="cg-slider @(Disabled ? "cg-slider--disabled" : "")">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="cg-slider__label">@Label</label>
+    }
+    <div class="cg-slider__track-wrap">
+        <input type="range"
+               class="cg-slider__input"
+               min="@Min"
+               max="@Max"
+               step="@Step"
+               value="@Value"
+               disabled="@Disabled"
+               @oninput="OnInput" />
+        <div class="cg-slider__fill" style="width: @FillPercent%"></div>
+    </div>
+    @if (ShowValue)
+    {
+        <span class="cg-slider__value">@Value.ToString(ValueFormat)</span>
+    }
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; }
+    [Parameter] public EventCallback<double> ValueChanged { get; set; }
+    [Parameter] public double Min { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public double Step { get; set; } = 1;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool ShowValue { get; set; }
+    [Parameter] public string ValueFormat { get; set; } = "0";
+    [Parameter] public bool Disabled { get; set; }
+
+    private double FillPercent => Max > Min ? (Value - Min) / (Max - Min) * 100 : 0;
+
+    private Task OnInput(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), out var val))
+        {
+            return ValueChanged.InvokeAsync(val);
+        }
+        return Task.CompletedTask;
+    }
+}

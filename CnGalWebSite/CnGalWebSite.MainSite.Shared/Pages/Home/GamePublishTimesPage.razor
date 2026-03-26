@@ -1,0 +1,290 @@
+@page "/times"
+@page "/gamepublishtimelist"
+@rendermode InteractiveServer
+
+@inject IEntryQueryService EntryQueryService
+@inject NavigationManager NavigationManager
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+<PageTitle>@PageTitle - CnGal</PageTitle>
+
+<div class="publish-times-page">
+    <div class="publish-times-header">
+        <h1 class="publish-times-title">@PageTitle</h1>
+        <p class="publish-times-desc">@PageDescription</p>
+
+        <div class="publish-times-controls">
+            <div class="publish-times-toggle-group">
+                <button class="publish-times-toggle @(Type == 0 ? "publish-times-toggle--active" : "")"
+                        @onclick="() => OnDisplayTypeChanged(0)">
+                    <CgMdiIcon Name="mdiViewList" aria-hidden="true" />
+                    <span>卡片列表</span>
+                </button>
+                <button class="publish-times-toggle @(Type == 1 ? "publish-times-toggle--active" : "")"
+                        @onclick="() => OnDisplayTypeChanged(1)">
+                    <CgMdiIcon Name="mdiTimelineClockOutline" aria-hidden="true" />
+                    <span>时间线</span>
+                </button>
+            </div>
+
+            <div class="publish-times-toggle-group">
+                <button class="publish-times-toggle @(Mode == 0 ? "publish-times-toggle--active" : "")"
+                        @onclick="() => OnDataModeChanged(0)">
+                    <CgMdiIcon Name="mdiGamepadSquare" aria-hidden="true" />
+                    <span>正式版</span>
+                </button>
+                <button class="publish-times-toggle @(Mode == 1 ? "publish-times-toggle--active" : "")"
+                        @onclick="() => OnDataModeChanged(1)">
+                    <CgMdiIcon Name="mdiFlaskOutline" aria-hidden="true" />
+                    <span>试玩版</span>
+                </button>
+            </div>
+        </div>
+
+        @if (Type == 0)
+        {
+            <div class="publish-times-nav">
+                <button class="publish-times-nav-btn" @onclick="OnClickLeft" aria-label="上个月">
+                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                    <span>上个月</span>
+                </button>
+                <span class="publish-times-nav-label">@CurrentDate.ToString("yyyy年M月")</span>
+                <button class="publish-times-nav-btn" @onclick="OnClickRight" aria-label="下个月">
+                    <span>下个月</span>
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="publish-times-date-range">
+                <span class="publish-times-date-label">从</span>
+                <CgDateInput Value="@After" ValueChanged="AfterDateChanged" Mode="CgDateInputMode.Date" Placeholder="开始日期" />
+                <span class="publish-times-date-separator">~</span>
+                <span class="publish-times-date-label">至</span>
+                <CgDateInput Value="@Before" ValueChanged="BeforeDateChanged" Mode="CgDateInputMode.Date" Placeholder="结束日期" />
+            </div>
+        }
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="publish-times-loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="publish-times-error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@ErrorMessage</p>
+            <a href="/" class="publish-times-error-link">返回首页</a>
+        </div>
+    }
+    else if (Type == 0)
+    {
+        @if (CardItems.Count == 0)
+        {
+            <div class="publish-times-empty">
+                <CgMdiIcon Name="mdiCalendarBlankOutline" aria-hidden="true" />
+                <p>暂无数据</p>
+            </div>
+        }
+        else
+        {
+            <div class="publish-times-card-grid">
+                @foreach (var item in CardItems)
+                {
+                    <GamePublishTimesCard Item="item" />
+                }
+            </div>
+        }
+    }
+    else
+    {
+        @if (TimelineItems.Count == 0)
+        {
+            <div class="publish-times-empty">
+                <CgMdiIcon Name="mdiCalendarBlankOutline" aria-hidden="true" />
+                <p>暂无数据</p>
+            </div>
+        }
+        else
+        {
+            <GamePublishTimesTimeline Items="TimelineItems" />
+        }
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "year")]
+    public int Year { get; set; }
+
+    [SupplyParameterFromQuery(Name = "month")]
+    public int Month { get; set; }
+
+    [SupplyParameterFromQuery(Name = "beforeTime")]
+    public long BeforeTime { get; set; }
+
+    [SupplyParameterFromQuery(Name = "afterTime")]
+    public long AfterTime { get; set; }
+
+    [SupplyParameterFromQuery(Name = "type")]
+    public int Type { get; set; }
+
+    [SupplyParameterFromQuery(Name = "mode")]
+    public int Mode { get; set; }
+
+    private DateOnly CurrentDate = DateOnly.FromDateTime(DateTime.Now);
+    private DateTime? Before = DateTime.Now.AddDays(1);
+    private DateTime? After = DateTime.Now.AddMonths(-1);
+
+    private IReadOnlyList<GamePublishTimesCardItem> CardItems = [];
+    private IReadOnlyList<GamePublishTimesTimelineItem> TimelineItems = [];
+
+    private bool IsLoading = true;
+    private string? ErrorMessage;
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    private string PageTitle => Mode == 1 ? "游戏试玩时间汇总" : "游戏发布时间汇总";
+    private string PageDescription => Mode == 1 ? "可以查看每月游戏试玩日期列表" : "可以查看每月发售游戏列表";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Only reload on first render or self-initiated navigation (Refresh).
+        // When navigating away, Blazor resets query params and fires this method;
+        // _selfNavigating is false in that case, so we skip the reload.
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        Mode = Mode == 1 ? 1 : 0;
+        Type = Type == 1 ? 1 : 0;
+
+        IsLoading = true;
+        ErrorMessage = null;
+
+        if (Type == 0)
+        {
+            // CardList mode
+            if (Year == 0 || Month == 0 || Month > 12)
+            {
+                CurrentDate = DateOnly.FromDateTime(DateTime.Now);
+                Year = CurrentDate.Year;
+                Month = CurrentDate.Month;
+            }
+            else
+            {
+                CurrentDate = new DateOnly(Year, Month, 1);
+            }
+
+            var result = await EntryQueryService.GetPublishGamesByTimeAsync(Year, Month, Mode);
+            if (result.Success && result.Data is not null)
+            {
+                CardItems = result.Data;
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取游戏发布时间列表失败";
+            }
+        }
+        else
+        {
+            // Timeline mode
+            if (AfterTime != 0)
+            {
+                After = DateTimeOffset.FromUnixTimeMilliseconds(AfterTime).LocalDateTime;
+            }
+            if (BeforeTime != 0)
+            {
+                Before = DateTimeOffset.FromUnixTimeMilliseconds(BeforeTime).LocalDateTime;
+            }
+
+            var afterMs = After.HasValue ? new DateTimeOffset(After.Value).ToUnixTimeMilliseconds() : 0L;
+            var beforeMs = Before.HasValue ? new DateTimeOffset(Before.Value).ToUnixTimeMilliseconds() : 0L;
+
+            var result = await EntryQueryService.GetPublishGamesTimelineAsync(afterMs, beforeMs, Mode);
+            if (result.Success && result.Data is not null)
+            {
+                TimelineItems = result.Data;
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取游戏发布时间线失败";
+            }
+        }
+
+        IsLoading = false;
+    }
+
+    private void OnClickLeft()
+    {
+        CurrentDate = CurrentDate.AddMonths(-1);
+        Refresh();
+    }
+
+    private void OnClickRight()
+    {
+        CurrentDate = CurrentDate.AddMonths(1);
+        Refresh();
+    }
+
+    private void AfterDateChanged(DateTime? date)
+    {
+        if (date.HasValue)
+        {
+            After = date.Value;
+            Refresh();
+        }
+    }
+
+    private void BeforeDateChanged(DateTime? date)
+    {
+        if (date.HasValue)
+        {
+            Before = date.Value;
+            Refresh();
+        }
+    }
+
+    private void OnDisplayTypeChanged(int newType)
+    {
+        Type = newType;
+        Refresh();
+    }
+
+    private void OnDataModeChanged(int newMode)
+    {
+        Mode = newMode;
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _selfNavigating = true;
+        if (Type == 0)
+        {
+            NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+            {
+                ["year"] = CurrentDate.Year,
+                ["month"] = CurrentDate.Month,
+                ["type"] = Type,
+                ["mode"] = Mode,
+            }));
+        }
+        else
+        {
+            NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+            {
+                ["beforeTime"] = Before.HasValue ? new DateTimeOffset(Before.Value).ToUnixTimeMilliseconds() : 0L,
+                ["afterTime"] = After.HasValue ? new DateTimeOffset(After.Value).ToUnixTimeMilliseconds() : 0L,
+                ["type"] = Type,
+                ["mode"] = Mode,
+            }));
+        }
+    }
+}

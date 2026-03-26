@@ -1,0 +1,39 @@
+<div class="publish-times-timeline">
+    @foreach (var (item, index) in Items.Select((v, i) => (v, i)))
+    {
+        <div class="publish-times-timeline__item" style="animation-delay: @(index * 60)ms;">
+            <div class="publish-times-timeline__dot-col">
+                <span class="publish-times-timeline__dot"></span>
+                @if (index < Items.Count - 1)
+                {
+                    <span class="publish-times-timeline__line"></span>
+                }
+            </div>
+            <div class="publish-times-timeline__time-col">
+                <span class="publish-times-timeline__time">
+                    @(string.IsNullOrWhiteSpace(item.PublishTimeNote)
+                        ? (item.PublishTime.HasValue ? item.PublishTime.Value.ToString("yyyy年M月d日") : "未知")
+                        : item.PublishTimeNote)
+                </span>
+            </div>
+            <a href="/entries/index/@item.Id" class="publish-times-timeline__content">
+                @if (!string.IsNullOrWhiteSpace(item.Image))
+                {
+                    <img src="@item.Image" alt="@item.Name" class="publish-times-timeline__image" loading="lazy" decoding="async" />
+                }
+                <div class="publish-times-timeline__info">
+                    <h3 class="publish-times-timeline__name">@item.Name</h3>
+                    @if (!string.IsNullOrWhiteSpace(item.BriefIntroduction))
+                    {
+                        <p class="publish-times-timeline__desc">@item.BriefIntroduction</p>
+                    }
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<GamePublishTimesTimelineItem> Items { get; set; } = [];
+}

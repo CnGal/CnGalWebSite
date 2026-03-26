@@ -24,21 +24,31 @@
                 <div class="cg-date-input__calendar">
                     @* 导航头 *@
                     <div class="cg-date-input__nav">
-                        @if (Mode == CgDateInputMode.MonthDay)
+                        @if (_showYearPicker)
                         {
-                            @if (_showMonthPicker)
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="PrevYearRange" aria-label="上一组">
+                                <CgMdiIcon Name="mdiChevronLeft" Size="20" />
+                            </button>
+                            <span class="cg-date-input__nav-title">@_viewYearRangeStart – @(_viewYearRangeStart + 11)</span>
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="NextYearRange" aria-label="下一组">
+                                <CgMdiIcon Name="mdiChevronRight" Size="20" />
+                            </button>
+                        }
+                        else if (_showMonthPicker)
+                        {
+                            @if (Mode == CgDateInputMode.MonthDay)
                             {
                                 <span class="cg-date-input__nav-title">选择月份</span>
                             }
                             else
                             {
-                                <button type="button" class="cg-date-input__nav-btn" @onclick="PrevMonth" aria-label="上一月">
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="PrevYear" aria-label="上一年">
                                     <CgMdiIcon Name="mdiChevronLeft" Size="20" />
                                 </button>
-                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
-                                    @_viewMonth 月
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenYearPicker">
+                                    @_viewYear 年
                                 </button>
-                                <button type="button" class="cg-date-input__nav-btn" @onclick="NextMonth" aria-label="下一月">
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="NextYear" aria-label="下一年">
                                     <CgMdiIcon Name="mdiChevronRight" Size="20" />
                                 </button>
                             }
@@ -48,16 +58,42 @@
                             <button type="button" class="cg-date-input__nav-btn" @onclick="PrevMonth" aria-label="上一月">
                                 <CgMdiIcon Name="mdiChevronLeft" Size="20" />
                             </button>
-                            <span class="cg-date-input__nav-title">@_viewYear 年 @_viewMonth 月</span>
+                            @if (Mode == CgDateInputMode.MonthDay)
+                            {
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
+                                    @_viewMonth 月
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
+                                    @_viewYear 年 @_viewMonth 月
+                                </button>
+                            }
                             <button type="button" class="cg-date-input__nav-btn" @onclick="NextMonth" aria-label="下一月">
                                 <CgMdiIcon Name="mdiChevronRight" Size="20" />
                             </button>
                         }
                     </div>
 
-                    @if (_showMonthPicker)
+                    @if (_showYearPicker)
                     {
-                        @* 月份选择网格（MonthDay 模式点击标题进入） *@
+                        @* 年份选择网格 *@
+                        <div class="cg-date-input__year-grid">
+                            @for (var y = _viewYearRangeStart; y < _viewYearRangeStart + 12; y++)
+                            {
+                                var year = y;
+                                <button type="button"
+                                        class="cg-date-input__year-cell @(year == _viewYear ? "is-selected" : "")"
+                                        @onclick="() => SelectYear(year)">
+                                    @year
+                                </button>
+                            }
+                        </div>
+                    }
+                    else if (_showMonthPicker)
+                    {
+                        @* 月份选择网格 *@
                         <div class="cg-date-input__month-grid">
                             @for (var m = 1; m <= 12; m++)
                             {
@@ -171,8 +207,10 @@
 
     private bool _isOpen;
     private bool _showMonthPicker;
+    private bool _showYearPicker;
     private int _viewYear;
     private int _viewMonth;
+    private int _viewYearRangeStart;
     private int _selectedHour;
     private int _selectedMinute;
     private List<CalendarCell> _calendarCells = [];
@@ -231,6 +269,8 @@
         _viewYear = reference.Year;
         _viewMonth = reference.Month;
         _showMonthPicker = false;
+        _showYearPicker = false;
+        _viewYearRangeStart = _viewYear - _viewYear % 10;
 
         if (Value.HasValue)
         {
@@ -258,20 +298,56 @@
     {
         _isOpen = false;
         _showMonthPicker = false;
+        _showYearPicker = false;
     }
 
-    // ── 月份选择器（MonthDay 模式专用） ──
+    // ── 月份 / 年份选择器 ──
 
     private void OpenMonthPicker()
     {
         _showMonthPicker = true;
+        _showYearPicker = false;
+    }
+
+    private void OpenYearPicker()
+    {
+        _viewYearRangeStart = _viewYear - _viewYear % 10;
+        _showYearPicker = true;
     }
 
     private void SelectMonth(int month)
     {
         _viewMonth = month;
         _showMonthPicker = false;
+        _showYearPicker = false;
         BuildCalendar();
+    }
+
+    private void SelectYear(int year)
+    {
+        _viewYear = year;
+        _showYearPicker = false;
+        // 选完年份回到月份选择
+    }
+
+    private void PrevYear()
+    {
+        _viewYear--;
+    }
+
+    private void NextYear()
+    {
+        _viewYear++;
+    }
+
+    private void PrevYearRange()
+    {
+        _viewYearRangeStart -= 12;
+    }
+
+    private void NextYearRange()
+    {
+        _viewYearRangeStart += 12;
     }
 
     // ── 日历导航 ──

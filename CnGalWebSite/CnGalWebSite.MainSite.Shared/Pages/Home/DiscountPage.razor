@@ -1,0 +1,213 @@
+@page "/discount"
+@rendermode InteractiveServer
+
+@inject IStoreInfoQueryService StoreInfoQueryService
+@using CnGalWebSite.DataModel.ViewModel.Steam
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+<PageTitle>打折中的游戏 - CnGal</PageTitle>
+
+<div class="discount-page">
+    <div class="discount-page__header">
+        <h1 class="discount-page__title">打折中的游戏</h1>
+        <p class="discount-page__desc">Steam 游戏折扣专题页，可以按价格、发行时间、好评率等排序</p>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="discount-page__loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="discount-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@ErrorMessage</p>
+            <a href="/" class="discount-page__error-link">返回首页</a>
+        </div>
+    }
+    else
+    {
+        <DiscountFilterPanel ScreenType="ScreenType"
+                             ScreenTypeChanged="OnScreenTypeChanged"
+                             SortType="SortType"
+                             SortTypeChanged="OnSortTypeChanged"
+                             ShowNoDiscount="ShowNoDiscount"
+                             ShowNoDiscountChanged="OnShowNoDiscountChanged"
+                             PageSize="PageSize"
+                             PageSizeChanged="OnPageSizeChanged"
+                             MaxOriginalPrice="MaxOriginalPrice"
+                             MaxOriginalPriceChanged="OnMaxOriginalPriceChanged"
+                             MinRecommendationRate="MinRecommendationRate"
+                             MinRecommendationRateChanged="OnMinRecommendationRateChanged"
+                             FilteredCount="FilteredItems.Count" />
+
+        @if (PagedItems.Count == 0)
+        {
+            <div class="discount-page__empty">
+                <CgMdiIcon Name="mdiTagOffOutline" aria-hidden="true" />
+                <p>没有符合条件的游戏</p>
+            </div>
+        }
+        else
+        {
+            <div class="discount-page__grid">
+                @foreach (var item in PagedItems)
+                {
+                    <DiscountGameCard Item="item" />
+                }
+            </div>
+        }
+
+        @if (TotalPages > 1)
+        {
+            <CgPagination CurrentPage="CurrentPage"
+                          TotalPages="TotalPages"
+                          CurrentPageChanged="OnPageChanged" />
+        }
+    }
+</div>
+
+@code {
+    // ── Raw data ──
+    private IReadOnlyList<DiscountGameItem> AllItems = [];
+
+    // ── Filter state ──
+    private ScreenSteamType ScreenType;
+    private SteamSortType SortType = SteamSortType.Discount;
+    private bool ShowNoDiscount;
+    private int PageSize = 12;
+    private double MaxOriginalPrice = DiscountFilterPanel.MaxPriceLimit;
+    private double MinRecommendationRate;
+    private int CurrentPage = 1;
+
+    // ── Derived data ──
+    private IReadOnlyList<DiscountGameItem> FilteredItems = [];
+    private IReadOnlyList<DiscountGameItem> PagedItems = [];
+    private int TotalPages => FilteredItems.Count == 0 ? 1 : ((FilteredItems.Count - 1) / PageSize) + 1;
+
+    // ── Loading state ──
+    private bool IsLoading = true;
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+
+        var result = await StoreInfoQueryService.GetAllGameStoreInfoAsync();
+        if (result.Success && result.Data is not null)
+        {
+            AllItems = result.Data;
+            ApplyFilterAndSort();
+        }
+        else
+        {
+            ErrorMessage = result.Error?.Message ?? "获取 Steam 折扣游戏列表失败";
+        }
+
+        IsLoading = false;
+    }
+
+    // ── Filter & sort logic ──
+    private void ApplyFilterAndSort()
+    {
+        IEnumerable<DiscountGameItem> items = AllItems;
+
+        // Filter: discount
+        if (!ShowNoDiscount)
+        {
+            items = items.Where(s => s.CutNow > 0);
+        }
+
+        // Filter: price range
+        if (MaxOriginalPrice < DiscountFilterPanel.MaxPriceLimit && MaxOriginalPrice >= 0)
+        {
+            items = items.Where(s => s.OriginalPrice <= MaxOriginalPrice);
+        }
+
+        // Filter: recommendation rate
+        items = items.Where(s => s.RecommendationRate >= MinRecommendationRate);
+
+        // Filter: screen type
+        items = ScreenType switch
+        {
+            ScreenSteamType.NewHistoryLow => items.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0),
+            ScreenSteamType.FlatHistoryLow => items.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0),
+            _ => items,
+        };
+
+        // Sort
+        items = SortType switch
+        {
+            SteamSortType.Price => items.OrderByDescending(s => s.PriceNow),
+            SteamSortType.PublishTime => items.OrderByDescending(s => s.PublishTime),
+            SteamSortType.EvaluationCount => items.OrderByDescending(s => s.EvaluationCount),
+            SteamSortType.RecommendationRate => items.OrderByDescending(s => s.RecommendationRate),
+            _ => items.OrderByDescending(s => s.CutNow), // Discount
+        };
+
+        FilteredItems = items.ToList();
+        ApplyPaging();
+    }
+
+    private void ApplyPaging()
+    {
+        if (CurrentPage > TotalPages)
+        {
+            CurrentPage = TotalPages;
+        }
+        if (CurrentPage < 1)
+        {
+            CurrentPage = 1;
+        }
+        PagedItems = FilteredItems.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    // ── Event handlers ──
+    private void OnScreenTypeChanged(ScreenSteamType value)
+    {
+        ScreenType = value;
+        CurrentPage = 1;
+        ApplyFilterAndSort();
+    }
+
+    private void OnSortTypeChanged(SteamSortType value)
+    {
+        SortType = value;
+        ApplyFilterAndSort();
+    }
+
+    private void OnShowNoDiscountChanged(bool value)
+    {
+        ShowNoDiscount = value;
+        CurrentPage = 1;
+        ApplyFilterAndSort();
+    }
+
+    private void OnPageSizeChanged(int value)
+    {
+        PageSize = value;
+        CurrentPage = 1;
+        ApplyFilterAndSort();
+    }
+
+    private void OnMaxOriginalPriceChanged(double value)
+    {
+        MaxOriginalPrice = value;
+        ApplyFilterAndSort();
+    }
+
+    private void OnMinRecommendationRateChanged(double value)
+    {
+        MinRecommendationRate = value;
+        ApplyFilterAndSort();
+    }
+
+    private void OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        ApplyPaging();
+    }
+}

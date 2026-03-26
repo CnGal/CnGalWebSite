@@ -1,0 +1,144 @@
+/* ── Card container ── */
+.discount-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.discount-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--cg-shadow-card-hover);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+}
+
+/* ── Image ── */
+.discount-card__image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+}
+
+.discount-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.discount-card:hover .discount-card__image {
+    transform: scale(1.04);
+}
+
+.discount-card__image-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent);
+    pointer-events: none;
+}
+
+/* ── Discount badge (gradient + shadow) ── */
+.discount-card__badge {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
+    background: linear-gradient(135deg, var(--cg-color-secondary), var(--cg-color-secondary-hover));
+    color: #fff;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-bold);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--cg-radius-sm);
+    z-index: 1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    letter-spacing: 0.02em;
+}
+
+/* ── Body ── */
+.discount-card__body {
+    padding: var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    flex: 1;
+}
+
+.discount-card__name {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-semibold);
+    margin: 0;
+    color: var(--cg-color-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.discount-card__desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.6;
+}
+
+/* ── Meta info ── */
+.discount-card__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cg-spacing-1) var(--cg-spacing-3);
+}
+
+.discount-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+::deep .discount-card__meta-item .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Price ── */
+.discount-card__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--cg-spacing-2);
+    margin-top: auto;
+    padding-top: var(--cg-spacing-3);
+    border-top: 1px solid var(--cg-color-border);
+}
+
+.discount-card__price-now {
+    font-size: var(--cg-font-size-lg);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--cg-color-secondary), var(--cg-color-secondary-hover));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.discount-card__price-original {
+    font-size: var(--cg-font-size-sm);
+    color: color-mix(in oklab, var(--cg-color-text-muted) 70%, transparent);
+    text-decoration: line-through;
+}

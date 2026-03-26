@@ -1,0 +1,61 @@
+<a href="/entries/index/@Item.Id" class="discount-card">
+    @if (!string.IsNullOrWhiteSpace(Item.MainImage))
+    {
+        <div class="discount-card__image-wrap">
+            <img src="@Item.MainImage" alt="@Item.Name" class="discount-card__image" loading="lazy" decoding="async" />
+            @if (Item.CutNow > 0)
+            {
+                <span class="discount-card__badge">-@Item.CutNow%</span>
+            }
+        </div>
+    }
+    <div class="discount-card__body">
+        <h3 class="discount-card__name">@Item.Name</h3>
+        @if (!string.IsNullOrWhiteSpace(Item.BriefIntroduction))
+        {
+            <p class="discount-card__desc">@Item.BriefIntroduction</p>
+        }
+        <div class="discount-card__meta">
+            @if (Item.EvaluationCount > 0)
+            {
+                <span class="discount-card__meta-item">
+                    <CgMdiIcon Name="mdiThumbUp" aria-hidden="true" />
+                    @($"{Item.RecommendationRate:0}%（{Item.EvaluationCount}条评测）")
+                </span>
+            }
+            @if (Item.PublishTime.HasValue)
+            {
+                <span class="discount-card__meta-item">
+                    <CgMdiIcon Name="mdiCalendar" aria-hidden="true" />
+                    @Item.PublishTime.Value.ToString("yyyy年M月d日")
+                </span>
+            }
+            @if (Item.CutLowest > 0)
+            {
+                <span class="discount-card__meta-item">
+                    <CgMdiIcon Name="mdiChartLine" aria-hidden="true" />
+                    @($"史低 ¥{Item.PriceLowest:0.00} (-{Item.CutLowest}%)")
+                </span>
+            }
+            @if (Item.PlayTime > 0)
+            {
+                <span class="discount-card__meta-item">
+                    <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
+                    @($"平均游玩 {Item.PlayTime / 60.0:0.0} 小时")
+                </span>
+            }
+        </div>
+        <div class="discount-card__price-row">
+            <span class="discount-card__price-now">¥ @Item.PriceNow.ToString("0.00")</span>
+            @if (Item.CutNow > 0)
+            {
+                <span class="discount-card__price-original">¥ @Item.OriginalPrice.ToString("0.00")</span>
+            }
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public DiscountGameItem Item { get; set; } = default!;
+}

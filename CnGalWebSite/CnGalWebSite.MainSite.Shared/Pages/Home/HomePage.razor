@@ -45,21 +45,37 @@ else
                     <HomeRandomRecommend HotRecommends="@Model.HotRecommends" />
 
             <HomeSection Title="近期新作" Icon="mdiRocketLaunch" IconColor="var(--cg-color-primary)">
-                <ul class="home-game-grid">
-                    @foreach (var item in Model.PublishedGames.Take(8))
-                    {
-                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
-                    }
-                </ul>
+                <HeaderAppendContent>
+                    <a href="/times?mode=0" class="home-section-more-link">
+                        查看更多
+                        <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                    </a>
+                </HeaderAppendContent>
+                <ChildContent>
+                    <ul class="home-game-grid">
+                        @foreach (var item in Model.PublishedGames.Take(8))
+                        {
+                            <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
+                        }
+                    </ul>
+                </ChildContent>
             </HomeSection>
 
             <HomeSection Title="近期试玩" Icon="mdiGamepadVariantOutline" IconColor="var(--cg-color-primary)">
-                <ul class="home-game-grid">
-                    @foreach (var item in Model.RecentlyDemoGames.Take(8))
-                    {
-                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
-                    }
-                </ul>
+                <HeaderAppendContent>
+                    <a href="/times?mode=1" class="home-section-more-link">
+                        查看更多
+                        <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                    </a>
+                </HeaderAppendContent>
+                <ChildContent>
+                    <ul class="home-game-grid">
+                        @foreach (var item in Model.RecentlyDemoGames.Take(8))
+                        {
+                            <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
+                        }
+                    </ul>
+                </ChildContent>
             </HomeSection>
 
 
@@ -76,14 +92,22 @@ else
             }
 
             <HomeSection Title="即将发布" Icon="mdiCalendarClock" IconColor="var(--cg-color-primary)">
-                <ul class="home-game-grid">
-                    @foreach (var item in Model.UpcomingGames.Take(8))
-                    {
-                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
-                            <small>@DisplayOrUnknown(item.PublishTime)</small>
-                        </HomeGameCard>
-                    }
-                </ul>
+                <HeaderAppendContent>
+                    <a href="/times?mode=0" class="home-section-more-link">
+                        查看更多
+                        <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                    </a>
+                </HeaderAppendContent>
+                <ChildContent>
+                    <ul class="home-game-grid">
+                        @foreach (var item in Model.UpcomingGames.Take(8))
+                        {
+                            <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
+                                <small>@DisplayOrUnknown(item.PublishTime)</small>
+                            </HomeGameCard>
+                        }
+                    </ul>
+                </ChildContent>
             </HomeSection>
         </div>
 
@@ -284,15 +308,30 @@ else
         <HomeKanban />
 
         <HomeSection Title="免费游玩" Icon="mdiGiftOutline" IconColor="#10b981">
+            <HeaderAppendContent>
+                <a href="/free" class="home-section-more-link">
+                    查看更多
+                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                </a>
+            </HeaderAppendContent>
+            <ChildContent>
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.FreeGames.Take(5))
                 {
                     <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags" />
                 }
             </ul>
+            </ChildContent>
         </HomeSection>
 
         <HomeSection Title="折扣中" Icon="mdiSale" IconColor="#f59e0b">
+            <HeaderAppendContent>
+                <a href="/discount" class="home-section-more-link">
+                    查看更多
+                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                </a>
+            </HeaderAppendContent>
+            <ChildContent>
             <ul class="home-bottom-game-grid">
                 @foreach (var item in Model.DiscountGames.Take(5))
                 {
@@ -304,6 +343,7 @@ else
                     </HomeGameCard>
                 }
             </ul>
+            </ChildContent>
         </HomeSection>
 
         <HomeSection Title="友情链接" Icon="mdiLink" IconColor="var(--cg-color-text-muted)">

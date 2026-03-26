@@ -730,3 +730,25 @@
     justify-content: center;
     line-height: 1.4;
 }
+
+/* ── Section "查看更多" link ── */
+.home-section-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: color var(--cg-transition-fast), gap var(--cg-transition-fast);
+}
+
+.home-section-more-link:hover {
+    color: var(--cg-color-primary);
+    gap: 0.5rem;
+}
+
+.home-section-more-link ::deep .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
+}

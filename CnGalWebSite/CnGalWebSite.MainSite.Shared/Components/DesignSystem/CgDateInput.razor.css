@@ -155,6 +155,42 @@
     background-color: var(--cg-color-primary-hover);
 }
 
+/* ── 年份选择网格 ── */
+.cg-date-input__year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: var(--cg-spacing-2) 0;
+}
+
+.cg-date-input__year-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--cg-radius-sm);
+    background: transparent;
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.cg-date-input__year-cell:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+}
+
+.cg-date-input__year-cell.is-selected {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.cg-date-input__year-cell.is-selected:hover {
+    background-color: var(--cg-color-primary-hover);
+}
+
 .cg-date-input__nav-btn {
     display: flex;
     align-items: center;

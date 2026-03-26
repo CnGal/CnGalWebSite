@@ -1,0 +1,101 @@
+.publish-times-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.publish-times-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--cg-shadow-card-hover);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+}
+
+/* ── Image wrapper ── */
+.publish-times-card__image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+}
+
+.publish-times-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.publish-times-card:hover .publish-times-card__image {
+    transform: scale(1.04);
+}
+
+/* gradient overlay at bottom of image */
+.publish-times-card__image-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent);
+    pointer-events: none;
+}
+
+.publish-times-card__body {
+    padding: var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    flex: 1;
+}
+
+.publish-times-card__name {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-semibold);
+    margin: 0;
+    color: var(--cg-color-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.publish-times-card__desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.6;
+}
+
+/* ── Date badge ── */
+.publish-times-card__time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-semibold);
+    margin-top: auto;
+    padding: 0.25rem 0.625rem;
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    border-radius: var(--cg-radius-full);
+    width: fit-content;
+}
+
+::deep .publish-times-card__time .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}

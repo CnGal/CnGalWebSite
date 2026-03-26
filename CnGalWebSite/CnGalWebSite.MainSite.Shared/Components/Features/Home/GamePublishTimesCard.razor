@@ -1,0 +1,27 @@
+<a href="/entries/index/@Item.Id" class="publish-times-card">
+    @if (!string.IsNullOrWhiteSpace(Item.Image))
+    {
+        <div class="publish-times-card__image-wrap">
+            <img src="@Item.Image" alt="@Item.Name" class="publish-times-card__image" loading="lazy" decoding="async" />
+        </div>
+    }
+    <div class="publish-times-card__body">
+        <h3 class="publish-times-card__name">@Item.Name</h3>
+        @if (!string.IsNullOrWhiteSpace(Item.BriefIntroduction))
+        {
+            <p class="publish-times-card__desc">@Item.BriefIntroduction</p>
+        }
+        @if (Item.PublishTime.HasValue)
+        {
+            <span class="publish-times-card__time">
+                <CgMdiIcon Name="mdiCalendar" aria-hidden="true" />
+                @Item.PublishTime.Value.ToString("yyyy年M月d日")
+            </span>
+        }
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public GamePublishTimesCardItem Item { get; set; } = default!;
+}
