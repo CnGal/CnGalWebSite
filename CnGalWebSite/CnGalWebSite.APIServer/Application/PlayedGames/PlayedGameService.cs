@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 
@@ -110,10 +110,18 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             var globalDistribution = GetGlobalDistribution(globalAllScores);
             var globalFilterDistribution = GetGlobalDistribution(globalFilterScores);
 
+            //计算每个游戏的评价数中位数作为先验强度
+            var reviewCountsPerGame = globalAllScores.GroupBy(s => s.EntryId).Select(g => (double)g.Count()).OrderBy(c => c).ToList();
+            var priorStrength = reviewCountsPerGame.Count > 0
+                ? reviewCountsPerGame[reviewCountsPerGame.Count / 2]
+                : 25.0;
+            // 确保先验强度不小于5，避免评分人数极少时波动过大
+            priorStrength = Math.Max(priorStrength, 5.0);
+
             //遍历计算每个游戏的分数并更新
             foreach (var item in games)
             {
-                await UpdateGameScore(item.Id, item.DisplayName,item.IsDubbing, globalAllScores, globalDistribution, globalFilterDistribution);
+                await UpdateGameScore(item.Id, item.DisplayName, item.IsDubbing, globalAllScores, globalDistribution, globalFilterDistribution, priorStrength);
             }
         }
 
@@ -146,8 +154,9 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="globalAllScores">所有用户评分</param>
         /// <param name="globalDistribution">全局分布</param>
         /// <param name="globalFilterDistribution">过滤后的全局分布</param>
+        /// <param name="priorStrength">先验强度（评价数中位数）</param>
         /// <returns></returns>
-        public async Task UpdateGameScore(int id, string name,bool isDubbing, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, long[]> globalDistribution ,Dictionary<PlayedGameScoreType, long[]> globalFilterDistribution)
+        public async Task UpdateGameScore(int id, string name, bool isDubbing, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, long[]> globalDistribution, Dictionary<PlayedGameScoreType, long[]> globalFilterDistribution, double priorStrength)
         {
             //获取当前游戏的所有玩家评分
             var scores = globalAllScores.Where(s => s.EntryId == id);
@@ -178,25 +187,25 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             model.GameName = name;
 
             //依次计算
-            model.AllCVSocre = isDubbing ? CalculateScore(scores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalDistribution[PlayedGameScoreType.CV]) : -1;
-            model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalDistribution[PlayedGameScoreType.Show]);
-            model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalDistribution[PlayedGameScoreType.System]);
-            model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalDistribution[PlayedGameScoreType.Music]);
-            model.AllPaintSocre = CalculateScore(scores.Select(s => s.PaintSocre), globalDistribution[PlayedGameScoreType.Paint]);
-            model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalDistribution[PlayedGameScoreType.Total]);
-            model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalDistribution[PlayedGameScoreType.Script]);
+            model.AllCVSocre = isDubbing ? CalculateScore(scores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalDistribution[PlayedGameScoreType.CV], priorStrength) : -1;
+            model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalDistribution[PlayedGameScoreType.Show], priorStrength);
+            model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalDistribution[PlayedGameScoreType.System], priorStrength);
+            model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalDistribution[PlayedGameScoreType.Music], priorStrength);
+            model.AllPaintSocre = CalculateScore(scores.Select(s => s.PaintSocre), globalDistribution[PlayedGameScoreType.Paint], priorStrength);
+            model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalDistribution[PlayedGameScoreType.Total], priorStrength);
+            model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalDistribution[PlayedGameScoreType.Script], priorStrength);
 
             var filterScores = scores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength);
             if (filterScores != null && filterScores.Any())
             {
                 //依次计算
-                model.FilterCVSocre = isDubbing ? CalculateScore(filterScores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalFilterDistribution[PlayedGameScoreType.CV]) : -1;
-                model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterDistribution[PlayedGameScoreType.Show]);
-                model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterDistribution[PlayedGameScoreType.System]);
-                model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterDistribution[PlayedGameScoreType.Music]);
-                model.FilterPaintSocre = CalculateScore(filterScores.Select(s => s.PaintSocre), globalFilterDistribution[PlayedGameScoreType.Paint]);
-                model.FilterTotalSocre = CalculateScore(filterScores.Select(s => s.TotalSocre), globalFilterDistribution[PlayedGameScoreType.Total]);
-                model.FilterScriptSocre = CalculateScore(filterScores.Select(s => s.ScriptSocre), globalFilterDistribution[PlayedGameScoreType.Script]);
+                model.FilterCVSocre = isDubbing ? CalculateScore(filterScores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalFilterDistribution[PlayedGameScoreType.CV], priorStrength) : -1;
+                model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterDistribution[PlayedGameScoreType.Show], priorStrength);
+                model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterDistribution[PlayedGameScoreType.System], priorStrength);
+                model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterDistribution[PlayedGameScoreType.Music], priorStrength);
+                model.FilterPaintSocre = CalculateScore(filterScores.Select(s => s.PaintSocre), globalFilterDistribution[PlayedGameScoreType.Paint], priorStrength);
+                model.FilterTotalSocre = CalculateScore(filterScores.Select(s => s.TotalSocre), globalFilterDistribution[PlayedGameScoreType.Total], priorStrength);
+                model.FilterScriptSocre = CalculateScore(filterScores.Select(s => s.ScriptSocre), globalFilterDistribution[PlayedGameScoreType.Script], priorStrength);
 
             }
 
@@ -209,12 +218,13 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// </summary>
         /// <param name="scores">当前游戏的评分</param>
         /// <param name="g">全局分布</param>
+        /// <param name="priorStrength">先验强度（评价数中位数）</param>
         /// <returns></returns>
-        public double CalculateScore(IEnumerable<int> scores, long[] g)
+        public double CalculateScore(IEnumerable<int> scores, long[] g, double priorStrength)
         {
             var s = GetDistribution(scores);
 
-            return CalculateScoreByDirichletDistribution(g, s);
+            return CalculateScoreByDirichletDistribution(g, s, priorStrength);
         }
 
         /// <summary>
@@ -251,19 +261,24 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// </remarks>
         /// <param name="globalDistribution">先验分布</param>
         /// <param name="singleMultivariateDistribution">多元分布</param>
+        /// <param name="priorStrength">先验强度，等价于虚拟投票数量，默认25</param>
         /// <returns></returns>
-        public double CalculateScoreByDirichletDistribution(long[] globalDistribution, long[] singleMultivariateDistribution)
+        public double CalculateScoreByDirichletDistribution(long[] globalDistribution, long[] singleMultivariateDistribution, double priorStrength = 25.0)
         {
             var n = globalDistribution.Count();
 
-            long[] d = new long[n];
-            long sum = 0;
+            // 计算全局分布总数，用于归一化
+            double globalSum = globalDistribution.Sum();
+
+            double[] d = new double[n];
+            double sum = 0;
 
             for (int i = 0; i < n; i++)
             {
-                //修正先验分布
-                d[i] = globalDistribution[i] + singleMultivariateDistribution[i];
-                //求和
+                // 缩放先验分布：将全局分布归一化后乘以先验强度 C
+                // 这样先验等价于 C 个虚拟投票，而不是全局的数万条记录
+                double prior = globalSum > 0 ? priorStrength * globalDistribution[i] / globalSum : 0;
+                d[i] = prior + singleMultivariateDistribution[i];
                 sum += d[i];
             }
 
@@ -272,7 +287,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             for (int i = 0; i < n; i++)
             {
                 //计算分布D的均值 加权平均
-                score += (double)d[i] *  (i + 1) / sum;
+                score += d[i] * (i + 1) / sum;
             }
 
             return score;

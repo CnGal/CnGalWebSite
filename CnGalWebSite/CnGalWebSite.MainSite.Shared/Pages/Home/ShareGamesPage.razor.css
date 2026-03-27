@@ -1,0 +1,239 @@
+/* ── ShareGamesPage ── */
+
+.share-games-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--cg-spacing-6) var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+::deep .space-steam-info-card,::deep .space-steam-toolbar{
+    margin-bottom: 0;
+}
+
+/* Header */
+.share-games-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-6) var(--cg-spacing-6);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.share-games-header__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.share-games-header__title ::deep .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    fill: var(--cg-color-primary);
+}
+
+.share-games-header__desc {
+    margin: var(--cg-spacing-2) 0 0;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    line-height: 1.5;
+}
+
+.share-games-header__stats {
+    display: flex;
+    gap: var(--cg-spacing-6);
+}
+
+.share-games-header__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--cg-spacing-3) var(--cg-spacing-5);
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, var(--cg-color-bg));
+    border-radius: var(--cg-radius-lg);
+}
+
+.share-games-header__stat-value {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-primary);
+    line-height: 1;
+}
+
+.share-games-header__stat-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin-top: var(--cg-spacing-1);
+}
+
+/* Tip bar */
+.share-games-tip {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    background: color-mix(in srgb, var(--cg-color-primary) 6%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-primary) 20%, var(--cg-color-border));
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+    line-height: 1.5;
+}
+
+.share-games-tip ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    fill: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.share-games-tip a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.share-games-tip a:hover {
+    text-decoration: underline;
+}
+
+/* Shared section title */
+.share-games-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+    padding-bottom: var(--cg-spacing-3);
+    border-bottom: 2px solid var(--cg-color-border);
+}
+
+.share-games-section-title ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+    fill: var(--cg-color-primary);
+}
+
+/* Reviews section */
+.share-games-reviews-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.share-games-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cg-spacing-4);
+}
+
+@media (max-width: 960px) {
+    .share-games-reviews-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .share-games-reviews-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* My library section */
+.share-games-my-library {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* Login CTA */
+.share-games-login-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-6) var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border: 1px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.share-games-login-cta ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--cg-color-text-muted);
+}
+
+/* Loading */
+.share-games-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+/* Error */
+.share-games-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 50vh;
+    text-align: center;
+    color: var(--cg-color-text-muted);
+}
+
+.share-games-error ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    fill: var(--cg-color-error);
+}
+
+.share-games-error h1 {
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.share-games-error p {
+    font-size: var(--cg-font-size-sm);
+    margin: 0;
+}
+
+.share-games-error__home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    margin-top: var(--cg-spacing-2);
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.share-games-error__home-link:hover {
+    text-decoration: underline;
+}
+
+.share-games-error__home-link ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}

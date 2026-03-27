@@ -13,6 +13,7 @@
                          SteamUsers="_steamUsers"
                          SteamId="@_steamId"
                          UserId="@UserId"
+                         TotalGameCount="TotalGameCount"
                          OnDataChanged="RefreshAsync" />
 }
 
@@ -22,6 +23,12 @@
 
     [Parameter]
     public string SteamId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 站内已收录游戏总数（用于计算收集率），由外部传入。
+    /// </summary>
+    [Parameter]
+    public int TotalGameCount { get; set; }
 
     private string _steamId = string.Empty;
     private UserGameRecordsViewModel? _gameRecords;

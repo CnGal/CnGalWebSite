@@ -25,6 +25,7 @@
             var steamCount = GameRecords.Records.Count(r => r.IsInSteam);
             var totalHours = GameRecords.Records.Sum(r => r.PlayDuration) / 60.0;
             var totalCount = GameRecords.Records.Count;
+            var totalPrice = SteamUsers.Sum(u => u.Price);
 
             <div class="space-steam-info-card__stats">
                 <div class="space-steam-info-card__stat">
@@ -32,28 +33,43 @@
                         <CgMdiIcon Name="mdiCounter" aria-hidden="true" />
                     </div>
                     <div class="space-steam-info-card__stat-content">
-                        <span class="space-steam-info-card__stat-value">@totalCount</span>
-                        <span class="space-steam-info-card__stat-label">总记录</span>
-                    </div>
-                </div>
-                <div class="space-steam-info-card__stat">
-                    <div class="space-steam-info-card__stat-icon">
-                        <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
-                    </div>
-                    <div class="space-steam-info-card__stat-content">
                         <span class="space-steam-info-card__stat-value">@steamCount</span>
-                        <span class="space-steam-info-card__stat-label">Steam</span>
+                        <span class="space-steam-info-card__stat-label">总库存</span>
                     </div>
                 </div>
+                @if (TotalGameCount > 0)
+                {
+                    <div class="space-steam-info-card__stat">
+                        <div class="space-steam-info-card__stat-icon">
+                            <CgMdiIcon Name="mdiChartDonut" aria-hidden="true" />
+                        </div>
+                        <div class="space-steam-info-card__stat-content">
+                            <span class="space-steam-info-card__stat-value">@((steamCount * 100.0 / TotalGameCount).ToString("0.0"))%</span>
+                            <span class="space-steam-info-card__stat-label">收集率（站内 @TotalGameCount）</span>
+                        </div>
+                    </div>
+                }
                 <div class="space-steam-info-card__stat">
                     <div class="space-steam-info-card__stat-icon">
                         <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                     </div>
                     <div class="space-steam-info-card__stat-content">
-                        <span class="space-steam-info-card__stat-value">@totalHours.ToString("0.0")</span>
-                        <span class="space-steam-info-card__stat-label">小时</span>
+                        <span class="space-steam-info-card__stat-value">@totalHours.ToString("0.0") h</span>
+                        <span class="space-steam-info-card__stat-label">总时长</span>
                     </div>
                 </div>
+                @if (totalPrice > 0)
+                {
+                    <div class="space-steam-info-card__stat">
+                        <div class="space-steam-info-card__stat-icon">
+                            <CgMdiIcon Name="mdiCurrencyCny" aria-hidden="true" />
+                        </div>
+                        <div class="space-steam-info-card__stat-content">
+                            <span class="space-steam-info-card__stat-value">@totalPrice.ToString("0") ¥</span>
+                            <span class="space-steam-info-card__stat-label">总价格</span>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>
@@ -65,4 +81,10 @@
 
     [Parameter]
     public UserGameRecordsViewModel? GameRecords { get; set; }
+
+    /// <summary>
+    /// 站内已收录游戏总数（用于计算收集率），0 表示不显示收集率。
+    /// </summary>
+    [Parameter]
+    public int TotalGameCount { get; set; }
 }

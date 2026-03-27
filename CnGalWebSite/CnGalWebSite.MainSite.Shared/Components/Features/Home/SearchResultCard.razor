@@ -1,0 +1,156 @@
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.DataModel.Model
+
+<a href="@DetailUrl" class="search-result-card">
+    @if (!string.IsNullOrWhiteSpace(ImageUrl))
+    {
+        <div class="search-result-card__image-link">
+            <img src="@ImageUrl" alt="@Title" class="search-result-card__image" loading="lazy" />
+        </div>
+    }
+    else
+    {
+        <div class="search-result-card__image-link">
+            <div class="search-result-card__image-placeholder">
+                <CgMdiIcon Name="mdiImageOffOutline" aria-hidden="true" />
+            </div>
+        </div>
+    }
+
+    <div class="search-result-card__body">
+        <div class="search-result-card__header">
+            <span class="search-result-card__type-badge search-result-card__type-badge--@TypeClass">@TypeLabel</span>
+            <span class="search-result-card__title">@Title</span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Brief))
+        {
+            <p class="search-result-card__brief">@Brief</p>
+        }
+
+        <div class="search-result-card__meta">
+            @if (ReaderCount > 0)
+            {
+                <span class="search-result-card__meta-item">
+                    <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                    @ReaderCount
+                </span>
+            }
+            @if (CommentCount > 0)
+            {
+                <span class="search-result-card__meta-item">
+                    <CgMdiIcon Name="mdiCommentOutline" aria-hidden="true" />
+                    @CommentCount
+                </span>
+            }
+            @if (LastEditTime != default)
+            {
+                <span class="search-result-card__meta-item">
+                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                    @LastEditTime.ToString("yyyy-MM-dd")
+                </span>
+            }
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public SearchAloneModel Item { get; set; } = default!;
+
+    private string Title => Item switch
+    {
+        { entry: not null } => Item.entry.Name ?? "",
+        { article: not null } => !string.IsNullOrWhiteSpace(Item.article.DisplayName) ? Item.article.DisplayName : Item.article.Name ?? "",
+        { tag: not null } => Item.tag.Name ?? "",
+        { video: not null } => !string.IsNullOrWhiteSpace(Item.video.DisplayName) ? Item.video.DisplayName : Item.video.Name ?? "",
+        { periphery: not null } => Item.periphery.Name ?? "",
+        _ => ""
+    };
+
+    private string ImageUrl => Item switch
+    {
+        { entry: not null } => Item.entry.MainImage ?? "",
+        { article: not null } => Item.article.MainImage ?? "",
+        { tag: not null } => Item.tag.MainImage ?? "",
+        { video: not null } => Item.video.MainImage ?? "",
+        { periphery: not null } => Item.periphery.MainImage ?? "",
+        _ => ""
+    };
+
+    private string Brief => Item switch
+    {
+        { entry: not null } => Item.entry.BriefIntroduction ?? "",
+        { article: not null } => Item.article.BriefIntroduction ?? "",
+        { tag: not null } => Item.tag.BriefIntroduction ?? "",
+        { video: not null } => Item.video.BriefIntroduction ?? "",
+        { periphery: not null } => Item.periphery.BriefIntroduction ?? "",
+        _ => ""
+    };
+
+    private int ReaderCount => Item switch
+    {
+        { entry: not null } => Item.entry.ReaderCount,
+        { article: not null } => Item.article.ReaderCount,
+        { tag: not null } => Item.tag.ReaderCount,
+        { video: not null } => Item.video.ReaderCount,
+        { periphery: not null } => Item.periphery.ReaderCount,
+        _ => 0
+    };
+
+    private int CommentCount => Item switch
+    {
+        { entry: not null } => Item.entry.CommentCount,
+        { article: not null } => Item.article.CommentCount,
+        { video: not null } => Item.video.CommentCount,
+        { periphery: not null } => Item.periphery.CommentCount,
+        _ => 0
+    };
+
+    private DateTime LastEditTime => Item switch
+    {
+        { entry: not null } => Item.entry.LastEditTime,
+        { article: not null } => Item.article.LastEditTime,
+        { tag: not null } => Item.tag.LastEditTime,
+        { video: not null } => Item.video.LastEditTime,
+        { periphery: not null } => Item.periphery.LastEditTime,
+        _ => default
+    };
+
+    private string TypeLabel => Item switch
+    {
+        { entry: not null } => Item.entry.Type switch
+        {
+            EntryType.Game => "游戏",
+            EntryType.Role => "角色",
+            EntryType.ProductionGroup => "组织",
+            EntryType.Staff => "Staff",
+            _ => "词条"
+        },
+        { article: not null } => "文章",
+        { tag: not null } => "标签",
+        { video: not null } => "视频",
+        { periphery: not null } => "周边",
+        _ => ""
+    };
+
+    private string TypeClass => Item switch
+    {
+        { entry: not null } => "entry",
+        { article: not null } => "article",
+        { tag: not null } => "tag",
+        { video: not null } => "video",
+        { periphery: not null } => "periphery",
+        _ => "default"
+    };
+
+    private string DetailUrl => Item switch
+    {
+        { entry: not null } => $"/entries/index/{Item.entry.Id}",
+        { article: not null } => $"/articles/index/{Item.article.Id}",
+        { tag: not null } => $"/tags/index/{Item.tag.Id}",
+        { video: not null } => $"/videos/index/{Item.video.Id}",
+        { periphery: not null } => $"/peripheries/index/{Item.periphery.Id}",
+        _ => "#"
+    };
+}

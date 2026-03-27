@@ -1,6 +1,6 @@
 @* 游玩记录列表 + Steam 信息 *@
 
-<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="Model" />
+<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="Model" TotalGameCount="TotalGameCount" />
 
 @if (IsCurrentUser)
 {
@@ -57,6 +57,9 @@ else
 
     [Parameter]
     public EventCallback OnDataChanged { get; set; }
+
+    [Parameter]
+    public int TotalGameCount { get; set; }
 
     private SpaceGameRecordViewModal? _viewModal;
     private SpaceGameRecordEditModal? _editModal;

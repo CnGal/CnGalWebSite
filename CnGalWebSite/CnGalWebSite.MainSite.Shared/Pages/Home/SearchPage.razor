@@ -1,0 +1,269 @@
+@page "/search"
+@rendermode InteractiveServer
+
+@inject IHomeQueryService HomeQueryService
+@inject NavigationManager NavigationManager
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+<PageTitle>搜索 - CnGal</PageTitle>
+
+<div class="search-page">
+    <div class="search-page__header">
+        <h1 class="search-page__title">搜索</h1>
+        <p class="search-page__desc">在 CnGal 资料站中搜索游戏、角色、文章、标签等内容</p>
+    </div>
+
+    @* ── Search bar ── *@
+    <div class="search-page__search-bar">
+        <div class="search-page__input-wrapper">
+            <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+            <input type="text"
+                   class="search-page__input"
+                   placeholder="输入关键词搜索..."
+                   @bind="SearchText"
+                   @bind:event="oninput"
+                   @onkeydown="OnKeyDown" />
+            @if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                <button class="search-page__clear-btn" @onclick="ClearSearch" aria-label="清除搜索">
+                    <CgMdiIcon Name="mdiCloseCircle" aria-hidden="true" />
+                </button>
+            }
+        </div>
+        <button class="search-page__search-btn" @onclick="OnSearch">
+            搜索
+        </button>
+    </div>
+
+    @* ── Filters ── *@
+    <SearchFilterPanel SelectedTypes="FilterTypes"
+                       SelectedTypesChanged="OnTypesChanged"
+                       SelectedTimes="FilterTimes"
+                       SelectedTimesChanged="OnTimesChanged"
+                       CurrentSort="@SortValue"
+                       CurrentSortChanged="OnSortChanged" />
+
+    @* ── Results ── *@
+    @if (IsLoading)
+    {
+        <div class="search-page__loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="search-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@ErrorMessage</p>
+            <a href="/" class="search-page__error-link">返回首页</a>
+        </div>
+    }
+    else if (SearchResult is not null)
+    {
+        @if (SearchResult.pagedResultDto.Data.Count == 0)
+        {
+            <div class="search-page__empty">
+                <CgMdiIcon Name="mdiMagnifyClose" aria-hidden="true" />
+                <p>搜索不到呢......</p>
+                <div class="search-page__empty-actions">
+                    <a href="/entries/establishentry" class="search-page__action-link">创建词条</a>
+                    <span class="search-page__action-divider">或</span>
+                    <a href="/articles/createarticle" class="search-page__action-link">发布文章</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="search-page__results">
+                @foreach (var item in SearchResult.pagedResultDto.Data)
+                {
+                    <SearchResultCard Item="item" />
+                }
+            </div>
+
+            @if (SearchResult.pagedResultDto.TotalPages > 1)
+            {
+                <CgPagination CurrentPage="CurrentPage"
+                              TotalPages="SearchResult.pagedResultDto.TotalPages"
+                              CurrentPageChanged="OnPageChanged" />
+            }
+        }
+    }
+</div>
+
+@code {
+    // ── URL query parameters ──
+    [SupplyParameterFromQuery(Name = "Text")]
+    public string? QueryText { get; set; }
+
+    [SupplyParameterFromQuery(Name = "Types")]
+    public string[]? QueryTypes { get; set; }
+
+    [SupplyParameterFromQuery(Name = "Times")]
+    public string[]? QueryTimes { get; set; }
+
+    [SupplyParameterFromQuery(Name = "Sort")]
+    public string? QuerySort { get; set; }
+
+    [SupplyParameterFromQuery(Name = "Page")]
+    public int QueryPage { get; set; }
+
+    // ── State ──
+    private string SearchText = "";
+    private List<string> FilterTypes = [];
+    private List<string> FilterTimes = [];
+    private string SortValue = "";
+    private int CurrentPage = 1;
+
+    private SearchViewModel? SearchResult;
+    private bool IsLoading;
+    private string? ErrorMessage;
+
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Skip if self-navigating: state is already set by event handlers
+        if (_selfNavigating)
+        {
+            _selfNavigating = false;
+            return;
+        }
+
+        if (_initialized)
+        {
+            return;
+        }
+        _initialized = true;
+
+        // Parse URL query parameters into state (only on initial load or external navigation)
+        SearchText = QueryText ?? "";
+        SortValue = QuerySort ?? "";
+        CurrentPage = QueryPage < 1 ? 1 : QueryPage;
+        FilterTypes = QueryTypes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
+        FilterTimes = QueryTimes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
+
+        await ExecuteSearchAsync();
+    }
+
+    private async Task ExecuteSearchAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        var queryString = BuildQueryString();
+        var result = await HomeQueryService.SearchAsync(queryString);
+
+        if (result.Success && result.Data is not null)
+        {
+            SearchResult = result.Data;
+        }
+        else
+        {
+            ErrorMessage = result.Error?.Message ?? "获取搜索结果失败";
+            SearchResult = null;
+        }
+
+        IsLoading = false;
+    }
+
+    // ── Event handlers ──
+    private async Task OnSearch()
+    {
+        CurrentPage = 1;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code is "Enter" or "NumpadEnter")
+        {
+            await OnSearch();
+        }
+    }
+
+    private async Task ClearSearch()
+    {
+        SearchText = "";
+        CurrentPage = 1;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private async Task OnTypesChanged(List<string> types)
+    {
+        FilterTypes = types;
+        CurrentPage = 1;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private async Task OnTimesChanged(List<string> times)
+    {
+        FilterTimes = times;
+        CurrentPage = 1;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private async Task OnSortChanged(string sort)
+    {
+        SortValue = sort;
+        CurrentPage = 1;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        NavigateWithParams();
+        await ExecuteSearchAsync();
+    }
+
+    private void NavigateWithParams()
+    {
+        _selfNavigating = true;
+        NavigationManager.NavigateTo("/search" + BuildQueryString());
+    }
+
+    /// <summary>
+    /// Build query string compatible with the backend API format.
+    /// </summary>
+    private string BuildQueryString()
+    {
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            parts.Add("Text=" + Uri.EscapeDataString(SearchText));
+        }
+
+        if (!string.IsNullOrWhiteSpace(SortValue))
+        {
+            parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
+        }
+
+        if (CurrentPage > 1)
+        {
+            parts.Add("Page=" + CurrentPage);
+        }
+
+        foreach (var type in FilterTypes)
+        {
+            parts.Add("Types=" + Uri.EscapeDataString(type));
+        }
+
+        foreach (var time in FilterTimes)
+        {
+            parts.Add("Times=" + Uri.EscapeDataString(time));
+        }
+
+        return parts.Count == 0 ? "" : "?" + string.Join("&", parts);
+    }
+}
+

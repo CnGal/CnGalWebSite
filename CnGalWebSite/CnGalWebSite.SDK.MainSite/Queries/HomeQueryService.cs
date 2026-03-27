@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
@@ -25,6 +25,12 @@ public sealed class HomeQueryService(
         const string cacheKey = "main-site:home-summary";
         if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached) && cached is not null)
         {
+            // Always refresh random data so it's not stale
+            var refreshWarnings = new List<SdkErrorModel>();
+            cached.HotRecommends = NormalizeHomeItemUrls(
+                await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", refreshWarnings, cancellationToken));
+            cached.Evaluations = NormalizeHomeItemUrls(
+                await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", refreshWarnings, cancellationToken));
             return SdkResult<HomeSummaryViewModel>.Ok(cached);
         }
 
@@ -93,6 +99,25 @@ public sealed class HomeQueryService(
 
         memoryCache.Set(cacheKey, model, HomeCacheDuration);
         return SdkResult<HomeSummaryViewModel>.Ok(model);
+    }
+
+    public async Task<SdkResult<SearchViewModel>> SearchAsync(string queryString, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:search:{queryString}";
+        if (memoryCache.TryGetValue(cacheKey, out SearchViewModel? cached) && cached is not null)
+        {
+            return SdkResult<SearchViewModel>.Ok(cached);
+        }
+
+        var path = $"api/home/search{queryString}";
+        var result = await GetAsync<SearchViewModel>(path, "SEARCH", "搜索结果", cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, HomeCacheDuration);
+        }
+
+        return result;
     }
 
     private static IReadOnlyList<TItem> NormalizeHomeItemUrls<TItem>(IReadOnlyList<TItem> source)

@@ -1,8 +1,8 @@
-﻿using CnGalWebSite.APIServer.Application.BackgroundTasks;
+using CnGalWebSite.APIServer.Application.BackgroundTasks;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Search;
-using CnGalWebSite.APIServer.Application.Typesense;
+using CnGalWebSite.APIServer.Application.Search.Meilisearch;
 using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Extentions;
@@ -39,7 +39,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
-using Typesense.Setup;
+using Meilisearch;
 using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.APIServer.Application.Tasks;
 using Microsoft.OpenApi;
@@ -93,24 +93,11 @@ namespace CnGalWebSite.APIServer
             //添加HTTP请求
             services.AddHttpClient();
             services.AddScoped<IHttpService, HttpService>();
-            //添加ElasticSearch服务
-            //services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //添加搜索服务
-            services.AddScoped<ISearchHelper, TypesenseHelper>()
-                .AddTypesenseClient(config =>
-                {
-                    config.ApiKey = Configuration["TypesenseAPIKey"];
-                    config.Nodes = new List<Node>
-                    {
-                        new Node
-                        (
-                            Configuration["TypesenseHost"],
-                            Configuration["TypesensePort"],
-                            "http", // 或根据实际配置选择 "https"
-                            ""      // 如果没有额外路径则传递空字符串
-                        )
-                    };
-                });
+            services.AddSingleton(new MeilisearchClient(
+                Configuration["MeilisearchHost"],
+                Configuration["MeilisearchApiKey"]));
+            services.AddScoped<ISearchHelper, MeilisearchHelper>();
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //添加文件上传服务

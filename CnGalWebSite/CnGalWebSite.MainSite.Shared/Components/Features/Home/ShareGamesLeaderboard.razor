@@ -1,0 +1,59 @@
+@* 分享游戏库排行榜 — 库存排行 + 拥有率排行（纯静态 SSR） *@
+
+<div class="share-games-leaderboard">
+    @* 库存排行 *@
+    <section class="share-games-leaderboard__panel">
+        <h2 class="share-games-leaderboard__title">
+            <CgMdiIcon Name="mdiAccountGroup" aria-hidden="true" />
+            库存排行榜
+        </h2>
+        <ol class="share-games-leaderboard__list">
+            @foreach (var (user, index) in TopUsers.Select((v, i) => (v, i)))
+            {
+                <li>
+                    <a href="@($"/space/index/{user.UserId}")" class="share-games-leaderboard__user-row">
+                        <span class="share-games-leaderboard__rank @(index < 3 ? "share-games-leaderboard__rank--top" : "")">@(index + 1)</span>
+                        <img src="@user.UserImage" alt="@user.UserName" class="share-games-leaderboard__avatar" loading="lazy" />
+                        <div class="share-games-leaderboard__user-info">
+                            <span class="share-games-leaderboard__user-name">@user.UserName</span>
+                            @if (!string.IsNullOrWhiteSpace(user.PersonalSignature))
+                            {
+                                <span class="share-games-leaderboard__user-sig">@user.PersonalSignature</span>
+                            }
+                        </div>
+                        <span class="share-games-leaderboard__count">@user.GameCount</span>
+                    </a>
+                </li>
+            }
+        </ol>
+    </section>
+
+    @* 拥有率排行 *@
+    <section class="share-games-leaderboard__panel">
+        <h2 class="share-games-leaderboard__title">
+            <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
+            拥有率排行榜
+        </h2>
+        <ol class="share-games-leaderboard__list">
+            @foreach (var (game, index) in TopGames.Select((v, i) => (v, i)))
+            {
+                <li>
+                    <a href="@($"/entries/index/{game.GameId}")" class="share-games-leaderboard__game-row">
+                        <span class="share-games-leaderboard__rank @(index < 3 ? "share-games-leaderboard__rank--top" : "")">@(index + 1)</span>
+                        <img src="@game.GameImage" alt="@game.GameName" class="share-games-leaderboard__game-cover" loading="lazy" />
+                        <span class="share-games-leaderboard__game-name">@game.GameName</span>
+                        <span class="share-games-leaderboard__rate">@((game.PossessionRate * 100).ToString("0.0"))%</span>
+                    </a>
+                </li>
+            }
+        </ol>
+    </section>
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<TopUserItem> TopUsers { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<TopGameItem> TopGames { get; set; } = [];
+}

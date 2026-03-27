@@ -1,0 +1,188 @@
+<div class="search-filter-panel">
+    @* ── Type filters ── *@
+    <div class="search-filter-panel__section">
+        <h3 class="search-filter-panel__section-title">
+            <CgMdiIcon Name="mdiFilterVariant" aria-hidden="true" />
+            类型
+        </h3>
+
+        <div class="search-filter-panel__group">
+            <span class="search-filter-panel__group-label">词条</span>
+            <div class="search-filter-panel__tags">
+                @foreach (var type in EntryTypes)
+                {
+                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
+                            @onclick="() => ToggleType(type.Key)">
+                        @type.Value
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="search-filter-panel__group">
+            <span class="search-filter-panel__group-label">文章</span>
+            <div class="search-filter-panel__tags">
+                @foreach (var type in ArticleTypes)
+                {
+                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
+                            @onclick="() => ToggleType(type.Key)">
+                        @type.Value
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="search-filter-panel__group">
+            <span class="search-filter-panel__group-label">其他</span>
+            <div class="search-filter-panel__tags">
+                @foreach (var type in OtherTypes)
+                {
+                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
+                            @onclick="() => ToggleType(type.Key)">
+                        @type.Value
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* ── Time filters ── *@
+    <div class="search-filter-panel__section">
+        <h3 class="search-filter-panel__section-title">
+            <CgMdiIcon Name="mdiCalendarRange" aria-hidden="true" />
+            时间
+        </h3>
+        <div class="search-filter-panel__tags">
+            @foreach (var time in AvailableTimes)
+            {
+                <button class="search-filter-panel__tag @(SelectedTimes.Contains(time.Key) ? "search-filter-panel__tag--active" : "")"
+                        @onclick="() => ToggleTime(time.Key)">
+                    @time.Value
+                </button>
+            }
+        </div>
+    </div>
+
+    @* ── Sort ── *@
+    <div class="search-filter-panel__section search-filter-panel__section--inline">
+        <h3 class="search-filter-panel__section-title">
+            <CgMdiIcon Name="mdiSortVariant" aria-hidden="true" />
+            排序
+        </h3>
+        <div class="search-filter-panel__tags">
+            @foreach (var sort in SortOptions)
+            {
+                <button class="search-filter-panel__tag @(CurrentSortField == sort.Key ? "search-filter-panel__tag--active" : "")"
+                        @onclick="() => SetSort(sort.Key)">
+                    @sort.Value
+                </button>
+            }
+            @if (!string.IsNullOrEmpty(CurrentSortField))
+            {
+                <button class="search-filter-panel__tag search-filter-panel__tag--active search-filter-panel__tag--order"
+                        @onclick="ToggleSortOrder">
+                    <CgMdiIcon Name="@(IsAscending ? "mdiSortAscending" : "mdiSortDescending")" aria-hidden="true" />
+                    @(IsAscending ? "顺序" : "逆序")
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<string> SelectedTypes { get; set; } = [];
+    [Parameter] public EventCallback<List<string>> SelectedTypesChanged { get; set; }
+
+    [Parameter] public List<string> SelectedTimes { get; set; } = [];
+    [Parameter] public EventCallback<List<string>> SelectedTimesChanged { get; set; }
+
+    [Parameter] public string CurrentSort { get; set; } = "";
+    [Parameter] public EventCallback<string> CurrentSortChanged { get; set; }
+
+    // Type definitions as Key-Value pairs (Key = enum name sent to API, Value = display label)
+    private static readonly KeyValuePair<string, string>[] EntryTypes =
+    [
+        new("Entry", "词条"), new("Game", "游戏"), new("Role", "角色"),
+        new("ProductionGroup", "组织"), new("Staff", "Staff"),
+    ];
+
+    private static readonly KeyValuePair<string, string>[] ArticleTypes =
+    [
+        new("Article", "文章"), new("Tought", "感想"), new("Strategy", "攻略"),
+        new("Interview", "访谈"), new("News", "动态"), new("Evaluation", "评测"),
+        new("PeripheralArticle", "周边文章"), new("Notice", "公告"),
+        new("OtherArticle", "杂谈"), new("Fan", "二创"),
+    ];
+
+    private static readonly KeyValuePair<string, string>[] OtherTypes =
+    [
+        new("Tag", "标签"), new("Video", "视频"),
+        new("Periphery", "周边"), new("SetorAlbumEtc", "设定集"), new("Ost", "原声集"),
+        new("Set", "套装"), new("OtherPeriphery", "其他周边"),
+    ];
+
+    private static readonly KeyValuePair<string, string>[] AvailableTimes = BuildAvailableTimes();
+
+    private static KeyValuePair<string, string>[] BuildAvailableTimes()
+    {
+        var range = 5;
+        var result = new KeyValuePair<string, string>[range + 1];
+        var year = DateTime.Now.Year - range;
+        for (var i = 0; i <= range; i++, year++)
+        {
+            var after = new DateTimeOffset(new DateTime(year, 1, 1)).ToUnixTimeMilliseconds();
+            var before = new DateTimeOffset(new DateTime(year + 1, 1, 1)).ToUnixTimeMilliseconds();
+            result[i] = new($"{after}-{before}", year.ToString());
+        }
+        return result;
+    }
+
+    private async Task ToggleType(string type)
+    {
+        var list = new List<string>(SelectedTypes);
+        if (!list.Remove(type))
+        {
+            list.Add(type);
+        }
+        await SelectedTypesChanged.InvokeAsync(list);
+    }
+
+    private async Task ToggleTime(string time)
+    {
+        var list = new List<string>(SelectedTimes);
+        if (!list.Remove(time))
+        {
+            list.Add(time);
+        }
+        await SelectedTimesChanged.InvokeAsync(list);
+    }
+
+    // Sort options matching old site (key = API field name, value = display label)
+    private static readonly KeyValuePair<string, string>[] SortOptions =
+    [
+        new("", "默认排序"),
+        new("LastEditTime", "最后编辑时间"),
+        new("PubulishTime", "发布时间"),
+        new("CreateTime", "创建时间"),
+        new("ReaderCount", "热度"),
+    ];
+
+    // Parse "LastEditTime desc" into field + direction
+    private string CurrentSortField => CurrentSort.Replace(" desc", "");
+    private bool IsAscending => !string.IsNullOrEmpty(CurrentSortField) && !CurrentSort.Contains(" desc");
+
+    private async Task SetSort(string field)
+    {
+        // When selecting a sort field, default to descending (same as old site)
+        var sort = string.IsNullOrEmpty(field) ? "" : field + " desc";
+        await CurrentSortChanged.InvokeAsync(sort);
+    }
+
+    private async Task ToggleSortOrder()
+    {
+        var sort = IsAscending
+            ? CurrentSortField + " desc"
+            : CurrentSortField;
+        await CurrentSortChanged.InvokeAsync(sort);
+    }
+}
