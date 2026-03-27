@@ -11,6 +11,8 @@ services:
       - ThirdPartyLoginQQ_client_id=${ThirdPartyLoginQQ_client_id}
       - ThirdPartyLoginQQ_client_secret=${ThirdPartyLoginQQ_client_secret}
       - TypesenseAPIKey=${TypesenseAPIKey}
+      - MeilisearchApiKey=${MeilisearchApiKey}
+      - MeilisearchHost=${MeilisearchHost}
       - AccessKeyId=${AccessKeyId}
       - AccessKeySecret=${AccessKeySecret}
       - SliotsImageAPIToken=${SliotsImageAPIToken}
