@@ -1,4 +1,5 @@
-﻿using System;
+#if false
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Typesense;
@@ -53,3 +54,4 @@ namespace CnGalWebSite.APIServer.CustomMiddlewares
     }
 
 }
+#endif

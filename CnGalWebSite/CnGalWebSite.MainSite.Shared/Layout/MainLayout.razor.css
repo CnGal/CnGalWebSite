@@ -121,6 +121,8 @@
     min-width: 10rem;
     max-width: 16rem;
     height: 2.5rem;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 @media (min-width: 768px) {
@@ -141,7 +143,7 @@
     transition: all var(--cg-transition-fast);
 }
 
-.cg-topbar__search-inner:focus-within {
+.cg-topbar__search:hover .cg-topbar__search-inner {
     border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
 }
 
@@ -158,20 +160,11 @@
     height: 22px;
 }
 
-.cg-topbar__search-inner input {
-    width: 100%;
-    background: transparent;
-    border: none;
+.cg-topbar__search-placeholder {
+    display: flex;
+    align-items: center;
     padding: 0 0.5rem;
     font-size: 0.875rem;
-    color: var(--cg-color-text);
-}
-
-.cg-topbar__search-inner input:focus {
-    outline: none;
-}
-
-.cg-topbar__search-inner input::placeholder {
     color: var(--cg-color-text-muted);
 }
 
