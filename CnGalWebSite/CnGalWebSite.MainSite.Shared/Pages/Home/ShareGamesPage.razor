@@ -1,0 +1,128 @@
+@page "/sharegames"
+
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+@inject IPlayedGameQueryService PlayedGameQueryService
+
+<PageTitle>分享游戏库 - CnGal资料站</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <div class="share-games-error">
+        <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true"/>
+        <h1>加载失败</h1>
+        <p>@_errorMessage</p>
+        <a href="/" class="share-games-error__home-link">
+            <CgMdiIcon Name="mdiArrowLeft" aria-hidden="true"/>
+            返回首页
+        </a>
+    </div>
+}
+else if (_overview is not null)
+{
+    <div class="share-games-page">
+        @* ── 页面标题区 ── *@
+        <header class="share-games-header">
+            <div class="share-games-header__content">
+                <h1 class="share-games-header__title">
+                    <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true"/>
+                    分享游戏库
+                </h1>
+                <p class="share-games-header__desc">
+                    绑定 Steam 游戏库，即可查看排行榜、分享你的游玩足迹
+                </p>
+            </div>
+            <div class="share-games-header__stats">
+                <div class="share-games-header__stat">
+                    <span class="share-games-header__stat-value">@_overview.TotalGameCount</span>
+                    <span class="share-games-header__stat-label">已收录游戏</span>
+                </div>
+            </div>
+        </header>
+
+
+        @* ── 排行榜 ── *@
+        <ShareGamesLeaderboard TopUsers="@_overview.TopUsers" TopGames="@_overview.TopGames"/>
+
+        @* ── 随机评价 ── *@
+        @if (_reviews.Count > 0)
+        {
+            <section class="share-games-reviews-section">
+                <h2 class="share-games-section-title">
+                    <CgMdiIcon Name="mdiCommentTextMultipleOutline" aria-hidden="true"/>
+                    随机评价
+                </h2>
+                <div class="share-games-reviews-grid">
+                    @foreach (var review in _reviews.Take(6))
+                    {
+                        <ShareGamesReviewCard Model="review"/>
+                    }
+                </div>
+            </section>
+        }
+
+        @* ── 当前用户的游戏库（登录后才展示） ── *@
+        <AuthorizeView>
+            <Authorized>
+                <section class="share-games-my-library">
+                    <h2 class="share-games-section-title">
+                        <CgMdiIcon Name="mdiGamepadVariant" aria-hidden="true"/>
+                        我的游戏库
+                    </h2>
+                    @* ── 提示 ── *@
+                    <div class="share-games-tip">
+                        <CgMdiIcon Name="mdiInformationOutline" aria-hidden="true"/>
+                        <span>Steam 个人资料隐私设置中<strong>【游戏详情】</strong>需要选择<strong>【公开】</strong>，</span>
+                        <a href="/articles/index/5">点击阅读教程</a>
+                    </div>
+
+                    <ShareGamesUserSection/>
+                </section>
+            </Authorized>
+            <NotAuthorized>
+                <div class="share-games-login-cta">
+                    <CgMdiIcon Name="mdiLogin" aria-hidden="true"/>
+                    <span>登录后即可分享你的游戏库</span>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+}
+else
+{
+    <div class="share-games-loading">
+        <CgProgressRing/>
+    </div>
+}
+
+@code {
+    private SteamGamesOverviewViewModel? _overview;
+    private IReadOnlyList<RandomReviewItem> _reviews = [];
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var overviewTask = PlayedGameQueryService.GetSteamGamesOverviewAsync();
+        var reviewsTask = PlayedGameQueryService.GetRandomReviewsAsync();
+
+        await Task.WhenAll(overviewTask, reviewsTask);
+
+        var overviewResult = overviewTask.Result;
+        if (overviewResult.Success && overviewResult.Data is not null)
+        {
+            _overview = overviewResult.Data;
+        }
+        else
+        {
+            _errorMessage = overviewResult.Error?.Message ?? "请稍后重试";
+            return;
+        }
+
+        var reviewsResult = reviewsTask.Result;
+        if (reviewsResult.Success && reviewsResult.Data is not null)
+        {
+            _reviews = reviewsResult.Data;
+        }
+    }
+
+}

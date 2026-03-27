@@ -6,7 +6,8 @@
     border-radius: var(--cg-radius-lg);
     overflow: hidden;
     text-decoration: none;
-    color: inherit;
+    color: inherit;    
+    height: 100%;
     transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
 }
 

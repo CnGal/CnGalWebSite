@@ -1,0 +1,49 @@
+@* 分享游戏库 — 当前用户的游戏库展示区域
+   交互式组件，仅在 AuthorizeView 内渲染 *@
+
+@rendermode InteractiveServer
+
+@using CnGalWebSite.MainSite.Shared.Components.Features.Space
+
+@inject ISpaceQueryService SpaceQueryService
+@inject IPlayedGameQueryService PlayedGameQueryService
+
+@if (_isLoading)
+{
+    <div class="share-games-user-section__loading">
+        <CgProgressRing />
+        <span>正在加载你的游戏库...</span>
+    </div>
+}
+else if (_spaceDetail is not null)
+{
+    <SpaceGameRecordSection UserId="@_spaceDetail.Id" SteamId="@_spaceDetail.SteamId" TotalGameCount="_totalGameCount" />
+}
+
+@code {
+    private SpaceDetailViewModel? _spaceDetail;
+    private int _totalGameCount;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var spaceTask = SpaceQueryService.GetSpaceDetailAsync(string.Empty);
+        var overviewTask = PlayedGameQueryService.GetSteamGamesOverviewAsync();
+
+        await Task.WhenAll(spaceTask, overviewTask);
+
+        var result = spaceTask.Result;
+        if (result.Success && result.Data is not null)
+        {
+            _spaceDetail = result.Data;
+        }
+
+        var overviewResult = overviewTask.Result;
+        if (overviewResult.Success && overviewResult.Data is not null)
+        {
+            _totalGameCount = overviewResult.Data.TotalGameCount;
+        }
+
+        _isLoading = false;
+    }
+}

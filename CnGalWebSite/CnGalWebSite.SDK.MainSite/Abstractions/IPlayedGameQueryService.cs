@@ -20,6 +20,16 @@ public interface IPlayedGameQueryService
     Task<SdkResult<IReadOnlyList<SteamUserInfoItem>>> GetUserSteamInfoAsync(string userId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 获取 Steam 游戏总览（库存排行 + 拥有率排行）。
+    /// </summary>
+    Task<SdkResult<SteamGamesOverviewViewModel>> GetSteamGamesOverviewAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取随机用户评价列表。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<RandomReviewItem>>> GetRandomReviewsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 清除指定用户的游玩记录缓存。
     /// </summary>
     void InvalidateUserRecordsCache(string userId);

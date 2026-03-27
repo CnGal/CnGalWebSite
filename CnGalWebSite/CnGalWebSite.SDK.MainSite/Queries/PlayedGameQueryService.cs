@@ -17,9 +17,12 @@ public sealed class PlayedGameQueryService(
     private static readonly TimeSpan OverviewCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan RecordsCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan SteamInfoCacheDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan GamesOverviewCacheDuration = TimeSpan.FromMinutes(10);
     private const string OverviewPathTemplate = "api/playedgame/GetPlayedGameOverview/{0}";
     private const string UserRecordsPathTemplate = "api/playedgame/GetUserGameRecords/{0}";
     private const string UserSteamInfoPathTemplate = "api/steam/GetUserSteamInfor/{0}";
+    private const string GamesOverviewPath = "api/steam/GetSteamGamesOverview";
+    private const string RandomReviewsPath = "api/playedgame/GetRandomUserScores";
 
     protected override ILogger Logger => logger;
 
@@ -103,6 +106,7 @@ public sealed class PlayedGameQueryService(
                 SteamId = s.SteamId ?? string.Empty,
                 Name = s.Name ?? string.Empty,
                 Image = s.Image ?? string.Empty,
+                Price = s.Price,
             })
             .ToList();
 
@@ -196,6 +200,33 @@ public sealed class PlayedGameQueryService(
         };
     }
 
+    public async Task<SdkResult<SteamGamesOverviewViewModel>> GetSteamGamesOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        const string cacheKey = "main-site:steam-games-overview";
+        if (memoryCache.TryGetValue(cacheKey, out SteamGamesOverviewViewModel? cached) && cached is not null)
+        {
+            return SdkResult<SteamGamesOverviewViewModel>.Ok(cached);
+        }
+
+        var result = await GetAsync<SteamGamesOverviewModel>(
+            GamesOverviewPath,
+            "STEAM_GAMES_OVERVIEW",
+            "Steam游戏总览",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<SteamGamesOverviewViewModel>.Fail(
+                result.Error?.Code ?? "STEAM_GAMES_OVERVIEW_FAILED",
+                result.Error?.Message ?? "获取 Steam 游戏总览失败",
+                result.Error?.StatusCode);
+        }
+
+        var viewModel = MapGamesOverviewToViewModel(result.Data);
+        memoryCache.Set(cacheKey, viewModel, GamesOverviewCacheDuration);
+        return SdkResult<SteamGamesOverviewViewModel>.Ok(viewModel);
+    }
+
     public void InvalidateUserRecordsCache(string userId)
     {
         var cacheKey = $"main-site:user-game-records:{userId}";
@@ -207,5 +238,73 @@ public sealed class PlayedGameQueryService(
         var cacheKey = $"main-site:played-game-overview:{entryId}";
         memoryCache.Remove(cacheKey);
     }
-}
 
+    public async Task<SdkResult<IReadOnlyList<RandomReviewItem>>> GetRandomReviewsAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await GetAsync<List<PlayedGameUserScoreRandomModel>>(
+            RandomReviewsPath,
+            "RANDOM_REVIEWS",
+            "随机用户评价",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(Array.Empty<RandomReviewItem>());
+        }
+
+        IReadOnlyList<RandomReviewItem> items = result.Data
+            .Select(MapRandomReview)
+            .ToList();
+
+        return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(items);
+    }
+
+    private static SteamGamesOverviewViewModel MapGamesOverviewToViewModel(SteamGamesOverviewModel model)
+    {
+        return new SteamGamesOverviewViewModel
+        {
+            TotalGameCount = model.Count,
+            TopUsers = model.HasMostGamesUsers
+                .Select(u => new TopUserItem
+                {
+                    UserId = u.Id ?? string.Empty,
+                    UserName = u.Name ?? string.Empty,
+                    UserImage = u.Image ?? string.Empty,
+                    PersonalSignature = u.PersonalSignature ?? string.Empty,
+                    GameCount = u.Count,
+                })
+                .ToList(),
+            TopGames = model.PossessionRateHighestGames
+                .Select(g => new TopGameItem
+                {
+                    GameId = g.Id,
+                    GameName = g.Name ?? string.Empty,
+                    GameImage = g.MainImage ?? string.Empty,
+                    PossessionRate = g.Rate,
+                })
+                .ToList(),
+        };
+    }
+
+    private static RandomReviewItem MapRandomReview(PlayedGameUserScoreRandomModel model)
+    {
+        return new RandomReviewItem
+        {
+            UserId = model.User?.Id ?? string.Empty,
+            UserName = model.User?.Name ?? string.Empty,
+            UserImage = model.User?.PhotoPath ?? string.Empty,
+            GameId = model.GameId,
+            GameName = model.GameName ?? string.Empty,
+            TotalScore = model.Socres?.TotalSocre ?? 0,
+            MusicScore = model.Socres?.MusicSocre ?? 0,
+            PaintScore = model.Socres?.PaintSocre ?? 0,
+            ScriptScore = model.Socres?.ScriptSocre ?? 0,
+            ShowScore = model.Socres?.ShowSocre ?? 0,
+            SystemScore = model.Socres?.SystemSocre ?? 0,
+            CVScore = model.Socres?.CVSocre ?? 0,
+            IsDubbing = model.IsDubbing,
+            PlayImpressions = model.PlayImpressions ?? string.Empty,
+            LastEditTime = model.LastEditTime,
+        };
+    }
+}

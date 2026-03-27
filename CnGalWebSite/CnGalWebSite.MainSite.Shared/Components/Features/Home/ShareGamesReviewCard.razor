@@ -1,0 +1,41 @@
+@* 随机评价卡片 — 纯静态 SSR *@
+
+<a href="@($"/entries/index/{Model.GameId}")" class="share-games-review-card">
+    <div class="share-games-review-card__header">
+        <img src="@Model.UserImage" alt="@Model.UserName" class="share-games-review-card__avatar" loading="lazy" />
+        <div class="share-games-review-card__user-info">
+            <span class="share-games-review-card__user-name">@Model.UserName</span>
+            <span class="share-games-review-card__game-name">《@Model.GameName》</span>
+        </div>
+        <div class="share-games-review-card__score">
+            <CgMdiIcon Name="mdiStar" aria-hidden="true" />
+            <span>@Model.TotalScore</span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.PlayImpressions))
+    {
+        <p class="share-games-review-card__text">@Model.PlayImpressions</p>
+    }
+
+    <div class="share-games-review-card__scores">
+        <span>音乐 @Model.MusicScore</span>
+        <span>美术 @Model.PaintScore</span>
+        <span>剧本 @Model.ScriptScore</span>
+        <span>演出 @Model.ShowScore</span>
+        <span>程序 @Model.SystemScore</span>
+        @if (Model.IsDubbing && Model.CVScore > 0)
+        {
+            <span>配音 @Model.CVScore</span>
+        }
+    </div>
+
+    <time class="share-games-review-card__time" datetime="@Model.LastEditTime.ToString("yyyy-MM-dd")">
+        @Model.LastEditTime.ToString("yyyy-MM-dd")
+    </time>
+</a>
+
+@code {
+    [Parameter]
+    public required RandomReviewItem Model { get; set; }
+}
