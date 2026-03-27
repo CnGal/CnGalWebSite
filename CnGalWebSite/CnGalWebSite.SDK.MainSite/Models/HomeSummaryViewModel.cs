@@ -14,7 +14,7 @@ public sealed class HomeSummaryViewModel
 
     public required IReadOnlyList<CarouselViewModel> Carousels { get; init; }
 
-    public required IReadOnlyList<HotRecommendItemModel> HotRecommends { get; init; }
+    public required IReadOnlyList<HotRecommendItemModel> HotRecommends { get; set; }
 
     public required IReadOnlyList<PublishedGameItemModel> PublishedGames { get; init; }
 
@@ -42,7 +42,7 @@ public sealed class HomeSummaryViewModel
 
     public required IReadOnlyList<HomeCommunityLinkViewModel> CommunityLinks { get; init; }
 
-    public required IReadOnlyList<EvaluationItemModel> Evaluations { get; init; }
+    public required IReadOnlyList<EvaluationItemModel> Evaluations { get; set; }
 
     public required HomeSupportLinkViewModel? SupportLink { get; init; }
 

@@ -25,6 +25,12 @@ public sealed class HomeQueryService(
         const string cacheKey = "main-site:home-summary";
         if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached) && cached is not null)
         {
+            // Always refresh random data so it's not stale
+            var refreshWarnings = new List<SdkErrorModel>();
+            cached.HotRecommends = NormalizeHomeItemUrls(
+                await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", refreshWarnings, cancellationToken));
+            cached.Evaluations = NormalizeHomeItemUrls(
+                await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", refreshWarnings, cancellationToken));
             return SdkResult<HomeSummaryViewModel>.Ok(cached);
         }
 
