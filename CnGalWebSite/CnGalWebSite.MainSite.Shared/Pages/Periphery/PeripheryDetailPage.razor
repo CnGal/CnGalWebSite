@@ -1,0 +1,142 @@
+@page "/peripheries/index/{Id:long}"
+@inject IPeripheryQueryService PeripheryQueryService
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.Features.Periphery.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+<PageTitle>@(_model is null ? "周边详情" : $"{GetDisplayTitle()} - 周边详情")</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <section class="periphery-not-found">
+        <h1>周边加载失败</h1>
+        <p>@_errorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (_model is not null)
+{
+    <article class="periphery-page">
+        <header class="periphery-header">
+            <PeripheryHero Name="@_model.Name"
+                           DisplayName="@_model.DisplayName"
+                           BriefIntroduction="@_model.BriefIntroduction"
+                           MainPicture="@_model.MainPicture"
+                           BackgroundPicture="@_model.BackgroundPicture"
+                           ReaderCount="_model.ReaderCount"
+                           CollectedCount="_model.CollectedCount"
+                           PeripheryId="_model.Id" />
+        </header>
+
+        @if (_model.IsHidden)
+        {
+            <CgAlert Variant="warning" Class="periphery-hidden-alert">
+                当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CgAlert>
+        }
+
+        @* ── 桌面端双栏布局 ── *@
+        <section class="periphery-layout periphery-layout--desktop" aria-label="桌面详情布局">
+            <main class="periphery-main-col">
+                <PeripheryGallery Pictures="_model.Pictures" />
+
+                <PeripheryOverviewSection OverviewModels="_model.PeripheryOverviewModels" />
+
+                <PeripheryRelatedEntries Entries="_model.Entries" />
+
+                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="periphery-card--comment" Show="_model.CanComment"
+                           Description="可前往评论区参与讨论，分享你的看法。">
+                    <a class="periphery-action-btn" href="@($"/space/comments?type=periphery&id={_model.Id}")">前往评论区</a>
+                </EntryCard>
+            </main>
+
+            <aside class="periphery-side-col">
+                <PeripheryInfoCard Type="_model.Type"
+                                   Category="@_model.Category"
+                                   Brand="@_model.Brand"
+                                   Author="@_model.Author"
+                                   Material="@_model.Material"
+                                   Size="@_model.Size"
+                                   IndividualParts="@_model.IndividualParts"
+                                   Price="@_model.Price"
+                                   SaleLink="@_model.SaleLink"
+                                   IsReprint="_model.IsReprint"
+                                   IsAvailableItem="_model.IsAvailableItem"
+                                   PageCount="_model.PageCount"
+                                   SongCount="_model.SongCount" />
+
+                <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
+            </aside>
+        </section>
+
+        @* ── 移动端单栏布局 ── *@
+        <section class="periphery-layout periphery-layout--mobile" aria-label="移动端详情布局">
+            <PeripheryInfoCard Type="_model.Type"
+                               Category="@_model.Category"
+                               Brand="@_model.Brand"
+                               Author="@_model.Author"
+                               Material="@_model.Material"
+                               Size="@_model.Size"
+                               IndividualParts="@_model.IndividualParts"
+                               Price="@_model.Price"
+                               SaleLink="@_model.SaleLink"
+                               IsReprint="_model.IsReprint"
+                               IsAvailableItem="_model.IsAvailableItem"
+                               PageCount="_model.PageCount"
+                               SongCount="_model.SongCount" />
+
+            <PeripheryGallery Pictures="_model.Pictures" />
+
+            <PeripheryOverviewSection OverviewModels="_model.PeripheryOverviewModels" />
+
+            <PeripheryRelatedEntries Entries="_model.Entries" />
+
+            <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
+
+            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="periphery-card--comment" Show="_model.CanComment"
+                       Description="可前往评论区参与讨论，分享你的看法。">
+                <a class="periphery-action-btn" href="@($"/space/comments?type=periphery&id={_model.Id}")">前往评论区</a>
+            </EntryCard>
+        </section>
+    </article>
+}
+else
+{
+    <section class="periphery-loading" aria-label="加载中">
+        <div class="periphery-loading-block periphery-loading-block--wide"></div>
+        <div class="periphery-loading-block"></div>
+        <div class="periphery-loading-block"></div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private PeripheryDetailViewModel? _model;
+    private string? _errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await PeripheryQueryService.GetPeripheryDetailAsync(Id);
+        if (result.Success && result.Data is not null)
+        {
+            _errorMessage = null;
+            _model = result.Data;
+            return;
+        }
+
+        _model = null;
+        _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private string GetDisplayTitle()
+    {
+        if (_model is null)
+        {
+            return string.Empty;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName;
+    }
+}

@@ -1,0 +1,24 @@
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+@if (Entries.Count > 0)
+{
+    <EntrySection Title="关联词条" Icon="mdiLinkVariant">
+        <EntryCardList LimitCount="9" ShowExpandButton="Entries.Count > 9">
+            @foreach (var item in Entries)
+            {
+                <li>
+                    <EntryCardItem Url="@($"/entries/index/{item.Id}")"
+                                   Image="@item.MainImage"
+                                   Title="@item.Name"
+                                   IsSquareCover="item.Type == EntryType.Role || item.Type == EntryType.Staff" />
+                </li>
+            }
+        </EntryCardList>
+    </EntrySection>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<EntryInforTipViewModel> Entries { get; set; } = [];
+}

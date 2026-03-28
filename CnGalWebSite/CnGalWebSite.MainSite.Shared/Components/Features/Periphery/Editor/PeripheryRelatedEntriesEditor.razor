@@ -1,0 +1,24 @@
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.SDK.MainSite.Models.PeripheryEdit
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
+
+<section class="periphery-editor-section" id="section-periphery-entries">
+    <h2><CgMdiIcon Name="mdiHub" Class="periphery-section-icon" aria-hidden="true"/>关联词条</h2>
+    <p>管理周边关联的游戏、角色、STAFF 和组织。</p>
+
+    @if (Model != null)
+    {
+        <CgFormSection Title="词条关联" Icon="mdiLinkVariant" Flat>
+            <EntryRelevanceListEditor Title="游戏" Items="Model.Games" AutoCompleteItems="MetaOptions.EntryGameItems"/>
+            <EntryRelevanceListEditor Title="角色" Items="Model.Roles" AutoCompleteItems="MetaOptions.EntryRoleItems"/>
+            <EntryRelevanceListEditor Title="STAFF" Items="Model.Staffs" AutoCompleteItems="MetaOptions.EntryStaffItems"/>
+            <EntryRelevanceListEditor Title="组织" Items="Model.Groups" AutoCompleteItems="MetaOptions.EntryGroupItems"/>
+        </CgFormSection>
+    }
+</section>
+
+@code {
+    [Parameter] public EditPeripheryRelatedEntriesViewModel Model { get; set; } = default!;
+
+    [Parameter] public PeripheryEditMetaOptions MetaOptions { get; set; } = default!;
+}

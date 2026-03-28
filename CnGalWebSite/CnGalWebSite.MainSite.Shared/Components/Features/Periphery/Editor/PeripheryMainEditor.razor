@@ -1,0 +1,185 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.SDK.MainSite.Models.Files
+
+<section class="periphery-editor-section" id="section-periphery-main">
+    <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="periphery-section-icon" aria-hidden="true"/>主要信息</h2>
+    <p>设置周边名称、类型、图片与基本属性。</p>
+
+    @if (Model != null)
+    {
+        <CgFormGroup Label="周边类型">
+            <div class="periphery-type-selector">
+                @foreach (var type in _peripheryTypes)
+                {
+                    var isActive = Model.Type == type;
+                    <button type="button"
+                            class="periphery-type-btn @(isActive ? "active" : "")"
+                            @onclick="() => Model.Type = type">
+                        <CgMdiIcon Name="@GetPeripheryTypeIcon(type)" Class="periphery-type-icon" aria-hidden="true"/>
+                        <span>@type.GetDisplayName()</span>
+                    </button>
+                }
+            </div>
+        </CgFormGroup>
+
+        <CgFormGroup Label="主图">
+            <CgImageUpload @bind-Value="Model.MainPicture"
+                           Text="上传主图"
+                           Type="ImageAspectType.None"/>
+        </CgFormGroup>
+
+        <CgFormGroup Label="名称同步">
+            <CgCheckbox Value="@_syncDisplayName"
+                        ValueChanged="OnSyncDisplayNameChanged"
+                        Label="显示名称与唯一名称保持一致"/>
+        </CgFormGroup>
+        <CgGrid>
+            <CgFormGroup Label="唯一名称">
+                <CgInput Value="@Model.Name"
+                         ValueChanged="OnNameChanged" TValue="string" Placeholder="用于 URL 标识"/>
+            </CgFormGroup>
+            <CgFormGroup Label="显示名称">
+                <CgInput @bind-Value="Model.DisplayName"
+                         Disabled="_syncDisplayName" Placeholder="展示给用户的名称"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgFormGroup Label="简介">
+            <CgTextarea @bind-Value="Model.BriefIntroduction" Placeholder="简要描述该周边"/>
+        </CgFormGroup>
+
+        <CgGrid>
+            <CgFormGroup Label="缩略图">
+                <CgImageUpload @bind-Value="Model.Thumbnail"
+                               Text="上传缩略图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="背景图">
+                <CgImageUpload @bind-Value="Model.BackgroundPicture"
+                               Text="上传背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+            <CgFormGroup Label="小背景图">
+                <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
+                               Text="上传小背景图"
+                               Type="ImageAspectType.None"/>
+            </CgFormGroup>
+        </CgGrid>
+
+        <CgFormSection Title="通用属性" Icon="mdiTuneVariant" Flat>
+            <CgGrid>
+                <CgFormGroup Label="类别">
+                    <CgInput @bind-Value="Model.Category" TValue="string" Placeholder="如：手办、模型"/>
+                </CgFormGroup>
+                <CgFormGroup Label="品牌">
+                    <CgInput @bind-Value="Model.Brand" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="作者">
+                    <CgInput @bind-Value="Model.Author" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="材质">
+                    <CgInput @bind-Value="Model.Material" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="尺寸">
+                    <CgInput @bind-Value="Model.Size" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="单独部件数量">
+                    <CgInput @bind-Value="Model.IndividualParts" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="价格">
+                    <CgInput @bind-Value="Model.Price" TValue="string"/>
+                </CgFormGroup>
+                <CgFormGroup Label="贩售链接">
+                    <CgInput @bind-Value="Model.SaleLink" TValue="string" Placeholder="https://..."/>
+                </CgFormGroup>
+            </CgGrid>
+            <CgGrid>
+                <CgFormGroup Label="是否为再版">
+                    <CgCheckbox @bind-Value="Model.IsReprint" Label="再版"/>
+                </CgFormGroup>
+                <CgFormGroup Label="是否为装饰品">
+                    <CgCheckbox @bind-Value="Model.IsAvailableItem" Label="装饰品"/>
+                </CgFormGroup>
+            </CgGrid>
+        </CgFormSection>
+
+        @if (Model.Type == PeripheryType.SetorAlbumEtc)
+        {
+            <CgFormSection Title="设定集/画册属性" Icon="mdiBookOpenVariant" Flat>
+                <CgFormGroup Label="页数">
+                    <CgInput @bind-Value="Model.PageCount" TValue="int"/>
+                </CgFormGroup>
+            </CgFormSection>
+        }
+
+        @if (Model.Type == PeripheryType.Ost)
+        {
+            <CgFormSection Title="原声集属性" Icon="mdiMusicNoteOutline" Flat>
+                <CgFormGroup Label="歌曲数">
+                    <CgInput @bind-Value="Model.SongCount" TValue="int"/>
+                </CgFormGroup>
+            </CgFormSection>
+        }
+    }
+</section>
+
+@code {
+    [Parameter] public EditPeripheryMainViewModel Model { get; set; } = default!;
+
+    private bool _syncDisplayName;
+    private bool _syncInitialized;
+
+    private static readonly PeripheryType[] _peripheryTypes = Enum.GetValues<PeripheryType>();
+
+    private static string GetPeripheryTypeIcon(PeripheryType type) => type switch
+    {
+        PeripheryType.None => "mdiHelpCircleOutline",
+        PeripheryType.SetorAlbumEtc => "mdiBookOpenVariant",
+        PeripheryType.Ost => "mdiMusicNoteOutline",
+        PeripheryType.Set => "mdiPackageVariantClosed",
+        PeripheryType.ActivationCode => "mdiKeyVariant",
+        PeripheryType.ColoredPaper => "mdiPaletteOutline",
+        PeripheryType.Badge => "mdiShieldStarOutline",
+        PeripheryType.Postcard => "mdiEmailOutline",
+        PeripheryType.HangPainting => "mdiImageFilterFrames",
+        PeripheryType.Keychain => "mdiKeyChainVariant",
+        PeripheryType.Bookmark => "mdiBookmarkOutline",
+        PeripheryType.Posters => "mdiImageOutline",
+        PeripheryType.CD => "mdiAlbum",
+        _ => "mdiHelpCircleOutline"
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (_syncInitialized)
+        {
+            return;
+        }
+
+        _syncDisplayName = string.Equals(Model.Name, Model.DisplayName, StringComparison.Ordinal);
+        _syncInitialized = true;
+    }
+
+    private Task OnNameChanged(string? value)
+    {
+        Model.Name = value ?? string.Empty;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnSyncDisplayNameChanged(bool value)
+    {
+        _syncDisplayName = value;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
+}

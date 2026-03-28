@@ -1,0 +1,74 @@
+@inject IMainSiteAuthRequestService AuthRequestService
+
+@if (!string.IsNullOrWhiteSpace(Name))
+{
+    <section class="periphery-hero">
+        @if (HasBackground)
+        {
+            <div class="periphery-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+        }
+
+        <div class="periphery-hero-content">
+            @if (!string.IsNullOrWhiteSpace(MainPicture))
+            {
+                <img class="periphery-hero-image" src="@MainPicture" alt="@Name" loading="eager" />
+            }
+
+            <div class="periphery-hero-text">
+                <span class="periphery-hero-type">
+                    <CgMdiIcon Name="mdiGiftOutline" />
+                    周边
+                </span>
+                <h1>@DisplayTitle</h1>
+                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+                {
+                    <p class="periphery-hero-intro">@BriefIntroduction</p>
+                }
+                <div class="periphery-hero-stats">
+                    <span class="periphery-hero-stat">
+                        <CgMdiIcon Name="mdiEyeOutline" />
+                        @ReaderCount 次浏览
+                    </span>
+                    <span class="periphery-hero-stat">
+                        <CgMdiIcon Name="mdiHeartOutline" />
+                        @CollectedCount 人收藏
+                    </span>
+                </div>
+
+                @if (PeripheryId > 0)
+                {
+                    <div class="periphery-hero-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                <a class="periphery-edit-btn" href="/peripheries/edit/@PeripheryId">
+                                    <CgMdiIcon Name="mdiPencilOutline" />
+                                    <span>编辑周边</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="periphery-edit-btn periphery-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/peripheries/edit/{PeripheryId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public string? BriefIntroduction { get; set; }
+    [Parameter] public string? MainPicture { get; set; }
+    [Parameter] public string? BackgroundPicture { get; set; }
+    [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public int CollectedCount { get; set; }
+    [Parameter] public long PeripheryId { get; set; }
+
+    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
+    private string DisplayTitle => string.IsNullOrWhiteSpace(DisplayName) ? Name : DisplayName;
+}

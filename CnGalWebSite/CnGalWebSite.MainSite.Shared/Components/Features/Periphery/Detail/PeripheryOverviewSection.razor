@@ -1,0 +1,63 @@
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+
+@if (OverviewModels.Count > 0)
+{
+    <section class="periphery-overview-section">
+        <h2>
+            <CgMdiIcon Name="mdiViewGridOutline" />
+            周边概览
+        </h2>
+        @foreach (var group in OverviewModels)
+        {
+            <div class="periphery-overview-group">
+                <div class="periphery-overview-group-header">
+                    @if (!string.IsNullOrWhiteSpace(group.Image))
+                    {
+                        <img class="periphery-overview-group-image" src="@group.Image" alt="@group.Name" loading="lazy" />
+                    }
+                    <div class="periphery-overview-group-info">
+                        <h3>@group.Name</h3>
+                        @if (!string.IsNullOrWhiteSpace(group.BriefIntroduction))
+                        {
+                            <p>@group.BriefIntroduction</p>
+                        }
+                    </div>
+                </div>
+
+                @if (group.Peripheries.Count > 0)
+                {
+                    <ul class="periphery-overview-items">
+                        @foreach (var item in group.Peripheries)
+                        {
+                            <li>
+                                <a href="@($"/peripheries/index/{item.Id}")" class="periphery-overview-item">
+                                    <div class="periphery-overview-item-image">
+                                        @if (!string.IsNullOrWhiteSpace(item.Image))
+                                        {
+                                            <img src="@item.Image" alt="@item.Name" loading="lazy" decoding="async" />
+                                        }
+                                        else
+                                        {
+                                            <div class="periphery-overview-item-placeholder">
+                                                <CgMdiIcon Name="mdiGiftOutline" />
+                                            </div>
+                                        }
+                                    </div>
+                                    <span class="periphery-overview-item-name">@item.Name</span>
+                                    <span class="periphery-overview-item-stat">
+                                        <CgMdiIcon Name="mdiHeartOutline" />
+                                        @item.CollectedCount
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<GameOverviewPeripheryListModel> OverviewModels { get; set; } = [];
+}

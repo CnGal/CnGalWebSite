@@ -1,0 +1,43 @@
+@using CnGalWebSite.DataModel.ViewModel.Search
+
+@if (Peripheries.Count > 0)
+{
+    <section class="periphery-related-peripheries">
+        <h2>
+            <CgMdiIcon Name="mdiGiftOutline" />
+            关联周边
+        </h2>
+        <ul class="periphery-related-list">
+            @foreach (var item in Peripheries)
+            {
+                <li>
+                    <a href="@($"/peripheries/index/{item.Id}")" class="periphery-related-item">
+                        <div class="periphery-related-image">
+                            @if (!string.IsNullOrWhiteSpace(item.MainImage))
+                            {
+                                <img src="@item.MainImage" alt="@item.Name" loading="lazy" decoding="async" />
+                            }
+                            else
+                            {
+                                <div class="periphery-related-placeholder">
+                                    <CgMdiIcon Name="mdiGiftOutline" />
+                                </div>
+                            }
+                        </div>
+                        <div class="periphery-related-info">
+                            <span class="periphery-related-name">@item.Name</span>
+                            @if (!string.IsNullOrWhiteSpace(item.BriefIntroduction))
+                            {
+                                <span class="periphery-related-intro">@item.BriefIntroduction</span>
+                            }
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<PeripheryInforTipViewModel> Peripheries { get; set; } = [];
+}

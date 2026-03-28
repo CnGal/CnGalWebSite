@@ -1,0 +1,56 @@
+/* PeripheryMainEditor 独有样式 */
+
+/* ── 类型选择器：自适应网格 ── */
+.periphery-type-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--cg-spacing-3);
+}
+
+.periphery-type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-4) var(--cg-spacing-2);
+    border: 2px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    color: var(--cg-color-text-muted);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    font-family: var(--cg-font-family);
+    user-select: none;
+}
+
+.periphery-type-btn:hover {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in srgb, var(--cg-color-primary) 6%, var(--cg-color-surface));
+}
+
+.periphery-type-btn:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+.periphery-type-btn.active {
+    border-color: var(--cg-color-primary);
+    background: color-mix(in srgb, var(--cg-color-primary) 12%, var(--cg-color-surface));
+    color: var(--cg-color-primary);
+}
+
+.periphery-type-btn ::deep .cg-mdi-icon {
+    width: 36px;
+    height: 36px;
+}
+
+/* 小屏幕时折叠为两列 */
+@media (max-width: 600px) {
+    .periphery-type-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

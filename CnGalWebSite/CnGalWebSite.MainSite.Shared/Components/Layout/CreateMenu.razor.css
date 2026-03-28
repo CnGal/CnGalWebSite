@@ -129,6 +129,11 @@
     color: var(--cg-color-secondary);
 }
 
+.cg-menu-item__icon--teal {
+    background: color-mix(in oklab, #14b8a6 12%, transparent);
+    color: #14b8a6;
+}
+
 .cg-menu-item__icon--purple {
     background: color-mix(in oklab, #8b5cf6 12%, transparent);
     color: #8b5cf6;
