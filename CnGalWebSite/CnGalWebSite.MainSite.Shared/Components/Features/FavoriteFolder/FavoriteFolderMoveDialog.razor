@@ -1,0 +1,157 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Favorites
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using CnGalWebSite.MainSite.Shared.Services
+
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IFavoriteFolderCommandService FavoriteFolderCommandService
+@inject ICgToastService ToastService
+
+<CgModal Title="移动收藏" IsOpen="_visible" OnClose="Close">
+    <ChildContent>
+        <p class="cg-ff-move-desc">在下方选择要移动到的收藏夹，可以选中多个</p>
+
+        @if (_isLoadingFolders)
+        {
+            <div class="cg-ff-move-loading">
+                <CgProgressRing />
+                <span>加载收藏夹...</span>
+            </div>
+        }
+        else if (_folders.Count == 0)
+        {
+            <div class="cg-ff-move-empty">
+                <span>没有找到其他收藏夹</span>
+            </div>
+        }
+        else
+        {
+            <div class="cg-ff-move-folder-list">
+                @foreach (var folder in _folders)
+                {
+                    <label class="cg-ff-move-folder-item @(_selectedFolderIds.Contains(folder.Id) ? "selected" : "")">
+                        <CgCheckbox Label="@folder.Name"
+                                    Value="@_selectedFolderIds.Contains(folder.Id)"
+                                    ValueChanged="@(v => ToggleFolder(folder.Id, v))" />
+                        <span class="cg-ff-move-folder-count">@folder.Count 项</span>
+                    </label>
+                }
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="outline" OnClick="Close" Disabled="_isMoving">取消</CgButton>
+        <CgButton Variant="primary" OnClick="OnConfirmMove" Disabled="@(_isMoving || _selectedFolderIds.Count == 0)">
+            @(_isMoving ? "移动中..." : "确认移动")
+        </CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public long FolderId { get; set; }
+
+    [Parameter]
+    public EventCallback OnMoved { get; set; }
+
+    private bool _visible;
+    private bool _isLoadingFolders;
+    private bool _isMoving;
+    private List<FavoriteFolderOverviewModel> _folders = [];
+    private List<long> _selectedFolderIds = [];
+    private List<KeyValuePair<FavoriteObjectType, long>> _objectIds = [];
+
+    /// <summary>
+    /// Open the move dialog with the specified objects to move.
+    /// </summary>
+    public async Task ShowAsync(List<KeyValuePair<FavoriteObjectType, long>> objectIds)
+    {
+        _objectIds = objectIds;
+        _selectedFolderIds.Clear();
+        _visible = true;
+        StateHasChanged();
+
+        await LoadFoldersAsync();
+    }
+
+    private async Task LoadFoldersAsync()
+    {
+        _isLoadingFolders = true;
+        StateHasChanged();
+
+        var result = await FavoriteFolderQueryService.GetUserFoldersByFolderIdAsync(FolderId);
+        if (result.Success && result.Data != null)
+        {
+            // Exclude current folder from target list
+            _folders = result.Data.Where(f => f.Id != FolderId).ToList();
+        }
+        else
+        {
+            _folders = [];
+            ToastService.Show(result.Error?.Message ?? "获取收藏夹列表失败", variant: "error");
+        }
+
+        _isLoadingFolders = false;
+        StateHasChanged();
+    }
+
+    private void ToggleFolder(long folderId, bool selected)
+    {
+        if (selected && !_selectedFolderIds.Contains(folderId))
+        {
+            _selectedFolderIds.Add(folderId);
+        }
+        else if (!selected)
+        {
+            _selectedFolderIds.Remove(folderId);
+        }
+    }
+
+    private async Task OnConfirmMove()
+    {
+        if (_selectedFolderIds.Count == 0)
+        {
+            ToastService.Show("请选择要移动到的收藏夹", variant: "error");
+            return;
+        }
+
+        _isMoving = true;
+        StateHasChanged();
+
+        try
+        {
+            var model = new MoveFavoriteObjectsModel
+            {
+                CurrentFolderId = FolderId,
+                FolderIds = _selectedFolderIds.ToArray(),
+                ObjectIds = _objectIds
+            };
+
+            var result = await FavoriteFolderCommandService.MoveFavoriteObjectsAsync(model);
+            if (result.Success)
+            {
+                ToastService.Show("移动收藏成功", variant: "success");
+                _visible = false;
+                StateHasChanged();
+                await OnMoved.InvokeAsync();
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "移动收藏失败", variant: "error");
+            }
+        }
+        finally
+        {
+            _isMoving = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Close()
+    {
+        _visible = false;
+        StateHasChanged();
+    }
+}

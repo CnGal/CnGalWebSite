@@ -22,4 +22,6 @@ public sealed class FavoriteFolderSummaryItem
     public bool IsDefault { get; set; }
 
     public bool ShowPublicly { get; set; }
+
+    public bool IsHidden { get; set; }
 }

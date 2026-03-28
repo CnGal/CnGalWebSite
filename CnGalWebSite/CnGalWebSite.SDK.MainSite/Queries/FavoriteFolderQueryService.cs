@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -69,6 +70,62 @@ public sealed class FavoriteFolderQueryService(
         return result;
     }
 
+    public async Task<SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>> GetAllUserFavoriteFoldersAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:user-all-favorite-folders:{userId}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderSummaryItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Ok(cached);
+        }
+
+        var path = $"api/favorites/ListUserFavoriteFolders?userId={userId}";
+        var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel
+        {
+            Page = 1,
+            ItemsPerPage = 1000, // large enough to get all folders
+        };
+
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync(path, queryParam, SdkJsonSerializerOptions.Default, cancellationToken);
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.LogError(
+                    "获取用户全部收藏夹列表失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
+                    path,
+                    (int)response.StatusCode,
+                    HttpClient.BaseAddress,
+                    TrimForLog(responseBody));
+
+                return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Fail("FAVORITE_FOLDER_ALL_HTTP_FAILED", $"获取全部收藏夹列表失败（HTTP {(int)response.StatusCode})");
+            }
+
+            var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteFolderOverviewModel>>(responseBody);
+            IReadOnlyList<FavoriteFolderSummaryItem> data = (queryResult?.Items?.Select(f => new FavoriteFolderSummaryItem
+            {
+                Id = f.Id,
+                Name = f.Name ?? string.Empty,
+                BriefIntroduction = f.BriefIntroduction ?? string.Empty,
+                MainImage = f.MainImage ?? string.Empty,
+                Count = f.Count,
+                CreateTime = f.CreateTime,
+                IsDefault = f.IsDefault,
+                ShowPublicly = f.ShowPublicly,
+                IsHidden = f.IsHidden,
+            }).ToList() as IReadOnlyList<FavoriteFolderSummaryItem>) ?? [];
+
+            memoryCache.Set(cacheKey, data, UserFoldersCacheDuration);
+            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Ok(data);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "获取用户全部收藏夹列表异常。Path={Path}; BaseAddress={BaseAddress}", path, HttpClient.BaseAddress);
+            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Fail("FAVORITE_FOLDER_ALL_EXCEPTION", "请求全部收藏夹列表时发生异常");
+        }
+    }
+
     public async Task<SdkResult<EditFavoriteFolderViewModel>> GetFavoriteFolderForEditAsync(long id, CancellationToken cancellationToken = default)
     {
         var path = $"api/favorites/EditFavoriteFolder/{id}";
@@ -116,6 +173,16 @@ public sealed class FavoriteFolderQueryService(
         }
     }
 
+    public async Task<SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>> GetUserFoldersByFolderIdAsync(long folderId, CancellationToken cancellationToken = default)
+    {
+        var path = $"api/favorites/GetUserFavoriteInforFromFolderId/{folderId}";
+        return await GetAsync<IReadOnlyList<FavoriteFolderOverviewModel>>(
+            path,
+            "FAVORITE_FOLDER",
+            "用户收藏夹列表（按收藏夹ID）",
+            cancellationToken);
+    }
+
     private static FavoriteFolderDetailViewModel MapToDetailViewModel(FavoriteFolderViewModel dto)
     {
         var objects = dto.Objects ?? [];
@@ -141,5 +208,28 @@ public sealed class FavoriteFolderQueryService(
             Tags = objects.Where(o => o.Tag != null).Select(o => o.Tag!).ToList(),
             Peripheries = objects.Where(o => o.periphery != null).Select(o => o.periphery!).ToList(),
         };
+    }
+
+    public async Task<SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>> GetRelateFavoriteFoldersAsync(FavoriteObjectType type, long id, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:relate-favorite-folders:{(int)type}:{id}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>.Ok(cached);
+        }
+
+        var path = $"api/favorites/GetRelateFavoriteFolders?type={(int)type}&id={id}";
+        var result = await GetAsync<IReadOnlyList<FavoriteFolderOverviewModel>>(
+            path,
+            "FAVORITE_FOLDER",
+            "相关目录",
+            cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration);
+        }
+
+        return result;
     }
 }

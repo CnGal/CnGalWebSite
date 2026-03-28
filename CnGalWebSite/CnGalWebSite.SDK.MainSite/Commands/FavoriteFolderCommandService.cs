@@ -139,6 +139,44 @@ public sealed class FavoriteFolderCommandService(
         }
     }
 
+    public async Task<SdkResult<bool>> MoveFavoriteObjectsAsync(MoveFavoriteObjectsModel model,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<MoveFavoriteObjectsModel, Result>(
+                "api/favorites/MoveFavoriteObjects",
+                model,
+                cancellationToken);
+
+            if (result is null)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_OBJECT_MOVE_EMPTY_RESPONSE", "移动收藏对象返回空响应");
+            }
+
+            if (!result.Successful)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_OBJECT_MOVE_FAILED", result.Error ?? "移动收藏对象失败");
+            }
+
+            // Invalidate source folder cache
+            InvalidateFolderCaches(model.CurrentFolderId);
+            // Invalidate target folder caches
+            foreach (var folderId in model.FolderIds)
+            {
+                InvalidateFolderCaches(folderId);
+            }
+
+            return SdkResult<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "移动收藏对象异常。CurrentFolderId={FolderId}; BaseAddress={BaseAddress}", model.CurrentFolderId,
+                HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("FAVORITE_OBJECT_MOVE_EXCEPTION", "移动收藏对象时发生异常");
+        }
+    }
+
     /// <summary>
     /// 清空指定收藏夹的详情缓存，以及当前用户的收藏夹列表缓存和空间详情缓存
     /// </summary>
@@ -163,11 +201,125 @@ public sealed class FavoriteFolderCommandService(
         }
 
         memoryCache.Remove($"main-site:user-favorite-folders:{userId}");
+        memoryCache.Remove($"main-site:user-all-favorite-folders:{userId}");
         memoryCache.Remove($"main-site:space-detail:{userId}");
     }
 
     private string? GetCurrentUserId()
     {
         return httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value;
+    }
+
+    public async Task<SdkResult<bool>> AddFavoriteObjectAsync(long objectId, FavoriteObjectType type,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // First, get the user's default folder ids
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return SdkResult<bool>.Fail("FAVORITE_NOT_AUTHENTICATED", "未登录，无法收藏");
+            }
+
+            var folders = await GetFromJsonAsync<List<FavoriteFolderOverviewModel>>(
+                $"api/favorites/GetUserFavoriteFolders/{userId}", cancellationToken);
+
+            if (folders is null || folders.Count == 0)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_NO_FOLDERS", "无法获取收藏夹信息");
+            }
+
+            var defaultFolderIds = folders.Where(f => f.IsDefault).Select(f => f.Id).ToArray();
+            if (defaultFolderIds.Length == 0)
+            {
+                // If no default folder, use the first one
+                defaultFolderIds = [folders[0].Id];
+            }
+
+            var result = await PostAsJsonAsync<AddFavoriteObjectViewModel, Result>(
+                "api/favorites/AddFavoriteObject",
+                new AddFavoriteObjectViewModel { FavoriteFolderIds = defaultFolderIds, ObjectId = objectId, Type = type },
+                cancellationToken);
+
+            if (result is null)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_ADD_EMPTY_RESPONSE", "收藏返回空响应");
+            }
+
+            if (!result.Successful)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_ADD_FAILED", result.Error ?? "收藏失败");
+            }
+
+            InvalidateUserFolderListCache();
+            foreach (var folderId in defaultFolderIds)
+            {
+                memoryCache.Remove($"main-site:favorite-folder-detail:{folderId}");
+            }
+            memoryCache.Remove($"main-site:relate-favorite-folders:{(int)type}:{objectId}");
+            return SdkResult<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "收藏对象异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",
+                objectId, type, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("FAVORITE_ADD_EXCEPTION", "收藏时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> UnFavoriteObjectAsync(long objectId, FavoriteObjectType type,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<UnFavoriteObjectsModel, Result>(
+                "api/favorites/UnFavoriteObjects",
+                new UnFavoriteObjectsModel { ObjectId = objectId, Type = type },
+                cancellationToken);
+
+            if (result is null)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_REMOVE_EMPTY_RESPONSE", "取消收藏返回空响应");
+            }
+
+            if (!result.Successful)
+            {
+                return SdkResult<bool>.Fail("FAVORITE_REMOVE_FAILED", result.Error ?? "取消收藏失败");
+            }
+
+            InvalidateUserFolderListCache();
+            memoryCache.Remove($"main-site:relate-favorite-folders:{(int)type}:{objectId}");
+            return SdkResult<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "取消收藏异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",
+                objectId, type, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("FAVORITE_REMOVE_EXCEPTION", "取消收藏时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> IsObjectFavoritedAsync(long objectId, FavoriteObjectType type,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(
+                $"api/favorites/IsObjectInUserFavoriteFolder/{objectId}/{type}", cancellationToken);
+
+            if (result is null)
+            {
+                return SdkResult<bool>.Ok(false);
+            }
+
+            return SdkResult<bool>.Ok(result.Result);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "检查收藏状态异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",
+                objectId, type, HttpClient.BaseAddress);
+            return SdkResult<bool>.Ok(false); // Fail silently, default to not favorited
+        }
     }
 }

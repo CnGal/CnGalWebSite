@@ -25,4 +25,24 @@ public interface IFavoriteFolderCommandService
     /// 删除收藏夹
     /// </summary>
     Task<SdkResult<bool>> DeleteFavoriteFolderAsync(long[] folderIds, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 移动收藏对象到其他收藏夹
+    /// </summary>
+    Task<SdkResult<bool>> MoveFavoriteObjectsAsync(MoveFavoriteObjectsModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 添加对象到默认收藏夹
+    /// </summary>
+    Task<SdkResult<bool>> AddFavoriteObjectAsync(long objectId, FavoriteObjectType type, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 从所有收藏夹中取消收藏某个对象
+    /// </summary>
+    Task<SdkResult<bool>> UnFavoriteObjectAsync(long objectId, FavoriteObjectType type, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 检查对象是否被当前用户收藏
+    /// </summary>
+    Task<SdkResult<bool>> IsObjectFavoritedAsync(long objectId, FavoriteObjectType type, CancellationToken cancellationToken = default);
 }

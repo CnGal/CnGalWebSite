@@ -94,6 +94,29 @@
     flex-shrink: 0;
 }
 
+.cg-ff-obj-manager-item-move {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: var(--cg-spacing-1);
+    border-radius: var(--cg-radius-sm);
+    color: var(--cg-color-text-muted);
+    transition: all var(--cg-transition-fast);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cg-ff-obj-manager-item-move:hover {
+    color: var(--cg-color-success);
+    background-color: color-mix(in oklab, var(--cg-color-success) 10%, transparent);
+}
+
+.cg-ff-obj-manager-item-move ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
 .cg-ff-obj-manager-item-delete {
     border: none;
     background: none;

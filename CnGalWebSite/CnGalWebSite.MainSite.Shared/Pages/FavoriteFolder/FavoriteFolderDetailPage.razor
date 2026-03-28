@@ -10,50 +10,51 @@
 
 @if (_isNotFound)
 {
-    <div class="cg-ff-not-found">
-        <h1 class="cg-ff-not-found-title">找不到这个收藏夹哦......</h1>
-        <div class="cg-ff-not-found-text">可以在个人空间 → 收藏夹 → 编辑中设置收藏夹公开</div>
+    <section class="cg-ff-not-found">
+        <h1>找不到这个收藏夹哦......</h1>
+        <p>可以在个人空间 → 收藏夹 → 编辑中设置收藏夹公开</p>
         <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
-    </div>
+    </section>
 }
 else if (_model != null)
 {
     <PageTitle>@($"目录 - {_model.Name} - CnGal资料站")</PageTitle>
 
-    <div class="cg-ff-detail-container">
+    <article class="cg-ff-page">
         <FavoriteFolderHero Model="_model" />
 
-        <div class="cg-ff-detail-layout">
-            <div class="cg-ff-detail-sidebar">
-                <FavoriteFolderInfoCard Model="_model" />
-            </div>
-            <div class="cg-ff-detail-main">
-                @if (_model.IsHidden)
-                {
-                    <div class="cg-ff-detail-alert">
-                        <CgAlert Variant="warning">
-                            当前目录处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                        </CgAlert>
-                    </div>
-                }
+        @if (_model.IsHidden)
+        {
+            <CgAlert Variant="warning">
+                当前目录处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CgAlert>
+        }
+
+        <section class="cg-ff-layout cg-ff-layout--desktop" aria-label="桌面详情布局">
+            <main class="cg-ff-main-col">
                 <FavoriteFolderObjectList Model="_model" />
-            </div>
-        </div>
-    </div>
+            </main>
+            <aside class="cg-ff-side-col">
+                <FavoriteFolderInfoCard Model="_model" />
+            </aside>
+        </section>
+    </article>
 }
 else if (_isError)
 {
-    <div class="cg-ff-not-found">
-        <h1 class="cg-ff-not-found-title">加载失败</h1>
-        <div class="cg-ff-not-found-text">@_errorMessage</div>
+    <section class="cg-ff-not-found">
+        <h1>加载失败</h1>
+        <p>@_errorMessage</p>
         <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
-    </div>
+    </section>
 }
 else
 {
-    <div class="cg-ff-loading">
-        <span>加载中...</span>
-    </div>
+    <section class="cg-ff-loading" aria-label="加载中">
+        <div class="cg-ff-loading-block"></div>
+        <div class="cg-ff-loading-block cg-ff-loading-block--wide"></div>
+        <div class="cg-ff-loading-block"></div>
+    </section>
 }
 
 @code {

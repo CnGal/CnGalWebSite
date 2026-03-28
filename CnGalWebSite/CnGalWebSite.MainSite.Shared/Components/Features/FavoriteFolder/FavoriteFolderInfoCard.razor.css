@@ -1,26 +1,24 @@
+/* ── InfoCard —— 对齐 .entry-card ── */
 .cg-ff-info-card {
-    background-color: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-sm);
-    padding: var(--cg-spacing-4);
-    margin-bottom: var(--cg-spacing-4);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    padding: 1.5rem;
 }
 
 .cg-ff-info-card-title {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-lg);
-    font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-text-primary);
-    margin: 0 0 var(--cg-spacing-3) 0;
-    padding-bottom: var(--cg-spacing-2);
-    border-bottom: 1px solid var(--cg-color-border);
+    gap: 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--cg-color-text);
+    margin: 0 0 1.25rem;
 }
 
 .cg-ff-info-card-title ::deep .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
+    width: 2rem;
+    height: 2rem;
     color: var(--cg-color-primary);
 }
 
@@ -45,25 +43,25 @@
 }
 
 .cg-ff-info-item-label {
-    color: var(--cg-color-text-secondary);
+    color: var(--cg-color-text-muted);
 }
 
 .cg-ff-info-item-value {
     margin-left: auto;
-    font-weight: var(--cg-font-weight-medium);
-    color: var(--cg-color-text-primary);
+    font-weight: 600;
+    color: var(--cg-color-text);
 }
 
 .cg-ff-info-user {
-    margin-top: var(--cg-spacing-3);
-    padding-top: var(--cg-spacing-3);
-    border-top: 1px solid var(--cg-color-border);
+    margin-top: var(--cg-spacing-4);
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px solid color-mix(in oklab, var(--cg-color-primary) 6%, var(--cg-color-border));
 }
 
 .cg-ff-info-user-title {
     font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text-secondary);
+    font-weight: 700;
+    color: var(--cg-color-text-muted);
     margin: 0 0 var(--cg-spacing-2) 0;
 }
 
@@ -71,11 +69,13 @@
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-2);
-    color: var(--cg-color-text-primary);
+    color: var(--cg-color-text);
     text-decoration: none;
     font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
+    font-weight: 600;
     transition: color var(--cg-transition-fast);
+    padding: 0.35rem 0;
+    border-radius: var(--cg-radius-md);
 }
 
 .cg-ff-info-user-link:hover {
@@ -87,4 +87,5 @@
     height: 28px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
 }

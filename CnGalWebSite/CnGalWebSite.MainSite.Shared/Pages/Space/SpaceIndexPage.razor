@@ -218,7 +218,11 @@ else
 
     private async Task LoadFavoriteFoldersAsync()
     {
-        var foldersResult = await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model!.Id);
+        // For the current user, use the owner API that includes hidden folders.
+        // For other users, use the public API that only returns visible folders.
+        var foldersResult = _model!.IsCurrentUser
+            ? await FavoriteFolderQueryService.GetAllUserFavoriteFoldersAsync(_model.Id)
+            : await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model.Id);
         _favoriteFolders = foldersResult.Success && foldersResult.Data is not null
             ? foldersResult.Data
             : [];

@@ -1,90 +1,190 @@
+/* ── Hero 容器 —— 对齐 .entry-hero ── */
 .cg-ff-hero {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+/* ── 封面区 ── */
+.cg-ff-hero-side {
     display: flex;
     flex-direction: column;
-    background-color: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-sm);
-    overflow: hidden;
-    margin-bottom: var(--cg-spacing-4);
-}
-
-.cg-ff-hero-image-wrapper {
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    overflow: hidden;
-    background-color: var(--cg-color-section-bg);
-}
-
-.cg-ff-hero-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cg-ff-hero-placeholder {
-    display: flex;
+    gap: 1rem;
     align-items: center;
-    justify-content: center;
     width: 100%;
-    height: 100%;
+}
+
+.cg-ff-cover {
+    width: 100%;
+    object-fit: cover;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-bg) 90%, white);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.cg-ff-hero--wide .cg-ff-cover {
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-lg);
+    max-width: 100%;
+}
+
+.cg-ff-cover--empty {
+    display: grid;
+    place-items: center;
     background: linear-gradient(135deg,
         color-mix(in oklab, var(--cg-color-primary) 15%, transparent),
         color-mix(in oklab, var(--cg-color-secondary) 15%, transparent));
 }
 
-.cg-ff-hero-placeholder ::deep .cg-mdi-icon {
+.cg-ff-cover--empty ::deep .cg-mdi-icon {
     width: 64px;
     height: 64px;
     color: var(--cg-color-text-muted);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
-.cg-ff-hero-content {
-    padding: var(--cg-spacing-4) var(--cg-spacing-5);
-}
-
-.cg-ff-hero-name {
-    font-size: var(--cg-font-size-2xl);
-    font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-text-primary);
-    margin: 0 0 var(--cg-spacing-2) 0;
-}
-
-.cg-ff-hero-desc {
-    font-size: var(--cg-font-size-md);
-    color: var(--cg-color-text-secondary);
-    margin: 0 0 var(--cg-spacing-3) 0;
-    line-height: 1.6;
-}
-
-.cg-ff-hero-actions {
+/* ── 信息区 ── */
+.cg-ff-hero-main {
     display: flex;
-    gap: var(--cg-spacing-2);
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.cg-ff-hero-edit-btn {
+.cg-ff-hero-main h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--cg-color-text);
+}
+
+.cg-ff-hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.cg-ff-type {
+    border-radius: var(--cg-radius-sm);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cg-ff-status {
+    border-radius: var(--cg-radius-sm);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cg-ff-status--default {
+    background: color-mix(in oklab, #22c55e 10%, transparent);
+    color: #166534;
+}
+
+.cg-ff-status--private {
+    background: color-mix(in oklab, var(--cg-color-warning) 10%, transparent);
+    color: #92400e;
+}
+
+.cg-ff-brief {
+    margin: 0;
+    color: var(--cg-color-text-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+/* ── 标签芯片 —— 对齐 .entry-people-chips ── */
+.cg-ff-hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.cg-ff-chip {
+    border: 1px solid var(--cg-color-border);
+    background: var(--cg-color-surface);
+    color: var(--cg-color-text);
+    text-decoration: none;
+    border-radius: var(--cg-radius-full);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--cg-transition-fast);
     display: inline-flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    border-radius: var(--cg-radius-md);
-    background: linear-gradient(135deg, var(--cg-color-primary), var(--cg-color-primary-hover));
-    color: var(--cg-color-on-primary);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
+    gap: 0.4rem;
+}
+
+.cg-ff-chip:hover {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+}
+
+.cg-ff-chip-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--cg-radius-full);
+    object-fit: cover;
+}
+
+/* ── 操作按钮 —— 对齐 .entry-edit-btn ── */
+.cg-ff-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.cg-ff-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
     text-decoration: none;
-    transition: all var(--cg-transition-fast);
-    cursor: pointer;
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-primary);
+    background: var(--cg-color-primary);
+    color: #fff;
 }
 
-.cg-ff-hero-edit-btn:hover {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+.cg-ff-edit-btn:hover {
+    opacity: 0.9;
 }
 
-.cg-ff-hero-edit-btn ::deep .cg-mdi-icon {
+.cg-ff-edit-btn ::deep .cg-mdi-icon {
     width: 16px;
     height: 16px;
-    color: var(--cg-color-on-primary);
+}
+
+/* ── 响应式 ── */
+@media (min-width: 768px) {
+    .cg-ff-hero {
+        gap: 2.5rem;
+        padding: 2rem;
+        align-items: center;
+    }
+
+    .cg-ff-hero--wide {
+        grid-template-columns: 5fr 7fr;
+    }
 }

@@ -1,3 +1,4 @@
+/* ── 空状态 ── */
 .cg-ff-objects-empty {
     display: flex;
     flex-direction: column;
@@ -6,6 +7,9 @@
     padding: var(--cg-spacing-8);
     color: var(--cg-color-text-muted);
     gap: var(--cg-spacing-2);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
 }
 
 .cg-ff-objects-empty ::deep .cg-mdi-icon {
@@ -14,6 +18,7 @@
     opacity: 0.4;
 }
 
+/* ── 分组标题 ── */
 .cg-ff-object-group {
     margin-bottom: var(--cg-spacing-4);
 }
@@ -23,14 +28,15 @@
 }
 
 .cg-ff-object-group-title {
-    font-size: var(--cg-font-size-md);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cg-color-text-muted);
     margin: 0 0 var(--cg-spacing-3) 0;
     padding-bottom: var(--cg-spacing-2);
-    border-bottom: 1px solid var(--cg-color-border);
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-primary) 6%, var(--cg-color-border));
 }
 
+/* ── 网格 ── */
 .cg-ff-object-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

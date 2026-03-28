@@ -1,0 +1,235 @@
+/* ══════════════════════════════════════════
+   Header card (collection overview)
+   ══════════════════════════════════════════ */
+.periphery-header-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
+    border-radius: var(--cg-radius-lg);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    box-shadow: var(--cg-shadow-sm);
+    text-decoration: none;
+    color: var(--cg-color-text);
+    transition: all var(--cg-transition-normal);
+}
+
+.periphery-header-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
+    box-shadow: var(--cg-shadow-card-hover, 0 8px 25px -5px rgba(0, 0, 0, 0.1));
+    transform: translateY(-2px);
+}
+
+.periphery-header-cover {
+    flex-shrink: 0;
+}
+
+.header-cover-img {
+    display: block;
+    object-fit: cover;
+}
+
+.header-cover-img--round {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--cg-radius-full);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.header-cover-img--wide {
+    width: 120px;
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-md);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.periphery-header-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.periphery-header-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.periphery-header-name {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.periphery-progress-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--cg-radius-full);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.periphery-progress-badge ::deep .cg-mdi-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+}
+
+.periphery-header-desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+/* Progress bar */
+.periphery-progress-track {
+    height: 4px;
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, var(--cg-color-bg));
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+
+.periphery-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cg-color-primary), color-mix(in oklab, var(--cg-color-primary) 70%, var(--cg-color-secondary)));
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ══════════════════════════════════════════
+   Periphery items grid
+   ══════════════════════════════════════════ */
+.periphery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+    .periphery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* ── Single item card ── */
+.periphery-item-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--cg-radius-lg);
+    background-color: var(--cg-color-surface);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--cg-color-text);
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
+    box-shadow: var(--cg-shadow-sm);
+    transition: all var(--cg-transition-normal);
+    height: 100%;
+    position: relative;
+}
+
+.periphery-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--cg-shadow-card-hover, 0 12px 24px -6px rgba(0, 0, 0, 0.1));
+    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
+}
+
+/* Cover */
+.periphery-item-cover {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    background-color: var(--cg-color-bg);
+    overflow: hidden;
+    position: relative;
+}
+
+.periphery-item-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.15) 100%);
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity var(--cg-transition-normal);
+}
+
+.periphery-item-card:hover .periphery-item-cover::after {
+    opacity: 0.5;
+}
+
+.periphery-item-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.periphery-item-card:hover .periphery-item-img {
+    transform: scale(1.05) translateZ(0);
+}
+
+/* Collected badge */
+.periphery-collected-badge {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: var(--cg-radius-full);
+    background: var(--cg-color-success);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.periphery-collected-badge ::deep .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
+    color: white;
+}
+
+/* Body */
+.periphery-item-body {
+    padding: 0.55rem 0.7rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.periphery-item-name {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    transition: color var(--cg-transition-fast);
+}
+
+.periphery-item-card:hover .periphery-item-name {
+    color: var(--cg-color-primary);
+}

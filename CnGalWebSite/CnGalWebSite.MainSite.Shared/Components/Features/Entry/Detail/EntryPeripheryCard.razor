@@ -1,0 +1,87 @@
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+@if (Model is not null && Model.Peripheries.Count > 0)
+{
+    <EntrySection Title="相关周边" Icon="mdiGiftOutline">
+        @* ── Header: collection info + progress ── *@
+        <a href="@GetUrl()" class="periphery-header-card">
+            <div class="periphery-header-cover">
+                @if (Model.IsThumbnail)
+                {
+                    <img src="@Model.Image" alt="@Model.Name" class="header-cover-img header-cover-img--round" loading="lazy" decoding="async" />
+                }
+                else
+                {
+                    <img src="@Model.Image" alt="@Model.Name" class="header-cover-img header-cover-img--wide" loading="lazy" decoding="async" />
+                }
+            </div>
+            <div class="periphery-header-info">
+                <div class="periphery-header-title-row">
+                    <h3 class="periphery-header-name">@Model.Name</h3>
+                    <span class="periphery-progress-badge">
+                        <CgMdiIcon Name="mdiCheckCircleOutline" />
+                        @CollectedCount / @Model.Peripheries.Count
+                    </span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+                {
+                    <p class="periphery-header-desc">@Model.BriefIntroduction</p>
+                }
+                <div class="periphery-progress-track">
+                    <div class="periphery-progress-fill" style="width: @ProgressPercent%"></div>
+                </div>
+            </div>
+        </a>
+
+        @* ── Periphery items grid ── *@
+        <div class="periphery-grid">
+            @foreach (var item in Model.Peripheries)
+            {
+                <a href="@($"/peripheries/index/{item.Id}")" class="periphery-item-card" title="@item.Name">
+                    <div class="periphery-item-cover">
+                        <img src="@item.Image" alt="@item.Name" class="periphery-item-img" loading="lazy" decoding="async" />
+                        @if (item.IsCollected)
+                        {
+                            <div class="periphery-collected-badge">
+                                <CgMdiIcon Name="mdiCheck" />
+                            </div>
+                        }
+                    </div>
+                    <div class="periphery-item-body">
+                        <span class="periphery-item-name">@item.Name</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </EntrySection>
+}
+
+@code {
+    [Parameter]
+    public GameOverviewPeripheryListModel? Model { get; set; }
+
+    private int CollectedCount => Model?.Peripheries.Count(s => s.IsCollected) ?? 0;
+
+    private int ProgressPercent
+    {
+        get
+        {
+            if (Model is null || Model.Peripheries.Count == 0) return 0;
+            return (int)((double)CollectedCount * 100 / Model.Peripheries.Count);
+        }
+    }
+
+    private string GetUrl()
+    {
+        if (Model is null) return "#";
+
+        return Model.Type switch
+        {
+            PeripheryOverviewType.Entry => $"/entries/index/{Model.ObjectId}",
+            PeripheryOverviewType.Periphery => $"/peripheries/index/{Model.ObjectId}",
+            PeripheryOverviewType.User => string.IsNullOrWhiteSpace(Model.ObjectId) ? "#" : $"/space/index/{Model.ObjectId}",
+            _ => "#"
+        };
+    }
+}

@@ -35,6 +35,9 @@
                         <span class="cg-ff-obj-manager-item-type @GetTypeClass(obj.Type)">@GetTypeName(obj.Type)</span>
                         <a href="@GetObjectUrl(obj)" class="cg-ff-obj-manager-item-name">@obj.ObjectName</a>
                         <span class="cg-ff-obj-manager-item-date">@obj.CreateTime.ToString("yyyy-MM-dd")</span>
+                        <button class="cg-ff-obj-manager-item-move" @onclick="() => MoveObject(obj)" title="移动" type="button">
+                            <CgMdiIcon Name="mdiFileMove" aria-hidden="true" />
+                        </button>
                         <button class="cg-ff-obj-manager-item-delete" @onclick="() => DeleteObject(obj)" title="删除" type="button">
                             <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
                         </button>
@@ -51,6 +54,8 @@
     }
 </div>
 
+<FavoriteFolderMoveDialog @ref="_moveDialog" FolderId="FolderId" OnMoved="OnMoveCompleted" />
+
 @code {
     [Parameter, EditorRequired]
     public long FolderId { get; set; }
@@ -59,6 +64,7 @@
     private List<FavoriteObjectOverviewModel> _objects = [];
     private int _currentPage = 1;
     private bool _isLoading = true;
+    private FavoriteFolderMoveDialog? _moveDialog;
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,6 +96,24 @@
         {
             ToastService.Show(result.Error?.Message ?? "删除失败", variant: "error");
         }
+    }
+
+    private async Task MoveObject(FavoriteObjectOverviewModel obj)
+    {
+        if (_moveDialog != null)
+        {
+            var objectIds = new List<KeyValuePair<FavoriteObjectType, long>>
+            {
+                new(obj.Type, obj.ObjectId)
+            };
+            await _moveDialog.ShowAsync(objectIds);
+        }
+    }
+
+    private async Task OnMoveCompleted()
+    {
+        // Refresh list after moving
+        await LoadObjectsAsync();
     }
 
     private async Task PreviousPage()

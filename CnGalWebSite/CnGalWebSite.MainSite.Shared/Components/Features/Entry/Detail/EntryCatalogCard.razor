@@ -1,0 +1,34 @@
+@using CnGalWebSite.DataModel.ViewModel.Favorites
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+@if (Folders is not null && Folders.Count > 0)
+{
+    <EntrySection Title="相关目录" Icon="mdiBookmarkMultipleOutline">
+        <div class="catalog-list">
+            @foreach (var item in Folders)
+            {
+                <a href="@($"/favoritefolders/index/{item.Id}")" class="catalog-card">
+                    <div class="catalog-card-cover">
+                        <img src="@(string.IsNullOrWhiteSpace(item.MainImage) ? "https://res.cngal.org/_content/CnGalWebSite.Shared/images/app.png" : item.MainImage)"
+                             alt="@item.Name"
+                             class="catalog-card-img"
+                             loading="lazy"
+                             decoding="async" />
+                    </div>
+                    <div class="catalog-card-body">
+                        <span class="catalog-card-name">@item.Name</span>
+                        @if (!string.IsNullOrWhiteSpace(item.BriefIntroduction))
+                        {
+                            <span class="catalog-card-desc">@item.BriefIntroduction</span>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    </EntrySection>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<FavoriteFolderOverviewModel>? Folders { get; set; }
+}

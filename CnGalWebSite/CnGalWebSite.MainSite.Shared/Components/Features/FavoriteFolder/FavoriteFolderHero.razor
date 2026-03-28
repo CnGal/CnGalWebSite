@@ -1,36 +1,51 @@
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
-<div class="cg-ff-hero">
-    <div class="cg-ff-hero-image-wrapper">
+<header class="cg-ff-hero cg-ff-hero--wide">
+    <div class="cg-ff-hero-side">
         @if (!string.IsNullOrWhiteSpace(Model.MainPicture))
         {
-            <img src="@Model.MainPicture" alt="@Model.Name" class="cg-ff-hero-image" />
+            <img src="@Model.MainPicture" alt="@Model.Name" class="cg-ff-cover" loading="eager" decoding="async" />
         }
         else
         {
-            <div class="cg-ff-hero-placeholder">
+            <div class="cg-ff-cover cg-ff-cover--empty" aria-label="暂无封面">
                 <CgMdiIcon Name="mdiHeartMultiple" aria-hidden="true" />
             </div>
         }
     </div>
-    <div class="cg-ff-hero-content">
-        <h1 class="cg-ff-hero-name">@Model.Name</h1>
+    <div class="cg-ff-hero-main">
+        <div class="cg-ff-hero-top">
+            <span class="cg-ff-type">收藏夹</span>
+        </div>
+        <h1>@Model.Name</h1>
         @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
         {
-            <p class="cg-ff-hero-desc">@Model.BriefIntroduction</p>
+            <p class="cg-ff-brief">@Model.BriefIntroduction</p>
         }
-        <div class="cg-ff-hero-actions">
-            @if (Model.Authority)
-            {
-                <a class="cg-ff-hero-edit-btn" href="/favoritefolders/edit/@Model.Id">
-                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                    <span>编辑</span>
+        @if (!string.IsNullOrWhiteSpace(Model.UserName))
+        {
+            <div class="cg-ff-hero-chips">
+                <a href="/space/index/@Model.UserId" class="cg-ff-chip">
+                    @if (!string.IsNullOrWhiteSpace(Model.UserPhotoPath))
+                    {
+                        <img src="@Model.UserPhotoPath" alt="@Model.UserName" class="cg-ff-chip-avatar" />
+                    }
+                    创建者：@Model.UserName
                 </a>
-            }
-        </div>
+            </div>
+        }
+        @if (Model.Authority)
+        {
+            <div class="cg-ff-hero-actions">
+                <a class="cg-ff-edit-btn" href="/favoritefolders/edit/@Model.Id">
+                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                    <span>编辑收藏夹</span>
+                </a>
+            </div>
+        }
     </div>
-</div>
+</header>
 
 @code {
     [Parameter, EditorRequired]
